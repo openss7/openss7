@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2008-10-30 11:36:18 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-10-31 06:54:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-30 11:36:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1730,25 +1730,23 @@ dnl streams_cv_symver="$streams_cv_lfs_symver"
 # _LFS_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_STRCONF], [dnl
-    strconf_cv_stem='Config'
-    strconf_cv_input='Config.master'
-    if test ${linux_cv_minorbits:-8} -gt 8 ; then
-	strconf_cv_majbase=2001
-    else
-	strconf_cv_majbase=231
-    fi
-    strconf_cv_midbase=5001
-    strconf_cv_config='include/sys/config.h'
-    strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes="src/util/${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
-    strconf_cv_package='LfS'
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
+    AC_REQUIRE([_LINUX_KERNEL])
+    strconf_prefix='streams'
+    AC_CACHE_CHECK([for streams major device number base], [streams_cv_majbase], [dnl
+	if test ${linux_cv_minorbits:-8} -gt 8 ; then
+	    streams_cv_majbase=2001
+	else
+	    streams_cv_majbase=231
+	fi
+    ])
+    AC_CACHE_CHECK([for streams module id base], [streams_cv_midbase], [dnl
+	streams_cv_midbase=5001
+    ])
+    streams_cv_sconfig='include/sys/config.h'
+    streams_cv_mknodes="src/util/${PACKAGE_TARNAME}_mknod.c"
     _STRCONF
+    ((streams_cv_majlast=streams_cv_majbase+10))
+    ((streams_cv_midlast=streams_cv_midbase+10))
 ])# _LFS_STRCONF
 # =============================================================================
 
@@ -1762,6 +1760,9 @@ AC_DEFUN([_LFS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.156  2008-10-31 06:54:53  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.155  2008-10-30 11:36:18  brian
 # - corrections to build
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-10-25 13:19:50 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-10-31 06:54:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-25 13:19:50 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([strbcm],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.22 $) $Date: 2008-10-25 13:19:50 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.23 $) $Date: 2008-10-31 06:54:52 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -189,8 +189,8 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 doc/manual/texi/args.texi
-		 src/modules/Config
-		 src/drivers/Config])
+		 src/modules/streams.conf
+		 src/drivers/streams.conf])
 
 _OPENSS7_OUTPUT
 
@@ -199,6 +199,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.23  2008-10-31 06:54:52  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.22  2008-10-25 13:19:50  brian
 # - updates for autoconf 2.63
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.47 $) $Date: 2008-09-20 11:17:14 $
+# @(#) $RCSfile: strconf.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.48 $) $Date: 2008-10-31 06:54:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-20 11:17:14 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,8 +79,14 @@ AC_DEFUN([_STRCONF_OPTIONS], [dnl
 # _STRCONF_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCONF_SETUP], [dnl
+    AC_MSG_CHECKING([for strconf prefix])
+    if test :${strconf_prefix+set} != :set ; then
+	strconf_prefix='strconf'
+    fi
+    AC_MSG_RESULT([$strconf_prefix])
     AC_MSG_CHECKING([for strconf stem file name])
-    STRCONF_STEM="${strconf_cv_stem:-Config}"
+    eval "STRCONF_STEM=\${${strconf_prefix}_cv_stem:-streams.conf}"
+    eval "${strconf_prefix}_cv_stem=\"\$STRCONF_STEM\""
     AC_MSG_RESULT([$STRCONF_STEM])
     AC_MSG_CHECKING([for strconf config files in $srcdir])
 dnl
@@ -124,13 +130,14 @@ dnl
 	    file is written @<:@default=Config.master@:>@]),
 	[with_strconf_master="$withval"],
 	[with_strconf_master=''])
-    AC_CACHE_CHECK([for strconf master file], [strconf_cv_input], [dnl
-	if test :"${with_strconf_master:-no}" != :no ; then
-	    strconf_cv_input="$with_strconf_master"
-	fi
-    ])
-    STRCONF_INPUT="${strconf_cv_input:-Config.master}"
-dnl
+    AC_MSG_CHECKING([for strconf master file])
+    if test :"${with_strconf_master:-no}" != :no ; then
+	STRCONF_INPUT="$with_strconf_master"
+    else
+	eval "STRCONF_INPUT=\"\${${strconf_prefix}_cv_input:-Config.master}\""
+    fi
+    eval "${strconf_prefix}_cv_input=\"\$STRCONF_INPUT\""
+    AC_MSG_RESULT([${STRCONF_INPUT}])
     AC_ARG_WITH([base-major],
 	AS_HELP_STRING([--with-base-major=MAJOR],
 	    [specify the base major device number from which to start
@@ -139,9 +146,11 @@ dnl
 	[with_base_major=''])
     AC_MSG_CHECKING([for strconf base major device number])
     if test :"${with_base_major:-no}" != :no ; then
-	strconf_cv_majbase="$with_base_major"
+	STRCONF_MAJBASE="$with_base_major"
+    else
+	eval "STRCONF_MAJBASE=\"\${${strconf_prefix}_cv_majbase:-231}\""
     fi
-    STRCONF_MAJBASE="${strconf_cv_majbase:-231}"
+    eval "${strconf_prefix}_cv_majbase=\"\$STRCONF_MAJBASE\""
     AC_MSG_RESULT([${STRCONF_MAJBASE}])
     AC_ARG_WITH([base-modid],
 	AS_HELP_STRING([--with-base-modid=MODID],
@@ -151,40 +160,52 @@ dnl
 	[with_base_modid=''])
     AC_MSG_CHECKING([for strconf base module id number])
     if test :"${with_base_modid:-no}" != :no ; then
-	strconf_cv_midbase="$with_base_modid"
+	STRCONF_MIDBASE="$with_base_modid"
+    else
+	eval "STRCONF_MIDBASE=\"\${${strconf_prefix}_cv_midbase:-1}\""
     fi
-    STRCONF_MIDBASE="${strconf_cv_midbase:-1}"
+    eval "${strconf_prefix}_cv_midbase=\"\$STRCONF_MIDBASE\""
     AC_MSG_RESULT([${STRCONF_MIDBASE}])
     AC_MSG_CHECKING([for strconf configuration header file name])
-    STRCONF_CONFIG="${strconf_cv_config:-include/sys/$PACKAGE_TARNAME/config.h}"
+    eval "STRCONF_CONFIG=\"\${${strconf_prefix}_cv_sconfig:-strconf.h}\""
+    eval "${strconf_prefix}_cv_sconfig=\"\$STRCONF_CONFIG\""
     AC_MSG_RESULT([${STRCONF_CONFIG}])
     AC_MSG_CHECKING([for strconf modules include file name])
-    STRCONF_MODCONF="${strconf_cv_modconf:-head/modconf.inc}"
+    eval "STRCONF_MODCONF=\"\${${strconf_prefix}_cv_modconf:-modconf.h}\""
+    eval "${strconf_prefix}_cv_modconf=\"\$STRCONF_MODCONF\""
     AC_MSG_RESULT([${STRCONF_MODCONF}])
     AC_MSG_CHECKING([for strconf modules makefile include file name])
-    STRCONF_DRVCONF="${strconf_cv_drvconf:-drvconf.mk}"
+    eval "STRCONF_DRVCONF=\"\${${strconf_prefix}_cv_drvconf:-drvconf.mk}\""
+    eval "${strconf_prefix}_cv_drvconf=\"\$STRCONF_DRVCONF\""
     AC_MSG_RESULT([${STRCONF_DRVCONF}])
     AC_MSG_CHECKING([for strconf kernel modules configuration file name])
-    STRCONF_CONFMOD="${strconf_cv_confmod:-conf.modules}"
+    eval "STRCONF_CONFMOD=\"\${${strconf_prefix}_cv_confmod:-conf.modules}\""
+    eval "${strconf_prefix}_cv_confmod=\"\$STRCONF_CONFMOD\""
     AC_MSG_RESULT([${STRCONF_CONFMOD}])
     AC_MSG_CHECKING([for strconf rpm devices list file name])
-    STRCONF_MAKEDEV="${strconf_cv_makedev:-devices.lst}"
+    eval "STRCONF_MAKEDEV=\"\${${strconf_prefix}_cv_makedev:-devices.lst}\""
+    eval "${strconf_prefix}_cv_makedev=\"\$STRCONF_MAKEDEV\""
     AC_MSG_RESULT([${STRCONF_MAKEDEV}])
     AC_MSG_CHECKING([for strconf makenodes source file name])
-    STRCONF_MKNODES="${strconf_cv_mknodes:-util/linux/strmakenodes.c}"
+    eval "STRCONF_MKNODES=\"\${${strconf_prefix}_cv_mknodes:-${PACKAGE_TARNAME}_mknod.c}\""
+    eval "${strconf_prefix}_cv_mknodes=\"\$STRCONF_MKNODES\""
     STRMAKENODES=`basename "$STRCONF_MKNODES" .c`
     AC_MSG_RESULT([${STRCONF_MKNODES}])
     AC_MSG_CHECKING([for strconf strsetup configuration file name])
-    STRCONF_STSETUP="${strconf_cv_stsetup:-strsetup.conf}"
+    eval "STRCONF_STSETUP=\"\${${strconf_prefix}_cv_strsetup:-strsetup.conf}\""
+    eval "${strconf_prefix}_cv_strsetup=\"\$STRCONF_STSETUP\""
     AC_MSG_RESULT([${STRCONF_STSETUP}])
     AC_MSG_CHECKING([for strconf strload configuration file name])
-    STRCONF_STRLOAD="${strconf_cv_strload:-strload.conf}"
+    eval "STRCONF_STRLOAD=\"\${${strconf_prefix}_cv_strload:-strload.conf}\""
+    eval "${strconf_prefix}_cv_strload=\"\$STRCONF_STRLOAD\""
     AC_MSG_RESULT([${STRCONF_STRLOAD}])
     AC_MSG_CHECKING([for strconf STREAMS package])
-    STRCONF_PACKAGE="${strconf_cv_package:-LiS}"
+    eval "STRCONF_PACKAGE=\"\${${strconf_prefix}_cv_package:-\${streams_cv_package:-LfS}}\""
+    eval "${strconf_prefix}_cv_package=\"\$STRCONF_PACKAGE\""
     AC_MSG_RESULT([${STRCONF_PACKAGE}])
     AC_MSG_CHECKING([for strconf minor bits])
-    STRCONF_MINORSZ="${strconf_cv_minorbits:-8}"
+    eval "STRCONF_MINORSZ=\"\${${strconf_prefix}_cv_minorbits:-\${linux_cv_minorbits:-8}}\""
+    eval "${strconf_prefix}_cv_minorbits=\"\$STRCONF_MINORSZ\""
     AC_MSG_RESULT([${STRCONF_MINORSZ}])
 dnl
 dnl Allow the user to specify a package directory that is completely outside
@@ -506,6 +527,9 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: strconf.m4,v $
+# Revision 0.9.2.48  2008-10-31 06:54:51  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.47  2008-09-20 11:17:14  brian
 # - build system updates
 #

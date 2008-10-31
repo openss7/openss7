@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 11:36:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-31 06:54:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-30 11:36:20 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -216,34 +216,27 @@ AC_DEFUN([_XNSL_CONFIG], [dnl
 # _XNSL_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNSL_STRCONF], [dnl
-    strconf_cv_stem='Config'
-    strconf_cv_input='Config.master'
-    strconf_cv_majbase=220
-    strconf_cv_midbase=70
-    if test ${streams_cv_package:-LfS} = LfS ; then
-	if test ${linux_cv_minorbits:-8} -gt 8 ; then
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-	    ((strconf_cv_majbase+=2000))
-	fi
-dnl
-dnl Get these away from device numbers.
-dnl
-	((strconf_cv_midbase+=5000))
-    fi
-    strconf_cv_config='strconf.h'
-    strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
-    strconf_cv_package=${streams_cv_package:-LiS}
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF dnl
+    strconf_prefix='nsl'
+    AC_CACHE_CHECK([for nsl major device number base], [nsl_cv_majbase], [dnl
+	nsl_cv_majbase=220
+	if test ${streams_cv_package:-LfS} = LfS ; then
+	    if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		((nsl_cv_majbase+=2000))
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for nsl module id base], [nsl_cv_midbase], [dnl
+	nsl_cv_midbase=70
+	if test ${streams_cv_package:-LfS} = LfS ; then
+	    if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		((nsl_cv_midbase+=5000))
+	    fi
+	fi
+    ])
+    _STRCONF
+    ((nsl_cv_majlast=nsl_cv_majbase+10))
+    ((nsl_cv_midlast=nsl_cv_midbase+10))
 ])# _XNSL_STRCONF
 # =============================================================================
 
@@ -257,6 +250,9 @@ AC_DEFUN([_XNSL_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.13  2008-10-31 06:54:54  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.12  2008-10-30 11:36:20  brian
 # - corrections to build
 #

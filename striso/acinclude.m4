@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-10-30 11:36:19 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-10-31 06:54:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-30 11:36:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -410,7 +410,7 @@ AC_DEFUN([_ISO_CONFIG_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_OUTPUT], [dnl
     _ISO_CONFIG
-    _ISO_STRCONF dnl
+    _ISO_STRCONF
 ])# _ISO_OUTPUT
 # =============================================================================
 
@@ -438,34 +438,35 @@ AC_DEFUN([_ISO_CONFIG], [dnl
 # _ISO_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_STRCONF], [dnl
-    strconf_cv_stem='lis.conf'
-    strconf_cv_input='Config.master'
-    strconf_cv_majbase=206
-    strconf_cv_midbase=120
-    if test ${streams_cv_package:-LfS} = LfS ; then
-	if test ${linux_cv_minorbits:-8} -gt 8 ; then
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-	    ((strconf_cv_majbase+=2000))
-	fi
-dnl
-dnl Get these away from device numbers.
-dnl
-	((strconf_cv_midbase+=5000))
-    fi
-    strconf_cv_config='strconf.h'
-    strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
-    strconf_cv_package=${streams_cv_package:-LiS}
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF dnl
+    strconf_prefix='iso'
+    AC_CACHE_CHECK([for iso major device number base], [iso_cv_majbase], [dnl
+	if test ${chan_cv_majbase-0} -gt 4 ; then
+	    ((iso_cv_majbase=chan_cv_majbase-4))
+	else
+	    iso_cv_majbase=206
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((iso_cv_majbase+=2000))
+		fi
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for iso module id base], [iso_cv_midbase], [dnl
+	if test ${chan_cv_midbase-0} -gt 0 ; then
+	    ((iso_cv_midbase=chan_cv_midbase+10))
+	else
+	    iso_cv_midbase=120
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((iso_cv_midbase+=5000))
+		fi
+	    fi
+	fi
+    ])
+    _STRCONF
+    ((iso_cv_majlast=iso_cv_majbase+10))
+    ((iso_cv_midlast=iso_cv_midbase+10))
 ])# _ISO_STRCONF
 # =============================================================================
 
@@ -479,6 +480,9 @@ AC_DEFUN([_ISO_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.28  2008-10-31 06:54:54  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.27  2008-10-30 11:36:19  brian
 # - corrections to build
 #

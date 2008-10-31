@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-10-25 13:19:49 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-10-31 06:54:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-25 13:19:49 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.54 $) $Date: 2008-10-25 13:19:49 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.55 $) $Date: 2008-10-31 06:54:52 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -201,23 +201,23 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/sli/Makefile
 		 doc/specs/sdli/Makefile
 		 doc/specs/sdti/Makefile
-		 src/modules/ti/lis.conf
-		 src/modules/inet/lis.conf
-		 src/modules/sctp/lis.conf
-		 src/modules/m2pa/lis.conf
-		 src/modules/ss7ip/lis.conf
-		 src/modules/ss7sctp/lis.conf
-		 src/modules/cd/lis.conf
-		 src/modules/dl/lis.conf
-		 src/modules/m2tp/lis.conf
-		 src/modules/m2ua/lis.conf
-		 src/modules/m3ua/lis.conf
-		 src/modules/sua/lis.conf
-		 src/modules/tali/lis.conf
-		 src/modules/tua/lis.conf
-		 src/modules/mg/lis.conf
-		 src/modules/isdn/lis.conf
-		 src/modules/h225/lis.conf])
+		 src/modules/ti/streams.conf
+		 src/modules/inet/streams.conf
+		 src/modules/sctp/streams.conf
+		 src/modules/m2pa/streams.conf
+		 src/modules/ss7ip/streams.conf
+		 src/modules/ss7sctp/streams.conf
+		 src/modules/cd/streams.conf
+		 src/modules/dl/streams.conf
+		 src/modules/m2tp/streams.conf
+		 src/modules/m2ua/streams.conf
+		 src/modules/m3ua/streams.conf
+		 src/modules/sua/streams.conf
+		 src/modules/tali/streams.conf
+		 src/modules/tua/streams.conf
+		 src/modules/mg/streams.conf
+		 src/modules/isdn/streams.conf
+		 src/modules/h225/streams.conf])
 
 _OPENSS7_OUTPUT
 
@@ -226,6 +226,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.55  2008-10-31 06:54:52  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.54  2008-10-25 13:19:49  brian
 # - updates for autoconf 2.63
 #

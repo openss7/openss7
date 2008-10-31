@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2008-10-30 11:36:19 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2008-10-31 06:54:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-30 11:36:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1276,7 +1276,7 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_OUTPUT], [dnl
     _INET_CONFIG
-    _INET_STRCONF dnl
+    _INET_STRCONF
 ])# _INET_OUTPUT
 # =============================================================================
 
@@ -1304,34 +1304,35 @@ AC_DEFUN([_INET_CONFIG], [dnl
 # _INET_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_STRCONF], [dnl
-    strconf_cv_stem='lis.conf'
-    strconf_cv_input='Config.master'
-    strconf_cv_majbase=212
-    strconf_cv_midbase=90
-    if test ${streams_cv_package:-LfS} = LfS ; then
-	if test ${linux_cv_minorbits:-8} -gt 8 ; then
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-	    ((strconf_cv_majbase+=2000))
-	fi
-dnl
-dnl Get these away from device numbers.
-dnl
-	((strconf_cv_midbase+=5000))
-    fi
-    strconf_cv_config='strconf.h'
-    strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
-    strconf_cv_package=${streams_cv_package:-LiS}
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF dnl
+    strconf_prefix='inet'
+    AC_CACHE_CHECK([for inet major device number base], [inet_cv_majbase], [dnl
+	if test ${sctp_cv_majbase-0} -gt 3 ; then
+	    ((inet_cv_majbase=sctp_cv_majbase-3))
+	else
+	    inet_cv_majbase=212
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((inet_cv_majbase+=2000))
+		fi
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for inet module id base], [inet_cv_midbase], [dnl
+	if test ${sctp_cv_midbase-0} -gt 0 ; then
+	    ((inet_cv_midbase=sctp_cv_midbase+10))
+	else
+	    inet_cv_midbase=90
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((inet_cv_midbase+=5000))
+		fi
+	    fi
+	fi
+    ])
+    _STRCONF
+    ((inet_cv_majlast=inet_cv_majbase+10))
+    ((inet_cv_midlast=inet_cv_midbase+10))
 ])# _INET_STRCONF
 # =============================================================================
 
@@ -1345,6 +1346,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.90  2008-10-31 06:54:53  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.89  2008-10-30 11:36:19  brian
 # - corrections to build
 #

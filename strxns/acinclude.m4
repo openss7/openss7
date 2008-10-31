@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008-10-30 11:36:22 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-10-31 06:54:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-30 11:36:22 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1095,7 +1095,7 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_OUTPUT], [dnl
     _XNS_CONFIG
-    _XNS_STRCONF dnl
+    _XNS_STRCONF
 ])# _XNS_OUTPUT
 # =============================================================================
 
@@ -1123,34 +1123,35 @@ AC_DEFUN([_XNS_CONFIG], [dnl
 # _XNS_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_STRCONF], [dnl
-    strconf_cv_stem='lis.conf'
-    strconf_cv_input='Config.master'
-    strconf_cv_majbase=222
-    strconf_cv_midbase=50
-    if test ${streams_cv_package:-LfS} = LfS ; then
-	if test ${linux_cv_minorbits:-8} -gt 8 ; then
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-	    ((strconf_cv_majbase+=2000))
-	fi
-dnl
-dnl Get these away from device numbers.
-dnl
-	((strconf_cv_midbase+=5000))
-    fi
-    strconf_cv_config='strconf.h'
-    strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
-    strconf_cv_package=${streams_cv_package:-LiS}
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF dnl
+    strconf_prefix='xns'
+    AC_CACHE_CHECK([for xns major device number base], [xns_cv_majbase], [dnl
+	if test ${streams_cv_majbase-0} -gt 9 ; then
+	    ((xns_cv_majbase=streams_cv_majbase-0))
+	else
+	    xns_cv_majbase=222
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((xns_cv_majbase+=2000))
+		fi
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for xns module id base], [xns_cv_midbase], [dnl
+	if test ${streams_cv_midbase-0} -gt 0 ; then
+	    ((xns_cv_midbase=streams_cv_midbase+10))
+	else
+	    xns_cv_midbase=50
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((xns_cv_midbase+=5000))
+		fi
+	    fi
+	fi
+    ])
+    _STRCONF
+    ((xns_cv_majlast=xns_cv_majbase+10))
+    ((xns_cv_midlast=xns_cv_midbase+10))
 ])# _XNS_STRCONF
 # =============================================================================
 
@@ -1164,6 +1165,9 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.70  2008-10-31 06:54:57  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.69  2008-10-30 11:36:22  brian
 # - corrections to build
 #

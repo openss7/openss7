@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-30 11:36:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-10-31 06:54:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-30 11:36:20 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -332,7 +332,7 @@ AC_DEFUN([_TTY_CONFIG_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TTY_OUTPUT], [dnl
     _TTY_CONFIG
-    _TTY_STRCONF dnl
+    _TTY_STRCONF
 ])# _TTY_OUTPUT
 # =============================================================================
 
@@ -360,34 +360,35 @@ AC_DEFUN([_TTY_CONFIG], [dnl
 # _TTY_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TTY_STRCONF], [dnl
-    strconf_cv_stem='Config'
-    strconf_cv_input='Config.master'
-    strconf_cv_majbase=253
-    strconf_cv_midbase=40
-    if test ${streams_cv_package:-LfS} = LfS ; then
-	if test ${linux_cv_minorbits:-8} -gt 8 ; then
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-	    ((strconf_cv_majbase+=2000))
-	fi
-dnl
-dnl Get these away from device numbers.
-dnl
-	((strconf_cv_midbase+=5000))
-    fi
-    strconf_cv_config='strconf.h'
-    strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
-    strconf_cv_package=${streams_cv_package:-LiS}
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF dnl
+    strconf_prefix='tty'
+    AC_CACHE_CHECK([for tty major device number base], [tty_cv_majbase], [dnl
+	if test ${strcomp_cv_majlast-0} -gt 0 ; then
+	    ((tty_cv_majbase=strcomp_cv_majlast+1))
+	else
+	    tty_cv_majbase=253
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((tty_cv_majbase+=2000))
+		fi
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for tty module id base], [tty_cv_midbase], [dnl
+	if test ${strcomp_cv_midbase-0} -gt 0 ; then
+	    ((tty_cv_midbase=strcomp_cv_majbase+20))
+	else
+	    tty_cv_midbase=40
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((tty_cv_midbase+=5000))
+		fi
+	    fi
+	fi
+    ])
+    _STRCONF
+    ((tty_cv_majlast=tty_cv_majbase+10))
+    ((tty_cv_midlast=tty_cv_midbase+10))
 ])# _TTY_STRCONF
 # =============================================================================
 
@@ -401,6 +402,9 @@ AC_DEFUN([_TTY_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.16  2008-10-31 06:54:56  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.15  2008-10-30 11:36:20  brian
 # - corrections to build
 #

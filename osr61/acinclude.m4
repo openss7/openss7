@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-10-30 11:36:17 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-10-31 06:54:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-30 11:36:17 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -892,7 +892,7 @@ my_autoconf_function_pointer1 = my_autoconf_function_pointer2;
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OSR61_OUTPUT], [dnl
     _OSR61_CONFIG
-    _OSR61_STRCONF dnl
+    _OSR61_STRCONF
 ])# _OSR61_OUTPUT
 # =============================================================================
 
@@ -920,34 +920,35 @@ AC_DEFUN([_OSR61_CONFIG], [dnl
 # _OSR61_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OSR61_STRCONF], [dnl
-    strconf_cv_stem='Config'
-    strconf_cv_input='Config.master'
-    strconf_cv_majbase=252
-    strconf_cv_midbase=30
-    if test ${streams_cv_package:-LfS} = LfS ; then
-	if test ${linux_cv_minorbits:-8} -gt 8 ; then
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-	    ((strconf_cv_majbase+=2000))
-	fi
-dnl
-dnl Get these away from device numbers.
-dnl
-	((strconf_cv_midbase+=5000))
-    fi
-    strconf_cv_config='strconf.h'
-    strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
-    strconf_cv_package=${streams_cv_package:-LiS}
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF dnl
+    strconf_prefix='osr'
+    AC_CACHE_CHECK([for osr major device number base], [osr_cv_majbase], [dnl
+	if test ${strcomp_cv_majlast-0} -gt 0 ; then
+	    osr_cv_majbase=$strcomp_cv_majlast
+	else
+	    osr_cv_majbase=252
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((osr_cv_majbase+=2000))
+		fi
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for osr module id base], [osr_cv_midbase], [dnl
+	if test ${strcomp_cv_midbase=0} -gt 0 ; then
+	    ((osr_cv_midbase=strcomp_cv_midbase+10))
+	else
+	    osr_cv_midbase=30
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((osr_cv_midbase+=5000))
+		fi
+	    fi
+	fi
+    ])
+    _STRCONF
+    ((osr_cv_majlast=osr_cv_majbase+10))
+    ((osr_cv_midlast=osr_cv_midbase+10))
 ])# _OSR61_STRCONF
 # =============================================================================
 
@@ -961,6 +962,9 @@ AC_DEFUN([_OSR61_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.20  2008-10-31 06:54:51  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.19  2008-10-30 11:36:17  brian
 # - corrections to build
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-30 11:36:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-10-31 06:54:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-30 11:36:20 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1158,7 +1158,7 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_OUTPUT], [dnl
     _SCTP_CONFIG
-    _SCTP_STRCONF dnl
+    _SCTP_STRCONF
 ])# _SCTP_OUTPUT
 # =============================================================================
 
@@ -1445,34 +1445,35 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
 # _SCTP_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_STRCONF], [dnl
-    strconf_cv_stem='lis.conf'
-    strconf_cv_input='Config.master'
-    strconf_cv_majbase=215
-    strconf_cv_midbase=100
-    if test ${streams_cv_package:-LfS} = LfS ; then
-	if test ${linux_cv_minorbits:-8} -gt 8 ; then
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-	    ((strconf_cv_majbase+=2000))
-	fi
-dnl
-dnl Get these away from device numbers.
-dnl
-	((strconf_cv_midbase+=5000))
-    fi
-    strconf_cv_config='strconf.h'
-    strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
-    strconf_cv_package=${streams_cv_package:-LiS}
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF dnl
+    strconf_prefix='sctp'
+    AC_CACHE_CHECK([for sctp major device number base], [sctp_cv_majbase], [dnl
+	if test ${x25_cv_majbase-0} -gt 3 ; then
+	    ((sctp_cv_majbase=x25_cv_majbase-3))
+	else
+	    sctp_cv_majbase=215
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((sctp_cv_majbase+=2000))
+		fi
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for sctp module id base], [sctp_cv_midbase], [dnl
+	if test ${x25_cv_midbase-0} -ft 0 ; then
+	    ((sctp_cv_midbase=x25_cv_midbase+10))
+	else
+	    sctp_cv_midbase=100
+	    if test ${streams_cv_package:-LfS} = LfS ; then
+		if test ${linux_cv_minorbits:-8} -gt 8 ; then
+		    ((sctp_cv_midbase+=5000))
+		fi
+	    fi
+	fi
+    ])
+    _STRCONF
+    ((sctp_cv_majlast=sctp_cv_majbase+10))
+    ((sctp_cv_midlast=sctp_cv_midbase+10))
 ])# _SCTP_STRCONF
 # =============================================================================
 
@@ -1486,6 +1487,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.84  2008-10-31 06:54:55  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.83  2008-10-30 11:36:20  brian
 # - corrections to build
 #
