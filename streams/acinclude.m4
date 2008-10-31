@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-10-31 06:54:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2008-10-31 07:10:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-31 06:54:53 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 07:10:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1732,6 +1732,7 @@ dnl streams_cv_symver="$streams_cv_lfs_symver"
 AC_DEFUN([_LFS_STRCONF], [dnl
     AC_REQUIRE([_LINUX_KERNEL])
     strconf_prefix='streams'
+    streams_cv_stem='Config'
     AC_CACHE_CHECK([for streams major device number base], [streams_cv_majbase], [dnl
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 	    streams_cv_majbase=2001
@@ -1760,6 +1761,9 @@ AC_DEFUN([_LFS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.157  2008-10-31 07:10:32  brian
+# - move config files back for streams due to conflict
+#
 # Revision 0.9.2.156  2008-10-31 06:54:53  brian
 # - move config files, better strconf handling
 #
