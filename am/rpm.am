@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2008-10-30 11:36:15 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2008-10-31 10:30:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-10-30 11:36:15 $ by $Author: brian $
+## Last Modified $Date: 2008-10-31 10:30:51 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -211,28 +211,24 @@ $(rpm_tar_file)::
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; \
-	};  \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; };  \
 	d=; test -f $$f || d='$(srcdir)/'; \
 	test ! \( "$@" -ef "$$d$$f" \) || exit 0; \
-	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
 		$(ECHO) "cp -f -- $$d$$f $@"; \
-		cp -f -- $$d$$f $@; \
-	}
+		cp -f -- $$d$$f $@; }
 
 $(rpm_spec_file) $(rpm_img_files)::
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; \
-	};  \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; };  \
 	d=; test -f $$f || d='$(srcdir)/'; \
 	test ! \( "$@" -ef "$$d$$f" \) || exit 0; \
-	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
 		$(ECHO) "cp -f -- $$d$$f $@"; \
-		cp -f -- $$d$$f $@; \
-	}
+		cp -f -- $$d$$f $@; }
 
 ##
 # This builds an SRPM for the current target.
@@ -248,8 +244,12 @@ $(rpm_spec_file) $(rpm_img_files)::
 ##
 
 $(rpm_src_file):: $(rpm_source_files)
-	$(MAKE) $(AM_MAKEFLAGS) -- $(rpm_directories)
-	$(RPMBUILD) -bs $(SRPMFLAGS) $(RPMSOPTS) --target $(target) -- $<
+	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) -- $(rpm_directories)" ; \
+	$(MAKE) $(AM_MAKEFLAGS) -- $(rpm_directories) ; \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
+		$(ECHO) "$(RPMBUILD) -bs $(SRPMFLAGS) $(RPMSOPTS) --target $(target) -- $<" ; \
+		$(RPMBUILD) -bs $(SRPMFLAGS) $(RPMSOPTS) --target $(target) -- $< ; }
 
 ##
 ## This rule must come after the one above.
@@ -257,14 +257,14 @@ $(rpm_src_file):: $(rpm_source_files)
 $(rpm_link_file)::
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@f=$(srcrpmdir)/`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
-	test ! \( "$@" -ef "$$f" \) || exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; }; \
 	test ! \( "$@" -ef "$$f" \) || exit 0; \
-	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
-		$(ECHO) "cp -f --link -- $$f $@"; \
-		cp -f --link -- $$f $@; }
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
+		$(ECHO) "cp -f --link -- $$d$$f $@"; \
+		cp -f --link -- $$d$$f $@; }
 
 #! srpm:
 #!     This target generates the source rpm for the package (without signing the
@@ -873,13 +873,11 @@ $(repomd_group)::
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
 	d=; test -f $$f || d='$(srcdir)/'; \
 	test -f "$$d$$f" || { \
-		touch $$f; exit 0; \
-	}; \
+		touch $$f; exit 0; }; \
 	test ! \( "$@" -ef "$$d$$f" \) || exit 0; \
-	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
+	test ":$(FORCE)" != :force -a -f "$@"  || { \
 		$(ECHO) "cp -f -- $$d$$f $@"; \
-		cp -f -- $$d$$f $@; \
-	}
+		cp -f -- $$d$$f $@; }
 
 $(repodir)/openss7.repo: $(repodir)
 	( \
@@ -1083,6 +1081,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.163  2008-10-31 10:30:51  brian
+## - do no rebuild stuff already in the repository
+##
 ## Revision 0.9.2.162  2008-10-30 11:36:15  brian
 ## - corrections to build
 ##
