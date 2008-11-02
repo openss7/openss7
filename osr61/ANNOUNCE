@@ -308,3 +308,142 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Wed Oct 29 14:21:27 2008
+Date: Wed, 29 Oct 2008 14:21:27 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			osr61
+Version:		0.9.2.3
+Entered-date:		2008-10-31
+Description:		Dialogic Open Systems Release 6.1.
+			Dialogic Open System Release 6.1 STREAMS Drivers.
+			The osr61 package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of STREAMS modules and
+			drivers.
+			This package provides the Dialogic OSR 6.1 GPL Drivers
+			modified to compile for Linux Fast-STREAMS.
+			This distribution is currently applicable to 2.4 and 2.6
+			kernels and was targetted at ix86, x86_64, pcc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		STREAMS, SVR 4.2 MP, LiS, LfS, OSR61
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			3M osr61-0.9.2.3.tar.gz
+			2M osr61-0.9.2.3.tar.bz2
+			2M osr61-0.9.2.3.tar.lzma
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M osr61-0.9.2.3-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0.9.2.4 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.7-1, strxns 0:0.9.2.7-1
+			strxnet 0:0.9.2.12-1
+Copying-policy:		AGPL
+End
+
+From bidulock@openss7.org Wed Oct 29 14:21:27 2008
+Date: Wed, 29 Oct 2008 14:21:27 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: osr61 0.9.2.3 Released - OpenSS7 Dialogic Open System Release 6.1
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package osr61-0.9.2.3 was released under AGPLv3 2008-10-31.
+
+The Dialogic Open Systems Release 6.1 package provides STREAMS modules
+and drivers, libraries, programs, init scripts, and daemons that
+implement the Dialogic(R) Open System Release 6.1 drivers for Linux
+Fast-STREAMS.
+
+This is an OpenSS7 Project modified release of the GPL Dialogic(R) OSR
+6.1 Release 239 drivers modified for use with Linux Fast-STREAMS.
+
+The Dialogic Open Systems Release 6.1 package includes kernel modules,
+SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of Dialogic Open Systems Release 6.1 components and applications for the
+SVR 4.2 STREAMS environment. It provides true STREAMS-based Dialogic(R)
+OSR 6.1 drivers for Linux. This is the third release from The OpenSS7
+Project of the Dialogic Open Systems Release 6.1 package and is now part
+of the OpenSS7 Master Package (openss7-0.9.2.F). This package provides
+dlgn, mercd and pmacd device drivers, as well as a dvbm and sctmr
+module. Additional drivers are the gncfd and gpio modules. The package
+contains all the necessary manual pages and other documentation for
+components in an autoconf tarball.
+
+This release is the third public release.
+
+Major features are as follows:
+
+  - Minor documentation corrections.
+  - Kernel module license made explicit GPL v2. And then changed back
+    to GPL.
+  - License upgrade to AGPL Version 3.
+  - Modifications to build under Fedora 2.6.22.5-49 kernel. These
+    changes also support 2.6.22.9-91.fc7 kernel. Changed deprecated
+    SA_SHIRQ flag to IRQF_SHARED; use pci_register_driver() instead of
+    obsolete pci_module_init().
+  - Ability to strap out major documentation build and installation
+    primarily for embedded targets.
+  - Improvements to common build process for embedded and
+    cross-compile targets.
+  - Modifications to build under Fedora 2.6.25-45.fc9 and
+    2.6.26.5-45.fc9 kernels.
+  - Updated tool chain to m4-1.4.12, autoconf-2.63 and texinfo-4.13.
+  - Conversion of RPM spec files to common approach for major
+    subpackages.
+  - Updated references database for manual pages and roff documents.
+  - Build system now builds yum(8) repositories for RPMs and
+    apt-get(8) repositories for DEBs. Installation documentation has
+    been updated to include details of repository install sourcesref.
+  - Added MODULE_VERSION to all modules and drivers.
+  - Build corrections for recent RHAS4 kernels that define an
+    irq_handler_t that takes a 3 arguments function template.
+
+This is another public alpha release of the package. Please see
+README-alpha in the release, or Maturity, in the manual.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the GNU Affero General Public
+License (AGPL) Version 3.  The release is available as an autoconf
+tarball, SRPM, DSC, and set of binary RPMs and DEBs. See the downloads
+page for the autoconf tarballs, SRPMs and DSCs. See the osr61 package
+page for tarballs, SRPMs, DSCs, and binary RPMs and DEBs.
+
+See <http://www.openss7.org/codefiles/osr61-0.9.2.3/ChangeLog> and
+<http://www.openss7.org/codefiles/osr61-0.9.2.3/NEWS> in the release, or
+<http://www.openss7.org/osr61_manual.html#Release-Notes> in the manual,
+for more information. Also, see the osr61.pdf manual in the release
+(also in html <http://www.openss7.org/osr61_manual.html>).
+
+For the news release, see <http://www.openss7.org/rel20081029_0.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
