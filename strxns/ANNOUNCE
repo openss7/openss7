@@ -526,3 +526,148 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Wed Oct 29 14:18:52 2008
+Date: Wed, 29 Oct 2008 14:18:52 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			strxns
+Version:		0.9.2.7
+Entered-date:		2008-10-31
+Description:		OpenSS7 XNS Networking.
+			X/Open Network Services (XNS) for Linux Fast-STREAMS.
+			The strxns package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of X/Open Network Services
+			(XNS) protocol stack components and applications for the
+			SVR 4.2 STREAMS environment.
+			This distribution is currently applicable to Linux 2.4
+			and 2.6 kernels and was targetted at ix86, x86_64, ppc
+			and ppc64 architectures, but should build and install
+			for other architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		XNS, CDI, DLPI, NPI, DL
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			7M strxns-0.9.2.7.tar.gz
+			6M strxns-0.9.2.7.tar.bz2
+			5M strxns-0.9.2.7.tar.lzma
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			6M strxns-0.9.2.7-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0.9.2.4 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.7-1.
+Copying-policy:		AGPL
+End
+
+From bidulock@openss7.org Wed Oct 29 14:18:52 2008
+Date: Wed, 29 Oct 2008 14:18:52 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: strxns 0.9.2.7 Released - STREAMS XNS 5.2 Networking for Linux
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package strxns-0.9.2.7 was released under AGPLv3 2008-10-31.
+
+The OpenSS7 XNS Networking package is an implementation of X/Open
+Network Services (XNS 5.2) for Linux Fast-STREAMS and provides OSI
+conforming CDI, DLPI and NPI header files as well as several DLPI and
+NPI modules and drivers that convert between Linux Native IP interface
+and the STREAMS DLPI and NPI interface. One allows DLPI drivers to be
+added to Linux as IP interfaces, another provides DLPI access to native
+Linux IP interfaces, and a third provides NPI access to the Linux IP
+subsystem.
+
+This is another separate release from the OpenSS7 Project of the OpenSS7
+XNS Networking package, formerly part of the (now deprecated) Linux
+STREAMS (LiS) package. These networking modules provide DLPI, NPI and
+Linux IP drivers, as well as providing CDI, DLPI and NPI header files.
+The package contains all the necessary manual pages and other
+documentation for XNS components in a separate autoconf tarball.
+
+This release is primarily a maintenance release supporting recent
+distributions and tool chains. This release is a stable production
+release for Linux Fast-STREAMS.
+
+Major features since the last public release are as follows:
+
+  - Minor documentation corrections.
+  - Kernel module license made explicit GPL v2. And then changed back
+    to GPL.
+  - License upgrade to AGPL Version 3.
+  - Modifications to build under Fedora 2.6.22.5-49 kernel. These
+    changes also support 2.6.22.9-91.fc7 kernel. New DEV_BASE list and
+    new sk_buff format.
+  - Ability to strap out major documentation build and installation
+    primarily for embedded targets.
+  - Improvements to common build process for embedded and
+    cross-compile targets.
+  - Modifications to build under Fedora 2.6.25-45.fc9 and
+    2.6.26.5-45.fc9 kernels.
+  - Updated tool chain to m4-1.4.12, autoconf-2.63 and texinfo-4.13.
+  - Conversion of RPM spec files to common approach for major
+    subpackages.
+  - Updated references database for manual pages and roff(1)
+    documents.
+  - Build system now builds yum(8) repositories for RPMs and
+    apt-get(8) repositories for DEBs. Installation documentation has
+    been updated to include details of repository install sourcesref.
+  - Added MODULE_VERSION to all modules and drivers.
+  - Addition of an np_udp(4) driver similar to np_ip(4) driver. (Not
+    yet part of build.)
+  - Added CDI interface specification texinfo (info, html, pdf)
+    document. Updated DLPI and NPI interface specification documents.
+    Added new dlpi_porting document. Added DL_* primitives compatible
+    with AIX, HP-UX, Solaris and others.
+  - Added four major libraries: the cdiapi(3), dlpiapi(3), npiapi(3)
+    and libdlpi(3) libraries and associated documentation. Most of
+    these libraries are incomplete and require test suites.
+  - Addition of dlpi(4) driver, llc(4) driver, llc2(4) driver, lcd(4)
+    driver, cddev(4) driver. Improvements to np_ip(4) driver. Many of
+    these new drivers are currently untested.
+
+This is a public stable production grade release of the package: it
+deprecates previous releases. Please upgrade to the current release
+before reporting bugs.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the GNU Affero General Public
+License (AGPL) Version 3.  The release is available as an autoconf
+tarball, SRPM, DSC, and set of binary RPMs and DEBs. See the downloads
+page for the autoconf tarballs, SRPMs and DSCs. See the strxns package
+page for tarballs, SRPMs, DSCs, and binary RPMs and DEBs.
+
+See <http://www.openss7.org/codefiles/strxns-0.9.2.7/ChangeLog> and
+<http://www.openss7.org/codefiles/strxns-0.9.2.7/NEWS> in the release,
+or <http://www.openss7.org/strxns_manual.html#Release-Notes> in the
+manual, for more information. Also, see the strxns.pdf manual in the
+release (also in html <http://www.openss7.org/strxns_manual.html>).
+
+For the news release, see <http://www.openss7.org/rel20081029_F.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

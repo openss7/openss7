@@ -366,3 +366,118 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Wed Oct 29 14:21:27 2008
+Date: Wed, 29 Oct 2008 14:21:27 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			sctp
+Version:		0.2.27
+Entered-date:		2008-10-31
+Description:		OpenSS7 Linux Native SCTP.
+			OpenSS7 Linux Native SCTP (Stream Control Transmission
+			Protocol).
+			sctp is the OpenSS7 Linux Native (Sockets) Kernel
+			implementation of Stream Control Transmission Protocol
+			(SCTP).
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		SCTP, SIGTRAN, OpenSS7, Sockets, Telecommunications
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			3M sctp-0.2.27.tar.gz
+			2M sctp-0.2.27.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M sctp-0.2.27-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4
+Copying-policy:		AGPL
+End
+
+From bidulock@openss7.org Wed Oct 29 14:21:27 2008
+Date: Wed, 29 Oct 2008 14:21:27 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>
+Subject: sctp 0.2.27 Released - Linux Native SCTP
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package sctp-0.2.27 was released under AGPLv3 2008-10-31.
+
+The OpenSS7 Linux Native SCTP package is the OpenSS7 Linux Native
+(Sockets) Kernel implementation of Stream Control Transmission Protocol
+(SCTP). For information on using the implementation see sctp(7) Linux
+manual page and look at the test programs in sctp-0.2.27/test/.
+
+This is the twenty-seventh release of the Linux Native (Sockets) SCTP
+from the OpenSS7 Project. This release, as with other releases, on
+builds and installs on 2.4 kernels. This package is not as important to
+the OpenSS7 Project as the STREAMS version of SCTP, which provides the
+basis for all of the SIGTRAN components for the OpenSS7 stacks.  Also,
+the STREAMS version runs on both 2.4 and 2.6 kernels.
+
+This is a stable production release: it deprecates previous releases.
+Please upgrade to the current release before reporting bugs.
+
+This is primarily a maintenance release correcting reported bugs, but
+also includes the latest packaging improvements.
+
+Major features since the last public release are as follows:
+
+  - Minor documentation corrections.
+  - Kernel module license made explicit "GPL v2". And then changed
+    back to "GPL".
+  - License upgrade to AGPL Version 3.
+  - Ability to strap out major documentation build and installation
+    primarily for embedded targets.
+  - Improvements to common build process for embedded and
+    cross-compile targets.
+  - Updated tool chain to m4-1.4.12, autoconf-2.63 and texinfo-4.13.
+  - Conversion of RPM spec files to common approach for major
+    subpackages.
+  - Updated references database for manual pages and roff documents.
+  - Build system now builds yum(8) repositories for RPMs and
+    apt-get(8) repositories for DEBs. Installation documentation has
+    been updated to include details of repository install sourcesref.
+  - Added MODULE_VERSION to all modules and drivers.
+
+This is a public stable production grade release of the package: it
+deprecates previous releases. Please upgrade to the current release
+before reporting bugs.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 RPM- and
+DPKG-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the GNU Affero General Public
+License (AGPL) Version 3.  The release is available as an autoconf
+tarball, SRPM, DSC, and set of binary RPMs and DEBs. See the downloads
+page for the autoconf tarballs, SRPMs and DSCs. See the sctp package
+page for tarballs, SRPMs, DSCs, and binary RPMs and DEBs.
+
+See <http://www.openss7.org/codefiles/sctp-0.2.27/ChangeLog> and
+<http://www.openss7.org/codefiles/sctp-0.2.27/NEWS> in the release, or
+<http://www.openss7.org/sctp_manual.html#Release-Notes> in the manual,
+for more information. Also, see the sctp.pdf manual in the release (also
+in html <http://www.openss7.org/sctp_manual.html>).
+
+For the news release, see <http://www.openss7.org/rel20081029_2.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
