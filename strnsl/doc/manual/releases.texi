@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.9 2008-04-25 11:50:53 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.10 2008-11-04 09:07:31 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-25 11:50:53 $ by $Author: brian $
+@c Last Modified $Date: 2008-11-04 09:07:31 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -291,6 +291,7 @@ You will void the warranty on any system on which you run this software.  YOU HA
 @end ignore
 
 @c This is the defect notice for alpha release software
+@ignore
 @dfn{@value{PACKAGE_TITLE}} has unknown defects.  This is an @dfn{alpha} release.  Some defects could
 be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7 Project} on
 this software.  The software might fail to configure or compile on some systems.  The @cite{OpenSS7
@@ -305,6 +306,7 @@ it unusable.  Crashes could lock your system and rebooting the system might not 
 You can possibly lose all the data on your system.  Because this software can crash your kernel,
 the resulting unstable system could destroy computer hardware or peripherals making them unusable.
 You could void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
+@end ignore
 
 @c This is the defect notice for beta release software
 @ignore
@@ -347,7 +349,7 @@ WARNED.}
 @end ignore
 
 @c This is the defect notice for production release software
-@ignore
+@c @ignore
 @dfn{@value{PACKAGE_TITLE}} could possibly contain unknown defects.  This is a @dfn{production}
 release.  Nevertheless, some remaining unknown defects could possibly be harmful.  Validation
 testing has been performed by the @cite{OpenSS7 Project} and external entities on this software for
@@ -365,7 +367,7 @@ problem.  You can possibly lose all the data on your system.  Because this softw
 of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
 peripherals making them unusable.  You might void the warranty on any system on which you run this
 software.  YOU HAVE BEEN WARNED.}
-@end ignore
+@c @end ignore
 
 @c This is the defect notice for unstable release software
 @ignore

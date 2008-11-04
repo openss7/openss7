@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100 fo+=tcqlorn
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.30 2008-10-29 12:23:04 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.31 2008-11-04 09:07:25 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-10-29 12:23:04 $ by $Author: brian $
+@c Last Modified $Date: 2008-11-04 09:07:25 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,6 +64,7 @@ package.
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+* Release @value{PACKAGE}-0.9.2.4::		Release 4
 * Release @value{PACKAGE}-0.9.2.3::		Release 3
 * Release @value{PACKAGE}-0.9.2.2::		Release 2
 * Release @value{PACKAGE}-0.9.2.1::		Release 1
@@ -77,11 +78,85 @@ package.
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+This is the fifth separate @cite{OpenSS7 Project} release of the @cite{@value{PACKAGE_TITLE}}
+package.  The package provides components that we previously part of the @file{strss7} package.
+
+With @cite{OpenSS7 Master Package} release @file{openss7-0.9.2.D}, the Channel components were
+separated from the @file{strss7} package and placed in this package.  All of the Channel components
+previously part of the @file{strss7} package have been strapped into this release and
+validated.@footnote{Note that no component in this package could be supported with the deprecated
+@cite{LiS} package.}  See the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/TODO,TODO} file in the
+release, or @refman{Schedule} in the manual, for more information about the release schedule.
+
+This release is a beta release and is part of the @cite{OpenSS7 Master Package}
+(@file{openss7-@value{VERSION_OPENSS7}}).
+
+Major features since the last public release are:
+
+@itemize -
+@item
+The channel drivers (@manref{mx(4)} and @manref{ch(4)}) are now used exclusively by the OpenSS7 SS7,
+ISDN, X.25, Frame Relay and VOIP stacks.  These drivers deprecate the old @manref{x400p-sl} driver
+for SS7 signalling links by providing a single channel multiplexing and switching nexus for use by
+all data link and voice channel modules and protocol stack components.  New hardware device drivers
+may now be written to these interfaces and transparently provide support for all OpenSS7 stack
+components without further considerations.  This is a significant improvement for the OpenSS7 stack
+and opens the door for supporting a much wider range of hardware devices.
+
+@item
+Included in this release is a full @manref{zaptel(4)} replacement driver.  This driver provides the
+ability for Asterisk, Yate, FreeSwitch and other @mantype{zaptel(4)} based PBX applications to
+access OpenSS7 device drivers in a tranparent fashion.  This completes Asterisk/OpenSS7 integration
+from the driver perspective.
+
+@item
+Addition of validation test suites for use by any hardware device driver conforming to the MXI or
+CHI interfaces, and validation test suites for the @manref{zaptel(4)} conversion driver.
+
+@item
+Complete SNMP agents supporting the MX, CH and PHY layers.
+
+@item
+OpenSS7 SNMP management application support.
+
+@end itemize
+
+@emph{This is a public beta release of the package: it deprecates previous releases: please upgrade
+before reporting bugs.  See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-alpha,README-alpha} in
+the release, or @refman{Maturity}.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 @manref{rpm(8)} and @manref{dpkg(1)} based distributions, and
+can be used on production kernels without patching or recompiling the kernel.
+
+This package is publicly released strictly under the @cite{GNU Affero General Public License Version
+3}; however, commercial licensing is available.  The release is available as an @manref{autoconf(1)}
+tarball, SRPM, DSC, and a set of binary RPMs and DEBs for popular distributions.  See the
+@uref{http://www.openss.org/@value{PACKAGE}_pkg.html,package page} for the @mantype{autoconf(1)}
+tarballs, SRPMs, DSCs and binary RPMs and DEBs.  See the
+@uref{http://www.openss7.org/repos.html,repository page} for information concerning network
+installation and update sources.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog,ChangeLog} and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS,NEWS} in the release for
+more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in
+@uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
+
+For the news release, see @uref{http://www.openss7.org/rel20081029_9.html}.
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2.4
+@unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.4
+@cindex release @value{PACKAGE}-0.9.2.4
+
 This is the fourth separate @cite{OpenSS7 Project} release of the @cite{@value{PACKAGE_TITLE}}
 package.
 The package provides components that were previously part of the @file{strss7} package.
 
-With OpenSS7 Master Package release @file{openss-0.9.2.D}, the Channel components were separated
+With OpenSS7 Master Package release @file{openss7-0.9.2.D}, the Channel components were separated
 from the @file{strss7} package and placed in this package.  Not all of the Channel components
 previously part of the @file{strss7} package have been strapped into this release.  Components will
 be re-validated against @cite{Linux Fast-STREAMS} on a module-by-module and driver-by-driver
