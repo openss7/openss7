@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100 fo+=tcqlorn
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.26 2008-10-29 12:23:01 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.27 2008-11-04 09:07:20 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-10-29 12:23:01 $ by $Author: brian $
+@c Last Modified $Date: 2008-11-04 09:07:20 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -65,6 +65,7 @@ Illinois} releases.
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+* Release @value{PACKAGE}-2.0.8::		Release 8
 * Release @value{PACKAGE}-2.0.7::		Release 7
 * Release @value{PACKAGE}-2.0.6::		Release 6
 * Release @value{PACKAGE}-2.0.5::		Release 5
@@ -85,13 +86,55 @@ Illinois} releases.
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+This is the ninth full @cite{OpenSS7 Project} release of the @cite{@value{PACKAGE_TITLE}} package.
+This is a stable, production grade release: it deprecates previous releases.  Please upgrade before
+reporting bugs.
+
+This release contains only the latest packaging improvements and tracks updates on related packages
+(i.e. @file{sctp-@value{VERSION_SCTP}}).
+
+Major features since the last public release are:
+
+@itemize -
+@item
+None.
+@end itemize
+
+@emph{This is a public, stable, production grade release of the package: it deprecates previous
+releases.  Please upgrade to the current release before reporting bugs.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 @manref{rpm(8)} and @manref{dpkg(1)} based distributions, and
+can be used on production kernels without patching or recompiling the kernel.
+
+This package is publicly released strictly under the @cite{GNU Affero General Public License Version
+3}; however, commercial licensing is available.  The release is available as an @manref{autoconf(1)}
+tarball, SRPM, DSC, and a set of binary RPMs and DEBs for popular distributions.  See the
+@uref{http://www.openss.org/@value{PACKAGE}_pkg.html,package page} for the @mantype{autoconf(1)}
+tarballs, SRPMs, DSCs and binary RPMs and DEBs.  See the
+@uref{http://www.openss7.org/repos.html,repository page} for information concerning network
+installation and update sources.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog,ChangeLog} and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS,NEWS} in the release for
+more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in
+@uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
+
+For the news release, see @uref{http://www.openss7.org/rel20081029_2.html}.
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-2.0.8
+@unnumberedsubsec Major changes for release @value{PACKAGE}-2.0.8
+@cindex release @value{PACKAGE}-2.0.8
+
 This is the eighth full release of the @cite{@value{PACKAGE_TITLE}} package.
 This is a stable, production grade release: it deprecates previous releases.  Please upgrade to the
 most current release before reporting bugs.
 
 This release is largely a maintenance release that provides support for more distributions an
 architectures as well as tracking feature updates on related packages (i.e.
-@file{sctp-@value{VERSION_SCTP}}).
+@file{sctp-0.2.27}).
 
 Major features since the last public release are as follows:
 
@@ -163,7 +206,7 @@ Please upgrade to the most current release before reporting bugs.
 
 This release is largely a maintenance release that provides support for more
 distributions an architectures as well as tracking feature updates on related
-packages (i.e. @file{sctp-@value{VERSION_SCTP}}).
+packages (i.e. @file{sctp-0.2.26}).
 
 Major features since the last public release are as follows:
 
@@ -203,7 +246,7 @@ Please upgrade to the most current release before reporting bugs.
 
 This release is largely a maintenance release that provides support for more
 distributions an architectures as well as tracking feature updates on related
-packages (i.e. @file{sctp-@value{VERSION_SCTP}}).
+packages (i.e. @file{sctp-0.2.25}).
 
 Major features since the last public release are as follows:
 
@@ -232,7 +275,7 @@ Please upgrade to the most current release before reporting bugs.
 
 This release is largely a maintenance release that provides support for more
 distributions an architectures as well as tracking feature updates on related
-packages (i.e. @file{sctp-@value{VERSION_SCTP}}).
+packages (i.e. @file{sctp-0.2.24}).
 
 Additional features include:
 

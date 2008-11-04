@@ -1,5 +1,5 @@
 OpenSS7 STREAMS Channels -- history of user visible changes.  2008-10-31
-$Id: NEWS,v 0.9.2.52 2008-10-31 13:12:23 brian Exp $
+$Id: NEWS,v 0.9.2.53 2008-11-04 09:07:25 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -10,11 +10,90 @@ The sections that follow provide information on OpenSS7 releases of the
  Major changes for release strchan-0.9.2.4
 ------------------------------------------
 
+This is the fifth separate `OpenSS7 Project' release of the
+`OpenSS7 STREAMS Channels' package.  The package provides components
+that we previously part of the `strss7' package.
+
+With `OpenSS7 Master Package' release `openss7-0.9.2.D', the Channel
+components were separated from the `strss7' package and placed in this
+package.  All of the Channel components previously part of the `strss7'
+package have been strapped into this release and validated.(1)  See the
+TODO (http://www.openss7.org/codefiles/strchan-0.9.2.4/TODO) file in the
+release, or `Schedule',in the manual in the manual, for more
+information about the release schedule.
+
+This release is a beta release and is part of the `OpenSS7 Master
+Package' (`openss7-0.9.2.G').
+
+Major features since the last public release are:
+
+   - The channel drivers (`mx(4)' and `ch(4)') are now used exclusively
+     by the OpenSS7 SS7, ISDN, X.25, Frame Relay and VOIP stacks.
+     These drivers deprecate the old `x400p-sl' driver for SS7
+     signalling links by providing a single channel multiplexing and
+     switching nexus for use by all data link and voice channel modules
+     and protocol stack components.  New hardware device drivers may
+     now be written to these interfaces and transparently provide
+     support for all OpenSS7 stack components without further
+     considerations.  This is a significant improvement for the OpenSS7
+     stack and opens the door for supporting a much wider range of
+     hardware devices.
+
+   - Included in this release is a full `zaptel(4)' replacement driver.
+     This driver provides the ability for Asterisk, Yate, FreeSwitch
+     and other `zaptel(4)' based PBX applications to access OpenSS7
+     device drivers in a tranparent fashion.  This completes
+     Asterisk/OpenSS7 integration from the driver perspective.
+
+   - Addition of validation test suites for use by any hardware device
+     driver conforming to the MXI or CHI interfaces, and validation
+     test suites for the `zaptel(4)' conversion driver.
+
+   - Complete SNMP agents supporting the MX, CH and PHY layers.
+
+   - OpenSS7 SNMP management application support.
+
+
+_This is a public beta release of the package: it deprecates previous
+releases: please upgrade before reporting bugs.  See README-alpha
+(http://www.openss7.org/codefiles/strchan-0.9.2.4/README-alpha) in the
+release, or `Maturity',in the manual._
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+`rpm(8)' and `dpkg(1)' based distributions, and can be used on
+production kernels without patching or recompiling the kernel.
+
+This package is publicly released strictly under the `GNU Affero
+General Public License Version 3'; however, commercial licensing is
+available.  The release is available as an `autoconf(1)' tarball, SRPM,
+DSC, and a set of binary RPMs and DEBs for popular distributions.  See
+the package page (http://www.openss.org/strchan_pkg.html) for the
+`autoconf(1)' tarballs, SRPMs, DSCs and binary RPMs and DEBs.  See the
+repository page (http://www.openss7.org/repos.html) for information
+concerning network installation and update sources.
+
+See ChangeLog
+(http://www.openss7.org/codefiles/strchan-0.9.2.4/ChangeLog) and NEWS
+(http://www.openss7.org/codefiles/strchan-0.9.2.4/NEWS) in the release
+for more information.  Also, see the `strchan.pdf' manual in the
+release (also in html (http://www.openss7.org/strchan_manual.html)).
+
+For the news release, see `http://www.openss7.org/rel20081029_9.html'.
+
+---------- Footnotes ----------
+
+(1) Note that no component in this package could be supported with the
+deprecated `LiS' package.
+
+ Major changes for release strchan-0.9.2.4
+------------------------------------------
+
 This is the fourth separate `OpenSS7 Project' release of the
 `OpenSS7 STREAMS Channels' package.  The package provides components
 that were previously part of the `strss7' package.
 
-With OpenSS7 Master Package release `openss-0.9.2.D', the Channel
+With OpenSS7 Master Package release `openss7-0.9.2.D', the Channel
 components were separated from the `strss7' package and placed in this
 package.  Not all of the Channel components previously part of the
 `strss7' package have been strapped into this release.  Components will
