@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:10:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-11-17 14:13:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 07:10:36 $ by $Author: brian $
+# Last Modified $Date: 2008-11-17 14:13:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +57,9 @@ SUBDIRS = cci tri tci mapi sccpi mtpi sli sdli sdti
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.11  2008-11-17 14:13:05  brian
+## - documentation additions
+##
 ## Revision 0.9.2.10  2008-04-29 07:10:36  brian
 ## - updating headers for release
 ##
