@@ -1,3 +1,128 @@
+2008-11-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/mtpi/npi_mtp.h: added npi-mtp documentation
+	* doc/specs/mtpi/npi_mtp.texi: added npi-mtp documentation
+	* doc/specs/mtpi/npi_mtp_taba1.tbl: added npi-mtp documentation
+
+	*  doc/specs/sccpi/Makefile.am: added SCCPI documentation
+	*  doc/specs/sccpi/Makefile.in: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi.h: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi.texi: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi01.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi02.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi03.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi04.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi05.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi06.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi07.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi08.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi24.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi31.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi42.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi44.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi10.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi11.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi12.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi13.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi14.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi15.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi16.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi17.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi18.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi19.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi20.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi21.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi22.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fi23.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig1.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig2.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig3.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig4.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig5.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig6.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig7.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig8.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_fig9.fig: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab01.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab02.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab03.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab04.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab05.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab1.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab2.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab3.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab4.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab5.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab6.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab7.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tab8.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_taba1.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabb1.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabb2.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabb3.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabb4.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabb5.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabb6.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabb7.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabb8.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabc1.tbl: added SCCPI documentation
+	*  doc/specs/sccpi/sccpi_tabc2.tbl: added SCCPI documentation
+
+	*  doc/specs/sccpi/npi_sccp.h: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp.texi: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp_taba1.tbl: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp_taba2.tbl: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp_taba3.tbl: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp_taba4.tbl: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp_taba5.tbl: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp_taba5b.tbl: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp_taba6.tbl: added NPI-SCCP documentation
+	*  doc/specs/sccpi/npi_sccp_taba7.tbl: added NPI-SCCP documentation
+
+	*  doc/specs/sccpi/tpi_sccp.h: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp.texi: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp_taba01.tbl: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp_taba02.tbl: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp_taba03.tbl: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp_taba04.tbl: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp_taba05.tbl: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp_taba06.tbl: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp_taba07.tbl: added TPI-SCCP documentation
+	*  doc/specs/sccpi/tpi_sccp_taba08.tbl: added TPI-SCCP documentation
+
+	*  doc/specs/sccpi/xti_sccp.h: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp.texi: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab21.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab22.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab23.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab24.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab25.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab26.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab27.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab28.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab29.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab30.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab31.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab32.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab51.tbl: added XTI-SCCP documentation
+	*  doc/specs/sccpi/xti_sccp_tab52.tbl: added XTI-SCCP documentation
+
+	* src/modules/sccp/npi_sccp.c: added modules and driver
+	* src/modules/sccp/sccp2.c: added modules and driver
+	* src/modules/sccp/sccp_tpi.c: added modules and driver
+	* src/modules/sccp/tpi_sccp.c: added modules and driver
+
+	* doc/specs/Makefile.am: added documentation
+	* doc/specs/mtpi/Makefile.am: added documentation
+	* doc/specs/mtpi/mtpi.texi: added documentation
+	* doc/specs/tpi/tpi_tcap.texi: added documentation
+
+	* configure.ac: added documentation
+	* strss7.lsm.in: updates
+
+	* src/include/sys/npi_sccp.h: added primitives for REQUEST Type 1 and 2
+	  and REPLY
+
 2008-11-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgpatchlevel: flipped release

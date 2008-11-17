@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi_tcap.texi,v 0.9.2.17 2008-09-20 11:04:45 brian Exp $
+% @(#) $Id: tpi_sccp.texi,v 0.9.2.1 2008-11-17 14:04:34 brian Exp $
 %
 % =========================================================================
 %
@@ -54,31 +54,31 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-09-20 11:04:45 $ by $Author: brian $
+% Last Modified $Date: 2008-11-17 14:04:34 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
 @c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 @c %**start of header
-@setfilename tpi_tcap.info
+@setfilename tpi_sccp.info
 @include texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
-@set MANUAL_TYPE Corrigendum for TCAP Conformance
+@set MANUAL_TYPE Corrigendum for SCCP Conformance
 @settitle @value{MANUAL_TITLE}
 @c %**end of header
 
 @dircategory OpenSS7
 @direntry
-* TPI-TCAP: (tpi_tcap).		TPI Corrigendum for TCAP
+* TPI-SCCP: (tpi_sccp).		TPI Corrigendum for SCCP
 @end direntry
 
 @include texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
-@set MANUAL_TYPE Corrigendum for TCAP Conformance
+@set MANUAL_TYPE Corrigendum for SCCP Conformance
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
-This file documents the TCAP Corrigendum to the Transport Provider Interface.
+This file documents the SCCP Corrigendum to the Transport Provider Interface.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
 @value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
@@ -118,12 +118,12 @@ under the above conditions for modified versions.
 
 @include texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
-@set MANUAL_TYPE Corrigendum for TCAP Conformance
+@set MANUAL_TYPE Corrigendum for SCCP Conformance
 
-@set PART Transaction Capabilities Application
-@set LONG Transaction Capabilities Application Part
-@set SHORT TCAP
-@set INTERFACE TPI-TCAP
+@set PART Signalling Connection Control
+@set LONG Signalling Connection Control Part
+@set SHORT SCCP
+@set INTERFACE TPI-SCCP
 
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
@@ -141,11 +141,11 @@ under the above conditions for modified versions.
 @quotation
 @subsubheading Abstract
 This document specifies an (unofficial) corrigendum to the Transport Provider Interface (TPI)
-Specification (@pxref{TPI,,TPI}) for SS7 Transaction Capabilities Application Part (TCAP)
-(@pxref{Q.771,,Q.771}) conformance in support of the TCAP to TCAP User primitive interface
-(@pxref{Q.771,,Q.771}).  it supports the user-level XTI/TLI abstraction (@pxref{XTI,,XTI}) of the
-Transaction Handling Interface (TRI) as well as providing a basis for TCAP User protocols using the
-services of the SS7 Transaction Capablities Application Part.
+Specification (@pxref{TPI,,TPI}) for SS7 Signalling Connection Control Part (SCCP)
+(@pxref{Q.711,,Q.711}) conformance in support of the SCCP to SCCP User primitive interface
+(@pxref{Q.711,,Q.711}).  it supports the user-level XTI/TLI abstraction (@pxref{XTI,,XTI}) of the
+Signalling Connection Control Part Interface (SCCPI) as well as providing a basis for SCCP User protocols using the
+services of the SS7 Signalling Connection Control Part.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -204,14 +204,14 @@ implied warranty.
 @subsubheading Notice:
 
 @noindent
-@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
-IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
-THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
-CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
-NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
-DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
-OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
 
 @sp 1
 
@@ -381,6 +381,7 @@ no obligation to provide any feature listed herein.
 @node Preface
 @unnumbered Preface
 
+@ignore
 @section Security Warning
 
 @noindent
@@ -408,6 +409,7 @@ contents thereof.
 reference point for the industry.  While @cite{OpenSS7 Corporation} believes that these interfaces
 are well defined in this release of the document, minor changes may be made prior to products
 conforming to the interfaces being made available.
+@end ignore
 
 @section Abstract
 
@@ -426,10 +428,11 @@ components as well as providing a basis for @value{PART} control for other @valu
 @section Purpose
 
 The purpose of this document is to provide technical documentation of the @value{SHORT} Transport
-Provider Interface (@value{INTERFACE}).  This document is intended to be included with the OpenSS7
-@cite{STREAMS} software package released by @cite{OpenSS7 Corporation}.  It is intended to assist
-software developers, maintainers and users of the @value{INTERFACE} with understanding the software
-architecture and technical interfaces that are made available in the software package.
+Provider Interface (@value{INTERFACE}).  This document is intended to be included with the
+@cite{@value{PACKAGE_TITLE}} software package released by @cite{OpenSS7 Corporation}.  It is
+intended to assist software developers, maintainers and users of the @value{INTERFACE} with
+understanding the software architecture and technical interfaces that are made available in the
+software package.
 
 @section Intent
 
@@ -456,12 +459,12 @@ is an @strong{UNCONTROLLED VERSION}.
 
 @smallexample
 @verbatim
-$Log$
+$Log: tpi_sccp.texi,v $
+Revision 0.9.2.1  2008-11-17 14:04:34  brian
+- added documentation and conversion modules
+
 @end verbatim
 @end smallexample
-
-@node Introduction
-@chapter Introduction
 
 @section Related Documentation
 
@@ -472,34 +475,148 @@ $Log$
 @node @value{INTERFACE}
 @chapter @value{INTERFACE}
 
-A document describing using XTI and mOSI for TCAP has been generated to support the use of the
-OpenSS7 TCAP TRI (Transaction Interface) using the methods of the X/Open minmal OSI interface
-described in XNS 5.2.  This document describes a corrigendum to the X/Open TPI Revision 2.0.0 that
-describes this TCAP transport provider that supports TCAP to XTI using the X/Open Transport Provider
-Interface.  No new primitive or semantics have been added to the interface, merely a definition of
-the protocol-specific and provider-specific aspects of TCAP Transport.
+A document describing using XTI for SCCP has been generated to support the use of the OpenSS7 SCCPI
+(SCCP Interface) using the methods of the X/Open Transport Interface described in XNS 5.2.  This
+document describes a corrigendum to the X/Open TPI Revision 2.0.0 that describes this SCCP transport
+provider that supports SCCP to XTI using the X/Open Transport Provider Interface.  No new primitive
+or semantics have been added to the interface, merely a definition of the protocol-specific and
+provider-specific aspects of SCCP Transport.
 
-TCAP Transport is very close to the XTI mOSI transport specification.  The major difference is that
-SCCP Network Layer Addresses and options are used instead of ISO Presentation Layer addresses and
-options.  Aside from that, TCAP Transport resembles X.217 (ACSE) ISO/OSI Presentation.
+SCCP Transport is very close to the XTI XX25 transport specification.  The major difference is that
+SCCP Network Layer Addresses and optoins are used instead of ISO Network Service Access Point
+addresses and options.  Aside from that, SCCP Transport resembles X.213 (NS) ISO/OSI Network.
 
 @section Addressing
 
-@value{INTERFACE} uses SCCP formatted addresses instead of ISO Presentation Layer addresses.
+@value{INTERFACE} uses SCCP formatted addresses instead of ISO Network Service Access Point addresses.
 
 @subsection Address Format
 
-The address format for a TCAP address is as follows:
+The address format for an SCCP address is as follows:
 
 @section Options
 
-@subsection TCAP Level Options
+Options are formatted according to the @type{t_opthdr} structure decribed in the XTI.  An SCCP
+transport provider compliant to this specification supports none, all, or any subset of the options
+defined here.  An implementation may restrict the use of any of these options by offering them only
+in a privileged or read-only mode.
 
-@subsubsection Application Context Name
+TPI-SCCP provides options at the @pval{XTI_GENERIC}, @pval{T_SS7_MTP} and @pval{T_SS7_SCCP} option
+levels as described in the subsections that follow.  Of the @pval{T_SS7_MTP} options, none of the
+options are of end-to-end significance.  Of the @pval{T_SS7_SCCP} options, only @pval{T_SCCP_PCLASS}
+and @pval{T_SCCP_CREDIT} are of end-to-end significance.
 
-@subsubsection User Information
+@menu
+* XTI Level Options::
+* MTP Level Options::
+* SCCP Level Options::
+@end menu
 
+@node XTI Level Options
+@subsection XTI Level Options
+
+Options at this level are specific to the X/Open Transport Interface (XTI/TLI) and are common to all
+transport providers.  For more information, see the XTI specification (@ref{XTI,,XTI}).
+
+The options defined with the option level @pval{XTI_GENERIC} are as follows:
+
+@subsubsection XTI_DEBUG
+
+Sets debugging flags for the Stream.  This option is formatted as an array of @type{t_uscalar_t}.
+Legal values are implementation defined.  For more information see @manref{xti(3)}.
+
+@subsubsection XTI_LINGER
+
+Sets whether, and the amount of time if, the Stream will linger waiting for unsent data to be
+delivered.  This option is formatted as a @type{t_linger} structure defined as follows:
+
+@format
+@verbatim
+struct t_linger {
+        t_scalar_t l_onoff;             /* option on/off */
+        t_scalar_t l_linger;            /* linger time */
+};
+@end verbatim
+@end format
+
+@multitable @columnfractions .2 .8
+@item @member{l_onoff} @tab
+Specifies whether to linger (@pval{T_YES}) or not (@pval{T_NO}).  Legal values are @pval{T_YES} and
+@pval{T_NO}.
+@item @member{l_linger} @tab
+Specifies the amount of time (in seconds) to linger.  Legal values are @pval{T_INFINITE},
+@pval{T_UNSPEC} and all positive numbers including zero.
+@end multitable
+
+For more information, see @manref{xti(3)}.
+
+@subsubsection XTI_RCVBUF
+
+Specifies the size, in bytes, of the receive buffer.  This option is formatted as a
+@type{t_uscalar_t}.  Legal value are all positive, non-zero numbers.  For more information, see
+@manref{xti(3)}.
+
+@subsubsection XTI_RCVLOWAT
+
+Specifies the low water mark above which received data will be indicated and delivered to the user.
+This option is formatted as @type{t_uscalar_t}.  Legal values are all positive, non-zero numbers.
+For more information see @manref{xti(3)}.
+
+@subsubsection XTI_SNDBUF
+
+Specifies the size, in bytes, of the transmit buffer.  This option is formatted as a
+@type{t_uscalar_t}.  Legal values are all positive, non-zero numbers.  For more information see
+@manref{xti(3)}.
+
+@subsubsection XTI_SNDLOWAT
+
+Specifies the low water mark above which queued data will be transmitted to the peer.  This option
+is formatted as a @type{t_uscalar_t}.  Legal values are all positive, non-zero numbers.  For more
+inforamtion see @manref{xti(3)}.
+
+@node MTP Level Options
+@subsection MTP Level Options
+
+@subsubsection T_MTP_SLS
+
+This option sets or gets the @dfn{Signalling Link Selection (SLS)} value assocaited wit a message or
+Stream.  The option argument is one @type{t_uscalar_t} value that represents the value of the SLS.
+When used in the @prim{T_OPTDATA} or @prim{T_UNITDATA} primitives, this option sets or gets the SLS
+value associated with a message.  When used in the @prim{T_INFO} primitives, this option sets or
+gets the SLS value associated with a Stream.
+
+This option is of end-to-end significance.  When the @pval{T_MTP_SLS} value is set on outgoing data,
+with the @prim{T_OPTDATA_REQ} or @prim{T_UNITDATA_REQ}, the same @pval{T_MTP_SLS} value will be
+indicated in the @prim{T_OPTDATA_IND} or @prim{T_UNITDATA_IND} at the transport layer.
+
+@subsubsection T_MTP_MP
+
+This option sets or gets the @dfn{Message Priority (MP)} value associated with a message or Stream.
+The option argument is one @type{t_uscalar_t} value that represents the value of the MP.
+@prim{T_OPTDATA} or @prim{T_UNITDATA} primitives, this option sets or gets the MP value associated
+with a message.  When used in the @prim{T_INFO} primitives, this option sets or gets the MP value
+associated with a Stream.
+
+@node SCCP Level Options
 @subsection SCCP Level Options
+
+@subsubsection T_SCCP_SEQ_CTRL
+
+@subsubsection T_SCCP_PRIORITY
+
+@subsubsection T_SCCP_PCLASS
+
+@itemize
+@item @pval{T_SCCP_PCLASS_0}
+@item @pval{T_SCCP_PCLASS_1}
+@item @pval{T_SCCP_PCLASS_2}
+@item @pval{T_SCCP_PCLASS_3}
+@item @pval{T_SCCP_PCLASS_ALL}
+@end itemize
+
+@subsubsection T_SCCP_IMPORTANCE
+
+@subsubsection T_SCCP_RET_ERROR
 
 @unnumberedsubsubsec SCCP Quality of Service Options
 
@@ -507,8 +624,8 @@ The TCAP interface uses protocol level T_SS7_SCCP for options at the SCCP level.
 parameters are communicated to the underlying transport using the option name T_SCCP_QOS.  There are
 three QOS structures that can be used in this fashion are listed in @emph{Table 7} as follows:
 
-@center @image{tpi_tabx}
-@center Table 7@strong{@emph{.  SCCP QOS Option Values}}
+@c @center @image{tpi_tabx}
+@c @center Table 7@strong{@emph{.  SCCP QOS Option Values}}
 
 Quality of service structure @code{N_qos_sel_sccp_t} has the following fields:
 
@@ -548,38 +665,31 @@ primitive in response to a T_INFO_REQ primitive.
 
 @table @emph
 @item TSDU_size
-TCAP has effectively no limit to the amount of data that can be sent in a particular invoke or
-result user data.  TCAP includes a ``more'' bit concept in that an Invoke Not Last and Return Result
-Not Last can be used to indicated that the next Invoke or Return Result are part of the same user
-data sequence.  ITU-T does not include the Not Last concept for Invokes.  As a result, for ANSI and
-other TCAPs supporting the Invoke Not Last user data, TSDU_size will be set to T_INFINITE (-1).  For
-other TCAPs not supporting Invoke Not Last, the TSDU_size will be set to the maximum size of a
-single user data sequence derived from the maximum size of the underlying SCCP network.  This may
-still be T_INFINITE (-1) as the underlying SCCP connectionless network may support unlimited size
-NSDUs.
+SCCP has effectively no limit to the amount of data that can be sent in a particular transfer of
+user data.  SCCP includes a @dfn{more} bit concept.
 @item ETSDU_size
-TCAP has no expedited data service and the value of ETSDU_size is set to T_UNKNOWN (-2).
+SCCP has supports an expedited data service.
 @item CDATA_size
-TCAP can send connection data (user data) with the initial Begin (Query) or first Continue
-(Conversation) package and can also send Application Context and User Information in either package.
-These messages correspond to TR-BEGIN and the first TR-CONTINUE after receiving a TR-BEGIN and these
+SCCP can send connectin data (user data) with the initi CR (connect request) or firsst CC (connect
+confirm) packet
+These messages correspond to @dfn{N-CONNECT request} and @dfn{N-CONNECT confirmation} and these
 correspond to @prim{T_CONN_REQ} and @prim{T_CONN_RES}.  Because the underlying SCCP connectionless
 network may support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be set to
-the maximum amount of connection data (including Application Context, User Information and user
-data) that can be sent or received in either package.  This informs the user as to what size to make
+the maximum amount of connection data
+that can be sent or received in either packet.  This informs the user as to what size to make
 data buffers associated with connection indications and confirmations (@prim{T_CONN_IND},
 @prim{T_CONN_CON}) and how much data can be sent with connection requests and responses
 (@prim{T_CONN_REQ}, @prim{T_CONN_RES}).
 @item DDATA_size
-TCAP can send disconnect data (user data) with the final End (Response) package.  These messages
-correspond to the TR-END primitive and the @prim{T_DISCON_REQ} or @prim{T_DISCON_IND}.  Again,
+SCCP can send disconnect data (user data) with the final (disconnect) packet.  These messages
+correspond to the N-DISCONNECT primitive and the @prim{T_DISCON_REQ} and @prim{T_DISCON_IND}. Again,
 because the underlying SCCP connectionless network may support unlimited size NSDUs, this value may
 be set to T_INFINITE (-1) or may be set to the maximum amount of disconnection data that can be sent
-or received in the End (Response) package.  This informs the user as to what size to make data
+or received in the disconnect packet.  This informs the user as to what size to make data
 buffers associated with disconnection indications (@prim{T_DISCON_IND}) and how much data can be
 sent with disconnection requests (@prim{T_DISCON_REQ}).
 @item ADDR_size
-This is the maximum TCAP address size that can be communicated across the interface.  This address
+This is the maximum SCCP address size that can be communicated across the interface.  This address
 size is the maximum size of the defined SCCP address structure (@code{sizeof sccp_addr_t}) that also
 will include address digits up to a maximum of @code{SCCP_MAX_ADDR_LENGTH} octets of digits.  This
 informs the user as to what size it should reserve for control buffers so as to receive control
@@ -590,25 +700,25 @@ option sizes of one of each of the options that can occur together.  This inform
 what size the user should reserve for control buffers to ensure that received control messages that
 include options can be contained within the buffer without truncation.
 @item TIDU_size
-Even though a TCAP provider can support unlimited TSDU size, it cannot normally support unlimited
-TIDU size.  This is because the underlying SCCP NSDU may be limited in size.  The TCAP provider is
+Although an SCCP provider can support unlimited TSDU size, it cannot normally support unlimited
+TIDU size.  This is because the underlying SCCP NSDU may be limited in size.  The SCCP provider is
 not responsible for segmenting user data sequences offered to the provider from the user in as
 @msg{M_DATA}.  This is the maximum size of the TIDU that corresponds to the maximum size of the
 underlying NSDU.  Because the underlying SCCP provider may have no limit on the NSDU size (i.e., it
 supports segmentation of connectionless NSDUs) this may be more in the manner of an optimal
-recommendation to the user rather than an absolute maximum.  Because of this, a given TCAP provider
+recommendation to the user rather than an absolute maximum.  Because of this, a given SCCP provider
 might not reject TIDUs that are larger than this value.
 @item SERV_type
-There are two service types supported by an ACSE provider: T_COTS and T_CLTS.  T_CLTS (ACSE
-Connectionless Class) is a connectionless transaction service with no error notification.  T_COTS
-(ACSE Connection-Oriented Class) is a connection-oriented transaction services with or without error
-notification.  The value reflected here is dependent on the setting of option T_ACSE_PCLASS or
-T_TCAP_PCLASS.
+There are two service types supported by an SCCP provider: T_COTS and T_CLTS.  T_CLTS (SCCP Protocol
+classes 0 and 1) is a connectionless transport servicew with or without error notification.  T_COTS
+(SCCP Protocol classes 2 or 3) is a connection-oriented transport service with or without error
+notification.  The value reflected here is dependent on the setting of option
+T_SCCP_PCLASS.
 @item CURRENT_state
-Provides the current state of the Transport Provider.  TCAP providers use the same states as other
+Provides the current state of the Transport Provider.  SCCP providers use the same states as other
 TPI providers.
 @item PROVIDER_flag
-TPI provider flags that are set are SENDZERO (because TCAP supports the sending of packages without
+TPI provider flags that are set are SENDZERO (because SCCP supports the sending of packets without
 user data) and XPG4_1 (to indicate that the transport provider supports the latest TPI semantics).
 @end table
 
@@ -657,9 +767,23 @@ user data) and XPG4_1 (to indicate that the transport provider supports the late
 
 @subsubheading T_DATA_IND
 
+@subsubsection Expedited Data Transfer
+
+The expedited data transfer service is only available in SCCP Protocol Class 3.
+
 @subsubheading T_EXDATA_REQ
 
 @subsubheading T_EXDATA_IND
+
+@subsubsection Reset Service
+
+The reset service is only available in SCCP Protocol Class 3.
+
+@subsubheading T_OPTDATA_REQ
+
+@subsubheading T_OPTDATA_IND
+
+@subsubsection Inform Service
 
 @subsubheading T_OPTDATA_REQ
 
@@ -674,37 +798,6 @@ user data) and XPG4_1 (to indicate that the transport provider supports the late
 Reason codes for disconnection:
 
 @vtable @var
-@item T_AC_U_AARE__NONE
-
-Connnection rejected by peer user, no reason given.
-
-@item T_AC_C_U_AARE_ACN
-
-Connection rejected, application context name not supported.
-
-@item T_AC_U_AARE_APT
-
-Connection rejected, AP title not supported.
-
-@item T_AC_U_AARE_AEQ
-
-Connection rejected, AE qualifier not supported.
-
-@item T_AC_U_AARE_PEER_AUTH
-
-Connection rejected, authentication required.
-
-@item T_AC_U_ABRT_NSPEC
-
-Connection aborted by peer, no reason given.
-
-@item T_AC_P_ABRT_NSPEC
-
-Connection aborted, no reason given.
-
-@item T_AC_P_AARE_VERSION
-
-Connection rejected, no common version.
 
 @end vtable
 
@@ -720,563 +813,183 @@ Connection rejected, no common version.
 
 @subsubheading T_UDERROR_IND
 
-@subsubsection Component Services
-
-@subsubheading T_INVOKE_REQ
-
-@subsubheading T_INVOKE_IND
-
-@subsubheading T_RESULT_REQ
-
-@subsubheading T_RESULT_IND
-
-@subsubheading T_ERROR_REQ
-
-@subsubheading T_ERROR_IND
-
-@subsubheading T_CANCEL_REQ
-
-@subsubheading T_CANCEL_IND
-
-@subsubheading T_REJECT_REQ
-
-@subsubheading T_REJECT_IND
 
 @node Mapping @value{INTERFACE} Primitives
 @appendix Mapping @value{INTERFACE} Primitives
 
 @menu
-* Mapping TPI Primitives to ITU-T Q.771::
-* Mapping TPI Primitives to ANSI T1.114::
-* Mapping TPI Primitives to ETSI ETS 300 287::
-* Mapping TPI Primitives to ITU-T X.219::
+* Mapping TPI Primitives to ITU-T Q.711::
+* Mapping TPI Primitives to ANSI T1.112::
+* Mapping TPI Primitives to ETSI ETS 300 009-1::
+* Mapping TPI Primitives to ITU-T X.213::
 @end menu
 
-@node Mapping TPI Primitives to ITU-T Q.771
-@section Mapping TPI Primitives to ITU-T Q.771
+@node Mapping TPI Primitives to ITU-T Q.711
+@section Mapping TPI Primitives to ITU-T Q.711
 
 @subsection State Mapping
 
-@cartouche
-@center @image{tpi_ne17,4in}
-@center Figure 18@strong{@emph{.  TR Sub-Layer State Machine}}
-@end cartouche
-
-@cartouche
-@center @image{tpi_ne18,4in}
-@center Figure 19@strong{@emph{.  TR Sub-Layer State Machine}}
-@end cartouche
 
 @subsection Primitive Mapping
 
-@center @image{tpi_tab8}
-@center Table 8@strong{@emph{.  Primitive Mapping}}
-
-@subsubsection TR-UNI
-
-@subsubheading Request
-
-The Q.771 TR-UNI and TC-UNI Requests map onto the TPI T_UNITDATA_REQ primitive
-as shown in Table 9.
-
-@center Table 9@strong{@emph{.  TR-UNI Request Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} 
-@item TR-UNI Request @tab T_UNITDATA_REQ 
-@item Quality of Service @tab OPT_offset, OPT_length 
-@item Destination Address @tab DEST_offset, DEST_length 
-@item Originating Address @tab implicit (see note 1) 
-@item User Data @tab M_DATA blocks 
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} 
-@item TC-UNI Request @tab T_UNITDATA_REQ 
-@item Quality of Service @tab OPT_offset, OPT_length 
-@item Destination Address @tab DEST_offset, DEST_length 
-@item Application Context Name @tab OPT_offset, OPT_length 
-@item Originating Address @tab implicit (see note 1) 
-@item Dialogue ID @tab implicit (see note 2) 
-@item User Information @tab OPT_offset, OPT_length 
-@item Components Present @tab M_DATA blocks 
-@end multitable 
-
-Notes:
-@enumerate 
-@item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address that is bound to the stream in a previous T_BIND_REQ
-operation and that is returned as the LOCADDR in a T_ADDR_ACK.
-@item The @emph{Dialogue ID} is implicit to the stream.  Each stream supports
-only one dialogue at a time.
-@end enumerate 
-
-@subsubheading Indication
-
-The Q.771 TR-UNI and TC-UNI Indications map onto the T_UNITDATA_IND primitive as
-shown in Table 10.
-
-Table 10@strong{@emph{.  TR-UNI Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} 
-@item TR-UNI Indication @tab T_UNITDATA_IND 
-@item Quality of Service @tab OPT_offset, OPT_length 
-@item Destination Address @tab implicit (see note 1) 
-@item Originating Address @tab SRC_offset, SRC_length 
-@item User Data @tab M_DATA blocks 
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} 
-@item TC-UNI Indication @tab T_UNITDATA_IND 
-@item Quality of Service @tab OPT_offset, OPT_length 
-@item Destination Address @tab implicit (see npte 1) 
-@item Application Context Name @tab OPT_offset, OPT_length 
-@item Originating Address @tab SRC_offset, SRC_length 
-@item User Information @tab OPT_offset, OPT_length 
-@item Components Present @tab M_DATA blocks 
-@end multitable 
-
-Notes:
-@enumerate 
-@item The @emph{Destination Address} parameter is implicit to the stream and is
-taken to be the address that is bound to the stream.
-@end enumerate 
-
-@subsubsection TR-BEGIN
-
-@subsubheading Request
-
-The Q.771 TR-BEGIN and TC-BEGIN Requests map onto the T_CONN_REQ primitive as
-shown in Table 11.
-
-@center Table 11@strong{@emph{.  T-Begin Request Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab DEST_offset, DEST_length
-@item Originating Address @tab implicit (see note 1)
-@item Transaction ID @tab implicit (see note 2)
-@item User Data @tab M_DATA blocks
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab DEST_offset, DEST_length
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Dialogue ID @tab implicit (see note 2)
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address that is bound to the stream in a previous T_BIND_REQ
-operation and that is returned as the LOCADDR in a T_ADDR_ACK.
-@item The @emph{Transaction ID} and @emph{Dialogue ID} are implicit to the
-stream.  Each stream only supports one dialogue at a time.
-@end enumerate 
-
-@subsubheading Indication
-
-The Q.771 TR-BEGIN and TC-BEGIN Indications map onto the T_CONN_IND primitive as
-shown in Table 12.
-
-@c Table 12@strong{@emph{.  T-Begin Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab implicit (see note 1)
-@item Originating Address @tab SRC_offset, SRC_length
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-BEGIN Indication @tab T_CONN_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab implicit (see note 1)
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Originating Address @tab SRC_offset, SRC_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Destination Address} parameter is implicit to the stream and is
-the address to which the stream was bound with the previous T_BIND_REQ operation
-and that is returned as as the LOCADDR in a T_ADDR_ACK.
-@end enumerate 
-
-@subsubsection TR-CONTINUE
-
-@subsubheading Confirming Request
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Requests confirming a transaction map onto
-the T_CONN_RES primitive as shown in Table 13.
-
-Table 13@strong{@emph{.  T-Continue Request Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Request @tab T_CONN_RES
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Request @tab T_CONN_RES
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address that is bound to the stream in a previous T_BIND_REQ
-operation and that is returned as the LOCADDR in a T_ADDR_ACK.
-@end enumerate 
-
-@subsubheading Confirming Indication
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Indications confirming a transaction map
-onto the T_CONN_CON primitive as shown in Table 14.
-
-@center Table 14@strong{@emph{.  T-Continue Indication Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Indication @tab T_CONN_CON
-@item Quality of Service @tab PT_offset, OPT_length
-@item Originating Address @tab RES_length, RES_offset
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Indication @tab T_CONN_CON
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab RES_length, RES_offset
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Responding Address} parameter is delivered in the primitive but
-may be ignored by the TR-User.
-@end enumerate 
-
-@subsubheading Subsequent Request
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Requests continuing a transaction map onto
-the T_OPTDATA_REQ primitive as shown in Table 15.
-
-@center Table 15@strong{@emph{.  T-Continue Request Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Request @tab T_OPTDATA_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Transaction ID @tab implicit (see note 1)
-@item User Data @tab M_DATA blocks
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Request @tab T_OPTDATA_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Dialogue ID @tab implicit (see note 1)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab OPT_offset, OPT_length
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are
-implicit to the stream.  Each stream supports only one dialogue at a time.
-@end enumerate 
-
-@subsubheading Subsequent Indication
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Indications continuing a transaction map
-onto the T_OPTDATA_IND primitive as shown in Table 16.
-
-@center Table 16@strong{@emph{.  T-Continue Indication Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Indication @tab T_OPTDATA_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Transaction ID @tab implicit (see note 1)
-@item User Data @tab M_DATA blocks
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Indication @tab T_OPTDATA_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Dialogue ID @tab implicit (see note 1)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab OPT_offset, OPT_length
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are
-implicit to the stream.  Each stream supports only one dialogue at a time.
-@end enumerate 
-
-@subsubsection TR-END
-
-@subsubheading Request
-
-The Q.771 TR-END and TC-END Requests map onto the T_ORDREL_REQ primitive as
-shown in Table 17.
-
-@center Table 17@strong{@emph{.  TR-END Request Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-END Request @tab T_ORDREL_REQ
-@item Quality of Service @tab implicit (see notes)
-@item Transaction ID @tab implicit (see notes)
-@item Termination @tab implied (see notes)
-@item User Data @tab M_DATA blocks
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-END Request @tab T_ORDREL_REQ
-@item Quality of Service @tab implicit (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab
-@item User Information @tab implicit (see notes)
-@item Termination @tab implied (see notes)
-@end multitable 
-Notes:
-@enumerate 
-@item Pre-arranged or basic terminations are distinguished by operation class
-and options parameters.
-@item User data in M_DATA blocks can be associated with the primitive.
-@end enumerate 
-
-@subsubheading Indication
-
-The Q.771 TR-END and TC-END Indications map onto the T_ORDREL_IND primitive as
-shown in Table 18.
-
-@center Table 18@strong{@emph{.  TR-END Indication Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item R-END Indication @tab T_ORDREL_IND
-@item Quality of Service @tab implicit (see notes)
-@item Transaction ID @tab implicit (see notes)
-@item User Data @tab M_DATA blocks
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-END Indication @tab T_ORDREL_IND
-@item Quality of Service @tab it (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab implicit (see notes)
-@end multitable 
-Notes:
-@enumerate 
-@item 
-@item 
-@item
-@end enumerate 
-
-@subsubsection TR-U-ABORT
-
-@subsubheading Request
-
-The Q.771 TR-U-ABORT and TC-U-ABORT Requests map onto the T_DISCON_REQ primitive
-as shown in Table 19.
-
-@center Table 19@strong{@emph{.  TR-U-ABORT Request Mapping}}
-
-@multitable @columnfractions .43 .43 .14
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} @tab @strong{Notes} 
-@item TR-U-ABORT Request @tab T_DISCON_REQ @tab 
-@item Quality of Service @tab implicit (see notes) @tab (1) 
-@item Transaction ID @tab SEQ_number @tab (2) 
-@item User Data @tab M_DATA blocks @tab 
-@end multitable
-@multitable @columnfractions .43 .43 .14
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} @tab 
-@item TC-U-ABORT Request @tab T_DISCON_REQ @tab 
-@item Quality of Service @tab implicit (see notes) @tab (1) 
-@item Dialogue ID @tab SEQ_number @tab (2) 
-@item Abort reason @tab (implied by presence or absence of Application Context Name) @tab (3) 
-@item Application Context Name @tab implicit (see notes) @tab (3) 
-@item Components Present @tab M_DATA blocks @tab 
-@item User Information @tab implicit (see notes) @tab (3) 
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Quality of Service} parameter is implicit to the stream.  Each
-Operation Class 1, 2 or 3 stream (structured dialogue) either has a sequence
-control value associated with the stream or a new sequence control is selected
-for each package in a transaction.  Thus, this parameter does not need to be
-specified by the T-User.  If the T-User wants to change the return option or
-sequence control associated with a TR-U-ABORT, this can be performed with the
-T_OPTMGMT_REQ primitive before the T_DISCON_REQ primitive is issued.
-@item The @emph{Transaction ID} and @emph{Dialogue ID} are implicit to the
-stream when the transaction association is fully formed.  When the transaction
-association has not been confirmed and an TR-U-ABORT is issued, the SEQ_number
-parameter identifies the transaction or dialogue in question.
-@end enumerate 
-
-@subsubheading Indication
-
-The TR-U-ABORT Indication primitive of Q.771 maps onto the T_DISCON_IND
-primitive.
-
-@center Table 20@strong{@emph{.  TR-U-ABORT Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-U-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab (not provided)
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-@item TC-U-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab implicit (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Abort reason @tab DISCON_reason
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab implicit (see notes)
-@end multitable 
-Notes:
-@enumerate 
-@item The T_DISCON_IND reason distinguishes between TR-U-ABORT and TR-P-ABORT.
-@item QOS parameters are not provided to the TR-User even when available at the
-transport provider.
-@item User Data may be provided with the disconnect in M_DATA message blocks
-associated with the @samp{M_PROTO}
-@prindex M_PROTO
-message block for the T_DISCON_IND.
-@end enumerate 
-
-@subsubsection TR-P-ABORT
-
-@subsubheading Indication
-
-The TR-P-ABORT Indication primitive of Q.771 maps onto the T_DISCON_IND
-primitive.
-
-@center Table 21@strong{@emph{.  TR-P-ABORT Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-P-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab (not provided)
-@item Transaction ID @tab SEQ_number
-@item P-Abort @tab DISCON_reason
-@end multitable 
-
-@enumerate 
-@item The T_DISCON_IND reason distinguishes between TR-U-ABORT and TR-P-ABORT.
-@item QOS parameters are not provided to the user on abort even when available
-at the transport provider.
-@end enumerate 
-
-@subsubsection TR-NOTICE
-
-@subsubheading Indication
-
-The TR-NOTICE Indication primitive of Q.771 maps onto the T_UDERROR_IND and
-T_DISCON_IND primitives.
-
-@center Table 22@strong{@emph{.  TR-NOTICE Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-NOTICE Indication @tab T_UDERROR_IND
-@item Transaction ID @tab implicit (see note 1)
-@item Report Cause @tab ERROR_type
-@end multitable
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-NOTICE Indication @tab T_UDERROR_IND
-@item Transaction ID @tab implicit (see note1)
-@item Report Cause @tab ERROR_type
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are
-implicit to the stream.  Each stream supports only one dialogue at a time.
-@end enumerate 
-
-@subsection Parameter Mapping
-
-@subsubsection TR Sub-Layer Parameters
-
-@subsubsection Quality of Service
-The @emph{Quality of Service} parameters map to the @code{N_QOS_SEL_SCCP}
-quality of service parameter set which can be placed in the @emph{OPT_length}
-and @emph{OPT_offset} fields of the appropriate messages.  The
-@code{N_qos_sel_sccp_t} structure has the Return Option and Sequence Control
-parameters referenced in the Q.771 recommendations.
-
-@subsubheading Destination Address
-
-The @emph{Destination Address} is an SCCP Called Party Address in the format
-specified for the @uref{http://www.openss7.org/spi_idx.html,SCCP Newtork}.  This
-parameter is contained in the @emph{DEST_length} and @emph{DEST_offset} fields
-of the appropriate TPI primitives.  It is also contained in the
-@emph{REMADDR_length} and @emph{REMADDR_offset} fields of the T_ADDR_ACK
-management primitive.
-
-@subsubheading Originating Address
-
-The @emph{Originating Address} is an SCCP Calling Party Address in the format
-specified for the @uref{http://www.openss7.org/spi_idx.html,SCCP Newtork}.  This
-parameter is contained in the @emph{SRC_length} and @emph{SRC_offset} or
-@emph{RES_length} and @emph{RES_offset} fields of the appropriate TPI
-primitives.  It is also contained in the @emph{LOCADDR_length} and
-@emph{LOCADDR_offset} fields in the T_ADDR_ACK management primitive.
-
-@subsubheading P-Abort
-
-@subsubheading Transaction ID
-
-The @emph{Transaction ID} parameter is normally implicit to the stream for a
-fully associated transaction.  Each stream supports only one fully associated
-transactions.  For unaccepted or unconfirmed transactions, the @emph{SEQ_number}
-field of the appropriate TPI primitive is use to identify the transaction.  The
-@emph{Transaction ID} is, therefore, implicit to the connection or connection
-indication.
-
-@subsubheading Termination
-
-Whether the termination is pre-arranged or basic is a characteristic of the
-stream.
-
-@subsubheading User Data
-
-@subsubheading Report Cause
+@menu
+* N-CONNECT::
+* N-DATA::
+* N-EXPEDITED-DATA::
+* N-RESET::
+* N-INFORM::
+* N-DISCONNECT::
+* N-UNIT-DATA::
+* N-NOTICE::
+* N-STATE::
+* N-PCSTATE::
+* N-COORD::
+@end menu
+
+@node N-CONNECT
+@subsubsection N-CONNECT
+
+@tabref{A-1} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-CONNECT}
+primitives and the TPI connection establishment phase primitives.
+
+@c tpi_sccp_taba01.tbl
+@tabfig{tpi_sccp_taba01,A-1,N-CONNECT Primitive Mapping}
+
+@enumerate
+@item The @dfn{calling address} for the @prim{T_CONN_REQ} primitive is assumed to be the address
+that is bound to the Stream upon which the primitive is issued.
+@item The @dfn{called address} for the @prim{T_CONN_IND} primitive is assumed to be the address that
+is bound to the Stream upon which the primitive is issued.
+@item The @dfn{responding address} for the @prim{T_CONN_RES} primitive is assumed to be the address
+to which @parm{ACCEPTOR_id} is bound, or if @parm{ACCEPTOR_id} is not bound, the address to which
+the Stream upon which the primitive is issued is bound.
+@item The @dfn{expedited data selection} and @dfn{importance} are indicated or confirmed as an
+implementation option.
+@item The @dfn{user data} is optional for all connection primitives.
+@item The @dfn{connection identifier} is implied for the @prim{T_CONN_REQ} and @prim{T_CONN_CON}
+primitives.
+@end enumerate
 
+@node N-DATA
+@subsubsection N-DATA
+
+@tabref{A-2} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-DATA}
+primitives and the TPI data transfer phase primitives.
+
+@c tpi_sccp_taba02.tbl
+@tabfig{tpi_sccp_taba02,A-2,N-DATA Primitive Mapping}
+
+@enumerate
+@item When @prim{T_OPTDATA_REQ} is used to transfer normal data, the @dfn{importance} of the data
+can be specified in the @parm{OPT_length} and @parm{OPT_offset} options.  If not specified, the
+default importance selection returned by @prim{T_INFO_ACK} is used.
+@item When @prim{T_DATA_REQ} or @msg{M_DATA} are used to transfer normal data, the @dfn{importance}
+returned by @prim{T_INFO_ACK} and setable by @prim{T_OPTMGMT_REQ} is used.
+@item When @prim{T_OPTDATA_IND} is used to transfer normal data, the @dfn{importance} of the data
+can be indicated in the @parm{OPT_length} and @parm{OPT_offset} options.  Otherwise, the importance
+is discarded.
+@item Note that @msg{M_DATA} used to transfer normal data must be of band zero (@samp{0}).
+@end enumerate
+
+@node N-EXPEDITED-DATA
+@subsubsection N-EXPEDITED-DATA
+
+@tabref{A-3} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-EXPEDITED-DATA}
+primitives and the TPI expedited data transfer phase primitives.
+
+@c tpi_sccp_taba03.tbl
+@tabfig{tpi_sccp_taba03,A-3,N-EXPEDITED-DATA Primitive Mapping}
+
+@enumerate
+@item Note that @msg{M_DATA} used to transfer expedited data must be of band one (@samp{1}).
+@end enumerate
+
+@node N-RESET
+@subsubsection N-RESET
+
+@tabref{A-4} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-RESET}
+primitives and the TPI option data transfer phase primitives.
+
+@c tpi_sccp_taba04.tbl
+@tabfig{tpi_sccp_taba04,A-4,N-RESET Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-INFORM
+@subsubsection N-INFORM
+
+@tabref{A-5} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-INFORM}
+primitives and the TPI option data transfer phase primitives.
+
+@c tpi_sccp_taba05.tbl
+@tabfig{tpi_sccp_taba05,A-5,N-INFORM Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-DISCONNECT
+@subsubsection N-DISCONNECT
+
+@tabref{A-6} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-DISCONNECT}
+primitives and the TPI connection release phase primitives.
+
+@c tpi_sccp_taba06.tbl
+@tabfig{tpi_sccp_taba06,A-6,N-DISCONNECT Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-UNIT-DATA
+@subsubsection N-UNIT-DATA
+
+@tabref{A-7} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-UNIT-DATA}
+primitives and the TPI connectionless data transfer primitives.
+
+@c tpi_sccp_taba07.tbl
+@tabfig{tpi_sccp_taba07,A-7,N-UNIT-DATA Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-NOTICE
+@subsubsection N-NOTICE
+
+@tabref{A-8} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-NOTICE}
+primitives and the TPI connectionless data transfer error primitives.
+
+@c tpi_sccp_taba08.tbl
+@tabfig{tpi_sccp_taba08,A-8,N-NOTICE Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-STATE
+@subsubsection N-STATE
+
+@c tpi_sccp_taba09.tbl
+
+@node N-PCSTATE
+@subsubsection N-PCSTATE
+
+@c tpi_sccp_taba10.tbl
+
+@node N-COORD
+@subsubsection N-COORD
+
+@c tpi_sccp_taba11.tbl
 
 @page
-@node Mapping TPI Primitives to ANSI T1.114
-@section Mapping TPI Primitives to ANSI T1.114
+@node Mapping TPI Primitives to ANSI T1.112
+@section Mapping TPI Primitives to ANSI T1.112
 
 @page
-@node Mapping TPI Primitives to ETSI ETS 300 287
-@section Mapping TPI Primitives to ETSI ETS 300 287
+@node Mapping TPI Primitives to ETSI ETS 300 009-1
+@section Mapping TPI Primitives to ETSI ETS 300 009-1
 
 @page
-@node Mapping TPI Primitives to ITU-T X.219
-@section Mapping TPI Primitives to ITU-T X.219
+@node Mapping TPI Primitives to ITU-T X.213
+@section Mapping TPI Primitives to ITU-T X.213
 
 
 @node @value{INTERFACE} Header Files
@@ -1285,7 +998,7 @@ stream.
 @node @value{INTERFACE} Library
 @appendix @value{INTERFACE} Library
 
-Because this Corrigendum provides a TCAP interface that conforms to the Transport Provider Interface
+Because this Corrigendum provides an SCCP interface that conforms to the Transport Provider Interface
 (TPI) Revision 2.0.0, it can use the libraries provided for use by the TPI.  In particular, the
 @manref{libxti(3)} library can be used.
 
@@ -1293,57 +1006,53 @@ Because this Corrigendum provides a TCAP interface that conforms to the Transpor
 @appendix @value{INTERFACE} Drivers and Modules
 
 @menu
-* TCI Module::
-* TRI Driver and Module::
+* SCCP Driver and Module::
+* NPI Conversion Module::
 * TPI Conversion Module::
 @end menu
 
-The Transaction Component Interface (TCI/TRI) is used to provide services to a number of
+The Signalling Connection Control Part Interface (SCCPI) is used to provide services to a number of
 @cite{STREAMS} drivers and modules in addition to user-space applications.
 @cite{@value{PACKAGE_TITLE}} provides a range of @cite{STREAMS} multiplexing drivers, pseudo-device
-drivers, and pushable modules that complement the SS7 Transaction Capabilities Application Part
-driver that provides the Transaction Component Interface (TCI/TRI) at its upper layer.
+drivers, and pushable modules that complement the SS7 Signalling Connection Control Part
+driver that provides the Signalling Connection Control Part Interface (SCCPI) at it s upper layer.
 
-@node TCI Module
-@section TCI Module
+@node NPI Conversion Module
+@section NPI Conversion Module
 
-The @dfn{TCI Module} is a pushable @dfn{STREAMS} module that provide the Component Handling sublayer
-of the Transaction Capabilities Application Part (TCAP).  It implements the Transaction Component
-Interface (TCI) at its upper boundary and utilized the Transaction Interface (TRI) at its lower
-boundary.
+The @dfn{NPI Conversion Module} is a specific-purpose pushable @dfn{STREAMS} module that can be
+pushed over any Stream conforming to the Signalling Connection Control Part Interface (SCCPI) and
+converts that Stream to an NPI-SCCP service interface conforming to the NPI-SCCP specification.
+This permits the SCCP Stream to be used by external applications using the NPI API library
+(@manref{libnpiapi(3)}).
 
-@node TRI Driver and Module
-@section TRI Driver and Module
+A minor device number on the SCCP driver is defined that will @manref{autopush(8)} the @dfn{NPI
+Conversion Module} that is part of this package.
 
-The @dfn{TRI Driver and Mdoule} is a @dfn{STREAMS} multiplexing driver or pushable module that links
-or pushes Streams conforming to the Signalling Connection Control Part Interface (SCCPI) and provide
-an upper boundary that conforms to the Transaction Interace (TRI).  It implements the Transaction
-Handling sublayer of the Transaction Capabilities Application Part (TCAP) protocol.  The module is
-more appropriate for Streams that service an entire SCCP subsystem, whereas the multiplexing driver
-is appropriate for Streams that handle only a subset of the Application Contexts available for a
-given SCCP subsystem.
+Similarly, a minor device number on the SUA driver is also defined.
 
 @node TPI Conversion Module
 @section TPI Conversion Module
 
 The @dfn{TPI Conversion Module} is a general-purpose pushable @dfn{STREAMS} module that can be
-pushed over any Stream conforming to the Transaction Component Interface (TCI/TRI) and coverts that
-Stream to an XTI-TCAP service interface conforming to the XTI-TCAP specification.  This permits the
-TCAP Stream to be used by external applications using the XTI/TLI Library (@manref{libxnet(3)}).
+pushed over any Stream conforming to the Network Provider Interface (NPI) and converts that
+Stream to an XTI-SCCP service interface conforming to the XTI-SCCP specification.  This permits the
+SCCP Stream to be used by external applications using the XTI/TLI Library (@manref{libxnet(3)}).
 
-A minor device number on the TR driver is defined that will @manref{autopush(8)} the @dfn{TC Module}
-and then push the special-purpose @dfn{TPI Conversion Module} that is part of this package.  The
-@dfn{TPI Conversion Module} provides option conversion assistance to this module.
+A minor device number on the SCCP driver is defined that will @manref{autopush(8)} the @dfn{NPI
+Conversion Module} and then push the general-purpose @dfn{TPI Conversion Module} that is part of the
+@file{strxnet} package.  The @dfn{NPI Conversion Module} provides option conversion assistance to
+this module.
 
 Similarly, a minor device number on the TUA driver is so defined.
 
 @node @value{INTERFACE} Utilities
 @appendix @value{INTERFACE} Utilities
 
-In general, any of the utilities provided by the underlying TCAP or TUA provider that support
-input-output controls defined in the TRI/TCI specification can be used on TCAP or TUA Streams upon
+In general, any of the utilities provided by the underlying SCCP or SUA provider that support
+input-output controls defined in the SCCPI specification can be used on SCCP or SUA Streams upon
 which the @dfn{TPI Conversion Module} has been pushed to conform to this Addendum.  The @dfn{TPI
-Conversion Module} passes input-output controls transparently to the underlying TCAP module.
+Conversion Module} passes input-output controls transparently to the underlying SCCP module.
 
 Therefore, this specification does not define any utilities of its own.
 

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-31 06:57:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 06:57:13 $ by $Author: brian $
+# Last Modified $Date: 2008-11-17 14:04:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,24 +57,36 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= mtpi.texi npi_mtp.texi
+info_TEXINFOS		+= sccpi.texi npi_sccp.texi tpi_sccp.texi xti_sccp.texi
 
-mtpi_TEXINFOS		= \
-			  mtpi.h \
+sccpi_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
-npi_mtp_TEXINFOS	= \
-			  npi_mtp.h \
+npi_sccp_TEXINFOS	= \
+			  npi_sccp.h \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
+tpi_sccp_TEXINFOS	= \
+			  tpi_sccp.h \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
+xti_sccp_TEXINFOS	= \
+			  xti_sccp.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 if MAINTAINER_MODE
 if AMDEP
-mtpi_TEXINFOS		+= \
+sccpi_TEXINFOS		+= \
 			  texi/args.texi
-
-npi_mtp_TEXINFOS	+= \
+npi_sccp_TEXINFOS	+= \
+			  texi/args.texi
+tpi_sccp_TEXINFOS	+= \
+			  texi/args.texi
+xti_sccp_TEXINFOS	+= \
 			  texi/args.texi
 endif
 endif
@@ -82,89 +94,107 @@ endif
 EXTRA_info_TEXINFOS	= \
 			  texi/args.texi \
 			  $(info_TEXINFOS) \
-			  $(mtpi_TEXINFOS) \
-			  $(npi_mtp_TEXINFOS)
+			  $(sccpi_TEXINFOS) \
+			  $(npi_sccp_TEXINFOS) \
+			  $(tpi_sccp_TEXINFOS) \
+			  $(xti_sccp_TEXINFOS)
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 FIG_FIGS		= \
-			  mtpi01.fig \
-			  mtpi02.fig \
-			  mtpi03.fig \
-			  mtpi04.fig \
-			  mtpi05.fig \
-			  mtpi06.fig \
-			  mtpi07.fig \
-			  mtpi08.fig \
-			  mtpi09.fig \
-			  mtpi10b.fig \
-			  mtpi10.fig \
-			  mtpi11b.fig \
-			  mtpi11.fig \
-			  mtpi12.fig \
-			  mtpi13.fig \
-			  mtpi14.fig \
-			  mtpi15.fig \
-			  mtpi16.fig \
-			  mtpi17.fig \
-			  mtpi18.fig \
-			  mtpi19.fig \
-			  mtpi20.fig \
-			  mtpi2_1.fig \
-			  mtpi21.fig \
-			  mtpi22.fig \
-			  mtpi23.fig \
-			  mtpi24.fig \
-			  mtpi25.fig \
-			  mtpi26.fig \
-			  mtpi27.fig \
-			  mtpi28.fig \
-			  mtpi30.fig \
-			  mtpi3_10.fig \
-			  mtpi3_11.fig \
-			  mtpi3_12.fig \
-			  mtpi3_13.fig \
-			  mtpi3_14.fig \
-			  mtpi3_15.fig \
-			  mtpi3_1.fig \
-			  mtpi31.fig \
-			  mtpi3_2.fig \
-			  mtpi32.fig \
-			  mtpi3_3.fig \
-			  mtpi33.fig \
-			  mtpi3_4.fig \
-			  mtpi34.fig \
-			  mtpi3_5.fig \
-			  mtpi35.fig \
-			  mtpi3_6.fig \
-			  mtpi36.fig \
-			  mtpi3_7.fig \
-			  mtpi37.fig \
-			  mtpi3_8.fig \
-			  mtpi38.fig \
-			  mtpi3_9.fig \
-			  mtpi39.fig \
-			  mtpi40.fig \
-			  mtpi41.fig \
-			  mtpi42.fig \
-			  mtpi43.fig \
-			  mtpi44.fig \
-			  mtpi45.fig \
-			  mtpi46.fig \
-			  mtpi47.fig \
-			  mtpi48.fig \
-			  mtpi49.fig
+			  sccpi01.fig \
+			  sccpi02.fig \
+			  sccpi42.fig \
+			  sccpi03.fig \
+			  sccpi04.fig \
+			  sccpi05.fig \
+			  sccpi06.fig \
+			  sccpi07.fig \
+			  sccpi44.fig \
+			  sccpi31.fig \
+			  sccpi08.fig \
+			  sccpi24.fig \
+			  sccpi_fi10.fig \
+			  sccpi_fi11.fig \
+			  sccpi_fi12.fig \
+			  sccpi_fi13.fig \
+			  sccpi_fi14.fig \
+			  sccpi_fi15.fig \
+			  sccpi_fi16.fig \
+			  sccpi_fi17.fig \
+			  sccpi_fi18.fig \
+			  sccpi_fi19.fig \
+			  sccpi_fi20.fig \
+			  sccpi_fi21.fig \
+			  sccpi_fi22.fig \
+			  sccpi_fi23.fig \
+			  sccpi_fig1.fig \
+			  sccpi_fig2.fig \
+			  sccpi_fig3.fig \
+			  sccpi_fig4.fig \
+			  sccpi_fig5.fig \
+			  sccpi_fig6.fig \
+			  sccpi_fig7.fig \
+			  sccpi_fig8.fig \
+			  sccpi_fig9.fig \
+			  sccpi_figc1.fig
 
 TBL_TBLS		= \
-			  mtpi_tab01.tbl \
-			  mtpi_tab02.tbl \
-			  mtpi_tab03.tbl \
-			  mtpi_tab04.tbl \
-			  mtpi_tab05.tbl \
-			  mtpi_tab06.tbl \
-			  mtpi_tab07.tbl \
-			  npi_mtp_taba1.tbl
+			  sccpi_tab01.tbl \
+			  sccpi_tab02.tbl \
+			  sccpi_tab03.tbl \
+			  sccpi_tab04.tbl \
+			  sccpi_tab05.tbl \
+			  sccpi_tab1.tbl \
+			  sccpi_tab2.tbl \
+			  sccpi_tab3.tbl \
+			  sccpi_tab4.tbl \
+			  sccpi_tab5.tbl \
+			  sccpi_tab6.tbl \
+			  sccpi_tab7.tbl \
+			  sccpi_tab8.tbl \
+			  sccpi_taba1.tbl \
+			  sccpi_tabb1.tbl \
+			  sccpi_tabb2.tbl \
+			  sccpi_tabb3.tbl \
+			  sccpi_tabb4.tbl \
+			  sccpi_tabb5.tbl \
+			  sccpi_tabb6.tbl \
+			  sccpi_tabb7.tbl \
+			  sccpi_tabb8.tbl \
+			  sccpi_tabc1.tbl \
+			  sccpi_tabc2.tbl \
+			  npi_sccp_taba1.tbl \
+			  npi_sccp_taba2.tbl \
+			  npi_sccp_taba3.tbl \
+			  npi_sccp_taba4.tbl \
+			  npi_sccp_taba5.tbl \
+			  npi_sccp_taba5b.tbl \
+			  npi_sccp_taba6.tbl \
+			  npi_sccp_taba7.tbl \
+			  tpi_sccp_taba01.tbl \
+			  tpi_sccp_taba02.tbl \
+			  tpi_sccp_taba03.tbl \
+			  tpi_sccp_taba04.tbl \
+			  tpi_sccp_taba05.tbl \
+			  tpi_sccp_taba06.tbl \
+			  tpi_sccp_taba07.tbl \
+			  tpi_sccp_taba08.tbl \
+			  xti_sccp_tab51.tbl \
+			  xti_sccp_tab52.tbl \
+			  xti_sccp_tab21.tbl \
+			  xti_sccp_tab22.tbl \
+			  xti_sccp_tab23.tbl \
+			  xti_sccp_tab24.tbl \
+			  xti_sccp_tab25.tbl \
+			  xti_sccp_tab26.tbl \
+			  xti_sccp_tab27.tbl \
+			  xti_sccp_tab28.tbl \
+			  xti_sccp_tab29.tbl \
+			  xti_sccp_tab30.tbl \
+			  xti_sccp_tab31.tbl \
+			  xti_sccp_tab32.tbl
 
 ## PKG_BUILD_INDEP
 endif
@@ -178,20 +208,8 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
-## Revision 0.9.2.5  2008-08-31 06:57:13  brian
-## - do not customize docs unless maintainer modes and dependency tracking
-##
-## Revision 0.9.2.4  2008-04-29 07:10:38  brian
-## - updating headers for release
-##
-## Revision 0.9.2.3  2007/08/14 12:17:00  brian
-## - GPLv3 header updates
-##
-## Revision 0.9.2.2  2007/08/13 15:22:04  brian
-## - header updates, added references
-##
-## Revision 0.9.2.1  2007/06/27 08:42:19  brian
-## - added MTPI spec document
+## Revision 0.9.2.1  2008-11-17 14:04:32  brian
+## - added documentation and conversion modules
 ##
 ## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
