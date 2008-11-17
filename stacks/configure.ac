@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-10-31 06:54:52 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-11-17 14:13:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-31 06:54:52 $ by $Author: brian $
+# Last Modified $Date: 2008-11-17 14:13:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.55 $) $Date: 2008-10-31 06:54:52 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.56 $) $Date: 2008-11-17 14:13:04 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -227,6 +227,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.56  2008-11-17 14:13:04  brian
+# - documentation additions
+#
 # Revision 0.9.2.55  2008-10-31 06:54:52  brian
 # - move config files, better strconf handling
 #

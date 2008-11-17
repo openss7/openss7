@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-31 06:57:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-11-17 14:13:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 06:57:13 $ by $Author: brian $
+# Last Modified $Date: 2008-11-17 14:13:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -178,6 +178,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.6  2008-11-17 14:13:05  brian
+## - documentation additions
+##
 ## Revision 0.9.2.5  2008-08-31 06:57:13  brian
 ## - do not customize docs unless maintainer modes and dependency tracking
 ##

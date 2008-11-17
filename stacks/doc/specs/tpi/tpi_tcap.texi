@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi_tcap.texi,v 0.9.2.17 2008-09-20 11:04:45 brian Exp $
+% @(#) $Id: tpi_tcap.texi,v 0.9.2.18 2008-11-17 14:13:05 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-09-20 11:04:45 $ by $Author: brian $
+% Last Modified $Date: 2008-11-17 14:13:05 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -456,7 +456,10 @@ is an @strong{UNCONTROLLED VERSION}.
 
 @smallexample
 @verbatim
-$Log$
+$Log: tpi_tcap.texi,v $
+Revision 0.9.2.18  2008-11-17 14:13:05  brian
+- documentation additions
+
 @end verbatim
 @end smallexample
 
