@@ -1,5 +1,11 @@
 2008-11-17  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: conversion modules compile
+	* src/include/sys/xti_sccp.h: conversion modules compile
+	* src/modules/sccp/npi_sccp.c: conversion modules compile
+	* src/modules/sccp/streams.conf: conversion modules compile
+	* src/modules/sccp/tpi_sccp.c: conversion modules compile
+
 	* doc/specs/mtpi/npi_mtp.h: added npi-mtp documentation
 	* doc/specs/mtpi/npi_mtp.texi: added npi-mtp documentation
 	* doc/specs/mtpi/npi_mtp_taba1.tbl: added npi-mtp documentation
