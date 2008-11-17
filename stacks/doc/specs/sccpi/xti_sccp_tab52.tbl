@@ -1,0 +1,49 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+box center tab(:);
+cb|cb|cb|cb|cb|cb|cb|cb
+l|c|c|c|c|c|c|c.
+Option Name:(1):(2):(3):(4):(5):(6):(7)
+=
+.TH
+T_SCCP_RST_OPT:X:X::X:::
+T_SCCP_VERSION:X:X::X:X:X:X
+T_SCCP_DISCON_REASON:X:::::X:X
+T_SCCP_DISCON_ADD:X::::::X
+=
+.T&
+lllsssss.
+:(1):t_optmgmt
+:(2):t_connect
+:(3):t_listen
+:(4):t_accept
+:(5):t_rcvconnect
+:(6):t_optmgmt before a call of t_snddis
+:(7):t_optmgmt after a call of t_rcvdis
+.TE

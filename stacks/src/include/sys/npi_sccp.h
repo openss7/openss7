@@ -234,6 +234,24 @@ typedef struct {
 	np_ulong TRAFFIC_mix;		/* traffic mix */
 } N_traffic_ind_t;
 
+#define N_REQUEST_REQ	43
+typedef struct {
+	np_ulong PRIM_type;		/* always N_REQUEST_REQ */
+	np_ulong SRC_length;
+	np_ulong SRC_offset;
+	np_ulong SRC_lref;
+	np_ulong QOS_length;
+	np_ulong QOS_offset;
+} N_request_req_t;
+
+#define N_REPLY_ACK	44
+typedef struct {
+	np_ulong PRIM_type;		/* always N_REPLY_ACK */
+	np_ulong SRC_lref;
+	np_ulong QOS_length;
+	np_ulong QOS_offset;
+} N_reply_ack_t;
+
 #define N_SCCP_STATUS_USER_IN_SERVICE			1
 #define N_SCCP_STATUS_USER_OUT_OF_SERVICE		2
 #define N_SCCP_STATUS_REMOTE_SCCP_AVAILABLE		3
@@ -321,6 +339,7 @@ typedef struct {
 	np_ulong sequence_selection;	/* selected SLS value */
 	np_ulong message_priority;	/* MTP message priority */
 	np_ulong importance;		/* importance */
+	np_ulong credit;		/* initial window credit */
 } N_qos_sel_conn_sccp_t;
 
 #define N_QOS_SEL_INFO_SCCP	0x0903
@@ -331,6 +350,7 @@ typedef struct {
 	np_ulong sequence_selection;	/* selected SLS value */
 	np_ulong message_priority;	/* MTP message priority */
 	np_ulong importance;		/* importance */
+	np_ulong credit;		/* initial window credit */
 } N_qos_sel_info_sccp_t;
 
 #define N_QOS_RANGE_INFO_SCCP	0x0904
@@ -338,6 +358,7 @@ typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_RANGE_INFO_SCCP */
 	np_ulong protocol_classes;	/* protocol class */
 	np_ulong sequence_selection;	/* SLS range */
+	np_ulong credit;		/* initial window credit */
 } N_qos_range_info_sccp_t;
 
 #define N_QOS_SEL_INFR_SCCP	0x0905
@@ -348,6 +369,7 @@ typedef struct {
 	np_ulong sequence_selection;	/* selected SLS value */
 	np_ulong message_priority;	/* MTP message priority */
 	np_ulong importance;		/* importance */
+	np_ulong credit;		/* initial window credit */
 } N_qos_sel_infr_sccp_t;
 
 typedef union {

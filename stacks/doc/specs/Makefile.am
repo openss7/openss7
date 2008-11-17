@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:10:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:10:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -52,7 +52,7 @@
 
 include ../../am/openss7.am
 
-SUBDIRS = cci tri tci mapi mtpi sli sdli sdti
+SUBDIRS = cci tri tci mapi sccpi mtpi sli sdli sdti
 
 ## =============================================================================
 ##

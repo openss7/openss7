@@ -1,0 +1,2158 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: npi_mtp.texi,v 0.9.2.1 2008-11-17 14:04:32 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2008-11-17 14:04:32 $ by $Author: brian $
+%
+% =========================================================================
+\input texinfo @c -*- texinfo -*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c %**start of header
+@setfilename npi_mtp.info
+@include texi/args.texi
+@set MANUAL_TITLE Network Provider Interface
+@set MANUAL_TYPE Corrigendum for MTP Conformance
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* NPI-MTP: (npi_mtp).		NPI Corrigendum for MTP
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE Network Provider Interface
+@set MANUAL_TYPE Corrigendum for MTP Conformance
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the MTP Corrigendum to the Network Provider Interface.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+
+
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both that copyright notice and this
+permission notice appear in supporting documentation, and that the name UNIX
+International not be used in advertising or publicity pertaining to distribution
+of the software without specific, written prior permission. UNIX International
+makes no representations about the suitability of this documentation for any
+purpose. It is provided ``as is'' without express or implied warranty.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting derived
+work is distributed under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE Network Provider Interface
+@set MANUAL_TYPE Corrigendum for MTP Conformance
+
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document specifies an (unofficial) addendum to the Network Provider Interface (NPI)
+Specification [NPI] for SS7 Message Transfer Part (MTP) [Q.704] conformance in support of the MTP to
+MTP User primitive interface [Q.701].  It supports the user-level XNS/NPI abstraction [XNS] of the
+Message Transfer Part User interface as well as providing a basis for MTP User protocols using the
+services of the SS7 Message Transfer Part.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Permission to use, copy and distribute this documentation without modification,
+for any purpose and without fee or royalty is hereby granted, provided that both
+the above copyright notice and this permission notice appears in all copies and
+that the name of OpenSS7 Corporation not be used in advertising or publicity
+pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation
+about the suitability of this documentation for any purpose.  It is provided
+``as is'' without express or implied warranty.
+
+@sp 1
+
+@noindent
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation
+including all implied warranties of merchantability, fitness for a particular
+purpose, non-infringement, or title; that the contents of the document are
+suitable for any purpose, or that the implementation of such contents will not
+infringe on any third party patents, copyrights, trademarks or other rights.
+In no event shall OpenSS7 Corporation be liable for any direct, indirect,
+special or consequential damages or any damages whatsoever resulting from loss
+of use, data or profits, whether in an action of contract, negligence or other
+tortious action, arising out of or in connection with any use of this document
+or the performance or implementation of the contents thereof.}
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@c @end ifnottex
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@iftex
+
+@macro prim {name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval {name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr {name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta {name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm {name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc {name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{\name\}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@code{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
+
+@ifnottex
+@node Top
+@top Network Provider Interface---Corrigendum for MTP Conformance
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* NPI-MTP::
+* NPI-MTP Rules for Conformance::
+* NPI-MTP Mapping of Primitives::
+* NPI-MTP Header File Listing::
+* License::
+* Glossary::
+* Acronyms::
+* References::
+* Index::
+@end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
+@node Preface
+@unnumbered Preface
+
+This document is intended to provide information for writers of OpenSS7 Message Transfer Part (MTP)
+applications at both the user and kernel level, as well as writers of OpenSS7 Message Transfer Part
+(MTP) Users.
+
+@unnumberedsec Target Audience
+
+The target audience is developers and users of the OpenSS7 SS7 protocol stack.
+
+@unnumberedsec Disclaimer
+
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+
+@unnumberedsec Revision History
+
+Take care that you are working with a current version of this document: you will not be informed of
+updates.  For a current version, please see the source documentation at
+@url{http://www.openss7.org/}.
+
+@smallexample
+@verbatim
+$Log: npi_mtp.texi,v $
+Revision 0.9.2.1  2008-11-17 14:04:32  brian
+- added documentation and conversion modules
+
+@end verbatim
+@end smallexample
+
+@node Introduction
+@chapter Introduction
+
+This document describes the protocol-specific information that is relevant to the SS7 Message
+Transfer Part (MTP) [Q.704, T1.111, JT-Q.704] NSP [NPI].  This document also describes the
+protocol-specific information that is relevant when MTP network services are provided over an IP
+network [M3UA].
+
+In general, this document describes the characteristics that the MTP and M3UA NSP have in common,
+with notes indicating where they differ.
+
+This document also defines the data structures and constants required for MTP and M3UA [M3UA] NSP
+that are exposed through the @file{<sys/npi_mtp.h>} header file.
+
+@menu
+* Protocol Address::
+* Connection and Connectionless Modes::
+* Sending Data of Zero Octets::
+* Quality of Service Parameters::
+@end menu
+
+@node Protocol Address
+@section Protocol Address
+
+In an MTP environment, the protocol address is the MTP-SAPI that identifies the SS7 netweork, SS7
+Signalling Point Code within the SS7 network, and the MTP-User identifier (service indicator).
+
+@node Connection and Connectionless Modes
+@section Connection and Connectionless Modes
+
+@subsection Connection-Oriented Mode
+
+The Message Transfer Part NSP supports connect-oriented mode for MTP-User protocols that form an
+association between two MTP-Users in an end-to-end exchange.  This includes TUP [Q.721], ISUP
+[Q.761], BTNUP, BICC and other call control protocols.
+
+The Message Transfer Part does not support a true connection-oriented mode.  When associations are
+formed with @prim{N_CONN_REQ}, no protocol messages are exchanged between the local and remote MTP
+users and the @prim{N_CONN_REQ} primitive will always succeed unless the remote MTP user is not
+known to the NSP.  Because of this, it is not possible for the Message Transfer Part to accept
+incoming connections; @prim{N_CONN_IND} primitives will not be issued by the NSP on association
+formation (but may be issued on first data).
+
+@subsection Connectionless Mode
+
+The Message Transfer Part NSP supports connection-less mode for MTP-User protocols that form
+one-to-many or many-to-one or many-to-many associations and are not restricted to an end-to-end
+exchange of MTP.  This includes SCCP [Q.711], MTUP, and other MTP Users of a connection-less nature.
+
+@node Sending Data of Zero Octets
+@section Sending Data of Zero Octets
+
+The Message Transfer Part, both in connection-oriented mode and in connection-less mode, does not
+permit sending a NSDU of zero octets.  So, in connection-less mode, if the number of @msg{M_DATA}
+message blocks is zero, the @prim{N_UNITDATA_REQ} primitive will always faile with the
+@parm{NPI_error} in the @prim{N_ERROR_ACK} set to @pval{NBADDATA}.  In connection-oriented mode, if
+the number of @msg{M_DATA} message block bytes is zero, the @prim{N_DATA_REQ} primitive will always
+fail with the @parm{NPI_error} in the @prim{N_ERROR_ACK} set to @pval{NBADDATA}.  If either the
+@pval{N_MORE_DATA_FLAG} is not set in the @parm{DATA_xfer_flags}, or the @pval{N_MORE_DATA_FLAG} is
+not set and the preceding @prim{N_DATA_REQ} primitive completed an NSDU (that is, the call has
+requested sending of a zero byte NSDU).
+
+@node Quality of Service Parameters
+@section Quality of Service Parameters
+
+The quality of service parameter structures are specific to MTP.  All quality of service parameters
+are association-related, that is, they are options with end-to-end significance.  They may be
+negotiated in the NPI state @psta{NS_IDLE}, and are read-only in all other states except
+@psta{NS_UNBND}.
+
+@subsection Quality of Service Structures
+
+MTP-NPI provides quality of service structure selection for data, connections, information and range
+information.  The MTP specific quality of service structures are discussed in detail below.
+
+@node NPI-MTP
+@chapter NPI-MTP
+
+@section NPI Primitives
+
+This section describes the formats and rules for the Network Provider Interface [NPI] that are
+specific to the Message Transfer Part [Q.704, T1.111, JT-Q.704].  This section must be used along
+with the generic Network Provider Interface Specification [NPI] when implementing an NSP that will
+be configured with the SS7 Message Transfer Part.
+
+@subsection Protocol Address
+
+The network address is used in the @prim{N_BIND_REQ}, @prim{N_BIND_ACK}, @prim{N_CONN_REQ},
+@prim{N_CONN_CON}, @prim{N_UNITDATA_REQ}, @prim{N_UNITDATA_IND} and @prim{N_UDERROR_IND} primitives.
+
+@subsubheading Format
+
+The MTP network protocol address uses a @type{sockaddr} structure to support sockets compatibility
+libraries consistent with the MTP XTI/TLI interface.
+
+The network protocol address is formatted as follows:
+
+@smallexample
+@verbatim
+struct sockaddr_mtp {
+	sa_family_t mtp_family;		/* Address family */
+	uint16_t mtp_ni;		/* Network indicator */
+	uint16_t mtp_si;		/* Service indicator */
+	uint32_t mtp_pc;		/* Point code */
+	uint8_t mtp_zero[sizeof(struct sockaddr) - sizeof(ss_family_t) -
+			 sizeof(uint16_t) * 2 - sizeof(uint32_t)];
+} __attribute__ ((packed));
+@end verbatim
+@end smallexample
+
+@subsubheading Parameters
+
+@table @member
+@item mtp_family
+Specifies the MTP socket address family.  The address family is always @pval{AF_MTP}.
+@item mtp_ni
+Specifies the network indicator that specifies the SS7 network to which the address belongs.  A
+given MTP entity can belong to multiple SS7 networks, particularly when acting as a gateway between
+networks.  The network indicator specifies to which network the MTP-SAPI belongs.
+@item mtp_si
+Specifies the service indicator of an MTP user.  The service indicator can take on one of the
+following values, each of which corresponds to an MTP user at the MTP entity.
+@table @pval
+@item N_SS7_MTP
+Refers to the Message Transfer Part management itself.  MTP provides conformin to this specification
+support CLNS for this NSU.
+@item N_SS7_SCCP
+Refers to the Signalling Connection Control Part [Q.711].  MTP providers conforming to this
+specification support CLNS for this NSU.
+@item N_SS7_TUP
+Refers to the Telephone User Part (TUP)[Q.724].  MTP providers conforming to this specification
+support CONS for this NSU.
+@item N_SS7_NUP
+Refers to the Network User Part (NUP).  MTP providers conforming to this specification support
+CONS for this NSU.
+@item N_SS7_ISUP
+Refers to the Integrated Services Digital Network (ISDN) User Part (ISUP) [Q.764].  MTP providers
+conforming to this specification support CONS for this NSU.
+@item N_SS7_DUP1
+Refers to the Data User Part (Call and Circuit-related messages) MTP providers conforming to this
+specification support CONS for this NSU.
+@item N_SS7_DUP2
+Refers to the Data User Part (Facility registration and cancellation messages) MTP providers
+conforming to this specification support CONS for this NSU.
+@item N_SS7_MTUP
+Refers to the MTP Test User Part (MTUP).  MTP providers conforming to this specification support
+CLNS for this NSU.
+@item N_SS7_BISDN
+Refers to the Broadband ISDN User Part (B-ISDN).  MTP providers conforming to this specification
+support CONS for this NSU.
+@item N_SS7_SISDN
+Refers to the Satellite ISDN User Part (S-ISDN).  MTP providers conforming to this specification
+support CONS for this NSU.
+@item N_SS7_SPNEUP
+Refers to the Signal Processing Newtork Equipment User Part.  MTP providers conforming to this
+specification support CONS for this NSU.
+@item N_SS7_AAL2_STC
+MTP providers conforming to this specification support CONS for this NSU.
+@item N_SS7_BICC
+Refers to the Bearer Independent Call Control (BICC).  MTP providers conforming to this
+specification support CONS for this NSU.
+@item N_SS7_GCP
+Refers to the Gateway Control Protocol (GCP).  MTP provider conforming to this specification support
+CLNS for this NSU.
+@end table
+@item mtp_pc
+Specifies the signalling point code f the MTP provider entity.  The point code is normally coded as
+a 14-bit [Q.704] or 24-bit [T1.111] value, right justified in the @member{mtp_pc} field, that
+identifies the MTP entity.  Non-significant bits are coded zero (@samp{0}).
+@item mtp_zero
+Specifies padding to pad the size of the @type{sockaddr_mtp} structure to the size of a
+@type{sockaddr_storage} structure [XNS].
+@end table
+
+@subsubheading Rules
+
+The following rules are followed for the coding of the @type{sockaddr_mtp} structure:
+
+@enumerate
+@item
+The @member{mtp_family} field must always be populated with the @pval{AF_MTP} address family.  This
+specifies that the @type{sockaddr} structure contains an SS7 Message Transfer Part protocol
+address.@footnote{The MTP NSP may ignore this field: it is present for compatibility of the address
+structure with the XTI/TPI version of the MTP interface.}
+@item
+The @member{mtp_ni} field is coded zero (@samp{0}) if the local MTP provider entity exists in only one
+network, or if the local MTP provider allows a default network.  When the @member{mtp_ni} field is
+specified as zero (@samp{0}) and a network indicator is required by the operation, the conforming
+MTP provider will assign a network indicator (default) or will return @perr{NNOADDR}.
+@item
+If the local MTP provider entity exists in more than one network, the @member{mtp_ni} value indicating
+the selected entwork can be specified in the @type{sockaddr_mtp} address.  Which values of the
+@member{mtp_ni} field correspond to which networks is local to the the MTP provider.@footnote{As an
+example of an instance where the @member{mtp_ni} field definition is local to the MTP provider is for
+M3UA, where the value of the @member{mtp_ni} field may be interpreted as a @dfn{Network Appearance}.}
+@item
+The @member{mtp_si} field is coded in conformance with Q.704 [Q.704], ANSI T1.111.4 [T1.111], and
+other national variant [JT-Q.704] specifications of values for the Service Indicator in the MTP
+message.
+@item
+The @member{mtp_pc} field is always populated and must contain a non-zero value.  The field continas
+the SS7 point code coded in conformance with Q.704 [Q.704], ANSI T1.111.4 [T1.111] and other
+national variant [JT-Q.704] specifications and is the point code representation right justified with
+unused most significant bits coded zero (@samp{0}).@footnote{For example, the ANSI [T1.1111] point
+code 032-008-032 would be coded 0x00100810U.}
+@end enumerate
+
+The following rules apply to including the @type{sockaddr_mtp} structure in NPI primitives:
+
+@table @prim
+@item N_BIND_REQ
+@itemx N_BIND_ACK
+When included in these primitives, the MTP protocol address identifies the local MTP-SAPI to which
+the stream request to be (or has been) bound.
+@item N_INFO_ACK
+When included in the @parm{LOC_addr} field of these primitives, the MTP protocol address identifies
+the local MTP-SAPI to which the stream is bound.  When included in the @parm{REM_addr} field of
+these primitives, the MTP protocol address identifies the remote MTP-SAPI to which the stream is
+connected.
+@item N_CONN_REQ
+@itemx N_CONN_CON
+When included in these primitives, the MTP protocol address identifies the remote MTP-SAPI to which
+the stream requests to be (or has been) connected.
+@item N_UNITDATA_REQ
+@itemx N_UDERROR_IND
+When included in these primitives, the MTP protocol address identifies the remote MTP-SAPI to which
+the message is being sent (or to which it was sent and returned an error).
+@item N_UNITDATA_IND
+When included in the @prim{N_UNITDATA_IND} primitive, the MTP protocol address identifies the local
+MTP-SAPI for which the message was received.
+@end table
+
+@section NPI Quality of Service
+
+@subsection MTP Quality of Service Overview
+
+@subsection MTP Quality of Service Formats
+
+The MTP provides the following quality of service structures:
+
+@subsubsection Data Quality of Service Selection
+
+@subsubheading N_QOS_SEL_DATA_MTP
+
+This quality of service structure type is used when selecting quality of service parameters on a
+message by message basis with the @prim{N_OPTMGMT_REQ} primitive before issuing an @prim{N_DATA_REQ}
+or @prim{N_UNITDATA_REQ} primitive.
+
+@subsubheading Format
+
+@smallexample
+@verbatim
+#define N_QOS_SEL_DATA_MTP      0x0801
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_SEL_DATA_MTP */
+        np_ulong sls;                   /* signalling link selection */
+        np_ulong mp;                    /* message priority */
+} N_qos_sel_data_mtp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+
+@table @member
+@item n_qos_type
+Specifies or indicates the quality of service structure type.  This field is always coded
+@pval{N_QOS_SEL_DATA_MTP}.
+@item sls
+Specifies the value fo the Signalling Link Selection field to use in outgoing MTP messages, or
+indicates the value of the Signalling Link Selection field that was received in incoming MTP
+messages.
+@item mp
+Specifies the value of the Message Priority field to use in outgoing MTP messages, or indicates the
+value of the Message Priority field that was received in incoming MTP messages.
+@end table
+
+@subsubsection Connection Quality of Service Selection
+
+@subsubheading N_QOS_SEL_CONN_MTP
+
+This quality of service structure type is used when selecting quality of service parameters on a
+connection with @prim{N_CONN_REQ}, @prim{N_CONN_IND}, @prim{N_CONN_RES} and @prim{N_CONN_CON}
+primitives.
+
+@subsubheading Format
+
+@smallexample
+@verbatim
+#define N_QOS_SEL_CONN_MTP      0x0802
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_SEL_CONN_MTP */
+        np_ulong sls;                   /* signalling link selection */
+        np_ulong mp;                    /* mssage priority */
+} N_qos_sel_conn_mtp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+
+@table @member
+@item n_qos_type
+Specifies or indicates the quality of service structure type.  This field is always coded to
+@pval{N_QOS_SEL_CONN_MTP}.
+@item sls
+Specifies the default Signalling Link Selection value to be used on the connection.
+@item mp
+Specifies the default Message Priority value to be used on the connection.
+@end table
+
+@subsubsection Information Quality of Service Selection
+
+@subsubheading N_QOS_SEL_INFO_MTP
+
+This quality of service structure type is used when selecting quality of service parameters
+for information with the @prim{N_INFO_ACK} primitive.
+
+@subsubheading Format
+
+@smallexample
+@verbatim
+#define N_QOS_SEL_INFO_MTP      0x0803
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_SEL_INFO_MTP */
+        np_ulong pvar;                  /* protocol variant */
+        np_ulong popt;                  /* protocol options */
+        np_ulong sls;                   /* signalling link selection */
+        np_ulong mp;                    /* message piority */
+} n_qos_sel_info_mtp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+
+@table @member
+@item n_qos_type
+Indicates the quality of service structure type.  This field is always coded
+@pval{N_QOS_SEL_INFO_MTP}.
+@item pvar
+Indicates the MTP protocol variant associated with the Stream.
+@item popt
+Indicates the MTP protocol options associated with the Stream.
+@item sls
+Indicates the default Signalling Link Selection value to be used on outgoing messages not specifying
+an SLS value.
+@item mp
+Indicates the default Message Priority value to be used on outgoing messages not specifying an MP
+value.
+@end table
+
+@subsubsection Information Quality of Service Range
+
+@subsubheading N_QOS_RANGE_INFO_MTP
+
+This quality of service structure type is used hwen indicating the range quality of service
+parameters for information with the @prim{N_INFO_ACK} primitive.
+
+@subsubheading Format
+
+@smallexample
+@verbatim
+#define N_QOS_RANGE_INFO_MTP        0x0804
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_RANGE_INFO_MTP */
+        np_ulong sls_range;             /* signalling link selection mask */
+        np_ulong mp_range;              /* message priority mask */
+} N_qos_range_info_mtp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+
+@table @member
+@item n_qos_type
+Indicates the quality of service structure type.  This field is always coded
+@pval{N_QOS_RANGE_INFO_MTP}.
+@item sls_range
+Indicates a bit mask that indicates the range of the SLS field.  This is typically a 4-bit bitmask
+for ITU-T variants, and a 5-bit or 8-bit bitmask for ANSI variants.
+@item mp_range
+Indicates a bit mask that indicates the range of the MP field.  This is typically a 0-bit bitmask
+for ITU-T variants, and a 2-bit bitmask for ANSI variants.
+@end table
+
+@section NPI Connection Modes
+
+@node NPI-MTP Rules for Conformance
+@chapter NPI-MTP Rules for Conformance
+
+@menu
+* CONS & CLNS: Local Management::
+* CONS: NC Establishment Phase::
+* CONS: Data Transfer Phase::
+* CONS: NC Termination Phase::
+* CLNS: Data Transfer Phase::
+@end menu
+
+@node CONS & CLNS: Local Management
+@section CONS & CLNS: Local Management
+
+@menu
+* N_INFO_ACK::
+* N_OPTMGMT_REQ::
+* N_BIND_REQ::
+* N_BIND_ACK::
+@end menu
+
+@node N_INFO_ACK
+@subsection N_INFO_ACK
+
+@subsubheading Parameters
+
+@table @parm
+@item NSDU_size
+Indicates the maximum size of the Network Service Data Unit in octets.
+@item ENSDU_size
+Indicates the maximum size of the Expedited Network Service Data Unit in octets.
+@item CDATA_size
+Indicates the maximum size of data included in the @prim{N_CONN_REQ}, @prim{N_CONN_IND},
+@prim{N_CONN_RES} and @prim{N_CONN_CON} primitives.
+@item DDATA_size
+Indicates the maximum size of data included in the @prim{N_DISCON_REQ} or @prim{N_DISCON_IND}
+primitives.
+@item ADDR_size
+Indicates the maximum size of an address.  This is the size of the @type{sockaddr_mtp} structure.
+@item ADDR_length
+Indicates the length of the associated protocol address.
+@item ADDR_offset
+Indicates the offset of the associated protocol address from the beginning of the @msg{M_PCPROTO}
+message block.
+@item QOS_length
+Indicates the length of the selected quality of service parameters.
+@item QOS_offset
+Indicates the offset of the selected quality of service parameters from the beginning of the
+@msg{M_PCPROTO} message block.
+@item QOS_range_length
+Indicates the length of the range of quality of service parameters.
+@item QOS_range_offset
+Indicates the offset of the range of quality of service parameters from the beginning of the
+@msg{M_PCPROTO} message block.
+@item OPTIONS_flags
+Indicates the options flags.
+@item NIDU_size
+Indicates the maximum size of the Network Interface Data Unit in octets.
+@item SERV_type
+Indicates the service type.  The service type can be one of the following:
+@table @pval
+@item CLNS
+Indicates that the NSP is in Connection-less mode for the current Stream.
+@item CONS
+Indicates that the NSP is in Connection-oriented mode for the current Stream.
+@end table
+@item CURRENT_state
+Indicates the current state of the NSP.  The current states can be one of the following:
+@table @psta
+@item NS_UNBND
+Indicates that the interface is not bound to a network address.
+@item NS_WACK_BREQ
+Indicates that the interface is pending local acknowledgment for an @prim{N_BIND_REQ} primitive.
+@item NS_WACK_UREQ
+Indicates that the interface is pending local acknowledgment for an @prim{N_UNBIND_REQ} primitive.
+@item NS_IDLE
+Indicates that the interface is idle.
+@item NS_WACK_OPTREQ
+Indicates that the interface is pending local acknowledgment for an @prim{N_OPTMGMT_REQ} primitive.
+@item NS_WACK_RRES
+Indicates that the interface is pending local acknowledgment for an @prim{N_RESET_RES} primitive.
+@item NS_WCON_CREQ
+Indicates that the interface is awaiting confirmation of an @prim{N_CONN_REQ} primitive.
+@item NS_WRES_CIND
+Indicates that the interface is awaiting response to an outstanding @prim{N_CONN_IND} primitive.
+@item NS_WACK_CRES
+Indicates that the interface is pending local acknowledgment for an @prim{N_CONN_RES} primitive.
+@item NS_DATA_XFER
+Indicates that the interface is in data transfer.
+@item NS_WCON_RREQ
+Indicates that the interface is awaiting confirmation to an outstanding @prim{N_RESET_REQ}
+primitive.
+@item NS_WRES_RIND
+Indicates that the interface is awaiting response to an outstanding @prim{N_RESET_IND} primitive.
+@item NS_WACK_DREQ6
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_WRES_RIND} state.
+@item NS_WACK_DREQ7
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_WRES_CIND} state.
+@item NS_WACK_DREQ9
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_DATA_XFER} state.
+@item NS_WACK_DREQ10
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_WCON_RREQ} state.
+@item NS_WACK_DREQ11
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_WRES_RIND} state.
+@end table
+@item PROVIDER_type
+Indicates the type of NS provider.  The value of this field can be one of the following:
+@table @pval
+@item N_SNICFP
+The provider is a subnetwork independent convergence function/protocol sub-layer of the network
+layer.
+@item N_SUBNET
+The provider is a subnetwork.
+@end table
+@item NODU_size
+Indicates the Network Optimal Data Unit size in octets.
+@item PROTOID_length
+Indicates the length of the bound protocol identifiers.
+@item PROTOID_offset
+Indicates the offset of the bound protocol identifiers from the beginning of the @msg{M_PCPROTO}
+message block.
+@item NPI_version
+Indicates the version of the NPI interface.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for sizes:}
+
+@enumerate
+@item
+MTP conforming NSP will return a value of @pval{N_INVALID} (@samp{-1U}) for the @parm{ENSDU_size}
+data size, indicating that the NSP does not support expedited data transfer.
+@item
+MTP conforming NSP will return the same defined value in the @parm{NSDU_size}, @parm{CDATA_size} and
+@parm{DDATA_size} fields.  This value is the maximum size of an NSU SDU that can be guaranteed
+transferred by the NSP.  The exact value of these fields will depend on the signalling links
+supported and in use by the MTP provider.
+@item
+MTP conforming NSP will return zero (@samp{0}), @pval{N_INVALID} (@samp{-1U}) or the same value as
+@parm{NSDU_size} in the @parm{CDATA_size} field.  When the MTP provider returns a value of zero
+(@samp{0}) or @pval{N_INVALID} (@samp{-1U}) for @parm{CDATA_size}, it is indicating that connection
+data is not permitted with the @prim{N_CONN_REQ} primitive.  When the MTP provider returns the same
+value as @parm{NSDU_size}, it is indicating that normal data is permitted with the @prim{N_CONN_REQ}
+primitive.
+@item
+MTP conforming NSP will return zero (@samp{0}), @pval{N_INVALID} (@samp{-1U}) or the same value as
+@parm{NSDU_size} in the @parm{DDATA_size} field.  When the MTP provider returns a value of zero
+(@samp{0}) or @pval{N_INVALID} (@samp{-1U}) for @parm{DDATA_size}, it is indicating that
+disconnection data is not permitted with the @prim{N_DISCON_REQ} primitive.  When the MTP provider
+returns the same value as @parm{NSDU_size}, it is indicating that normal data is permitted with the
+@prim{N_DISCON_REQ} primitive.
+@item
+MTP conforming NSP will return a value in the @parm{NIDU_size} field that is less than or equal to
+the @parm{NSDU_size} field, but must not be set to @pval{N_INVALID} (@samp{-1U}) or zero
+(@samp{0}).@footnote{Typically, the @parm{NIDU_size} will be the same value as the @parm{NSDU_size}
+for narrowband SS7 links.  For ATM, High-Speed and M2PA links, or for M3UA, the @parm{NIDU_size}
+will typically be smaller than the @parm{NSDU_size} when the maximum SIF size supported by the link
+is greater than the maximum size of an @msg{M_DATA} message block.}
+@item
+MTP conforming NSP will return a value of the @parm{NODU_size} field that is less than or equal to
+the @parm{NSDU_size} field, but must not be set to @pval{N_INVALID} (@samp{-1U}) or zero
+(@samp{0}).@footnote{Typically the @parm{NODU_size} field will be equal to the @parm{NIDU_size}.}
+@item
+MTP conforming NSP will return the size of the @type{sockaddr} structure in the @parm{ADDR_size}
+field.
+@end enumerate
+
+@b{Rules for provider type:}
+
+@enumerate
+@item
+MTP conforming NSP will return a provider type of @pval{N_SNICFP}.
+@end enumerate
+
+@b{Rules for service type:}
+
+@enumerate
+@item
+When the stream is bound and @pval{MTP_CONNECTION_ORIENTED} or @pval{MTP_CONNECTIONLESS} flags were
+set in the @prim{N_BIND_REQ}, the service type will be set according to the requested service type.
+(See @ref{N_BIND_REQ,,N_BIND_REQ}, and @ref{N_BIND_ACK,,N_BIND_REQ}.)
+@item
+When neither @pval{MTP_CONNECTION_ORIENTED} nor @pval{MTP_CONNECTIONLESS} flags are set in the
+@prim{N_BIND_REQ}, or the Stream is unbound, the MTP conforming NSP will return a service type of
+@pval{CLNS} when bound to non-call-related MTP Users.  The MTP conforming NSP will return a service
+type of @pval{CLNS} for the following MTP User:
+@itemize @bullet
+@item SCCP---Signalling Connection Control Part
+@item MTUP---MTP Test User Part
+@item GCP---Gateway Control Protocol
+@item Any other non-call-realted MTP User specified by the appropriate specification.
+@end itemize
+@item
+When neither @pval{MTP_CONNECTION_ORIENTED} nor @pval{MTP_CONNECTIONLESS} flags are set in the
+@prim{N_BIND_REQ}, or the Stream is unbound, the MTP conforming NSP will return a service type of
+@pval{CONS} when bound to call related MTP Users.  The MTP conforming NSP will return a service type
+of @pval{CONS} for the following MTP Users:
+@itemize @bullet
+@item TUP---Telephone User Part
+@item NUP---Network User Part
+@item ISUP---ISDN User Part
+@item DUP---Data User Part
+@item B-ISDN---Broadband ISDN User Part
+@item S-ISDN---Satellite ISDN User Part
+@item SPNE UP---Signal Processing Network Equipment User Part
+@item AAL2 STC---AAL Type 2 STC
+@item BICC---Bearer Independent Call Control
+@item Any other call-related MTP User specified by the appropriate specification.
+@end itemize
+@end enumerate
+
+@b{Rules for flags:}
+
+@enumerate
+@item
+Because the MTP does not support receipt confirmation, the MTP conforming NSP will not set the
+@pval{RECV_CONF_OPT} flag in the @parm{OPTIONS_flags} field.
+@item
+Because the MTP does not support expedited data, the MTP conforming NSP will not set the
+@pval{EX_DATA_OPT} flag in the @parm{OPTIONS_flags} field.
+@end enumerate
+
+@b{Rules for states:}
+
+@enumerate
+@item
+Because MTP does not support the reset service from the MTP-User, the MTP conforming NSP will never
+return a @parm{CURRENT_state} of @psta{NS_WCON_RREQ}, @psta{NS_WRES_RIND} or @psta{NS_WACK_RRES}.
+@end enumerate
+
+@b{Rules for Quality of Service Parameters:}
+
+@enumerate
+@item
+MTP conforming NSP will return an @pval{N_QOS_SEL_INFO_MTP} structure indicated in the
+@parm{QOS_length} and @parm{QOS_offset} fields.
+@item
+MTP conforming NSP will return an @pval{N_QOS_RANGE_INFO_MTP} structure indicated in the
+@parm{QOS_range_length} and @parm{QOS_range_offset} fields.
+@end enumerate
+
+@page
+@node N_OPTMGMT_REQ
+@subsection N_OPTMGMT_REQ
+
+@subsubheading Parameters
+
+@table @parm
+@item QOS_length
+Specifies the length of the QOS parameter values.
+@item QOS_offset
+Specifies the offset of the QOS parameter values from the beginning of the @msg{M_PROTO} or
+@msg{M_PCPROTO} message block.
+@item OPTMGMT_flags
+Specifies the options management flags associated with the request (see ``Flags'' below).
+@end table
+
+@subsubheading Flags
+
+@table @pval
+@item DEFAULT_RC_SEL
+Specifies if default receipt confirmation is selected.
+@end table
+
+@subsubheading Quality of Service Parameters
+
+@table @member
+@item n_qos_type
+Specifies the QOS structure type.  For this primitive, the MTP conforming NSP will demand a
+structure type of @pval{N_QOS_SEL_OPT_MTP}.
+@item sls
+Specifies the default value of the Signalling Link Selection field to be used in outgoing messages
+that do not contain an SLS value specified in the data transfer request.
+@item mp
+Specifies the default value of the Message Priority field to be used in outgoing messages that do
+not contain an MP value specified in the data transfer request.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for QOS parameters:}
+
+@enumerate
+@item
+The QOS parameters used for any subsequent @prim{N_DATA_REQ} or @prim{N_UNITDATA_REQ} primitives
+will be the values set with the @prim{N_OPTMGMT_REQ} primitive.
+@item
+For the @member{mp} QOS parameters to have any effect, the NSU muse be bound to a Stream supporting
+a protocol variant that provides for Message Priority (e.g. ANSI [T1.111, JT-Q.704] variants).
+@item
+Options for data transfer set with this primitive will only be valid for request or indication
+primitives issued after this primitive is successfully acknowledged.
+@end enumerate
+
+@page
+@node N_BIND_REQ
+@subsection N_BIND_REQ
+
+@subsubheading Parameters
+
+@table @parm
+@item ADDR_length
+Specifies the length of the address to bind.
+@item ADDR_offset
+Specifies the offset of the address to bind from the beginning of the @msg{M_PROTO} message block.
+@item CONIND_number
+Sepcifies the maximum number of outstanding connection indications.
+@item BIND_flags
+Specifies the bind flags (see ``Flags'' below).
+@item PROTOID_length
+Specifies the length of the protocol identifiers to bind.
+@item PROTOID_offset
+Specifies the offset of the protocol identifiers to bind from the beginning of the @msg{M_PROTO} message block.
+@end table
+
+@subsubheading Flags
+
+@table @pval
+@item DEFAULT_LISTENER
+Specifies whether this Stream is to be treated as the default listener Stream.
+@item TOKEN_REQUEST
+Specifies if a ``token'' should be assigned to the Stream and returned in the @prim{N_BIND_ACK}.
+@item DEFAULT_DEST
+Specifies if this Stream is to be treated as the default destination Stream.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for address specification:}
+
+@enumerate
+@item
+The Network Indicator (NI) value in the @parm{mtp_ni} field of the address must be specified and
+known to the MTP NSP.@footnote{Network indicator values are assigned to the MTP NSP via the local
+layer management interface.}
+@item
+The Service Indicator (SI) int the @parm{mtp_si} field of the address must be specified, cannot be
+SI values @samp{0}, @samp{1} or @samp{2}, and must be known to the MTP NSP.
+@item
+The Signalling Point Code (PC) in the @parm{mtp_pc} field of the address must be specified,
+non-zero, and known to the MTP NSP as a local point code in the specified
+network.@footnote{Signalling point code values are assigned to the MTP NSP via the local layer
+management interface.}
+@item
+The address must not already be bound to a CLNS NSP for the same service indicator.
+@end enumerate
+
+@b{Rules for connection indications:}
+
+@enumerate
+@item
+The MTP NSP only supports a pseudo-connection-oriented service that cannot support true connection
+indications.  Nevertheless, connection indications can be emulated when data arrives for an
+association between endpoints.  Therefore, the @parm{CONIND_number} field can be set in accordance
+with the general rules for connection indications present in the Network Provider Interface [NPI].
+@end enumerate
+
+@b{Rules for bind flags:}
+
+@enumerate
+@item
+The MTP NSP will support the @pval{DEFAULT_LISTENER} flag.  When the @pval{DEFAULT_LISTENER} flag is
+set for a CONS MTP address (MTP-SAPI) as specified in the @prim{N_BIND_REQ}, any received message
+that does not belong to an existing connection will be delivered to the Stream bound with the
+@pval{DEFAULT_LISTENER} flag as an @prim{N_CONN_IND} primitive.
+@item
+The MTP NSP will support the @pval{DEFAULT_DESTINATION} flag.  When the @pval{DEFAULT_DESTINATION}
+flags is set for a CLNS MTP address (MTP-SAPI) as specified in the @prim{N_BIND_REQ}, any received
+message that does not belong to an existing bound CLNS Stream will be delivered to the Stream bound
+with the @pval{DEFAULT_DESTINATION} flag.  There can be one @pval{DEFAULT_DESTINATION} Stream per SI
+value, and one and only one @pval{DEFAULT_DESTINATION} Stream per MTP provider instance.  If the
+@pval{DEFAULT_DESTINATION} is SI-specific, an MTP address must be specified with the @parm{mtp_pc}
+field set to zero and the appropriate @parm{mtp_ni} and @parm{mtp_si} values populated.  If the
+@pval{DEFAULT_DESTINATION} is not SI-specific, no MTP address (MTP-SAPI) is provided and the fields
+@parm{ADDR_length} and @parm{ADDR_offset} are coded zero (@samp{0}).
+@item
+The MTP NSP will support the @pval{TOKEN_REQUEST} flag.
+@end enumerate
+
+@b{Rules for protocol identifiers:}
+
+@enumerate
+@item
+The MTP NSP can optionally support the SI values specified in the @parm{PROTOID_length} and
+@parm{PROTOID_offset} fields.  When there is not MTP address (i.e. the @parm{ADDR_length} and
+@parm{ADDR_offset} fields are coded zero (@samp{0})), the SI values equipped for the bound addresses
+whould be specified in this field.
+@end enumerate
+
+@page
+@node N_BIND_ACK
+@subsection N_BIND_ACK
+
+@subsubheading Parameters
+
+@table @parm
+@item ADDR_length
+Indicates the length of the bound address.
+@item ADDR_offset
+Indicates the offset of the bound address from the beginning of the @msg{M_PCPROTO} message block.
+@item CONIND_number
+Indicates the number of negotiated maximum outstanding connection indications.
+@item TOKEN_value
+Indicates the token value associated with the indicating Stream.
+@item PROTOID_length
+Indicates the length of the bound protocol identifiers.
+@item PROTOID_offset
+Indicates the offset of the bound protocol identifiers from the beginning of the @msg{M_PCPROTO}
+message block.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for address specification:}
+
+@enumerate
+@item
+THe MTP NSP wil always return the address specified in the @prim{N_BIND_REQ} primtiive in the
+@parm{ADDR_length} and @parm{ADDR_offset} fields.
+@end enumerate
+
+@b{Rules for token value:}
+
+@enumerate
+@item
+Althougt the MTP does not support true connection indications, where the token value is used, the
+MTP NSP will return a correct value of the token associated with the Strem in the @parm{TOKEN_value}
+field.
+@end enumerate
+
+@b{Rules for connection indications:}
+
+@enumerate
+@item
+The MTP NSP will return the value requested in the @parm{CONIND_number} field.
+@end enumerate
+
+@b{Rules for protocol identifiers:}
+
+@enumerate
+@item
+The MTP NSP may optionally include the bound SI values in the @parm{PROTOID_length} and
+@parm{PROTOID_offset} fields.
+@end enumerate
+
+
+@page
+@node CONS: NC Establishment Phase
+@section CONS: NC Establishment Phase
+
+SS7 Message Transfer Part conforming NSP only provide a pseudo-connection-oriented mode.  The
+connection establishment phase of this pseudo-connection-oriented mode consists primarily of the
+@prim{N_CONN_REQ} and @prim{N_CONN_CON} primitives.  Conneciton indications (and reponses) may also
+be simulated.
+
+@menu
+* N_CONN_REQ::
+* N_CONN_IND::
+* N_CONN_RES::
+* N_CONN_CON::
+@end menu
+
+@node N_CONN_REQ
+@subsection N_CONN_REQ
+
+Requests that the NSP establish a pseudo-connection with the specified destination address and
+quality of service parameters.
+
+@subsubheading Parameters
+
+@table @parm
+@item DEST_length
+Specifies the length of the remote address.
+@item DEST_offset
+Specifies the offset of the remote address from the beginning of the @msg{M_PROTO} message block.
+@item CONN_flags
+Specifies the options flags associated with the connection request.
+@item QOS_length
+Specifies the length of the connection request options.
+@item QOS_offset
+Specifies the offset of the connection request options from the begnning of the @msg{M_PROTO}
+message block.
+@end table
+
+@subsubheading Quality of Service Parameters
+
+@table @member
+@item n_qos_type
+Specifies the QOS structure type.  For this primitive, the MTP conforming NSP will demand a
+structure type of @pval{N_QOS_SEL_CONN_MTP}.
+@item sls
+Specifies the default value fo the Signalling Link Selection field to be used in outgoing messages
+that do not contain an SLS value specified in the data transfer request, or with the
+@prim{N_OPTMGMT_REQ} primitive.  This includes any data included with the @prim{N_CONN_REQ}
+primitive.
+@item mp
+Specifies the default value of the Message Priority field to be used in outgoing messages that do
+not contain an SLS value specified in the data transfer request, or with the @prim{N_OPTMGMT_REQ}
+primitive.  This includes any data included with the @prim{N_CONN_REQ} primitive.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for address specification:}
+
+@enumerate
+@item
+The Network Indicator (NI) value in the @member{mtp_ni} field of the address must be specified, must
+be known to the MTP NSP, and must be the same as returned in the @member{mtp_ni} field of the
+@prim{N_BIND_ACK} when the Stream was bound.@footnote{Network indicator values are assigned to the
+MTP NSP via the layer management interface.}
+@item
+THe Service Indicatory (SI) in the @member{mtp_si} field  of the address must be specified, cannot
+be SI values @samp{0}, @samp{1} or @samp{2}, must be known the MTP NSP and must be the same as the
+value of the @member{mtp_si} field returned in the @prim{N_BIND_ACK} when the Stream was bound.
+@item
+The Signalling Point Code (PC) in the @member{mtp_pc} field of the address must be specified,
+non-zero, must be knonw to the MTP NSP as a remote point code in the specified network, and must be
+different than the @member{mtp_pc} field retrned in the @prim{N_BIND_ACK} when the Stream was
+bound.@footnote{Signalling point code values are assigned to the MTP NSP via the layer management
+interface.}
+@item
+The destination address must not have already been connected to the address bound to the requesting
+Stream for the specified service indicator.
+@end enumerate
+
+@b{Rules for QOS parameters:}
+
+@enumerate
+@item
+For rules concerning the QOS parameters inlcuded in this primitive, see @ref{N_UNITDATA_REQ}.
+@end enumerate
+
+@b{Rules for data:}
+
+@enumerate
+@item
+The NSU can include data in the @prim{N_CONN_REQ} primitive.  The options can then include data
+transfer options.  The MTP NSP will transfer such data and options as though it were placed in a
+separate @prim{N_OPTDATA_REQ} primitive.
+@end enumerate
+
+@page
+@node N_CONN_IND
+@subsection N_CONN_IND
+
+This primitive is not issued by an MTP conforming NSP and the NSP will never be in state
+@psta{NS_WRES_CIND}.
+
+@page
+@node N_CONN_RES
+@subsection N_CONN_RES
+
+This primitive is not supported by an MTP conforming NSP and the NSP will never be in state
+@psta{NS_WRES_CIND}.
+
+@subsubheading Parameters
+@subsubheading Rules
+
+@page
+@node N_CONN_CON
+@subsection N_CONN_CON
+
+Confirms that a pseudo-connection has been established with the requested destination address.
+
+Confirms that the reponding address has been associated with the Stream upon which the confirmation
+is indicated.  The @prim{N_CONN_CON} primitive is used ot indicate the @dfn{MTP-RESUME-IND} and
+@dfn{MTP-COMPLETE-IND} MTP primitives.
+
+@subsubheading Parameters
+
+@table @parm
+@item RES_length
+Indicates the length of the responding address.
+@item RES_offset
+Indicates the offset of the responding address from the beginning of the @msg{M_PROTO} message
+block.
+@item CONN_flags
+Indicates the options flags associated with the connection confirmation.
+@item QOS_length
+Indicates the length of the connection options.
+@item QOS_offset
+Indicates the offset of the connection options from the beginning of the @msg{M_PROTO} message
+block.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for address specification:}
+
+@enumerate
+@item
+For MTP conforming NSP, the responding address cannot be different from the requested address.
+Therefore, the responding address should be omitted from the confirmation and the @parm{RES_length}
+and @parm{RES_offset} fields should be coded zero (@samp{0}) by the NSP and ignored by the NSU.
+@item
+If the responding address is included in the primitive, it must be the same as the destination
+address in the response.  This is a limitation of the protocol, not of the interface.
+@end enumerate
+
+@b{Rules for QOS parameters:}
+
+@enumerate
+@item
+The MTP conforming NSP does not indicate any QOS parameters in the @prim{N_CONN_CON} primitive.
+Therefore, the QOS parameters should be omitted from the confirmation and the @parm{OPT_length} and
+@parm{OPT_offset} fields should be coded zero (@samp{0}) by the NSP and ignored by the NSU.
+@end enumerate
+
+@b{Rules for data:}
+
+@enumerate
+@item
+The MTP conforming NSP does not indicate connection data in the @prim{N_CONN_CON} primitive.
+@end enumerate
+
+@page
+@node CONS: Data Transfer Phase
+@section CONS: Data Transfer Phase
+
+@menu
+* N_DATA_REQ::
+* N_DATA_IND::
+* N_EXDATA_REQ::
+* N_EXDATA_IND::
+* N_DATACK_REQ::
+* N_DATACK_IND::
+@end menu
+
+@node N_DATA_REQ
+@subsection N_DATA_REQ
+
+@subsubheading Parameters
+
+@table @parm
+@item DATA_xfer_flags
+Specifies the data transfer options flags (see ``Flags'' below).
+@end table
+
+@subsubheading Flags
+
+@table @pval
+@item N_MORE_DATA_FLAG
+Specifies that the next @prim{N_DATA_REQ} primitive forms part of the same NSDU.
+@item N_RC_FLAG
+Specifies that receipt confirmation is requsted for the NSDU.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for flags:}
+
+@enumerate
+@item
+MTP conforming NSP do not accept the @pval{N_RC_FLAG} in the @parm{DATA_xfer_flags}.
+@item
+MTP conforming NSP accept the @pval{N_MORE_DATA_FLAG} in the @parm{DATA_xfer_flags}.
+@item
+MTP conforming NSP do not accept any other flags in the @parm{DATA_xfer_flags}.
+@end enumerate
+
+@page
+@node N_DATA_IND
+@subsection N_DATA_IND
+
+@subsubheading Parameters
+
+@table @parm
+@item DATA_xfer_flags
+Indicates the data transfer options (see ``Flags'' below).
+@end table
+
+@subsubheading Flags
+
+@table @pval
+@item N_MORE_DATA_FLAG
+Indicates that the next @prim{N_DATA_IND} forms part of the same NSDU.
+@item N_RC_FLAG
+Indicates that receipt confirmation is requested on the NSDU.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for issue primitive:}
+
+@enumerate
+@item
+The @prim{N_DATA_IND} primitive (or simply a @msg{M_DATA} block) is issued to the NSU to indicate
+data.  The @prim{N_DATA_IND} (or @msg{M_DATA}) is used in preference to the @prim{N_UNITDATA_IND}
+primitive when the NSU has not requested received message priority or received signalling link
+selection with the @pval{N_MTP_RECV_SLS} or @pval{N_MTP_RECV_MP} options.
+@item
+The @prim{N_DATA_IND} primitive is issued instead of @msg{M_DATA} message blocks when the NSP needs
+to indicate that the subsequent @prim{N_DATA_IND} primitive also forms part of the NSDU (i.e. the
+@pval{N_MORE_DATA_FLAG} is set in the @parm{DATA_xfer_flags} field).  Otherwise, the NSP may, at its
+option, issue either the @prim{N_DATA_IND} or @msg{M_DATA} indications.
+@end enumerate
+
+@b{Rules for flags:}
+
+@enumerate
+@item
+MTP conforming NSP do not set the @pval{N_RC_FLAG} in the @parm{DATA_xfer_flags} field.
+@item
+MTP conforming NSP set the @pval{N_MORE_DATA_FLAG} in the @parm{DATA_xfer_flags} field when the data
+delivered exceeds the @parm{NIDU_size} value returned in the @prim{N_INFO_ACK} primitive.  (See
+@ref{N_INFO_ACK}).
+@item
+MTP conforming NSP doe not set any other flags in the @parm{DATA_xfer_flags} field.
+@end enumerate
+
+@page
+@node N_EXDATA_REQ
+@subsection N_EXDATA_REQ
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+The MTP conforming connect-oriented provider does not support expedited data transfer.  If the NSDU
+issues the @prim{N_EXDATA_REQ} primitive, the service provider should respond with an @msg{M_ERROR}
+primitive with error number @errno{EPROTO}.
+@end enumerate
+
+@page
+@node N_EXDATA_IND
+@subsection N_EXDATA_IND
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+The MTP connection-oriented provider does not support expedited data transfer and should never issue
+this primitive.
+@end enumerate
+
+@page
+@node N_DATACK_REQ
+@subsection N_DATACK_REQ
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+The MTP conforming connect-oriented provider does not support receipt confirmation.  If the NSDU
+issues the @prim{N_DATACK_REQ} primitive, the service provider should respond with an @msg{M_ERROR}
+primitive with error number @errno{EPROTO}.
+@end enumerate
+
+@page
+@node N_DATACK_IND
+@subsection N_DATACK_IND
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+The MTP connection-oriented provider does not support receipt confirmation and should never issue
+this primitive.
+@end enumerate
+
+@page
+
+@node CONS: NC Termination Phase
+@section CONS: NC Termination Phase
+
+@menu
+* N_DISCON_REQ::
+* N_DISCON_IND::
+* N_RESET_REQ::
+* N_RESET_RES::
+* N_RESET_IND::
+* N_RESET_CON::
+@end menu
+
+@node N_DISCON_REQ
+@subsection N_DISCON_REQ
+
+@subsubheading Parameters
+
+@table @parm
+@item DISCON_reason
+The disconnection or connection rejection reason.  (See ``Reasons'' below.)
+@item RES_length
+The length of the responding MTP address (MTP-SAPI).
+@item RES_offset
+The offset of the responding MTP address (MTP-SAPI) from the beginning of the @msg{M_PROTO} message
+block.
+@item SEQ_number
+Specifies the sequence number of the associated connection indication when refusing a connection, or
+zero (@samp{0}) when disconnecting an established connection.
+@end table
+
+@subsubheading Reasons
+
+@table @pval
+@item N_MTP_USER_PART_UNKNOWN
+Disconnection because the remote user part (MTP-SAPI) is unknown.
+@item N_MTP_USER_PART_UNEQUIPPED
+Disconnection because the remote user part (MTP-SAPI) is unequipped.
+@item N_MTP_USER_PART_UNAVAILABLE
+Disconnection because the remote user part (MTP-SAPI) is unavailable.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for sequence number:}
+
+@enumerate
+@item
+The @parm{SEQ_number} field is not supported by an MTP conforming NSP.  The field should be coded
+zero (@samp{0}) by the NSU and ignored by the NSP.
+@end enumerate
+
+@b{Rules for disconnect reasons:}
+
+@enumerate
+@item
+Any of the disconnect reasons listed above under ``Reasons'' can be specified by the NSU.
+@item
+The MTP conforming NSP will use the disconnect reason to determine the reason to give th peer when
+the peer attempts to send messages to a disconnected MTP-SAPI.
+@end enumerate
+
+@page
+@node N_DISCON_IND
+@subsection N_DISCON_IND
+
+@subsubheading Parameters
+
+@table @parm
+@item DISCON_orig
+Indicates the disconnect originator.  The disconnect originator can be one of the following:
+@itemize
+@item @pval{N_PROVIDER}
+@item @pval{N_USER}
+@item @pval{N_UNSPECIFIED}
+@end itemize
+@item DISCON_reason
+Indicates the reason for disconnect or connection rejection.  (See ``Reasons'' below.)
+@item RES_length
+Indicates the length of the responding MTP address (MTP-SAPI).
+@item RES_offset
+Indicates the offset of the responding MTP address (MTP-SAPI) from the beginning of the
+@msg{M_PROTO} message block.
+@end table
+
+@subsubheading Reasons
+
+@table @pval
+@item N_PROVIDER
+The following disconnect reasons apply when the @parm{DISCON_orig} is @pval{N_PROVIDER}:
+@table @pval
+@item N_MTP_DEST_PROHIBITED
+Disconnection or connection rejection because the remote signalling point is inaccessible.
+@item N_MTP_CLUS_PROHIBITED
+Disconnection or connection rejection because the remote cluster is inaccessible.
+@item N_MTP_RESTARTING
+Disconnection or connection rejection because the local signalling point is restarting.
+@end table
+@item N_USER
+The following disconnect reasons apply when the @parm{DISCON_orig} is @pval{N_USER}:
+@table @pval
+@item N_MTP_USER_PART_UNKNOWN
+Disconnection or connection rejection because the remote user part (MTP-SAPI) is unknown.
+@item N_MTP_USER_PART_UNEQUIPPED
+Disconnection or connection rejection because the remote user part (MTP-SAPI) is unequipped.
+@item N_MTP_USER_PART_UNAVAILABLE
+Disconnection or connection rejection because the remote user part (MTP-SAPI) is unavailable.
+@end table
+@end table
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+This primitive is issued on a CONS service type Stream in response to an @dfn{MTP-PAUSE Indication},
+an @dfn{MTP-STATUS Indication} indicating user part inaccessibility, or an @dfn{MTP-RESTART-BEGINS
+Indication}.
+@end enumerate
+
+@b{Rules for disconnect reason:}
+
+@enumerate
+@item
+When the primitive is issued in response to an @dfn{MTP-PAUSE Indication}, the @parm{DISCON_orig} is
+set to @pval{N_PROVIDER} and the @parm{DISCON_reason} is set to either @pval{N_MTP_DEST_PROHIBITED}
+or @pval{N_MTP_CLUSTER_PROHIBITED} depending on whether the @dfn{MTP-PAUSE Indication} indicaets a
+signalling point or a cluster.
+@item
+When the primitive is issued in response to an @dfn{MTP-RESTART-BEGINS Indication}, the
+@parm{DISCON_orig} is set to @pval{N_PROVIDER} and the @parm{DISCON_reason} is set to
+@pval{N_MTP_RESTARTING}.
+@item
+When the primtiive is isused in response to an @dfn{MTP-STATUS Indication} indicating user part
+inaccessibility, the @parm{DISCON_orgi} is set to @pval{N_USER} and the @parm{DISCON_reason} is set
+to @pval{N_MTP_USER_PART_UNKNOWN}, @pval{N_MTP_USER_PART_UNEQUIPPED}, or
+@pval{N_MTP_USER_PART_UNAVAILABLE}, depending on the nature of the status of the remote user.
+@end enumerate
+
+@page
+@node N_RESET_REQ
+@subsection N_RESET_REQ
+
+@subsubheading Parameters
+
+@table @parm
+@item RESET_reason
+Specifies the reason for reset.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+The MTP conforming NSP does not support user-originated reset.  If the NSU issues a
+@prim{N_RESET_REQ} primitive, the service provider should respond with an @prim{N_ERROR_ACK}
+primitive with the error type set to @perr{NNOTSUPPORT}.
+@end enumerate
+
+@page
+@node N_RESET_RES
+@subsection N_RESET_RES
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+The normal rules for issuing this primitive apply.
+@item
+The MTP conforming NSP will not flush queues in response to this primitive.
+@end enumerate
+
+@page
+@node N_RESET_IND
+@subsection N_RESET_IND
+
+@subsubheading Parameters
+
+@table @parm
+@item RESET_orig
+Indicates the originator of the reset.
+@item RESET_reason
+Indicates the reason for the reset.
+@end table
+
+@subsubheading Reasons
+
+@table @pval
+@item N_PROVIDER
+The following reset reasons apply when the @parm{RESET_orig} is @pval{N_PROVIDER}:
+@table @pval
+@item N_MTP_DEST_CONGESTED(n)
+Reset due to destination congestion at level ``n''.
+@item N_MTP_CLUS_CONGESTED(n)
+Reset due to cluster congestion at level ``n''.
+@end table
+@end table
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+MTP conforming NSP will issue this primitive when an @dfn{MTP-STATUS Indication} primtive is receive
+indicating congestion toward the remote MTP address (Signalling Point) or congestion toward a
+Cluster route.
+@end enumerate
+
+@b{Rules for reset reasons:}
+
+@enumerate
+@item
+The MTP conforming NSP will only set @parm{RESET_orig} to @pval{N_PROVIDER}.
+@item
+The MTP conforming NSP will only set @parm{RESET_reason} to @pval{N_MTP_DEST_CONGESTED(n)} or
+@pval{N_MTP_CLUS_CONGESTED(n)}.
+@end enumerate
+
+@page
+@node N_RESET_CON
+@subsection N_RESET_CON
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+The MTP conforming NSP does not support user-originated reset and will never issue this primitive
+nor enter the @psta{NS_WCON_RREQ} state.
+@end enumerate
+
+@page
+@node CLNS: Data Transfer Phase
+@section CLNS: Data Transfer Phase
+
+@menu
+* N_UNITDATA_REQ::
+* N_UNITDATA_IND::
+* N_UDERROR_IND::
+@end menu
+
+@node N_UNITDATA_REQ
+@subsection N_UNITDATA_REQ
+
+@subsubheading Parameters
+
+@table @parm
+@item DEST_length
+Specifies the length of the destination address.
+@item DEST_offset
+Specifies the offset of the destination address from the beginning of the @msg{M_PROTO} message
+block.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for source address:}
+
+@enumerate
+@item
+NPI does not permit the source address of the NSU to be specified.  The source MTP address
+(MTP-SAPI) that will be used as the source address for the data transmission will be the bound
+(MTP-SAPI).
+@item
+If no MTP-SAPI is bound (i.e. when the Stream is bound with @pval{DEFAULT_DESTINATION} the MTP can
+either choose a source address or refuse the Stream with an @msg{M_ERROR} message with error number
+@errno{EPROTO}.
+@end enumerate
+
+@b{Rules for destination address:}
+
+@enumerate
+@item
+The NSU must specify a destination address that is compatible with the bound MTP-SAPI.  If the
+destination address is not compatible with the MTP-SAPI, the MTP may return an @prim{N_UDERROR_IND}
+primitive with an appropriate @parm{ERROR_type} or refuse the Stream with an @msg{M_ERROR} message
+with error number @errno{EPROTO}.
+@item
+If the NSU does not specify the destination address, the MTP can choose a destination address,
+return an @prim{N_UDERROR_IND} primitive with an appropriate @parm{ERROR_type}, or refuse the Stream
+with an @msg{M_ERROR} mesasge with error number @errno{EPROTO}.
+@end enumerate
+
+@b{Rules for QOS parameters:}
+
+@enumerate
+@item
+The QOS parameters @member{sls} and @member{mp} will be set according to the last setting made with
+the @prim{N_OPTMGMT_REQ} primitive.
+@item
+To set a specific @member{sls} or @member{mp} value for an outgoing message, @prim{N_OPTMGMT_REQ}
+must be called before @prim{N_UNITDATA_REQ}.  In this case the @prim{N_OPTMGMT_REQ} must be of
+message type @msg{M_PROTO} and not @msg{M_PCPROTO}.
+@end enumerate
+
+@page
+@node N_UNITDATA_IND
+@subsection N_UNITDATA_IND
+
+@subsubheading Parameters
+
+@table @parm
+@item SRC_length
+Indicates the length of the source address.
+@item SRC_offset
+Indicates the offset of the source address from the beginning of the @msg{M_PROTO} message block.
+@item DEST_length
+Indicates the length of the destination address.
+@item DEST_offset
+Indicates the offset of the destination address from the beginning of the @msg{M_PROTO} message block.
+@item ERROR_type
+Indicates whether the indicated data encountered congestion.  (See ``Errors'' below.)
+@end table
+
+@subsubheading Errors
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+@enumerate
+@item
+The @prim{N_UNITDATA_IND} primtiive is used to indicate data.  It is issued whenever data is
+received for an NSDU on a Stream in CLNS mode.
+@item
+The @prim{N_UNITDATA_IND} primitive is never issued by the MTP service provider in CONS mode.
+@end enumerate
+
+@b{Rules for source address:}
+@enumerate
+@item
+The source address is always set to the source address present in the corresponding received MSU.
+@item
+The source address indicates the received Originating Point Code (OPC) form the MTP Routing Label of
+the received message in the @member{mtp_pc} field as well as the received Service Indicator (SI)
+from the MTP Routing Label of the received message in the @member{mtp_si} field.
+@item
+The @member{mtp_ni} field is set correctly according to local network indicator configuration.
+@end enumerate
+
+@b{Rules for destination address:}
+@enumerate
+@item
+The destination address is always set to the destination address present in the corresponding
+received MSU.
+@item
+The destination address indicates the received Destination Point Code (DPC) from the MTP Routing
+Label of the received message in the @member{mtp_pc} field as well as the received Service Indicator
+(SI) from the MTP Routing Label of the received message in the @member{mtp_si} field.
+@item
+The @member{mtp_ni} field is set correclty according to local network indicator configuration.
+@end enumerate
+
+@b{Rules for error type:}
+@enumerate
+@item
+The MTP conforming NSP does not support congestion indication on a per-packet basis and this field
+will always be coded zero (@samp{0}).
+@end enumerate
+
+@b{Rules for data:}
+@enumerate
+@item
+The amount of data (in octets) indicated will not exceed the value of @parm{NSDU_size} returned by
+the @prim{N_INFO_ACK} primitive.  (See @ref{N_INFO_ACK,,N_INFO_ACK}.)
+@end enumerate
+
+@page
+@node N_UDERROR_IND
+@subsection N_UDERROR_IND
+
+@subsubheading Parameters
+@table @parm
+@item DEST_length
+Indicates the length of the destination address.
+@item DEST_offset
+Indicates the offset of the destination address from the beginning of the @msg{M_PROTO} message
+block.
+@item ERROR_type
+Indicates the reason for the unit data error indication.  The @parm{ERROR_type} field can assume one
+of the values listed under ``Errors'' below.
+@end table
+
+@subsubheading Errors
+@table @pval
+@item N_MTP_DEST_CONGESTED(n)
+The path toward the indicated remote signalling point has become congested at the level indicated.
+@item N_MTP_CLUS_CONGESTED(n)
+The path toward the indicated cluster route has become congested at the level indicated.
+@item N_MTP_DEST_PROHIBITED
+The path toward the indicated remote signalling point is unavailable.
+@item N_MTP_CLUS_PROHIBITED
+The path toward the indicated cluster route is unavailable.
+@item N_MTP_RESTARTING
+The local MTP is retsarting.
+@item N_MTP_USER_PART_UNKNOWN
+The indicated remote user part (MTP-SAPI) is inaccessbile for unknown reasons.
+@item N_MTP_USER_PART_UNEQUIPPED
+The indicated remote user part (MTP-SAPI) is inaccessbile because it is unequipped.
+@item N_MTP_USER_PART_UNAVAILABLE
+The indicated remote user part (MTP-SAPI) is inaccessbile because it is unavailable.
+@end table
+
+@subsubheading Rules
+
+@b{Rules for issuing primitive:}
+@enumerate
+@item
+This primitive is issued in response to an @prim{N_UNITDATA_REQ} under the same circumstances that
+an @dfn{MTP-PAUSE Indication} or @dfn{MTP-STATUS Indication} primitive would be issued in response
+to an @dfn{MTP-TRANSFER Request} (responsive).
+@item
+This primitive is issued independent of an @prim{N_UNITDATA_REQ} under the same circumstances that
+an @dfn{MTP-PAUSE Indication}, @dfn{MTP-STATUS Indication}, @prim{MTP-RESUME Indication} would be
+issued (preventative).
+@item
+This primitive is issued independent of an @prim{N_UNITDATA_REQ} whenever an
+@dfn{MTP-RESETART-BEGINS Indication} or @dfn{MTP-RESTART-COMPLETE Indication} would be given to the
+MTP-User.
+@end enumerate
+
+@b{Rules for destination address:}
+@enumerate
+@item
+If the error was associated with an @prim{N_UNITDATA_REQ} primitive, the destination address will
+contain the destination address from the @prim{N_UNITDATA_REQ} primitive.
+@item
+If the error was not associated with an @prim{N_UNITDATA_REQ} primitive (i.e. the indication is
+preventative rather than responsive), the destination address contains the affected address to
+which the error corresponds.
+@item
+For error types @pval{N_MTP_DEST_PROHIBITED} and @pval{N_MTP_CLUS_PROHIBITED}, the @member{mtp_pc}
+field of the destination address indicates the member or cluster that is prohibited.
+@item
+For error types @pval{N_MTP_DEST_PROHIBITED} and @pval{N_MTP_CLUS_PROHIBITED}, the @member{mtp_si}
+field is not significant and should be ignored by the NSU.
+@item
+For error types @pval{N_MTP_USER_PART_UNKNOWN}, @pval{N_MTP_USER_PART_UNEQUIPPED} and
+@pval{N_MTP_USER_PART_UNAVAILABLE}, the @member{mtp_si} field is significant and indicates the MTP
+User (MTP-SAPI) that is inaccessible for the reason indicated.
+@item
+For error types @pval{N_MTP_USER_PART_UNKNOWN}, @pval{N_MTP_USER_PART_UNEQUIPPED} and
+@pval{N_MTP_USER_PART_UNAVAILABLE}, the @member{mtp_pc} field of the destination address indicates
+the signalling point to which the affected user part belongs.
+@end enumerate
+
+@b{Rules for error type:}
+@enumerate
+@item
+Error type @pval{N_MTP_DEST_PROHIBITED} corresponds to an @dfn{MTP-PAUSE Indication} primitive.
+@item
+Error type @pval{N_MTP_CLUS_PROHIBITED} corresponds to an @dfn{MTP-PAUSE Indication} primitive.
+This error type is only indicated if the protocol variant and NSP support cluster routing.
+@item
+Primitives with error types @pval{N_MTP_DEST_PROHIBITED} or @pval{N_MTP_CLUS_PROHIBITED} are issued
+either in response to an @prim{N_UNITDATA_REQ} to a prohibited destination (in which case the
+@prim{N_UDERROR_IND} can contain @msg{M_DATA} message blocks representing the message), or in
+response to the detected inaccessiblity of the destination (in which case the @prim{N_UDERROR_IND}
+does not contain @msg{M_DATA} message blocks representing a message).
+@item
+Error type @pval{N_MTP_USER_PART_UNKNOWN}, @pval{N_MTP_USER_PART_UNEQUIPPED} and
+@pval{N_MTP_USER_PART_UNAVAILABLE} correspond to an equivalent @dfn{MTP-STATUS Indication}
+primitive.  These error types do not include @msg{M_DATA} message blocks.
+@end enumerate
+
+@b{Rules for data:}
+@enumerate
+@item
+If the error indication is as a result of data that was transmitted using an @prim{N_UNITDATA_REQ}
+primitive (responsive), the data will be returned in @msg{M_DATA} message blocks along with the
+@prim{N_UDERROR_IND} primitive.
+@item
+If the error indication was not a result of data being transmitted (preventative), no @msg{M_DATA}
+message blocks will be returned in the @prim{N_UDERROR_IND} primitive.
+@end enumerate
+
+@node NPI-MTP Mapping of Primitives
+@appendix NPI-MTP Mapping of Primitives
+
+@section The mapping of NPI Primitives to MTP
+
+The mapping of NPI primitives to Q.704 [Q.704] and ANSI T1.111 [T1.111] is shown in @tabref{A-1}.
+
+@tabfig{npi_mtp_taba1,A-1,Mapping of NPI primitives to MTP Primitives}
+
+@node NPI-MTP Header File Listing
+@appendix NPI-MTP Header File Listing
+
+@smallformat
+@verbatiminclude npi_mtp.h
+@end smallformat
+
+@node License
+@unnumbered License
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@include texi/fdl.texi
+
+@node Glossary
+@unnumbered Glossary
+
+@table @emph
+@item Signalling Data Link Service Data Unit
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
+connection to the other.
+@item Data transfer
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data link users.
+@item SDL provider
+The signalling data link layer protocol that provides the services of the signalling data link
+interface.
+@item SDL user
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data link layer.
+@item Local management
+The phase in connection and connectionless modes in which a SDL user initializes a stream and
+attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+@item PPA
+The point at which a system attaches itself to a physical communications medium.
+@item PPA identifier
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
+@node Acronyms
+@unnumbered Acronyms
+
+@multitable {SDL SDU}{International Telecommunications Union}
+@item SDLI @tab Signalling Data Link Interface
+@item SDL @tab Signalling Data Link
+@item SDL SDU @tab Signalling Data Link Service Data Unit
+@item ITU-T @tab International Telecommunications Union - Telecom Sector
+@item PPA @tab Physical Point of Attachment
+@end multitable
+
+@node References
+@unnumbered References
+@enumerate
+@item ITU-T Recommendation X.210, (Geneva, 1993), ``Information Technology --- Open Systems Interconnection --- Basic reference model: Conventions for the definition of OSI services,'' ISO/IEC 10731:1994.
+@item ITU-T Recommendation X.217, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Service definition for the Association Control Service Element,'' ISO/IEC 8649:1996.
+@item ITU-T Recommendation X.227, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connection-oriented protocol for the Association Control Service Element: Protocol Specification,'' ISO/IEC 8650-1.
+@item ITU-T Recommendation X.237, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless protocol for the Association Control Service Element: Protocol Specification,'' ISO/IEC 10035-1 : 1995.
+@item ITU-T Recommendation X.216, (Geneva, 1994), ``Information Technology --- Open Systems Interconnection --- Presentation service definition,'' ISO/IEC 8822:1994.
+@item ITU-T Recommendation X.226, (Geneva, 1994), ``Information Technology --- Open Systems Interconnection --- Connection-oriented presentation protocol: Protocol specification,'' ISO/IEC 8823-1:1994.
+@item ITU-T Recommendation X.236, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless presentation protocol: Protocol specification,'' ISO/IEC 9576-1:1995.
+@item ITU-T Recommendation X.215, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Session service definition,'' ISO/IEC 8326:1996.
+@item ITU-T Recommendation X.225, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connection-oriented session protocol: Protocol specification,'' ISO/IEC 8327-1:1996.
+@item ITU-T Recommendation X.235, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless session protocol: Protocol specification,'' ISO/IEC 9548-1:1995.
+@item ITU-T Recommendation X.214, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Transport service definition,'' ISO/IEC 8072:1996.
+@item ITU-T Recommendation X.224
+@item ITU-T Recommendation Q.700
+@item ITU-T Recommendation Q.701
+@item ITU-T Recommendation Q.702
+@item ITU-T Recommendation Q.703
+@item ITU-T Recommendation Q.704
+@item Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.
+@item ITU-T Recommendation Q.771, (Geneva, 1993), ``Signalling System No. 7 --- Functional description of transaction capabilities,'' (White Book).
+@end enumerate
+
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@node Index
+@unnumbered Index
+
+@c @ifnottex
+@c @c concatenate indices for html and info
+@printindex cp
+@c @end ifnottex
+
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
+@end ifnotplaintext
+
+@page
+@shortcontents
+@page
+@contents
+@bye

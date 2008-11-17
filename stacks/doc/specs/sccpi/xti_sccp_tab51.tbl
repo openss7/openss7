@@ -1,0 +1,78 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+box center tab(:);
+cb|cb|cb|cbs
+cb|cb|cb|cbs
+lb|l|l|ls.
+:Type of::
+Option Name:Option Value:Legal Option Value:Meaning
+=
+.TH
+T{
+T_SCCP_RST_OPT
+T}:t_uscalar_t:T{
+\fC\)T_YES/T_NO\fP
+.br
+The default value is \fC\)T_NO\fP.
+T}:T{
+User supports resets.
+T}
+_
+T{
+T_SCCP_VERSION read-only
+T}:t_uscalar_t:T{
+\fC\)T_SCCP_\fP\fI\)vvvv\fP\fC\)_\fP\fI\)yyyy\fP with \fI\)vvvv\fP representing the variant (e.g.
+ANSI, ITUT, ETSI) and \fI\)yyyy\fP representing the year of the specification.
+.br
+The default value is implementation defined.
+T}:T{
+Version of the SCCP protocol specificaiton supported by the SCCP provider.
+T}
+_
+T{
+T_SCCP_DISCON_REASON
+T}:t_uscalar_t:T{
+See meaning.
+.br
+The default value is \fC\)0xf1\fP.
+T}:T{
+Reason for a connection release that includes the cause and the diagnostic.  This reason can be
+encoded by using the \fC\)T_SCCP_SET_CAUSE\fP and \fC\)T_SCCP_SET_DIAG\fP C preprocessor macros.
+T}
+_
+T{
+T_SCCP_DISCON_ADD
+T}:T{
+struct
+.br
+t_sccpaddr
+T}:See text.:T{
+Address of the user that released the connection.
+T}
+.TE

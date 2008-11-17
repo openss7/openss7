@@ -201,6 +201,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/sli/Makefile
 		 doc/specs/sdli/Makefile
 		 doc/specs/sdti/Makefile
+		 doc/specs/sccpi/Makefile
 		 src/modules/ti/streams.conf
 		 src/modules/inet/streams.conf
 		 src/modules/sctp/streams.conf
