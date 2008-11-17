@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $
+ @(#) $RCSfile: tpi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-17 14:04:35 $ by $Author: brian $
+ Last Modified $Date: 2008-11-17 19:02:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpi_sccp.c,v $
+ Revision 0.9.2.2  2008-11-17 19:02:27  brian
+ - conversion modules compile
+
  Revision 0.9.2.1  2008-11-17 14:04:35  brian
  - added documentation and conversion modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $"
+#ident "@(#) $RCSfile: tpi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $"
 
-static char const ident[] = "$RCSfile: tpi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $";
+static char const ident[] = "$RCSfile: tpi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $";
 
 /*
  * This is a pushable STREAMS module that converts between the SCCPI (Signalling Connection Control
@@ -76,11 +79,21 @@ static char const ident[] = "$RCSfile: tpi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Re
 #define _SVR4_SOURCE
 
 #include <sys/os7/compat.h>
+#include <sys/strsun.h>
+
 #include <sys/tpi.h>
 #include <sys/tpi_sccp.h>
+#include <sys/npi.h>
+#include <sys/npi_sccp.h>
 #include <ss7/sccpi.h>
 
-#include <linux/bitopts.h>
+#include <ss7/lmi.h>
+#include <ss7/lmi_ioctl.h>
+
+#include <linux/socket.h>
+#include <sys/tihdr.h>
+#include <sys/xti.h>
+#include <sys/xti_sccp.h>
 
 #define t_tst_bit(nr,addr)  test_bit(nr,addr)
 #define t_set_bit(nr,addr)  __set_bit(nr,addr)
@@ -89,7 +102,7 @@ static char const ident[] = "$RCSfile: tpi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Re
 #define TPI_SCCP_DESCRIP	"SCCPI to TPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define TPI_SCCP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TPI_SCCP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TPI_SCCP_REVISION	"OpenSS7 $RCSfile: tpi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $"
+#define TPI_SCCP_REVISION	"OpenSS7 $RCSfile: tpi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $"
 #define TPI_SCCP_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define TPI_SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TPI_SCCP_LICENSE	"GPL"
@@ -124,7 +137,7 @@ MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TPI_SCCP_MODID));
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACAKAGE_RPMEXTRA2);
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif				/* MODULE_VERSION */
 #endif				/* MODULE */
 #endif				/* LINUX */
@@ -135,6 +148,15 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #ifndef TPI_SCCP_MOD_ID
 #define TPI_SCCP_MOD_ID		CONFIG_STREAMS_TPI_SCCP_MODID
 #endif				/* TPI_SCCP_MOD_ID */
+
+#define STRLOGERR	0
+#define STRLOGNO	1
+#define STRLOGRX	2
+#define STRLOGTX	3
+#define STRLOGST	4
+#define STRLOGTO	5
+#define STRLOGTE	6
+#define STRLOGDA	7
 
 /*
  * STREAMS DEFINITIONS
@@ -195,7 +217,7 @@ static struct streamtab tpi_sccpinfo = {
  */
 
 struct t_sccp_options {
-	uint32_t flags[4];
+	long flags[4];
 	struct {
 		t_scalar_t debug[4];
 		struct t_linger linger;
@@ -216,6 +238,7 @@ struct t_sccp_options {
 		t_uscalar_t cluster;
 		t_uscalar_t prio;
 		t_uscalar_t pclass;
+		t_uscalar_t seqctrl;
 		t_uscalar_t imp;
 		t_uscalar_t reterr;
 		t_uscalar_t credit;
@@ -225,9 +248,10 @@ struct t_sccp_options {
 	} sccp;
 } t_defaults = {
 	/* *INDENT-OFF* */
-	{ 0, (struct t_linger) { T_NO, 0,}, 1 << 12, 1, 1 << 12, 1,},
-	{ SS7_PVAR_ITUT_2000, 4, T_NO, 2,},
-	{ SS7_PVAR_ITUT_2000, 4, T_NO, 2, T_SCCP_PCLASS_0, 0, T_NO, 1 << 12, (struct sockaddr_sccp) { AF_SCCP,}, 0, 0,},
+	{ 0, },
+	{ {0, }, (struct t_linger) { T_NO, 0,}, 1 << 12, 1, 1 << 12, 1,},
+	{ SS7_PVAR_ITUT_00, 4, T_NO, 2,},
+	{ SS7_PVAR_ITUT_00, 4, T_NO, 2, T_SCCP_PCLASS_0, 0, 0, T_NO, 1 << 12, (struct sockaddr_sccp) { AF_SCCP,}, 0, 0,},
 	/* *INDENT-ON* */
 };
 
@@ -268,23 +292,31 @@ struct sc;
 struct tp {
 	struct sc *sc;
 	queue_t *oq;
+	t_uscalar_t maxinds;
 	struct {
 		t_uscalar_t state;
 		t_uscalar_t datinds;
 		t_uscalar_t datacks;
+		t_uscalar_t edatack;
 		t_uscalar_t coninds;
-		t_uscalar_t inform;
+		t_uscalar_t infinds;
 		t_uscalar_t accept;
+		t_uscalar_t pending;
+		t_uscalar_t resinds;
+		t_uscalar_t resacks;
 	} state, oldstate;
-	ushort add_len;
 	struct {
 		struct T_info_ack info;
 		struct sockaddr_sccp add;
-		N_qos_co_opt_sel_t qos;
-		N_qos_co_opt_range_t qor;
+		N_qos_sel_info_sccp_t qos;
+		N_qos_range_info_sccp_t qor;
 	} proto;
+	t_uscalar_t INFORM_reason;
+	t_uscalar_t RESET_reason;
+	t_uscalar_t DISCON_reason;
+	t_uscalar_t TOKEN_value;
 	t_uscalar_t OPT_length;
-	t_sccp_options opts;
+	struct t_sccp_options opts;
 	t_uscalar_t ADDR_length;
 	struct sockaddr_sccp add;
 	t_uscalar_t LOCADDR_length;
@@ -299,21 +331,28 @@ struct tp {
 struct sc {
 	struct tp *tp;
 	queue_t *oq;
+	np_ulong maxinds;
 	struct {
 		np_ulong state;
 		np_ulong datinds;
 		np_ulong datacks;
+		np_ulong edatack;
 		np_ulong coninds;
-		np_ulong inform;
+		np_ulong infinds;
 		np_ulong accept;
+		np_ulong pending;
+		np_ulong resinds;
+		np_ulong resacks;
 	} state, oldstate;
-	ushort add_len;
 	struct {
 		N_info_ack_t info;
 		struct sockaddr_sccp add;
-		N_qos_sccp_opt_sel_t qos;
-		N_qos_sccp_opt_range_t qor;
+		N_qos_sel_info_sccp_t qos;
+		N_qos_range_info_sccp_t qor;
 	} proto;
+	np_ulong SRC_lref;
+	np_ulong TOKEN_value;
+	np_ulong BIND_flags;
 	np_ulong QOS_length;
 	N_qos_sccp_t qos;
 	np_ulong QOS_range_length;
@@ -326,16 +365,18 @@ struct sc {
 	struct sockaddr_sccp rem;
 	np_ulong RES_length;
 	struct sockaddr_sccp res;
+	np_ulong PROTOID_length;
+	np_ulong pro[4];
 };
 
 struct priv {
-	struct tp tpi;
-	struct sc sccpi;
+	struct tp tp;
+	struct sc sc;
 };
 
 #define PRIV(q) ((struct priv *)q->q_ptr)
-#define NP_PRIV(q) (&PRIV(q)->tpi)
-#define SC_PRIV(q) (&PRIV(q)->sccpi)
+#define NP_PRIV(q) (&PRIV(q)->tp)
+#define SC_PRIV(q) (&PRIV(q)->sc)
 
 static inline const char *
 tp_primname(t_uscalar_t prim)
@@ -452,7 +493,7 @@ tp_statename(t_uscalar_t state)
 }
 
 static inline const char *
-tp_strerror(const t_scalar_t error)
+tp_strerror(t_scalar_t error)
 {
 	if (error < 0)
 		error = NSYSERR;
@@ -544,13 +585,13 @@ static t_uscalar_t
 tp_save_state(struct tp *tp)
 {
 	tp->oldstate = tp->state;
-	return ((tp->oldstate = tp_get_state(tp)));
+	return ((tp->oldstate.state = tp_get_state(tp)));
 }
 
 static t_uscalar_t
 tp_restore_state(struct tp *tp)
 {
-	return (tp_set_state(tp, tp->oldstate));
+	return (tp_set_state(tp, tp->oldstate.state));
 }
 
 static const char *
@@ -629,8 +670,8 @@ sc_primname(np_ulong prim)
 		return ("N_COORD_CON");
 	case N_REQUEST_REQ:
 		return ("N_REQUEST_REQ");
-	case N_REQUEST_ACK:
-		return ("N_REQUEST_ACK");
+	case N_REPLY_ACK:
+		return ("N_REPLY_ACK");
 	default:
 		return ("(unknown)");
 	}
@@ -639,28 +680,102 @@ sc_primname(np_ulong prim)
 static const char *
 sc_statename(np_ulong state)
 {
-	return np_statename(state);
+	switch (state) {
+	case NS_UNBND:
+		return ("NS_UNBND");
+	case NS_WACK_BREQ:
+		return ("NS_WACK_BREQ");
+	case NS_WACK_UREQ:
+		return ("NS_WACK_UREQ");
+	case NS_IDLE:
+		return ("NS_IDLE");
+	case NS_WACK_OPTREQ:
+		return ("NS_WACK_OPTREQ");
+	case NS_WACK_RRES:
+		return ("NS_WACK_RRES");
+	case NS_WCON_CREQ:
+		return ("NS_WCON_CREQ");
+	case NS_WRES_CIND:
+		return ("NS_WRES_CIND");
+	case NS_WACK_CRES:
+		return ("NS_WACK_CRES");
+	case NS_DATA_XFER:
+		return ("NS_DATA_XFER");
+	case NS_WCON_RREQ:
+		return ("NS_WCON_RREQ");
+	case NS_WRES_RIND:
+		return ("NS_WRES_RIND");
+	case NS_WACK_DREQ6:
+		return ("NS_WACK_DREQ6");
+	case NS_WACK_DREQ7:
+		return ("NS_WACK_DREQ7");
+	case NS_WACK_DREQ9:
+		return ("NS_WACK_DREQ9");
+	case NS_WACK_DREQ10:
+		return ("NS_WACK_DREQ10");
+	case NS_WACK_DREQ11:
+		return ("NS_WACK_DREQ11");
+	case NS_NOSTATES:
+		return ("NS_NOSTATES");
+	default:
+		return ("(unknown)");
+	}
 }
 
-static const char *
+static inline const char *
 sc_strerror(np_long error)
 {
-	return np_strerror(error);
+	if (error < 0)
+		error = NSYSERR;
+	switch (error) {
+	case NBADADDR:
+		return ("Incorrect address format/illegal address information.");
+	case NBADOPT:
+		return ("Options in incorrect format or contain illegal information.");
+	case NACCESS:
+		return ("User did no have proper permissions.");
+	case NNOADDR:
+		return ("NS Provider could not allocate address.");
+	case NOUTSTATE:
+		return ("Primitive was issued in wrong sequence.");
+	case NBADSEQ:
+		return ("Sequence number in primitive was incorrect/illegal.");
+	case NSYSERR:
+		return ("UNIX system error occured.");
+	case NBADDATA:
+		return ("User data spec. outside rnage supported by NS provider.");
+	case NBADFLAG:
+		return ("Flags specified in primitive were illegal/incorrect.");
+	case NNOTSUPPORT:
+		return ("Primitive type not supported by the NS provider.");
+	case NBOUND:
+		return ("Illegal second attempt to bind listenter or default listener.");
+	case NBADQOSPARAM:
+		return ("QOS values outside range supported by NS provider.");
+	case NBADQOSTYPE:
+		return ("QOS structure type not supported by NS provider.");
+	case NBADTOKEN:
+		return ("Token used is not associated with an open stream.");
+	case NNOPROTOID:
+		return ("Protocol id could not be allocated.");
+	default:
+		return ("(unknown)");
+	}
 }
 
 static np_ulong
 sc_get_state(struct sc *sc)
 {
-	return (sc->state);
+	return (sc->state.state);
 }
 
 static np_ulong
-sc_set_state(struct sc *sc)
+sc_set_state(struct sc *sc, np_ulong newstate)
 {
-	int oldstate = sc->state;
+	np_ulong oldstate = sc->state.state;
 
 	if (newstate != oldstate) {
-		sc->state = newstate;
+		sc->state.state = newstate;
 		sc->proto.info.CURRENT_state = newstate;
 		mi_strlog(sc->oq, STRLOGST, SL_TRACE, "%s <- %s", sc_statename(newstate),
 			  sc_statename(oldstate));
@@ -671,18 +786,30 @@ sc_set_state(struct sc *sc)
 static np_ulong
 sc_save_state(struct sc *sc)
 {
-	return ((sc->oldstate = sc_get_state(sc)))
+	return ((sc->oldstate.state = sc_get_state(sc)));
 }
 
 static np_ulong
 sc_restore_state(struct sc *sc)
 {
-	return (sc_set_state(sc, sc->oldstate));
+	return (sc_set_state(sc, sc->oldstate.state));
 }
 
 /*
  * TPI OPTION HANDLING
  */
+#define T_SPACE(len) \
+	(sizeof(struct t_opthdr) + T_ALIGN(len))
+
+#define T_LENGTH(len) \
+	(sizeof(struct t_opthdr) + len)
+
+#define _T_SPACE_SIZEOF(s) \
+	T_SPACE(sizeof(s))
+
+#define _T_LENGTH_SIZEOF(s) \
+	T_LENGTH(sizeof(s))
+
 static size_t
 t_size_opts(N_qos_sccp_t * qos)
 {
@@ -788,7 +915,7 @@ t_size_opts(N_qos_sccp_t * qos)
 static size_t
 t_build_opts(N_qos_sccp_t * qos, unsigned char *op, size_t olen)
 {
-	struct t_opthdr *oh;
+	struct t_opthdr *oh = (typeof(oh)) op;
 
 	if (op == NULL || olen == 0)
 		return (0);
@@ -799,55 +926,55 @@ t_build_opts(N_qos_sccp_t * qos, unsigned char *op, size_t olen)
 			if (qos->sel_data.protocol_class != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.pclass);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.pclass);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PCLASS;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.pclass) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.pclass) *) T_OPT_DATA(oh) =
 				    qos->sel_data.protocol_class;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_data.option_flags != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.reterr);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.reterr);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_RETERR;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.reterr) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.reterr) *) T_OPT_DATA(oh) =
 				    qos->sel_data.option_flags;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_data.sequence_selection != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.seqctrl);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.seqctrl);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_SEQCTRL;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.seqctrl) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.seqctrl) *) T_OPT_DATA(oh) =
 				    qos->sel_data.sequence_selection;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_data.message_priority != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.prio);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.prio);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PRIO;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.prio) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.prio) *) T_OPT_DATA(oh) =
 				    qos->sel_data.message_priority;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_data.importance != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.imp);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.imp);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_IMP;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.imp) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.imp) *) T_OPT_DATA(oh) =
 				    qos->sel_data.importance;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -856,66 +983,66 @@ t_build_opts(N_qos_sccp_t * qos, unsigned char *op, size_t olen)
 			if (qos->sel_conn.protocol_class != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.pclass);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.pclass);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PCLASS;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.pclass) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.pclass) *) T_OPT_DATA(oh) =
 				    qos->sel_conn.protocol_class;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_conn.option_flags != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.reterr);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.reterr);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_RETERR;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.reterr) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.reterr) *) T_OPT_DATA(oh) =
 				    qos->sel_conn.option_flags;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_conn.sequence_selection != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.seqctrl);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.seqctrl);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_SEQCTRL;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.seqctrl) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.seqctrl) *) T_OPT_DATA(oh) =
 				    qos->sel_conn.sequence_selection;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_conn.message_priority != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.prio);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.prio);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PRIO;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.prio) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.prio) *) T_OPT_DATA(oh) =
 				    qos->sel_conn.message_priority;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_conn.importance != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.imp);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.imp);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_IMP;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.imp) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.imp) *) T_OPT_DATA(oh) =
 				    qos->sel_conn.importance;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_conn.credit != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.credit);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.credit);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_CREDIT;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.credit) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.credit) *) T_OPT_DATA(oh) =
 				    qos->sel_conn.credit;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -924,66 +1051,66 @@ t_build_opts(N_qos_sccp_t * qos, unsigned char *op, size_t olen)
 			if (qos->sel_info.protocol_class != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.pclass);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.pclass);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PCLASS;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.pclass) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.pclass) *) T_OPT_DATA(oh) =
 				    qos->sel_info.protocol_class;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_info.option_flags != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.reterr);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.reterr);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_RETERR;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.reterr) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.reterr) *) T_OPT_DATA(oh) =
 				    qos->sel_info.option_flags;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_info.sequence_selection != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.seqctrl);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.seqctrl);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_SEQCTRL;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.seqctrl) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.seqctrl) *) T_OPT_DATA(oh) =
 				    qos->sel_info.sequence_selection;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_info.message_priority != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.prio);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.prio);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PRIO;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.prio) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.prio) *) T_OPT_DATA(oh) =
 				    qos->sel_info.message_priority;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_info.importance != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.imp);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.imp);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_IMP;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.imp) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.imp) *) T_OPT_DATA(oh) =
 				    qos->sel_info.importance;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_info.credit != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.credit);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.credit);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_CREDIT;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.credit) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.credit) *) T_OPT_DATA(oh) =
 				    qos->sel_info.credit;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -992,33 +1119,33 @@ t_build_opts(N_qos_sccp_t * qos, unsigned char *op, size_t olen)
 			if (qos->range_info.protocol_classes != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.pclass);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.pclass);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PCLASS;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.pclass) *) T_OPT_DATA(oh) =
-				    qos->range_info.protocol_class;
+				*(typeof(t_defaults.sccp.pclass) *) T_OPT_DATA(oh) =
+				    qos->range_info.protocol_classes;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->range_info.sequence_selection != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.seqctrl);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.seqctrl);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_SEQCTRL;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.seqctrl) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.seqctrl) *) T_OPT_DATA(oh) =
 				    qos->range_info.sequence_selection;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->range_info.credit != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.credit);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.credit);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_CREDIT;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.credit) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.credit) *) T_OPT_DATA(oh) =
 				    qos->range_info.credit;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -1027,66 +1154,66 @@ t_build_opts(N_qos_sccp_t * qos, unsigned char *op, size_t olen)
 			if (qos->sel_infr.protocol_class != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.pclass);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.pclass);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PCLASS;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.pclass) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.pclass) *) T_OPT_DATA(oh) =
 				    qos->sel_infr.protocol_class;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_infr.option_flags != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.reterr);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.reterr);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_RETERR;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.reterr) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.reterr) *) T_OPT_DATA(oh) =
 				    qos->sel_infr.option_flags;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_infr.sequence_selection != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.seqctrl);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.seqctrl);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_SEQCTRL;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.seqctrl) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.seqctrl) *) T_OPT_DATA(oh) =
 				    qos->sel_infr.sequence_selection;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_infr.message_priority != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.prio);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.prio);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PRIO;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.prio) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.prio) *) T_OPT_DATA(oh) =
 				    qos->sel_infr.message_priority;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_infr.importance != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.imp);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.imp);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_IMP;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.imp) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.imp) *) T_OPT_DATA(oh) =
 				    qos->sel_infr.importance;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (qos->sel_infr.credit != QOS_UNKNOWN) {
 				if (oh == NULL)
 					goto efault;
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.opts.sccp.credit);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.sccp.credit);
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_CREDIT;
 				oh->status = T_SUCCESS;
-				*(typeof(t_defaults.opts.sccp.credit) *) T_OPT_DATA(oh) =
+				*(typeof(t_defaults.sccp.credit) *) T_OPT_DATA(oh) =
 				    qos->sel_infr.credit;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -1098,11 +1225,15 @@ t_build_opts(N_qos_sccp_t * qos, unsigned char *op, size_t olen)
 	if (oh == NULL)
 		return (olen);
 	return ((unsigned char *) oh - op);
+      efault:
+	return (-EFAULT);
 }
 
 static int
 t_read_opts(struct tp *tp, N_qos_sccp_t * qos, unsigned char *ip, size_t ilen)
 {
+	struct t_opthdr *ih;
+
 	/* This is only for connect request, response and data requests.  Any value of any option
 	   is appropriate and is stored in the transport provider private structure.  The, once all
 	   options have been processed, any options that were set are added to the structure if
@@ -1198,6 +1329,7 @@ t_read_opts(struct tp *tp, N_qos_sccp_t * qos, unsigned char *ip, size_t ilen)
 			}
 			}
 			continue;
+#if 0
 		case T_SS7_MTP:
 			switch (ih->name) {
 			case T_MTP_PVAR:
@@ -1242,6 +1374,7 @@ t_read_opts(struct tp *tp, N_qos_sccp_t * qos, unsigned char *ip, size_t ilen)
 			}
 			}
 			continue;
+#endif
 		case T_SS7_SCCP:
 			switch (ih->name) {
 			case T_SCCP_PVAR:
@@ -1368,21 +1501,21 @@ t_read_opts(struct tp *tp, N_qos_sccp_t * qos, unsigned char *ip, size_t ilen)
 			else
 				qos->sel_data.protocol_class = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_RETERR, tp->opts.flags))
-				qos->sel_data.protocol_class = tp->opts.sccp.reterr;
+				qos->sel_data.option_flags = tp->opts.sccp.reterr;
 			else
-				qos->sel_data.protocol_class = QOS_UNKNOWN;
+				qos->sel_data.option_flags = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_SEQCTRL, tp->opts.flags))
-				qos->sel_data.protocol_class = tp->opts.sccp.seqctrl;
+				qos->sel_data.sequence_selection = tp->opts.sccp.seqctrl;
 			else
-				qos->sel_data.protocol_class = QOS_UNKNOWN;
+				qos->sel_data.sequence_selection = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_PRIO, tp->opts.flags))
-				qos->sel_data.protocol_class = tp->opts.sccp.prio;
+				qos->sel_data.message_priority = tp->opts.sccp.prio;
 			else
-				qos->sel_data.protocol_class = QOS_UNKNOWN;
+				qos->sel_data.message_priority = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_IMP, tp->opts.flags))
-				qos->sel_data.protocol_class = tp->opts.sccp.imp;
+				qos->sel_data.importance = tp->opts.sccp.imp;
 			else
-				qos->sel_data.protocol_class = QOS_UNKNOWN;
+				qos->sel_data.importance = QOS_UNKNOWN;
 			break;
 		case N_QOS_SEL_CONN_SCCP:
 			if (t_tst_bit(_T_BIT_SCCP_PCLASS, tp->opts.flags))
@@ -1390,25 +1523,25 @@ t_read_opts(struct tp *tp, N_qos_sccp_t * qos, unsigned char *ip, size_t ilen)
 			else
 				qos->sel_conn.protocol_class = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_RETERR, tp->opts.flags))
-				qos->sel_conn.protocol_class = tp->opts.sccp.reterr;
+				qos->sel_conn.option_flags = tp->opts.sccp.reterr;
 			else
-				qos->sel_conn.protocol_class = QOS_UNKNOWN;
+				qos->sel_conn.option_flags = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_SEQCTRL, tp->opts.flags))
-				qos->sel_conn.protocol_class = tp->opts.sccp.seqctrl;
+				qos->sel_conn.sequence_selection = tp->opts.sccp.seqctrl;
 			else
-				qos->sel_conn.protocol_class = QOS_UNKNOWN;
+				qos->sel_conn.sequence_selection = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_PRIO, tp->opts.flags))
-				qos->sel_conn.protocol_class = tp->opts.sccp.prio;
+				qos->sel_conn.message_priority = tp->opts.sccp.prio;
 			else
-				qos->sel_conn.protocol_class = QOS_UNKNOWN;
+				qos->sel_conn.message_priority = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_IMP, tp->opts.flags))
-				qos->sel_conn.protocol_class = tp->opts.sccp.imp;
+				qos->sel_conn.importance = tp->opts.sccp.imp;
 			else
-				qos->sel_conn.protocol_class = QOS_UNKNOWN;
+				qos->sel_conn.importance = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_CREDIT, tp->opts.flags))
-				qos->sel_conn.protocol_class = tp->opts.sccp.credit;
+				qos->sel_conn.credit = tp->opts.sccp.credit;
 			else
-				qos->sel_conn.protocol_class = QOS_UNKNOWN;
+				qos->sel_conn.credit = QOS_UNKNOWN;
 			break;
 		case N_QOS_SEL_INFO_SCCP:
 			if (t_tst_bit(_T_BIT_SCCP_PCLASS, tp->opts.flags))
@@ -1416,39 +1549,39 @@ t_read_opts(struct tp *tp, N_qos_sccp_t * qos, unsigned char *ip, size_t ilen)
 			else
 				qos->sel_info.protocol_class = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_RETERR, tp->opts.flags))
-				qos->sel_info.protocol_class = tp->opts.sccp.reterr;
+				qos->sel_info.option_flags = tp->opts.sccp.reterr;
 			else
-				qos->sel_info.protocol_class = QOS_UNKNOWN;
+				qos->sel_info.option_flags = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_SEQCTRL, tp->opts.flags))
-				qos->sel_info.protocol_class = tp->opts.sccp.seqctrl;
+				qos->sel_info.sequence_selection = tp->opts.sccp.seqctrl;
 			else
-				qos->sel_info.protocol_class = QOS_UNKNOWN;
+				qos->sel_info.sequence_selection = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_PRIO, tp->opts.flags))
-				qos->sel_info.protocol_class = tp->opts.sccp.prio;
+				qos->sel_info.message_priority = tp->opts.sccp.prio;
 			else
-				qos->sel_info.protocol_class = QOS_UNKNOWN;
+				qos->sel_info.message_priority = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_IMP, tp->opts.flags))
-				qos->sel_info.protocol_class = tp->opts.sccp.imp;
+				qos->sel_info.importance = tp->opts.sccp.imp;
 			else
-				qos->sel_info.protocol_class = QOS_UNKNOWN;
+				qos->sel_info.importance = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_CREDIT, tp->opts.flags))
-				qos->sel_info.protocol_class = tp->opts.sccp.credit;
+				qos->sel_info.credit = tp->opts.sccp.credit;
 			else
-				qos->sel_info.protocol_class = QOS_UNKNOWN;
+				qos->sel_info.credit = QOS_UNKNOWN;
 			break;
 		case N_QOS_RANGE_INFO_SCCP:
 			if (t_tst_bit(_T_BIT_SCCP_PCLASS, tp->opts.flags))
-				qos->range_info.protocol_class = tp->opts.sccp.pclass;
+				qos->range_info.protocol_classes = tp->opts.sccp.pclass;
 			else
-				qos->range_info.protocol_class = QOS_UNKNOWN;
+				qos->range_info.protocol_classes = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_SEQCTRL, tp->opts.flags))
-				qos->range_info.protocol_class = tp->opts.sccp.seqctrl;
+				qos->range_info.sequence_selection = tp->opts.sccp.seqctrl;
 			else
-				qos->range_info.protocol_class = QOS_UNKNOWN;
+				qos->range_info.sequence_selection = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_CREDIT, tp->opts.flags))
-				qos->range_info.protocol_class = tp->opts.sccp.credit;
+				qos->range_info.credit = tp->opts.sccp.credit;
 			else
-				qos->range_info.protocol_class = QOS_UNKNOWN;
+				qos->range_info.credit = QOS_UNKNOWN;
 			break;
 		case N_QOS_SEL_INFR_SCCP:
 			if (t_tst_bit(_T_BIT_SCCP_PCLASS, tp->opts.flags))
@@ -1456,31 +1589,33 @@ t_read_opts(struct tp *tp, N_qos_sccp_t * qos, unsigned char *ip, size_t ilen)
 			else
 				qos->sel_infr.protocol_class = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_RETERR, tp->opts.flags))
-				qos->sel_infr.protocol_class = tp->opts.sccp.reterr;
+				qos->sel_infr.option_flags = tp->opts.sccp.reterr;
 			else
-				qos->sel_infr.protocol_class = QOS_UNKNOWN;
+				qos->sel_infr.option_flags = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_SEQCTRL, tp->opts.flags))
-				qos->sel_infr.protocol_class = tp->opts.sccp.seqctrl;
+				qos->sel_infr.sequence_selection = tp->opts.sccp.seqctrl;
 			else
-				qos->sel_infr.protocol_class = QOS_UNKNOWN;
+				qos->sel_infr.sequence_selection = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_PRIO, tp->opts.flags))
-				qos->sel_infr.protocol_class = tp->opts.sccp.prio;
+				qos->sel_infr.message_priority = tp->opts.sccp.prio;
 			else
-				qos->sel_infr.protocol_class = QOS_UNKNOWN;
+				qos->sel_infr.message_priority = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_IMP, tp->opts.flags))
-				qos->sel_infr.protocol_class = tp->opts.sccp.imp;
+				qos->sel_infr.importance = tp->opts.sccp.imp;
 			else
-				qos->sel_infr.protocol_class = QOS_UNKNOWN;
+				qos->sel_infr.importance = QOS_UNKNOWN;
 			if (t_tst_bit(_T_BIT_SCCP_CREDIT, tp->opts.flags))
-				qos->sel_infr.protocol_class = tp->opts.sccp.credit;
+				qos->sel_infr.credit = tp->opts.sccp.credit;
 			else
-				qos->sel_infr.protocol_class = QOS_UNKNOWN;
+				qos->sel_infr.credit = QOS_UNKNOWN;
 			break;
 		default:
 			break;
 		}
 	}
 	return (0);
+      einval:
+	return (-EINVAL);
 }
 
 /*
@@ -1500,11 +1635,11 @@ t_read_opts(struct tp *tp, N_qos_sccp_t * qos, unsigned char *ip, size_t ilen)
  */
 noinline fastcall int
 t_conn_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc,
-	   struct sockaddr_sccp *rem, N_qos_sel_conn_sccp_t *qos, t_uscalar_t seq, const mblk_t *dp)
+	   struct sockaddr_sccp *rem, N_qos_sel_conn_sccp_t *qos, t_uscalar_t seq, mblk_t *dp)
 {
 	struct T_conn_ind *p;
 	mblk_t *mp;
-	const size_t olen = t_size_opts((N_qos_sccp_t *) qos);
+	size_t olen = t_size_opts((N_qos_sccp_t *) qos);
 	const size_t mlen = sizeof(*p) + sizeof(tp->rem) + olen;
 
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
@@ -1524,6 +1659,7 @@ t_conn_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc,
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_CONN_IND;
 	p->SRC_length = tp->REMADDR_length;
 	p->SRC_offset = tp->REMADDR_length ? sizeof(*p) : 0;
@@ -1562,11 +1698,11 @@ t_conn_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc,
  */
 noinline fastcall int
 t_conn_con(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
-	   N_qos_sel_conn_sccp_t *qos, const mblk_t *dp)
+	   N_qos_sel_conn_sccp_t *qos, mblk_t *dp)
 {
 	struct T_conn_con *p;
 	mblk_t *mp;
-	const size_t olen = t_size_opts((N_qos_sccp_t *) qos);
+	size_t olen = t_size_opts((N_qos_sccp_t *) qos);
 	const size_t mlen = sizeof(*p) + sizeof(tp->res) + olen;
 
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
@@ -1579,6 +1715,7 @@ t_conn_con(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_CONN_CON;
 	p->RES_length = tp->RES_length;
 	p->RES_offset = tp->RES_length ? sizeof(*p) : 0;
@@ -1614,7 +1751,7 @@ t_conn_con(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
  */
 noinline fastcall int
 t_discon_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, t_scalar_t reason,
-	     t_scalar_t seq, const mblk_t *dp)
+	     t_scalar_t seq, mblk_t *dp)
 {
 	struct T_discon_ind *p;
 	mblk_t *mp;
@@ -1630,6 +1767,7 @@ t_discon_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, 
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_DISCON_IND;
 	p->DISCON_reason = reason;
 	p->SEQ_number = seq;
@@ -1657,7 +1795,7 @@ t_discon_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, 
  * @dp: user data
  */
 noinline fastcall int
-t_data_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, const mblk_t *dp)
+t_data_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, mblk_t *dp)
 {
 	struct T_data_ind *p;
 	mblk_t *mp;
@@ -1668,6 +1806,7 @@ t_data_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, const mblk_t
 	if (unlikely(!bcanputnext(tp->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_DATA_IND;
 	p->MORE_flag = flag;
 	mp->b_wptr += sizeof(*p);
@@ -1694,7 +1833,7 @@ t_data_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, const mblk_t
  * @dp: user data
  */
 noinline fastcall int
-t_exdata_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, const mblk_t *dp)
+t_exdata_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, mblk_t *dp)
 {
 	struct T_exdata_ind *p;
 	mblk_t *mp;
@@ -1706,6 +1845,7 @@ t_exdata_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, const mblk
 		goto ebusy;
 	mp->b_band = 1;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_EXDATA_IND;
 	p->MORE_flag = flag;
 	mp->b_wptr += sizeof(*p);
@@ -1739,6 +1879,7 @@ t_info_ack(struct tp *tp, queue_t *q, mblk_t *msg)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	*p = tp->proto.info;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(tp->oq, STRLOGTX, SL_TRACE, "<- T_INFO_ACK");
@@ -1765,12 +1906,13 @@ t_bind_ack(struct tp *tp, queue_t *q, mblk_t *msg)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_BIND_ACK;
 	p->ADDR_length = sizeof(tp->add);
 	p->ADDR_offset = sizeof(*p);
 	p->CONIND_number = tp->maxinds;
 	mp->b_wptr += sizeof(*p);
-	bcopy(&tp->add, mp->b_wtpr, p->ADDR_length);
+	bcopy(&tp->add, mp->b_wptr, p->ADDR_length);
 	mp->b_wptr += p->ADDR_length;
 	mi_strlog(tp->oq, STRLOGTX, SL_TRACE, "<- T_BIND_ACK");
 	tp_set_state(tp, TS_IDLE);
@@ -1800,6 +1942,7 @@ t_error_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_uscalar_t prim, t_scalar_t
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_ERROR_ACK;
 	p->ERROR_prim = prim;
 	p->TLI_error = error < 0 ? TSYSERR : error;
@@ -1865,6 +2008,7 @@ t_ok_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_uscalar_t prim)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_OK_ACK;
 	p->CORRECT_prim = prim;
 	mp->b_wptr += sizeof(*p);
@@ -1915,11 +2059,11 @@ t_ok_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_uscalar_t prim)
  */
 noinline fastcall int
 t_unitdata_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
-	       struct sockaddr_sccp *loc, N_qos_sel_data_sccp_t *qos, const mblk_t *dp)
+	       struct sockaddr_sccp *loc, N_qos_sel_data_sccp_t *qos, mblk_t *dp)
 {
 	struct T_unitdata_ind *p;
 	mblk_t *mp;
-	const size_t olen = t_size_opts((N_qos_sccp_t *) qos);
+	size_t olen = t_size_opts((N_qos_sccp_t *) qos);
 	const size_t mlen = sizeof(*p) + sizeof(*loc) + olen;
 
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
@@ -1927,6 +2071,7 @@ t_unitdata_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem
 	if (unlikely(!bcanputnext(tp->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_UNITDATA_IND;
 	p->SRC_length = loc ? sizeof(*loc) : 0;
 	p->SRC_offset = loc ? sizeof(*p) : 0;
@@ -1963,11 +2108,11 @@ t_unitdata_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem
  */
 noinline fastcall int
 t_uderror_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
-	      N_qos_sel_data_sccp_t *qos, t_scalar_t error, const mblk_t *dp)
+	      N_qos_sel_data_sccp_t *qos, t_scalar_t error, mblk_t *dp)
 {
 	struct T_uderror_ind *p;
 	mblk_t *mp;
-	const size_t olen = t_size_opts((N_qos_sccp_t *) qos);
+	size_t olen = t_size_opts((N_qos_sccp_t *) qos);
 	const size_t mlen = sizeof(*p) + sizeof(*rem) + olen;
 
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
@@ -1976,6 +2121,7 @@ t_uderror_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
 		goto ebusy;
 	mp->b_band = 1;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_UDERROR_IND;
 	p->DEST_length = rem ? sizeof(*rem) : 0;
 	p->DEST_offset = rem ? sizeof(*p) : 0;
@@ -2010,17 +2156,19 @@ t_uderror_ind(struct tp *tp, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
 noinline fastcall int
 t_datack_ind(struct tp *tp, queue_t *q, mblk_t *msg)
 {
-	struct T_optmgmt_ind *p;
+	struct T_optdata_ind *p;
 	mblk_t *mp;
 	static const size_t mlen = sizeof(*p);
 
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
-	if (unlikely(!bcanputnext()))
+	if (unlikely(!bcanputnext(tp->oq, 2)))
 		goto ebusy;
+	mp->b_band = 2;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_OPTDATA_IND;
-	p->DATA_flags = T_SCCP_ACK;
+	p->DATA_flag = T_SCCP_ACK;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(tp->oq, STRLOGTX, SL_TRACE, "<- T_OPTDATA_IND(T_SCCP_ACK)");
 	tp->state.datacks--;
@@ -2047,12 +2195,13 @@ t_optmgmt_ack(struct tp *tp, queue_t *q, mblk_t *msg, N_qos_sccp_t * qos, t_scal
 {
 	struct T_optmgmt_ack *p;
 	mblk_t *mp;
-	const size_t olen = t_size_opts(qos);
+	size_t olen = t_size_opts(qos);
 	const size_t mlen = sizeof(*p) + olen;
 
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_OPTMGMT_ACK;
 	p->OPT_length = olen;
 	p->OPT_offset = olen ? sizeof(*p) : 0;
@@ -2061,7 +2210,7 @@ t_optmgmt_ack(struct tp *tp, queue_t *q, mblk_t *msg, N_qos_sccp_t * qos, t_scal
 	olen = t_build_opts(qos, mp->b_wptr, olen);
 	mp->b_wptr += olen;
 	mi_strlog(tp->oq, STRLOGTX, SL_TRACE, "<- T_OPTMGMT_ACK");
-	if (tp_get_state(tp, TS_WACK_OPTREQ))
+	if (tp_get_state(tp) == TS_WACK_OPTREQ)
 		tp_set_state(tp, TS_IDLE);
 	freemsg(msg);
 	putnext(tp->oq, mp);
@@ -2078,7 +2227,7 @@ t_optmgmt_ack(struct tp *tp, queue_t *q, mblk_t *msg, N_qos_sccp_t * qos, t_scal
  * @dp: user data
  */
 noinline fastcall int
-t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *msg, const mblk_t *dp)
+t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *msg, mblk_t *dp)
 {
 	struct T_ordrel_ind *p;
 	mblk_t *mp;
@@ -2089,6 +2238,7 @@ t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *msg, const mblk_t *dp)
 	if (unlikely(!bcanputnext(tp->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_ORDREL_IND;
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
@@ -2124,11 +2274,11 @@ t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *msg, const mblk_t *dp)
  */
 noinline fastcall int
 t_optdata_ind(struct tp *tp, queue_t *q, mblk_t *msg, N_qos_sccp_t * qos, t_scalar_t flag,
-	      const mblk_t *dp)
+	      mblk_t *dp)
 {
 	struct T_optdata_ind *p;
 	mblk_t *mp;
-	const size_t olen = t_size_opts(qos);
+	size_t olen = t_size_opts(qos);
 	const size_t mlen = sizeof(*p) + olen;
 	unsigned char band = (flag & T_ODF_EX) ? 1 : 0;
 
@@ -2138,6 +2288,7 @@ t_optdata_ind(struct tp *tp, queue_t *q, mblk_t *msg, N_qos_sccp_t * qos, t_scal
 		goto ebusy;
 	mp->b_band = band;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_OPTDATA_IND;
 	p->DATA_flag = flag;
 	p->OPT_length = olen;
@@ -2175,11 +2326,12 @@ t_addr_ack(struct tp *tp, queue_t *q, mblk_t *msg)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_ADDR_ACK;
-	p->LOCADDR_length = tp->proto.addr.LOCADDR_length;
-	p->LOCADDR_offset = p->LOCADDR_length ? sizeof(*p) : 0;
-	p->REMADDR_length = tp->proto.addr.REMADDR_length;
-	p->REMADDR_offset = p->REMADDR_length ? p->LOCADDR_offset + p->LOCADDR_length : 0;
+	p->LOCADDR_length = tp->LOCADDR_length;
+	p->LOCADDR_offset = tp->LOCADDR_length ? sizeof(*p) : 0;
+	p->REMADDR_length = tp->REMADDR_length;
+	p->REMADDR_offset = tp->REMADDR_length ? p->LOCADDR_offset + p->LOCADDR_length : 0;
 	mp->b_wptr += sizeof(*p);
 	bcopy(&tp->add, mp->b_wptr, p->LOCADDR_length);
 	mp->b_wptr += p->LOCADDR_length;
@@ -2213,10 +2365,11 @@ t_capability_ack(struct tp *tp, queue_t *q, mblk_t *msg, uchar type, t_uscalar_t
 	if (unlikely(!pcmsg(type) && !bcanputnext(tp->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = type;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_CAPABILITY_ACK;
 	p->CAP_bits1 = flags;
 	p->INFO_ack = tp->proto.info;
-	p->ACCEPTOR_id = tp->token;
+	p->ACCEPTOR_id = tp->TOKEN_value;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(tp->oq, STRLOGTX, SL_TRACE, "<- T_CAPABILITY_ACK");
 	freemsg(msg);
@@ -2242,7 +2395,7 @@ t_inform_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_uscalar_t orig, t_uscalar
 	struct T_optdata_ind *p;
 	mblk_t *mp;
 	struct t_opthdr *oh;
-	const size_t olen = 4 * (sizeof(*oh) + sizeof(t_scalar_t));
+	const size_t olen = 3 * (sizeof(*oh) + sizeof(t_scalar_t));
 	const size_t mlen = sizeof(*p) + olen;
 
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
@@ -2251,17 +2404,11 @@ t_inform_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_uscalar_t orig, t_uscalar
 		goto ebusy;
 	mp->b_band = 2;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_OPTDATA_IND;
 	p->DATA_flag = T_SCCP_INF;
 	p->OPT_length = olen;
 	p->OPT_offset = sizeof(*p);
-	mp->b_wptr += sizeof(*p);
-	oh = (typeof(oh)) mp->b_wptr;
-	oh->level = T_SS7_SCCP;
-	oh->name = T_SCCP_INFORM_ORIG;
-	oh->len = sizeof(*oh) + sizeof(t_scalar_t);
-	*(t_scalar_t *)(oh + 1) = orig;
-	mp->b_wptr += oh->len;
 	oh = (typeof(oh)) mp->b_wptr;
 	oh->level = T_SS7_SCCP;
 	oh->name = T_SCCP_INFORM_REASON;
@@ -2280,7 +2427,7 @@ t_inform_ind(struct tp *tp, queue_t *q, mblk_t *msg, t_uscalar_t orig, t_uscalar
 	oh->len = sizeof(*oh)+ sizeof(t_scalar_t);
 	*(t_scalar_t *)(oh + 1) = tp->opts.sccp.credit;
 	mp->b_wptr += oh->len;
-	mi_strlog(np->oq, STRLOGTX, SL_TRACE, "<- T_OPTDATA_IND(T_SCCP_INF)");
+	mi_strlog(tp->oq, STRLOGTX, SL_TRACE, "<- T_OPTDATA_IND(T_SCCP_INF)");
 	tp_set_state(tp, tp_get_state(tp));
 	freemsg(msg);
 	putnext(tp->oq, mp);
@@ -2312,6 +2459,7 @@ t_reset_ind(struct tp *tp, queue_t *q, mblk_t *msg, np_ulong orig, np_ulong reas
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_OPTDATA_IND;
 	p->DATA_flag = T_SCCP_RST;
 	p->OPT_length = olen;
@@ -2357,6 +2505,7 @@ t_reset_con(struct tp *tp, queue_t *q, mblk_t *msg)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_OPTDATA_IND;
 	p->DATA_flag = T_SCCP_RST;
 	p->OPT_length = 0;
@@ -2391,7 +2540,7 @@ t_reset_con(struct tp *tp, queue_t *q, mblk_t *msg)
  */
 noinline fastcall int
 n_conn_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
-	   N_qos_sel_conn_sccp_t *qos, np_ulong flags, const mblk_t *dp)
+	   N_qos_sel_conn_sccp_t *qos, np_ulong flags, mblk_t *dp)
 {
 	N_conn_req_t *p;
 	mblk_t *mp;
@@ -2409,11 +2558,12 @@ n_conn_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
 	}
 	/* save options for later */
 	if (qos) {
-		sc->qos = *qos;
+		bcopy(qos, &sc->qos, sizeof(*qos));
 		sc->QOS_length = sizeof(*qos);
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_CONN_REQ;
 	p->DEST_length = sc->REMADDR_length;
 	p->DEST_offset = sc->REMADDR_length ? sizeof(*p) : 0;
@@ -2454,7 +2604,7 @@ n_conn_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
 noinline fastcall int
 n_conn_res(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
 	   N_qos_sel_conn_sccp_t *qos, np_ulong token, np_ulong flags, np_ulong seq,
-	   const mblk_t *dp)
+	   mblk_t *dp)
 {
 	N_conn_res_t *p;
 	mblk_t *mp;
@@ -2472,11 +2622,12 @@ n_conn_res(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
 	}
 	/* save quality of service parameters */
 	if (qos) {
-		sc->qos = *qos;
+		bcopy(qos, &sc->qos, sizeof(*qos));
 		sc->QOS_length = sizeof(*qos);
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_CONN_RES;
 	p->TOKEN_value = token;
 	p->RES_length = sc->RES_length;
@@ -2518,7 +2669,7 @@ n_conn_res(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
  */
 noinline fastcall int
 n_discon_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, np_ulong reason,
-	     np_ulong seq, const mblk_t *dp)
+	     np_ulong seq, mblk_t *dp)
 {
 	N_discon_req_t *p;
 	mblk_t *mp;
@@ -2536,6 +2687,7 @@ n_discon_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, 
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DISCON_REQ;
 	p->DISCON_reason = reason;
 	p->RES_length = sc->RES_length;
@@ -2568,7 +2720,7 @@ n_discon_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, 
  * @dp: user data
  */
 noinline fastcall int
-n_data_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t *dp)
+n_data_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, mblk_t *dp)
 {
 	N_data_req_t *p;
 	mblk_t *mp;
@@ -2579,6 +2731,7 @@ n_data_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t 
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATA_REQ;
 	p->DATA_xfer_flags = flags;
 	mp->b_wptr += sizeof(*p);
@@ -2604,7 +2757,7 @@ n_data_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t 
  * @dp: user data
  */
 noinline fastcall int
-n_exdata_req(struct sc *sc, queue_t *q, mblk_t *msg, const mblk_t *dp)
+n_exdata_req(struct sc *sc, queue_t *q, mblk_t *msg, mblk_t *dp)
 {
 	N_exdata_req_t *p;
 	mblk_t *mp;
@@ -2615,6 +2768,7 @@ n_exdata_req(struct sc *sc, queue_t *q, mblk_t *msg, const mblk_t *dp)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_EXDATA_REQ;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_EXDATA_REQ ->");
@@ -2648,6 +2802,7 @@ n_info_req(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_INFO_REQ;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_INFO_REQ ->");
@@ -2681,6 +2836,7 @@ n_bind_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong maxinds, np_ulong fl
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_BIND_REQ;
 	p->ADDR_length = sizeof(sc->add);
 	p->ADDR_offset = sizeof(*p);
@@ -2723,6 +2879,7 @@ n_unbind_req(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UNBIND_REQ;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_UNBIND_REQ ->");
@@ -2748,7 +2905,7 @@ n_unbind_req(struct sc *sc, queue_t *q, mblk_t *msg)
  */
 noinline fastcall int
 n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
-	       N_qos_sel_data_sccp_t *qos, const mblk_t *dp)
+	       N_qos_sel_data_sccp_t *qos, mblk_t *dp)
 {
 	N_unitdata_req_t *p;
 	mblk_t *mp;
@@ -2759,6 +2916,7 @@ n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UNITDATA_REQ;
 	p->DEST_length = sizeof(*rem);
 	p->DEST_offset = sizeof(*p);
@@ -2767,8 +2925,8 @@ n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem
 	mp->b_wptr += sizeof(*p);
 	bcopy(rem, mp->b_wptr, p->DEST_length);
 	mp->b_wptr += p->DEST_length;
-	bcopy(qos, mp->b_wptr, p->QOS_length);
-	mp->b_wptr += p->QOS_length;
+	bcopy(qos, mp->b_wptr, p->RESERVED_field[0]);
+	mp->b_wptr += p->RESERVED_field[0];
 	mp->b_cont = dp;
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_UNITDATA_REQ ->");
 	if (msg && msg->b_cont == dp)
@@ -2804,13 +2962,14 @@ n_optmgmt_req(struct sc *sc, queue_t *q, mblk_t *msg, caddr_t qptr, size_t qlen,
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_OPTMGMT_REQ;
 	p->QOS_length = qlen;
 	p->QOS_offset = qlen ? sizeof(*p) : 0;
-	p->MGMT_flags = flags;
+	p->OPTMGMT_flags = flags;
 	mp->b_wptr += sizeof(*p);
 	bcopy(qptr, mp->b_wptr, p->QOS_length);
-	mp->b_wptr + p->QOS_length;
+	mp->b_wptr += p->QOS_length;
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_OPTMGMT_REQ ->");
 	if (sc_get_state(sc) == NS_IDLE)
 		sc_set_state(sc, NS_WACK_OPTREQ);
@@ -2842,6 +3001,7 @@ n_datack_req(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATACK_REQ;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_DATACK_REQ ->");
@@ -2875,6 +3035,7 @@ n_reset_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong reason)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_REQ;
 	p->RESET_reason = reason;
 	mp->b_wptr += sizeof(*p);
@@ -2908,6 +3069,7 @@ n_reset_res(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_RES;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_RESET_RES ->");
@@ -2931,7 +3093,7 @@ n_reset_res(struct sc *sc, queue_t *q, mblk_t *msg)
  * @sref: source local reference
  */
 noinline fastcall int
-n_request_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc, nl_ulong sref)
+n_request_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc, np_ulong sref)
 {
 	N_request_req_t *p;
 	mblk_t *mp;
@@ -2942,6 +3104,7 @@ n_request_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc,
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_REQUEST_REQ;
 	p->SRC_length = loc ? sizeof(*loc) : 0;
 	p->SRC_offset = loc ? sizeof(*p) : 0;
@@ -2984,12 +3147,13 @@ n_inform_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong reason)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_INFORM_REQ;
 	p->QOS_length = sizeof(sc->qos);
 	p->QOS_offset = sizeof(*p);
 	p->REASON = reason;
 	mp->b_wptr += sizeof(*p);
-	bcopy(&sc->qos, mp->b_qptr, p->QOS_length);
+	bcopy(&sc->qos, mp->b_wptr, p->QOS_length);
 	mp->b_wptr += p->QOS_length;
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_INFORM_REQ ->");
 	freemsg(msg);
@@ -3020,6 +3184,7 @@ n_state_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong status)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_STATE_REQ;
 	p->ADDR_length = sizeof(sc->add);
 	p->ADDR_offset = sizeof(*p);
@@ -3056,6 +3221,7 @@ n_coord_req(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_COORD_REQ;
 	p->ADDR_length = sizeof(sc->add);
 	p->ADDR_offset = sizeof(*p);
@@ -3091,6 +3257,7 @@ n_coord_res(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_COORD_RES;
 	p->ADDR_length = sizeof(sc->add);
 	p->ADDR_offset = sizeof(*p);
@@ -3140,13 +3307,13 @@ tp_conn_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	rem = &tp->rem;
 	if (!MBLKIN(mp, p->OPT_offset, p->OPT_length))
 		goto badopt;
-	if ((err = t_read_opts(tp, (N_qos_sccp_t *) qos,
+	if ((err = t_read_opts(tp, (N_qos_sccp_t *) &qos,
 			       mp->b_rptr + p->OPT_offset, p->OPT_length)))
 		goto error;
 	if (mp->b_cont && msgsize(mp->b_cont) > tp->proto.info.CDATA_size)
 		goto baddata;
 	tp_set_state(tp, TS_WACK_CREQ);
-	return n_conn_req(tp->sc, q, mp, rem, qos, 0 /* FIXME */ , mp->b_cont);
+	return n_conn_req(tp->sc, q, mp, rem, &qos, 0 /* FIXME */ , mp->b_cont);
       baddata:
 	err = TBADDATA;
 	goto error;
@@ -3188,7 +3355,7 @@ tp_conn_res(struct tp *tp, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (!MBLKIN(mp, p->OPT_offset, p->OPT_length))
 		goto badopt;
-	if ((err = t_read_opts(tp, (N_qos_sccp_t *) qos,
+	if ((err = t_read_opts(tp, (N_qos_sccp_t *) &qos,
 			       mp->b_rptr + p->OPT_offset, p->OPT_length)))
 		goto error;
 	if (mp->b_cont && msgsize(mp->b_cont) > tp->proto.info.CDATA_size)
@@ -3196,7 +3363,7 @@ tp_conn_res(struct tp *tp, queue_t *q, mblk_t *mp)
 	tp->state.accept = p->ACCEPTOR_id;
 	tp->state.pending = T_CONN_RES;
 	tp_set_state(tp, TS_WACK_CRES);
-	return n_conn_res(tp->sc, q, mp, NULL, qos, p->ACCEPTOR_id, 0 /* FIXME */ , p->SEQ_number,
+	return n_conn_res(tp->sc, q, mp, NULL, &qos, p->ACCEPTOR_id, 0 /* FIXME */ , p->SEQ_number,
 			  mp->b_cont);
       baddata:
 	err = TBADDATA;
@@ -3292,7 +3459,7 @@ tp_data_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (tp->edatack)
+	if (tp->state.edatack)
 		/* The TS user must wait until the expedited data request is acknowledged before
 		   any other normal data or expedited data primitives are issued. */
 		goto outstate;
@@ -3346,7 +3513,7 @@ tp_exdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (tp->edatack)
+	if (tp->state.edatack)
 		/* The TS user must wait until the expedited data request is acknowledged before
 		   any other normal data or expedited data primitives are issued. */
 		goto outstate;
@@ -3360,7 +3527,7 @@ tp_exdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		goto baddata;
 	if (mp->b_cont && msgsize(mp->b_cont) > tp->proto.info.ETSDU_size)
 		goto baddata;
-	tp->edatack = 1;
+	tp->state.edatack = 1;
 	return n_exdata_req(tp->sc, q, mp, mp->b_cont);
       baddata:
 	err = TBADDATA;
@@ -3421,7 +3588,7 @@ tp_bind_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		bcopy(mp->b_rptr + p->ADDR_offset, &tp->add, sizeof(tp->add));
 	}
 	tp_set_state(tp, TS_WACK_BREQ);
-	return n_bind_req(np->sc, q, mp, p->CONIND_number, 0 /* FIXME */ );
+	return n_bind_req(tp->sc, q, mp, p->CONIND_number, 0 /* FIXME */ );
       badaddr:
 	err = TBADADDR;
 	goto error;
@@ -3499,14 +3666,9 @@ tp_unitdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
 			goto badaddr;
 		bcopy(mp->b_rptr + p->DEST_offset, rptr, sizeof(*rptr));
 	}
-	if (!MBLKIN(mp, p->RESERVED_field[1], p->RESERVED_field[0]))
-		goto badqos;
-	if (p->RESERVED_field[0]) {
-		qptr = &tp->qos;
-		if (p->QOS_length < sizeof(*qptr))
-			goto badqos;
-		bcopy(mp->b_rptr + p->QOS_offset, qptr, sizeof(*qptr));
-	}
+	if (!MBLKIN(mp, p->OPT_offset, p->OPT_length))
+		goto badopt;
+	t_read_opts(tp, NULL, mp->b_rptr + p->OPT_offset, p->OPT_length);
 	if (mp->b_cont && msgsize(mp->b_cont) > tp->proto.info.TIDU_size)
 		goto baddata;
 	if (mp->b_cont && msgsize(mp->b_cont) > tp->proto.info.TSDU_size)
@@ -3515,7 +3677,7 @@ tp_unitdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
       baddata:
 	err = TBADDATA;
 	goto error;
-      badqos:
+      badopt:
 	err = TBADOPT;
 	goto error;
       badaddr:
@@ -3561,9 +3723,6 @@ tp_optmgmt_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	goto error;
       badopt:
 	err = TBADOPT;
-	goto error;
-      outstate:
-	err = TOUTSTATE;
 	goto error;
       tooshort:
 	err = -EFAULT;
@@ -3690,11 +3849,11 @@ tp_reset_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (tp->state.resreqs)
+	if (tp->state.resacks)
 		/* If there are outstanding reset requests, we are out of state. */
 		goto outstate;
 	t_read_opts(tp, NULL, mp->b_rptr + p->OPT_offset, p->OPT_length);
-	tp->state.resreqs = 1;
+	tp->state.resacks = 1;
 	tp_set_state(tp, NS_DATA_XFER);
 	return n_reset_req(tp->sc, q, mp, tp->RESET_reason);
       outstate:
@@ -3733,14 +3892,14 @@ tp_reset_res(struct tp *tp, queue_t *q, mblk_t *mp)
 		   N_RESET_RES primitive, then the NS provider should discard the message without
 		   generating an error. */
 		goto discard;
-	case TS_WRES_RIND:
+	case TS_DATA_XFER:
 		break;
 	default:
 		goto outstate;
 	}
-	if (tp->resinds <= 0)
+	if (tp->state.resinds <= 0)
 		goto outstate;
-	tp->resinds = 0;
+	tp->state.resinds = 0;
 	tp_set_state(tp, TS_DATA_XFER);
 	return n_reset_res(tp->sc, q, mp);
       outstate:
@@ -3811,7 +3970,7 @@ tp_optdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (tp->edatack)
+	if (tp->state.edatack)
 		/* The TS user must wait until the expedited data request is acknowledged before
 		   any other normal data or expedited data primitives are issued. */
 		goto outstate;
@@ -3882,7 +4041,7 @@ tp_addr_req(struct tp *tp, queue_t *q, mblk_t *mp)
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
-	tp->state.ackpending = T_ADDR_ACK;
+	tp->state.pending = T_ADDR_ACK;
 	return n_info_req(tp->sc, q, mp);
       tooshort:
 	err = -EFAULT;
@@ -3905,7 +4064,7 @@ tp_capability_req(struct tp *tp, queue_t *q, mblk_t *mp)
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
-	tp->state.ackpending = T_CAPABILITY_ACK;
+	tp->state.pending = T_CAPABILITY_ACK;
 	return n_info_req(tp->sc, q, mp);
       tooshort:
 	err = -EFAULT;
@@ -3954,7 +4113,7 @@ sc_conn_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	}
 	sc->state.coninds++;
 	sc_set_state(sc, NS_WRES_CIND);
-	return t_conn_ind(sc->tp, q, mp, loc, rem, qos, p->SEQ_number, p->CONN_flags, mp->b_cont);
+	return t_conn_ind(sc->tp, q, mp, loc, rem, qos, p->SEQ_number, mp->b_cont);
 }
 
 /**
@@ -3967,19 +4126,21 @@ noinline fastcall int
 sc_conn_con(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_conn_con_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *req;
+	struct sockaddr_sccp *res;
 	N_qos_sel_conn_sccp_t *qos;
 
 	if (p->RES_length) {
 		res = (typeof(res)) (mp->b_rptr + p->RES_offset);
 		bcopy(res, &sc->res, p->RES_length);
-	}
+	} else
+		res = NULL;
 	if (p->QOS_length) {
 		qos = (typeof(qos)) (mp->b_rptr + p->QOS_offset);
 		bcopy(qos, &sc->qos, p->QOS_length);
-	}
+	} else
+		qos = NULL;
 	sc_set_state(sc, NS_DATA_XFER);
-	return t_conn_con(sc->tp, q, mp, res, qos, p->CONN_flags, mp->b_cont);
+	return t_conn_con(sc->tp, q, mp, res, qos, mp->b_cont);
 }
 
 /**
@@ -3997,12 +4158,12 @@ sc_discon_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	if (p->RES_length) {
 		res = (typeof(res)) (mp->b_rptr + p->RES_offset);
 		bcopy(res, &sc->res, p->RES_length);
-	}
+	} else
+		res = NULL;
 	if (p->SEQ_number)
 		sc->state.coninds--;
 	sc_set_state(sc, sc->state.coninds ? NS_WRES_CIND : NS_IDLE);
-	return t_discon_ind(sc->tp, q, mp, res, p->DISCON_orig, p->DISCON_reason, p->SEQ_number,
-			    mp->b_cont);
+	return t_discon_ind(sc->tp, q, mp, res, p->DISCON_reason, p->SEQ_number, mp->b_cont);
 }
 
 /**
@@ -4016,7 +4177,7 @@ sc_data_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_data_ind_t *p = (typeof(p)) mp->b_rptr;
 
-	retrn t_data_ind(sc->tp, q, mp, p->DATA_xfer_flags, mp->b_cont);
+	return t_data_ind(sc->tp, q, mp, p->DATA_xfer_flags, mp->b_cont);
 }
 
 /**
@@ -4030,7 +4191,7 @@ sc_exdata_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_exdata_ind_t *p = (typeof(p)) mp->b_rptr;
 
-	return t_exdata_ind(sc->tp, q, mp, mp->b_cont);
+	return t_exdata_ind(sc->tp, q, mp, 0, mp->b_cont);
 }
 
 /**
@@ -4113,9 +4274,8 @@ sc_bind_ack(struct sc *sc, queue_t *q, mblk_t *mp)
 	}
 	sc->proto.info.PROTOID_length = p->PROTOID_length;
 	sc->maxinds = p->CONIND_number;
-	sc->token = p->TOKEN_value;
-	sc->BIND_flags = p->BIND_flags;
-	return t_bind_ack(sc->tp, q, mp, add, pro, p->BIND_flags);
+	sc->TOKEN_value = p->TOKEN_value;
+	return t_bind_ack(sc->tp, q, mp);
 }
 
 /**
@@ -4221,7 +4381,7 @@ sc_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 
 	loc = p->SRC_length ? (typeof(loc)) (mp->b_rptr + p->SRC_offset) : NULL;
 	rem = p->DEST_length ? (typeof(rem)) (mp->b_rptr + p->DEST_offset) : NULL;
-	return t_unitdata_ind(sc->tp, q, mp, loc, rem, p->ERROR_type, mp->b_cont);
+	return t_unitdata_ind(sc->tp, q, mp, loc, rem, NULL, mp->b_cont);
 }
 
 /**
@@ -4237,7 +4397,7 @@ sc_uderror_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	struct sockaddr_sccp *rem;
 
 	rem = p->DEST_length ? (typeof(rem)) (mp->b_rptr + p->DEST_offset) : NULL;
-	return t_uderror_ind(sc->tp, q, mp, rem, p->ERROR_type, mp->b_cont);
+	return t_uderror_ind(sc->tp, q, mp, rem, NULL, p->ERROR_type, mp->b_cont);
 }
 
 /**
@@ -4303,7 +4463,7 @@ sc_notice_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	rem = (typeof(rem)) (mp->b_rptr + p->DEST_offset);
 	/* In mapping the N_NOTICE_IND primitive to the N_UDERROR_IND primitive, the source address 
 	   and quality of service parameters associated with the message are lost. */
-	return t_uderror_ind(sc->tp, q, mp, rem, p->RETURN_cause, mp->b_cont);
+	return t_uderror_ind(sc->tp, q, mp, rem, NULL, p->RETURN_cause, mp->b_cont);
 }
 
 /**
@@ -4318,7 +4478,7 @@ sc_inform_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	N_inform_ind_t *p = (typeof(p)) mp->b_rptr;
 
 	bcopy(mp->b_rptr + p->QOS_offset, &sc->qos, p->QOS_length);
-	sc->state.inform = 1;
+	sc->state.infinds = 1;
 	sc_set_state(sc, NS_WRES_RIND);
 	return t_inform_ind(sc->tp, q, mp, N_PROVIDER, p->REASON);
 }
@@ -4332,7 +4492,7 @@ sc_inform_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 noinline fastcall int
 sc_coord_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
-	N_coord_ind_t *p = (typeof(p)) mp->b_rtpr;
+	N_coord_ind_t *p = (typeof(p)) mp->b_rptr;
 
 	freemsg(mp);
 	return (0);
@@ -4447,6 +4607,13 @@ m_r_other(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+static int
+tp_error_reply(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t prim, t_scalar_t error, const char *func)
+{
+	/* FIXME */
+	return t_error_ack(tp, q, msg, prim, error);
+}
+
 /**
  * tp_w_proto: - process M_PROTO or M_PCPROTO message
  * @tp: transport provider private structure (locked)
@@ -4518,13 +4685,24 @@ tp_w_proto(struct tp *tp, queue_t *q, mblk_t *mp)
 		err = tp_capability_req(tp, q, mp);
 		break;
 	default:
+#if 0
 		err = tp_other_req(tp, q, mp);
+#endif
+		err = -EPROTO;
 		break;
 	}
       done:
 	if (err)
 		tp_restore_state(tp);
 	return tp_error_reply(tp, q, mp, prim, err, tp_primname(prim));
+}
+
+static int
+sc_error_reply(struct sc *sc, queue_t *q, mblk_t *msg, np_long prim, np_long error, const char *func)
+{
+	/* FIXME */
+	freemsg(msg);
+	return (0);
 }
 
 /**
@@ -4624,7 +4802,10 @@ sc_r_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 		err = sc_reply_ack(sc, q, mp);
 		break;
 	default:
+#if 0
 		err = sc_other_ind(sc, q, mp);
+#endif
+		err = -EPROTO;
 		break;
 	}
       done:
@@ -4642,6 +4823,7 @@ static int
 m_w_proto(queue_t *q, mblk_t *mp)
 {
 	struct priv *priv;
+	int err;
 
 	if (likely(!!(priv = (struct priv *) mi_trylock(q)))) {
 		err = tp_w_proto(&priv->tp, q, mp);
@@ -4660,6 +4842,7 @@ static int
 m_r_proto(queue_t *q, mblk_t *mp)
 {
 	struct priv *priv;
+	int err;
 
 	if (likely(!!(priv = (struct priv *) mi_trylock(q)))) {
 		err = sc_r_proto(&priv->sc, q, mp);
@@ -4678,7 +4861,7 @@ m_r_proto(queue_t *q, mblk_t *mp)
 static int
 tp_w_data(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	t_uscalar_t DATA_flag;
+	t_uscalar_t DATA_flag = 0;
 	int err;
 
 	switch (tp_get_state(tp)) {
@@ -4689,7 +4872,7 @@ tp_w_data(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (tp->edatack)
+	if (tp->state.edatack)
 		/* The NS user must wait until the expedited data request is acknowledged before
 		   any other normal data or expedited data primitives are issued. */
 		goto outstate;
@@ -4698,7 +4881,7 @@ tp_w_data(struct tp *tp, queue_t *q, mblk_t *mp)
 	if (mp->b_band)
 		return n_exdata_req(tp->sc, q, NULL, mp);
 	if (!(mp->b_flag & MSGDELIM))
-		DATA_xfer_flags |= N_MORE_DATA_FLAG;
+		DATA_flag |= N_MORE_DATA_FLAG;
 	return n_data_req(tp->sc, q, NULL, 0, mp);
 baddata:
 	err = TBADDATA;
@@ -4725,10 +4908,10 @@ sc_r_data(struct sc *sc, queue_t *q, mblk_t *mp)
 	np_ulong DATA_xfer_flags = 0;
 
 	if (mp->b_band)
-		return n_exdata_ind(sc->np, q, NULL, mp);
+		return t_exdata_ind(sc->tp, q, mp, DATA_xfer_flags, mp);
 	if (!(mp->b_flag & MSGDELIM))
 		DATA_xfer_flags |= N_MORE_DATA_FLAG;
-	return n_data_ind(sc->np, q, NULL, DATA_xfer_flags, mp);
+	return t_data_ind(sc->tp, q, NULL, DATA_xfer_flags, mp);
 }
 
 /**
@@ -4740,6 +4923,7 @@ static int
 m_w_data(queue_t *q, mblk_t *mp)
 {
 	struct priv *priv;
+	int err;
 
 	if (likely(!!(priv = (struct priv *) mi_trylock(q)))) {
 		err = tp_w_data(&priv->tp, q, mp);
@@ -4758,6 +4942,7 @@ static int
 m_r_data(queue_t *q, mblk_t *mp)
 {
 	struct priv *priv;
+	int err;
 
 	if (likely(!!(priv = (struct priv *) mi_trylock(q)))) {
 		err = sc_r_data(&priv->sc, q, mp);
@@ -4854,6 +5039,7 @@ tp_w_msg(struct tp *tp, queue_t *q, mblk_t *mp)
 		err = m_w_other(q, mp);
 		break;
 	}
+	return (err);
 }
 
 /**
@@ -4889,6 +5075,7 @@ sc_r_msg(struct sc *sc, queue_t *q, mblk_t *mp)
 		err = m_w_other(q, mp);
 		break;
 	}
+	return (err);
 }
 
 /**
@@ -5073,27 +5260,25 @@ tp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *credp)
 	p->tp.state.datinds = 0;
 	p->tp.state.datacks = 0;
 	p->tp.state.coninds = 0;
-	p->tp.state.inform = 0;
+	p->tp.state.infinds = 0;
 	p->tp.proto.info.PRIM_type = T_INFO_ACK;
 	p->tp.proto.info.TSDU_size = QOS_UNKNOWN;
 	p->tp.proto.info.ETSDU_size = QOS_UNKNOWN;
 	p->tp.proto.info.CDATA_size = QOS_UNKNOWN;
 	p->tp.proto.info.DDATA_size = QOS_UNKNOWN;
 	p->tp.proto.info.ADDR_size = QOS_UNKNOWN;
-	p->tp.proto.info.OPTIONS_flags = QOS_UNKNOWN;
+	p->tp.proto.info.OPT_size = QOS_UNKNOWN;
 	p->tp.proto.info.TIDU_size = QOS_UNKNOWN;
 	p->tp.proto.info.SERV_type = QOS_UNKNOWN;
 	p->tp.proto.info.CURRENT_state = QOS_UNKNOWN;
-	p->tp.proto.info.PROVIDER_type = QOS_UNKNOWN;
-	p->tp.proto.info.TODU_size = QOS_UNKNOWN;
-	p->tp.proto.info.TLI_version = QOS_UNKNOWN;
+	p->tp.proto.info.PROVIDER_flag = QOS_UNKNOWN;
 	/* ... */
 	p->sc.oq = WR(q);
 	p->sc.state.state = NS_UNBND;
 	p->sc.state.datinds = 0;
 	p->sc.state.datacks = 0;
 	p->sc.state.coninds = 0;
-	p->sc.state.inform = 0;
+	p->sc.state.infinds = 0;
 	p->sc.proto.info.PRIM_type = N_INFO_ACK;
 	p->sc.proto.info.NSDU_size = QOS_UNKNOWN;
 	p->sc.proto.info.ENSDU_size = QOS_UNKNOWN;
@@ -5147,7 +5332,7 @@ MODULE_PARM_DESC(modid, "Module ID for TPI-SCCP.  (0 for allocation.)");
 static struct fmodsw tp_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &tpi_sccpinfo,
-	.f_flag = F_MP,
+	.f_flag = D_MP,
 	.f_modid = MOD_ID,
 	.f_kmod = THIS_MODULE,
 };
@@ -5160,7 +5345,7 @@ tpi_sccp_modinit(void)
 {
 	int err;
 
-	if ((err = register_strmod(&tp_fmod, modid)) < 0) {
+	if ((err = register_strmod(&tp_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: Could not register module: err = %d\n", __FUNCTION__, -err);
 		return (-err);
 	}
@@ -5177,7 +5362,7 @@ tpi_sccp_modexit(void)
 {
 	int err;
 
-	if ((err = unregister_strmod(&tp_fmod, modid)) < 0)
+	if ((err = unregister_strmod(&tp_fmod)) < 0)
 		cmn_err(CE_WARN, "%s: Could not deregister module: err = %d\n", __FUNCTION__, -err);
 	return;
 }

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2008-09-22 17:37:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2008-11-17 19:02:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:27 $ by $Author: brian $
+# Last Modified $Date: 2008-11-17 19:02:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -366,6 +366,8 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/isup/isup.c \
 				  src/modules/sccp/sccp.c \
 				  src/modules/sccp/sccp_mod.c \
+				  src/modules/sccp/npi_sccp.c \
+				  src/modules/sccp/tpi_sccp.c \
 				  src/modules/tcap/tcap.c \
 				  src/modules/tcap/tr_mod.c \
 				  src/modules/tcap/tc_mod.c \
@@ -765,6 +767,8 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/mx/mx_sdl.c \
 				  src/modules/sccp/sccp.c \
 				  src/modules/sccp/sccp_mod.c \
+				  src/modules/sccp/npi_sccp.c \
+				  src/modules/sccp/tpi_sccp.c \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \
@@ -1488,6 +1492,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.106  2008-11-17 19:02:26  brian
+## - conversion modules compile
+##
 ## Revision 0.9.2.105  2008-09-22 17:37:27  brian
 ## - build and release updates
 ##

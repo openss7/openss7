@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $
+ @(#) $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-17 14:04:35 $ by $Author: brian $
+ Last Modified $Date: 2008-11-17 19:02:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_sccp.c,v $
+ Revision 0.9.2.2  2008-11-17 19:02:27  brian
+ - conversion modules compile
+
  Revision 0.9.2.1  2008-11-17 14:04:35  brian
  - added documentation and conversion modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $"
+#ident "@(#) $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $"
 
-static char const ident[] = "$RCSfile: npi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $";
+static char const ident[] = "$RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $";
 
 /*
  * This is a pushable STREAMS module that converts between the SCCPI (Signalling Connection Control
@@ -76,11 +79,11 @@ static char const ident[] = "$RCSfile: npi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Re
 #define _SVR4_SOURCE
 
 #include <sys/os7/compat.h>
+#include <sys/strsun.h>
+
 #include <sys/npi.h>
 #include <sys/npi_sccp.h>
 #include <ss7/sccpi.h>
-
-#include <linux/bitopts.h>
 
 #define n_tst_bit(nr,addr)  test_bit(nr,addr)
 #define n_set_bit(nr,addr)  __set_bit(nr,addr)
@@ -89,7 +92,7 @@ static char const ident[] = "$RCSfile: npi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Re
 #define NPI_SCCP_DESCRIP	"SCCPI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define NPI_SCCP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define NPI_SCCP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_SCCP_REVISION	"OpenSS7 $RCSfile: npi_sccp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $"
+#define NPI_SCCP_REVISION	"OpenSS7 $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $"
 #define NPI_SCCP_DEVICE		"SVR 4.2MP SCCPI to NPI Conversion Module (NPI) for SCCP"
 #define NPI_SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_SCCP_LICENSE	"GPL"
@@ -124,7 +127,7 @@ MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NPI_SCCP_MODID));
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACAKAGE_RPMEXTRA2);
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif				/* MODULE_VERSION */
 #endif				/* MODULE */
 #endif				/* LINUX */
@@ -135,6 +138,15 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #ifndef NPI_SCCP_MOD_ID
 #define NPI_SCCP_MOD_ID		CONFIG_STREAMS_NPI_SCCP_MODID
 #endif				/* NPI_SCCP_MOD_ID */
+
+#define STRLOGERR	0
+#define STRLOGNO	1
+#define STRLOGRX	2
+#define STRLOGTX	3
+#define STRLOGST	4
+#define STRLOGTO	5
+#define STRLOGTE	6
+#define STRLOGDA	7
 
 /*
  * STREAMS DEFINITIONS
@@ -205,76 +217,94 @@ struct sc;
 struct np {
 	struct sc *sc;
 	queue_t *oq;
+	np_ulong maxinds;
 	struct {
 		np_ulong state;
 		np_ulong datinds;
 		np_ulong datacks;
+		np_ulong edatack;
 		np_ulong coninds;
-		np_ulong inform;
+		np_ulong infinds;
 		np_ulong accept;
+		np_ulong resinds;
+		np_ulong resacks;
+		np_ulong pending;
 	} state, oldstate;
-	ushort add_len;
 	struct {
 		N_info_ack_t info;
-		struct sockaddr_sccp add;
-		N_qos_co_opt_sel_t qos;
-		N_qos_co_opt_range_t qor;
+		struct sccp_addr add;
+		N_qos_sel_info_sccp_t qos;
+		N_qos_range_info_sccp_t qor;
 	} proto;
+	np_ulong TOKEN_value;
+	np_ulong BIND_flags;
+	np_ulong SRC_lref;
 	np_ulong QOS_length;
 	N_qos_sccp_t qos;
 	np_ulong QOS_range_length;
 	N_qos_sccp_t qor;
 	np_ulong ADDR_length;
-	struct sockaddr_sccp add;
+	struct sccp_addr add;
 	np_ulong LOCADDR_length;
-	struct sockaddr_sccp loc;
+	struct sccp_addr loc;
 	np_ulong REMADDR_length;
-	struct sockaddr_sccp rem;
+	struct sccp_addr rem;
 	np_ulong RES_length;
-	struct sockaddr_sccp res;
+	struct sccp_addr res;
+	np_ulong PROTOID_length;
+	np_ulong pro[4];
 };
 
 /* Lower interface structure */
 struct sc {
 	struct np *np;
 	queue_t *oq;
+	np_ulong maxinds;
 	struct {
 		np_ulong state;
 		np_ulong datinds;
 		np_ulong datacks;
+		np_ulong edatack;
 		np_ulong coninds;
-		np_ulong inform;
+		np_ulong infinds;
 		np_ulong accept;
+		np_ulong resinds;
+		np_ulong resacks;
+		np_ulong pending;
 	} state, oldstate;
-	ushort add_len;
 	struct {
 		N_info_ack_t info;
-		struct sockaddr_sccp add;
-		N_qos_sccp_opt_sel_t qos;
-		N_qos_sccp_opt_range_t qor;
+		struct sccp_addr add;
+		N_qos_sel_info_sccp_t qos;
+		N_qos_range_info_sccp_t qor;
 	} proto;
+	np_ulong TOKEN_value;
+	np_ulong BIND_flags;
+	np_ulong SRC_lref;
 	np_ulong QOS_length;
 	N_qos_sccp_t qos;
 	np_ulong QOS_range_length;
 	N_qos_sccp_t qor;
 	np_ulong ADDR_length;
-	struct sockaddr_sccp add;
+	struct sccp_addr add;
 	np_ulong LOCADDR_length;
-	struct sockaddr_sccp loc;
+	struct sccp_addr loc;
 	np_ulong REMADDR_length;
-	struct sockaddr_sccp rem;
+	struct sccp_addr rem;
 	np_ulong RES_length;
-	struct sockaddr_sccp res;
+	struct sccp_addr res;
+	np_ulong PROTOID_length;
+	np_ulong pro[4];
 };
 
 struct priv {
-	struct np npi;
-	struct sc sccpi;
+	struct np np;
+	struct sc sc;
 };
 
 #define PRIV(q) ((struct priv *)q->q_ptr)
-#define NP_PRIV(q) (&PRIV(q)->npi)
-#define SC_PRIV(q) (&PRIV(q)->sccpi)
+#define NP_PRIV(q) (&PRIV(q)->np)
+#define SC_PRIV(q) (&PRIV(q)->sc)
 
 static inline const char *
 np_primname(np_ulong prim)
@@ -403,8 +433,8 @@ np_statename(np_ulong state)
 static inline const char *
 np_strerror(np_long error)
 {
-	if (err < 0)
-		err = NSYSERR;
+	if (error < 0)
+		error = NSYSERR;
 	switch (error) {
 	case NBADADDR:
 		return ("Incorrect address format/illegal address information.");
@@ -464,14 +494,14 @@ np_set_state(struct np *np, np_ulong newstate)
 static np_ulong
 np_save_state(struct np *np)
 {
-	np->oldstate = np->state;
-	return ((np->oldstate = np_get_state(np)));
+	np->oldstate.state = np->state.state;
+	return ((np->oldstate.state = np_get_state(np)));
 }
 
 static np_ulong
 np_restore_state(struct np *np)
 {
-	return (np_set_state(np, np->oldstate));
+	return (np_set_state(np, np->oldstate.state));
 }
 
 static const char *
@@ -550,8 +580,8 @@ sc_primname(np_ulong prim)
 		return ("N_COORD_CON");
 	case N_REQUEST_REQ:
 		return ("N_REQUEST_REQ");
-	case N_REQUEST_ACK:
-		return ("N_REQUEST_ACK");
+	case N_REPLY_ACK:
+		return ("N_REPLY_ACK");
 	default:
 		return ("(unknown)");
 	}
@@ -563,7 +593,7 @@ sc_statename(np_ulong state)
 	return np_statename(state);
 }
 
-static const char *
+static inline const char *
 sc_strerror(np_long error)
 {
 	return np_strerror(error);
@@ -572,16 +602,16 @@ sc_strerror(np_long error)
 static np_ulong
 sc_get_state(struct sc *sc)
 {
-	return (sc->state);
+	return (sc->state.state);
 }
 
 static np_ulong
-sc_set_state(struct sc *sc)
+sc_set_state(struct sc *sc, np_ulong newstate)
 {
-	int oldstate = sc->state;
+	np_ulong oldstate = sc->state.state;
 
 	if (newstate != oldstate) {
-		sc->state = newstate;
+		sc->state.state = newstate;
 		sc->proto.info.CURRENT_state = newstate;
 		mi_strlog(sc->oq, STRLOGST, SL_TRACE, "%s <- %s", sc_statename(newstate),
 			  sc_statename(oldstate));
@@ -592,13 +622,13 @@ sc_set_state(struct sc *sc)
 static np_ulong
 sc_save_state(struct sc *sc)
 {
-	return ((sc->oldstate = sc_get_state(sc)))
+	return ((sc->oldstate.state = sc_get_state(sc)));
 }
 
 static np_ulong
 sc_restore_state(struct sc *sc)
 {
-	return (sc_set_state(sc, sc->oldstate));
+	return (sc_set_state(sc, sc->oldstate.state));
 }
 
 /*
@@ -618,9 +648,9 @@ sc_restore_state(struct sc *sc)
  * @dp: user data
  */
 noinline fastcall int
-n_conn_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc,
-	   struct sockaddr_sccp *rem, N_qos_sel_conn_sccp_t *qos, np_ulong seq, np_ulong flags,
-	   const mblk_t *dp)
+n_conn_ind(struct np *np, queue_t *q, mblk_t *msg, struct sccp_addr *loc,
+	   struct sccp_addr *rem, N_qos_sel_conn_sccp_t *qos, np_ulong seq, np_ulong flags,
+	   mblk_t *dp)
 {
 	N_conn_ind_t *p;
 	mblk_t *mp;
@@ -643,13 +673,14 @@ n_conn_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc,
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_CONN_IND;
 	p->DEST_length = np->LOCADDR_length;
 	p->DEST_offset = np->LOCADDR_length ? sizeof(*p) : 0;
 	p->SEQ_number = seq;
 	p->CONN_flags = flags;
-	p->SRC_length = np->DESTADDR_length;
-	p->SRC_offset = np->DESTADDR_length ? p->DEST_offset + p->DEST_length: 0;
+	p->SRC_length = np->REMADDR_length;
+	p->SRC_offset = np->REMADDR_length ? p->DEST_offset + p->DEST_length: 0;
 	p->QOS_length = np->QOS_length;
 	p->QOS_offset = np->QOS_length ? p->SRC_offset + p->SRC_length : 0;
 	mp->b_wptr += sizeof(*p);
@@ -686,8 +717,8 @@ n_conn_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc,
  * @dp: user data
  */
 noinline fastcall int
-n_conn_con(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, N_qos_sel_conn_sccp_t *qos, np_ulong flags,
-	   const mblk_t *dp)
+n_conn_con(struct np *np, queue_t *q, mblk_t *msg, struct sccp_addr *res, N_qos_sel_conn_sccp_t *qos, np_ulong flags,
+	   mblk_t *dp)
 {
 	N_conn_con_t *p;
 	mblk_t *mp;
@@ -703,6 +734,7 @@ n_conn_con(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, N_
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_CONN_CON;
 	p->RES_length = np->RES_length;
 	p->RES_offset = np->RES_length ? sizeof(*p) : 0;
@@ -738,8 +770,8 @@ n_conn_con(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, N_
  * @dp: user data
  */
 noinline fastcall int
-n_discon_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, np_ulong orig, np_ulong reason, np_ulong seq,
-	     const mblk_t *dp)
+n_discon_ind(struct np *np, queue_t *q, mblk_t *msg, struct sccp_addr *res, np_ulong orig, np_ulong reason, np_ulong seq,
+	     mblk_t *dp)
 {
 	N_discon_ind_t *p;
 	mblk_t *mp;
@@ -755,6 +787,7 @@ n_discon_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, 
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DISCON_IND;
 	p->DISCON_orig = orig;
 	p->DISCON_reason = reason;
@@ -787,7 +820,7 @@ n_discon_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, 
  * @dp: user data
  */
 noinline fastcall int
-n_data_ind(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t *dp)
+n_data_ind(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags, mblk_t *dp)
 {
 	N_data_ind_t *p;
 	mblk_t *mp;
@@ -798,6 +831,7 @@ n_data_ind(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t 
 	if (unlikely(!bcanputnext(np->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATA_IND;
 	p->DATA_xfer_flags = flags;
 	mp->b_wptr += sizeof(*p);
@@ -825,7 +859,7 @@ n_data_ind(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t 
  * @dp: user data
  */
 noinline fastcall int
-n_exdata_ind(struct np *np, queue_t *q, mblk_t *msg, const mblk_t *dp)
+n_exdata_ind(struct np *np, queue_t *q, mblk_t *msg, mblk_t *dp)
 {
 	N_exdata_ind_t *p;
 	mblk_t *mp;
@@ -837,6 +871,7 @@ n_exdata_ind(struct np *np, queue_t *q, mblk_t *msg, const mblk_t *dp)
 		goto ebusy;
 	mp->b_band = 1;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_EXDATA_IND;
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
@@ -870,6 +905,7 @@ n_info_ack(struct np *np, queue_t *q, mblk_t *msg)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	*p = np->proto.info;
 	mp->b_wptr += sizeof(*p);
 	p->ADDR_offset = MBLKL(mp);
@@ -897,10 +933,9 @@ n_info_ack(struct np *np, queue_t *q, mblk_t *msg)
  * @np: network provider private structure (locked)
  * @q: active queue
  * @msg: message to free upon success (or NULL)
- * @flags: bind flags
  */
 noinline fastcall int
-n_bind_ack(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags)
+n_bind_ack(struct np *np, queue_t *q, mblk_t *msg)
 {
 	N_bind_ack_t *p;
 	mblk_t *mp;
@@ -909,15 +944,15 @@ n_bind_ack(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_BIND_ACK;
 	p->ADDR_length = sizeof(np->add);
 	p->ADDR_offset = sizeof(*p);
 	p->CONIND_number = np->maxinds;
-	p->BIND_flags = flags;
 	p->PROTOID_length = np->proto.info.PROTOID_length;
 	p->PROTOID_offset = p->ADDR_offset + p->ADDR_length;
 	mp->b_wptr += sizeof(*p);
-	bcopy(&np->add, mp->b_wtpr, p->ADDR_length);
+	bcopy(&np->add, mp->b_wptr, p->ADDR_length);
 	mp->b_wptr += p->ADDR_length;
 	bcopy(&np->pro, mp->b_wptr, p->PROTOID_length);
 	mp->b_wptr += p->PROTOID_length;
@@ -949,6 +984,7 @@ n_error_ack(struct np *np, queue_t *q, mblk_t *msg, np_ulong prim, np_ulong erro
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_ERROR_ACK;
 	p->ERROR_prim = prim;
 	p->NPI_error = error < 0 ? NSYSERR : error;
@@ -1020,6 +1056,7 @@ n_ok_ack(struct np *np, queue_t *q, mblk_t *msg, np_ulong prim)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PCPROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_OK_ACK;
 	p->CORRECT_prim = prim;
 	mp->b_wptr += sizeof(*p);
@@ -1072,9 +1109,9 @@ n_ok_ack(struct np *np, queue_t *q, mblk_t *msg, np_ulong prim)
  * @dp: user data
  */
 noinline fastcall int
-n_unitdata_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
-	       struct sockaddr_sccp *loc, N_qos_sel_data_sccp_t *qos, np_ulong error,
-	       const mblk_t *dp)
+n_unitdata_ind(struct np *np, queue_t *q, mblk_t *msg, struct sccp_addr *rem,
+	       struct sccp_addr *loc, N_qos_sel_data_sccp_t *qos, np_ulong error,
+	       mblk_t *dp)
 {
 	N_unitdata_ind_t *p;
 	mblk_t *mp;
@@ -1085,6 +1122,7 @@ n_unitdata_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem
 	if (unlikely(!bcanputnext(np->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UNITDATA_IND;
 	p->SRC_length = loc ? sizeof(*loc) : 0;
 	p->SRC_offset = loc ? sizeof(*p) : 0;
@@ -1121,8 +1159,8 @@ n_unitdata_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem
  * @dp: user data
  */
 noinline fastcall int
-n_uderror_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
-	      N_qos_sel_data_sccp_t *qos, np_ulong error, const mblk_t *dp)
+n_uderror_ind(struct np *np, queue_t *q, mblk_t *msg, struct sccp_addr *rem,
+	      N_qos_sel_data_sccp_t *qos, np_ulong error, mblk_t *dp)
 {
 	N_uderror_ind_t *p;
 	mblk_t *mp;
@@ -1134,6 +1172,7 @@ n_uderror_ind(struct np *np, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
 		goto ebusy;
 	mp->b_band = 1;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UDERROR_IND;
 	p->DEST_length = rem ? sizeof(*rem) : 0;
 	p->DEST_offset = rem ? sizeof(*p) : 0;
@@ -1174,6 +1213,7 @@ n_datack_ind(struct np *np, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(np->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATACK_IND;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(np->oq, STRLOGTX, SL_TRACE, "<- N_DATACK_IND");
@@ -1208,6 +1248,7 @@ n_inform_ind(struct np *np, queue_t *q, mblk_t *msg, np_ulong orig, np_ulong rea
 		goto ebusy;
 	mp->b_band = 2;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = orig;
 	p->RESET_reason = reason;
@@ -1243,6 +1284,7 @@ n_reset_ind(struct np *np, queue_t *q, mblk_t *msg, np_ulong orig, np_ulong reas
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = orig;
 	p->RESET_reason = reason;
@@ -1275,6 +1317,7 @@ n_reset_con(struct np *np, queue_t *q, mblk_t *msg)
 	if (unlikely(!(mp = mi_allocb(q, mlen, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_CON;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(np->oq, STRLOGTX, SL_TRACE, "<- N_RESET_CON");
@@ -1305,8 +1348,8 @@ n_reset_con(struct np *np, queue_t *q, mblk_t *msg)
  * @dp: user data
  */
 noinline fastcall int
-n_conn_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
-	   N_qos_sel_conn_sccp_t *qos, np_ulong flags, const mblk_t *dp)
+n_conn_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *rem,
+	   N_qos_sel_conn_sccp_t *qos, np_ulong flags, mblk_t *dp)
 {
 	N_conn_req_t *p;
 	mblk_t *mp;
@@ -1324,11 +1367,12 @@ n_conn_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
 	}
 	/* save options for later */
 	if (qos) {
-		sc->qos = *qos;
+		bcopy(qos, &sc->qos, sizeof(*qos));
 		sc->QOS_length = sizeof(*qos);
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_CONN_REQ;
 	p->DEST_length = sc->REMADDR_length;
 	p->DEST_offset = sc->REMADDR_length ? sizeof(*p) : 0;
@@ -1367,9 +1411,9 @@ n_conn_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
  * @seq: connection indication responded to
  */
 noinline fastcall int
-n_conn_res(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
+n_conn_res(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *res,
 	   N_qos_sel_conn_sccp_t *qos, np_ulong token, np_ulong flags, np_ulong seq,
-	   const mblk_t *dp)
+	   mblk_t *dp)
 {
 	N_conn_res_t *p;
 	mblk_t *mp;
@@ -1387,11 +1431,12 @@ n_conn_res(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
 	}
 	/* save quality of service parameters */
 	if (qos) {
-		sc->qos = *qos;
+		bcopy(qos, &sc->qos, sizeof(*qos));
 		sc->QOS_length = sizeof(*qos);
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_CONN_RES;
 	p->TOKEN_value = token;
 	p->RES_length = sc->RES_length;
@@ -1432,8 +1477,8 @@ n_conn_res(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res,
  * @dp: user data
  */
 noinline fastcall int
-n_discon_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, np_ulong reason,
-	     np_ulong seq, const mblk_t *dp)
+n_discon_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *res, np_ulong reason,
+	     np_ulong seq, mblk_t *dp)
 {
 	N_discon_req_t *p;
 	mblk_t *mp;
@@ -1451,6 +1496,7 @@ n_discon_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, 
 	}
 
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DISCON_REQ;
 	p->DISCON_reason = reason;
 	p->RES_length = sc->RES_length;
@@ -1483,7 +1529,7 @@ n_discon_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *res, 
  * @dp: user data
  */
 noinline fastcall int
-n_data_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t *dp)
+n_data_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, mblk_t *dp)
 {
 	N_data_req_t *p;
 	mblk_t *mp;
@@ -1494,6 +1540,7 @@ n_data_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t 
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATA_REQ;
 	p->DATA_xfer_flags = flags;
 	mp->b_wptr += sizeof(*p);
@@ -1519,7 +1566,7 @@ n_data_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, const mblk_t 
  * @dp: user data
  */
 noinline fastcall int
-n_exdata_req(struct sc *sc, queue_t *q, mblk_t *msg, const mblk_t *dp)
+n_exdata_req(struct sc *sc, queue_t *q, mblk_t *msg, mblk_t *dp)
 {
 	N_exdata_req_t *p;
 	mblk_t *mp;
@@ -1530,6 +1577,7 @@ n_exdata_req(struct sc *sc, queue_t *q, mblk_t *msg, const mblk_t *dp)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_EXDATA_REQ;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_EXDATA_REQ ->");
@@ -1563,6 +1611,7 @@ n_info_req(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_INFO_REQ;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_INFO_REQ ->");
@@ -1596,6 +1645,7 @@ n_bind_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong maxinds, np_ulong fl
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_BIND_REQ;
 	p->ADDR_length = sizeof(sc->add);
 	p->ADDR_offset = sizeof(*p);
@@ -1638,6 +1688,7 @@ n_unbind_req(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UNBIND_REQ;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_UNBIND_REQ ->");
@@ -1662,8 +1713,8 @@ n_unbind_req(struct sc *sc, queue_t *q, mblk_t *msg)
  * @dp: user data
  */
 noinline fastcall int
-n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem,
-	       N_qos_sel_data_sccp_t *qos, const mblk_t *dp)
+n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *rem,
+	       N_qos_sel_data_sccp_t *qos, mblk_t *dp)
 {
 	N_unitdata_req_t *p;
 	mblk_t *mp;
@@ -1674,6 +1725,7 @@ n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_UNITDATA_REQ;
 	p->DEST_length = sizeof(*rem);
 	p->DEST_offset = sizeof(*p);
@@ -1682,8 +1734,8 @@ n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *rem
 	mp->b_wptr += sizeof(*p);
 	bcopy(rem, mp->b_wptr, p->DEST_length);
 	mp->b_wptr += p->DEST_length;
-	bcopy(qos, mp->b_wptr, p->QOS_length);
-	mp->b_wptr += p->QOS_length;
+	bcopy(qos, mp->b_wptr, p->RESERVED_field[0]);
+	mp->b_wptr += p->RESERVED_field[0];
 	mp->b_cont = dp;
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_UNITDATA_REQ ->");
 	if (msg && msg->b_cont == dp)
@@ -1719,13 +1771,14 @@ n_optmgmt_req(struct sc *sc, queue_t *q, mblk_t *msg, caddr_t qptr, size_t qlen,
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_OPTMGMT_REQ;
 	p->QOS_length = qlen;
 	p->QOS_offset = qlen ? sizeof(*p) : 0;
-	p->MGMT_flags = flags;
+	p->OPTMGMT_flags = flags;
 	mp->b_wptr += sizeof(*p);
 	bcopy(qptr, mp->b_wptr, p->QOS_length);
-	mp->b_wptr + p->QOS_length;
+	mp->b_wptr += p->QOS_length;
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_OPTMGMT_REQ ->");
 	if (sc_get_state(sc) == NS_IDLE)
 		sc_set_state(sc, NS_WACK_OPTREQ);
@@ -1757,6 +1810,7 @@ n_datack_req(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_DATACK_REQ;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_DATACK_REQ ->");
@@ -1790,6 +1844,7 @@ n_reset_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong reason)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_REQ;
 	p->RESET_reason = reason;
 	mp->b_wptr += sizeof(*p);
@@ -1823,6 +1878,7 @@ n_reset_res(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_RES;
 	mp->b_wptr += sizeof(*p);
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_RESET_RES ->");
@@ -1846,7 +1902,7 @@ n_reset_res(struct sc *sc, queue_t *q, mblk_t *msg)
  * @sref: source local reference
  */
 noinline fastcall int
-n_request_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc, nl_ulong sref)
+n_request_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *loc, np_ulong sref)
 {
 	N_request_req_t *p;
 	mblk_t *mp;
@@ -1857,6 +1913,7 @@ n_request_req(struct sc *sc, queue_t *q, mblk_t *msg, struct sockaddr_sccp *loc,
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_REQUEST_REQ;
 	p->SRC_length = loc ? sizeof(*loc) : 0;
 	p->SRC_offset = loc ? sizeof(*p) : 0;
@@ -1899,12 +1956,13 @@ n_inform_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong reason)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_INFORM_REQ;
 	p->QOS_length = sizeof(sc->qos);
 	p->QOS_offset = sizeof(*p);
 	p->REASON = reason;
 	mp->b_wptr += sizeof(*p);
-	bcopy(&sc->qos, mp->b_qptr, p->QOS_length);
+	bcopy(&sc->qos, mp->b_wptr, p->QOS_length);
 	mp->b_wptr += p->QOS_length;
 	mi_strlog(sc->oq, STRLOGTX, SL_TRACE, "N_INFORM_REQ ->");
 	freemsg(msg);
@@ -1935,6 +1993,7 @@ n_state_req(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong status)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_STATE_REQ;
 	p->ADDR_length = sizeof(sc->add);
 	p->ADDR_offset = sizeof(*p);
@@ -1971,6 +2030,7 @@ n_coord_req(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_COORD_REQ;
 	p->ADDR_length = sizeof(sc->add);
 	p->ADDR_offset = sizeof(*p);
@@ -2006,6 +2066,7 @@ n_coord_res(struct sc *sc, queue_t *q, mblk_t *msg)
 	if (unlikely(!bcanputnext(sc->oq, 0)))
 		goto ebusy;
 	DB_TYPE(mp) = M_PROTO;
+	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_COORD_RES;
 	p->ADDR_length = sizeof(sc->add);
 	p->ADDR_offset = sizeof(*p);
@@ -2063,7 +2124,7 @@ np_conn_req(struct np *np, queue_t *q, mblk_t *mp)
 	if (mp->b_cont && msgsize(mp->b_cont) > np->proto.info.CDATA_size)
 		goto baddata;
 	np_set_state(np, NS_WCON_CREQ);
-	return n_conn_req(np->sc, q, mp, &np->rem, p->CONN_flags, mp->b_cont);
+	return n_conn_req(np->sc, q, mp, &np->rem, (N_qos_sel_conn_sccp_t *)&np->qos, p->CONN_flags, mp->b_cont);
       baddata:
 	err = NBADDATA;
 	goto error;
@@ -2100,7 +2161,7 @@ np_conn_res(struct np *np, queue_t *q, mblk_t *mp)
 {
 	N_conn_res_t *p = (typeof(p)) mp->b_rptr;
 	N_qos_sel_conn_sccp_t *qos;
-	struct sockaddr_sccp *res;
+	struct sccp_addr *res;
 	int err;
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
@@ -2112,7 +2173,7 @@ np_conn_res(struct np *np, queue_t *q, mblk_t *mp)
 	if (p->RES_length) {
 		if (p->RES_length < sizeof(*res))
 			goto badaddr;
-		res = (typeof(res)) (mp->b_rtpr + p->RES_offset);
+		res = (typeof(res)) (mp->b_rptr + p->RES_offset);
 		bcopy(res, &np->res, sizeof(*res));
 		np->RES_length = sizeof(*res);
 	} else {
@@ -2170,7 +2231,7 @@ noinline fastcall int
 np_discon_req(struct np *np, queue_t *q, mblk_t *mp)
 {
 	N_discon_req_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *res;
+	struct sccp_addr *res;
 	int err;
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
@@ -2245,7 +2306,7 @@ np_data_req(struct np *np, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (np->edatack)
+	if (np->state.edatack)
 		/* The NS user must wait until the expedited data request is acknowledged before
 		   any other normal data or expedited data primitives are issued. */
 		goto outstate;
@@ -2298,13 +2359,13 @@ np_exdata_req(struct np *np, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (np->edatack)
+	if (np->state.edatack)
 		/* The NS user must wait until the expedited data request is acknowledged before
 		   any other normal data or expedited data primitives are issued. */
 		goto outstate;
 	if (mp->b_cont && msgsize(mp->b_cont) > np->proto.info.ENSDU_size)
 		goto baddata;
-	np->edatack = 1;
+	np->state.edatack = 1;
 	return n_exdata_req(np->sc, q, mp, mp->b_cont);
       baddata:
 	err = NBADDATA;
@@ -2404,7 +2465,7 @@ np_unbind_req(struct np *np, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (np_get_state(np) != NS_IDLE)
 		goto outstate;
-	ns_set_state(ns, NS_WACK_UREQ);
+	np_set_state(np, NS_WACK_UREQ);
 	return n_unbind_req(np->sc, q, mp);
       outstate:
 	err = NOUTSTATE;
@@ -2426,13 +2487,13 @@ noinline fastcall int
 np_unitdata_req(struct np *np, queue_t *q, mblk_t *mp)
 {
 	N_unitdata_req_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *rptr = NULL;
+	struct sccp_addr *rptr = NULL;
 	N_qos_sel_data_sccp_t *qptr = NULL;
 	int err;
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
-	switch (ns_get_state(np)) {
+	switch (np_get_state(np)) {
 	case NS_IDLE:
 		if (p->DEST_length == 0)
 			goto noaddr;
@@ -2455,16 +2516,16 @@ np_unitdata_req(struct np *np, queue_t *q, mblk_t *mp)
 	if (!MBLKIN(mp, p->RESERVED_field[1], p->RESERVED_field[0]))
 		goto badqos;
 	if (p->RESERVED_field[0]) {
-		qptr = &np->qos;
-		if (p->QOS_length < sizeof(*qptr))
+		qptr = (N_qos_sel_data_sccp_t *)&np->qos;
+		if (p->RESERVED_field[0] < sizeof(*qptr))
 			goto badqos;
-		bcopy(mp->b_rptr + p->QOS_offset, qptr, sizeof(*qptr));
+		bcopy(mp->b_rptr + p->RESERVED_field[1], qptr, sizeof(*qptr));
 	}
 	if (mp->b_cont && msgsize(mp->b_cont) > np->proto.info.NIDU_size)
 		goto baddata;
 	if (mp->b_cont && msgsize(mp->b_cont) > np->proto.info.NSDU_size)
 		goto baddata;
-	return n_unitdata_req(np->qc, q, mp, rptr, qptr, mp->b_cont);
+	return n_unitdata_req(np->sc, q, mp, rptr, qptr, mp->b_cont);
       baddata:
 	err = NBADDATA;
 	goto error;
@@ -2505,12 +2566,12 @@ np_optmgmt_req(struct np *np, queue_t *q, mblk_t *mp)
 		goto badqos;
 	if (p->QOS_length == 0)
 		goto badqostype;
-	if (p->MGMT_flags & ~(DEFAULT_RC_SEL))
+	if (p->OPTMGMT_flags & ~(DEFAULT_RC_SEL))
 		goto badflag;
 	if (np_get_state(np) == NS_IDLE)
 		np_set_state(np, NS_WACK_OPTREQ);
 	return n_optmgmt_req(np->sc, q, mp, mp->b_rptr + p->QOS_offset, p->QOS_length,
-			     p->MGMT_flags);
+			     p->OPTMGMT_flags);
       badflag:
 	err = NBADFLAG;
 	goto error;
@@ -2559,7 +2620,7 @@ np_datack_req(struct np *np, queue_t *q, mblk_t *mp)
 		goto discard;
 	np->state.datinds--;
 	return n_datack_req(np->sc, q, mp);
-      oustate:
+      outstate:
 	err = -EFAULT;
 	goto error;
       discard:
@@ -2597,7 +2658,7 @@ np_inform_req(struct np *np, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	return n_inform_req(np->qc, q, mp, p->RESET_reason);
+	return n_inform_req(np->sc, q, mp, p->RESET_reason);
       outstate:
 	err = NOUTSTATE;
 	goto error;
@@ -2639,23 +2700,26 @@ np_reset_req(struct np *np, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (np->state.resreqs)
+	if (np->state.resacks)
 		/* If there are outstanding reset requests, we are out of state. */
 		goto outstate;
-	np->state.resreqs = 1;
+	np->state.resacks = 1;
 	np_set_state(np, NS_WCON_RREQ);
 	switch (p->RESET_reason) {
-	case XXX:
+	case 0:
+#if 0
+	case XXX: /* FIXME */
 	case YYY:
 	case ZZZ:
+#endif
 		/* NPI-SCCP uses a combination of the N_OPTMGMT_REQ and the N_RESET_REQ to emulate
 		   the N_INFORM_REQ primitive.  When the RESET_reason is one of the three reset
 		   reasons used by the N_INFORM_REQ, then the primitive is transformed to an
 		   N_INFORM_REQ, otherwise it is passed as an N_RESET_REQ. */
-		np->infinds = 1;
+		np->state.infinds = 1;
 		return n_inform_req(np->sc, q, mp, p->RESET_reason);
 	}
-	np->infinds = 0;
+	np->state.infinds = 0;
 	return n_reset_req(np->sc, q, mp, p->RESET_reason);
       outstate:
 	err = NOUTSTATE;
@@ -2698,14 +2762,14 @@ np_reset_res(struct np *np, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (np->resinds <= 0)
+	if (np->state.resinds <= 0)
 		goto outstate;
-	if (np->infinds) {
-		np->infinds = 0;
+	if (np->state.infinds) {
+		np->state.infinds = 0;
 		np_set_state(np, NS_WACK_RRES);
 		return n_ok_ack(np, q, mp, N_RESET_RES);
 	}
-	np->resinds = 0;
+	np->state.resinds = 0;
 	np_set_state(np, NS_WACK_RRES);
 	return n_reset_res(np->sc, q, mp);
       outstate:
@@ -2759,7 +2823,7 @@ noinline fastcall int
 sc_conn_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_conn_ind_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *loc, *rem;
+	struct sccp_addr *loc, *rem;
 	N_qos_sel_conn_sccp_t *qos;
 
 	if (p->DEST_length) {
@@ -2798,17 +2862,19 @@ noinline fastcall int
 sc_conn_con(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_conn_con_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *req;
+	struct sccp_addr *res;
 	N_qos_sel_conn_sccp_t *qos;
 
 	if (p->RES_length) {
 		res = (typeof(res)) (mp->b_rptr + p->RES_offset);
 		bcopy(res, &sc->res, p->RES_length);
-	}
+	} else
+		res = NULL;
 	if (p->QOS_length) {
 		qos = (typeof(qos)) (mp->b_rptr + p->QOS_offset);
 		bcopy(qos, &sc->qos, p->QOS_length);
-	}
+	} else
+		qos = NULL;
 	sc_set_state(sc, NS_DATA_XFER);
 	return n_conn_con(sc->np, q, mp, res, qos, p->CONN_flags, mp->b_cont);
 }
@@ -2823,12 +2889,13 @@ noinline fastcall int
 sc_discon_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_discon_ind_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *res;
+	struct sccp_addr *res;
 
 	if (p->RES_length) {
 		res = (typeof(res)) (mp->b_rptr + p->RES_offset);
 		bcopy(res, &sc->res, p->RES_length);
-	}
+	} else
+		res = NULL;
 	if (p->SEQ_number)
 		sc->state.coninds--;
 	sc_set_state(sc, sc->state.coninds ? NS_WRES_CIND : NS_IDLE);
@@ -2847,7 +2914,7 @@ sc_data_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_data_ind_t *p = (typeof(p)) mp->b_rptr;
 
-	retrn n_data_ind(sc->np, q, mp, p->DATA_xfer_flags, mp->b_cont);
+	return n_data_ind(sc->np, q, mp, p->DATA_xfer_flags, mp->b_cont);
 }
 
 /**
@@ -2874,7 +2941,7 @@ noinline fastcall int
 sc_info_ack(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_info_ack_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *add;
+	struct sccp_addr *add;
 	N_qos_sel_info_sccp_t *qos;
 	N_qos_range_info_sccp_t *qor;
 
@@ -2928,7 +2995,7 @@ noinline fastcall int
 sc_bind_ack(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_bind_ack_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *add;
+	struct sccp_addr *add;
 	unsigned char *pro;
 
 	if (p->ADDR_length) {
@@ -2944,9 +3011,8 @@ sc_bind_ack(struct sc *sc, queue_t *q, mblk_t *mp)
 	}
 	sc->proto.info.PROTOID_length = p->PROTOID_length;
 	sc->maxinds = p->CONIND_number;
-	sc->token = p->TOKEN_value;
-	sc->BIND_flags = p->BIND_flags;
-	return n_bind_ack(sc->np, q, mp, add, pro, p->BIND_flags);
+	sc->TOKEN_value = p->TOKEN_value;
+	return n_bind_ack(sc->np, q, mp);
 }
 
 /**
@@ -3047,12 +3113,12 @@ noinline fastcall int
 sc_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_unitdata_ind_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *rem;
-	struct sockaddr_sccp *loc;
+	struct sccp_addr *rem;
+	struct sccp_addr *loc;
 
 	loc = p->SRC_length ? (typeof(loc)) (mp->b_rptr + p->SRC_offset) : NULL;
 	rem = p->DEST_length ? (typeof(rem)) (mp->b_rptr + p->DEST_offset) : NULL;
-	return n_unitdata_ind(sc->np, q, mp, loc, rem, p->ERROR_type, mp->b_cont);
+	return n_unitdata_ind(sc->np, q, mp, rem, loc, NULL, p->ERROR_type, mp->b_cont);
 }
 
 /**
@@ -3065,10 +3131,10 @@ noinline fastcall int
 sc_uderror_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_uderror_ind_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *rem;
+	struct sccp_addr *rem;
 
 	rem = p->DEST_length ? (typeof(rem)) (mp->b_rptr + p->DEST_offset) : NULL;
-	return n_uderror_ind(sc->np, q, mp, rem, p->ERROR_type, mp->b_cont);
+	return n_uderror_ind(sc->np, q, mp, rem, NULL, p->ERROR_type, mp->b_cont);
 }
 
 /**
@@ -3129,12 +3195,12 @@ noinline fastcall int
 sc_notice_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	N_notice_ind_t *p = (typeof(p)) mp->b_rptr;
-	struct sockaddr_sccp *rem;
+	struct sccp_addr *rem;
 
 	rem = (typeof(rem)) (mp->b_rptr + p->DEST_offset);
 	/* In mapping the N_NOTICE_IND primitive to the N_UDERROR_IND primitive, the source address 
 	   and quality of service parameters associated with the message are lost. */
-	return n_uderror_ind(sc->np, q, mp, rem, p->RETURN_cause, mp->b_cont);
+	return n_uderror_ind(sc->np, q, mp, rem, NULL, p->RETURN_cause, mp->b_cont);
 }
 
 /**
@@ -3149,7 +3215,7 @@ sc_inform_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	N_inform_ind_t *p = (typeof(p)) mp->b_rptr;
 
 	bcopy(mp->b_rptr + p->QOS_offset, &sc->qos, p->QOS_length);
-	sc->state.inform = 1;
+	sc->state.infinds = 1;
 	sc_set_state(sc, NS_WRES_RIND);
 	return n_inform_ind(sc->np, q, mp, N_PROVIDER, p->REASON);
 }
@@ -3163,7 +3229,7 @@ sc_inform_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 noinline fastcall int
 sc_coord_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 {
-	N_coord_ind_t *p = (typeof(p)) mp->b_rtpr;
+	N_coord_ind_t *p = (typeof(p)) mp->b_rptr;
 
 	freemsg(mp);
 	return (0);
@@ -3278,6 +3344,13 @@ m_r_other(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+static int
+np_error_reply(struct np *np, queue_t *q, mblk_t *msg, np_ulong prim, np_long error,
+	       const char *func)
+{
+	/* FIXME */
+	return n_error_ack(np, q, msg, prim, error);
+}
 /**
  * np_w_proto: - process M_PROTO or M_PCPROTO message
  * @np: network provider private structure (locked)
@@ -3346,13 +3419,25 @@ np_w_proto(struct np *np, queue_t *q, mblk_t *mp)
 		err = np_reset_res(np, q, mp);
 		break;
 	default:
+#if 0
 		err = np_other_req(np, q, mp);
+#endif
+		err = -EPROTO;
 		break;
 	}
       done:
 	if (err)
 		np_restore_state(np);
 	return np_error_reply(np, q, mp, prim, err, np_primname(prim));
+}
+
+static int
+sc_error_reply(struct sc *sc, queue_t *q, mblk_t *msg, np_long prim, np_long error,
+	       const char *func)
+{
+	/* FIXME */
+	freemsg(msg);
+	return (0);
 }
 
 /**
@@ -3452,7 +3537,10 @@ sc_r_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 		err = sc_reply_ack(sc, q, mp);
 		break;
 	default:
+		err = -EPROTO;
+#if 0
 		err = sc_other_ind(sc, q, mp);
+#endif
 		break;
 	}
       done:
@@ -3470,6 +3558,7 @@ static int
 m_w_proto(queue_t *q, mblk_t *mp)
 {
 	struct priv *priv;
+	int err;
 
 	if (likely(!!(priv = (struct priv *) mi_trylock(q)))) {
 		err = np_w_proto(&priv->np, q, mp);
@@ -3488,6 +3577,7 @@ static int
 m_r_proto(queue_t *q, mblk_t *mp)
 {
 	struct priv *priv;
+	int err;
 
 	if (likely(!!(priv = (struct priv *) mi_trylock(q)))) {
 		err = sc_r_proto(&priv->sc, q, mp);
@@ -3517,7 +3607,7 @@ np_w_data(struct np *np, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	if (np->edatack)
+	if (np->state.edatack)
 		/* The NS user must wait until the expedited data request is acknowledged before
 		   any other normal data or expedited data primitives are issued. */
 		goto outstate;
@@ -3568,6 +3658,7 @@ static int
 m_w_data(queue_t *q, mblk_t *mp)
 {
 	struct priv *priv;
+	int err;
 
 	if (likely(!!(priv = (struct priv *) mi_trylock(q)))) {
 		err = np_w_data(&priv->np, q, mp);
@@ -3586,6 +3677,7 @@ static int
 m_r_data(queue_t *q, mblk_t *mp)
 {
 	struct priv *priv;
+	int err;
 
 	if (likely(!!(priv = (struct priv *) mi_trylock(q)))) {
 		err = sc_r_data(&priv->sc, q, mp);
@@ -3682,6 +3774,7 @@ np_w_msg(struct np *np, queue_t *q, mblk_t *mp)
 		err = m_w_other(q, mp);
 		break;
 	}
+	return (err);
 }
 
 /**
@@ -3717,6 +3810,7 @@ sc_r_msg(struct sc *sc, queue_t *q, mblk_t *mp)
 		err = m_w_other(q, mp);
 		break;
 	}
+	return (err);
 }
 
 /**
@@ -3901,7 +3995,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *credp)
 	p->np.state.datinds = 0;
 	p->np.state.datacks = 0;
 	p->np.state.coninds = 0;
-	p->np.state.inform = 0;
+	p->np.state.infinds = 0;
 	p->np.proto.info.PRIM_type = N_INFO_ACK;
 	p->np.proto.info.NSDU_size = QOS_UNKNOWN;
 	p->np.proto.info.ENSDU_size = QOS_UNKNOWN;
@@ -3929,7 +4023,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *credp)
 	p->sc.state.datinds = 0;
 	p->sc.state.datacks = 0;
 	p->sc.state.coninds = 0;
-	p->sc.state.inform = 0;
+	p->sc.state.infinds = 0;
 	p->sc.proto.info.PRIM_type = N_INFO_ACK;
 	p->sc.proto.info.NSDU_size = QOS_UNKNOWN;
 	p->sc.proto.info.ENSDU_size = QOS_UNKNOWN;
@@ -3983,7 +4077,7 @@ MODULE_PARM_DESC(modid, "Module ID for NPI-SCCP.  (0 for allocation.)");
 static struct fmodsw np_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &npi_sccpinfo,
-	.f_flag = F_MP,
+	.f_flag = D_MP,
 	.f_modid = MOD_ID,
 	.f_kmod = THIS_MODULE,
 };
@@ -3996,7 +4090,7 @@ npi_sccp_modinit(void)
 {
 	int err;
 
-	if ((err = register_strmod(&np_fmod, modid)) < 0) {
+	if ((err = register_strmod(&np_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: Could not register module: err = %d\n", __FUNCTION__, -err);
 		return (-err);
 	}
@@ -4013,7 +4107,7 @@ npi_sccp_modexit(void)
 {
 	int err;
 
-	if ((err = unregister_strmod(&np_fmod, modid)) < 0)
+	if ((err = unregister_strmod(&np_fmod)) < 0)
 		cmn_err(CE_WARN, "%s: Could not deregister module: err = %d\n", __FUNCTION__, -err);
 	return;
 }

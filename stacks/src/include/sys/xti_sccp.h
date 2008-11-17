@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sccp.h,v 0.9.2.8 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: xti_sccp.h,v 0.9.2.9 2008-11-17 19:02:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-11-17 19:02:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_sccp.h,v $
+ Revision 0.9.2.9  2008-11-17 19:02:26  brian
+ - conversion modules compile
+
  Revision 0.9.2.8  2008-04-29 07:10:46  brian
  - updating headers for release
 
@@ -68,7 +71,7 @@
 #ifndef _SYS_XTI_SCCP_H
 #define _SYS_XTI_SCCP_H
 
-#ident "@(#) $RCSfile: xti_sccp.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sccp.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -89,6 +92,10 @@
 #undef SCCP_MAX_ADDR_LENGTH
 #endif
 #define SCCP_MAX_ADDR_LENGTH	32
+
+#ifndef AF_SCCP
+#define AF_SCCP		4
+#endif
 
 /** SCCP Address structure. */
 typedef struct sockaddr_sccp {
@@ -172,12 +179,28 @@ typedef struct sockaddr_sccp {
 
 #define T_SCCP_CLUSTER		7	/**< Protocol option. */
 #define T_SCCP_SEQ_CTRL		8	/**< Sequence control parameter. */
+#define T_SCCP_SEQCTRL		8	/**< Sequence control parameter. */
 #define T_SCCP_PRIORITY		9	/**< Message priority. */
+#define T_SCCP_PRIO		9	/**< Message priority. */
 
 #define T_SCCP_PCLASS		10	/**< Protocol class. */
 #define T_SCCP_IMPORTANCE	11	/**< Importance. */
+#define T_SCCP_IMP		11	/**< Importance. */
 #define T_SCCP_RET_ERROR	12	/**< Return on error. */
+#define T_SCCP_RETERR		12	/**< Return on error. */
+#define T_SCCP_CREDIT		13	/**< Credit. */
+
+#define T_SCCP_DISCON_ADD	14
+#define T_SCCP_DISCON_REASON	15
+#define T_SCCP_DISCON_ORIG	16
+#define T_SCCP_RESET_ORIG	17
+#define T_SCCP_RESET_REASON	18
+#define T_SCCP_INFORM_REASON	19
 /** @} */
+
+#define T_SCCP_RST	0x1000
+#define T_SCCP_INF	0x2000
+#define T_SCCP_ACK	0x4000
 
 /** @name Protocl Classes
   * For use with T_SCCP_PCLASS.
