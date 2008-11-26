@@ -1,5 +1,6 @@
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
+	* LiS.lsm.in: change repo directory
 	* LiS.texi: update to FDL 1.3
 	* Makefile.am: update to FDL 1.3
 	* manual/LiS.texi: update to FDL 1.3

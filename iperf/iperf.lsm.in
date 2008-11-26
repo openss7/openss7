@@ -12,10 +12,10 @@ Description:		@PACKAGE_TITLE@.
 Keywords:		SCTP, Iperf
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Primary-site:		http://www.openss7.org/ tarballs/
+Primary-site:		http://www.openss7.org/ repos/tarballs/
 			1M @PACKAGE@-@VERSION@.tar.gz
 			1M @PACKAGE@-@VERSION@.tar.bz2
-Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+Alternate-site:		http://www.openss7.org/ repos/rpms/SRPMS/
 			1M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
