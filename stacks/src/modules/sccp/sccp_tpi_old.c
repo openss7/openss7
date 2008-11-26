@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_tpi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $
+ @(#) $RCSfile: sccp_tpi_old.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-17 14:04:35 $ by $Author: brian $
+ Last Modified $Date: 2008-11-26 13:13:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: sccp_tpi.c,v $
+ $Log: sccp_tpi_old.c,v $
+ Revision 0.9.2.1  2008-11-26 13:13:52  brian
+ - sync with working copy
+
  Revision 0.9.2.1  2008-11-17 14:04:35  brian
  - added documentation and conversion modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp_tpi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $"
+#ident "@(#) $RCSfile: sccp_tpi_old.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:52 $"
 
-static char const ident[] = "$RCSfile: sccp_tpi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $";
+static char const ident[] = "$RCSfile: sccp_tpi_old.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:52 $";
 
 /*
  * This is a TPI module that can be pushed over an SCCPI (Signalling Connection Control Part
@@ -97,7 +100,7 @@ static char const ident[] = "$RCSfile: sccp_tpi.c,v $ $Name: OpenSS7-0_9_2 $($Re
 #define SCCP_TPI_DESCRIP	"SS7 Signalling Connection Control Part (SCCP) TPI STREAMS MODULE."
 #define SCCP_TPI_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_TPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:35 $"
+#define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi_old.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:52 $"
 #define SCCP_TPI_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define SCCP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_TPI_LICENSE	"GPL"

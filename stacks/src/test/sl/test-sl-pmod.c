@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:30 $
+ @(#) $RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-11-26 13:13:53 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:30 $ by $Author: brian $
+ Last Modified $Date: 2008-11-26 13:13:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sl-pmod.c,v $
+ Revision 0.9.2.5  2008-11-26 13:13:53  brian
+ - sync with working copy
+
  Revision 0.9.2.4  2008-04-29 07:11:30  brian
  - updating headers for release
 
@@ -88,9 +91,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:30 $"
+#ident "@(#) $RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-11-26 13:13:53 $"
 
-static char const ident[] = "$RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:30 $";
+static char const ident[] = "$RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-11-26 13:13:53 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -9341,7 +9344,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sl-pmod", PACKAGE, VERSION, "$Revision: 0.9.2.4 $ $Date: 2008-04-29 07:11:30 $");
+", "test-sl-pmod", PACKAGE, VERSION, "$Revision: 0.9.2.5 $ $Date: 2008-11-26 13:13:53 $");
 }
 
 void

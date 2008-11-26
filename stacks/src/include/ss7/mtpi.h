@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi.h,v 0.9.2.8 2008-04-29 07:10:44 brian Exp $
+ @(#) $Id: mtpi.h,v 0.9.2.9 2008-11-26 13:13:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:44 $ by $Author: brian $
+ Last Modified $Date: 2008-11-26 13:13:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtpi.h,v $
+ Revision 0.9.2.9  2008-11-26 13:13:52  brian
+ - sync with working copy
+
  Revision 0.9.2.8  2008-04-29 07:10:44  brian
  - updating headers for release
 
@@ -68,7 +71,7 @@
 #ifndef __SS7_MTPI_H__
 #define __SS7_MTPI_H__
 
-#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
