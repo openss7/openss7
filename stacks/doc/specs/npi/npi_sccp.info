@@ -1,0 +1,1347 @@
+This is /home/brian/os8/strxns/doc/specs/npi/npi_sccp.info, produced by
+makeinfo version 4.13 from /home/brian/os8/strxns/doc/specs/npi/npi_sccp.texi.
+
+INFO-DIR-SECTION OpenSS7
+START-INFO-DIR-ENTRY
+* NPI-SCCP: (npi_sccp).		NPI Corrigendum for SCCP
+END-INFO-DIR-ENTRY
+
+This file documents the SCCP Corrigendum to the Network Provider Interface.
+
+This is Edition 0.9.2, last updated 2008-10-31, for OpenSS7 XNS Networking
+version 0.9.2 release 7 published by OpenSS7 Corporation
+(http://www.openss7.com/).
+
+Copyright (C) 2001-2008  OpenSS7 Corporation (http://www.openss7.com/)
+Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both that copyright notice and this
+permission notice appear in supporting documentation, and that the name UNIX
+International not be used in advertising or publicity pertaining to distribution
+of the software without specific, written prior permission. UNIX International
+makes no representations about the suitability of this documentation for any
+purpose. It is provided "as is" without express or implied warranty.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting derived
+work is distributed under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+
+
+File: npi_sccp.info,  Node: Top,  Next: Preface,  Up: (dir)
+
+ Network Provider Interface--Corrigendum for SCCP Conformance
+*************************************************************
+
+* Menu:
+
+* Preface::
+* Introduction::
+* NPI-SCCP::
+* NPI-SCCP Header File Listing::
+* License::
+* Glossary::
+* Acronyms::
+* References::
+* Index::
+
+
+File: npi_sccp.info,  Node: Preface,  Next: Introduction,  Prev: Top,  Up: Top
+
+ Preface
+********
+
+ Abstract
+=========
+
+This document is a Corrigendum for SCCP Conformance to the Transport Provider
+Interface containing technical details concerning the implementation of the
+Signalling Connection Control Part (SCCP) using the Network Provider Interface
+(NPI).  It contains recommendations on software architecture as well as
+platform and system applicability of NPI-SCCP.
+
+ Purpose
+========
+
+The purpose of this document is to provide technical documentation of the SCCP
+Transport Provider Interface (NPI-SCCP).  This document is intended to be
+included with the OpenSS7 STREAMS software package released by OpenSS7
+Corporation (http://www.openss7.com/).  It is intended to assist software
+developers, maintainers and users of the NPI-SCCP with understanding the
+software architecture and technical interfaces which are made available in the
+software package.
+
+ Intent
+=======
+
+It is the intent of this document that it act as the primary source of
+information concerning the NPI-SCCP.
+
+ Audience
+=========
+
+The audience for this document is software developers, maintainers and users
+and integrators of the NPI-SCCP.
+
+ Revision History
+=================
+
+Take care that you are working with a current version of this documentation:
+you will not be notified of updates.  To ensure that you are working with a
+current version, check the OpenSS7 Project (http://www.openss7.org/) website
+for a current version.
+
+Only the texinfo or roff source is controlled.  A printed (or postscript)
+version of this document is an *UNCONTROLLED VERSION*.
+
+
+File: npi_sccp.info,  Node: Introduction,  Next: NPI-SCCP,  Prev: Preface,  Up: Top
+
+1 Introduction
+**************
+
+This document describes the protocol-specific information that is relevant to
+for SS7 Signalling Connection Control Part (SCCP).  This document also
+describes the protocol-specific information that is relevant when SCCP network
+services are provided over an IP network.
+
+In general, this document describes the characteristics that the SCCP and M3UA
+NSP have in common, with notes indicating where they differ.
+
+This document also defines the data structures and constants required for SCCP
+and M3UA NSP which are exposed through the `<sys/npi_mtp.h>' header file.
+
+1.1 Protocol Address
+====================
+
+In an SCCP environment, the protocol address is the SCCP-SAPI which identifies
+the SS7 network, SS7 Signalling Point Code within the SS7 network, and the
+SCCP-User identifier (Subsystem Number).
+
+1.2 Connection and Connectionless Modes
+=======================================
+
+1.2.1 Connection-Oriented Mode
+------------------------------
+
+The Signalling Connection Control Part NSP supports connection-oriented mode
+for SCCP-User protocols that form an association between two SCCP-Users in an
+end-to-end exchange.  This includes TUP, ISUP, BTNUP, BICC and other call
+control protocols.
+
+The Signalling Connection Control Part does not support a true
+connection-oriented mode.  When associations are formed with `N_CONN_REQ', no
+protocol messages are exchanged between the local and remote SCCP users and the
+`N_CONN_REQ' primitive will always succeed unless the remote SCCP user is not
+known to the NSP.  Because of this, it is not possible for the Signalling
+Connection Control Part to accept incoming connections; `N_CONN_IND' primitives
+will not be issued by the NSP.
+
+1.2.2 Connection-less Mode
+--------------------------
+
+The Signalling Connection Control Part NSP supports connection-less mode for
+SCCP-User protocols that form one-to-many or many-to-one or many-to-many
+associations and are not restricted to an end-to-end exchange at SCCP.  This
+includes SCCP, MTUP, and other SCCP Users of a connection-less nature.
+
+1.3 Sending Data of Zero Octets
+===============================
+
+The Signalling Connection Control Part, both in connection-oriented mode and in
+connection-less mode, does not permit sending a NSDU of zero octets.  So, in
+connection-less mode, if the number of M_DATA block bytes is zero, the
+`N_UNITDATA_REQ' primitive will always fail with the NPI_error in the
+N_ERROR_ACK set to NBADDATA.  In connection-oriented mode, if the number of
+M_DATA block bytes is zero, the N_DATA_REQ primitive will always fail with the
+NPI_error in the N_ERROR_ACK set to NBADDATA.  if either the N_MORE_DATA_FLAG
+is not set in the DATA_xfer_flags, or the N_MORE_DATA_FLAG flag is not set and
+the preceding N_DATA_REQ primitive completed a NSDU (that is, the call has
+requested sending a zero byte NSDU).
+
+1.4 Quality of Service Parameters
+=================================
+
+The quality of service structures are specific to SCCP.  All quality of service
+parameters are association-related, that is, they are options with end-to-end
+significance.  They may be negotiated in the NPI state NS_IDLE, and are
+read-only in all other sates except NS_UNBND.
+
+1.4.1 Quality of Service Structures
+-----------------------------------
+
+SCCP-NPI provides quality of service structure selection for data, connection
+requests, information, and range information.  The SCCP specific quality of
+service structures are discussed in detail below.
+
+
+File: npi_sccp.info,  Node: NPI Primitives
+
+2 NPI Primitives
+****************
+
+This section describes the formats and rules for the Network Provider Interface
+that are specific to the Signalling Connection Control Part.  This section must
+be used along with the generic Network Provider Interface Specification when
+implementing a NSP that will be configured with the SS7 Signalling Connection
+Control Part.
+
+2.1 Protocol Address
+====================
+
+The network address is used in the `N_BIND_REQ', `N_BIND_ACK', `N_CONN_REQ',
+`N_CONN_CON', `N_UNITDATA_REQ', `N_UNITDATA_IND', and `N_UDERROR_IND'
+primitives.
+
+ Format
+-------
+
+The SCCP network protocol address uses a sockaddr struct to support sockets
+compatibility libraries consistent with the SCCP XTI/TLI interface.
+
+The network protocol address is formatted as follows:
+
+typedef struct sccp_addr {
+        uint ni;                        /* network indicator */
+        uint ri;                        /* routing indicator */
+        uint pc;                        /* point code (-1 not present) */
+        uint ssn;                       /* subsystem number (0 not present) */
+        uint gtt;                       /* type of global title */
+        uint tt;                        /* translation type */
+        uint es;                        /* encoding scheme */
+        uint nplan;                     /* numbering plan */
+        uint nai;                       /* nature of address indicator */
+        uint alen;                      /* address length */
+        uint8_t addr[0];                /* address digits */
+        /* followed by address bytes */
+} sccp_addr_t;
+
+#define SCCP_MAX_ADDR_LENGTH 32
+
+#define SCCP_RI_DPC_SSN         0       /* route on DPC/SSN */
+#define SCCP_RI_GT              1       /* route on GT */
+
+#define SCCP_GTTTYPE_NONE       0       /* no GT */
+#define SCCP_GTTTYPE_NAI        1       /* NAI only */
+#define SCCP_GTTTYPE_TT         2       /* TT only */
+#define SCCP_GTTTYPE_NP         3       /* TT, ES, NPLAN */
+#define SCCP_GTTTYPE_NP_NAI     4       /* TT, ES, NPLAN and NAI */
+
+ Parameters
+-----------
+
+`sccp_family'
+     Specifies the SCCP socket address family.  The address family is always
+     AF_SCCP.
+
+`sccp_ni'
+     Specifies the network indicator which specifies the SS7 network to which
+     the address belongs.  A given SCCP entity can belong to multiple SS7
+     networks, particularly when acting as a gateway between networks.  The
+     network indicator specifies to which network the SCCP-SAPI belongs.
+
+`sccp_ri'
+     Specifies which components of the address are to be used for routing.  The
+     `sccp_ri' can be one of the following values:
+    `SCCP_RI_DPC_SSN'
+          Specifies that routing is to be performed on destination point code
+          (DPC) and subsystem number (SSN).
+
+    `SCCP_RI_GT'
+          Specifies that routing is to be performed on global title (GT).
+
+`sccp_pc'
+     Specifies the signalling point code of the SCCP provider entity.  The
+     point code is normally coded as a 14-bit value, right justified in the
+     `sccp_pc' field, which identifies the SCCP entity.  Non-significant bits
+     are coded zero (`0').
+
+`sccp_ssn'
+     Specifies the subsystem number of the SCCP provider entity.  The subsystem
+     number is normally coded as an 8-bit value.  The `sccp_ssn' can take on
+     one of the following values, each of which corresponds to an SCCP user at
+     the SCCP entity:
+    `SCCP_SSN_UNKNOWN'
+          Subsystem number not known/not used.
+
+    `SCCP_SSN_SCMG'
+          SCCP management.
+
+    `SCCP_SSN_RESERVED'
+          Reserved for ITU-T allocation.
+
+    `SCCP_SSN_ISUP'
+          ISDN user part.
+
+    `SCCP_SSN_OMAP'
+          OMAP (Operation, Maintenance and Administration Part)
+
+    `SCCP_SSN_MAP'
+          MAP (Mobile Application Part)
+
+    `SCCP_SSN_HLR'
+          HLR (Home Location Register)
+
+    `SCCP_SSN_VLR'
+          VLR (Visitor Location Register)
+
+    `SCCP_SSN_MSC'
+          MSC (Mobile Switching Centre)
+
+    `SCCP_SSN_EIC'
+          EIC (Equipment Identifier Centre)
+
+    `SCCP_SSN_AUC'
+          AUC (Authentication Centre)
+
+    `SCCP_SSN_ISDN_SS'
+          ISDN supplementary services.
+
+    `SCCP_SSN_RESERVED2'
+          Reserved for international use.
+
+    `SCCP_SSN_BISDN'
+          Broadband ISDN edge-to-edge applications.
+
+    `SCCP_SSN_TC_TEST'
+          TC test responder.
+
+    `...'
+          Other values from `0' to 255.
+
+`sccp_gtt'
+     Specifies the type of global title included in the address.  This field
+     can be one of the following values:
+    `SCCP_GTTTYPE_NONE'
+          The global title is not included in the address.
+
+    `SCCP_GTTTYPE_NAI'
+          The global title includes the nature of address indication (NAI) only.
+
+    `SCCP_GTTTYPE_TT'
+          The global title includes the translation type (TT) only.
+
+    `SCCP_GTTTYPE_NP'
+          The global title includes the translation type (TT), encoding scheme
+          (ES), and numbering plan (NPLAN).
+
+    `SCCP_GTTTYPE_NP_NAI'
+          The global title includes the translation type (TT), encoding scheme
+          (ES), and numbering plan (NPLAN), and nature of address indicator
+          (NAI).
+
+    `...'
+
+`sccp_tt'
+     Specifies the translation type (TT).
+
+`sccp_es'
+     Specifies the encoding scheme (ES).  Encoding scheme can be one of the
+     following values:
+    `SCCP_ES_UNKNOWN'
+          Unknown encoding scheme.
+
+    `SCCP_ES_BCD_ODD'
+          BCD encoding scheme, odd number of digits.
+
+    `SCCP_ES_BCD_EVEN'
+          BCD encoding scheme, even number of digits.
+
+    `SCCP_ES_NATIONAL_SPECIFIC'
+          National specific encoding scheme.
+
+    `...'
+          Other values from `0' to 15.
+
+`sccp_nplan'
+     Specifies the numbering plan (NPLAN).  The `sccp_nplan' field can be one
+     of the following:
+    `SCCP_NPLAN_UNKNOWN'
+          Unknown.
+
+    `SCCP_NPLAN_ISDN'
+          ISDN/telephony numbering plan (Recommendations E.163 and E.164).
+
+    `SCCP_NPLAN_GENERIC'
+          Generic numbering plan.
+
+    `SCCP_NPLAN_DATA'
+          Data numbering plan (Recommendation X.121).
+
+    `SCCP_NPLAN_TELEX'
+          Telex numbering plan (Recommendation F.69).
+
+    `SCCP_NPLAN_MARITIME'
+          Maritime mobile numbering plan (Recommendations E.210, E.211).
+
+    `SCCP_NPLAN_LAND_MOBILE'
+          Land mobile numbering plan (Recommendation E.212).
+
+    `SCCP_NPLAN_ISDN_MOBILE'
+          ISDN/mobile numbering plan (Recommendation E.214).
+
+    `SCCP_NPLAN_PRIVATE'
+          Private network-specific numbering plan.
+
+`sccp_nai'
+     Specifies the nature of address indicator (NAI).
+
+`sccp_alen'
+     Specifies the length of the address signals.
+
+`sccp_addr'
+     Specifies the address signals.
+
+2.2 NPI Quality of Service
+==========================
+
+2.2.1 SCCP Quality of Service Overview
+--------------------------------------
+
+2.2.2 SCCP Quality of Service Formats
+-------------------------------------
+
+The SCCP provides the following quality of service structures:
+
+2.2.2.1 Data Quality of Service Selection
+.........................................
+
+ N_QOS_SEL_DATA_MTP
+...................
+
+This quality of service structure type is used when selecting quality of
+service parameters on a message by message basis with the `N_OPTMGMT_REQ'
+primitive before issuing an N_DATA_REQ or `N_UNITDATA_REQ' primitive.
+
+ Format
+.......
+
+#define N_QOS_SEL_DATA_MTP      0x0801
+typedef struct {
+        ulong n_qos_type;               /* always N_QOS_SEL_DATA_MTP */
+        ulong sls;                      /* signalling link selection */
+        ulong mp;                       /* message priority */
+} N_qos_sel_data_mtp_t;
+
+ Fields
+.......
+
+`n_qos_type'
+     Specifies or indicates the quality of service structure type.  This field
+     is always coded N_QOS_SEL_DATA_MTP.
+
+`sls'
+     Specifies the value of the Signalling Link Selection field to use in
+     outgoing SCCP messages, or indicates the value of the Signalling Link
+     Selection field that was received in incoming SCCP messages.
+
+`mp'
+     Specifies the value of the Messae Priority field to use in outgoing SCCP
+     messages, or indicates the value of the Message Priority field that was
+     received in incoming SCCP messages.
+
+ N_QOS_SEL_INFO_MTP
+...................
+
+This quality of service structure type is used when selecting quality of
+service parameters for information with the N_INFO_ACK primitive.
+
+#define N_QOS_SEL_INFO_MTP      0x0803
+typedef struct {
+        ulong n_qos_type;               /* always N_QOS_SEL_INFO_MTP */
+        ulong pvar;                     /* protocol variant */
+        ulong popt;                     /* protocol options */
+        ulong sls;                      /* signalling link selection */
+        ulong mp;                       /* message priority */
+} N_qos_sel_info_mtp_t;
+
+ Fields
+.......
+
+`n_qos_type'
+     Indicates the quality of service structure type.  This field is always
+     coded N_QOS_SEL_INFO_MTP.
+
+`pvar'
+     Indicates the SCCP protocol variant associated with the stream.
+
+`popt'
+     Indicates the SCCP protocol options associated wtih the stream.
+
+`sls'
+     Indicates the default Signalling Link Selection value to be used on
+     outgoing messages not specifying a SLS value.
+
+`mp'
+     Indicates the default Message Priority value to be used on outgoing
+     messages not specifying a MP value.
+
+2.2.2.2 Information Quality of Service Range
+............................................
+
+ N_QOS_RANGE_INFO_MTP
+.....................
+
+This quality of service structure type is used when indicating the range
+quality of service parameters for information with the N_INFO_ACK primitive.
+
+ Format
+.......
+
+#define N_QOS_RANGE_INFO_MTP    0x0804
+typedef struct {
+        ulong n_qos_type;               /* always N_QOS_RANGE_INFO_MTP */
+        ulong sls_range;                /* signalling link selection mask */
+        ulong mp_range;                 /* message priority mask */
+} N_qos_range_info_mtp_t;
+
+ Fields
+.......
+
+`n_qos_type'
+     Indicates the quality of service structure type.  This field is always
+     coded N_QOS_RANGE_INFO_MTP.
+
+`sls_range'
+     Indicates a bit mask that indicates the range of the SLS field.
+
+`mp_range'
+     Indicates a bit mask that indicates the range of the MP field.
+
+2.3 NPI Connection Modes
+========================
+
+3 NPI Primitives: Rules for SCCP Conformance
+********************************************
+
+3.1 CONS & CLNS: Local Management
+=================================
+
+3.1.1 N_INFO_ACK
+----------------
+
+ Parameters
+-----------
+
+`NSDU_size'
+     Indicates the maximum size of the Network Service Data Unit in octets.
+
+`ENSDU_size'
+     Indicates the maximum size of the Expedited Network Service Data Unit in
+     octets.
+
+`CDATA_size'
+     Indicates the maximum size of data included in the `N_CONN_REQ' or
+     `N_CONN_IND'.
+
+`DDATA_size'
+     Indicates the maximum size of data included in the `N_DISCON_REQ' or
+     `N_DISCON_IND'.
+
+`ADDR_size'
+     Indicates the maximum size of an address.
+
+`ADDR_length'
+     Indicates the length of the associated protocol address.
+
+`ADDR_offset'
+     Indicates the offset of the associated protocol address from the beginning
+     of the `M_PCPROTO' message block.
+
+`QOS_length'
+     Indicates the length of the selected quality of service parameters.
+
+`QOS_offset'
+     Indicates the offset of the selected quality of service parameters from
+     the beginning of the `M_PCPROTO' message block.
+
+`QOS_range_length'
+     Indicates the length of the range of quality of service parameters.
+
+`QOS_range_offset'
+     Indicates the offset of the range of quality of service parameters from
+     the beginning of the `M_PCPROTO' message block.
+
+`OPTIONS_flags'
+     Indicates the options flags.
+
+`NIDU_size'
+     Indicates the maximum size of the Network Interface Data Unit in octets.
+
+`SERV_type'
+     Indicates the service type.  The service type can be one of the following:
+    `CLNS'
+          Indicates that the NSP is in Connection-less mode for the current
+          stream.
+
+    `CONS'
+          Indicates that the NSP is in Connection-oriented mode for the current
+          stream.
+
+`CURRENT_state'
+     Indicates the current state of the NSP.  The current states can be one of
+     the following:
+    `NS_UNBND'
+          Indicates that the NS user not bound to network address.
+
+    `NS_WACK_BREQ'
+          Indicates that the stream is awaiting acknowledgement of `N_BIND_REQ'.
+
+    `NS_WACK_UREQ'
+          Indicates that the stream is pending acknowledgement for
+          `N_UNBIND_REQ'.
+
+    `NS_IDLE'
+          Indicates that the stream is idle, no connection.
+
+    `NS_WACK_OPTREQ'
+          Indicates that the stream is pending acknowledgement of
+          `N_OPTMGMT_REQ'.
+
+    `NS_WACK_RRES'
+          Indicates that the stream is pending acknowledgement of `N_RESET_RES'.
+
+    `NS_WCON_CREQ'
+          Indicates that the stream is pending confirmation of `N_CONN_REQ'.
+
+    `NS_WRES_CIND'
+          Indicates that the stream is pending response of `N_CONN_REQ'.
+
+    `NS_WACK_CRES'
+          Indicates that the stream is pending acknowledgement of `N_CONN_RES'.
+
+    `NS_DATA_XFER'
+          Indicates that the stream is in connection-mode data transfer.
+
+    `NS_WCON_RREQ'
+          Indicates that the stream is pending confirmation of `N_RESET_REQ'.
+
+    `NS_WRES_RIND'
+          Indicates that the stream is pending response of `N_RESET_IND'.
+
+    `NS_WACK_DREQ6'
+          Indicates that the stream is waiting ack of `N_DISCON_REQ'.
+
+    `NS_WACK_DREQ7'
+          Indicates that the stream is waiting ack of `N_DISCON_REQ'.
+
+    `NS_WACK_DREQ9'
+          Indicates that the stream is waiting ack of `N_DISCON_REQ'.
+
+    `NS_WACK_DREQ10'
+          Indicates that the stream is waiting ack of `N_DISCON_REQ'.
+
+    `NS_WACK_DREQ11'
+          Indicates that the stream is waiting ack of `N_DISCON_REQ'.
+
+`PROVIDER_type'
+     Indicates the type of NS provider.
+    `N_SNICFP'
+          The provider is a subnetwork independent convergence
+          function/protocol sub-layer of the network layer.
+
+    `N_SUBNET'
+          The provider is a subnetwork.
+
+`NODU_size'
+     Indicates the Network Optimal Data Unit size in octets.
+
+`PROTOID_length'
+     Indicates the length of the bound protocol identifiers.
+
+`PROTOID_offset'
+     Indicates the offset of the bound protocol identifiers from the beginning
+     of the `M_PCPROTO' message block.
+
+`NPI_version'
+     Indicates the version of the NPI interface.
+
+ Rules
+------
+
+ Rules for sizes:
+.................
+
+  1. SCCP conforming NSP will return a value of `N_INVALID' (`-1UL') for the
+     `ETSDU_size' data size, indicating that the NSP does not support expedited
+     data transfer.
+
+  2. SCCP conforming NSP will return the same defined value in the `NSDU_size',
+     `CDATA_size' and `DDATA_size' fields.  This value is the maximum size of a
+     NSU SDU that can be guaranteed transferred by the NSP.  The exact value of
+     these fields will depend on the signalling links supported by the SCCP
+     provider.
+
+  3. SCCP conforming NSP will return zero (`0'), `N_INVALID' (`-1UL') or the
+     same value as `NSDU_size' in the `CDATA_size' and field.  When the SCCP
+     provider returns a value of zero (`0') or `N_INVALID' (`-1UL') for
+     `CDATA_size', it is indicating that connection data is not permitted with
+     the `N_CONN_REQ' primitive.  When the SCCP provider returns the same value
+     as `NSDU_size', it is indicating that normal data is permitted with the
+     `N_CONN_REQ' primitive.
+
+  4. SCCP conforming NSP will return zero (`0'), `N_INVALID' (`-1UL') or the
+     same value as `NSDU_size' in the `DDATA_size' and field.  When the SCCP
+     provider returns a value of zero (`0') or `N_INVALID' (`-1UL') for
+     `DDATA_size', it is indicating that disconnection data is not permitted
+     with the `N_DISCON_REQ' primitive.  When the SCCP provider returns the
+     same value as `NSDU_size', it is indicating that normal data is permitted
+     with the `N_DISCON_REQ' primitive.
+
+  5. SCCP conforming NSP will return a value in the `NIDU_size' field that is
+     less than or equal to the `NSDU_size' field, but must not be set to
+     `N_INVALID' (`-1UL') or zero (`0').(1)
+
+  6. SCCP conforming NSP will return a value in the `NODU_size' field that is
+     less than or equal to the `NSDU_size' field, but must not be set to
+     `N_INVALID' (`-1UL') or zero (`0').(2)
+
+  7. SCCP conforming NSP will return the size of the sockaddr structure in the
+     `ADDR_size' field.
+
+ Rules for provider type:
+.........................
+
+  1. When the stream is bound and `MTP_CONNECTION_ORIENTED' or
+     `MTP_CONNECTIONLESS' flags were set in the `N_BIND_REQ', the service type
+     will be set according to the requested service type.  (See *note
+     N_BIND_REQ:: and *note N_BIND_ACK::.)
+
+  2. When neither `MTP_CONNECTION_ORIENTED' nor `MTP_CONNECTIONLESS' flags are
+     set in the `N_BIND_REQ', or the stream is unbound, the SCCP conforming NSP
+     will return a service type of `CLNS' when bound to non-call-related SCCP
+     Users.  The SCCP conforming NSP will return a service type of `CLNS' for
+     the following SCCP Users:
+        * SCCP--Signalling Connection Control Part
+
+        * MTUP--SCCP Test User Part
+
+        * GCP--Gateway Control Protocol
+
+        * Any other non-call-related SCCP User specified by the appropriate
+          specification.
+
+  3. When neither `MTP_CONNECTION_ORIENTED' nor `MTP_CONNECTIONLESS' flags are
+     set in the `N_BIND_REQ', or the stream is unbound, the SCCP conforming NSP
+     will return a service type of CONS when bound to call related SCCP Users.
+     The SCCP conforming NSP will return a service type of CONS for the
+     following SCCP Users:
+        * TUP--Telephone User Part
+
+        * NUP--Network User Part
+
+        * ISUP--ISDN User Part
+
+        * DUP--Data User Part
+
+        * B-ISDN--Broadband ISDN User Part
+
+        * S-ISDN--Satellite ISDN User Part
+
+        * SPNE UP--Signal Processing Network Equipment User Part
+
+        * AAL2 STC--AAL Type 2 STC
+
+        * BICC--Bearer Independent Call Control
+
+        * Any other call-related SCCP User specified by the appropriate
+          specification.
+
+  4. SCCP conforming NSP will not return a service type of COTS_ORD.
+
+ Rules for flags:
+.................
+
+  1. Because the SCCP does not support receipt confirmation, the SCCP
+     conforming NSP will not set the `REC_CONF_OPT' flag in the `OPTIONS_flags'
+     field.
+
+  2. Because the SCCP does not support expedited data, the SCCP conforming NSP
+     will not set the `EX_DATA_OPT' flag in the `OPTIONS_flags' field.
+
+ Rules for states:
+..................
+
+  1. Because SCCP only supports pseudo-connections, the SCCP conforming NSP
+     will never return a `CURRENT_state' of `NS_WRES_CIND', `NS_WACK_CRES',
+     `NS_WACK_DREQ6', `NS_WACK_DREQ7' or `NS_WACK_DREQ11'.
+
+  2. Because SCCP does not support the reset service from the SCCP-User, the
+     SCCP conforming NSP will never return a `CURRENT_state' of `NS_WCON_RREQ'.
+
+ Rules for Quality of Service Parameters
+........................................
+
+  1. SCCP conforming NSP will retrun an `N_QOS_SEL_INFO_MTP' structure
+     indicated in the `QOS_length' and `QOS_offset' fields.
+
+  2. SCCP conforming NSP will return an `N_QOS_RANGE_INFO_MTP' structure
+     indicated in the `QOS_range_length' and `QOS_range_offset' fields.
+
+---------- Footnotes ----------
+
+(1) Typically, the `NIDU_size' will be the same value of the `NSDU_size' for
+normal SS7 links.  For ATM and High-Speed SS7 liks, the `NIDU_size' will
+typically be smaller than the `NSDU_size' when the maximum SIF size supported
+by the link is greater than the maximum size of an M_DATA message block.
+
+(2) Typically the `NODU_size' field will be equal to the `NIDU_size' field.
+
+
+File: npi_sccp.info,  Node: Mapping NPI-SCCP Primitives to ANSI T1.114
+
+3.2 Mapping NPI-SCCP Primitives to ANSI T1.114
+==============================================
+
+
+File: npi_sccp.info,  Node: Mapping NPI-SCCP Primitives to ETSI ETS 300 287
+
+3.3 Mapping NPI-SCCP Primitives to ETSI ETS 300 287
+===================================================
+
+
+File: npi_sccp.info,  Node: Mapping NPI-SCCP Primitives to ITU-T X.219
+
+3.4 Mapping NPI-SCCP Primitives to ITU-T X.219
+==============================================
+
+
+File: npi_sccp.info,  Node: TPI-TCAP Header File Listing
+
+Appendix A TPI-TCAP Header File Listing
+***************************************
+
+
+File: npi_sccp.info,  Node: License,  Next: Glossary,  Prev: NPI-SCCP Header File Listing,  Up: Top
+
+ License
+********
+
+* Menu:
+
+* GNU Free Documentation License::
+
+
+File: npi_sccp.info,  Node: GNU Free Documentation License,  Up: License
+
+ GNU Free Documentation License
+===============================
+
+
+
+                        GNU FREE DOCUMENTATION LICENSE
+                            Version 1.1, March 2000
+
+     Copyright (C) 2000 Free Software Foundation, Inc.
+     59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
+
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+
+ PREAMBLE
+=========
+
+The purpose of this License is to make a manual, textbook, or other written
+document "free" in the sense of freedom: to assure everyone the effective
+freedom to copy and redistribute it, with or without modifying it, either
+commercially or noncommercially.  Secondarily, this License preserves for the
+author and publisher a way to get credit for their work, while not being
+considered responsible for modifications made by others.
+
+This License is a kind of "copyleft", which means that derivative works of the
+document must themselves be free in the same sense.  It complements the GNU
+General Public License, which is a copyleft license designed for free software.
+
+We have designed this License in order to use it for manuals for free software,
+because free software needs free documentation: a free program should come with
+manuals providing the same freedoms that the software does.  But this License
+is not limited to software manuals; it can be used for any textual work,
+regardless of subject matter or whether it is published as a printed book.  We
+recommend this License principally for works whose purpose is instruction or
+reference.
+
+        TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+  1. APPLICABILITY AND DEFINITIONS
+
+     This License applies to any manual or other work that contains a notice
+     placed by the copyright holder saying it can be distributed under the
+     terms of this License.  The "Document", below, refers to any such manual
+     or work.  Any member of the public is a licensee, and is addressed as
+     "you".
+
+     A "Modified Version" of the Document means any work containing the
+     Document or a portion of it, either copied verbatim, or with modifications
+     and/or translated into another language.
+
+     A "Secondary Section" is a named appendix or a front-matter section of the
+     Document that deals exclusively with the relationship of the publishers or
+     authors of the Document to the Document's overall subject (or to related
+     matters) and contains nothing that could fall directly within that overall
+     subject.  (For example, if the Document is in part a textbook of
+     mathematics, a Secondary Section may not explain any mathematics.)  The
+     relationship could be a matter of historical connection with the subject
+     or with related matters, or of legal, commercial, philosophical, ethical
+     or political position regarding them.
+
+     The "Invariant Sections" are certain Secondary Sections whose titles are
+     designated, as being those of Invariant Sections, in the notice that says
+     that the Document is released under this License.
+
+     The "Cover Texts" are certain short passages of text that are listed, as
+     Front-Cover Texts or Back-Cover Texts, in the notice that says that the
+     Document is released under this License.
+
+     A "Transparent" copy of the Document means a machine-readable copy,
+     represented in a format whose specification is available to the general
+     public, whose contents can be viewed and edited directly and
+     straightforwardly with generic text editors or (for images composed of
+     pixels) generic paint programs or (for drawings) some widely available
+     drawing editor, and that is suitable for input to text formatters or for
+     automatic translation to a variety of formats suitable for input to text
+     formatters.  A copy made in an otherwise Transparent file format whose
+     markup has been designed to thwart or discourage subsequent modification
+     by readers is not Transparent.  A copy that is not "Transparent" is called
+     "Opaque".
+
+     Examples of suitable formats for Transparent copies include plain ASCII
+     without markup, Texinfo input format, LaTeX input format, SGML or XML
+     using a publicly available DTD, and standard-conforming simple HTML
+     designed for human modification.  Opaque formats include PostScript, PDF,
+     proprietary formats that can be read and edited only by proprietary word
+     processors, SGML or XML for which the DTD and/or processing tools are not
+     generally available, and the machine-generated HTML produced by some word
+     processors for output purposes only.
+
+     The "Title Page" means, for a printed book, the title page itself, plus
+     such following pages as are needed to hold, legibly, the material this
+     License requires to appear in the title page.  For works in formats which
+     do not have any title page as such, "Title Page" means the text near the
+     most prominent appearance of the work's title, preceding the beginning of
+     the body of the text.
+
+  2. VERBATIM COPYING
+
+     You may copy and distribute the Document in any medium, either
+     commercially or noncommercially, provided that this License, the copyright
+     notices, and the license notice saying this License applies to the
+     Document are reproduced in all copies, and that you add no other
+     conditions whatsoever to those of this License.  You may not use technical
+     measures to obstruct or control the reading or further copying of the
+     copies you make or distribute.  However, you may accept compensation in
+     exchange for copies.  If you distribute a large enough number of copies
+     you must also follow the conditions in section 3.
+
+     You may also lend copies, under the same conditions stated above, and you
+     may publicly display copies.
+
+  3. COPYING IN QUANTITY
+
+     If you publish printed copies of the Document numbering more than 100, and
+     the Document's license notice requires Cover Texts, you must enclose the
+     copies in covers that carry, clearly and legibly, all these Cover Texts:
+     Front-Cover Texts on the front cover, and Back-Cover Texts on the back
+     cover.  Both covers must also clearly and legibly identify you as the
+     publisher of these copies.  The front cover must present the full title
+     with all words of the title equally prominent and visible.  You may add
+     other material on the covers in addition.  Copying with changes limited to
+     the covers, as long as they preserve the title of the Document and satisfy
+     these conditions, can be treated as verbatim copying in other respects.
+
+     If the required texts for either cover are too voluminous to fit legibly,
+     you should put the first ones listed (as many as fit reasonably) on the
+     actual cover, and continue the rest onto adjacent pages.
+
+     If you publish or distribute Opaque copies of the Document numbering more
+     than 100, you must either include a machine-readable Transparent copy
+     along with each Opaque copy, or state in or with each Opaque copy a
+     publicly-accessible computer-network location containing a complete
+     Transparent copy of the Document, free of added material, which the
+     general network-using public has access to download anonymously at no
+     charge using public-standard network protocols.  If you use the latter
+     option, you must take reasonably prudent steps, when you begin
+     distribution of Opaque copies in quantity, to ensure that this Transparent
+     copy will remain thus accessible at the stated location until at least one
+     year after the last time you distribute an Opaque copy (directly or
+     through your agents or retailers) of that edition to the public.
+
+     It is requested, but not required, that you contact the authors of the
+     Document well before redistributing any large number of copies, to give
+     them a chance to provide you with an updated version of the Document.
+
+  4. MODIFICATIONS
+
+     You may copy and distribute a Modified Version of the Document under the
+     conditions of sections 2 and 3 above, provided that you release the
+     Modified Version under precisely this License, with the Modified Version
+     filling the role of the Document, thus licensing distribution and
+     modification of the Modified Version to whoever possesses a copy of it.
+     In addition, you must do these things in the Modified Version:
+
+       A. Use in the Title Page (and on the covers, if any) a title distinct
+          from that of the Document, and from those of previous versions (which
+          should, if there were any, be listed in the History section of the
+          Document).  You may use the same title as a previous version if the
+          original publisher of that version gives permission.
+
+       B. List on the Title Page, as authors, one or more persons or entities
+          responsible for authorship of the modifications in the Modified
+          Version, together with at least five of the principal authors of the
+          Document (all of its principal authors, if it has less than five).
+
+       C. State on the Title page the name of the publisher of the Modified
+          Version, as the publisher.
+
+       D. Preserve all the copyright notices of the Document.
+
+       E. Add an appropriate copyright notice for your modifications adjacent
+          to the other copyright notices.
+
+       F. Include, immediately after the copyright notices, a license notice
+          giving the public permission to use the Modified Version under the
+          terms of this License, in the form shown in the Addendum below.
+
+       G. Preserve in that license notice the full lists of Invariant Sections
+          and required Cover Texts given in the Document's license notice.
+
+       H. Include an unaltered copy of this License.
+
+       I. Preserve the section entitled "History", and its title, and add to it
+          an item stating at least the title, year, new authors, and publisher
+          of the Modified Version as given on the Title Page.  If there is no
+          section entitled "History" in the Document, create one stating the
+          title, year, authors, and publisher of the Document as given on its
+          Title Page, then add an item describing the Modified Version as
+          stated in the previous sentence.
+
+       J. Preserve the network location, if any, given in the Document for
+          public access to a Transparent copy of the Document, and likewise the
+          network locations given in the Document for previous versions it was
+          based on.  These may be placed in the "History" section.  You may
+          omit a network location for a work that was published at least four
+          years before the Document itself, or if the original publisher of the
+          version it refers to gives permission.
+
+       K. In any section entitled "Acknowledgments" or "Dedications", preserve
+          the section's title, and preserve in the section all the substance
+          and tone of each of the contributor acknowledgments and/or
+          dedications given therein.
+
+       L. Preserve all the Invariant Sections of the Document, unaltered in
+          their text and in their titles.  Section numbers or the equivalent
+          are not considered part of the section titles.
+
+       M. Delete any section entitled "Endorsements".  Such a section may not
+          be included in the Modified Version.
+
+       N. Do not retitle any existing section as "Endorsements" or to conflict
+          in title with any Invariant Section.
+
+     If the Modified Version includes new front-matter sections or appendices
+     that qualify as Secondary Sections and contain no material copied from the
+     Document, you may at your option designate some or all of these sections
+     as invariant.  To do this, add their titles to the list of Invariant
+     Sections in the Modified Version's license notice.  These titles must be
+     distinct from any other section titles.
+
+     You may add a section entitled "Endorsements", provided it contains
+     nothing but endorsements of your Modified Version by various parties--for
+     example, statements of peer review or that the text has been approved by
+     an organization as the authoritative definition of a standard.
+
+     You may add a passage of up to five words as a Front-Cover Text, and a
+     passage of up to 25 words as a Back-Cover Text, to the end of the list of
+     Cover Texts in the Modified Version.  Only one passage of Front-Cover Text
+     and one of Back-Cover Text may be added by (or through arrangements made
+     by) any one entity.  If the Document already includes a cover text for the
+     same cover, previously added by you or by arrangement made by the same
+     entity you are acting on behalf of, you may not add another; but you may
+     replace the old one, on explicit permission from the previous publisher
+     that added the old one.
+
+     The author(s) and publisher(s) of the Document do not by this License give
+     permission to use their names for publicity for or to assert or imply
+     endorsement of any Modified Version.
+
+  5. COMBINING DOCUMENTS
+
+     You may combine the Document with other documents released under this
+     License, under the terms defined in section 4 above for modified versions,
+     provided that you include in the combination all of the Invariant Sections
+     of all of the original documents, unmodified, and list them all as
+     Invariant Sections of your combined work in its license notice.
+
+     The combined work need only contain one copy of this License, and multiple
+     identical Invariant Sections may be replaced with a single copy.  If there
+     are multiple Invariant Sections with the same name but different contents,
+     make the title of each such section unique by adding at the end of it, in
+     parentheses, the name of the original author or publisher of that section
+     if known, or else a unique number.  Make the same adjustment to the
+     section titles in the list of Invariant Sections in the license notice of
+     the combined work.
+
+     In the combination, you must combine any sections entitled "History" in
+     the various original documents, forming one section entitled "History";
+     likewise combine any sections entitled "Acknowledgments", and any sections
+     entitled "Dedications".  You must delete all sections entitled
+     "Endorsements."
+
+  6. COLLECTIONS OF DOCUMENTS
+
+     You may make a collection consisting of the Document and other documents
+     released under this License, and replace the individual copies of this
+     License in the various documents with a single copy that is included in
+     the collection, provided that you follow the rules of this License for
+     verbatim copying of each of the documents in all other respects.
+
+     You may extract a single document from such a collection, and distribute
+     it individually under this License, provided you insert a copy of this
+     License into the extracted document, and follow this License in all other
+     respects regarding verbatim copying of that document.
+
+  7. AGGREGATION WITH INDEPENDENT WORKS
+
+     A compilation of the Document or its derivatives with other separate and
+     independent documents or works, in or on a volume of a storage or
+     distribution medium, does not as a whole count as a Modified Version of
+     the Document, provided no compilation copyright is claimed for the
+     compilation.  Such a compilation is called an "aggregate", and this
+     License does not apply to the other self-contained works thus compiled
+     with the Document, on account of their being thus compiled, if they are
+     not themselves derivative works of the Document.
+
+     If the Cover Text requirement of section 3 is applicable to these copies
+     of the Document, then if the Document is less than one quarter of the
+     entire aggregate, the Document's Cover Texts may be placed on covers that
+     surround only the Document within the aggregate.  Otherwise they must
+     appear on covers around the whole aggregate.
+
+  8. TRANSLATION
+
+     Translation is considered a kind of modification, so you may distribute
+     translations of the Document under the terms of section 4.  Replacing
+     Invariant Sections with translations requires special permission from
+     their copyright holders, but you may include translations of some or all
+     Invariant Sections in addition to the original versions of these Invariant
+     Sections.  You may include a translation of this License provided that you
+     also include the original English version of this License.  In case of a
+     disagreement between the translation and the original English version of
+     this License, the original English version will prevail.
+
+  9. TERMINATION
+
+     You may not copy, modify, sublicense, or distribute the Document except as
+     expressly provided for under this License.  Any other attempt to copy,
+     modify, sublicense or distribute the Document is void, and will
+     automatically terminate your rights under this License.  However, parties
+     who have received copies, or rights, from you under this License will not
+     have their licenses terminated so long as such parties remain in full
+     compliance.
+
+ 10. FUTURE REVISIONS OF THIS LICENSE
+
+     The Free Software Foundation may publish new, revised versions of the GNU
+     Free Documentation License from time to time.  Such new versions will be
+     similar in spirit to the present version, but may differ in detail to
+     address new problems or concerns.  See `http://www.gnu.org/copyleft/'.
+
+     Each version of the License is given a distinguishing version number.  If
+     the Document specifies that a particular numbered version of this License
+     "or any later version" applies to it, you have the option of following the
+     terms and conditions either of that specified version or of any later
+     version that has been published (not as a draft) by the Free Software
+     Foundation.  If the Document does not specify a version number of this
+     License, you may choose any version ever published (not as a draft) by the
+     Free Software Foundation.
+
+                          END OF TERMS AND CONDITIONS
+
+ ADDENDUM: How to use this License for your documents
+=====================================================
+
+To use this License in a document you have written, include a copy of the
+License in the document and put the following copyright and license notices
+just after the title page:
+
+       Copyright (C)  YEAR  YOUR NAME.
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.1
+       or any later version published by the Free Software Foundation;
+       with the Invariant Sections being LIST THEIR TITLES, with the
+       Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+       A copy of the license is included in the section entitled ``GNU
+       Free Documentation License''.
+
+If you have no Invariant Sections, write "with no Invariant Sections" instead
+of saying which ones are invariant.  If you have no Front-Cover Texts, write
+"no Front-Cover Texts" instead of "Front-Cover Texts being LIST"; likewise for
+Back-Cover Texts.
+
+If your document contains nontrivial examples of program code, we recommend
+releasing these examples in parallel under your choice of free software
+license, such as the GNU General Public License, to permit their use in free
+software.
+
+
+File: npi_sccp.info,  Node: Glossary,  Next: Acronyms,  Prev: License,  Up: Top
+
+ Glossary
+*********
+
+_Signalling Data Link Service Data Unit_
+     A grouping of SDL user data whose boundaries are preserved from one end of
+     the signalling data link connection to the other.
+
+_Data transfer_
+     The phase in connection and connectionless modes that supports the
+     transfer of data between to signalling data link users.
+
+_SDL provider_
+     The signalling data link layer protocol that provides the services of the
+     signalling data link interface.
+
+_SDL user_
+     The user-level application or user-level or kernel-level protocol that
+     accesses the services of the signalling data link layer.
+
+_Local management_
+     The phase in connection and connectionless modes in which a SDL user
+     initializes a stream and attaches a PPA address to the stream.  Primitives
+     in this phase generate local operations only.
+
+_PPA_
+     The point at which a system attaches itself to a physical communications
+     medium.
+
+_PPA identifier_
+     An identifier of a particular physical medium over which communication
+     transpires.
+
+
+File: npi_sccp.info,  Node: Acronyms,  Next: References,  Prev: Glossary,  Up: Top
+
+ Acronyms
+*********
+
+SDLI      Signalling Data Link Interface
+SDL       Signalling Data Link
+SDL SDU   Signalling Data Link Service Data Unit
+ITU-T     International Telecommunications Union
+          - Telecom Sector
+PPA       Physical Point of Attachment
+
+
+File: npi_sccp.info,  Node: References,  Next: Index,  Prev: Acronyms,  Up: Top
+
+ References
+***********
+
+  1. ITU-T Recommendation X.210, (Geneva, 1993), "Information Technology --
+     Open Systems Interconnection -- Basic reference model: Conventions for the
+     definition of OSI services," ISO/IEC 10731:1994.
+
+  2. ITU-T Recommendation X.217, (Geneva, 1995), "Information Technology --
+     Open Systems Interconnection -- Service definition for the Association
+     Control Service Element," ISO/IEC 8649:1996.
+
+  3. ITU-T Recommendation X.227, (Geneva, 1995), "Information Technology --
+     Open Systems Interconnection -- Connection-oriented protocol for the
+     Association Control Service Element: Protocol Specification," ISO/IEC
+     8650-1.
+
+  4. ITU-T Recommendation X.237, (Geneva, 1995), "Information Technology --
+     Open Systems Interconnection -- Connectionless protocol for the
+     Association Control Service Element: Protocol Specification," ISO/IEC
+     10035-1 : 1995.
+
+  5. ITU-T Recommendation X.216, (Geneva, 1994), "Information Technology --
+     Open Systems Interconnection -- Presentation service definition," ISO/IEC
+     8822:1994.
+
+  6. ITU-T Recommendation X.226, (Geneva, 1994), "Information Technology --
+     Open Systems Interconnection -- Connection-oriented presentation protocol:
+     Protocol specification," ISO/IEC 8823-1:1994.
+
+  7. ITU-T Recommendation X.236, (Geneva, 1995), "Information Technology --
+     Open Systems Interconnection -- Connectionless presentation protocol:
+     Protocol specification," ISO/IEC 9576-1:1995.
+
+  8. ITU-T Recommendation X.215, (Geneva, 1995), "Information Technology --
+     Open Systems Interconnection -- Session service definition," ISO/IEC
+     8326:1996.
+
+  9. ITU-T Recommendation X.225, (Geneva, 1995), "Information Technology --
+     Open Systems Interconnection -- Connection-oriented session protocol:
+     Protocol specification," ISO/IEC 8327-1:1996.
+
+ 10. ITU-T Recommendation X.235, (Geneva, 1995), "Information Technology --
+     Open Systems Interconnection -- Connectionless session protocol: Protocol
+     specification," ISO/IEC 9548-1:1995.
+
+ 11. ITU-T Recommendation X.214, (Geneva, 1995), "Information Technology --
+     Open Systems Interconnection -- Transport service definition," ISO/IEC
+     8072:1996.
+
+ 12. ITU-T Recommendation X.224
+
+ 13. ITU-T Recommendation Q.700
+
+ 14. ITU-T Recommendation Q.701
+
+ 15. ITU-T Recommendation Q.702
+
+ 16. ITU-T Recommendation Q.703
+
+ 17. ITU-T Recommendation Q.704
+
+ 18. Geoffrey Gerrien, "CDI - Application Program Interface Guide," Gcom, Inc.,
+     March 1999.
+
+ 19. ITU-T Recommendation Q.771, (Geneva, 1993), "Signalling System No. 7 --
+     Functional description of transaction capabilities," (White Book).
+
+
+File: npi_sccp.info,  Node: Index,  Prev: References,  Up: Top
+
+ Index
+******
+
+ [index ]
+* Menu:
+
+* license, FDL:                          GNU Free Documentation License.
+                                                                        (line 6)
+* license, GNU Free Documentation License: GNU Free Documentation License.
+                                                                        (line 6)
+
+
+
+Tag Table:
+Node: Top1830
+Node: Preface2166
+Node: Introduction3808
+Node: NPI Primitives7375
+Ref: NPI Primitives-Footnote-126811
+Ref: NPI Primitives-Footnote-227113
+Node: Mapping NPI-SCCP Primitives to ANSI T1.11427190
+Node: Mapping NPI-SCCP Primitives to ETSI ETS 300 28727359
+Node: Mapping NPI-SCCP Primitives to ITU-T X.21927543
+Node: TPI-TCAP Header File Listing27712
+Node: License27853
+Node: GNU Free Documentation License28020
+Node: Glossary47785
+Node: Acronyms48932
+Node: References49276
+Node: Index52045
+
+End Tag Table
