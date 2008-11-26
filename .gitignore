@@ -2451,6 +2451,7 @@ stacks/doc/projects/hlr.info
 stacks/doc/projects/lab.info
 stacks/doc/projects/Makefile.in
 stacks/doc/projects/sg.info
+stacks/doc/projects/sgp.info
 stacks/doc/projects/voip.info
 stacks/doc/specs/cci/cci.info
 stacks/doc/specs/cci/cci.info-1
@@ -2474,6 +2475,7 @@ stacks/doc/specs/npi/npi.info-5
 stacks/doc/specs/npi/npi.info-6
 stacks/doc/specs/npi/npi.info-7
 stacks/doc/specs/npi/npi.info-8
+stacks/doc/specs/sccpi/Makefile.in
 stacks/doc/specs/sdli/sdli.info
 stacks/doc/specs/sdti/sdti.info
 stacks/doc/specs/sli/sli.info
@@ -4311,4 +4313,3 @@ strxns/TODO
 .*.swp
 tags
 TODO
-stacks/doc/projects/sgp.info
