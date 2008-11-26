@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-31 06:57:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-11-26 12:01:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 06:57:13 $ by $Author: brian $
+# Last Modified $Date: 2008-11-26 12:01:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,6 +65,7 @@ cci_TEXINFOS		= \
 			  isdni.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/fdl13.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
 
 if MAINTAINER_MODE
@@ -154,6 +155,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.14  2008-11-26 12:01:32  brian
+## - updated to FDL 1.3
+##
 ## Revision 0.9.2.13  2008-08-31 06:57:13  brian
 ## - do not customize docs unless maintainer modes and dependency tracking
 ##

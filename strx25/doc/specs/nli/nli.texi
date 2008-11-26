@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: nli.texi,v 0.9.2.7 2008-09-20 11:04:41 brian Exp $
+% @(#) $Id: nli.texi,v 0.9.2.8 2008-11-26 12:01:49 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-09-20 11:04:41 $ by $Author: brian $
+% Last Modified $Date: 2008-11-26 12:01:49 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -125,6 +125,11 @@ no obligation to provide any feature listed herein.
 @set MANUAL_TITLE Network Layer Interface
 @set MANUAL_TYPE Specification
 
+@set PART X.25 Packet Layer
+@set LONG X.25 Packet Layer Protocol
+@set SHORT PLP
+@set INTERFACE NLI
+
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
@@ -143,8 +148,8 @@ no obligation to provide any feature listed herein.
 This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
 the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
 as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
-X.25 Packet Layer Protocol (PLP) to these components as well as providing a basis for network layer
-control for other network protocols.
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -238,8 +243,8 @@ no obligation to provide any feature listed herein.
 @defcodeindex pr
 @c Define an index of primitive values
 @defcodeindex pv
-@c @c Define an index of primitive error values
-@c @defcodeindex pe
+@c Define an index of primitive error values
+@defcodeindex pe
 @c Define an index of protocol states
 @defcodeindex st
 @c Define an index of input-output controls
@@ -254,7 +259,7 @@ no obligation to provide any feature listed herein.
 @c @c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
-@c @syncodeindex pe cp
+@syncodeindex pe cp
 @syncodeindex st cp
 @syncodeindex mp cp
 @syncodeindex tp cp
@@ -276,16 +281,16 @@ no obligation to provide any feature listed herein.
 @code{\name\}@pvindex \name\
 @end macro
 
-@c @macro perr{name}
-@c @code{\name\}@peindex \name\
-@c @end macro
+@macro perr{name}
+@var{[\name\]}@peindex \name\
+@end macro
 
 @macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
 @macro parm{name}
-@code{\name\}@vrindex \name\
+@var{\name\}@vrindex \name\
 @end macro
 
 @macro pioc{name}
@@ -310,16 +315,16 @@ no obligation to provide any feature listed herein.
 @code{\name\}
 @end macro
 
-@c @macro perr{name}
-@c @code{\name\}
-@c @end macro
+@macro perr{name}
+@var{[\name\]}
+@end macro
 
 @macro psta{name}
 @code{\name\}
 @end macro
 
 @macro parm{name}
-@code{\name\}
+@var{\name\}
 @end macro
 
 @macro pioc{name}
@@ -338,23 +343,29 @@ no obligation to provide any feature listed herein.
 @end ifnottex
 
 @menu
+* Preface::
 * Introduction::
-* Model of the X.25 Packet Layer::
-* NLI Services::
-* NLI Message Primitives::
-* NLI Input-Output Controls::
-* NLI Management Information Base::
-* Allowable Sequence of NLI Primitives::
-@c * Precedence of NPI Primitives::
-@c * Guidelines for Protocol Independent NS Users::
-@c * Required Information for NS Provider-Specific Addenda::
-* NLI Header Files::
-* NLI Library::
-* NLI Drivers and Modules::
-* NLI Utilities::
-* NLI File Formats::
-* NLI Compatibility and Porting::
-* Glossary of NLI Terms and Acronyms::
+* Model of the @value{PART}::
+* @value{INTERFACE} Services Definition::
+* @value{INTERFACE} Primitives::
+@c * Diagnostics Requirements::
+* @value{INTERFACE} Input-Output Controls::
+* @value{INTERFACE} Management Information Base::
+@c * Addendum for @value{SHORT} Conformance::
+@c * Mapping @value{INTERFACE} Primitives::
+@c * State/Event Tables::
+@c * Precedence Tables::
+* Allowable Sequence of @value{INTERFACE} Primitives::
+@c * Precedence of @value{INTERFACE} Primitives::
+@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
+@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
+* @value{INTERFACE} Header Files::
+* @value{INTERFACE} Library::
+* @value{INTERFACE} Drivers and Modules::
+* @value{INTERFACE} Utilities::
+* @value{INTERFACE} File Formats::
+* @value{INTERFACE} Compatibility and Porting::
+* Glossary of @value{INTERFACE} Terms and Acronyms::
 * References::
 @c @iftex
 @c * Indices::
@@ -369,10 +380,102 @@ no obligation to provide any feature listed herein.
 @page
 @heading List of Figures
 @listoffloats Figure
-@c @page
-@c @heading List of Tables
-@c @listoffloats Table
+@page
+@heading List of Tables
+@listoffloats Table
 @end iftex
+
+@node Preface
+@unnumbered Preface
+
+@section Security Warning
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used
+in advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the document are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action of contract, negligence or other tortious action, arising out
+of or in connection with any use of this document or the performance or implementation of the
+contents thereof.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a
+reference point for the industry.  While @cite{OpenSS7 Corporation} believes that these interfaces
+are well defined in this release of the document, minor changes may be made prior to products
+conforming to the interfaces being made available.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
+(@value{SHORT}) protocol stacks.  It provides abstraction of the signalling link interface to these
+components as well as providing a basis for signalling link control for other @value{PART}
+protocols.
+
+@section Purpose
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
+
+@section Intent
+
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@section Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Disclaimer
+
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document
+is an @strong{UNCONTROLLED VERSION}.
+
+@smallexample
+@verbatim
+$Log: nli.texi,v $
+Revision 0.9.2.8  2008-11-26 12:01:49  brian
+- updated to FDL 1.3
+
+
+
+
+
+
+
+
+@end verbatim
+@end smallexample
 
 @node Introduction
 @chapter Introduction
@@ -382,12 +485,12 @@ no obligation to provide any feature listed herein.
 * Development::
 @end menu
 
-The Network Layer Interface (NLI) was developed by Spider Systems, Ltd., (now a division of Emerson
+The Network Layer Interface (@value{INTERFACE}) was developed by Spider Systems, Ltd., (now a division of Emerson
 Power), and is widely available on many platforms.  For example, @cite{AIX AIXlink/X.25},
 @cite{HP-UX HP X.25/9000}, @cite{Solaris Solstice X.25} and @cite{SunLink X.25}, @cite{IRIX IRIS
-SX.25}, @cite{PT X.25} and @cite{SBE X.25} implement the Network Layer Interface (NLI).
+SX.25}, @cite{PT X.25} and @cite{SBE X.25} implement the Network Layer Interface (@value{INTERFACE}).
 
-The Network Layer Interface (NLI) was designed to be used directly with standard @dfn{STREAMS}
+The Network Layer Interface (@value{INTERFACE}) was designed to be used directly with standard @dfn{STREAMS}
 system calls and does not require the use of a cooperating user space shared library.  Applications
 programs directly use the @command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)},
 @command{putpmsg(2)} and @command{ioctl(2)} system calls.@footnote{See @manref{getmsg(2s)},
@@ -397,11 +500,11 @@ service primitive interface.
 
 The system header files that must be included when compiling user applications,
 or @dfn{STREAMS} drivers and modules that use the interface, are detailed in
-@ref{NLI Header Files}.
+@ref{@value{INTERFACE} Header Files}.
 
 A user library, @file{libsx25}, is provided, not for interfacing to the message primitive service
 interface, but for providing various helper functions when using the @dfn{STREAMS} service
-interface.  This library is detailed in @ref{NLI Library}.
+interface.  This library is detailed in @ref{@value{INTERFACE} Library}.
 
 @node History
 @section History
@@ -431,7 +534,7 @@ No library was provided by @cite{SVR 4} for this interface; however,
 @uref{http://www.gcom.com/,,GCOM} specified an @dfn{NPI API Library} also
 provided by @uref{http://www.openss7.org/,,OpenSS7}.
 For X.25, @cite{Spider Systems, Ltd.} provided the @dfn{Network Layer Interface
-(NLI)} that is the subject of this specification.
+(@value{INTERFACE})} that is the subject of this specification.
 
 @item Link Layer Interface
 
@@ -467,7 +570,7 @@ Interface} that is the subject of a companion specification.
 
 @end table
 
-The @dfn{Network Layer Interface (NLI)} specified by @cite{Spider Systems, Ltd.}
+The @dfn{Network Layer Interface (@value{INTERFACE})} specified by @cite{Spider Systems, Ltd.}
 was the most widespread implementation of X.25 found on
 @cite{UNIX@registeredsymbol{}} and Unix-like systems.
 
@@ -475,7 +578,7 @@ was the most widespread implementation of X.25 found on
 @section Development
 @cindex Spider Systems, Ltd.
 
-Although the @cite{Spider Systems, Ltd.} @dfn{Network Layer Interface (NLI)}
+Although the @cite{Spider Systems, Ltd.} @dfn{Network Layer Interface (@value{INTERFACE})}
 that is the subject of this specification was and is still in widespread use for
 the implementation of X.25 on @cite{UNIX@registeredsymbol{}} and Unix-like
 systems, it must be stressed that this is a legacy interface.  It is provided by
@@ -515,29 +618,29 @@ This interface alone should be used by OSI applications, drivers and modules.
 
 @item
 When porting legacy applications, drivers and modules to @b{Linux}, the
-@dfn{Network Layer Interface (NLI)} as specified in this document may be used
+@dfn{Network Layer Interface (@value{INTERFACE})} as specified in this document may be used
 both for application interface and for inter-module service interfaces.
 
 @end itemize
 
-Note that when porting legacy NLI applications to @b{Linux} using the interface
+Note that when porting legacy @value{INTERFACE} applications to @b{Linux} using the interface
 specified in this document, that there are many variations in implementation of
-the @dfn{NLI} as modified by licensors of the @cite{Spider Systems, Ltd.}
+the @dfn{@value{INTERFACE}} as modified by licensors of the @cite{Spider Systems, Ltd.}
 implementation.  These modifications are ofter incompatible.  Some of the
-incompatibilities are hidden by an X.25 utility library described in @ref{NLI
+incompatibilities are hidden by an X.25 utility library described in @ref{@value{INTERFACE}
 Library}.
 @cindex Spider Systems, Ltd.
 
-@node Model of the X.25 Packet Layer
-@chapter Model of the X.25 Packet Layer
+@node Model of the @value{PART}
+@chapter Model of the @value{PART}
 @cindex Model of the X.25 packet layer
 @cindex STREAMS
 
-The @dfn{X.25 Packet Layer} provides the means to manage the operation of the
+The @dfn{@value{PART}} provides the means to manage the operation of the
 X.25 network.  It is responsible for the routing and management of data exchange
 between network-user entities.
 
-The NLI defines the services provided by the X.25 packet layer to the X.25 user
+The @value{INTERFACE} defines the services provided by the X.25 packet layer to the X.25 user
 at the boundary between the X.25 packet layer and the X.25 user entity.  The
 interface consists of a set of messages defined as @dfn{STREAMS} messages that
 provide access to the X.25 packet layer services, and are transferred between
@@ -548,36 +651,36 @@ other that originate from the X.25 packet layer.  The messages that originate
 from the X.25 user make requests to the X.25 packet layer, or respone to an
 event of the X.25 packet layer.  The messages that originate from the X.25
 packet layer, are either confirmations of a request or are indications to the
-X.25 user that the event has occured.  @figref{1} shows the model of the NLI.
+X.25 user that the event has occured.  @figref{1} shows the model of the @value{INTERFACE}.
 
-@figuresized{nli_fig1,1,Model of the NLI,5.0in}
+@figuresized{nli_fig1,1,Model of the @value{INTERFACE},5.0in}
 
-The NLI allows the X.25 packet layer (as a @dfn{STREAMS} driver) to be
+The @value{INTERFACE} allows the X.25 packet layer (as a @dfn{STREAMS} driver) to be
 configured with an X.25 user (as a @dfn{STREAMS} module) that conforms to the
-NLI.  An X.25 user can also be a user program that conforms to the NLI and
+@value{INTERFACE}.  An X.25 user can also be a user program that conforms to the @value{INTERFACE} and
 accesses the X.25 packet layer using @manref{putmsg(2s)}, @manref{putpmsg(2)},
 @manref{getmsg(2s)}, @manref{getpmsg(2)}, and @manref{ioctl(2)} system calls.
 
-@node NLI Services
-@chapter NLI Services
-@cindex NLI services
+@node @valur{INTERFACE} Services Definition
+@chapter @valur{INTERFACE} Services Definition
+@cindex @value{INTERFACE} services
 
 @menu
-* NLI Modes::
-* NLI Commands::
-* NLI Data Structures::
+* @value{INTERFACE} Modes::
+* @value{INTERFACE} Commands::
+* @value{INTERFACE} Data Structures::
 @end menu
 
-The features of the NLI are defined in termsof the services provided by the X.25
+The features of the @value{INTERFACE} are defined in termsof the services provided by the X.25
 packet layer, and the individual messages that may flow between the X.25 user
 and the X.25 packet layer.
 
-The services supported by the NLI are based on three related modes of
+The services supported by the @value{INTERFACE} are based on three related modes of
 communication, X.25 mode, non-X.25 mode, and CONS mode.
 
-@node NLI Modes
-@section NLI Modes
-@cindex NLI modes
+@node @value{INTERFACE} Modes
+@section @value{INTERFACE} Modes
+@cindex @value{INTERFACE} modes
 
 @subsubheading Packet Level Features
 
@@ -658,9 +761,9 @@ communication, X.25 mode, non-X.25 mode, and CONS mode.
 @end itemize
 
 
-@node NLI Commands
-@section NLI Commands
-@cindex NLI commands
+@node @value{INTERFACE} Commands
+@section @value{INTERFACE} Commands
+@cindex @value{INTERFACE} commands
 
 @multitable @columnfractions 0.17 0.15 0.68
 @item Command @tab Description @tab Section
@@ -686,9 +789,9 @@ communication, X.25 mode, non-X.25 mode, and CONS mode.
 @c @item @prim{M_CircuitId} @tab @type{} @tab
 @end multitable
 
-@node NLI Data Structures
-@section NLI Data Structures
-@cindex NLI data structures
+@node @value{INTERFACE} Data Structures
+@section @value{INTERFACE} Data Structures
+@cindex @value{INTERFACE} data structures
 
 @menu
 * Addresses::
@@ -867,9 +970,9 @@ NPI when TOA is Alternative Address is:
 @node CONS Quality of Service Parameters
 @subsection CONS Quality of Service Parameters
 
-Negotiable X.25 facilities are supported by the PLP driver.  This section
+Negotiable X.25 facilities are supported by the @value{SHORT} driver.  This section
 describes the request and negotiation of these facilities, and the data
-structures used by the NLI primitives.
+structures used by the @value{INTERFACE} primitives.
 
 The facilities are broken down into two groups:
 
@@ -1071,7 +1174,7 @@ service interface.
 @subsection Non-OSI X.25 Facilities
 
 Although these are non-OSI facilities, they are also negotiable with CONS.  For
-those NLI applications that require them, the non-OSI facilities supported are
+those @value{INTERFACE} applications that require them, the non-OSI facilities supported are
 as follows:
 
 @itemize
@@ -1194,7 +1297,7 @@ The field is used for two reasons:
 @item The X.25 software always indicates the values of the window and packet
 sizes operating on the virtual circuit.  The field @parm{pwoptions} for an
 incoming call indicates whether these values are negotiable.
-@item In Connect Request/Response message, the NLI user can set
+@item In Connect Request/Response message, the @value{INTERFACE} user can set
 @parm{nsdulimit}, the limit value for packet concatentation by the X.25 level,
 to a value different from the limit in the subnetwork configuration database.
 It is not a negotiable option, so whatever the user requests is used.
@@ -1289,9 +1392,9 @@ packet or window sizes).  If any non-X.25 facilities are supplied, the
 appropriate marker is inserted before the supplied facilities.
 @end table
 
-@node NLI Message Primitives
-@chapter NLI Message Primitives
-@cindex NLI message primitives
+@node @value{INTERFACE} Primitives
+@chapter @value{INTERFACE} Primitives
+@cindex @value{INTERFACE} primitives
 
 @menu
 * Connect Request/Indication::
@@ -1684,7 +1787,7 @@ The data part of the message consists of one or more @msg{M_DATA} message blocks
 containing the local or remote expedited NS user data (ENSDU).
 
 The Expedited Data message primitive, @prim{N_EData}, is used when expedited
-data, carried by an X.25 interrupt packet, corsses the X.25 NLI service
+data, carried by an X.25 interrupt packet, corsses the X.25 @value{INTERFACE} service
 interface from NS provider to user or NS user to provider.
 The Expedited Data message is a confirmed primitive and must be acknowledged
 before another expedited data unit can be requested or indicated.
@@ -2777,11 +2880,11 @@ use of the D-bit.  This field can have one of the following values:
 @item @pval{RC_CONF_APP} @tab 2 @tab Confirmation by the remote application.
 @end multitable
 In the case of receipt confirmation by the remote station, no acknowledgements
-are expected or given over the X.25 NLI service interface.  For receipt
+are expected or given over the X.25 @value{INTERFACE} service interface.  For receipt
 confirmation by the remote application, there is a one-to-one correspondence
 between D-bit data and acknolwedgements passing in opposite directions.  One
 data acknowledgement is received or sent for each D-bit data packet sent or
-received over the X.25 NLI service interface.
+received over the X.25 @value{INTERFACE} service interface.
 @item reqnsdulimit
 When non-zero, conveys that an NSDU concantenation limit is asserted and the
 @parm{nsdulimit} field is valid.
@@ -2912,8 +3015,8 @@ primitive from the NS provider in response.
 The PVC Detach message primitive is equivalent to the
 @prim{N_DISCON_REQ} of the NPI.
 
-@node NLI Input-Output Controls
-@chapter NLI Input-Output Controls
+@node @value{INTERFACE} Input-Output Controls
+@chapter @value{INTERFACE} Input-Output Controls
 
 @menu
 * Input-Output Control Data Structures::
@@ -3868,8 +3971,8 @@ struct qosdatpri {
 @node N_resetQOSDATPRI
 @subsection N_resetQOSDATPRI
 
-@node NLI Management Information Base
-@chapter NLI Management Information Base
+@node @value{INTERFACE} Management Information Base
+@chapter @value{INTERFACE} Management Information Base
 
 The @file{OPENSS7-X25-MIB} provides the following tables:
 
@@ -3935,7 +4038,7 @@ The @dfn{X.25 Packet Layer Entity (PLE) Configuration Table},
 @mobj{x25PLEConfigTable}, is a table that provides specific configuration
 information for various @dfn{X.25 Packet Layer Entities}.
 
-Provides a table of X.25 Packet Layer Protocol (PLP) Entities.  Each X.25 Packet
+Provides a table of @value{LONG} (@value{SHORT}) Entities.  Each X.25 Packet
 Layer Entity corresponds to an X.25 DTE or DCE over which permanent virtual
 circuits exist or virtual calls can be placed.  ITU-T Rec. X.283 | ISO/IEC 10733.
 Each entry corresponds to an instance of an x25PLE managed object, which
@@ -4827,8 +4930,20 @@ In the OSI context, this will always be an NSAP address but in other uses it may
 not.  In any case, it may be null, for example, when used by ISO 8473.
 @end table
 
-@node Allowable Sequence of NLI Primitives
-@chapter Allowable Sequence of NLI Primitives
+@c @node Addendum for @value{SHORT} Conformance
+@c @chapter Addendum for @value{SHORT} Conformance
+
+@c @node Mapping @value{INTERFACE} Primitives
+@c @chapter Mapping @value{INTERFACE} Primitives
+
+@c @node State/Event Tables
+@c @appendix State/Event Tables
+
+@c @node Precedence Tables
+@c @appendix Precedence Tables
+
+@node Allowable Sequence of @value{INTERFACE} Primitives
+@chapter Allowable Sequence of @value{INTERFACE} Primitives
 
 @menu
 * Opening a Connection::
@@ -4858,24 +4973,24 @@ not.  In any case, it may be null, for example, when used by ISO 8473.
 @section PVC Operation
 @cindex PVC operation
 
-@c @node Precedence of NPI Primitives
-@c @chapter Precedence of NPI Primitives
+@c @node Precedence of @value{INTERFACE} Primitives
+@c @chapter Precedence of @value{INTERFACE} Primitives
 
-@c @node Guidelines for Protocol Independent NS Users
-@c @appendix Guidelines for Protocol Independent NS Users
+@c @node Guidelines for Protocol Independent @value{INTERFACE} Users
+@c @appendix Guidelines for Protocol Independent @value{INTERFACE} Users
 
-@c @node Required Information for NS Provider-Specific Addenda
-@c @appendix Required Information for NS Provider-Specific Addenda
+@c @node Required Information for @value{INTERFACE} Provider-Specific Addenda
+@c @appendix Required Information for @value{INTERFACE} Provider-Specific Addenda
 
-@node NLI Header Files
-@appendix NLI Header Files
+@node @value{INTERFACE} Header Files
+@appendix @value{INTERFACE} Header Files
 
 @menu
 * x25_proto.h::		X.25 Protocol Primitive Header
 * x25_control.h::	X.25 Input-Output Control Header
 @end menu
 
-Applications using the Network Layer Interface (NLI) need to include several
+Applications using the Network Layer Interface (@value{INTERFACE}) need to include several
 system header files:
 
 @node x25_proto.h
@@ -4915,15 +5030,15 @@ Note that on @cite{Solaris X.25} this file is located in @file{<sys/netx25/x25_c
 @verbatiminclude x25_control.h
 @end smallformat
 
-@node NLI Library
-@appendix NLI Library
+@node @value{INTERFACE} Library
+@appendix @value{INTERFACE} Library
 
-@node NLI Drivers and Modules
-@appendix NLI Drivers and Modules
+@node @value{INTERFACE} Drivers and Modules
+@appendix @value{INTERFACE} Drivers and Modules
 
 @menu
-* NLI Multiplexing Driver::
-* NLI Conversion Module::
+* @value{INTERFACE} Multiplexing Driver::
+* @value{INTERFACE} Conversion Module::
 * NPI Conversion Module::
 * CONS Module::
 * XX25 Module::
@@ -4931,25 +5046,24 @@ Note that on @cite{Solaris X.25} this file is located in @file{<sys/netx25/x25_c
 * IP Multiplexing Driver::
 @end menu
 
-The Network Layer Interface (NLI) is used to provide services to a number of
+The Network Layer Interface (@value{INTERFACE}) is used to provide services to a number of
 @dfn{STREAMS} drivers and modules in addition to user-space applications.
 @cite{@value{PACKAGE_TITLE}} provides a range of @dfn{STREAMS} multiplexing
 drivers, pseudo-device drivers, and pushable modules that complement the X.25
 Packet Layer Protocol driver that provides the Network Layer Interface at it
 upper layer.
 
-@figuresized{nli_figc1,C-1,NLI Drivers and Modules,5.5in}
+@figuresized{nli_figc1,C-1,@value{INTERFACE} Drivers and Modules,5.5in}
 
 @figref{C-1} illustrates the @dfn{STREAMS} multiplexing drivers, pseudo-device
 drivers, and pushable modules, and their organization.
 
-@node NLI Multiplexing Driver
-@section NLI Multiplexing Driver
-@cindex NLI multiplexing driver
+@node @value{INTERFACE} Multiplexing Driver
+@section @value{INTERFACE} Multiplexing Driver
+@cindex @value{INTERFACE} multiplexing driver
 
-The NLI @dfn{STREAMS} multiplexing driver implements the X.25 Packet Layer
-Protocol (PLP)
-and provides the Network Layer Interface (NLI), Version 3, at it
+The @value{INTERFACE} @dfn{STREAMS} multiplexing driver implements the @value{LONG} (@value{SHORT})
+and provides the Network Layer Interface (@value{INTERFACE}), Version 3, at it
 upper multiplex.  Data links are linked beneath the driver at the lower
 multiplex.  Linked Streams under @cite{@value{PACKAGE_TITLE}} conform to the
 Data Link Provider Interface (DLPI),@footnote{``@cite{Open Group CAE
@@ -4961,8 +5075,8 @@ Inc., UNIX International Press}.'' Available from
 implemetnations based on SpiderX.25 might use some other interface at this
 level.@footnote{For compatibility, the issue is moot.}
 
-Each Stream on the upper multiplex of the NLI multiplexing driver represents
-either a VC or a PVC.  Each Stream on the lower multiplex of the NLI
+Each Stream on the upper multiplex of the @value{INTERFACE} multiplexing driver represents
+either a VC or a PVC.  Each Stream on the lower multiplex of the @value{INTERFACE}
 multiplexing driver represents a data link@footnote{``@cite{ISO/IEC 7776:1995,
 Information technology -- Telecommunications information exchange between
 systems -- High-level data link control procedures -- Description of the X.25
@@ -4970,7 +5084,7 @@ LAPB-compatible DTE data link procedures, Second Edition, July 1, 1995,
 International Organization for Standardization.}''
 Available from @uref{http://www.iso.org/,ISO}.}
 or subnetwork@footnote{``@cite{ISO/IEC 8881:1989, Information Processing Systems
--- Data Communications -- User of the X.25 Packet Level Protocol in Local Area
+-- Data Communications -- User of the @value{LONG} in Local Area
 Networks, 1989, ISO/IEC, International Organization for Standardization.}''
 Available from @uref{http://www.iso.org/,ISO}.}
 interface.@footnote{``@cite{ANSI/IEEE Standard 802.2-1998 [ISO/IEC
@@ -4987,9 +5101,9 @@ simply @file{/dev/x25}.  @cite{AIXlink/X.25} calls the driver
 The @dfn{STREAMS} @file{/dev/x25-plp} multiplexing pseudo-device driver is
 illustrated in @figref{C-1}.
 
-@node NLI Conversion Module
-@section NLI Conversion Module
-@cindex NLI conversion module
+@node @value{INTERFACE} Conversion Module
+@section @value{INTERFACE} Conversion Module
+@cindex @value{INTERFACE} conversion module
 
 Many Spider-based implementations of X.25 will call this multiplexing driver
 @file{s_nli3}.
@@ -5038,7 +5152,7 @@ Open Group Publication}.''  Available from
 
 The @dfn{IXE} module provides Internet Protocol over X.25 Encapsulation (IXE) per
 RFC 877 and RFC 1356.  The protocol module provides an @pval{DL_IPX25} MAC
-type DLPI Stream on the upper multiplex and a @dfn{NLI} Stream (or possibly an
+type DLPI Stream on the upper multiplex and a @dfn{@value{INTERFACE}} Stream (or possibly an
 @dfn{NPI} Stream) on the lower multiplex.  Each lower multiplex Stream
 represents an X.25 PVC or VC.  Each upper multiiplex Stream represents a
 @pval{DL_IPX25} connectionless data link Stream.
@@ -5053,10 +5167,10 @@ The @dfn{STREAMS} @file{/dev/ixe} multiplexing driver is illustrated in
 The @dfn{STREAMS} @file{/dev/ip} multiplexing pseudo-device driver is
 illustrated in @figref{C-1}.
 
-@node NLI Utilities
-@appendix NLI Utilities
+@node @value{INTERFACE} Utilities
+@appendix @value{INTERFACE} Utilities
 
-Most implementations of the NLI provides a number of utilities that are aimed
+Most implementations of the @value{INTERFACE} provides a number of utilities that are aimed
 at providing three or four capabilities as follows:
 
 @itemize
@@ -5132,7 +5246,7 @@ nuimap @{-C|--copying@}
 
 @subheading Description
 
-X.25 Packet Layer Protocol drivers supporting the NLI provide a mechanism for
+@value{LONG} drivers supporting the @value{INTERFACE} provide a mechanism for
 mapping Network User Identities to a set of X.25 facilities that are subscribed
 by the Network User Identity.  @command{nuimap} provides a mechanism whereby the
 user can modify these mappings, or system configuration scripts can load or dump
@@ -5371,7 +5485,7 @@ coding standards.
 
 @end itemize
 
-For additional compatibilty considerations, see @ref{NLI Compatibility and
+For additional compatibilty considerations, see @ref{@value{INTERFACE} Compatibility and
 Porting}.
 
 @subheading Conformance
@@ -5425,7 +5539,7 @@ nuimap @{-C|--copying@}
 
 @subheading Description
 
-X.25 Packet Layer Protocol drivers upporting the NLI provide a mechanism for
+@value{LONG} drivers upporting the @value{INTERFACE} provide a mechanism for
 attaching Permanent Virtual Circuits (PVC) for use by upper layer protocols.
 @command{pvcmap} provides a mechanism whereby the administrator can modify the
 local and remote packet and window sizes associated with PVC for each logical
@@ -5667,7 +5781,7 @@ coding standards.
 
 @end itemize
 
-For additional compatibilty considerations, see @ref{NLI Compatibility and
+For additional compatibilty considerations, see @ref{@value{INTERFACE} Compatibility and
 Porting}.
 
 @subheading Conformance
@@ -5956,8 +6070,8 @@ documentation.  @xref{References}.
 @subheading History
 
 
-@node NLI File Formats
-@appendix NLI File Formats
+@node @value{INTERFACE} File Formats
+@appendix @value{INTERFACE} File Formats
 
 @menu
 * LAPB Template File::
@@ -7223,8 +7337,8 @@ The @file{x25template} file format first appeared in @cite{Spider X.25}.
 @subheading History
 
 
-@node NLI Compatibility and Porting
-@appendix NLI Compatibility and Porting
+@node @value{INTERFACE} Compatibility and Porting
+@appendix @value{INTERFACE} Compatibility and Porting
 
 @menu
 * Compatibility with AIXlink/X.25::
@@ -7235,7 +7349,7 @@ The @file{x25template} file format first appeared in @cite{Spider X.25}.
 * Compatibility with Solstice X.25::
 @end menu
 
-It should be noted that the Network Layer Interface (NLI) is not, by any
+It should be noted that the Network Layer Interface (@value{INTERFACE}) is not, by any
 stretch of the imagination, a current application programming interface.  It
 is, however, traditional on many @cite{UNIX} systems.  This inteface is
 provided by @cite{@value{PACKAGE_TITLE}} solely for compatibility with
@@ -7259,7 +7373,7 @@ Local: Wed, Apr 18 2007 1:12 am
 Subject: Sun thumbs its nose at a 30 year-old goal (including its own)
 
 Protocol independence has been the goal of network programming since the
-beginning.  But for X.25, Sun blithely pushes its NLI interface - which is
+beginning.  But for X.25, Sun blithely pushes its @value{INTERFACE} interface - which is
 basically hard-coded X.25.  It shares no abstractions with any other API
 and is not compatible with any of the facilities that support all other
 protocols as a group.  Plus it is complicated to use (desipte that Sun uses
@@ -7280,18 +7394,18 @@ starts off
 for AIX: Guide and Reference, No: SC23-2520-07, Eighth Edition, September 2006,
 (Bolder, CO), International Business Machine Corp., IBM},'' available from
 @uref{http://publibn.bould.ibm.com/,IBM Documentation Library}.} a @dfn{Network
-Layer Interface (NLI)}.  It only documents a @dfn{Network Provider Interface
+Layer Interface (@value{INTERFACE})}.  It only documents a @dfn{Network Provider Interface
 (NPI)} in support of X.25 applications.  It appears that the NPI provided by
 @cite{AIXlink/X.25} is merely an @file{npi} module, similar to the @file{s_npi}
-module, pushed over an NLI Stream opened on an X.25 packet layer protocol
+module, pushed over an @value{INTERFACE} Stream opened on an X.25 packet layer protocol
 driver.  Although it is not documented, it appears that the X.25 packet layer
 protocol driver, @file{/dev/x25pckt}, provided by @cite{AIXlink/X.25} is indeed
-a Spider NLI driver.
+a Spider @value{INTERFACE} driver.
 
-As it is undocumented, this NLI driver's compatibility to that of the
-@cite{@value{PACKAGE_TITLE}} cannot be ascertained.  Nevertheless, any NLI
+As it is undocumented, this @value{INTERFACE} driver's compatibility to that of the
+@cite{@value{PACKAGE_TITLE}} cannot be ascertained.  Nevertheless, any @value{INTERFACE}
 drivers, modules and applications that rely upon the undocumented capabilities
-of the NLI interface will likely be compatible with, and port easily to,
+of the @value{INTERFACE} interface will likely be compatible with, and port easily to,
 @cite{@value{PACKAGE_TITLE}}.
 
 @itemize
@@ -7308,7 +7422,7 @@ See also, @manref{s_npi(4)}.
 
 @item @cite{AIXlink/X.25} does not document support for the @file{s_nli3}
 @dfn{STREAMS} module.  Nevertheless, @cite{@value{PACKAGE_TITLE}} provides
-support for this module.  @xref{NLI Conversion Module}.
+support for this module.  @xref{@value{INTERFACE} Conversion Module}.
 See also, @manref{s_nli3(4)}.
 
 @end itemize
@@ -7318,21 +7432,21 @@ See also, @manref{s_nli3(4)}.
 @cindex Compatibility with HP X.25/9000
 
 @cite{HP X.25/9000} does not document@footnote{``@cite{HP X.25/9000 Programmer's
-Guide}''.} a @dfn{Network Layer Interface (NLI)} even though its architecture
-document indicates that a @dfn{NLI} is being used.  @cite{HP X.25/9000} only
+Guide}''.} a @dfn{Network Layer Interface (@value{INTERFACE})} even though its architecture
+document indicates that a @dfn{@value{INTERFACE}} is being used.  @cite{HP X.25/9000} only
 documents a BSD IPC interface supported by a library of functions.
 
-As the @dfn{NLI} interface is undocumented, this NLI driver's compatibility to
+As the @dfn{@value{INTERFACE}} interface is undocumented, this @value{INTERFACE} driver's compatibility to
 that of the @cite{@value{PACKAGE_TITLE}} cannot be ascertained.  Nevertheless,
-any NLI drivers, modules and applications that rely upon the
-undocumented capabilities of the NLI interface will likely be compatible with,
+any @value{INTERFACE} drivers, modules and applications that rely upon the
+undocumented capabilities of the @value{INTERFACE} interface will likely be compatible with,
 and port easily to, @cite{@value{PACKAGE_TITLE}}.
 
 @itemize
 
 @item @cite{HP-UX} does not document any @dfn{STREAMS} modules or drivers.
-Nevertheless, @cite{@value{PACKAGE_TITLE}} provides support for NLI modules and
-drivers.  @xref{NLI Drivers and Modules}.
+Nevertheless, @cite{@value{PACKAGE_TITLE}} provides support for @value{INTERFACE} modules and
+drivers.  @xref{@value{INTERFACE} Drivers and Modules}.
 
 @end itemize
 
@@ -7341,7 +7455,7 @@ drivers.  @xref{NLI Drivers and Modules}.
 @cindex Compatibility with IRIS SX.25
 
 The @cite{SGI IRIX} X.25 driver, @cite{IRIS SX.25}, is documented by
-@cite{SGI}.@footnote{``@cite{IRIS SX.25 NLI Programmer's Guide, 1995,
+@cite{SGI}.@footnote{``@cite{IRIS SX.25 @value{INTERFACE} Programmer's Guide, 1995,
 (Mountainview, CA), Silicon Graphics, Inc., SGI Technical Publications. [No:
 007-2268-002]}.''  Available from @uref{http://techpubs.sgi.com/,SGI Technical
 Publications}.}
@@ -7371,7 +7485,7 @@ The @cite{PT NexusWare} X.25 driver, @cite{PT X.25}, is documented by
 support for this module.  @xref{NPI Conversion Module}.
 See also, @manref{s_npi(4)}.
 
-@item @cite{PT X.25} does not document support for the @file{s_nli3} @xref{NLI
+@item @cite{PT X.25} does not document support for the @file{s_nli3} @xref{@value{INTERFACE}
 Conversion Module}.  @dfn{STREAMS} module.  Nevertheless,
 @cite{@value{PACKAGE_TITLE}} provides support for this module. 
 See also, @manref{s_nli3(4)}.
@@ -7407,7 +7521,7 @@ support for this module.  @xref{NPI Conversion Module}.
 See also, @manref{s_npi(4)}.
 
 @item @cite{Solstice X.25} does not document support for the @file{s_nli3}
-@dfn{STREAMS} module.  @xref{NLI Conversion Module}.  Nevertheless,
+@dfn{STREAMS} module.  @xref{@value{INTERFACE} Conversion Module}.  Nevertheless,
 @cite{@value{PACKAGE_TITLE}} provides support for this module. 
 See also, @manref{s_nli3(4)}.
 
@@ -7432,8 +7546,8 @@ X.25}.  @xref{Listen Request/Response}.
 
 @end itemize
 
-@node Glossary of NLI Terms and Acronyms
-@appendix Glossary of NLI Terms and Acronyms
+@node Glossary of @value{INTERFACE} Terms and Acronyms
+@appendix Glossary of @value{INTERFACE} Terms and Acronyms
 
 @multitable @columnfractions 0.15 0.85
 @item @dfn{ANSI} @tab American National Standards Institute
@@ -7452,7 +7566,11 @@ X.25}.  @xref{Listen Request/Response}.
 @item @dfn{HDLC} @tab High-Level Data Link Control
 @item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
 @item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISDNI} @tab ISDN Interface
+@item @dfn{ISDN} @tab Integrated Services Digital Network
 @item @dfn{ISO} @tab International Organization for Standardization
+@item @dfn{ISUPI} @tab ISUP Interface
+@item @dfn{ISUP} @tab ISDN User Part
 @item @dfn{ITU} @tab International Telecommunications Union
 @item @dfn{ITU-T} @tab ITU Telecom Sector
 @item @dfn{LAN} @tab Local Area Network
@@ -7468,6 +7586,8 @@ X.25}.  @xref{Listen Request/Response}.
 @item @dfn{LLI} @tab Logical Link Inteface
 @item @dfn{LSAP} @tab Link Service Access Point
 @item @dfn{MAC} @tab Media Access Control
+@item @dfn{MTPI} @tab Message Transfer Part Interface
+@item @dfn{MTP} @tab Message Transfer Part 
 @item @dfn{NLI} @tab Network Layer Interface
 @item @dfn{NPDU} @tab Network Protocol Data Unit
 @item @dfn{NPI} @tab Network Provider Interface
@@ -7489,15 +7609,28 @@ X.25}.  @xref{Listen Request/Response}.
 @item @dfn{QOS} @tab Quality of Service
 @item @dfn{RPOA} @tab Recognized Private Operating Agency
 @item @dfn{SAP} @tab Service Access Point
+@item @dfn{SCCPI} @tab Signalling Connection Control Part Interface
+@item @dfn{SCCP} @tab Signalling Connection Control Part
+@item @dfn{SDLI} @tab Signalling Data Link Interface
+@item @dfn{SDL} @tab Signalling Data Link
+@item @dfn{SDTI} @tab Signalling Data Terminal Interface
+@item @dfn{SDT} @tab Signalling Data Terminal
 @item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLI} @tab Signalling Link Interface
 @item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SL} @tab Signalling Link
 @item @dfn{SNPA} @tab Subnetwork Point of Attachment
 @item @dfn{SSAP} @tab Source Service Access Point
 @item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TCAP} @tab Transaction Capabilities Application Part
+@item @dfn{TCI} @tab Transaction Component Interface
+@item @dfn{TC} @tab Component Handling Sub-Layer
 @item @dfn{TLI} @tab Transport Layer Interface
 @item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
 @item @dfn{TOA} @tab Type of Address
 @item @dfn{TPI} @tab Transport Provider Interface
+@item @dfn{TRI} @tab Transaction Interface
+@item @dfn{TR} @tab Transaction Handling Sub-Layer
 @item @dfn{VC} @tab Virtual Circuit
 @item @dfn{WAN} @tab Wide Area Network
 @item @dfn{X.121} @tab ITU-T Recommendation X.121
@@ -7646,7 +7779,7 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 @c * Primitive Structure and Type Index::
 @c * Primitive Structure Field Index::
 @c * Primitive Values Index::
-@c @c * Primitive Error Values Index::
+@c * Primitive Error Values Index::
 @c * Input-Output Control Index::
 @c * MIB Object Index::
 @c * Manual Page Index::
@@ -7681,10 +7814,10 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 @c @section Primitive Values Index
 @c @printindex pv
 @c 
-@c @c @page
-@c @c @node Primitive Error Values Index
-@c @c @section Primitive Error Values Index
-@c @c @printindex pe
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
 @c 
 @c @page
 @c @node Input-Output Control Index

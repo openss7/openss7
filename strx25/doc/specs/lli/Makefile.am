@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-08-31 06:57:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-11-26 12:01:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 06:57:20 $ by $Author: brian $
+# Last Modified $Date: 2008-11-26 12:01:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,6 +61,7 @@ info_TEXINFOS		+= lli.texi
 lli_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/fdl13.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
 
 if MAINTAINER_MODE
@@ -94,6 +95,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2008-11-26 12:01:49  brian
+# - updated to FDL 1.3
+#
 # Revision 0.9.2.2  2008-08-31 06:57:20  brian
 # - do not customize docs unless maintainer modes and dependency tracking
 #

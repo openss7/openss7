@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi_tcap.texi,v 0.9.2.17 2008-09-20 11:04:45 brian Exp $
+% @(#) $Id: tpi_tcap.texi,v 0.9.2.20 2008-11-26 12:01:51 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 %
 % All Rights Reserved.
 %
@@ -17,7 +17,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-09-20 11:04:45 $ by $Author: brian $
+% Last Modified $Date: 2008-11-26 12:01:51 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -78,7 +78,7 @@
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
-This file documents the TCAP Corrigendum to the Transaction Provider Interface.
+This file documents the TCAP Corrigendum to the Transport Provider Interface.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
 @value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
@@ -91,38 +91,39 @@ Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidu
 
 All Rights Reserved.
 
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission is granted to make and distribute verbatim copies of this manual provided the copyright
+notice and this permission notice are preserved on all copies.
 
 @ignore
-Permission is granted to process this file through Tex and print the results,
-provided the printed document carries copying permission notice identical to
-this one except for the removal of this paragraph (this paragraph not being
-relevant to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-Permission to use, copy, modify, and distribute this documentation for any
-purpose and without fee is hereby granted, provided that the above copyright
-notice appears in all copies and that both that copyright notice and this
-permission notice appear in supporting documentation, and that the name UNIX
-International not be used in advertising or publicity pertaining to distribution
-of the software without specific, written prior permission. UNIX International
-makes no representations about the suitability of this documentation for any
-purpose. It is provided ``as is'' without express or implied warranty.
+Permission to use, copy, modify, and distribute this documentation for any purpose and without fee
+is hereby granted, provided that the above copyright notice appears in all copies and that both that
+copyright notice and this permission notice appear in supporting documentation, and that the name
+UNIX International not be used in advertising or publicity pertaining to distribution of the
+software without specific, written prior permission. UNIX International makes no representations
+about the suitability of this documentation for any purpose. It is provided ``as is'' without
+express or implied warranty.
 
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided the entire resulting derived
-work is distributed under the terms of a permission notice identical to this
-one.
+Permission is granted to copy and distribute modified versions of this manual under the conditions
+for verbatim copying, provided the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
 
-Permission is granted to copy and distribute translations of this manual into
-another language, under the above conditions for modified versions.
+Permission is granted to copy and distribute translations of this manual into another language,
+under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
 @set MANUAL_TYPE Corrigendum for TCAP Conformance
+
+@set PART Transaction Capabilities Application
+@set LONG Transaction Capabilities Application Part
+@set SHORT TCAP
+@set INTERFACE TPI-TCAP
 
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
@@ -133,12 +134,34 @@ another language, under the above conditions for modified versions.
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subsubheading Abstract
+This document specifies an (unofficial) corrigendum to the Transport Provider Interface (TPI)
+Specification (@pxref{TPI,,TPI}) for SS7 Transaction Capabilities Application Part (TCAP)
+(@pxref{Q.771,,Q.771}) conformance in support of the TCAP to TCAP User primitive interface
+(@pxref{Q.771,,Q.771}).  it supports the user-level XTI/TLI abstraction (@pxref{XTI,,XTI}) of the
+Transaction Handling Interface (TRI) as well as providing a basis for TCAP User protocols using the
+services of the SS7 Transaction Capablities Application Part.
+@end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
 @subsubheading Published by:
 @noindent
 @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
@@ -146,39 +169,58 @@ another language, under the above conditions for modified versions.
 Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
-@noindent
-Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+@sp 1
 
+@ignore
+@noindent
+This software and related documentation is protected by copyright and distributed under licenses
+restricting its use, copying, distribution and decompilation.  No part of this software or related
+documentation may be reproduced in any form by any means without the prior written authorization of
+the copyright holder, and licensors, if any.
 
 @noindent
-All Rights Reserved.
+The recipient of this document, by its retention and use, warrants that the recipient will protect
+this information and keep it confidential, and will not disclose the information contained in this
+document without the written permission of its owner.
+
+@noindent
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
+listed herein.
+@end ignore
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 
 @sp 1
 
 @noindent
-Permission to use, copy and distribute this documentation without modification,
-for any purpose and without fee or royalty is hereby granted, provided that both
-the above copyright notice and this permission notice appears in all copies and
-that the name of OpenSS7 Corporation not be used in advertising or publicity
-pertaining to distribution of this documentation or its contents without
-specific, written prior permission.  OpenSS7 Corporation makes no representation
-about the suitability of this documentation for any purpose.  It is provided
-``as is'' without express or implied warranty.
-
-@sp 1
-
-@noindent
-@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation
-including all implied warranties of merchantability, fitness for a particular
-purpose, non-infringement, or title; that the contents of the document are
-suitable for any purpose, or that the implementation of such contents will not
-infringe on any third party patents, copyrights, trademarks or other rights..
-In no event shall OpenSS7 Corporation be liable for any direct, indirect,
-special or consequential damages or any damages whatsoever resulting from loss
-of use, data or profits, whether in an action of contract, negligence or other
-tortious action, arising out of or in connection with any use of this document
-or the performance or implementation of the contents thereof.}
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
@@ -205,6 +247,8 @@ or the performance or implementation of the contents thereof.}
 @defcodeindex ct
 @c Define an index of manual pages.
 @defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
 
 @c frags out automake
 @c @ifnottex
@@ -217,6 +261,7 @@ or the performance or implementation of the contents thereof.}
 @syncodeindex tp cp
 @syncodeindex vr cp
 @syncodeindex ct cp
+@syncodeindex mo cp
 @c @end ifnottex
 
 @include texi/macros.texi
@@ -224,28 +269,32 @@ or the performance or implementation of the contents thereof.}
 
 @iftex
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}@prindex \name\
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}@pvindex \name\
 @end macro
 
-@macro perr {name}
-@code{\name\}@peindex \name\
+@macro perr{name}
+@code{[\name\]}@peindex \name\
 @end macro
 
-@macro psta {name}
+@macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
-@macro parm {name}
-@code{\name\}@vrindex \name\
+@macro parm{name}
+@var{\name\}@vrindex \name\
 @end macro
 
-@macro pioc {name}
+@macro pioc{name}
 @code{\name\}@ctindex \name\
+@end macro
+
+@macro mobj{name}
+@code{\name\}@moindex \name\
 @end macro
 
 @end iftex
@@ -263,7 +312,7 @@ or the performance or implementation of the contents thereof.}
 @end macro
 
 @macro perr{name}
-@code{\name\}
+@var{[\name\]}
 @end macro
 
 @macro psta{name}
@@ -271,10 +320,14 @@ or the performance or implementation of the contents thereof.}
 @end macro
 
 @macro parm{name}
-@code{\name\}
+@var{\name\}
 @end macro
 
 @macro pioc{name}
+@code{\name\}
+@end macro
+
+@macro mobj{name}
 @code{\name\}
 @end macro
 
@@ -282,19 +335,37 @@ or the performance or implementation of the contents thereof.}
 
 @ifnottex
 @node Top
-@top Transaction Provider Interface---Corrigendum for TCAP Conformance
+@top Transport Provider Interface---Corrigendum for @value{SHORT} Conformance
 @end ifnottex
 
 @menu
 * Preface::
 * Introduction::
-* TPI-TCAP::
-* TPI-TCAP Header File Listing::
+* @value{INTERFACE}::
+@c * Addendum for @value{SHORT} Conformance::
+* Mapping @value{INTERFACE} Primitives::
+@c * State/Event Tables::
+@c * Precedence Tables::
+@c * Allowable Sequence of @value{INTERFACE} Primitives::
+@c * Precedence of @value{INTERFACE} Primitives::
+@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
+@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
+* @value{INTERFACE} Header Files::
+* @value{INTERFACE} Library::
+* @value{INTERFACE} Drivers and Modules::
+* @value{INTERFACE} Utilities::
+@c * @value{INTERFACE} File Formats::
+@c * @value{INTERFACE} Compatibility and Porting::
 * License::
 * Glossary::
 * Acronyms::
 * References::
+@c @iftex
+@c * Indices::
+@c @end iftex
+@c @ifnottex
 * Index::
+@c @end ifnottex
 @end menu
 
 @iftex
@@ -310,32 +381,71 @@ or the performance or implementation of the contents thereof.}
 @node Preface
 @unnumbered Preface
 
+@section Security Warning
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used
+in advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the document are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action of contract, negligence or other tortious action, arising out
+of or in connection with any use of this document or the performance or implementation of the
+contents thereof.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a
+reference point for the industry.  While @cite{OpenSS7 Corporation} believes that these interfaces
+are well defined in this release of the document, minor changes may be made prior to products
+conforming to the interfaces being made available.
+
 @section Abstract
 
-This document is a Corrigendum for TCAP Conformance to the Transport Provider Interface containing
-technical details concerning the implementation of the Transaction Capabilities Application Part
-(TCAP) using the X/Open Transaction Provider Interface (TPI).  It contains recommendations on
-software architecture as well as platform and system applicability of TPI-TCAP.
+This document is a Corrigendum for @value{SHORT} Conformance to the Transport Provider Interface
+containing technical details concerning the implementation of the @value{LONG} (@value{SHORT}) using
+the X/Open Transport Provider Interface (TPI).  It contains recommendations on software architecture
+as well as platform and system applicability of @value{INTERFACE}.
+
+@ignore
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
+(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
+components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+@end ignore
 
 @section Purpose
 
-The purpose of this document is to provide technical documentation of the TCAP Transport Provider
-Interface (TPI-TCAP).  This document is intended to be included with the OpenSS7 STREAMS software
-package released by @uref{http://www.openss7.com/,OpenSS7 Corporation}.  It is intended to assist
-software developers, maintainers and users of the TPI-TCAP with understanding the software
-architecture and technical interfaces which are made available in the software package.
+The purpose of this document is to provide technical documentation of the @value{SHORT} Transport
+Provider Interface (@value{INTERFACE}).  This document is intended to be included with the OpenSS7
+@cite{STREAMS} software package released by @cite{OpenSS7 Corporation}.  It is intended to assist
+software developers, maintainers and users of the @value{INTERFACE} with understanding the software
+architecture and technical interfaces that are made available in the software package.
 
 @section Intent
 
 It is the intent of this document that it act as the primary source of information concerning the
-TPI-TCAP.
+@value{INTERFACE}.  This document is intended to provide information for writers of OpenSS7
+@value{INTERFACE} applications as well as writers of OpenSS7 @value{INTERFACE} Users.
 
 @section Audience
 
 The audience for this document is software developers, maintainers and users and integrators of the
-TPI-TCAP.
+@value{INTERFACE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
 
 @section Revision History
+
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
 
 Take care that you are working with a current version of this documentation: you will not be
 notified of updates.  To ensure that you are working with a current version, check the
@@ -343,6 +453,18 @@ notified of updates.  To ensure that you are working with a current version, che
 @sp 1
 Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document
 is an @strong{UNCONTROLLED VERSION}.
+
+@smallexample
+@verbatim
+$Log: tpi_tcap.texi,v $
+Revision 0.9.2.20  2008-11-26 12:01:51  brian
+- updated to FDL 1.3
+
+Revision 0.9.2.18  2008-11-17 14:13:05  brian
+- documentation additions
+
+@end verbatim
+@end smallexample
 
 @node Introduction
 @chapter Introduction
@@ -353,8 +475,8 @@ is an @strong{UNCONTROLLED VERSION}.
 
 @section Definitions, Acronyms, and Abbreviations
 
-@node TPI-TCAP
-@chapter TPI-TCAP
+@node @value{INTERFACE}
+@chapter @value{INTERFACE}
 
 A document describing using XTI and mOSI for TCAP has been generated to support the use of the
 OpenSS7 TCAP TRI (Transaction Interface) using the methods of the X/Open minmal OSI interface
@@ -369,7 +491,7 @@ options.  Aside from that, TCAP Transport resembles X.217 (ACSE) ISO/OSI Present
 
 @section Addressing
 
-TPI-TCAP uses SCCP formatted addresses instead of ISO Presentation Layer addresses.
+@value{INTERFACE} uses SCCP formatted addresses instead of ISO Presentation Layer addresses.
 
 @subsection Address Format
 
@@ -389,7 +511,7 @@ The address format for a TCAP address is as follows:
 
 The TCAP interface uses protocol level T_SS7_SCCP for options at the SCCP level.  SCCP QOS
 parameters are communicated to the underlying transport using the option name T_SCCP_QOS.  There are
-three QOS structures which can be used in this fashion are listed in @emph{Table 7} as follows:
+three QOS structures that can be used in this fashion are listed in @emph{Table 7} as follows:
 
 @center @image{tpi_tabx}
 @center Table 7@strong{@emph{.  SCCP QOS Option Values}}
@@ -427,12 +549,12 @@ value @code{QOS_UNKNOWN}.
 
 @section T_INFO_ACK Values
 
-The following discusses the values which may be returned in the T_INFO_ACK
+The following discusses the values that may be returned in the T_INFO_ACK
 primitive in response to a T_INFO_REQ primitive.
 
 @table @emph
 @item TSDU_size
-TCAP has effectively no limit to the amount of data which can be sent in a particular invoke or
+TCAP has effectively no limit to the amount of data that can be sent in a particular invoke or
 result user data.  TCAP includes a ``more'' bit concept in that an Invoke Not Last and Return Result
 Not Last can be used to indicated that the next Invoke or Return Result are part of the same user
 data sequence.  ITU-T does not include the Not Last concept for Invokes.  As a result, for ANSI and
@@ -447,44 +569,43 @@ TCAP has no expedited data service and the value of ETSDU_size is set to T_UNKNO
 TCAP can send connection data (user data) with the initial Begin (Query) or first Continue
 (Conversation) package and can also send Application Context and User Information in either package.
 These messages correspond to TR-BEGIN and the first TR-CONTINUE after receiving a TR-BEGIN and these
-correspond to T_CONN_REQ and T_CONN_RES.  Because the underlying SCCP connectionless network may
-support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be set to the maximum
-amount of connection data (including Application Context, User Information and user data) which can
-be sent or received in either package.  This informs the user as to wht size to make data buffers
-associated with connection indications and confirmations (T_CONN_IND, T_CONN_CON) and how much data
-can be sent with connection requests and responses (T_CONN_REQ, T_CONN_RES).
+correspond to @prim{T_CONN_REQ} and @prim{T_CONN_RES}.  Because the underlying SCCP connectionless
+network may support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be set to
+the maximum amount of connection data (including Application Context, User Information and user
+data) that can be sent or received in either package.  This informs the user as to what size to make
+data buffers associated with connection indications and confirmations (@prim{T_CONN_IND},
+@prim{T_CONN_CON}) and how much data can be sent with connection requests and responses
+(@prim{T_CONN_REQ}, @prim{T_CONN_RES}).
 @item DDATA_size
 TCAP can send disconnect data (user data) with the final End (Response) package.  These messages
-correspond to the TR-END primitive and the T_DISCON_REQ or T_DISCON_IND.  Again, because the
-underlying SCCP connectionless network may support unlimited size NSDUs, this value may be set to
-T_INFINITE (-1) or may be set to the maximum amount of disconnection data which can be sent or
-received in the End (Response) package.  This informs the user as to what size to make data buffers
-associated with disconnection indications (T_DISCON_IND) and how much data can be sent with
-disconnection requests (T_DISCON_REQ).
+correspond to the TR-END primitive and the @prim{T_DISCON_REQ} or @prim{T_DISCON_IND}.  Again,
+because the underlying SCCP connectionless network may support unlimited size NSDUs, this value may
+be set to T_INFINITE (-1) or may be set to the maximum amount of disconnection data that can be sent
+or received in the End (Response) package.  This informs the user as to what size to make data
+buffers associated with disconnection indications (@prim{T_DISCON_IND}) and how much data can be
+sent with disconnection requests (@prim{T_DISCON_REQ}).
 @item ADDR_size
-This is the maximum TCAP address size which can be communicated across the interface.  This address
-size is the maximum size of the defined SCCP address structure (@code{sizeof sccp_addr_t}) which
-also will include address digits up to a maximum of @code{SCCP_MAX_ADDR_LENGTH} octets of digits.
-This informs the user as to what size it should reserve for control buffers so as to receive control
+This is the maximum TCAP address size that can be communicated across the interface.  This address
+size is the maximum size of the defined SCCP address structure (@code{sizeof sccp_addr_t}) that also
+will include address digits up to a maximum of @code{SCCP_MAX_ADDR_LENGTH} octets of digits.  This
+informs the user as to what size it should reserve for control buffers so as to receive control
 information without buffer truncation.
 @item OPT_size
 This is the maximum size of the options field used in any TPI message and is the sum of the maximum
 option sizes of one of each of the options that can occur together.  This informs the user as to
-what size is should reserve for control buffers to ensure that received control messages which
+what size the user should reserve for control buffers to ensure that received control messages that
 include options can be contained within the buffer without truncation.
 @item TIDU_size
 Even though a TCAP provider can support unlimited TSDU size, it cannot normally support unlimited
 TIDU size.  This is because the underlying SCCP NSDU may be limited in size.  The TCAP provider is
 not responsible for segmenting user data sequences offered to the provider from the user in as
-M_DATA.
-@prindex M_DATA
-This is the maximum size of the TIDU which corresponds to the maximum size of the underlying NSDU.
-Because the underlying SCCP provider may have no limit on the NSDU size (i.e., it supports
-segmentation of connectionless NSDUs) this may be more in the manner of a optimal recommendation to
-the user rather than an absolute maximum.  Because of this, a given TCAP provider might not reject
-TIDUs which are larger than this value.
+@msg{M_DATA}.  This is the maximum size of the TIDU that corresponds to the maximum size of the
+underlying NSDU.  Because the underlying SCCP provider may have no limit on the NSDU size (i.e., it
+supports segmentation of connectionless NSDUs) this may be more in the manner of an optimal
+recommendation to the user rather than an absolute maximum.  Because of this, a given TCAP provider
+might not reject TIDUs that are larger than this value.
 @item SERV_type
-There are two service type supported by an ACSE provider: T_COTS and T_CLTS.  T_CLTS (ACSE
+There are two service types supported by an ACSE provider: T_COTS and T_CLTS.  T_CLTS (ACSE
 Connectionless Class) is a connectionless transaction service with no error notification.  T_COTS
 (ACSE Connection-Oriented Class) is a connection-oriented transaction services with or without error
 notification.  The value reflected here is dependent on the setting of option T_ACSE_PCLASS or
@@ -493,7 +614,7 @@ T_TCAP_PCLASS.
 Provides the current state of the Transport Provider.  TCAP providers use the same states as other
 TPI providers.
 @item PROVIDER_flag
-TPI provider flags which are set are SENDZERO (because TCAP supports the sending of packages without
+TPI provider flags that are set are SENDZERO (because TCAP supports the sending of packages without
 user data) and XPG4_1 (to indicate that the transport provider supports the latest TPI semantics).
 @end table
 
@@ -627,23 +748,18 @@ Connection rejected, no common version.
 
 @subsubheading T_REJECT_IND
 
-@node Mapping TPI-TCAP Primitives
-@appendix Mapping TPI-TCAP Primitives
+@node Mapping @value{INTERFACE} Primitives
+@appendix Mapping @value{INTERFACE} Primitives
 
 @menu
-* Mapping TPI-TCAP Pirmitives to TRI::
-* Mapping TPI-TCAP Primitives to ITU-T Q.771::
-* Mapping TPI-TCAP Primitives to ANSI T1.114::
-* Mapping TPI-TCAP Primitives to ETSI ETS 300 287::
-* Mapping TPI-TCAP Primitives to ITU-T X.219::
+* Mapping TPI Primitives to ITU-T Q.771::
+* Mapping TPI Primitives to ANSI T1.114::
+* Mapping TPI Primitives to ETSI ETS 300 287::
+* Mapping TPI Primitives to ITU-T X.219::
 @end menu
 
-@node Mapping TPI-TCAP Pirmitives to TRI
-@section Mapping TPI-TCAP Pirmitives to TRI
-
-@page
-@node Mapping TPI-TCAP Primitives to ITU-T Q.771
-@section Mapping TPI-TCAP Primitives to ITU-T Q.771
+@node Mapping TPI Primitives to ITU-T Q.771
+@section Mapping TPI Primitives to ITU-T Q.771
 
 @subsection State Mapping
 
@@ -694,8 +810,8 @@ as shown in Table 9.
 Notes:
 @enumerate 
 @item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address which is bound to the stream in a previous T_BIND_REQ
-operation and which is returned as the LOCADDR in a T_ADDR_ACK.
+taken from the address that is bound to the stream in a previous T_BIND_REQ
+operation and that is returned as the LOCADDR in a T_ADDR_ACK.
 @item The @emph{Dialogue ID} is implicit to the stream.  Each stream supports
 only one dialogue at a time.
 @end enumerate 
@@ -728,7 +844,7 @@ Table 10@strong{@emph{.  TR-UNI Indication Mapping}}
 Notes:
 @enumerate 
 @item The @emph{Destination Address} parameter is implicit to the stream and is
-taken to be the address which is bound to the stream.
+taken to be the address that is bound to the stream.
 @end enumerate 
 
 @subsubsection TR-BEGIN
@@ -763,8 +879,8 @@ shown in Table 11.
 Notes:
 @enumerate 
 @item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address which is bound to the stream in a previous T_BIND_REQ
-operation and which is returned as the LOCADDR in a T_ADDR_ACK.
+taken from the address that is bound to the stream in a previous T_BIND_REQ
+operation and that is returned as the LOCADDR in a T_ADDR_ACK.
 @item The @emph{Transaction ID} and @emph{Dialogue ID} are implicit to the
 stream.  Each stream only supports one dialogue at a time.
 @end enumerate 
@@ -799,7 +915,7 @@ Notes:
 @enumerate 
 @item The @emph{Destination Address} parameter is implicit to the stream and is
 the address to which the stream was bound with the previous T_BIND_REQ operation
-and which is returned as as the LOCADDR in a T_ADDR_ACK.
+and that is returned as as the LOCADDR in a T_ADDR_ACK.
 @end enumerate 
 
 @subsubsection TR-CONTINUE
@@ -832,8 +948,8 @@ Table 13@strong{@emph{.  T-Continue Request Mapping}}
 Notes:
 @enumerate 
 @item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address which is bound to the stream in a previous T_BIND_REQ
-operation and which is returned as the LOCADDR in a T_ADDR_ACK.
+taken from the address that is bound to the stream in a previous T_BIND_REQ
+operation and that is returned as the LOCADDR in a T_ADDR_ACK.
 @end enumerate 
 
 @subsubheading Confirming Indication
@@ -1157,29 +1273,109 @@ stream.
 
 
 @page
-@node Mapping TPI-TCAP Primitives to ANSI T1.114
-@section Mapping TPI-TCAP Primitives to ANSI T1.114
+@node Mapping TPI Primitives to ANSI T1.114
+@section Mapping TPI Primitives to ANSI T1.114
 
 @page
-@node Mapping TPI-TCAP Primitives to ETSI ETS 300 287
-@section Mapping TPI-TCAP Primitives to ETSI ETS 300 287
+@node Mapping TPI Primitives to ETSI ETS 300 287
+@section Mapping TPI Primitives to ETSI ETS 300 287
 
 @page
-@node Mapping TPI-TCAP Primitives to ITU-T X.219
-@section Mapping TPI-TCAP Primitives to ITU-T X.219
+@node Mapping TPI Primitives to ITU-T X.219
+@section Mapping TPI Primitives to ITU-T X.219
 
 
-@node TPI-TCAP Header File Listing
-@appendix TPI-TCAP Header File Listing
+@node @value{INTERFACE} Header Files
+@appendix @value{INTERFACE} Header Files
 
+@node @value{INTERFACE} Library
+@appendix @value{INTERFACE} Library
+
+Because this Corrigendum provides a TCAP interface that conforms to the Transport Provider Interface
+(TPI) Revision 2.0.0, it can use the libraries provided for use by the TPI.  In particular, the
+@manref{libxti(3)} library can be used.
+
+@node @value{INTERFACE} Drivers and Modules
+@appendix @value{INTERFACE} Drivers and Modules
+
+@menu
+* TCI Module::
+* TRI Driver and Module::
+* TPI Conversion Module::
+@end menu
+
+The Transaction Component Interface (TCI/TRI) is used to provide services to a number of
+@cite{STREAMS} drivers and modules in addition to user-space applications.
+@cite{@value{PACKAGE_TITLE}} provides a range of @cite{STREAMS} multiplexing drivers, pseudo-device
+drivers, and pushable modules that complement the SS7 Transaction Capabilities Application Part
+driver that provides the Transaction Component Interface (TCI/TRI) at its upper layer.
+
+@node TCI Module
+@section TCI Module
+
+The @dfn{TCI Module} is a pushable @dfn{STREAMS} module that provide the Component Handling sublayer
+of the Transaction Capabilities Application Part (TCAP).  It implements the Transaction Component
+Interface (TCI) at its upper boundary and utilized the Transaction Interface (TRI) at its lower
+boundary.
+
+@node TRI Driver and Module
+@section TRI Driver and Module
+
+The @dfn{TRI Driver and Mdoule} is a @dfn{STREAMS} multiplexing driver or pushable module that links
+or pushes Streams conforming to the Signalling Connection Control Part Interface (SCCPI) and provide
+an upper boundary that conforms to the Transaction Interace (TRI).  It implements the Transaction
+Handling sublayer of the Transaction Capabilities Application Part (TCAP) protocol.  The module is
+more appropriate for Streams that service an entire SCCP subsystem, whereas the multiplexing driver
+is appropriate for Streams that handle only a subset of the Application Contexts available for a
+given SCCP subsystem.
+
+@node TPI Conversion Module
+@section TPI Conversion Module
+
+The @dfn{TPI Conversion Module} is a general-purpose pushable @dfn{STREAMS} module that can be
+pushed over any Stream conforming to the Transaction Component Interface (TCI/TRI) and coverts that
+Stream to an XTI-TCAP service interface conforming to the XTI-TCAP specification.  This permits the
+TCAP Stream to be used by external applications using the XTI/TLI Library (@manref{libxnet(3)}).
+
+A minor device number on the TR driver is defined that will @manref{autopush(8)} the @dfn{TC Module}
+and then push the special-purpose @dfn{TPI Conversion Module} that is part of this package.  The
+@dfn{TPI Conversion Module} provides option conversion assistance to this module.
+
+Similarly, a minor device number on the TUA driver is so defined.
+
+@node @value{INTERFACE} Utilities
+@appendix @value{INTERFACE} Utilities
+
+In general, any of the utilities provided by the underlying TCAP or TUA provider that support
+input-output controls defined in the TRI/TCI specification can be used on TCAP or TUA Streams upon
+which the @dfn{TPI Conversion Module} has been pushed to conform to this Addendum.  The @dfn{TPI
+Conversion Module} passes input-output controls transparently to the underlying TCAP module.
+
+Therefore, this specification does not define any utilities of its own.
+
+@c @node @value{INTERFACE} File Formats
+@c @appendix @value{INTERFACE} File Formats
+@c 
+@c @node @value{INTERFACE} Compatibility and Porting
+@c @appendix @value{INTERFACE} Compatibility and Porting
+@c 
 @node License
 @unnumbered License
 
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+
+The text of the manual are licensed under the @ref{GNU Free Documentation License}, with no
+invariant sections, no front-cover texts and no back-cover texts.  Please note, however, that it is
+just plain wrong to modify statements of, or attribute statements to, the author or @cite{OpenSS7
+Corporation}.
+
 @menu
+* GNU Affero General Public License::
 * GNU Free Documentation License::
 @end menu
 
-@include texi/fdl.texi
+@include texi/agpl3.texi
+@include texi/fdl13.texi
 
 @node Glossary
 @unnumbered Glossary
@@ -1209,12 +1405,97 @@ An identifier of a particular physical medium over which communication transpire
 @node Acronyms
 @unnumbered Acronyms
 
-@multitable {SDL SDU}{International Telecommunications Union}
-@item SDLI @tab Signalling Data Link Interface
-@item SDL @tab Signalling Data Link
-@item SDL SDU @tab Signalling Data Link Service Data Unit
-@item ITU-T @tab International Telecommunications Union - Telecom Sector
-@item PPA @tab Physical Point of Attachment
+@multitable @columnfractions 0.15 0.85
+@item @dfn{ANSI} @tab American National Standards Institute
+@item @dfn{CCITT} @tab The International Telegraph and Telephone Consutative Committee, old name for ITU-T
+@item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{CUD} @tab Call User Data
+@item @dfn{DCE} @tab Data Circuit-terminating Equipment
+@item @dfn{DDN} @tab Defence Data Network
+@item @dfn{DLPI} @tab Data Link Provider Interface
+@item @dfn{DLSAP} @tab Destination Link Service Access Point
+@item @dfn{DNIC} @tab Data Network Identification Code
+@item @dfn{DSAP} @tab Destination Service Access Point
+@item @dfn{DTE} @tab Data Terminal Equipment 
+@item @dfn{ENSDU} @tab Expedited Network Service Data Unit
+@item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{HDLC} @tab High-Level Data Link Control
+@item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISDNI} @tab ISDN Interface
+@item @dfn{ISDN} @tab Integrated Services Digital Network
+@item @dfn{ISO} @tab International Organization for Standardization
+@item @dfn{ISUPI} @tab ISUP Interface
+@item @dfn{ISUP} @tab ISDN User Part
+@item @dfn{ITU} @tab International Telecommunications Union
+@item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LAN} @tab Local Area Network
+@item @dfn{LAPB} @tab Link Access Procedure (Balanced), ISO/IEC 7776
+@item @dfn{LAPD} @tab Link Access Procedure D-Channel, Q.921
+@item @dfn{LAPF} @tab Link Access Procedure Frame Mode, Q.922
+@item @dfn{LAP} @tab Link Access Procedure
+@item @dfn{LCI} @tab Logical Channel Identifier
+@item @dfn{LLC1} @tab Logical Link Control Type 1
+@item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC3} @tab Logical Link Control Type 3
+@item @dfn{LLC} @tab Logical Link Control
+@item @dfn{LLI} @tab Logical Link Inteface
+@item @dfn{LSAP} @tab Link Service Access Point
+@item @dfn{MAC} @tab Media Access Control
+@item @dfn{MTPI} @tab Message Transfer Part Interface
+@item @dfn{MTP} @tab Message Transfer Part 
+@item @dfn{NLI} @tab Network Layer Interface
+@item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NPI} @tab Network Provider Interface
+@item @dfn{NPI} @tab Numbering Plan Indicator
+@item @dfn{NSAP} @tab Network Service Access Point
+@item @dfn{NSDU} @tab Network Service Data Unit
+@item @dfn{NSP} @tab Network Service Provider
+@item @dfn{NS} @tab Network Service
+@item @dfn{NSU} @tab Network Service User
+@item @dfn{NUI} @tab Network User Information
+@item @dfn{PAD} @tab Packet Assembler/Disassembler
+@item @dfn{PDN} @tab Public Data Network
+@item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PLP} @tab Packet Layer Protocol
+@item @dfn{PPA} @tab Physical Point of Attachment
+@item @dfn{PSDN} @tab Public Switched Data Network
+@item @dfn{PSTN} @tab Public Switch Telephone Network
+@item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{QOS} @tab Quality of Service
+@item @dfn{RPOA} @tab Recognized Private Operating Agency
+@item @dfn{SAP} @tab Service Access Point
+@item @dfn{SCCPI} @tab Signalling Connection Control Part Interface
+@item @dfn{SCCP} @tab Signalling Connection Control Part
+@item @dfn{SDLI} @tab Signalling Data Link Interface
+@item @dfn{SDL} @tab Signalling Data Link
+@item @dfn{SDTI} @tab Signalling Data Terminal Interface
+@item @dfn{SDT} @tab Signalling Data Terminal
+@item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLI} @tab Signalling Link Interface
+@item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SL} @tab Signalling Link
+@item @dfn{SNPA} @tab Subnetwork Point of Attachment
+@item @dfn{SSAP} @tab Source Service Access Point
+@item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TCAP} @tab Transaction Capabilities Application Part
+@item @dfn{TCI} @tab Transaction Component Interface
+@item @dfn{TC} @tab Component Handling Sub-Layer
+@item @dfn{TLI} @tab Transport Layer Interface
+@item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
+@item @dfn{TOA} @tab Type of Address
+@item @dfn{TPI} @tab Transport Provider Interface
+@item @dfn{TRI} @tab Transaction Interface
+@item @dfn{TR} @tab Transaction Handling Sub-Layer
+@item @dfn{VC} @tab Virtual Circuit
+@item @dfn{WAN} @tab Wide Area Network
+@item @dfn{X.121} @tab ITU-T Recommendation X.121
+@item @dfn{X.25} @tab ITU-T Recommendation X.25
+@item @dfn{X.28} @tab ITU-T Recommendation X.28
+@item @dfn{X.3} @tab ITU-T Recommendation X.3
+@item @dfn{X.75} @tab ITU-T Recommendation X.75
+@item @dfn{XX25} @tab X.25 Programming Inteface using XTI
+@item @dfn{XXX} @tab X.3, X.28, X.29
 @end multitable
 
 @node References
@@ -1243,11 +1524,15 @@ An identifier of a particular physical medium over which communication transpire
 
 @ifnotplaintext
 @c skip indexes for plain text (regex search works better)
-@node Index
-@unnumbered Index
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
 
 @c @ifnottex
 @c @c concatenate indices for html and info
+@node Index
+@unnumbered Index
 @printindex cp
 @c @end ifnottex
 
@@ -1261,6 +1546,7 @@ An identifier of a particular physical medium over which communication transpire
 @c * Primitive Values Index::
 @c * Primitive Error Values Index::
 @c * Input-Output Control Index::
+@c * MIB Object Index::
 @c * Manual Page Index::
 @c @end menu
 @c 
@@ -1302,6 +1588,11 @@ An identifier of a particular physical medium over which communication transpire
 @c @node Input-Output Control Index
 @c @section Input-Output Control Index
 @c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
 @c 
 @c @page
 @c @node Manual Page Index

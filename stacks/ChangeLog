@@ -1,3 +1,34 @@
+2008-11-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/libxnet.texi: update to FDL 1.3
+	* doc/manual/Makefile.am: update to FDL 1.3
+	* doc/manual/strss7.texi: update to FDL 1.3
+	* doc/manual/x400p.texi: update to FDL 1.3
+	* doc/projects/cnam.texi: update to FDL 1.3
+	* doc/projects/hlr.texi: update to FDL 1.3
+	* doc/projects/lab.texi: update to FDL 1.3
+	* doc/specs/cci/cci.texi: update to FDL 1.3
+	* doc/specs/cci/Makefile.am: update to FDL 1.3
+	* doc/specs/mapi/Makefile.am: update to FDL 1.3
+	* doc/specs/mapi/mapi.texi: update to FDL 1.3
+	* doc/specs/mtpi/mtpi.texi: update to FDL 1.3
+	* doc/specs/mtpi/npi_mtp.texi: update to FDL 1.3
+	* doc/specs/nli/Makefile.am: update to FDL 1.3
+	* doc/specs/sccpi/npi_sccp.texi: update to FDL 1.3
+	* doc/specs/sccpi/sccpi.texi: update to FDL 1.3
+	* doc/specs/sccpi/tpi_sccp.texi: update to FDL 1.3
+	* doc/specs/sccpi/xti_sccp.texi: update to FDL 1.3
+	* doc/specs/sdli/sdli.texi: update to FDL 1.3
+	* doc/specs/sdti/sdti.texi: update to FDL 1.3
+	* doc/specs/sli/sli.texi: update to FDL 1.3
+	* doc/specs/tci/Makefile.am: update to FDL 1.3
+	* doc/specs/tci/tci.texi: update to FDL 1.3
+	* doc/specs/tpi/Makefile.am: update to FDL 1.3
+	* doc/specs/tpi/tpi_tcap.texi: update to FDL 1.3
+	* doc/specs/tri/Makefile.am: update to FDL 1.3
+	* doc/specs/tri/tri.texi: update to FDL 1.3
+	* Makefile.am: update to FDL 1.3
+
 2008-11-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: conversion modules compile

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-08-31 06:57:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-11-26 12:01:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 06:57:16 $ by $Author: brian $
+# Last Modified $Date: 2008-11-26 12:01:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,6 +76,7 @@ STREAMS_TEXINFOS	= \
 			  texi/agpl3.texi \
 			  texi/bsd.texi \
 			  texi/decmit.texi \
+			  texi/fdl13.texi \
 			  texi/fdl12.texi \
 			  texi/fdl.texi \
 			  texi/gpl3.texi \
@@ -113,6 +114,7 @@ SPG2_TEXINFOS		= \
 			  texi/agpl3.texi \
 			  texi/bsd.texi \
 			  texi/decmit.texi \
+			  texi/fdl13.texi \
 			  texi/fdl12.texi \
 			  texi/fdl.texi \
 			  texi/gpl3.texi \
@@ -139,6 +141,7 @@ SPG_TEXINFOS		= \
 			  texi/agpl3.texi \
 			  texi/bsd.texi \
 			  texi/decmit.texi \
+			  texi/fdl13.texi \
 			  texi/fdl12.texi \
 			  texi/fdl.texi \
 			  texi/gpl3.texi \
@@ -165,6 +168,7 @@ porting_TEXINFOS	= \
 			  texi/agpl3.texi \
 			  texi/bsd.texi \
 			  texi/decmit.texi \
+			  texi/fdl13.texi \
 			  texi/fdl12.texi \
 			  texi/fdl.texi \
 			  texi/gpl3.texi \
@@ -286,6 +290,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.60  2008-11-26 12:01:40  brian
+# - updated to FDL 1.3
+#
 # Revision 0.9.2.59  2008-08-31 06:57:16  brian
 # - do not customize docs unless maintainer modes and dependency tracking
 #
