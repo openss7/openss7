@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-08-31 06:57:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-11-26 12:01:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 06:57:15 $ by $Author: brian $
+# Last Modified $Date: 2008-11-26 12:01:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,6 +71,7 @@ strbcm_TEXINFOS		= \
 			  texi/agpl3.texi \
 			  texi/bsd.texi \
 			  texi/decmit.texi \
+			  texi/fdl13.texi \
 			  texi/fdl12.texi \
 			  texi/fdl.texi \
 			  texi/gpl3.texi \
@@ -115,6 +116,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.18  2008-11-26 12:01:37  brian
+# - updated to FDL 1.3
+#
 # Revision 0.9.2.17  2008-08-31 06:57:15  brian
 # - do not customize docs unless maintainer modes and dependency tracking
 #

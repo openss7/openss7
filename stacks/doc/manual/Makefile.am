@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-08-31 06:57:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-11-26 12:01:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 06:57:12 $ by $Author: brian $
+# Last Modified $Date: 2008-11-26 12:01:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,6 +72,7 @@ strss7_TEXINFOS		= \
 			  texi/agpl3.texi \
 			  texi/bsd.texi \
 			  texi/decmit.texi \
+			  texi/fdl13.texi \
 			  texi/fdl12.texi \
 			  texi/fdl.texi \
 			  texi/gpl3.texi \
@@ -100,6 +101,7 @@ x400p_TEXINFOS		= \
 			  texi/agpl3.texi \
 			  texi/bsd.texi \
 			  texi/decmit.texi \
+			  texi/fdl13.texi \
 			  texi/fdl12.texi \
 			  texi/fdl.texi \
 			  texi/gpl3.texi \
@@ -126,6 +128,7 @@ libxnet_TEXINFOS	= \
 			  texi/agpl3.texi \
 			  texi/bsd.texi \
 			  texi/decmit.texi \
+			  texi/fdl13.texi \
 			  texi/fdl12.texi \
 			  texi/fdl.texi \
 			  texi/gpl3.texi \
@@ -171,6 +174,9 @@ include ../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.41  2008-11-26 12:01:30  brian
+## - updated to FDL 1.3
+##
 ## Revision 0.9.2.40  2008-08-31 06:57:12  brian
 ## - do not customize docs unless maintainer modes and dependency tracking
 ##

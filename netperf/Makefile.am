@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 17:37:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-11-26 12:01:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:24 $ by $Author: brian $
+# Last Modified $Date: 2008-11-26 12:01:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -247,6 +247,7 @@ EXTRA_DIST			+= ACKNWLDGMNTS COPYRIGHT README.ovms Release_Notes netperf_hp.ps
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
 				scripts/texi/args.texi.in \
+				scripts/texi/fdl13.texi \
 				scripts/texi/fdl.texi \
 				scripts/texi/gpl.texi \
 				scripts/texi/install.texi \
@@ -293,6 +294,9 @@ EXTRA_DIST			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.53  2008-11-26 12:01:25  brian
+# - updated to FDL 1.3
+#
 # Revision 0.9.2.52  2008-09-22 17:37:24  brian
 # - build and release updates
 #

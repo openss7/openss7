@@ -1,3 +1,9 @@
+2008-11-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: update to FDL 1.3
+	* manual/Makefile.am: update to FDL 1.3
+	* manual/netperf.texi: update to FDL 1.3
+
 2008-11-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgpatchlevel: flipped release
