@@ -1,5 +1,6 @@
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
+	* strsctp.lsm.in: change repo directory
 	* doc/manual/Makefile.am: update to FDL 1.3
 	* doc/manual/strsctp.texi: update to FDL 1.3
 	* Makefile.am: update to FDL 1.3

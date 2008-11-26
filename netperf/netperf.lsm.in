@@ -12,11 +12,11 @@ Description:		@PACKAGE_TITLE@.
 Keywords:		INET, SCTP, XNET, XTI, Netperf
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Primary-site:		http://www.openss7.org/ tarballs/
+Primary-site:		http://www.openss7.org/ repos/tarballs/
 			3M @PACKAGE@-@VERSION@.tar.gz
 			2M @PACKAGE@-@VERSION@.tar.bz2
 			2M @PACKAGE@-@VERSION@.tar.lzma
-Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+Alternate-site:		http://www.openss7.org/ repos/rpms/SRPMS/
 			2M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		http://www.hp.com/ /
 			950K @PACKAGE@-@VERSION@.tar.gz

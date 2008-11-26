@@ -17,10 +17,10 @@ Description:	@PACKAGE_TITLE@.
 Keywords:	STREAMS, SVR4, LiS
 Author:		dave@gcom.com (David Grothe)
 Maintained-by:	bidulock@openss7.org (Brian Bidulock)
-Primary-site:	http://www.openss7.org/ tarballs/
+Primary-site:	http://www.openss7.org/ repos/tarballs/
 		3M @PACKAGE@-@VERSION@.tar.gz
 		2M @PACKAGE@-@VERSION@.tar.bz2
-Alternate-site:	http://www.openss7.org/ rpms/SRPMS/
+Alternate-site:	http://www.openss7.org/ repos/rpms/SRPMS/
 		3M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:	ftp.gcom.com /pub/linux/src/LiS
 		748K @PACKAGE@-2.18.0.tgz

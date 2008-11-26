@@ -1,5 +1,7 @@
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
+	* netperf.lsm.in: change repo directory
+	* netperf-openss7.lsm.in: change repo directory
 	* Makefile.am: update to FDL 1.3
 	* manual/Makefile.am: update to FDL 1.3
 	* manual/netperf.texi: update to FDL 1.3
