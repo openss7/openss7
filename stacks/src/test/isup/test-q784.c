@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:26 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:53 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:26 $ by $Author: brian $
+ Last Modified $Date: 2008-11-26 13:13:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-q784.c,v $
+ Revision 0.9.2.12  2008-11-26 13:13:53  brian
+ - sync with working copy
+
  Revision 0.9.2.11  2008-04-29 07:11:26  brian
  - updating headers for release
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:26 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:53 $"
 
-static char const ident[] = "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:26 $";
+static char const ident[] = "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:53 $";
 
 /*
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -19863,7 +19866,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.11 $ $Date: 2008-04-29 07:11:26 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.12 $ $Date: 2008-11-26 13:13:53 $");
 }
 
 void

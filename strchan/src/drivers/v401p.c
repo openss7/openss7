@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:27 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-11-26 13:13:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:27 $ by $Author: brian $
+ Last Modified $Date: 2008-11-26 13:13:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.17  2008-11-26 13:13:54  brian
+ - sync with working copy
+
  Revision 0.9.2.16  2008-09-22 20:31:27  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:27 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-11-26 13:13:54 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:27 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-11-26 13:13:54 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -261,7 +264,7 @@ static char const ident[] =
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:27 $"
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-11-26 13:13:54 $"
 #define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

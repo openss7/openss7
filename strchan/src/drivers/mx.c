@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:27 $
+ @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:27 $ by $Author: brian $
+ Last Modified $Date: 2008-11-26 13:13:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx.c,v $
+ Revision 0.9.2.12  2008-11-26 13:13:54  brian
+ - sync with working copy
+
  Revision 0.9.2.11  2008-09-22 20:31:27  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:27 $"
+#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:54 $"
 
 static char const ident[] =
-    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:27 $";
+    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:54 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device
@@ -156,7 +159,7 @@ static char const ident[] =
 #include <ss7/chi_ioctl.h>
 
 #define MX_DESCRIP	"MX (MX) STREAMS MULTIPLEXING DRIVER."
-#define MX_REVISION	"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:27 $"
+#define MX_REVISION	"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:54 $"
 #define MX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

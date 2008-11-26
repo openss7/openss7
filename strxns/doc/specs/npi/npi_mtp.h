@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_mtp.h,v 0.9.2.6 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: npi_mtp.h,v 0.9.2.1 2008-11-26 13:13:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-11-26 13:13:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_mtp.h,v $
+ Revision 0.9.2.1  2008-11-26 13:13:57  brian
+ - sync with working copy
+
  Revision 0.9.2.6  2008-04-29 07:10:46  brian
  - updating headers for release
 
@@ -65,7 +68,7 @@
 #ifndef _SYS_NPI_MTP_H
 #define _SYS_NPI_MTP_H
 
-#ident "@(#) $RCSfile: npi_mtp.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_mtp.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

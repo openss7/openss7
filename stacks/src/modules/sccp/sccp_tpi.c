@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $
+ @(#) $RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-26 13:13:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-17 19:02:27 $ by $Author: brian $
+ Last Modified $Date: 2008-11-26 13:13:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp_tpi.c,v $
+ Revision 0.9.2.2  2008-11-26 13:13:52  brian
+ - sync with working copy
+
  Revision 0.9.2.2  2008-11-17 19:02:27  brian
  - conversion modules compile
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $"
+#ident "@(#) $RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-26 13:13:52 $"
 
-static char const ident[] = "$RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $";
+static char const ident[] = "$RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-26 13:13:52 $";
 
 /*
  * This is a pushable STREAMS module that converts between the SCCPI (Signalling Connection Control
@@ -105,7 +108,7 @@ static char const ident[] = "$RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2
 #define SCCP_TPI_DESCRIP	"SCCPI to TPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define SCCP_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_TPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $"
+#define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-26 13:13:52 $"
 #define SCCP_TPI_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define SCCP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_TPI_LICENSE	"GPL"
