@@ -87,20 +87,21 @@ typedef u_int8_t mtp_uchar;
 #define MTP_ADDR_REQ			 5+120	/* Address service */
 #define MTP_INFO_REQ			 6+120	/* Information service */
 #define MTP_OPTMGMT_REQ			 7+120	/* Options management service */
-#define MTP_TRANSFER_REQ		 8+120	/* MTP data transfer request */
+#define MTP_STATUS_REQ			 8+120	/* MTP status request */
+#define MTP_TRANSFER_REQ		 9+120	/* MTP data transfer request */
 
-#define MTP_OK_ACK			 9+120	/* Positive acknowledgement */
-#define MTP_ERROR_ACK			10+120	/* Negative acknowledgement */
-#define MTP_BIND_ACK			11+120	/* Bind acknowledgement */
-#define MTP_ADDR_ACK			12+120	/* Address acknowledgement */
-#define MTP_INFO_ACK			13+120	/* Information acknowledgement */
-#define MTP_OPTMGMT_ACK			14+120	/* Options management acknowledgement */
-#define MTP_TRANSFER_IND		15+120	/* MTP data transfer indication */
-#define MTP_PAUSE_IND			16+120	/* MTP pause (stop) indication */
-#define MTP_RESUME_IND			17+120	/* MTP resume (start) indication */
-#define MTP_STATUS_IND			18+120	/* MTP status indication */
-#define MTP_RESTART_BEGINS_IND		19+120	/* MTP restart begins (impl. dep.) */
-#define MTP_RESTART_COMPLETE_IND	20+120	/* MTP restart complete (impl. dep.) */
+#define MTP_OK_ACK			10+120	/* Positive acknowledgement */
+#define MTP_ERROR_ACK			11+120	/* Negative acknowledgement */
+#define MTP_BIND_ACK			12+120	/* Bind acknowledgement */
+#define MTP_ADDR_ACK			13+120	/* Address acknowledgement */
+#define MTP_INFO_ACK			14+120	/* Information acknowledgement */
+#define MTP_OPTMGMT_ACK			15+120	/* Options management acknowledgement */
+#define MTP_TRANSFER_IND		16+120	/* MTP data transfer indication */
+#define MTP_PAUSE_IND			17+120	/* MTP pause (stop) indication */
+#define MTP_RESUME_IND			18+120	/* MTP resume (start) indication */
+#define MTP_STATUS_IND			19+120	/* MTP status indication */
+#define MTP_RESTART_BEGINS_IND		20+120	/* MTP restart begins (impl. dep.) */
+#define MTP_RESTART_COMPLETE_IND	21+120	/* MTP restart complete (impl. dep.) */
 
 /*
  *  Interface States
@@ -308,6 +309,17 @@ typedef struct MTP_resume_ind {
 	mtp_ulong mtp_addr_length;	/* length of affected MTP address */
 	mtp_ulong mtp_addr_offset;	/* offset of affected MTP address */
 } MTP_resume_ind_t;
+
+/*
+ * MTP_STATUS_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct MTP_status_req{
+	mtp_ulong mtp_primitive;	/* always MTP_STATUS_REQ */
+	mtp_ulong mtp_addr_length;	/* length of affected MTP address */
+	mtp_ulong mtp_addr_offset;	/* offset of affected MTP address */
+	mtp_ulong mtp_type;		/* type */
+	mtp_ulong mtp_status;		/* status */
+} MTP_status_req_t;
 
 /*
  *  MTP_STATUS_IND, M_PROTO (band 1)

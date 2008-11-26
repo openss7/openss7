@@ -88,7 +88,7 @@
 
 static char const ident[] = "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:26 $";
 
-/* 
+/*
  *  This is a ferry-clip Q.784 conformance test program for testing the
  *  OpenSS7 ISUP multiplexing driver.
  *
@@ -133,8 +133,18 @@ static char const ident[] = "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.
  *            |___________________________________________________|         
  */
 
+#include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
+
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -145,6 +155,12 @@ static char const ident[] = "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/uio.h>
+#include <time.h>
+
+#ifdef HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -158,20 +174,63 @@ static char const ident[] = "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.
 #include <ss7/isupi.h>
 #include <ss7/isupi_ioctl.h>
 
-#define FFLUSH(stream) fflush(stream)
-
 enum {
-	TIMEOUT = -5, UNKNOWN = -4, DECODEERROR = -3, SCRIPTERROR = -2,
-	INCONCLUSIVE = -1, SUCCESS = 0, FAILURE = 1,
+	__EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4, __RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
+	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0, __RESULT_FAILURE = 1,
 };
 
-/* 
+
+
+/*
  *  -------------------------------------------------------------------------
  *
  *  Configuration
  *
  *  -------------------------------------------------------------------------
  */
+
+/* Q.784 ISUP Basic Call Test Specification - Conformance Test Program\n\ */
+
+static const char *lpkgname = "SS7 ISDN User Part";
+
+/* static const char *spkgname = "strss7"; */
+static const char *lstdname = "Q.763/ANSI T1.113/JQ.763";
+static const char *sstdname = "Q.784";
+static const char *shortname = "ISUP";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/isup";
+#else
+static char devname[256] = "/dev/isup";
+#endif
+
+static int repeat_verbose = 0;
+static int repeat_on_success = 0;
+static int repeat_on_failure = 0;
+static int exit_on_failure = 0;
+
+static int verbose = 1;
+
+static int client_exec = 0;		/* execute client side */
+static int server_exec = 0;		/* execute server side */
+
+static int show_msg = 0;
+static int show_acks = 0;
+static int show_timeout = 0;
+static int show_fisus = 1;
+//static int show_data = 1;
+
+static int last_prim = 0;
+static int last_event = 0;
+static int last_errno = 0;
+static int last_retval = 0;
+static int last_prio = 0;
+
+#define TEST_PROTOCOL 132
+
+#define CHILD_PTU   0
+#define CHILD_IUT   1
+
+static int iut_connects = 1;
 
 struct mtp_addr loc_addr = {
 	ni:1,
@@ -277,7 +336,7 @@ static struct isup_opt_conf_mtp iut_mtp_opt = {
 static struct isup_opt_conf_df iut_df_opt = {
 };
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Messages
@@ -452,11 +511,8 @@ struct prim mprim = {
 	{{0,}, 0}
 };
 
-static int verbose = 0;
-static int show_msg = 0;
-static int show_acks = 0;
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Timer Functions
@@ -464,7 +520,7 @@ static int show_acks = 0;
  *  -------------------------------------------------------------------------
  */
 
-/* 
+/*
  *  Timer values for tests: each timer has a low range (minus error margin)
  *  and a high range (plus error margin).
  */
@@ -476,6 +532,7 @@ static long timer_scale = 1;
 typedef struct timer_range {
 	long lo;
 	long hi;
+	char *name;
 } timer_range_t;
 
 enum {
@@ -489,52 +546,63 @@ enum {
 
 /* *INDENT-OFF* */
 static timer_range_t timer[tmax] = {
-	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
-	{(3 * 60 * HZ),		(3 * 60 * HZ)},		/* T2 3 minutes */
-	{(2 * 60 * HZ),		(2 * 60 * HZ)},		/* T3 2 minutes */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T4 5-15 minutes */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T5 5-15 minutes */
-	{(10 * HZ),		(32 * HZ)},		/* T6 10-32 seconds (specified in Q.118) */
-	{(20 * HZ),		(30 * HZ)},		/* T7 20-30 seconds */
-	{(10 * HZ),		(15 * HZ)},		/* T8 10-15 seconds */
-	{(2 * 60 * HZ),		(4 * 60 * HZ)},		/* T9 2-4 minutes (specified in Q.118) */
-	{(4 * HZ),		(6 * HZ)},		/* T10 4-6 seconds */
-	{(15 * HZ),		(20 * HZ)},		/* T11 15-20 seconds */
-	{(15 * HZ),		(60 * HZ)},		/* T12 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T13 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T14 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T15 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T16 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T17 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T18 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T19 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T20 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T21 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T22 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T23 5-15 minutes */
-	{(1 * HZ),		(2 * HZ)},		/* T24 < 2 seconds */
-	{(1 * HZ),		(10 * HZ)},		/* T25 1-10 seconds */
-	{(1 * 60 * HZ),		(3 * 60 * HZ)},		/* T26 1-3 minutes */
-	{(4 * 60 * HZ),		(4 * 60 * HZ)},		/* T27 4 minutes */
-	{(10 * HZ),		(10 * HZ)},		/* T28 10 seconds */
-	{(300 * HZ / 1000),	(600 * HZ / 1000)},	/* T29 300-600 milliseconds */
-	{(5 * HZ),		(10 * HZ)},		/* T30 5-10 seconds */
-	{(6 * 60 * HZ),		(7 * 60 * HZ)},		/* T31 > 6 minutes */
-	{(3 * HZ),		(5 * HZ)},		/* T32 3-5 seconds */
-	{(12 * HZ),		(15 * HZ)},		/* T33 12-15 seconds */
-	{(12 * HZ),		(15 * HZ)},		/* T34 12-15 seconds */
-	{(15 * HZ),		(20 * HZ)},		/* T35 15-20 seconds */
-	{(15 * HZ),		(20 * HZ)},		/* T36 15-20 seconds */
-	{(2 * HZ),		(4 * HZ)},		/* T37 2-4 seconds */
-	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
+	{(15 * HZ),		(60 * HZ),		"T1"	},	/* T1 15-60 seconds */
+	{(3 * 60 * HZ),		(3 * 60 * HZ),		"T2"	},	/* T2 3 minutes */
+	{(2 * 60 * HZ),		(2 * 60 * HZ),		"T3"	},	/* T3 2 minutes */
+	{(5 * 60 * HZ),		(15 * 60 * HZ),		"T4"	},	/* T4 5-15 minutes */
+	{(5 * 60 * HZ),		(15 * 60 * HZ),		"T5"	},	/* T5 5-15 minutes */
+	{(10 * HZ),		(32 * HZ),		"T6"	},	/* T6 10-32 seconds (specified in Q.118) */
+	{(20 * HZ),		(30 * HZ),		"T7"	},	/* T7 20-30 seconds */
+	{(10 * HZ),		(15 * HZ),		"T8"	},	/* T8 10-15 seconds */
+	{(2 * 60 * HZ),		(4 * 60 * HZ),		"T9"	},	/* T9 2-4 minutes (specified in Q.118) */
+	{(4 * HZ),		(6 * HZ),		"T10"	},	/* T10 4-6 seconds */
+	{(15 * HZ),		(20 * HZ),		"T11"	},	/* T11 15-20 seconds */
+	{(15 * HZ),		(60 * HZ),		"T12"	},	/* T12 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ),		"T13"	},	/* T13 5-15 minutes */
+	{(15 * HZ),		(60 * HZ),		"T14"	},	/* T14 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ),		"T15"	},	/* T15 5-15 minutes */
+	{(15 * HZ),		(60 * HZ),		"T16"	},	/* T16 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ),		"T17"	},	/* T17 5-15 minutes */
+	{(15 * HZ),		(60 * HZ),		"T18"	},	/* T18 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ),		"T19"	},	/* T19 5-15 minutes */
+	{(15 * HZ),		(60 * HZ),		"T20"	},	/* T20 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ),		"T21"	},	/* T21 5-15 minutes */
+	{(15 * HZ),		(60 * HZ),		"T22"	},	/* T22 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ),		"T23"	},	/* T23 5-15 minutes */
+	{(1 * HZ),		(2 * HZ),		"T24"	},	/* T24 < 2 seconds */
+	{(1 * HZ),		(10 * HZ),		"T25"	},	/* T25 1-10 seconds */
+	{(1 * 60 * HZ),		(3 * 60 * HZ),		"T26"	},	/* T26 1-3 minutes */
+	{(4 * 60 * HZ),		(4 * 60 * HZ),		"T27"	},	/* T27 4 minutes */
+	{(10 * HZ),		(10 * HZ),		"T28"	},	/* T28 10 seconds */
+	{(300 * HZ / 1000),	(600 * HZ / 1000),	"T29"	},	/* T29 300-600 milliseconds */
+	{(5 * HZ),		(10 * HZ),		"T30"	},	/* T30 5-10 seconds */
+	{(6 * 60 * HZ),		(7 * 60 * HZ),		"T31"	},	/* T31 > 6 minutes */
+	{(3 * HZ),		(5 * HZ),		"T32"	},	/* T32 3-5 seconds */
+	{(12 * HZ),		(15 * HZ),		"T33"	},	/* T33 12-15 seconds */
+	{(12 * HZ),		(15 * HZ),		"T34"	},	/* T34 12-15 seconds */
+	{(15 * HZ),		(20 * HZ),		"T35"	},	/* T35 15-20 seconds */
+	{(15 * HZ),		(20 * HZ),		"T36"	},	/* T36 15-20 seconds */
+	{(2 * HZ),		(4 * HZ),		"T37"	},	/* T37 2-4 seconds */
+	{(15 * HZ),		(20 * HZ),		"T38"	}	/* T38 15-20 seconds */
 };
 /* *INDENT-ON* */
 
 long test_start = 0;
 
-static int state;
+static int state = 0;
+static const char *failure_string = NULL;
 
-/* 
+#define __stringify_1(x) #x
+#define __stringify(x) __stringify_1(x)
+#define FAILURE_STRING(string) "[" __stringify(__LINE__) "] " string
+
+/* lockf does not work well on SMP for some reason */
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
+
+/*
  *  Return the current time in milliseconds.
  */
 static long
@@ -546,7 +614,7 @@ now(void)
 	if (gettimeofday(&now, NULL)) {
 		printf("***************ERROR: couldn't get time!\n");
 		printf("                      %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
+		fflush(stdout);
 		return (0);
 	}
 	if (!test_start)	/* avoid blowing over precision */
@@ -555,13 +623,17 @@ now(void)
 	ret += (now.tv_usec + 999L) / 1000L;
 	return ret;
 }
+
+/*
+ *  Return the current time in milliseconds.
+ */
 static long
 milliseconds(char *t)
 {
 	printf("                    .  .              :                .                    \n");
 	printf("                    .  .            %6s             .                    (%d)\n", t, state);
 	printf("                    .  .              :                .                    \n");
-	FFLUSH(stdout);
+	fflush(stdout);
 	return now();
 }
 static long
@@ -570,11 +642,11 @@ milliseconds_2nd(char *t)
 	printf("                    .  .              :   :            .                    \n");
 	printf("                    .  .              : %6s         .                    (%d)\n", t, state);
 	printf("                    .  .              :   :            .                    \n");
-	FFLUSH(stdout);
+	fflush(stdout);
 	return now();
 }
 
-/* 
+/*
  *  Check the current time against the beginning time provided as an argnument
  *  and see if the time inverval falls between the low and high values for the
  *  timer as specified by arguments.  Return SUCCESS if the interval is within
@@ -594,11 +666,11 @@ check_time(const char *t, long i, long lo, long hi)
 	dhi = dhi / 1000;
 	tol = tol / 1000;
 	printf("                    |  |(%7.3g <= %7.3g <= %7.3g)| %s             (%d)\n", dlo - tol, itv, dhi + tol, t, state);
-	FFLUSH(stdout);
+	fflush(stdout);
 	if (dlo - tol <= itv && itv <= dhi + tol)
-		return SUCCESS;
-	else
-		return FAILURE;
+		return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 
 static int
@@ -616,40 +688,62 @@ time_event(int event)
 		m = m / 1000000;
 		t += m;
 		printf("                    |  | %11.6g                   |                    (%d)\n", t, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 	}
 	return (event);
 }
 
 static int timer_timeout = 0;
+static int last_signum = 0;
 
 static void
-timer_handler(int signum)
+signal_handler(int signum)
 {
+	last_signum = signum;
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
 static int
-timer_sethandler(void)
+start_signals(void)
 {
 	sigset_t mask;
 	struct sigaction act;
 
-	act.sa_handler = timer_handler;
-	act.sa_flags = SA_RESTART | SA_ONESHOT;
-	act.sa_restorer = NULL;
+	act.sa_handler = signal_handler;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_flags = 0;
+//      act.sa_restorer = NULL;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
-		return FAILURE;
+		goto failure;
+	if (sigaction(SIGPOLL, &act, NULL))
+		goto failure;
+	if (sigaction(SIGURG, &act, NULL))
+		goto failure;
+	if (sigaction(SIGPIPE, &act, NULL))
+		goto failure;
+	if (sigaction(SIGHUP, &act, NULL))
+		goto failure;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
-	return SUCCESS;
+	siginterrupt(SIGALRM, 1);
+	siginterrupt(SIGPOLL, 1);
+	siginterrupt(SIGURG, 1);
+	siginterrupt(SIGPIPE, 1);
+	siginterrupt(SIGHUP, 1);
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 
-/* 
+/*
  *  Start an interval timer as the overall test timer.
  */
 static int
@@ -660,12 +754,16 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
-	if (timer_sethandler())
-		return FAILURE;
+	if (duration == (long) INFINITE_WAIT)
+		return __RESULT_SUCCESS;
+	if (start_signals())
+		goto failure;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
-		return FAILURE;
+		goto failure;
 	timer_timeout = 0;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 static int
 start_st(long duration)
@@ -676,25 +774,48 @@ start_st(long duration)
 }
 
 static int
-stop_tt(void)
+stop_signals(void)
 {
-	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
 	sigset_t mask;
 	struct sigaction act;
 
-	if (setitimer(ITIMER_REAL, &setting, NULL))
-		return FAILURE;
 	act.sa_handler = SIG_DFL;
 	act.sa_flags = 0;
-	act.sa_restorer = NULL;
+//	act.sa_restorer = NULL;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
-		return FAILURE;
-	timer_timeout = 0;
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		result = __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_BLOCK, &mask, NULL);
-	return SUCCESS;
+	return (result);
+}
+
+static int
+stop_tt(void)
+{
+	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
+
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	if (stop_signals() != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	timer_timeout = 0;
+	return (result);
 }
 
 #define ISUP_MT_IAM	  1UL	/* 0x01 - 0b00000001 - Initial address */
@@ -810,6 +931,4946 @@ enum {
 	IBI, RINGING, COMMUNICATION, TONE, LOOPBACK,
 	NO_MSG
 };
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Printing things
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+char *
+errno_string(long err)
+{
+	switch (err) {
+	case 0:
+		return ("ok");
+	case EPERM:
+		return ("[EPERM]");
+	case ENOENT:
+		return ("[ENOENT]");
+	case ESRCH:
+		return ("[ESRCH]");
+	case EINTR:
+		return ("[EINTR]");
+	case EIO:
+		return ("[EIO]");
+	case ENXIO:
+		return ("[ENXIO]");
+	case E2BIG:
+		return ("[E2BIG]");
+	case ENOEXEC:
+		return ("[ENOEXEC]");
+	case EBADF:
+		return ("[EBADF]");
+	case ECHILD:
+		return ("[ECHILD]");
+	case EAGAIN:
+		return ("[EAGAIN]");
+	case ENOMEM:
+		return ("[ENOMEM]");
+	case EACCES:
+		return ("[EACCES]");
+	case EFAULT:
+		return ("[EFAULT]");
+	case ENOTBLK:
+		return ("[ENOTBLK]");
+	case EBUSY:
+		return ("[EBUSY]");
+	case EEXIST:
+		return ("[EEXIST]");
+	case EXDEV:
+		return ("[EXDEV]");
+	case ENODEV:
+		return ("[ENODEV]");
+	case ENOTDIR:
+		return ("[ENOTDIR]");
+	case EISDIR:
+		return ("[EISDIR]");
+	case EINVAL:
+		return ("[EINVAL]");
+	case ENFILE:
+		return ("[ENFILE]");
+	case EMFILE:
+		return ("[EMFILE]");
+	case ENOTTY:
+		return ("[ENOTTY]");
+	case ETXTBSY:
+		return ("[ETXTBSY]");
+	case EFBIG:
+		return ("[EFBIG]");
+	case ENOSPC:
+		return ("[ENOSPC]");
+	case ESPIPE:
+		return ("[ESPIPE]");
+	case EROFS:
+		return ("[EROFS]");
+	case EMLINK:
+		return ("[EMLINK]");
+	case EPIPE:
+		return ("[EPIPE]");
+	case EDOM:
+		return ("[EDOM]");
+	case ERANGE:
+		return ("[ERANGE]");
+	case EDEADLK:
+		return ("[EDEADLK]");
+	case ENAMETOOLONG:
+		return ("[ENAMETOOLONG]");
+	case ENOLCK:
+		return ("[ENOLCK]");
+	case ENOSYS:
+		return ("[ENOSYS]");
+	case ENOTEMPTY:
+		return ("[ENOTEMPTY]");
+	case ELOOP:
+		return ("[ELOOP]");
+	case ENOMSG:
+		return ("[ENOMSG]");
+	case EIDRM:
+		return ("[EIDRM]");
+	case ECHRNG:
+		return ("[ECHRNG]");
+	case EL2NSYNC:
+		return ("[EL2NSYNC]");
+	case EL3HLT:
+		return ("[EL3HLT]");
+	case EL3RST:
+		return ("[EL3RST]");
+	case ELNRNG:
+		return ("[ELNRNG]");
+	case EUNATCH:
+		return ("[EUNATCH]");
+	case ENOCSI:
+		return ("[ENOCSI]");
+	case EL2HLT:
+		return ("[EL2HLT]");
+	case EBADE:
+		return ("[EBADE]");
+	case EBADR:
+		return ("[EBADR]");
+	case EXFULL:
+		return ("[EXFULL]");
+	case ENOANO:
+		return ("[ENOANO]");
+	case EBADRQC:
+		return ("[EBADRQC]");
+	case EBADSLT:
+		return ("[EBADSLT]");
+	case EBFONT:
+		return ("[EBFONT]");
+	case ENOSTR:
+		return ("[ENOSTR]");
+	case ENODATA:
+		return ("[ENODATA]");
+	case ETIME:
+		return ("[ETIME]");
+	case ENOSR:
+		return ("[ENOSR]");
+	case ENONET:
+		return ("[ENONET]");
+	case ENOPKG:
+		return ("[ENOPKG]");
+	case EREMOTE:
+		return ("[EREMOTE]");
+	case ENOLINK:
+		return ("[ENOLINK]");
+	case EADV:
+		return ("[EADV]");
+	case ESRMNT:
+		return ("[ESRMNT]");
+	case ECOMM:
+		return ("[ECOMM]");
+	case EPROTO:
+		return ("[EPROTO]");
+	case EMULTIHOP:
+		return ("[EMULTIHOP]");
+	case EDOTDOT:
+		return ("[EDOTDOT]");
+	case EBADMSG:
+		return ("[EBADMSG]");
+	case EOVERFLOW:
+		return ("[EOVERFLOW]");
+	case ENOTUNIQ:
+		return ("[ENOTUNIQ]");
+	case EBADFD:
+		return ("[EBADFD]");
+	case EREMCHG:
+		return ("[EREMCHG]");
+	case ELIBACC:
+		return ("[ELIBACC]");
+	case ELIBBAD:
+		return ("[ELIBBAD]");
+	case ELIBSCN:
+		return ("[ELIBSCN]");
+	case ELIBMAX:
+		return ("[ELIBMAX]");
+	case ELIBEXEC:
+		return ("[ELIBEXEC]");
+	case EILSEQ:
+		return ("[EILSEQ]");
+	case ERESTART:
+		return ("[ERESTART]");
+	case ESTRPIPE:
+		return ("[ESTRPIPE]");
+	case EUSERS:
+		return ("[EUSERS]");
+	case ENOTSOCK:
+		return ("[ENOTSOCK]");
+	case EDESTADDRREQ:
+		return ("[EDESTADDRREQ]");
+	case EMSGSIZE:
+		return ("[EMSGSIZE]");
+	case EPROTOTYPE:
+		return ("[EPROTOTYPE]");
+	case ENOPROTOOPT:
+		return ("[ENOPROTOOPT]");
+	case EPROTONOSUPPORT:
+		return ("[EPROTONOSUPPORT]");
+	case ESOCKTNOSUPPORT:
+		return ("[ESOCKTNOSUPPORT]");
+	case EOPNOTSUPP:
+		return ("[EOPNOTSUPP]");
+	case EPFNOSUPPORT:
+		return ("[EPFNOSUPPORT]");
+	case EAFNOSUPPORT:
+		return ("[EAFNOSUPPORT]");
+	case EADDRINUSE:
+		return ("[EADDRINUSE]");
+	case EADDRNOTAVAIL:
+		return ("[EADDRNOTAVAIL]");
+	case ENETDOWN:
+		return ("[ENETDOWN]");
+	case ENETUNREACH:
+		return ("[ENETUNREACH]");
+	case ENETRESET:
+		return ("[ENETRESET]");
+	case ECONNABORTED:
+		return ("[ECONNABORTED]");
+	case ECONNRESET:
+		return ("[ECONNRESET]");
+	case ENOBUFS:
+		return ("[ENOBUFS]");
+	case EISCONN:
+		return ("[EISCONN]");
+	case ENOTCONN:
+		return ("[ENOTCONN]");
+	case ESHUTDOWN:
+		return ("[ESHUTDOWN]");
+	case ETOOMANYREFS:
+		return ("[ETOOMANYREFS]");
+	case ETIMEDOUT:
+		return ("[ETIMEDOUT]");
+	case ECONNREFUSED:
+		return ("[ECONNREFUSED]");
+	case EHOSTDOWN:
+		return ("[EHOSTDOWN]");
+	case EHOSTUNREACH:
+		return ("[EHOSTUNREACH]");
+	case EALREADY:
+		return ("[EALREADY]");
+	case EINPROGRESS:
+		return ("[EINPROGRESS]");
+	case ESTALE:
+		return ("[ESTALE]");
+	case EUCLEAN:
+		return ("[EUCLEAN]");
+	case ENOTNAM:
+		return ("[ENOTNAM]");
+	case ENAVAIL:
+		return ("[ENAVAIL]");
+	case EISNAM:
+		return ("[EISNAM]");
+	case EREMOTEIO:
+		return ("[EREMOTEIO]");
+	case EDQUOT:
+		return ("[EDQUOT]");
+	case ENOMEDIUM:
+		return ("[ENOMEDIUM]");
+	case EMEDIUMTYPE:
+		return ("[EMEDIUMTYPE]");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
+		return buf;
+	}
+	}
+}
+
+const char *
+lmi_strreason(unsigned int reason)
+{
+	switch (reason) {
+	default:
+	case LMI_UNSPEC:
+		return ("Unknown or unspecified");
+	case LMI_BADADDRESS:
+		return ("Address was invalid");
+	case LMI_BADADDRTYPE:
+		return ("Invalid address type");
+	case LMI_BADDIAL:
+		return ("(not used)");
+	case LMI_BADDIALTYPE:
+		return ("(not used)");
+	case LMI_BADDISPOSAL:
+		return ("Invalid disposal parameter");
+	case LMI_BADFRAME:
+		return ("Defective SDU received");
+	case LMI_BADPPA:
+		return ("Invalid PPA identifier");
+	case LMI_BADPRIM:
+		return ("Unregognized primitive");
+	case LMI_DISC:
+		return ("Disconnected");
+	case LMI_EVENT:
+		return ("Protocol-specific event ocurred");
+	case LMI_FATALERR:
+		return ("Device has become unusable");
+	case LMI_INITFAILED:
+		return ("Link initialization failed");
+	case LMI_NOTSUPP:
+		return ("Primitive not supported by this device");
+	case LMI_OUTSTATE:
+		return ("Primitive was issued from invalid state");
+	case LMI_PROTOSHORT:
+		return ("M_PROTO block too short");
+	case LMI_SYSERR:
+		return ("UNIX system error");
+	case LMI_WRITEFAIL:
+		return ("Unitdata request failed");
+	case LMI_CRCERR:
+		return ("CRC or FCS error");
+	case LMI_DLE_EOT:
+		return ("DLE EOT detected");
+	case LMI_FORMAT:
+		return ("Format error detected");
+	case LMI_HDLC_ABORT:
+		return ("Aborted frame detected");
+	case LMI_OVERRUN:
+		return ("Input overrun");
+	case LMI_TOOSHORT:
+		return ("Frame too short");
+	case LMI_INCOMPLETE:
+		return ("Partial frame received");
+	case LMI_BUSY:
+		return ("Telephone was busy");
+	case LMI_NOANSWER:
+		return ("Connection went unanswered");
+	case LMI_CALLREJECT:
+		return ("Connection rejected");
+	case LMI_HDLC_IDLE:
+		return ("HDLC line went idle");
+	case LMI_HDLC_NOTIDLE:
+		return ("HDLC link no longer idle");
+	case LMI_QUIESCENT:
+		return ("Line being reassigned");
+	case LMI_RESUMED:
+		return ("Line has been reassigned");
+	case LMI_DSRTIMEOUT:
+		return ("Did not see DSR in time");
+	case LMI_LAN_COLLISIONS:
+		return ("LAN excessive collisions");
+	case LMI_LAN_REFUSED:
+		return ("LAN message refused");
+	case LMI_LAN_NOSTATION:
+		return ("LAN no such station");
+	case LMI_LOSTCTS:
+		return ("Lost Clear to Send signal");
+	case LMI_DEVERR:
+		return ("Start of device-specific error codes");
+	}
+}
+
+char *
+lmerrno_string(long uerr, ulong lmerr)
+{
+	switch (lmerr) {
+	case LMI_UNSPEC:	/* Unknown or unspecified */
+		return ("[LMI_UNSPEC]");
+	case LMI_BADADDRESS:	/* Address was invalid */
+		return ("[LMI_BADADDRESS]");
+	case LMI_BADADDRTYPE:	/* Invalid address type */
+		return ("[LMI_BADADDRTYPE]");
+	case LMI_BADDIAL:	/* (not used) */
+		return ("[LMI_BADDIAL]");
+	case LMI_BADDIALTYPE:	/* (not used) */
+		return ("[LMI_BADDIALTYPE]");
+	case LMI_BADDISPOSAL:	/* Invalid disposal parameter */
+		return ("[LMI_BADDISPOSAL]");
+	case LMI_BADFRAME:	/* Defective SDU received */
+		return ("[LMI_BADFRAME]");
+	case LMI_BADPPA:	/* Invalid PPA identifier */
+		return ("[LMI_BADPPA]");
+	case LMI_BADPRIM:	/* Unregognized primitive */
+		return ("[LMI_BADPRIM]");
+	case LMI_DISC:		/* Disconnected */
+		return ("[LMI_DISC]");
+	case LMI_EVENT:	/* Protocol-specific event ocurred */
+		return ("[LMI_EVENT]");
+	case LMI_FATALERR:	/* Device has become unusable */
+		return ("[LMI_FATALERR]");
+	case LMI_INITFAILED:	/* Link initialization failed */
+		return ("[LMI_INITFAILED]");
+	case LMI_NOTSUPP:	/* Primitive not supported by this device */
+		return ("[LMI_NOTSUPP]");
+	case LMI_OUTSTATE:	/* Primitive was issued from invalid state */
+		return ("[LMI_OUTSTATE]");
+	case LMI_PROTOSHORT:	/* M_PROTO block too short */
+		return ("[LMI_PROTOSHORT]");
+	case LMI_SYSERR:	/* UNIX system error */
+		return errno_string(uerr);
+	case LMI_WRITEFAIL:	/* Unitdata request failed */
+		return ("[LMI_WRITEFAIL]");
+	case LMI_CRCERR:	/* CRC or FCS error */
+		return ("[LMI_CRCERR]");
+	case LMI_DLE_EOT:	/* DLE EOT detected */
+		return ("[LMI_DLE_EOT]");
+	case LMI_FORMAT:	/* Format error detected */
+		return ("[LMI_FORMAT]");
+	case LMI_HDLC_ABORT:	/* Aborted frame detected */
+		return ("[LMI_HDLC_ABORT]");
+	case LMI_OVERRUN:	/* Input overrun */
+		return ("[LMI_OVERRUN]");
+	case LMI_TOOSHORT:	/* Frame too short */
+		return ("[LMI_TOOSHORT]");
+	case LMI_INCOMPLETE:	/* Partial frame received */
+		return ("[LMI_INCOMPLETE]");
+	case LMI_BUSY:		/* Telephone was busy */
+		return ("[LMI_BUSY]");
+	case LMI_NOANSWER:	/* Connection went unanswered */
+		return ("[LMI_NOANSWER]");
+	case LMI_CALLREJECT:	/* Connection rejected */
+		return ("[LMI_CALLREJECT]");
+	case LMI_HDLC_IDLE:	/* HDLC line went idle */
+		return ("[LMI_HDLC_IDLE]");
+	case LMI_HDLC_NOTIDLE:	/* HDLC link no longer idle */
+		return ("[LMI_HDLC_NOTIDLE]");
+	case LMI_QUIESCENT:	/* Line being reassigned */
+		return ("[LMI_QUIESCENT]");
+	case LMI_RESUMED:	/* Line has been reassigned */
+		return ("[LMI_RESUMED]");
+	case LMI_DSRTIMEOUT:	/* Did not see DSR in time */
+		return ("[LMI_DSRTIMEOUT]");
+	case LMI_LAN_COLLISIONS:	/* LAN excessive collisions */
+		return ("[LMI_LAN_COLLISIONS]");
+	case LMI_LAN_REFUSED:	/* LAN message refused */
+		return ("[LMI_LAN_REFUSED]");
+	case LMI_LAN_NOSTATION:	/* LAN no such station */
+		return ("[LMI_LAN_NOSTATION]");
+	case LMI_LOSTCTS:	/* Lost Clear to Send signal */
+		return ("[LMI_LOSTCTS]");
+	case LMI_DEVERR:	/* Start of device-specific error codes */
+		return ("[LMI_DEVERR]");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) lmerr);
+		return buf;
+	}
+	}
+}
+
+const char *
+event_string(int child, int event)
+{
+	switch (child) {
+	case CHILD_IUT:
+		switch (event) {
+		case __EVENT_IUT_OUT_OF_SERVICE:
+			return ("!out of service");
+		case __EVENT_IUT_IN_SERVICE:
+			return ("!in service");
+		case __EVENT_IUT_RPO:
+			return ("!rpo");
+		case __EVENT_IUT_RPR:
+			return ("!rpr");
+		case __EVENT_IUT_DATA:
+			return ("!msu");
+		}
+		break;
+	default:
+	case CHILD_PTU:
+		switch (event) {
+		case __STATUS_OUT_OF_SERVICE:
+			return ("OUT-OF-SERVICE");
+		case __STATUS_ALIGNMENT:
+			return ("ALIGNMENT");
+		case __STATUS_PROVING_NORMAL:
+			return ("PROVING-NORMAL");
+		case __STATUS_PROVING_EMERG:
+			return ("PROVING-EMERGENCY");
+		case __STATUS_IN_SERVICE:
+			return ("IN-SERVICE");
+		case __STATUS_PROCESSOR_OUTAGE:
+			return ("PROCESSOR-OUTAGE");
+		case __STATUS_PROCESSOR_ENDED:
+			return ("PROCESSOR-ENDED");
+		case __STATUS_BUSY:
+			return ("BUSY");
+		case __STATUS_BUSY_ENDED:
+			return ("BUSY-ENDED");
+		case __STATUS_SEQUENCE_SYNC:
+			return ("READY");
+		case __MSG_PROVING:
+			return ("PROVING");
+		case __TEST_ACK:
+			return ("ACK");
+		case __TEST_DATA:
+			return ("DATA");
+		case __TEST_SIO:
+			return ("SIO");
+		case __TEST_SIN:
+			return ("SIN");
+		case __TEST_SIE:
+			return ("SIE");
+		case __TEST_SIOS:
+			return ("SIOS");
+		case __TEST_SIPO:
+			return ("SIPO");
+		case __TEST_SIB:
+			return ("SIB");
+		case __TEST_SIX:
+			return ("SIX");
+		case __TEST_SIO2:
+			return ("SIO2");
+		case __TEST_SIN2:
+			return ("SIN2");
+		case __TEST_SIE2:
+			return ("SIE2");
+		case __TEST_SIOS2:
+			return ("SIOS2");
+		case __TEST_SIPO2:
+			return ("SIPO2");
+		case __TEST_SIB2:
+			return ("SIB2");
+		case __TEST_SIX2:
+			return ("SIX2");
+		case __TEST_FISU:
+			return ("FISU");
+		case __TEST_FISU_S:
+			return ("FISU_S");
+		case __TEST_FISU_BAD_FIB:
+			return ("FISU_BAD_FIB");
+		case __TEST_FISU_CORRUPT:
+			return ("FISU_CORRUPT");
+		case __TEST_FISU_CORRUPT_S:
+			return ("FISU_CORRUPT_S");
+		case __TEST_LSSU_CORRUPT:
+			return ("LSSU_CORRUPT");
+		case __TEST_LSSU_CORRUPT_S:
+			return ("LSSU_CORRUPT_S");
+		case __TEST_MSU:
+			return ("MSU");
+		case __TEST_MSU_SEVEN_ONES:
+			return ("MSU_SEVEN_ONES");
+		case __TEST_MSU_TOO_LONG:
+			return ("MSU_TOO_LONG");
+		case __TEST_MSU_TOO_SHORT:
+			return ("MSU_TOO_SHORT");
+		case __TEST_TX_BREAK:
+			return ("TX_BREAK");
+		case __TEST_TX_MAKE:
+			return ("TX_MAKE");
+		case __TEST_FISU_FISU_1FLAG:
+			return ("FISU_FISU_1FLAG");
+		case __TEST_FISU_FISU_2FLAG:
+			return ("FISU_FISU_2FLAG");
+		case __TEST_MSU_MSU_1FLAG:
+			return ("MSU_MSU_1FLAG");
+		case __TEST_MSU_MSU_2FLAG:
+			return ("MSU_MSU_2FLAG");
+		}
+		break;
+	}
+	switch (event) {
+	case __EVENT_EOF:
+		return ("END OF FILE");
+	case __EVENT_NO_MSG:
+		return ("NO MESSAGE");
+	case __EVENT_TIMEOUT:
+		return ("TIMEOUT");
+	case __EVENT_UNKNOWN:
+		return ("UNKNOWN");
+	case __RESULT_DECODE_ERROR:
+		return ("DECODE ERROR");
+	case __RESULT_SCRIPT_ERROR:
+		return ("SCRIPT ERROR");
+	case __RESULT_INCONCLUSIVE:
+		return ("INCONCLUSIVE");
+	case __RESULT_SUCCESS:
+		return ("SUCCESS");
+	case __RESULT_FAILURE:
+		return ("FAILURE");
+	case __TEST_ENABLE_CON:
+		return ("!enable con");
+	case __TEST_DISABLE_CON:
+		return ("!disable con");
+	case __TEST_OK_ACK:
+		return ("!ok ack");
+	case __TEST_ERROR_ACK:
+		return ("!error ack");
+	case __TEST_ERROR_IND:
+		return ("!error ind");
+	case __TEST_COUNT:
+		return ("COUNT");
+	case __TEST_TRIES:
+		return ("TRIES");
+	case __TEST_ETC:
+		return ("ETC");
+	case __TEST_SIB_S:
+		return ("SIB_S");
+	case __TEST_POWER_ON:
+		return ("POWER_ON");
+	case __TEST_START:
+		return ("START");
+	case __TEST_STOP:
+		return ("STOP");
+	case __TEST_LPO:
+		return ("LPO");
+	case __TEST_LPR:
+		return ("LPR");
+	case __TEST_CONTINUE:
+		return ("CONTINUE");
+	case __TEST_EMERG:
+		return ("EMERG");
+	case __TEST_CEASE:
+		return ("CEASE");
+	case __TEST_SEND_MSU:
+		return ("SEND_MSU");
+	case __TEST_SEND_MSU_S:
+		return ("SEND_MSU_S");
+	case __TEST_CONG_A:
+		return ("CONG_A");
+	case __TEST_CONG_D:
+		return ("CONG_D");
+	case __TEST_NO_CONG:
+		return ("NO_CONG");
+	case __TEST_CLEARB:
+		return ("CLEARB");
+	}
+	return ("(unexpected)");
+}
+
+const char *
+ioctl_string(int cmd, intptr_t arg)
+{
+	switch (cmd) {
+	case I_NREAD:
+		return ("I_NREAD");
+	case I_PUSH:
+		return ("I_PUSH");
+	case I_POP:
+		return ("I_POP");
+	case I_LOOK:
+		return ("I_LOOK");
+	case I_FLUSH:
+		return ("I_FLUSH");
+	case I_SRDOPT:
+		return ("I_SRDOPT");
+	case I_GRDOPT:
+		return ("I_GRDOPT");
+	case I_STR:
+		if (arg) {
+			struct strioctl *icp = (struct strioctl *) arg;
+
+			switch (icp->ic_cmd) {
+#if 0
+			case _O_TI_BIND:
+				return ("_O_TI_BIND");
+			case O_TI_BIND:
+				return ("O_TI_BIND");
+			case _O_TI_GETINFO:
+				return ("_O_TI_GETINFO");
+			case O_TI_GETINFO:
+				return ("O_TI_GETINFO");
+			case _O_TI_GETMYNAME:
+				return ("_O_TI_GETMYNAME");
+			case _O_TI_GETPEERNAME:
+				return ("_O_TI_GETPEERNAME");
+			case _O_TI_OPTMGMT:
+				return ("_O_TI_OPTMGMT");
+			case O_TI_OPTMGMT:
+				return ("O_TI_OPTMGMT");
+			case _O_TI_TLI_MODE:
+				return ("_O_TI_TLI_MODE");
+			case _O_TI_UNBIND:
+				return ("_O_TI_UNBIND");
+			case O_TI_UNBIND:
+				return ("O_TI_UNBIND");
+			case _O_TI_XTI_CLEAR_EVENT:
+				return ("_O_TI_XTI_CLEAR_EVENT");
+			case _O_TI_XTI_GET_STATE:
+				return ("_O_TI_XTI_GET_STATE");
+			case _O_TI_XTI_HELLO:
+				return ("_O_TI_XTI_HELLO");
+			case _O_TI_XTI_MODE:
+				return ("_O_TI_XTI_MODE");
+			case TI_BIND:
+				return ("TI_BIND");
+			case TI_CAPABILITY:
+				return ("TI_CAPABILITY");
+			case TI_GETADDRS:
+				return ("TI_GETADDRS");
+			case TI_GETINFO:
+				return ("TI_GETINFO");
+			case TI_GETMYNAME:
+				return ("TI_GETMYNAME");
+			case TI_GETPEERNAME:
+				return ("TI_GETPEERNAME");
+			case TI_OPTMGMT:
+				return ("TI_OPTMGMT");
+			case TI_SETMYNAME:
+				return ("TI_SETMYNAME");
+			case TI_SETPEERNAME:
+				return ("TI_SETPEERNAME");
+			case TI_SYNC:
+				return ("TI_SYNC");
+			case TI_UNBIND:
+				return ("TI_UNBIND");
+#endif
+			}
+		}
+		return ("I_STR");
+	case I_SETSIG:
+		return ("I_SETSIG");
+	case I_GETSIG:
+		return ("I_GETSIG");
+	case I_FIND:
+		return ("I_FIND");
+	case I_LINK:
+		return ("I_LINK");
+	case I_UNLINK:
+		return ("I_UNLINK");
+	case I_RECVFD:
+		return ("I_RECVFD");
+	case I_PEEK:
+		return ("I_PEEK");
+	case I_FDINSERT:
+		return ("I_FDINSERT");
+	case I_SENDFD:
+		return ("I_SENDFD");
+#if 0
+	case I_E_RECVFD:
+		return ("I_E_RECVFD");
+#endif
+	case I_SWROPT:
+		return ("I_SWROPT");
+	case I_GWROPT:
+		return ("I_GWROPT");
+	case I_LIST:
+		return ("I_LIST");
+	case I_PLINK:
+		return ("I_PLINK");
+	case I_PUNLINK:
+		return ("I_PUNLINK");
+	case I_FLUSHBAND:
+		return ("I_FLUSHBAND");
+	case I_CKBAND:
+		return ("I_CKBAND");
+	case I_GETBAND:
+		return ("I_GETBAND");
+	case I_ATMARK:
+		return ("I_ATMARK");
+	case I_SETCLTIME:
+		return ("I_SETCLTIME");
+	case I_GETCLTIME:
+		return ("I_GETCLTIME");
+	case I_CANPUT:
+		return ("I_CANPUT");
+#if 0
+	case I_SERROPT:
+		return ("I_SERROPT");
+	case I_GERROPT:
+		return ("I_GERROPT");
+	case I_ANCHOR:
+		return ("I_ANCHOR");
+#endif
+#if 0
+	case I_S_RECVFD:
+		return ("I_S_RECVFD");
+	case I_STATS:
+		return ("I_STATS");
+	case I_BIGPIPE:
+		return ("I_BIGPIPE");
+#endif
+#if 0
+	case I_GETTP:
+		return ("I_GETTP");
+	case I_AUTOPUSH:
+		return ("I_AUTOPUSH");
+	case I_HEAP_REPORT:
+		return ("I_HEAP_REPORT");
+	case I_FIFO:
+		return ("I_FIFO");
+	case I_GETMSG:
+		return ("I_GETMSG");
+	case I_PUTMSG:
+		return ("I_PUTMSG");
+	case I_PUTPMSG:
+		return ("I_PUTPMSG");
+	case I_GETPMSG:
+		return ("I_GETPMSG");
+	case I_FATTACH:
+		return ("I_FATTACH");
+	case I_FDETACH:
+		return ("I_FDETACH");
+	case I_PIPE:
+		return ("I_PIPE");
+#endif
+	default:
+		return ("(unexpected)");
+	}
+}
+
+const char *
+signal_string(int signum)
+{
+	switch (signum) {
+	case SIGHUP:
+		return ("SIGHUP");
+	case SIGINT:
+		return ("SIGINT");
+	case SIGQUIT:
+		return ("SIGQUIT");
+	case SIGILL:
+		return ("SIGILL");
+	case SIGABRT:
+		return ("SIGABRT");
+	case SIGFPE:
+		return ("SIGFPE");
+	case SIGKILL:
+		return ("SIGKILL");
+	case SIGSEGV:
+		return ("SIGSEGV");
+	case SIGPIPE:
+		return ("SIGPIPE");
+	case SIGALRM:
+		return ("SIGALRM");
+	case SIGTERM:
+		return ("SIGTERM");
+	case SIGUSR1:
+		return ("SIGUSR1");
+	case SIGUSR2:
+		return ("SIGUSR2");
+	case SIGCHLD:
+		return ("SIGCHLD");
+	case SIGCONT:
+		return ("SIGCONT");
+	case SIGSTOP:
+		return ("SIGSTOP");
+	case SIGTSTP:
+		return ("SIGTSTP");
+	case SIGTTIN:
+		return ("SIGTTIN");
+	case SIGTTOU:
+		return ("SIGTTOU");
+	case SIGBUS:
+		return ("SIGBUS");
+	case SIGPOLL:
+		return ("SIGPOLL");
+	case SIGPROF:
+		return ("SIGPROF");
+	case SIGSYS:
+		return ("SIGSYS");
+	case SIGTRAP:
+		return ("SIGTRAP");
+	case SIGURG:
+		return ("SIGURG");
+	case SIGVTALRM:
+		return ("SIGVTALRM");
+	case SIGXCPU:
+		return ("SIGXCPU");
+	case SIGXFSZ:
+		return ("SIGXFSZ");
+	default:
+		return ("unknown");
+	}
+}
+
+const char *
+poll_string(short events)
+{
+	if (events & POLLIN)
+		return ("POLLIN");
+	if (events & POLLPRI)
+		return ("POLLPRI");
+	if (events & POLLOUT)
+		return ("POLLOUT");
+	if (events & POLLRDNORM)
+		return ("POLLRDNORM");
+	if (events & POLLRDBAND)
+		return ("POLLRDBAND");
+	if (events & POLLWRNORM)
+		return ("POLLWRNORM");
+	if (events & POLLWRBAND)
+		return ("POLLWRBAND");
+	if (events & POLLERR)
+		return ("POLLERR");
+	if (events & POLLHUP)
+		return ("POLLHUP");
+	if (events & POLLNVAL)
+		return ("POLLNVAL");
+	if (events & POLLMSG)
+		return ("POLLMSG");
+	return ("none");
+}
+
+const char *
+poll_events_string(short events)
+{
+	static char string[256] = "";
+	int offset = 0, size = 256, len = 0;
+
+	if (events & POLLIN) {
+		len = snprintf(string + offset, size, "POLLIN|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLPRI) {
+		len = snprintf(string + offset, size, "POLLPRI|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLOUT) {
+		len = snprintf(string + offset, size, "POLLOUT|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDNORM) {
+		len = snprintf(string + offset, size, "POLLRDNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDBAND) {
+		len = snprintf(string + offset, size, "POLLRDBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRNORM) {
+		len = snprintf(string + offset, size, "POLLWRNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRBAND) {
+		len = snprintf(string + offset, size, "POLLWRBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLERR) {
+		len = snprintf(string + offset, size, "POLLERR|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLHUP) {
+		len = snprintf(string + offset, size, "POLLHUP|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLNVAL) {
+		len = snprintf(string + offset, size, "POLLNVAL|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLMSG) {
+		len = snprintf(string + offset, size, "POLLMSG|");
+		offset += len;
+		size -= len;
+	}
+	return (string);
+}
+
+void print_string(int child, const char *string);
+void
+print_ppa(int child, ppa_t * ppa)
+{
+	char buf[32];
+
+	snprintf(buf, sizeof(buf), "%d:%d:%d", ((*ppa) >> 12) & 0x0f, ((*ppa) >> 8) & 0x0f, (*ppa) & 0x0ff);
+	print_string(child, buf);
+}
+void print_string_val(int child, const char *string, ulong val);
+void
+print_sdl_stats(int child, sdl_stats_t * s)
+{
+	if (s->rx_octets)
+		print_string_val(child, "rx_octets", s->rx_octets);
+	if (s->tx_octets)
+		print_string_val(child, "tx_octets", s->tx_octets);
+	if (s->rx_overruns)
+		print_string_val(child, "rx_overruns", s->rx_overruns);
+	if (s->tx_underruns)
+		print_string_val(child, "tx_underruns", s->tx_underruns);
+	if (s->rx_buffer_overflows)
+		print_string_val(child, "rx_buffer_overflows", s->rx_buffer_overflows);
+	if (s->tx_buffer_overflows)
+		print_string_val(child, "tx_buffer_overflows", s->tx_buffer_overflows);
+	if (s->lead_cts_lost)
+		print_string_val(child, "lead_cts_lost", s->lead_cts_lost);
+	if (s->lead_dcd_lost)
+		print_string_val(child, "lead_dcd_lost", s->lead_dcd_lost);
+	if (s->carrier_lost)
+		print_string_val(child, "carrier_lost", s->carrier_lost);
+}
+
+void
+print_sdt_stats(int child, sdt_stats_t * s)
+{
+	if (s->tx_bytes)
+		print_string_val(child, "tx_bytes", s->tx_bytes);
+	if (s->tx_sus)
+		print_string_val(child, "tx_sus", s->tx_sus);
+	if (s->tx_sus_repeated)
+		print_string_val(child, "tx_sus_repeated", s->tx_sus_repeated);
+	if (s->tx_underruns)
+		print_string_val(child, "tx_underruns", s->tx_underruns);
+	if (s->tx_aborts)
+		print_string_val(child, "tx_aborts", s->tx_aborts);
+	if (s->tx_buffer_overflows)
+		print_string_val(child, "tx_buffer_overflows", s->tx_buffer_overflows);
+	if (s->tx_sus_in_error)
+		print_string_val(child, "tx_sus_in_error", s->tx_sus_in_error);
+	if (s->rx_bytes)
+		print_string_val(child, "rx_bytes", s->rx_bytes);
+	if (s->rx_sus)
+		print_string_val(child, "rx_sus", s->rx_sus);
+	if (s->rx_sus_compressed)
+		print_string_val(child, "rx_sus_compressed", s->rx_sus_compressed);
+	if (s->rx_overruns)
+		print_string_val(child, "rx_overruns", s->rx_overruns);
+	if (s->rx_aborts)
+		print_string_val(child, "rx_aborts", s->rx_aborts);
+	if (s->rx_buffer_overflows)
+		print_string_val(child, "rx_buffer_overflows", s->rx_buffer_overflows);
+	if (s->rx_sus_in_error)
+		print_string_val(child, "rx_sus_in_error", s->rx_sus_in_error);
+	if (s->rx_sync_transitions)
+		print_string_val(child, "rx_sync_transitions", s->rx_sync_transitions);
+	if (s->rx_bits_octet_counted)
+		print_string_val(child, "rx_bits_octet_counted", s->rx_bits_octet_counted);
+	if (s->rx_crc_errors)
+		print_string_val(child, "rx_crc_errors", s->rx_crc_errors);
+	if (s->rx_frame_errors)
+		print_string_val(child, "rx_frame_errors", s->rx_frame_errors);
+	if (s->rx_frame_overflows)
+		print_string_val(child, "rx_frame_overflows", s->rx_frame_overflows);
+	if (s->rx_frame_too_long)
+		print_string_val(child, "rx_frame_too_long", s->rx_frame_too_long);
+	if (s->rx_frame_too_short)
+		print_string_val(child, "rx_frame_too_short", s->rx_frame_too_short);
+	if (s->rx_residue_errors)
+		print_string_val(child, "rx_residue_errors", s->rx_residue_errors);
+	if (s->rx_length_error)
+		print_string_val(child, "rx_length_error", s->rx_length_error);
+	if (s->carrier_cts_lost)
+		print_string_val(child, "carrier_cts_lost", s->carrier_cts_lost);
+	if (s->carrier_dcd_lost)
+		print_string_val(child, "carrier_dcd_lost", s->carrier_dcd_lost);
+	if (s->carrier_lost)
+		print_string_val(child, "carrier_lost", s->carrier_lost);
+}
+void
+print_sl_stats(int child, sl_stats_t *s)
+{
+	if (s->sl_dur_in_service)
+		print_string_val(child, "sl_dur_in_service", s->sl_dur_in_service);
+	if (s->sl_fail_align_or_proving)
+		print_string_val(child, "sl_fail_align_or_proving", s->sl_fail_align_or_proving);
+	if (s->sl_nacks_received)
+		print_string_val(child, "sl_nacks_received", s->sl_nacks_received);
+	if (s->sl_dur_unavail)
+		print_string_val(child, "sl_dur_unavail", s->sl_dur_unavail);
+	if (s->sl_dur_unavail_failed)
+		print_string_val(child, "sl_dur_unavail_failed", s->sl_dur_unavail_failed);
+	if (s->sl_sibs_sent)
+		print_string_val(child, "sl_sibs_sent", s->sl_sibs_sent);
+	if (s->sl_tran_sio_sif_octets)
+		print_string_val(child, "sl_tran_sio_sif_octets", s->sl_tran_sio_sif_octets);
+	if (s->sl_tran_msus)
+		print_string_val(child, "sl_tran_msus", s->sl_tran_msus);
+	if (s->sl_recv_sio_sif_octets)
+		print_string_val(child, "sl_recv_sio_sif_octets", s->sl_recv_sio_sif_octets);
+	if (s->sl_recv_msus)
+		print_string_val(child, "sl_recv_msus", s->sl_recv_msus);
+	if (s->sl_cong_onset_ind[0])
+		print_string_val(child, "sl_cong_onset_ind[0]", s->sl_cong_onset_ind[0]);
+	if (s->sl_cong_onset_ind[1])
+		print_string_val(child, "sl_cong_onset_ind[1]", s->sl_cong_onset_ind[1]);
+	if (s->sl_cong_onset_ind[2])
+		print_string_val(child, "sl_cong_onset_ind[2]", s->sl_cong_onset_ind[2]);
+	if (s->sl_cong_onset_ind[3])
+		print_string_val(child, "sl_cong_onset_ind[3]", s->sl_cong_onset_ind[3]);
+	if (s->sl_dur_cong_status[0])
+		print_string_val(child, "sl_dur_cong_status[0]", s->sl_dur_cong_status[0]);
+	if (s->sl_dur_cong_status[1])
+		print_string_val(child, "sl_dur_cong_status[1]", s->sl_dur_cong_status[1]);
+	if (s->sl_dur_cong_status[2])
+		print_string_val(child, "sl_dur_cong_status[2]", s->sl_dur_cong_status[2]);
+	if (s->sl_dur_cong_status[3])
+		print_string_val(child, "sl_dur_cong_status[3]", s->sl_dur_cong_status[3]);
+	if (s->sl_cong_discd_ind[0])
+		print_string_val(child, "sl_cong_discd_ind[0]", s->sl_cong_discd_ind[0]);
+	if (s->sl_cong_discd_ind[1])
+		print_string_val(child, "sl_cong_discd_ind[1]", s->sl_cong_discd_ind[1]);
+	if (s->sl_cong_discd_ind[2])
+		print_string_val(child, "sl_cong_discd_ind[2]", s->sl_cong_discd_ind[2]);
+	if (s->sl_cong_discd_ind[3])
+		print_string_val(child, "sl_cong_discd_ind[3]", s->sl_cong_discd_ind[3]);
+}
+
+const char *
+oos_string(sl_ulong reason)
+{
+	switch (reason) {
+	case SL_FAIL_UNSPECIFIED:
+		return ("!out of service (unspec)");
+	case SL_FAIL_CONG_TIMEOUT:
+		return ("!out of service (T6)");
+	case SL_FAIL_ACK_TIMEOUT:
+		return ("!out of service (T7)");
+	case SL_FAIL_ABNORMAL_BSNR:
+		return ("!out of service (BSNR)");
+	case SL_FAIL_ABNORMAL_FIBR:
+		return ("!out of service (FIBR)");
+	case SL_FAIL_SUERM_EIM:
+		return ("!out of service (SUERM)");
+	case SL_FAIL_ALIGNMENT_NOT_POSSIBLE:
+		return ("!out of service (AERM)");
+	case SL_FAIL_RECEIVED_SIO:
+		return ("!out of service (SIO)");
+	case SL_FAIL_RECEIVED_SIN:
+		return ("!out of service (SIN)");
+	case SL_FAIL_RECEIVED_SIE:
+		return ("!out of service (SIE)");
+	case SL_FAIL_RECEIVED_SIOS:
+		return ("!out of service (SIOS)");
+	case SL_FAIL_T1_TIMEOUT:
+		return ("!out of service (T1)");
+	default:
+		return ("!out of service (\?\?\?)");
+	}
+}
+
+const char *
+prim_string(int prim)
+{
+	switch (prim) {
+	case SL_REMOTE_PROCESSOR_OUTAGE_IND:
+		return ("!rpo");
+	case SL_REMOTE_PROCESSOR_RECOVERED_IND:
+		return ("!rpr");
+	case SL_IN_SERVICE_IND:
+		return ("!in service");
+	case SL_OUT_OF_SERVICE_IND:
+		return ("!out of service");
+	case SL_PDU_IND:
+		return ("!msu");
+	case SL_LINK_CONGESTED_IND:
+		return ("!congested");
+	case SL_LINK_CONGESTION_CEASED_IND:
+		return ("!congestion ceased");
+	case SL_RETRIEVED_MESSAGE_IND:
+		return ("!retrieved message");
+	case SL_RETRIEVAL_COMPLETE_IND:
+		return ("!retrieval complete");
+	case SL_RB_CLEARED_IND:
+		return ("!rb cleared");
+	case SL_BSNT_IND:
+		return ("!bsnt");
+	case SL_RTB_CLEARED_IND:
+		return ("!rtb cleared");
+	case LMI_INFO_ACK:
+		return ("!info ack");
+	case LMI_OK_ACK:
+		return ("!ok ack");
+	case LMI_ERROR_ACK:
+		return ("!error ack");
+	case LMI_ENABLE_CON:
+		return ("!enable con");
+	case LMI_DISABLE_CON:
+		return ("!disable con");
+	case LMI_ERROR_IND:
+		return ("!error ind");
+	case LMI_STATS_IND:
+		return ("!stats ind");
+	case LMI_EVENT_IND:
+		return ("!event ind");
+	default:
+		return ("?_????_??? -----");
+	}
+}
+
+void
+print_simple(int child, const char *msgs[])
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child]);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_simple_int(int child, const char *msgs[], int val)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], val);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_double_int(int child, const char *msgs[], int val, int val2)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], val, val2);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_triple_int(int child, const char *msgs[], int val, int val2, int val3)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], val, val2, val3);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_simple_string(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_string_state(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_triple_string(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], "", child, state);
+	fprintf(stdout, msgs[child], string, child, state);
+	fprintf(stdout, msgs[child], "", child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_more(int child)
+{
+	show = 1;
+}
+
+void
+print_less(int child)
+{
+	static const char *msgs[] = {
+		"         . %1$6.6s . | <------         .         ------> :                    [%2$d:%3$03d]\n",
+		"                    : <------         .         ------> | . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"                    : <------         .      ------> |  : . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"         . %1$6.6s . : <------         .      ------> :> : . %1$-6.6s .         [%2$d:%3$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_triple_string(child, msgs, "(more)");
+	show = 0;
+}
+
+void
+print_pipe(int child)
+{
+	static const char *msgs[] = {
+		"  pipe()      ----->v  v<------------------------------>v                   \n",
+		"                    v  v<------------------------------>v<-----     pipe()  \n",
+		"                    .  .                                .                   \n",
+	};
+
+	if (show && verbose > 3)
+		print_simple(child, msgs);
+}
+
+void
+print_open(int child, const char *name)
+{
+	static const char *msgs[] = {
+		"  open()      ----->v %-30.30s    .                   \n",
+		"                    | %-30.30s    v<-----     open()  \n",
+		"                    | %-30.30s v<-+------     open()  \n",
+		"                    . %-30.30s .  .                   \n",
+	};
+
+	if (show && verbose > 3)
+		print_simple_string(child, msgs, name);
+}
+
+void
+print_close(int child)
+{
+	static const char *msgs[] = {
+		"  close()     ----->X                                   |                   \n",
+		"                    .                                   X<-----    close()  \n",
+		"                    .                                X<-+------    close()  \n",
+		"                    .                                .  .                   \n",
+	};
+
+	if (show && verbose > 3)
+		print_simple(child, msgs);
+}
+
+void
+print_preamble(int child)
+{
+	static const char *msgs[] = {
+		"--------------------+-------------Preamble--------------+                   \n",
+		"                    +-------------Preamble--------------+-------------------\n",
+		"                    +-------------Preamble-----------+--+-------------------\n",
+		"--------------------+-------------Preamble--------------+-------------------\n",
+	};
+
+	if (verbose > 0)
+		print_simple(child, msgs);
+}
+
+void
+print_failure(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"....................|%-32.32s   |                    [%d:%03d]\n",
+		"                    |%-32.32s   |................... [%d:%03d]\n",
+		"                    |%-32.32s|...................... [%d:%03d]\n",
+		"....................|%-32.32s...|................... [%d:%03d]\n",
+	};
+
+	if (string && strnlen(string, 32) > 0 && verbose > 0)
+		print_string_state(child, msgs, string);
+}
+
+void
+print_notapplicable(int child)
+{
+	static const char *msgs[] = {
+		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-X-X|                    [%d:%03d]\n",
+		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
+}
+
+void
+print_skipped(int child)
+{
+	static const char *msgs[] = {
+		"::::::::::::::::::::|:::::::::::: SKIPPED ::::::::::::::|                    [%d:%03d]\n",
+		"                    |:::::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
+		"                    |:::::::::::: SKIPPED :::::::::::|::|::::::::::::::::::: [%d:%03d]\n",
+		"::::::::::::::::::::|:::::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
+}
+
+void
+print_inconclusive(int child)
+{
+	static const char *msgs[] = {
+		"????????????????????|?????????? INCONCLUSIVE ???????????|                    [%d:%03d]\n",
+		"                    |?????????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
+		"                    |?????????? INCONCLUSIVE ????????|??|??????????????????? [%d:%03d]\n",
+		"????????????????????|?????????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
+}
+
+void
+print_test(int child)
+{
+	static const char *msgs[] = {
+		"--------------------+---------------Test----------------+                   \n",
+		"                    +---------------Test----------------+-------------------\n",
+		"                    +---------------Test-------------+--+-------------------\n",
+		"--------------------+---------------Test----------------+-------------------\n",
+	};
+
+	if (verbose > 0)
+		print_simple(child, msgs);
+}
+
+void
+print_failed(int child)
+{
+	static const char *msgs[] = {
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d:%03d]\n",
+		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
+}
+
+void
+print_script_error(int child)
+{
+	static const char *msgs[] = {
+		"####################|########### SCRIPT ERROR ##########|                    [%d:%03d]\n",
+		"                    |########### SCRIPT ERROR ##########|################### [%d:%03d]\n",
+		"                    |########### SCRIPT ERROR #######|##|################### [%d:%03d]\n",
+		"####################|########### SCRIPT ERROR ##########|################### [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
+}
+
+void
+print_passed(int child)
+{
+	static const char *msgs[] = {
+		"********************|************* PASSED **************|                    [%d:%03d]\n",
+		"                    |************* PASSED **************|******************* [%d:%03d]\n",
+		"                    |************* PASSED ***********|**|******************* [%d:%03d]\n",
+		"********************|************* PASSED **************|******************* [%d:%03d]\n",
+	};
+
+	if (verbose > 2)
+		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
+}
+
+void
+print_postamble(int child)
+{
+	static const char *msgs[] = {
+		"--------------------+-------------Postamble-------------+                   \n",
+		"                    +-------------Postamble-------------+-------------------\n",
+		"                    +-------------Postamble----------+--+-------------------\n",
+		"--------------------+-------------Postamble-------------+-------------------\n",
+	};
+
+	if (verbose > 0)
+		print_simple(child, msgs);
+}
+
+void
+print_test_end(int child)
+{
+	static const char *msgs[] = {
+		"--------------------+-----------------------------------+                   \n",
+		"                    +-----------------------------------+-------------------\n",
+		"                    +--------------------------------+--+-------------------\n",
+		"--------------------+-----------------------------------+-------------------\n",
+	};
+
+	if (verbose > 0)
+		print_simple(child, msgs);
+}
+
+void
+print_terminated(int child, int signal)
+{
+	static const char *msgs[] = {
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@@@@|                    {%d:%03d}\n",
+		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, signal);
+}
+
+void
+print_stopped(int child, int signal)
+{
+	static const char *msgs[] = {
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                    {%d:%03d}\n",
+		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, signal);
+}
+
+void
+print_timeout(int child)
+{
+	static const char *msgs[] = {
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! +++++++++++++|                    [%d:%03d]\n",
+		"                    |++++++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
+		"                    |++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
+	};
+
+	if (show_timeout || verbose > 1) {
+		print_double_int(child, msgs, child, state);
+		show_timeout--;
+	}
+}
+
+void
+print_nothing(int child)
+{
+	static const char *msgs[] = {
+		"- - - - - - - - - - |- - - - - - -nothing! - - - - - - -|                    [%d:%03d]\n",
+		"                    |- - - - - - -nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
+		"                    |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
+		"- - - - - - - - - - |- - - - - - -nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_double_int(child, msgs, child, state);
+}
+
+void
+print_syscall(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"%-14s----->|                                   |                    [%d:%03d]\n",
+		"                    |                                   |<---%-14s  [%d:%03d]\n",
+		"                    |                                |<-+----%-14s  [%d:%03d]\n",
+		"                    |          %-14s           |                    [%d:%03d]\n",
+	};
+
+	if ((verbose && show) || (verbose > 5 && show_msg))
+		print_string_state(child, msgs, command);
+}
+
+void
+print_tx_prim(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"--%16s->| - - - - - - - - - - - - - - - - ->|                    [%d:%03d]\n",
+		"                    |<- - - - - - - - - - - - - - - - - |<-%16s- [%d:%03d]\n",
+		"                    |<- - - - - - - - - - - - - - - -|<----%16s- [%d:%03d]\n",
+		"                    |         %-16s          |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, command);
+}
+
+void
+print_rx_prim(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"<-%16s--|<- - - - - - - - - - - - - - - - - |                    [%d:%03d]\n",
+		"                    |- - - - - - - - - - - - - - - - - >|--%16s> [%d:%03d]\n",
+		"                    |- - - - - - - - - - - - - - - ->|--+--%16s> [%d:%03d]\n",
+		"                    |         <%16s>        |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, command);
+}
+
+void
+print_string_state_sn(int child, const char *msgs[], const char *string, uint32_t bsn, uint32_t fsn)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, bsn, fsn, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_tx_msg_sn(int child, const char *string, uint32_t bsn, uint32_t fsn)
+{
+	static const char *msgs[] = {
+		"%1$20.20s| ---------[%3$06X,%2$06X]--------> |                    [%4$d:%5$03d]\n",
+		"                    | <--------[%2$06X,%3$06X]--------- |%1$-20.20s[%4$d:%5$03d]\n",
+		"                    | <--------[%2$06X,%3$06X]------ |  |%1$-20.20s[%4$d:%5$03d]\n",
+		"                    |      <%1$-20.20s>       |                    [%4$d:%5$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state_sn(child, msgs, string, bsn, fsn);
+}
+
+void
+print_rx_msg_sn(int child, const char *string, uint32_t bsn, uint32_t fsn)
+{
+	static const char *msgs[] = {
+		"%1$20.20s| <--------[%2$06X,%3$06X]--------- |                    [%4$d:%5$03d]\n",
+		"                    | ---------[%3$06X,%2$06X]--------> |%1$-20.20s[%4$d:%5$03d]\n",
+		"                    | ---------[%3$06X,%2$06X]-----> |   %1$-20.20s[%4$d:%5$03d]\n",
+		"                    |       <%1$20.20s>      |                    [%4$d:%5$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state_sn(child, msgs, string, bsn, fsn);
+}
+
+void
+print_tx_msg(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%20.20s| --------------------------------> |                    [%d:%03d]\n",
+		"                    | <-------------------------------- |%-20.20s[%d:%03d]\n",
+		"                    | <----------------------------- |  |%-20.20s[%d:%03d]\n",
+		"                    |      <%-20.20s>       |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0) {
+		if (fsn[child] != 0x7f || bsn[child] != 0x7f || fib[child] != 0x80 || bib[child] != 0x80)
+			print_tx_msg_sn(child, string, bib[child] | bsn[child], fib[child] | fsn[child]);
+		else
+			print_string_state(child, msgs, string);
+	}
+}
+
+void
+print_rx_msg(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%20.20s| <-------------------------------- |                    [%d:%03d]\n",
+		"                    | --------------------------------> |%-20.20s[%d:%03d]\n",
+		"                    | -----------------------------> |   %-20.20s[%d:%03d]\n",
+		"                    |       <%20.20s>      |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0) {
+		int other = (child + 1) % 2;
+
+		if (fsn[other] != 0x7f || bsn[other] != 0x7f || fib[other] != 0x80 || bib[other] != 0x80)
+			print_rx_msg_sn(child, string, bib[other] | bsn[other], fib[other] | fsn[other]);
+		else
+			print_string_state(child, msgs, string);
+	}
+}
+
+void
+print_ack_prim(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"<-%16s-/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\-%16s> [%d:%03d]\n",
+		"                    |                                |\\-+--%16s> [%d:%03d]\n",
+		"                    |         <%16s>        |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, command);
+}
+
+void
+print_long_state(int child, const char *msgs[], long value)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], value, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_no_prim(int child, long prim)
+{
+	static const char *msgs[] = {
+		"????%4ld????  ?----?| ?- - - - - - - - - - - - - - - -? |                     [%d:%03d]\n",
+		"                    | ?- - - - - - - - - - - - - - - -? |?--? ????%4ld????    [%d:%03d]\n",
+		"                    | ?- - - - - - - -- - - - - - -? |?-+---? ????%4ld????    [%d:%03d]\n",
+		"                    | ?- - - - - - -%4ld- - - - - -? |  |                     [%d:%03d]\n",
+	};
+
+	if (verbose > 1)
+		print_long_state(child, msgs, prim);
+}
+
+void
+print_signal(int child, int signum)
+{
+	static const char *msgs[] = {
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|                    [%d:%03d]\n",
+		"                    |>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		"                    |>>>>>>>>>>>> %-8.8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_string_state(child, msgs, signal_string(signum));
+}
+
+void
+print_double_string_state(int child, const char *msgs[], const char *string1, const char *string2)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string1, string2, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_command_info(int child, const char *command, const char *info)
+{
+	static const char *msgs[] = {
+		"%1$-14s----->|         %2$-16.16s          |                    [%3$d:%4$03d]\n",
+		"                    |         %2$-16.16s          |<---%1$-14s  [%3$d:%4$03d]\n",
+		"                    |         %2$-16.16s       |<-+----%1$-14s  [%3$d:%4$03d]\n",
+		"                    | %1$-14s %2$-16.16s|  |                    [%3$d:%4$03d]\n",
+	};
+
+	if (show && verbose > 3)
+		print_double_string_state(child, msgs, command, info);
+}
+
+void
+print_string_int_state(int child, const char *msgs[], const char *string, int val)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, val, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_tx_data(int child, const char *command, size_t bytes)
+{
+	static const char *msgs[] = {
+		"--%1$16s->| - %2$5d bytes - - - - - - - - - ->|                    [%3$d:%4$03d]\n",
+		"                    |<- %2$5d bytes - - - - - - - - - - |<-%1$16s- [%3$d:%4$03d]\n",
+		"                    |<- %2$5d bytes - - - - - - - - -|<-+ -%1$16s- [%3$d:%4$03d]\n",
+		"                    | - %2$5d bytes %1$16s    |                    [%3$d:%4$03d]\n",
+	};
+
+	if ((verbose && show) || verbose > 4)
+		print_string_int_state(child, msgs, command, bytes);
+}
+
+void
+print_rx_data(int child, const char *command, size_t bytes)
+{
+	static const char *msgs[] = {
+		"<-%1$16s--|<- -%2$4d bytes- - - - - - - - - - -|                    [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes- - - - - - - - - - >|--%1$16s> [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes- - - - - - - - ->|--+--%1$16s> [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes %1$16s    |                    [%3$d:%4$03d]\n",
+	};
+
+	if ((verbose && show) || (verbose > 5 && show_msg))
+		print_string_int_state(child, msgs, command, bytes);
+}
+
+void
+print_errno(int child, long error)
+{
+	static const char *msgs[] = {
+		"  %-14s<--/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\-->%14s  [%d:%03d]\n",
+		"                    |                                |\\-+--->%14s  [%d:%03d]\n",
+		"                    |          [%14s]         |                    [%d:%03d]\n",
+	};
+
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
+		print_string_state(child, msgs, errno_string(error));
+}
+
+void
+print_success(int child)
+{
+	static const char *msgs[] = {
+		"  ok          <----/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\---->         ok   [%d:%03d]\n",
+		"                    |                                |\\-+----->         ok   [%d:%03d]\n",
+		"                    |                 ok                |                    [%d:%03d]\n",
+	};
+
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
+		print_double_int(child, msgs, child, state);
+}
+
+void
+print_success_value(int child, int value)
+{
+	static const char *msgs[] = {
+		"  %10d  <----/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\---->  %10d  [%d:%03d]\n",
+		"                    |                                |\\-+----->  %10d  [%d:%03d]\n",
+		"                    |            [%10d]           |                    [%d:%03d]\n",
+	};
+
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
+		print_triple_int(child, msgs, value, child, state);
+}
+
+void
+print_int_string_state(int child, const char *msgs[], const int value, const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], value, string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_poll_value(int child, int value, short revents)
+{
+	static const char *msgs[] = {
+		"  %1$10d  <----/| %2$-30.30s    |                    [%3$d:%4$03d]\n",
+		"                    | %2$-30.30s    |\\---->  %1$10d  [%3$d:%4$03d]\n",
+		"                    | %2$-30.30s |\\-+----->  %1$10d  [%3$d:%4$03d]\n",
+		"                    | %2$-20.20s [%1$10d] |                    [%3$d:%4$03d]\n",
+	};
+
+	if (show && verbose > 3)
+		print_int_string_state(child, msgs, value, poll_events_string(revents));
+}
+
+void
+print_ti_ioctl(int child, int cmd, intptr_t arg)
+{
+	static const char *msgs[] = {
+		"--ioctl(2)--------->|       %16s            |                    [%d:%03d]\n",
+		"                    |       %16s            |<---ioctl(2)------  [%d:%03d]\n",
+		"                    |       %16s         |<-+----ioctl(2)------  [%d:%03d]\n",
+		"                    |       %16s ioctl(2)   |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, ioctl_string(cmd, arg));
+}
+
+void
+print_ioctl(int child, int cmd, intptr_t arg)
+{
+	print_command_info(child, "ioctl(2)------", ioctl_string(cmd, arg));
+}
+
+void
+print_poll(int child, short events)
+{
+	print_command_info(child, "poll(2)-------", poll_string(events));
+}
+
+void
+print_datcall(int child, const char *command, size_t bytes)
+{
+	static const char *msgs[] = {
+		"  %1$16s->| - %2$5d bytes - - - - - - - - - ->|                    [%3$d:%4$03d]\n",
+		"                    |<- %2$5d bytes - - - - - - - - - - |<-%1$16s  [%3$d:%4$03d]\n",
+		"                    |<- %2$5d bytes - - - - - - - - -|<-+--%1$16s  [%3$d:%4$03d]\n",
+		"                    | - %2$5d bytes %1$16s    |                    [%3$d:%4$03d]\n",
+	};
+
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
+		print_string_int_state(child, msgs, command, bytes);
+}
+
+void
+print_libcall(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"  %-16s->|                                   |                    [%d:%03d]\n",
+		"                    |                                   |<-%16s  [%d:%03d]\n",
+		"                    |                                |<-+--%16s  [%d:%03d]\n",
+		"                    |        [%16s]         |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, command);
+}
+
+#if 0
+void
+print_terror(int child, long error, long terror)
+{
+	static const char *msgs[] = {
+		"  %-14s<--/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\-->%14s  [%d:%03d]\n",
+		"                    |                                |\\-+--->%14s  [%d:%03d]\n",
+		"                    |          [%14s]         |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, t_errno_string(terror, error));
+}
+#endif
+
+#if 0
+void
+print_tlook(int child, int tlook)
+{
+	static const char *msgs[] = {
+		"  %-14s<--/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\-->%14s  [%d:%03d]\n",
+		"                    |                                |\\-|--->%14s  [%d:%03d]\n",
+		"                    |          [%14s]         |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, t_look_string(tlook));
+}
+#endif
+
+void
+print_expect(int child, int want)
+{
+	static const char *msgs[] = {
+		" (%-16s) |- - - - - -[Expected]- - - - - - - |                    [%d:%03d]\n",
+		"                    |- - - - - -[Expected]- - - - - - - | (%-16s) [%d:%03d]\n",
+		"                    |- - - - - -[Expected]- - - - - -|- | (%-16s) [%d:%03d]\n",
+		"                    |- [Expected %-16s ] - - |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 0 && show)
+		print_string_state(child, msgs, event_string(child, want));
+}
+
+void
+print_string(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%-20s|                                   |                    \n",
+		"                    |                                   |%-20s\n",
+		"                    |                                |   %-20s\n",
+		"                    |       %-20s        |                    \n",
+	};
+
+	if (show && verbose > 0)
+		print_simple_string(child, msgs, string);
+}
+
+void
+print_string_val(int child, const char *string, ulong val)
+{
+	static const char *msgs[] = {
+		"%1$20.20s|          %2$15u          |                    \n",
+		"                    |          %2$15u          |%1$-20.20s\n",
+		"                    |          %2$15u       |   %1$-20.20s\n",
+		"                    |%1$-20.20s%2$15u|                    \n",
+	};
+
+	if (show && verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, msgs[child], string, val);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_command_state(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%20s|                                   |                    [%d:%03d]\n",
+		"                    |                                   |%-20s[%d:%03d]\n",
+		"                    |                                |   %-20s[%d:%03d]\n",
+		"                    |       %-20s        |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state(child, msgs, string);
+}
+
+void
+print_time_state(int child, const char *msgs[], ulong time)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], time, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_waiting(int child, ulong time)
+{
+	static const char *msgs[] = {
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / / / |                    [%d:%03d]\n",
+		"                    | / / / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
+		"                    | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
+	};
+
+	if (verbose > 1 && show)
+		print_time_state(child, msgs, time);
+}
+
+void
+print_float_state(int child, const char *msgs[], float time)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], time, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_mwaiting(int child, struct timespec *time)
+{
+	static const char *msgs[] = {
+		"/ / / / / / / / / / | / / Waiting %8.4f seconds/ / / |                    [%d:%03d]\n",
+		"                    | / / Waiting %8.4f seconds/ / / | / / / / / / / / /  [%d:%03d]\n",
+		"                    | / / Waiting %8.4f seconds/ /|/ / / / / / / / / / /  [%d:%03d]\n",
+		"/ / / / / / / / / / | / / Waiting %8.4f seconds/ / / | / / / / / / / / /  [%d:%03d]\n",
+	};
+
+	if (verbose > 1 && show) {
+		float delay;
+
+		delay = time->tv_nsec;
+		delay = delay / 1000000000;
+		delay = delay + time->tv_sec;
+		print_float_state(child, msgs, delay);
+	}
+}
+
+#if 0
+void
+print_opt_level(int child, struct t_opthdr *oh)
+{
+	char *level = level_string(oh);
+
+	if (level)
+		print_string(child, level);
+}
+
+void
+print_opt_name(int child, struct t_opthdr *oh)
+{
+	char *name = name_string(oh);
+
+	if (name)
+		print_string(child, name);
+}
+
+void
+print_opt_status(int child, struct t_opthdr *oh)
+{
+	char *status = status_string(oh);
+
+	if (status)
+		print_string(child, status);
+}
+
+void
+print_opt_length(int child, struct t_opthdr *oh)
+{
+	int len = oh->len - sizeof(*oh);
+
+	if (len) {
+		char buf[32];
+
+		snprintf(buf, sizeof(buf), "(len=%d)", len);
+		print_string(child, buf);
+	}
+}
+void
+print_opt_value(int child, struct t_opthdr *oh)
+{
+	char *value = value_string(child, oh);
+
+	if (value)
+		print_string(child, value);
+}
+#endif
+
+#if 0
+void
+print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
+{
+	unsigned char *qos_ptr = (unsigned char *) (cmd_buf + qos_ofs);
+	union N_qos_ip_types *qos = (union N_qos_ip_types *) qos_ptr;
+	char buf[64];
+
+	if (verbose < 3 || !show)
+		return;
+	if (qos_len) {
+		switch (qos->n_qos_type) {
+		case N_QOS_SEL_CONN_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_CONN_IP:");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_conn.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_conn.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_conn.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_conn.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_conn.mtu);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_conn.saddr));
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " daddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_conn.daddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_SEL_UD_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_UD_IP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_ud.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_ud.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_ud.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_ud.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_ud.saddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_SEL_INFO_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_INFO_IP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_info.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_info.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_info.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_info.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_info.mtu);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_info.saddr));
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " daddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_info.daddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_RANGE_INFO_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_RANGE_INFO_IP: ");
+			print_string(child, buf);
+			break;
+
+		default:
+			snprintf(buf, sizeof(buf), "(unknown qos structure %lu)\n", (ulong) qos->n_qos_type);
+			print_string(child, buf);
+			break;
+		}
+	} else {
+		snprintf(buf, sizeof(buf), "(no qos)");
+		print_string(child, buf);
+	}
+}
+#endif
+
+#if 0
+int
+ip_n_open(const char *name, int *fdp)
+{
+	int fd;
+
+	for (;;) {
+		print_open(fdp, name);
+		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
+			*fdp = fd;
+			print_success(fd);
+			return (__RESULT_SUCCESS);
+		}
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return (__RESULT_FAILURE);
+	}
+}
+
+int
+ip_close(int *fdp)
+{
+	int fd = *fdp;
+
+	*fdp = 0;
+	for (;;) {
+		print_close(fdp);
+		if (close(fd) >= 0) {
+			print_success(fd);
+			return __RESULT_SUCCESS;
+		}
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return __RESULT_FAILURE;
+	}
+}
+
+int
+ip_datack_req(int fd)
+{
+	int ret;
+
+	data.len = -1;
+	ctrl.len = sizeof(cmd.npi.datack_req) + sizeof(qos_data);
+	cmd.prim = N_DATACK_REQ;
+	bcopy(&qos_data, cbuf + sizeof(cmd.npi.datack_req), sizeof(qos_data));
+	ret = put_msg(fd, 0, MSG_BAND, 0);
+	return (ret);
+}
+#endif
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Driver actions.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+int
+test_waitsig(int child)
+{
+	int signum;
+	sigset_t set;
+
+	sigemptyset(&set);
+	while ((signum = last_signum) == 0)
+		sigsuspend(&set);
+	print_signal(child, signum);
+	return (__RESULT_SUCCESS);
+
+}
+
+int
+test_ioctl(int child, int cmd, intptr_t arg)
+{
+	print_ioctl(child, cmd, arg);
+	for (;;) {
+		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		if (show && verbose > 3)
+			print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
+	}
+}
+
+int
+test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strbuf *data, int flags)
+{
+	struct strfdinsert fdi;
+
+	if (ctrl) {
+		fdi.ctlbuf.maxlen = ctrl->maxlen;
+		fdi.ctlbuf.len = ctrl->len;
+		fdi.ctlbuf.buf = ctrl->buf;
+	} else {
+		fdi.ctlbuf.maxlen = -1;
+		fdi.ctlbuf.len = 0;
+		fdi.ctlbuf.buf = NULL;
+	}
+	if (data) {
+		fdi.databuf.maxlen = data->maxlen;
+		fdi.databuf.len = data->len;
+		fdi.databuf.buf = data->buf;
+	} else {
+		fdi.databuf.maxlen = -1;
+		fdi.databuf.len = 0;
+		fdi.databuf.buf = NULL;
+	}
+	fdi.flags = flags;
+	fdi.fildes = resfd;
+	fdi.offset = offset;
+	if (show && verbose > 4) {
+		int i;
+
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "fdinsert to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+		fprintf(stdout, "[");
+		for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+			fprintf(stdout, "%02X", (uint8_t) ctrl->buf[i]);
+		fprintf(stdout, "]\n");
+		fprintf(stdout, "[");
+		for (i = 0; i < (data ? data->len : 0); i++)
+			fprintf(stdout, "%02X", (uint8_t) data->buf[i]);
+		fprintf(stdout, "]\n");
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
+int
+test_putmsg(int child, struct strbuf *ctrl, struct strbuf *data, int flags)
+{
+	print_datcall(child, "putmsg(2)-----", data ? data->len : -1);
+	if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+	print_success_value(child, last_retval);
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
+{
+	if (flags & MSG_BAND || band) {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
+			int i;
+
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+			fprintf(stdout, "[");
+			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+				fprintf(stdout, "%02X", (uint8_t) ctrl->buf[i]);
+			fprintf(stdout, "]\n");
+			fprintf(stdout, "[");
+			for (i = 0; i < (data ? data->len : 0); i++)
+				fprintf(stdout, "%02X", (uint8_t) data->buf[i]);
+			fprintf(stdout, "]\n");
+			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		if (ctrl == NULL || data != NULL)
+			print_datcall(child, "M_DATA----------", data ? data->len : 0);
+		for (;;) {
+			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
+				if (last_errno == EINTR || last_errno == ERESTART)
+					continue;
+				print_errno(child, (last_errno = errno));
+				return (__RESULT_FAILURE);
+			}
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
+				print_success_value(child, last_retval);
+			return (__RESULT_SUCCESS);
+		}
+	} else {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			fflush(stdout);
+		}
+		if (ctrl == NULL || data != NULL)
+			print_datcall(child, "M_DATA----------", data ? data->len : 0);
+		for (;;) {
+			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+				if (last_errno == EINTR || last_errno == ERESTART)
+					continue;
+				print_errno(child, (last_errno = errno));
+				return (__RESULT_FAILURE);
+			}
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
+				print_success_value(child, last_retval);
+			return (__RESULT_SUCCESS);
+		}
+	}
+}
+
+int
+test_write(int child, const void *buf, size_t len)
+{
+	print_syscall(child, "write(2)------");
+	for (;;) {
+		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_writev(int child, const struct iovec *iov, int num)
+{
+	print_syscall(child, "writev(2)-----");
+	for (;;) {
+		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
+{
+	print_syscall(child, "getmsg(2)-----");
+	for (;;) {
+		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
+{
+	print_syscall(child, "getpmsg(2)----");
+	for (;;) {
+		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_read(int child, void *buf, size_t count)
+{
+	print_syscall(child, "read(2)-------");
+	for (;;) {
+		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_readv(int child, const struct iovec *iov, int count)
+{
+	print_syscall(child, "readv(2)------");
+	for (;;) {
+		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_ti_ioctl(int child, int cmd, intptr_t arg)
+{
+	if (cmd == I_STR && verbose > 3) {
+		struct strioctl *icp = (struct strioctl *) arg;
+
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	print_ti_ioctl(child, cmd, arg);
+	for (;;) {
+		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		if (show && verbose > 3)
+			print_success_value(child, last_retval);
+		break;
+	}
+	if (cmd == I_STR && show && verbose > 3) {
+		struct strioctl *icp = (struct strioctl *) arg;
+
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "got ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (last_retval == 0)
+		return __RESULT_SUCCESS;
+	if (verbose) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "***************ERROR: ioctl failed\n");
+		if (show && verbose > 3)
+			fprintf(stdout, "                    : %s; result = %d\n", __FUNCTION__, last_retval);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+		fflush(stdout);
+	}
+	return (__RESULT_FAILURE);
+}
+
+int
+test_nonblock(int child)
+{
+	long flags;
+
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_block(int child)
+{
+	long flags;
+
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_isastream(int child)
+{
+	int result;
+
+	print_syscall(child, "isastream(2)--");
+	for (;;) {
+		if ((result = last_retval = isastream(test_fd[child])) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_poll(int child, const short events, short *revents, long ms)
+{
+	struct pollfd pfd = {.fd = test_fd[child],.events = events,.revents = 0 };
+	int result;
+
+	print_poll(child, events);
+	for (;;) {
+		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_poll_value(child, last_retval, pfd.revents);
+		if (last_retval == 1 && revents)
+			*revents = pfd.revents;
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_pipe(int child)
+{
+	int fds[2];
+
+	for (;;) {
+		print_pipe(child);
+		if (pipe(fds) >= 0) {
+			test_fd[child + 0] = fds[0];
+			test_fd[child + 1] = fds[1];
+			print_success(child);
+			return (__RESULT_SUCCESS);
+		}
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+}
+
+int
+test_fopen(int child, const char *name, int flags)
+{
+	int fd;
+
+	print_open(child, name);
+	if ((fd = open(name, flags)) >= 0) {
+		print_success(child);
+		return (fd);
+	}
+	print_errno(child, (last_errno = errno));
+	return (fd);
+}
+
+int
+test_fclose(int child, int fd)
+{
+	print_close(child);
+	if (close(fd) >= 0) {
+		print_success(child);
+		return __RESULT_SUCCESS;
+	}
+	print_errno(child, (last_errno = errno));
+	return __RESULT_FAILURE;
+}
+
+int
+test_open(int child, const char *name, int flags)
+{
+	int fd;
+
+	for (;;) {
+		print_open(child, name);
+		if ((fd = open(name, flags)) >= 0) {
+			test_fd[child] = fd;
+			print_success(child);
+			return (__RESULT_SUCCESS);
+		}
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+}
+
+int
+test_close(int child)
+{
+	int fd = test_fd[child];
+
+	test_fd[child] = 0;
+	for (;;) {
+		print_close(child);
+		if (close(fd) >= 0) {
+			print_success(child);
+			return __RESULT_SUCCESS;
+		}
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		print_errno(child, (last_errno = errno));
+		return __RESULT_FAILURE;
+	}
+}
+
+int
+test_push(int child, const char *name)
+{
+	if (show && verbose > 1)
+		print_command_state(child, ":push");
+	if (test_ioctl(child, I_PUSH, (intptr_t) name))
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
+int
+test_pop(int child)
+{
+	if (show && verbose > 1)
+		print_command_state(child, ":pop");
+	if (test_ioctl(child, I_POP, (intptr_t) 0))
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Old Stream Initialization
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+static int
+pt_open(void)
+{
+	int pfd[2];
+
+	if (verbose > 1) {
+		printf("                    .  .                            X--X---pipe()           (%d)\n", state);
+		fflush(stdout);
+	}
+	if ((pipe(pfd) < 0)) {
+		printf("                                              ****ERROR: pipe failed\n");
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return FAILURE;
+	}
+	pt_fd = pfd[0];
+	pt_lnk_fd = pfd[1];
+	if (verbose > 1) {
+		printf("                    .  .                            |  |<--I_SRDOPT---------(%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(pt_fd, I_SRDOPT, RMSGD) < 0) {
+		printf("                                              ****ERROR: ioctl failed\n");
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("                    .  .                            |  |<--I_PUSH-----------(%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(pt_fd, I_PUSH, "pipemod") < 0) {
+		printf("                                              ****ERROR: push failed\n");
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	return __RESULT_SUCCESS;
+}
+
+static int
+pt_close(void)
+{
+	if (verbose > 1) {
+		printf("                    .  .                            |  |<--I_POP------------(%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(pt_fd, I_POP, 0) < 0) {
+		printf("                                              ****ERROR: pop failed\n");
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("                    .  .                            X--X---close()          (%d)\n", state);
+		fflush(stdout);
+	}
+	if (close(pt_fd) < 0) {
+		printf("                                              ****ERROR: close pipe[0] failed\n");
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (close(pt_lnk_fd) < 0) {
+		printf("                                              ****ERROR: close pipe[1] failed\n");
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	return __RESULT_SUCCESS;
+}
+
+static int
+pt_start(void)
+{
+	if (pt_open() != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
+static int
+pt_stop(void)
+{
+	if (pt_close() != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
+/*
+ *  IUT Intitialization and Configuration
+ */
+static int
+iut_open(void)
+{
+	if (verbose > 1) {
+		printf("---open()-----------X  .                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if ((iut_cpc_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
+		printf("***************ERROR: open failed\n");
+		printf("                    : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---open()-tst-------+--X                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if ((iut_tst_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
+		printf("******************ERROR: open tst failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---open()-mgm-------+--X                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if ((iut_mgm_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
+		printf("******************ERROR: open mgm failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---open()-mnt-------+--X                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if ((iut_mnt_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
+		printf("******************ERROR: open mnt failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---I_SRDOPT-------->|  |                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_cpc_fd, I_SRDOPT, RMSGD) < 0) {
+		printf("***************ERROR: ioctl failed\n");
+		printf("                    : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---I_SRDOPT-tst-----+->|                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_tst_fd, I_SRDOPT, RMSGD) < 0) {
+		printf("******************ERROR: ioctl tst failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---I_SRDOPT-mgm-----+->|                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_SRDOPT, RMSGD) < 0) {
+		printf("******************ERROR: ioctl mgm failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---I_SRDOPT-mnt-----+->|                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mnt_fd, I_SRDOPT, RMSGD) < 0) {
+		printf("******************ERROR: ioctl mnt failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	return __RESULT_SUCCESS;
+}
+
+static int
+iut_close(void)
+{
+	if (verbose > 1) {
+		printf("---close()----------+--X                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (close(iut_mnt_fd) < 0) {
+		printf("******************ERROR: close mnt failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---close()----------+--X                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (close(iut_mgm_fd) < 0) {
+		printf("******************ERROR: close mgm failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---close()----------+--X                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (close(iut_tst_fd) < 0) {
+		printf("******************ERROR: close tst failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	if (verbose > 1) {
+		printf("---close()----------X  .                            |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (close(iut_cpc_fd) < 0) {
+		printf("***************ERROR: close cpc failed\n");
+		printf("                    : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	return __RESULT_SUCCESS;
+}
+
+static int
+iut_config(void)
+{
+	int i;
+	struct strioctl ioc;
+	struct {
+		struct isup_config conf;
+		struct isup_conf_sp sp;
+	} conf_sp;
+	struct {
+		struct isup_config conf;
+		struct isup_conf_sr sr;
+	} conf_sr;
+	struct {
+		struct isup_config conf;
+		struct isup_conf_tg tg;
+	} conf_tg;
+	struct {
+		struct isup_config conf;
+		struct isup_conf_cg cg;
+	} conf_cg;
+	struct {
+		struct isup_config conf;
+		struct isup_conf_ct ct;
+	} conf_ct;
+
+	conf_sp.conf.type = ISUP_OBJ_TYPE_SP;
+	conf_sp.conf.id = 1;
+	conf_sp.conf.cmd = ISUP_ADD;
+	conf_sp.sp.add = loc_addr;
+	conf_sp.sp.proto.pvar = SS7_PVAR_ITUT_96;
+	conf_sp.sp.proto.popt = SS7_POPT_UPT;
+	ioc.ic_cmd = ISUP_IOCSCONFIG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(conf_sp);
+	ioc.ic_dp = (char *) &conf_sp;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD sp = 1)          |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: adding sp=1\n");
+		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	conf_sr.conf.type = ISUP_OBJ_TYPE_SR;
+	conf_sr.conf.id = 1;
+	conf_sr.conf.cmd = ISUP_ADD;
+	conf_sr.sr.spid = 1;
+	conf_sr.sr.add = rem_addr;
+	conf_sr.sr.proto.pvar = SS7_PVAR_ITUT_96;
+	conf_sr.sr.proto.popt = SS7_POPT_UPT;
+	ioc.ic_cmd = ISUP_IOCSCONFIG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(conf_sr);
+	ioc.ic_dp = (char *) &conf_sr;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD sr = 1)          |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: adding sr=1\n");
+		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	conf_tg.conf.type = ISUP_OBJ_TYPE_TG;
+	conf_tg.conf.id = 1;
+	conf_tg.conf.cmd = ISUP_ADD;
+	conf_tg.tg.srid = 1;
+	conf_tg.tg.proto.pvar = SS7_PVAR_ITUT_96;
+	conf_tg.tg.proto.popt = SS7_POPT_UPT;
+	ioc.ic_cmd = ISUP_IOCSCONFIG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(conf_tg);
+	ioc.ic_dp = (char *) &conf_tg;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD tg = 1)          |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: adding tg=1\n");
+		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	conf_cg.conf.type = ISUP_OBJ_TYPE_CG;
+	conf_cg.conf.id = 1;
+	conf_cg.conf.cmd = ISUP_ADD;
+	conf_cg.cg.srid = 1;
+	conf_cg.cg.proto.pvar = SS7_PVAR_ITUT_96;
+	conf_cg.cg.proto.popt = SS7_POPT_UPT;
+	ioc.ic_cmd = ISUP_IOCSCONFIG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(conf_cg);
+	ioc.ic_dp = (char *) &conf_cg;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD cg = 1)          |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: adding cg=1\n");
+		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	ioc.ic_cmd = ISUP_IOCSCONFIG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(conf_ct);
+	ioc.ic_dp = (char *) &conf_ct;
+	for (i = 1; i < 32; i++) {
+		if (i == 16)
+			continue;
+		conf_ct.conf.type = ISUP_OBJ_TYPE_CT;
+		conf_ct.conf.id = i;
+		conf_ct.conf.cmd = ISUP_ADD;
+		conf_ct.ct.cgid = 1;
+		conf_ct.ct.tgid = 1;
+		conf_ct.ct.cic = i;
+		if (verbose > 2) {
+			printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD ct = %2d)         |  |                    (%d)\n", state, i);
+			fflush(stdout);
+		}
+		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+			printf("******************ERROR: adding ct=%d\n", i);
+			printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+			fflush(stdout);
+			return __RESULT_FAILURE;
+		}
+	}
+	return __RESULT_SUCCESS;
+}
+
+static int
+iut_unconfig(void)
+{
+	int i;
+	struct isup_config conf;
+	struct strioctl ioc = { ISUP_IOCCCONFIG, 0, sizeof(conf), (char *) &conf };
+
+	for (i = 1; i < 32; i++) {
+		if (i == 16)
+			continue;
+		conf.type = ISUP_OBJ_TYPE_CT;
+		conf.id = i;
+		conf.cmd = ISUP_DEL;
+		if (verbose > 2) {
+			printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL ct = %2d)         |  |                    (%d)\n", i, state);
+			fflush(stdout);
+		}
+		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+			printf("******************ERROR: deleting ct=%d\n", i);
+			printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+			fflush(stdout);
+			return __RESULT_FAILURE;
+		}
+	}
+	conf.type = ISUP_OBJ_TYPE_CG;
+	conf.id = 1;
+	conf.cmd = ISUP_DEL;
+	if (verbose > 2) {
+		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL cg = 1)          |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: deleting cg=%d\n", 1);
+		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	conf.type = ISUP_OBJ_TYPE_TG;
+	conf.id = 1;
+	conf.cmd = ISUP_DEL;
+	if (verbose > 2) {
+		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL tg = 1)          |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: deleting tg=%d\n", 1);
+		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	conf.type = ISUP_OBJ_TYPE_SR;
+	conf.id = 1;
+	conf.cmd = ISUP_DEL;
+	if (verbose > 2) {
+		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL sr = 1)          |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: deleting sr=%d\n", 1);
+		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	conf.type = ISUP_OBJ_TYPE_SP;
+	conf.id = 1;
+	conf.cmd = ISUP_DEL;
+	if (verbose > 2) {
+		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL sp = 1)          |  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: deleting sp=%d\n", 1);
+		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+	return __RESULT_SUCCESS;
+}
+
+static int
+iut_link(void)
+{
+	struct {
+		struct isup_config config;
+		struct isup_conf_mtp mtp;
+	} conf;
+	struct strioctl ioc;
+
+	if (verbose > 1) {
+		printf("---I_LINK-----------+->|<---------------------------X  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if ((pt_lnk_id = ioctl(iut_mgm_fd, I_LINK, pt_lnk_fd)) == -1) {
+		printf("***************** ERROR: link failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	conf.config.type = ISUP_OBJ_TYPE_MT;
+	conf.config.id = 1;
+	conf.config.cmd = ISUP_ADD;
+	conf.mtp.spid = 1;
+	conf.mtp.srid = 1;
+	conf.mtp.muxid = pt_lnk_id;
+	conf.mtp.proto.pvar = SS7_PVAR_ITUT_96;
+	conf.mtp.proto.popt = 0;
+	ioc.ic_cmd = ISUP_IOCSCONFIG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(conf);
+	ioc.ic_dp = (char *) &conf;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSCONFIG--+->| ISUP_ADD (mtp = 1)            |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("***************** ERROR: config failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+iut_unlink(void)
+{
+#if 0
+	struct isup_config conf;
+	struct strioctl ioc;
+
+	conf.type = ISUP_OBJ_TYPE_MT;
+	conf.id = 1;
+	conf.cmd = ISUP_DEL;
+	ioc.ic_cmd = ISUP_IOCCCONFIG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(conf);
+	ioc.ic_dp = (char *) &conf;
+	if (verbose > 2) {
+		printf("---ISUP_IOCCCONFIG--+->| ISUP_DEL (mtp = 1)            |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("******************ERROR: config failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+#endif
+	if (verbose > 1) {
+		printf("---I_UNLINK---------+->|<---------------------------X  |                    (%d)\n", state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_UNLINK, pt_lnk_id) < 0) {
+		printf("******************ERROR: unlink failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+iut_option(void)
+{
+	int i;
+	struct {
+		struct isup_option hdr;
+		union {
+			struct isup_opt_conf_ct ct_opt;
+			struct isup_opt_conf_cg cg_opt;
+			struct isup_opt_conf_tg tg_opt;
+			struct isup_opt_conf_sr sr_opt;
+			struct isup_opt_conf_sp sp_opt;
+			struct isup_opt_conf_mtp mtp_opt;
+			struct isup_opt_conf_df df_opt;
+		} opts;
+	} opt;
+	struct strioctl ioc;
+
+	/* circuit options */
+	opt.opts.ct_opt = iut_ct_opt;
+	ioc.ic_cmd = ISUP_IOCSOPTIONS;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.ct_opt);
+	ioc.ic_dp = (char *) &opt;
+	for (i = 1; i < 32; i++) {
+		if (i == 16)
+			continue;
+		opt.hdr.type = ISUP_OBJ_TYPE_CT;
+		opt.hdr.id = i;
+		if (verbose > 2) {
+			printf("---ISUP_IOCSOPTIONS-+->| ct id = %2d                    |                    (%d)\n", i, state);
+			fflush(stdout);
+		}
+		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+			printf("***************** ERROR: set option failed\n");
+			printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+			fflush(stdout);
+			goto failure;
+		}
+	}
+	/* circuit group options */
+	opt.opts.cg_opt = iut_cg_opt;
+	opt.hdr.type = ISUP_OBJ_TYPE_CG;
+	opt.hdr.id = 1;
+	ioc.ic_cmd = ISUP_IOCSOPTIONS;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.cg_opt);
+	ioc.ic_dp = (char *) &opt;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSOPTIONS-+->| cg id = %2d                    |                    (%d)\n", 1, state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("***************** ERROR: set option failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	/* trunk group options */
+	opt.opts.tg_opt = iut_tg_opt;
+	if (timer_scale > 1) {
+		/* scale timers down by scaling factor */
+		opt.opts.tg_opt.t1 = iut_tg_opt.t1 / timer_scale;	/* waiting for RLC retry */
+		opt.opts.tg_opt.t2 = iut_tg_opt.t2 / timer_scale;	/* waiting for RES */
+		opt.opts.tg_opt.t3 = iut_tg_opt.t3 / timer_scale;	/* waiting OVL timeout */
+		opt.opts.tg_opt.t5 = iut_tg_opt.t5 / timer_scale;	/* waiting for RLC
+									   maintenance */
+		opt.opts.tg_opt.t6 = iut_tg_opt.t6 / timer_scale;	/* waiting for RES */
+		opt.opts.tg_opt.t7 = iut_tg_opt.t7 / timer_scale;	/* waiting for ACM/ANM/CON */
+		opt.opts.tg_opt.t8 = iut_tg_opt.t8 / timer_scale;	/* waiting for COT */
+		opt.opts.tg_opt.t9 = iut_tg_opt.t9 / timer_scale;	/* waiting for ANM/CON */
+		opt.opts.tg_opt.t10 = iut_tg_opt.t10 / timer_scale;	/* waiting more
+									   information.
+									   Interworking */
+		opt.opts.tg_opt.t11 = iut_tg_opt.t11 / timer_scale;	/* waiting for ACM,
+									   Interworking */
+		opt.opts.tg_opt.t12 = iut_tg_opt.t12 / timer_scale;	/* waiting for BLA retry */
+		opt.opts.tg_opt.t13 = iut_tg_opt.t13 / timer_scale;	/* waiting for BLA
+									   maintenance */
+		opt.opts.tg_opt.t14 = iut_tg_opt.t14 / timer_scale;	/* waiting for UBA retry */
+		opt.opts.tg_opt.t15 = iut_tg_opt.t15 / timer_scale;	/* waiting for UBA
+									   maintenance */
+		opt.opts.tg_opt.t16 = iut_tg_opt.t16 / timer_scale;	/* waiting for RLC retry */
+		opt.opts.tg_opt.t17 = iut_tg_opt.t17 / timer_scale;	/* waiting for RLC
+									   maintenance */
+		opt.opts.tg_opt.t24 = iut_tg_opt.t24 / timer_scale;	/* waiting for continuity
+									   IAM */
+		opt.opts.tg_opt.t25 = iut_tg_opt.t25 / timer_scale;	/* waiting for continuity
+									   CCR retry */
+		opt.opts.tg_opt.t26 = iut_tg_opt.t26 / timer_scale;	/* waiting for continuity
+									   CCR maintenance */
+		opt.opts.tg_opt.t27 = iut_tg_opt.t27 / timer_scale;	/* waiting for COT reset */
+		opt.opts.tg_opt.t31 = iut_tg_opt.t31 / timer_scale;	/* call reference guard */
+		opt.opts.tg_opt.t32 = iut_tg_opt.t32 / timer_scale;	/* waiting to send E2E
+									   message */
+		opt.opts.tg_opt.t33 = iut_tg_opt.t33 / timer_scale;	/* waiting for INF */
+		opt.opts.tg_opt.t34 = iut_tg_opt.t34 / timer_scale;	/* waiting for SEG */
+		opt.opts.tg_opt.t35 = iut_tg_opt.t35 / timer_scale;	/* waiting more
+									   information. */
+		opt.opts.tg_opt.t36 = iut_tg_opt.t36 / timer_scale;	/* waiting for COT/REL */
+		opt.opts.tg_opt.t37 = iut_tg_opt.t37 / timer_scale;	/* waiting echo control
+									   device */
+		opt.opts.tg_opt.t38 = iut_tg_opt.t38 / timer_scale;	/* waiting for RES */
+		opt.opts.tg_opt.tacc_r = iut_tg_opt.tacc_r / timer_scale;	/* */
+		opt.opts.tg_opt.tccr = iut_tg_opt.tccr / timer_scale;	/* */
+		opt.opts.tg_opt.tccr_r = iut_tg_opt.tccr_r / timer_scale;	/* */
+		opt.opts.tg_opt.tcra = iut_tg_opt.tcra / timer_scale;	/* */
+		opt.opts.tg_opt.tcrm = iut_tg_opt.tcrm / timer_scale;	/* */
+		opt.opts.tg_opt.tcvt = iut_tg_opt.tcvt / timer_scale;	/* */
+		opt.opts.tg_opt.texm_d = iut_tg_opt.texm_d / timer_scale;	/* */
+	}
+	opt.hdr.type = ISUP_OBJ_TYPE_TG;
+	opt.hdr.id = 1;
+	ioc.ic_cmd = ISUP_IOCSOPTIONS;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.tg_opt);
+	ioc.ic_dp = (char *) &opt;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSOPTIONS-+->| tg id = %2d                    |                    (%d)\n", 1, state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("***************** ERROR: set option failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	/* signalling relation options */
+	opt.opts.sr_opt = iut_sr_opt;
+	if (timer_scale > 1) {
+		opt.opts.sr_opt.t4 = iut_sr_opt.t4 / timer_scale;	/* waiting for UPA/other */
+		opt.opts.sr_opt.t18 = iut_sr_opt.t18 / timer_scale;	/* waiting CGBA retry */
+		opt.opts.sr_opt.t19 = iut_sr_opt.t19 / timer_scale;	/* waiting CGBA maintenance 
+									 */
+		opt.opts.sr_opt.t20 = iut_sr_opt.t20 / timer_scale;	/* waiting CGUA retry */
+		opt.opts.sr_opt.t21 = iut_sr_opt.t21 / timer_scale;	/* waiting CGUA maintenance 
+									 */
+		opt.opts.sr_opt.t22 = iut_sr_opt.t22 / timer_scale;	/* waiting GRA retry */
+		opt.opts.sr_opt.t23 = iut_sr_opt.t23 / timer_scale;	/* waiting GRA maintenance */
+		opt.opts.sr_opt.t28 = iut_sr_opt.t28 / timer_scale;	/* waiting CQR */
+		opt.opts.sr_opt.t29 = iut_sr_opt.t29 / timer_scale;	/* congestion attack timer */
+		opt.opts.sr_opt.t30 = iut_sr_opt.t30 / timer_scale;	/* congestion decay timer */
+		opt.opts.sr_opt.tcgb = iut_sr_opt.tcgb / timer_scale;	/* */
+		opt.opts.sr_opt.tgrs = iut_sr_opt.tgrs / timer_scale;	/* */
+		opt.opts.sr_opt.thga = iut_sr_opt.thga / timer_scale;	/* */
+		opt.opts.sr_opt.tscga = iut_sr_opt.tscga / timer_scale;	/* */
+		opt.opts.sr_opt.tscga_d = iut_sr_opt.tscga_d / timer_scale;	/* */
+	}
+	opt.hdr.type = ISUP_OBJ_TYPE_SR;
+	opt.hdr.id = 1;
+	ioc.ic_cmd = ISUP_IOCSOPTIONS;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.sr_opt);
+	ioc.ic_dp = (char *) &opt;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSOPTIONS-+->| sr id = %2d                    |                    (%d)\n", 1, state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("***************** ERROR: set option failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	/* signalling point options */
+	opt.opts.sp_opt = iut_sp_opt;
+	opt.hdr.type = ISUP_OBJ_TYPE_SP;
+	opt.hdr.id = 1;
+	ioc.ic_cmd = ISUP_IOCSOPTIONS;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.sp_opt);
+	ioc.ic_dp = (char *) &opt;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSOPTIONS-+->| sp id = %2d                    |                    (%d)\n", 1, state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("***************** ERROR: set option failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	/* message transfer part options */
+	opt.opts.mtp_opt = iut_mtp_opt;
+	opt.hdr.type = ISUP_OBJ_TYPE_MT;
+	opt.hdr.id = 1;
+	ioc.ic_cmd = ISUP_IOCSOPTIONS;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.mtp_opt);
+	ioc.ic_dp = (char *) &opt;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSOPTIONS-+->| mtp id = %2d                   |                    (%d)\n", 1, state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("***************** ERROR: set option failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	/* default options */
+	opt.opts.df_opt = iut_df_opt;
+	opt.hdr.type = ISUP_OBJ_TYPE_DF;
+	opt.hdr.id = 0;
+	ioc.ic_cmd = ISUP_IOCSOPTIONS;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.df_opt);
+	ioc.ic_dp = (char *) &opt;
+	if (verbose > 2) {
+		printf("---ISUP_IOCSOPTIONS-+->| df id = %2d                    |                    (%d)\n", 0, state);
+		fflush(stdout);
+	}
+	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
+		printf("***************** ERROR: set option failed\n");
+		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+};
+
+static int
+iut_bind(void)
+{
+	mprim.addr.add.scope = iut_tst_addr.scope;
+	mprim.addr.add.id = iut_tst_addr.id;
+	mprim.addr.add.cic = iut_tst_addr.cic;
+	mprim.addr.len = sizeof(mprim.addr.add);
+	mprim.bind_flags = CC_TOKEN_REQUEST | CC_TEST;
+	iut_tst_signal(BIND_REQ);
+	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_tst_addr.scope || mprim.addr.add.id != iut_tst_addr.id || mprim.addr.add.cic != iut_tst_addr.cic)
+		goto failure;
+	mprim.addr.add.scope = iut_mgm_addr.scope;
+	mprim.addr.add.id = iut_mgm_addr.id;
+	mprim.addr.add.cic = iut_mgm_addr.cic;
+	mprim.addr.len = sizeof(mprim.addr.add);
+	mprim.bind_flags = CC_TOKEN_REQUEST | CC_MANAGEMENT;
+	iut_mgm_signal(BIND_REQ);
+	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_mgm_addr.scope || mprim.addr.add.id != iut_mgm_addr.id || mprim.addr.add.cic != iut_mgm_addr.cic)
+		goto failure;
+	mprim.addr.add.scope = iut_mnt_addr.scope;
+	mprim.addr.add.id = iut_mnt_addr.id;
+	mprim.addr.add.cic = iut_mnt_addr.cic;
+	mprim.addr.len = sizeof(mprim.addr.add);
+	mprim.bind_flags = CC_TOKEN_REQUEST | CC_MAINTENANCE;
+	iut_mnt_signal(BIND_REQ);
+	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_mnt_addr.scope || mprim.addr.add.id != iut_mnt_addr.id || mprim.addr.add.cic != iut_mnt_addr.cic)
+		goto failure;
+	cprim.addr.add.scope = iut_cpc_addr.scope;
+	cprim.addr.add.id = iut_cpc_addr.id;
+	cprim.addr.add.cic = iut_cpc_addr.cic;
+	cprim.addr.len = sizeof(cprim.addr.add);
+	cprim.bind_flags = CC_TOKEN_REQUEST;
+	iut_cpc_signal(BIND_REQ);
+	if (any_event() != CPC_BIND_ACK || cprim.addr.len != sizeof(cprim.addr.add) || cprim.addr.add.scope != iut_cpc_addr.scope || cprim.addr.add.id != iut_cpc_addr.id || cprim.addr.add.cic != iut_cpc_addr.cic)
+		goto failure;
+#if 0
+	iut_tst_signal(ADDR_REQ);
+	if (any_event() != MGM_ADDR_ACK)
+		goto failure;
+	iut_mgm_signal(ADDR_REQ);
+	if (any_event() != MGM_ADDR_ACK)
+		goto failure;
+	iut_mnt_signal(ADDR_REQ);
+	if (any_event() != MGM_ADDR_ACK)
+		goto failure;
+	iut_cpc_signal(ADDR_REQ);
+	if (any_event() != CPC_ADDR_ACK)
+		goto failure;
+#endif
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+iut_unbind(void)
+{
+	iut_cpc_signal(UNBIND_REQ);
+	if (any_event() != CPC_OK_ACK)
+		goto failure;
+	iut_tst_signal(UNBIND_REQ);
+	if (any_event() != MGM_OK_ACK)
+		goto failure;
+	iut_mgm_signal(UNBIND_REQ);
+	if (any_event() != MGM_OK_ACK)
+		goto failure;
+	iut_mnt_signal(UNBIND_REQ);
+	if (any_event() != MGM_OK_ACK)
+		goto failure;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+iut_start(void)
+{
+	if (iut_open() != __RESULT_SUCCESS)
+		goto failure;
+	if (iut_config() != __RESULT_SUCCESS)
+		goto failure;
+	if (iut_link() != __RESULT_SUCCESS)
+		goto failure;
+	if (iut_option() != __RESULT_SUCCESS)
+		goto failure;
+	if (iut_bind() != __RESULT_SUCCESS)
+		goto failure;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+iut_stop(void)
+{
+	if (iut_unbind() != __RESULT_SUCCESS)
+		goto failure;
+	if (iut_unlink() != __RESULT_SUCCESS)
+		goto failure;
+	if (iut_unconfig() != __RESULT_SUCCESS)
+		goto failure;
+	if (iut_close() != __RESULT_SUCCESS)
+		goto failure;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Stream Initialization
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+static int
+stream_start(int child, int index)
+{
+	switch (child) {
+	case 1:
+	case 2:
+	case 0:
+		if (test_open(child, devname, O_RDWR) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		return __RESULT_SUCCESS;
+	default:
+		return __RESULT_FAILURE;
+	}
+}
+
+static int
+stream_stop(int child)
+{
+	switch (child) {
+	case 1:
+	case 2:
+	case 0:
+		if (test_close(child) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		return __RESULT_SUCCESS;
+	default:
+		return __RESULT_FAILURE;
+	}
+}
+
+void
+test_sleep(int child, unsigned long t)
+{
+	print_waiting(child, t);
+	sleep(t);
+}
+
+void
+test_msleep(int child, unsigned long m)
+{
+	struct timespec time;
+
+	time.tv_sec = m / 1000;
+	time.tv_nsec = (m % 1000) * 1000000;
+	print_mwaiting(child, &time);
+	nanosleep(&time, NULL);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Test harness initialization and termination.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+static int
+begin_tests(int index)
+{
+	state = 0;
+	if (stream_start(0, index) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (stream_start(1, index) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (stream_start(2, index) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	show_acks = 1;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+end_tests(int index)
+{
+	show_acks = 0;
+	if (stream_stop(2) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (stream_stop(1) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (stream_stop(0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+begin_tests(void)
+{
+	if (pt_start() != __RESULT_SUCCESS)
+		goto failure;
+	if (iut_start() != __RESULT_SUCCESS)
+		goto failure;
+	show_acks = 1;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+end_tests(void)
+{
+	show_acks = 0;
+	if (iut_stop() != __RESULT_SUCCESS)
+		goto failure;
+	if (pt_stop() != __RESULT_SUCCESS)
+		goto failure;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Injected event encoding and display functions.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+union primitives {
+	lmi_ulong prim;
+	union LMI_primitives lmi;
+	union SDL_primitives sdl;
+	union SDT_primitives sdt;
+	union SL_primitives sl;
+};
+
+static int
+do_signal(int child, int action)
+{
+	struct strbuf ctrl_buf, data_buf, *ctrl = &ctrl_buf, *data = &data_buf;
+	char cbuf[BUFSIZE], dbuf[BUFSIZE];
+	union primitives *p = (typeof(p)) cbuf;
+	struct strioctl ic;
+	int err;
+
+	if (action != oldact) {
+		oldact = action;
+		show = 1;
+		if (verbose > 1) {
+			if (cntact > 0) {
+				char buf[64];
+
+				snprintf(buf, sizeof(buf), "Ct=%5d", cntact + 1);
+				print_command_state(child, buf);
+			}
+		}
+		cntact = 0;
+	} else if (!show)
+		cntact++;
+
+	ic.ic_cmd = 0;
+	ic.ic_timout = test_timout;
+	ic.ic_len = sizeof(cbuf);
+	ic.ic_dp = cbuf;
+	ctrl->maxlen = 0;
+	ctrl->buf = cbuf;
+	data->maxlen = 0;
+	data->buf = dbuf;
+	test_pflags = MSG_BAND;
+	test_pband = 0;
+	switch (action) {
+	case __TEST_SIO:
+		if (!cntmsg)
+			print_tx_msg(child, "SIO");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 1;
+		dbuf[3] = LSSU_SIO;
+		data->len = 4;
+		goto send_message;
+	case __TEST_SIN:
+		if (!cntmsg)
+			print_tx_msg(child, "SIN");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 1;
+		dbuf[3] = LSSU_SIN;
+		data->len = 4;
+		goto send_message;
+	case __TEST_SIE:
+		if (!cntmsg)
+			print_tx_msg(child, "SIE");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 1;
+		dbuf[3] = LSSU_SIE;
+		data->len = 4;
+		goto send_message;
+	case __TEST_SIOS:
+		if (!cntmsg)
+			print_tx_msg(child, "SIOS");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 1;
+		dbuf[3] = LSSU_SIOS;
+		data->len = 4;
+		goto send_message;
+	case __TEST_SIPO:
+		if (!cntmsg)
+			print_tx_msg(child, "SIPO");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 1;
+		dbuf[3] = LSSU_SIPO;
+		data->len = 4;
+		goto send_message;
+	case __TEST_SIB:
+		if (!cntmsg)
+			print_tx_msg(child, "SIB");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 1;
+		dbuf[3] = LSSU_SIB;
+		data->len = 4;
+		goto send_message;
+	case __TEST_SIX:
+		if (!cntmsg)
+			print_tx_msg(child, "LSSU(invalid)");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 1;
+		dbuf[3] = 6;
+		data->len = 4;
+		goto send_message;
+	case __TEST_SIO2:
+		if (!cntmsg)
+			print_tx_msg(child, "SIO[2]");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 2;
+		dbuf[3] = 0;
+		dbuf[4] = LSSU_SIO;
+		data->len = 5;
+		goto send_message;
+	case __TEST_SIN2:
+		if (!cntmsg)
+			print_tx_msg(child, "SIN[2]");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 2;
+		dbuf[3] = 0;
+		dbuf[4] = LSSU_SIN;
+		data->len = 5;
+		goto send_message;
+	case __TEST_SIE2:
+		if (!cntmsg)
+			print_tx_msg(child, "SIE[2]");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 2;
+		dbuf[3] = 0;
+		dbuf[4] = LSSU_SIE;
+		data->len = 5;
+		goto send_message;
+	case __TEST_SIOS2:
+		if (!cntmsg)
+			print_tx_msg(child, "SIOS[2]");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 2;
+		dbuf[3] = 0;
+		dbuf[4] = LSSU_SIOS;
+		data->len = 5;
+		goto send_message;
+	case __TEST_SIPO2:
+		if (!cntmsg)
+			print_tx_msg(child, "SIPO[2]");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 2;
+		dbuf[3] = 0;
+		dbuf[4] = LSSU_SIPO;
+		data->len = 5;
+		goto send_message;
+	case __TEST_SIB2:
+		if (!cntmsg)
+			print_tx_msg(child, "SIB[2]");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 2;
+		dbuf[3] = 0;
+		dbuf[4] = LSSU_SIB;
+		data->len = 5;
+		goto send_message;
+	case __TEST_SIX2:
+		if (!cntmsg)
+			print_tx_msg(child, "LSSU(invalid)[2]");
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 2;
+		dbuf[3] = 0;
+		dbuf[4] = 6;
+		data->len = 5;
+		goto send_message;
+	case __TEST_SIB_S:
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 1;
+		dbuf[3] = LSSU_SIB;
+		data->len = 4;
+		goto send_message;
+	case __TEST_FISU:
+		if (!cntmsg)
+			print_tx_msg(child, "FISU");
+	case __TEST_FISU_S:
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 0;
+		data->len = 3;
+		goto send_message;
+	case __TEST_FISU_BAD_FIB:
+		if (!cntmsg)
+			print_tx_msg_sn(child, "FISU(bad fib)", bib[child] | bsn[child], (fib[child] | fsn[child]) ^ 0x80);
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = (fib[child] | fsn[child]) ^ 0x80;
+		dbuf[2] = 0;
+		data->len = 3;
+		goto send_message;
+	case __TEST_LSSU_CORRUPT:
+		if (!cntmsg)
+			print_tx_msg(child, "LSSU(corrupt)");
+	case __TEST_LSSU_CORRUPT_S:
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 0xff;
+		dbuf[3] = 0xff;
+		data->len = 4;
+		goto send_message;
+	case __TEST_FISU_CORRUPT:
+		if (!cntmsg)
+			print_tx_msg(child, "FISU(corrupt)");
+	case __TEST_FISU_CORRUPT_S:
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 0xff;
+		data->len = 3;
+		goto send_message;
+	case __TEST_MSU:
+		if (msu_len > BUFSIZE - 10)
+			msu_len = BUFSIZE - 10;
+		fsn[child] = (fsn[child] + 1) & 0x7f;
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = msu_len;
+		memset(&dbuf[3], 'B', msu_len);
+		data->len = msu_len + 3;
+		if (!cntmsg)
+			print_tx_msg(child, "MSU");
+		goto send_message;
+	case __TEST_MSU_S:
+		if (msu_len > BUFSIZE - 10)
+			msu_len = BUFSIZE - 10;
+		fsn[child] = (fsn[child] + 1) & 0x7f;
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = msu_len;
+		memset(&dbuf[3], 'B', msu_len);
+		data->len = msu_len + 3;
+		goto send_message;
+	case __TEST_MSU_TOO_LONG:
+		fsn[child] = (fsn[child] + 1) & 0x7f;
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		dbuf[2] = 63;
+		memset(&dbuf[3], 'A', 280);
+		data->len = 283;
+		if (!cntmsg)
+			print_tx_msg(child, "MSU(too long)");
+		goto send_message;
+	case __TEST_MSU_SEVEN_ONES:
+		msu_len = 256;
+		fsn[child] = (fsn[child] + 1) & 0x7f;
+		if (!cntmsg)
+			print_tx_msg(child, "MSU(7 ones)");
+		fsn[child] = (fsn[child] - 1) & 0x7f;
+		{
+			struct strioctl ctl;
+
+			ctl.ic_cmd = SDT_IOCCABORT;
+			ctl.ic_timout = 0;
+			ctl.ic_len = 0;
+			ctl.ic_dp = NULL;
+			do_signal(child, __TEST_MSU_S);
+			if (ioctl(test_fd[child], I_STR, &ctl) < 0)
+				return __RESULT_INCONCLUSIVE;
+		}
+		return __RESULT_SUCCESS;
+	case __TEST_MSU_TOO_SHORT:
+		fsn[child] = (fsn[child] + 1) & 0x7f;
+		dbuf[0] = bib[child] | bsn[child];
+		dbuf[1] = fib[child] | fsn[child];
+		data->len = 2;
+		if (!cntmsg)
+			print_tx_msg(child, "MSU(too short)");
+		goto send_message;
+	case __TEST_FISU_FISU_1FLAG:
+		print_tx_msg(child, "FISU-F-FISU");
+		do_signal(child, __TEST_FISU_S);
+		do_signal(child, __TEST_FISU_S);
+		return __RESULT_SUCCESS;
+	case __TEST_FISU_FISU_2FLAG:
+		print_tx_msg(child, "FISU-F-F-FISU");
+		config->sdt.f = SDT_FLAGS_TWO;
+		if (do_signal(child, __TEST_SDT_CONFIG) != __RESULT_SUCCESS)
+			return __RESULT_INCONCLUSIVE;
+		do_signal(child, __TEST_FISU_S);
+		do_signal(child, __TEST_FISU_S);
+		config->sdt.f = SDT_FLAGS_ONE;
+		if (do_signal(child, __TEST_SDT_CONFIG) != __RESULT_SUCCESS)
+			return __RESULT_INCONCLUSIVE;
+		return __RESULT_SUCCESS;
+	case __TEST_MSU_MSU_1FLAG:
+		print_tx_msg(child, "MSU-F-MSU");
+		do_signal(child, __TEST_MSU_S);
+		do_signal(child, __TEST_MSU_S);
+		return __RESULT_SUCCESS;
+	case __TEST_MSU_MSU_2FLAG:
+		print_tx_msg(child, "MSU-F-F-MSU");
+		config->sdt.f = SDT_FLAGS_TWO;
+		if (do_signal(child, __TEST_SDT_CONFIG) != __RESULT_SUCCESS)
+			return __RESULT_INCONCLUSIVE;
+		do_signal(child, __TEST_MSU_S);
+		do_signal(child, __TEST_MSU_S);
+		config->sdt.f = SDT_FLAGS_ONE;
+		if (do_signal(child, __TEST_SDT_CONFIG) != __RESULT_SUCCESS)
+			return __RESULT_INCONCLUSIVE;
+		return __RESULT_SUCCESS;
+	      send_message:
+		data->maxlen = BUFSIZE;
+		data->len = data->len;
+		data->buf = dbuf;
+		ctrl->maxlen = BUFSIZE;
+		ctrl->len = sizeof(p->sdt.daedt_transmission_req);
+		ctrl->buf = cbuf;
+		p->sdt.daedt_transmission_req.sdt_primitive = SDT_DAEDT_TRANSMISSION_REQ;
+		return test_putmsg(child, ctrl, data, 0);
+	case __TEST_WRITE:
+		data->len = snprintf(dbuf, BUFSIZE, "%s", "Write test data.");
+		return test_write(child, dbuf, data->len);
+	case __TEST_WRITEV:
+	{
+		struct iovec vector[4];
+
+		vector[0].iov_base = dbuf;
+		vector[0].iov_len = sprintf(vector[0].iov_base, "Writev test datum for vector 0.");
+		vector[1].iov_base = dbuf + vector[0].iov_len;
+		vector[1].iov_len = sprintf(vector[1].iov_base, "Writev test datum for vector 1.");
+		vector[2].iov_base = dbuf + vector[1].iov_len;
+		vector[2].iov_len = sprintf(vector[2].iov_base, "Writev test datum for vector 2.");
+		vector[3].iov_base = dbuf + vector[2].iov_len;
+		vector[3].iov_len = sprintf(vector[3].iov_base, "Writev test datum for vector 3.");
+		return test_writev(child, vector, 4);
+	}
+	}
+	switch (action) {
+	case __TEST_PUSH:
+		return test_push(child, "m2pa-sl");
+	case __TEST_POP:
+		return test_pop(child);
+	case __TEST_PUTMSG_DATA:
+		ctrl = NULL;
+		data->len = snprintf(dbuf, BUFSIZE, "%s", "Putmsg test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_PUTPMSG_DATA:
+		ctrl = NULL;
+		data->len = snprintf(dbuf, BUFSIZE, "%s", "Putpmsg band test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 1;
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+
+/*
+ *  The following group cannot really be performed on the PT (child == 1) and
+ *  they are only used to print the messages that would appear if the PT were
+ *  functioning similar to the IUT.
+ */
+
+	case __TEST_POWER_ON:
+		if (child == CHILD_PTU) {
+			ctrl->len = sizeof(p->sdt.daedt_start_req);
+			p->sdt.daedt_start_req.sdt_primitive = SDT_DAEDT_START_REQ;
+			data = NULL;
+			test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+			ctrl->len = sizeof(p->sdt.daedr_start_req);
+			p->sdt.daedr_start_req.sdt_primitive = SDT_DAEDR_START_REQ;
+			data = NULL;
+		} else {
+			ctrl->len = sizeof(p->sl.power_on_req);
+			p->sl.power_on_req.sl_primitive = SL_POWER_ON_REQ;
+			data = NULL;
+			test_pflags = MSG_HIPRI;
+			test_pband = 0;
+		}
+		print_command_state(child, ":power on");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_START:
+		ctrl->len = sizeof(p->sl.start_req);
+		p->sl.start_req.sl_primitive = SL_START_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":start");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_STOP:
+		ctrl->len = sizeof(p->sl.stop_req);
+		p->sl.stop_req.sl_primitive = SL_STOP_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":stop");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_LPO:
+		ctrl->len = sizeof(p->sl.local_proc_outage_req);
+		p->sl.local_proc_outage_req.sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":set lpo");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_LPR:
+		ctrl->len = sizeof(p->sl.resume_req);
+		p->sl.resume_req.sl_primitive = SL_RESUME_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":clear lpo");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_CONTINUE:
+		if (((ss7_pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI) || ((ss7_pvar & SS7_PVAR_YR) == SS7_PVAR_88)) {
+			ctrl->len = sizeof(p->sl.continue_req);
+			p->sl.continue_req.sl_primitive = SL_CONTINUE_REQ;
+			data = NULL;
+			test_pflags = MSG_HIPRI;
+			test_pband = 0;
+			print_command_state(child, ":continue");
+			if (child != CHILD_PTU)
+				return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		}
+		return __RESULT_SUCCESS;
+	case __TEST_CONG_A:
+		ctrl->len = sizeof(p->sl.cong_accept_req);
+		p->sl.cong_accept_req.sl_primitive = SL_CONGESTION_ACCEPT_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":make congested");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_CONG_D:
+		ctrl->len = sizeof(p->sl.cong_discard_req);
+		p->sl.cong_discard_req.sl_primitive = SL_CONGESTION_DISCARD_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":make congested");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_NO_CONG:
+		ctrl->len = sizeof(p->sl.no_cong_req);
+		p->sl.no_cong_req.sl_primitive = SL_NO_CONGESTION_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":clear congested");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_EMERG:
+		ctrl->len = sizeof(p->sl.emergency_req);
+		p->sl.emergency_req.sl_primitive = SL_EMERGENCY_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":set emerg");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_CEASE:
+		ctrl->len = sizeof(p->sl.emergency_ceases_req);
+		p->sl.emergency_ceases_req.sl_primitive = SL_EMERGENCY_CEASES_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":clear emerg");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+	case __TEST_CLEARB:
+		ctrl->len = sizeof(p->sl.clear_buffers_req);
+		p->sl.clear_buffers_req.sl_primitive = SL_CLEAR_BUFFERS_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":clear buffers");
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+
+	case __TEST_COUNT:
+	{
+		char buf[64];
+
+		snprintf(buf, sizeof(buf), "Ct = %5d", count);
+		print_string(child, buf);
+		return __RESULT_SUCCESS;
+	}
+	case __TEST_TRIES:
+	{
+		char buf[64];
+
+		snprintf(buf, sizeof(buf), "%d iterations", tries);
+		print_string(child, buf);
+		return __RESULT_SUCCESS;
+	}
+	case __TEST_ETC:
+		print_string(child, ".");
+		print_string(child, ".");
+		print_string(child, ".");
+		return __RESULT_SUCCESS;
+
+	case __TEST_SEND_MSU:
+	case __TEST_SEND_MSU_S:
+		if (msu_len > BUFSIZE - 10)
+			msu_len = BUFSIZE - 10;
+		print_command_state(child, ":msu");
+		ctrl->len = sizeof(p->sl.pdu_req);
+		p->sl.pdu_req.sl_primitive = SL_PDU_REQ;
+		data->len = msu_len;
+		memset(dbuf, 'B', msu_len);
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_TX_BREAK:
+		print_command_state(child, ":break Tx");
+		ic.ic_cmd = SDL_IOCCDISCTX;
+		ic.ic_timout = 0;
+		ic.ic_len = 0;
+		ic.ic_dp = NULL;
+		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_TX_MAKE:
+		print_command_state(child, ":reconnect Tx");
+		ic.ic_cmd = SDL_IOCCCONNTX;
+		ic.ic_timout = 0;
+		ic.ic_len = 0;
+		ic.ic_dp = NULL;
+		return test_ioctl(child, I_STR, (intptr_t) &ic);
+
+	case __TEST_SDL_OPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, ":options sdl");
+		ic.ic_cmd = SDL_IOCSOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SDL_CONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, ":config sdl");
+		ic.ic_cmd = SDL_IOCSCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sdl);
+		ic.ic_dp = (char *) &config->sdl;
+		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SDL_STATS:
+		if (show && verbose > 1)
+			print_command_state(child, ":stats sdl");
+		ic.ic_cmd = SDL_IOCGSTATS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(stats->sdl);
+		ic.ic_dp = (char *) &stats->sdl;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sdl_stats(child, &stats->sdl);
+		return (err);
+	case __TEST_SDT_OPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, ":options sdt");
+		ic.ic_cmd = SDT_IOCSOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SDT_CONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, ":config sdt");
+		ic.ic_cmd = SDT_IOCSCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sdt);
+		ic.ic_dp = (char *) &config->sdt;
+		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SDT_STATS:
+		if (show && verbose > 1)
+			print_command_state(child, ":stats sdt");
+		ic.ic_cmd = SDT_IOCGSTATS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(stats->sdt);
+		ic.ic_dp = (char *) &stats->sdt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sdt_stats(child, &stats->sdt);
+		return (err);
+	case __TEST_SL_OPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, ":options sl");
+		ic.ic_cmd = SL_IOCSOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SL_CONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, ":config sl");
+		ic.ic_cmd = SL_IOCSCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sl);
+		ic.ic_dp = (char *) &config->sl;
+		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SL_STATS:
+		if (show && verbose > 1)
+			print_command_state(child, ":stats sl");
+		ic.ic_cmd = SL_IOCGSTATS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(stats->sl);
+		ic.ic_dp = (char *) &stats->sl;
+		if ((err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sl_stats(child, &stats->sl);
+		return (err);
+
+	case __TEST_ATTACH_REQ:
+		ctrl->len = sizeof(p->lmi.attach_req) + (ADDR_buffer ? ADDR_length : 0);
+		p->lmi.attach_req.lmi_primitive = LMI_ATTACH_REQ;
+		p->lmi.attach_req.lmi_ppa_length = ADDR_length;
+		p->lmi.attach_req.lmi_ppa_offset = sizeof(p->lmi.attach_req);
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.attach_req), ADDR_length);
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		if (show && verbose > 1) {
+			print_command_state(child, ":attach");
+			print_ppa(child, (ppa_t *) p->lmi.attach_req.lmi_ppa);
+		}
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DETACH_REQ:
+		ctrl->len = sizeof(p->lmi.detach_req);
+		p->lmi.detach_req.lmi_primitive = LMI_DETACH_REQ;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		if (show && verbose > 1)
+			print_command_state(child, ":detach");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_ENABLE_REQ:
+		ctrl->len = sizeof(p->lmi.enable_req) + (ADDR_buffer ? ADDR_length : 0);
+		p->lmi.enable_req.lmi_primitive = LMI_ENABLE_REQ;
+		p->lmi.enable_req.lmi_rem_length = ADDR_length;
+		p->lmi.enable_req.lmi_rem_offset = sizeof(p->lmi.enable_req);
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.enable_req), ADDR_length);
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		if (show && verbose > 1) {
+			print_command_state(child, ":enable");
+			print_ppa(child, (ppa_t *) p->lmi.enable_req.lmi_rem);
+		}
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DISABLE_REQ:
+		ctrl->len = sizeof(p->lmi.disable_req);
+		p->lmi.disable_req.lmi_primitive = LMI_DISABLE_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		if (show && verbose > 1)
+			print_command_state(child, ":disable");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+
+#if 0
+	case __TEST_BIND_REQ:
+		ctrl->len = sizeof(p->npi.bind_req) + anums[child] * sizeof(addrs[child][0]);
+		data = NULL;
+		p->npi.bind_req.PRIM_type = N_BIND_REQ;
+		p->npi.bind_req.ADDR_length = anums[child] * sizeof(addrs[child][0]);
+		p->npi.bind_req.ADDR_offset = sizeof(p->npi.bind_req);
+		p->npi.bind_req.CONIND_number = (child == 2) ? 2 : 0;
+		p->npi.bind_req.BIND_flags = TOKEN_REQUEST;
+		p->npi.bind_req.PROTOID_length = 0;
+		p->npi.bind_req.PROTOID_offset = 0;
+		bcopy(&addrs[child], (&p->npi.bind_req + 1), anums[child] * sizeof(addrs[child][0]));
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		if (show && verbose > 1)
+			print_command_state(child, ">bind");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_CONN_REQ:
+		ctrl->len = sizeof(p->npi.conn_req) + sizeof(qos[child].conn);
+		data = NULL;
+		p->npi.conn_req.PRIM_type = N_CONN_REQ;
+		p->npi.conn_req.DEST_length = anums[(child + 1) % 2] * sizeof(addrs[child][0]);
+		p->npi.conn_req.DEST_offset = sizeof(p->npi.conn_req);
+		p->npi.conn_req.CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
+		p->npi.conn_req.QOS_length = sizeof(qos[child].conn);
+		p->npi.conn_req.QOS_offset = sizeof(p->npi.conn_req) + anums[(child + 1) % 2] * sizeof(addrs[child][0]);
+		bcopy(&addrs[(child + 1) % 2], (&p->npi.conn_req + 1), anums[(child + 1) % 2] * sizeof(addrs[child][0]));
+		bcopy(&qos[child].conn, (caddr_t) (&p->npi.conn_req + 1) + anums[(child + 1) % 2] * sizeof(addrs[child][0]), sizeof(qos[child].conn));
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		if (show && verbose > 1)
+			print_command_state(child, ">connect");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_CONN_RES:
+		ctrl->len = sizeof(p->npi.conn_res) + sizeof(qos[child].conn);
+		data = NULL;
+		p->npi.conn_res.PRIM_type = N_CONN_RES;
+		p->npi.conn_res.RES_length = 0;
+		p->npi.conn_res.RES_offset = 0;
+		p->npi.conn_res.SEQ_number = seq[child];
+		p->npi.conn_res.CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
+		p->npi.conn_res.QOS_length = sizeof(qos[child].conn);
+		p->npi.conn_res.QOS_offset = sizeof(p->npi.conn_res);
+		bcopy(&qos[child].conn, (&p->npi.conn_res + 1), sizeof(qos[child].conn));
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		if (show && verbose > 1)
+			print_command_state(child, ">accept");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DISCON_REQ:
+		ctrl->len = sizeof(p->npi.discon_req);
+		data = NULL;
+		p->npi.discon_req.PRIM_type = N_DISCON_REQ;
+		p->npi.discon_req.RES_length = 0;
+		p->npi.discon_req.RES_offset = 0;
+		p->npi.discon_req.SEQ_number = 0;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		if (show && verbose > 1)
+			print_command_state(child, ">disconnect");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_OPTMGMT_REQ:
+		ctrl->len = sizeof(p->npi.optmgmt_req) + sizeof(qos[child].info);
+		p->npi.optmgmt_req.QOS_length = sizeof(qos[child].info);
+		p->npi.optmgmt_req.QOS_offset = sizeof(p->npi.optmgmt_req);
+		p->npi.optmgmt_req.OPTMGMT_flags = 0;
+		bcopy(&qos[child].info, (&p->npi.optmgmt_req + 1), sizeof(qos[child].info));
+		if (show && verbose > 1)
+			print_command_state(child, ">optmgmt");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+#endif
+
+	default:
+		if (show && verbose > 1)
+			print_command_state(child, ":????????");
+		return __RESULT_SCRIPT_ERROR;
+	}
+	return __RESULT_SCRIPT_ERROR;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Received event decoding and display functions.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+static int
+do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
+{
+	int event = __RESULT_DECODE_ERROR;
+	int other = (child + 1) % 2;
+
+	if (data->len >= 0) {
+		switch (child) {
+		default:
+			event = __TEST_DATA;
+			print_rx_data(child, "M_DATA----------", data->len);
+			break;
+		case 0:
+		{
+			bib[other] = data->buf[0] & 0x80;
+			bsn[other] = data->buf[0] & 0x7f;
+			fib[other] = data->buf[1] & 0x80;
+			fsn[other] = data->buf[1] & 0x7f;
+			li[other] = data->buf[2] & 0x3f;
+			sio[other] = data->buf[3] & 0x7;
+			bsn[child] = fsn[other];
+			switch (li[other]) {
+			case 0:
+				event = __TEST_FISU;
+				break;
+			case 1:
+				event = sio[other] = data->buf[3] & 0x7;
+				switch (sio[other]) {
+				case LSSU_SIO:
+					event = __TEST_SIO;
+					break;
+				case LSSU_SIN:
+					event = __TEST_SIN;
+					break;
+				case LSSU_SIE:
+					event = __TEST_SIE;
+					break;
+				case LSSU_SIOS:
+					event = __TEST_SIOS;
+					break;
+				case LSSU_SIPO:
+					event = __TEST_SIPO;
+					break;
+				case LSSU_SIB:
+					event = __TEST_SIB;
+					break;
+				default:
+					event = __TEST_SIX;
+					break;
+				}
+				break;
+			case 2:
+				event = sio[other] = data->buf[4] & 0x7;
+				switch (sio[other]) {
+				case LSSU_SIO:
+					event = __TEST_SIO2;
+					break;
+				case LSSU_SIN:
+					event = __TEST_SIN2;
+					break;
+				case LSSU_SIE:
+					event = __TEST_SIE2;
+					break;
+				case LSSU_SIOS:
+					event = __TEST_SIOS2;
+					break;
+				case LSSU_SIPO:
+					event = __TEST_SIPO2;
+					break;
+				case LSSU_SIB:
+					event = __TEST_SIB2;
+					break;
+				default:
+					event = __TEST_SIX2;
+					break;
+				}
+				break;
+			default:
+				event = __TEST_MSU;
+				break;
+			}
+			if (show_fisus || event != __TEST_FISU) {
+				if (event != oldret || oldisb != (((bib[other] | bsn[other]) << 8) | (fib[other] | fsn[other]))) {
+					// if (oldisb == (((bib[other] | bsn[other]) << 8) |
+					// (fib[other] |
+					// fsn[other])) &&
+					// ((event == __TEST_FISU && oldret == __TEST_MSU) ||
+					// (event == __TEST_MSU && oldret == __TEST_FISU))) {
+					// if (event == __TEST_MSU && !expand)
+					// cntmsg++;
+					// } else
+					// cntret = 0;
+					oldret = event;
+					oldisb = ((bib[other] | bsn[other]) << 8) | (fib[other] | fsn[other]);
+					// if (cntret) {
+					// printf(" Ct=%d\n", cntret + 1);
+					// fflush(stdout);
+					// }
+					cntret = 0;
+				} else if (!expand)
+					cntret++;
+			}
+			if (!cntret) {
+				char buf[32];
+
+				switch (event) {
+				case __TEST_FISU:
+					if (show_fisus) {
+						snprintf(buf, sizeof(buf), "FISU");
+						print_rx_msg(child, buf);
+					}
+					break;
+				case __TEST_SIO:
+					if (li[other] == 1)
+						snprintf(buf, sizeof(buf), "SIO");
+					else
+						snprintf(buf, sizeof(buf), "SIO[%d]", li[other]);
+					print_rx_msg(child, buf);
+					break;
+				case __TEST_SIN:
+					if (li[other] == 1)
+						snprintf(buf, sizeof(buf), "SIN");
+					else
+						snprintf(buf, sizeof(buf), "SIN[%d]", li[other]);
+					print_rx_msg(child, buf);
+					break;
+				case __TEST_SIE:
+					if (li[other] == 1)
+						snprintf(buf, sizeof(buf), "SIE");
+					else
+						snprintf(buf, sizeof(buf), "SIE[%d]", li[other]);
+					print_rx_msg(child, buf);
+					break;
+				case __TEST_SIOS:
+					if (li[other] == 1)
+						snprintf(buf, sizeof(buf), "SIOS");
+					else
+						snprintf(buf, sizeof(buf), "SIOS[%d]", li[other]);
+					print_rx_msg(child, buf);
+					break;
+				case __TEST_SIPO:
+					if (li[other] == 1)
+						snprintf(buf, sizeof(buf), "SIPO");
+					else
+						snprintf(buf, sizeof(buf), "SIPO[%d]", li[other]);
+					print_rx_msg(child, buf);
+					break;
+				case __TEST_SIB:
+					if (li[other] == 1)
+						snprintf(buf, sizeof(buf), "SIB");
+					else
+						snprintf(buf, sizeof(buf), "SIB[%d]", li[other]);
+					print_rx_msg(child, buf);
+					break;
+				case __TEST_SIX:
+					snprintf(buf, sizeof(buf), "LSSU(invalid)[%d]", li[other]);
+					print_rx_msg(child, buf);
+					break;
+				case __TEST_SIX2:
+					snprintf(buf, sizeof(buf), "LSSU(invalid)[%d]", li[other]);
+					print_rx_msg(child, buf);
+					break;
+				case __TEST_MSU:
+					if (show_msus) {
+						snprintf(buf, sizeof(buf), "MSU[%d]", li[other]);
+						print_rx_msg(child, buf);
+					}
+					break;
+				}
+			}
+		}
+		}
+	}
+	return ((last_event = event));
+}
+
+static int
+do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
+{
+	int event = __RESULT_DECODE_ERROR;
+	union primitives *p = (union primitives *) ctrl->buf;
+
+	if (ctrl->len >= sizeof(p->prim)) {
+		switch ((last_prim = p->prim)) {
+		case SL_REMOTE_PROCESSOR_OUTAGE_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_IUT_RPO;
+			break;
+		case SL_REMOTE_PROCESSOR_RECOVERED_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_IUT_RPR;
+			break;
+		case SL_IN_SERVICE_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_IUT_IN_SERVICE;
+			break;
+		case SL_OUT_OF_SERVICE_IND:
+			print_command_state(child, oos_string(p->sl.out_of_service_ind.sl_reason));
+			event = __EVENT_IUT_OUT_OF_SERVICE;
+			break;
+		case SL_PDU_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_IUT_DATA;
+			break;
+		case SL_LINK_CONGESTED_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SL_LINK_CONGESTION_CEASED_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SL_RETRIEVED_MESSAGE_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SL_RETRIEVAL_COMPLETE_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SL_RB_CLEARED_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SL_BSNT_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SL_RTB_CLEARED_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SDT_RC_SIGNAL_UNIT_IND:
+			if (verbose > 5 && show_msg)
+				print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SDT_IAC_CORRECT_SU_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SDT_IAC_ABORT_PROVING_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SDT_LSC_LINK_FAILURE_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SDT_TXC_TRANSMISSION_REQUEST_IND:
+			if (verbose > 5 && show_msg)
+				print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case SDT_RC_CONGESTION_ACCEPT_IND:
+		case SDT_RC_CONGESTION_DISCARD_IND:
+		case SDT_RC_NO_CONGESTION_IND:
+			print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case LMI_INFO_ACK:
+			if (show && verbose > 1)
+				print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case LMI_OK_ACK:
+			if (show && verbose > 1)
+				print_command_state(child, prim_string(p->prim));
+			event = __TEST_OK_ACK;
+			break;
+		case LMI_ERROR_ACK:
+			if (show && verbose > 1) {
+				print_command_state(child, prim_string(p->prim));
+				print_string(child, lmerrno_string(p->lmi.error_ack.lmi_errno, p->lmi.error_ack.lmi_reason));
+			}
+			event = __TEST_ERROR_ACK;
+			break;
+		case LMI_ENABLE_CON:
+			if (show && verbose > 1)
+				print_command_state(child, prim_string(p->prim));
+			event = __TEST_ENABLE_CON;
+			break;
+		case LMI_DISABLE_CON:
+			if (show && verbose > 1)
+				print_command_state(child, prim_string(p->prim));
+			event = __TEST_DISABLE_CON;
+			break;
+		case LMI_ERROR_IND:
+			if (show && verbose > 1)
+				print_command_state(child, prim_string(p->prim));
+			event = __TEST_ERROR_IND;
+			break;
+		case LMI_STATS_IND:
+			if (show && verbose > 1)
+				print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		case LMI_EVENT_IND:
+			if (show && verbose > 1)
+				print_command_state(child, prim_string(p->prim));
+			event = __EVENT_UNKNOWN;
+			break;
+		default:
+			event = __EVENT_UNKNOWN;
+			print_no_prim(child, p->prim);
+			break;
+		}
+		if (data && data->len >= 0)
+			if ((last_event = do_decode_data(child, ctrl, data)) != __EVENT_UNKNOWN)
+				event = last_event;
+	}
+	return ((last_event = event));
+}
+
+static int
+do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
+{
+	if (ctrl->len > 0) {
+		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
+			return time_event(child, last_event);
+	} else if (data->len > 0) {
+		if ((last_event = do_decode_data(child, ctrl, data)) != __EVENT_UNKNOWN)
+			return time_event(child, last_event);
+	}
+	return ((last_event = __EVENT_NO_MSG));
+}
+
+int
+wait_event(int child, int wait)
+{
+	while (1) {
+		struct pollfd pfd[] = { {test_fd[child], POLLIN | POLLPRI, 0} };
+
+		if (timer_timeout) {
+			timer_timeout = 0;
+			print_timeout(child);
+			last_event = __EVENT_TIMEOUT;
+			return time_event(child, __EVENT_TIMEOUT);
+		}
+		if (show && verbose > 4)
+			print_syscall(child, "poll()");
+		pfd[0].fd = test_fd[child];
+		pfd[0].events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
+		pfd[0].revents = 0;
+		switch (poll(pfd, 1, wait)) {
+		case -1:
+			if (errno == EINTR || errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		case 0:
+			if (show && verbose > 4)
+				print_success(child);
+			print_nothing(child);
+			last_event = __EVENT_NO_MSG;
+			return time_event(child, __EVENT_NO_MSG);
+		case 1:
+			if (show && verbose > 4)
+				print_success(child);
+			if (pfd[0].revents) {
+				int ret;
+
+				ctrl.maxlen = BUFSIZE;
+				ctrl.len = -1;
+				ctrl.buf = cbuf;
+				data.maxlen = BUFSIZE;
+				data.len = -1;
+				data.buf = dbuf;
+				flags = 0;
+				for (;;) {
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg))
+						print_syscall(child, "getmsg()");
+					if ((ret = getmsg(test_fd[child], &ctrl, &data, &flags)) >= 0)
+						break;
+					if (errno == EINTR || errno == ERESTART)
+						continue;
+					print_errno(child, (last_errno = errno));
+					if (errno == EAGAIN)
+						break;
+					return __RESULT_FAILURE;
+				}
+				if (ret < 0)
+					break;
+				if (ret == 0) {
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg))
+						print_success(child);
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
+						int i;
+
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
+						fprintf(stdout, "[");
+						for (i = 0; i < ctrl.len; i++)
+							fprintf(stdout, "%02X", (uint8_t) ctrl.buf[i]);
+						fprintf(stdout, "]\n");
+						fprintf(stdout, "[");
+						for (i = 0; i < data.len; i++)
+							fprintf(stdout, "%02X", (uint8_t) data.buf[i]);
+						fprintf(stdout, "]\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					last_prio = (flags == RS_HIPRI);
+					if ((last_event = do_decode_msg(child, &ctrl, &data)) != __EVENT_NO_MSG)
+						return time_event(child, last_event);
+				}
+			}
+		default:
+			break;
+		}
+	}
+	return __EVENT_UNKNOWN;
+}
+
+int
+get_event(int child)
+{
+	return wait_event(child, -1);
+}
+
+int
+get_data(int child, int action)
+{
+	int ret = 0;
+
+	switch (action) {
+	case __TEST_READ:
+	{
+		char buf[BUFSIZE];
+
+		test_read(child, buf, BUFSIZE);
+		ret = last_retval;
+		break;
+	}
+	case __TEST_READV:
+	{
+		char buf[BUFSIZE];
+		static const size_t count = 4;
+		struct iovec vector[] = {
+			{buf, (BUFSIZE >> 2)},
+			{buf + (BUFSIZE >> 2), (BUFSIZE >> 2)},
+			{buf + (BUFSIZE >> 2) + (BUFSIZE >> 2), (BUFSIZE >> 2)},
+			{buf + (BUFSIZE >> 2) + (BUFSIZE >> 2) + (BUFSIZE >> 2), (BUFSIZE >> 2)}
+		};
+
+		test_readv(child, vector, count);
+		ret = last_retval;
+		break;
+	}
+	case __TEST_GETMSG:
+	{
+		char buf[BUFSIZE];
+		struct strbuf data = { BUFSIZE, 0, buf };
+
+		if (test_getmsg(child, NULL, &data, &test_gflags) == __RESULT_FAILURE) {
+			ret = last_retval;
+			break;
+		}
+		ret = data.len;
+		break;
+	}
+	case __TEST_GETPMSG:
+	{
+		char buf[BUFSIZE];
+		struct strbuf data = { BUFSIZE, 0, buf };
+
+		if (test_getpmsg(child, NULL, &data, &test_gband, &test_gflags) == __RESULT_FAILURE) {
+			ret = last_retval;
+			break;
+		}
+		ret = data.len;
+		break;
+	}
+	}
+	return (ret);
+}
+
+int
+expect(int child, int wait, int want)
+{
+	if ((last_event = wait_event(child, wait)) == want)
+		return (__RESULT_SUCCESS);
+	print_expect(child, want);
+	return (__RESULT_FAILURE);
+}
 
 static const char *
 scope_string(int s)
@@ -1007,7 +6068,7 @@ extern size_t strnlen(__const char *, size_t);
 static int
 send(int msg)
 {
-	int ret = SUCCESS;
+	int ret = __RESULT_SUCCESS;
 	int i;
 	char cbuf[BUFSIZE];
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
@@ -1022,7 +6083,7 @@ send(int msg)
 	switch (msg) {
 	case IAM:
 		printf("                    |<-+---------------------%3ld--IAM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_IAM;
 		*d++ = pmsg.nci;
 		*d++ = pmsg.fci;
@@ -1055,7 +6116,7 @@ send(int msg)
 		goto send_isup;
 	case SAM:
 		printf("                    |<-+---------------------%3ld--SAM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_SAM;
 		p = d + 2;
 		*d = p - d;
@@ -1071,14 +6132,14 @@ send(int msg)
 		goto send_isup;
 	case INR:
 		printf("                    |<-+---------------------%3ld--INR--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_INR;
 		*d++ = pmsg.inri;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case INF:
 		printf("                    |<-+---------------------%3ld--INF--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_INF;
 		*d++ = pmsg.infi;
 		*d++ = 0;	/* eop */
@@ -1088,15 +6149,15 @@ send(int msg)
 		*d++ = pmsg.coti;	/* success = 1, failure = 0 */
 		if (pmsg.coti) {
 			printf("                    |<-+---------------------%3ld--COT--| (success)          (%d)\n", pmsg.cic, state);
-			FFLUSH(stdout);
+			fflush(stdout);
 		} else {
 			printf("                    |<-+---------------------%3ld--COT--| (failure)          (%d)\n", pmsg.cic, state);
-			FFLUSH(stdout);
+			fflush(stdout);
 		}
 		goto send_isup;
 	case ACM:
 		printf("                    |<-+---------------------%3ld--ACM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_ACM;
 		*d++ = pmsg.bci;
 		*d++ = pmsg.bci >> 8;
@@ -1104,7 +6165,7 @@ send(int msg)
 		goto send_isup;
 	case CON:
 		printf("                    |<-+---------------------%3ld--CON--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CON;
 		*d++ = pmsg.bci;
 		*d++ = pmsg.bci >> 8;
@@ -1112,19 +6173,19 @@ send(int msg)
 		goto send_isup;
 	case FOT:
 		printf("                    |<-+---------------------%3ld--FOT--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_FOT;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case ANM:
 		printf("                    |<-+---------------------%3ld--ANM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_ANM;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case REL:
 		printf("                    |<-+---------------------%3ld--REL--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_REL;
 		*d++ = 2;	/* causv pointer */
 		*d++ = 0;	/* eop */
@@ -1134,57 +6195,57 @@ send(int msg)
 		goto send_isup;
 	case SUS:
 		printf("                    |<-+---------------------%3ld--SUS--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_SUS;
 		*d++ = pmsg.sris;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case RES:
 		printf("                    |<-+---------------------%3ld--RES--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_RES;
 		*d++ = pmsg.sris;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case RLC:
 		printf("                    |<-+---------------------%3ld--RLC--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_RLC;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CCR:
 		printf("                    |<-+---------------------%3ld--CCR--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CCR;
 		goto send_isup;
 	case RSC:
 		printf("                    |<-+---------------------%3ld--RSC--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_RSC;
 		goto send_isup;
 	case BLO:
 		printf("                    |<-+---------------------%3ld--BLO--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_BLO;
 		goto send_isup;
 	case UBL:
 		printf("                    |<-+---------------------%3ld--UBL--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_UBL;
 		goto send_isup;
 	case BLA:
 		printf("                    |<-+---------------------%3ld--BLA--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_BLA;
 		goto send_isup;
 	case UBA:
 		printf("                    |<-+---------------------%3ld--UBA--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_UBA;
 		goto send_isup;
 	case GRS:
 		printf("                    |<-+---------------------%3ld--GRS--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_GRS;
 		*d++ = 1;
 		*d++ = pmsg.rs.len;
@@ -1193,7 +6254,7 @@ send(int msg)
 		goto send_isup;
 	case CGB:
 		printf("                    |<-+---------------------%3ld--CGB--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CGB;
 		*d++ = pmsg.cgi;
 		*d++ = 1;
@@ -1203,7 +6264,7 @@ send(int msg)
 		goto send_isup;
 	case CGU:
 		printf("                    |<-+---------------------%3ld--CGU--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CGU;
 		*d++ = pmsg.cgi;
 		*d++ = 1;
@@ -1213,7 +6274,7 @@ send(int msg)
 		goto send_isup;
 	case CGBA:
 		printf("                    |<-+---------------------%3ld--CGBA-|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CGBA;
 		*d++ = pmsg.cgi;
 		*d++ = 1;
@@ -1223,7 +6284,7 @@ send(int msg)
 		goto send_isup;
 	case CGUA:
 		printf("                    |<-+---------------------%3ld--CGUA-|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CGUA;
 		*d++ = pmsg.cgi;
 		*d++ = 1;
@@ -1233,81 +6294,81 @@ send(int msg)
 		goto send_isup;
 	case CMR:
 		printf("                    |<-+---------------------%3ld--CMR--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CMR;
 		*d++ = pmsg.cmi;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CMC:
 		printf("                    |<-+---------------------%3ld--CMC--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CMC;
 		*d++ = pmsg.cmi;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CMRJ:
 		printf("                    |<-+---------------------%3ld--CMRJ-|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CMRJ;
 		*d++ = pmsg.cmi;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAR:
 		printf("                    |<-+---------------------%3ld--FAR--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_FAR;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAA:
 		printf("                    |<-+---------------------%3ld--FAA--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_FAA;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FRJ:
 		printf("                    |<-+---------------------%3ld--FRJ--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_FRJ;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAD:
 		printf("                    |<-+---------------------%3ld--FAD--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_FAD;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAI:
 		printf("                    |<-+---------------------%3ld--FAI--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_FAI;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case LPA:
 		printf("                    |<-+---------------------%3ld--LPA--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_LPA;
 		goto send_isup;
 	case DRS:
 		printf("                    |<-+---------------------%3ld--DRS--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_DRS;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case PAM:
 		printf("                    |<-+---------------------%3ld--PAM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_PAM;
 		for (i = 0; i < pmsg.pam.len; i++)
 			*d++ = pmsg.pam.buf[i];
 		goto send_isup;
 	case GRA:
 		printf("                    |<-+---------------------%3ld--GRA--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_GRA;
 		*d++ = 1;
 		*d++ = pmsg.rs.len;
@@ -1316,7 +6377,7 @@ send(int msg)
 		goto send_isup;
 	case CQM:
 		printf("                    |<-+---------------------%3ld--CQM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CQM;
 		*d++ = 1;
 		*d++ = pmsg.rs.len;
@@ -1325,7 +6386,7 @@ send(int msg)
 		goto send_isup;
 	case CQR:
 		printf("                    |<-+---------------------%3ld--CQR--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CQR;
 		*d++ = 2;
 		*d++ = 1 + pmsg.rs.len + 1;
@@ -1338,14 +6399,14 @@ send(int msg)
 		goto send_isup;
 	case CPG:
 		printf("                    |<-+---------------------%3ld--CPG--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CPG;
 		*d++ = pmsg.evnt;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case USR:
 		printf("                    |<-+---------------------%3ld--USR--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_USR;
 		*d++ = 2;
 		*d++ = 0;	/* eop */
@@ -1355,12 +6416,12 @@ send(int msg)
 		goto send_isup;
 	case UCIC:
 		printf("                    |<-+---------------------%3ld--UCIC-|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_UCIC;
 		goto send_isup;
 	case CFN:
 		printf("                    |<-+---------------------%3ld--CFN--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CFN;
 		*d++ = 2;
 		*d++ = 0;	/* eop */
@@ -1370,70 +6431,70 @@ send(int msg)
 		goto send_isup;
 	case OLM:
 		printf("                    |<-+---------------------%3ld--OLM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_OLM;
 		goto send_isup;
 	case CRG:
 		printf("                    |<-+---------------------%3ld--CRG--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CRG;
 		goto send_isup;
 	case NRM:
 		printf("                    |<-+---------------------%3ld--NRM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_NRM;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAC:
 		printf("                    |<-+---------------------%3ld--FAC--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_FAC;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case UPT:
 		printf("                    |<-+---------------------%3ld--UPT--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_UPT;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case UPA:
 		printf("                    |<-+---------------------%3ld--UPA--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_UPA;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case IDR:
 		printf("                    |<-+---------------------%3ld--IDR--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_IDR;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case IRS:
 		printf("                    |<-+---------------------%3ld--IRS--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_IRS;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case SGM:
 		printf("                    |<-+---------------------%3ld--SGM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_SGM;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CRA:
 		printf("                    |<-+---------------------%3ld--CRA--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CRA;
 		goto send_isup;
 	case CRM:
 		printf("                    |<-+---------------------%3ld--CRM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CRM;
 		*d++ = pmsg.nci;
 		goto send_isup;
 	case CVR:
 		printf("                    |<-+---------------------%3ld--CVR--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CVR;
 		*d++ = pmsg.cvri;
 		*d++ = pmsg.cgri;
@@ -1441,46 +6502,46 @@ send(int msg)
 		goto send_isup;
 	case CVT:
 		printf("                    |<-+---------------------%3ld--CVT--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CVT;
 		goto send_isup;
 	case EXM:
 		printf("                    |<-+---------------------%3ld--EXM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_EXM;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case NON:
 		printf("                    |<-+---------------------%3ld--NON--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_NON;
 		*d++ = pmsg.ton;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case LLM:
 		printf("                    |<-+---------------------%3ld--LLM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_LLM;
 		goto send_isup;
 	case CAK:
 		printf("                    |<-+---------------------%3ld--CAK--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_CAK;
 		goto send_isup;
 	case TCM:
 		printf("                    |<-+---------------------%3ld--TCM--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_TCM;
 		*d++ = pmsg.cri;
 		goto send_isup;
 	case MCP:
 		printf("                    |<-+---------------------%3ld--MCP--|                    (%d)\n", pmsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		*d++ = ISUP_MT_MCP;
 		goto send_isup;
 	case PAUSE:
 		printf("                    |<-+--------------------------TFP--|                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->pause_ind.mtp_primitive = MTP_PAUSE_IND;
 		m->pause_ind.mtp_addr_offset = sizeof(m->pause_ind);
 		m->pause_ind.mtp_addr_length = sizeof(rem_addr);
@@ -1490,7 +6551,7 @@ send(int msg)
 		goto send_mtp;
 	case RESUME:
 		printf("                    |<-+--------------------------TFA--|                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->resume_ind.mtp_primitive = MTP_RESUME_IND;
 		m->resume_ind.mtp_addr_offset = sizeof(m->resume_ind);
 		m->resume_ind.mtp_addr_length = sizeof(rem_addr);
@@ -1500,14 +6561,14 @@ send(int msg)
 		goto send_mtp;
 	case RESTART_COMPLETE:
 		printf("                    |<-+--------------------------TRA--|                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->pause_ind.mtp_primitive = MTP_RESTART_COMPLETE_IND;
 		ctrl.len = sizeof(m->restart_complete_ind);
 		data.len = 0;
 		goto send_mtp;
 	case USER_PART_UNKNOWN:
 		printf("                    |<-+--------------------------UPU--| (unknown)          (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ctrl.len = sizeof(m->status_ind) + sizeof(mtp_addr_t);
 		m->status_ind.mtp_primitive = MTP_STATUS_IND;
 		m->status_ind.mtp_type = MTP_STATUS_TYPE_UPU;
@@ -1520,7 +6581,7 @@ send(int msg)
 		goto send_mtp;
 	case USER_PART_UNEQUIPPED:
 		printf("                    |<-+--------------------------UPU--| (unequipped)       (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ctrl.len = sizeof(m->status_ind) + sizeof(mtp_addr_t);
 		m->status_ind.mtp_primitive = MTP_STATUS_IND;
 		m->status_ind.mtp_type = MTP_STATUS_TYPE_UPU;
@@ -1533,7 +6594,7 @@ send(int msg)
 		goto send_mtp;
 	case USER_PART_UNAVAILABLE:
 		printf("                    |<-+--------------------------UPU--| (unavailable)      (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ctrl.len = sizeof(m->status_ind) + sizeof(mtp_addr_t);
 		m->status_ind.mtp_primitive = MTP_STATUS_IND;
 		m->status_ind.mtp_type = MTP_STATUS_TYPE_UPU;
@@ -1546,7 +6607,7 @@ send(int msg)
 		goto send_mtp;
 	case CONGESTION:
 		printf("                    |<-+--------------------------TFC--|                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->status_ind.mtp_primitive = MTP_STATUS_IND;
 		m->status_ind.mtp_type = MTP_STATUS_TYPE_CONG;
 		m->status_ind.mtp_status = MTP_STATUS_CONGESTION;
@@ -1558,30 +6619,30 @@ send(int msg)
 		goto send_mtp;
 	case IBI:
 		printf("<<<<<<<<<<<<<<<<<<<<|<<|<<< IN-BAND INFORMATION <<<<<<<|<<<<<<<<<<<<<<<<<<<<(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case RINGING:
 		printf("<<<<<<<<<<<<<<<<<<<<|<<|<<<<<<<<< RINGING <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<<<(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case COMMUNICATION:
 		printf("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case TONE:
 		printf("^<^<^<^<^<^<^<^<^<^<|<^|^<^<^< CONTINUITY TONE <^<^<^<^|^<^<^<^<^<^<^<^<^<^<(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case LOOPBACK:
 		printf("                    |__|_______________________________|_                   \n");
 		printf("                    |<<|_______________________________|_| LOOPBACK         (%d)\n", state);
 		printf("                    |  |                               |                    \n");
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	default:
 		printf("                    |<-+--------------------------\?\?\?--|                    (%d)\n", state);
-		FFLUSH(stdout);
-		return (FAILURE);
+		fflush(stdout);
+		return (__RESULT_FAILURE);
 	}
       send_isup:
 	data.len = (d > p) ? (d - pt_dat) : (p - pt_dat);
@@ -1590,7 +6651,7 @@ send(int msg)
 		for (i = 0; i < data.len; i++)
 			printf("%02X ", (unsigned char) data.buf[i]);
 		printf("\n");
-		FFLUSH(stdout);
+		fflush(stdout);
 	}
 	ctrl.len = sizeof(m->transfer_ind) + sizeof(rem_addr);
 	m->transfer_ind.mtp_primitive = MTP_TRANSFER_IND;
@@ -1606,11 +6667,11 @@ send(int msg)
 	data.buf = (char *) pt_dat;
 	if (putmsg(pt_fd, ctrl.len ? &ctrl : NULL, data.len ? &data : NULL, 0) < 0) {
 		if (errno == EAGAIN || errno == EINTR)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		printf("                    |<-+--------------------******** ERROR: putmsg failed                                         \n");
 		printf("                                                          : %-13s:%40s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
+		fflush(stdout);
+		return __RESULT_FAILURE;
 	}
 	return time_event(ret);
 }
@@ -1634,7 +6695,7 @@ iut_cpc_signal(int action)
 	case INFO_REQ:
 		if (verbose) {
 			printf("---INFO------------>|  |                               |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 		}
 		m->cc_primitive = CC_INFO_REQ;
 		ctrl.len = sizeof(m->info_req);
@@ -1643,7 +6704,7 @@ iut_cpc_signal(int action)
 	case OPTMGMT_REQ:
 		if (verbose) {
 			printf("---OPTMGMT--------->|  |                               |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 		}
 		m->cc_primitive = CC_OPTMGMT_REQ;
 		m->optmgmt_req.cc_opt_length = cprim.opt.len;
@@ -1658,7 +6719,7 @@ iut_cpc_signal(int action)
 	case BIND_REQ:
 		if (verbose > 1) {
 			printf("---BIND------------>|  |                               |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			if (verbose > 2) {
 				if (cprim.addr.len) {
 					printf(" addr scope =    %2s |  |                               |                    \n", scope_string(cprim.addr.add.scope));
@@ -1667,7 +6728,7 @@ iut_cpc_signal(int action)
 				}
 				printf(" setup inds = %5ld |  |                               |                    \n", cprim.setup_ind);
 				printf(" flags      =  %4lx |  |                               |                    \n", cprim.bind_flags);
-				FFLUSH(stdout);
+				fflush(stdout);
 			}
 		}
 		m->cc_primitive = CC_BIND_REQ;
@@ -1683,7 +6744,7 @@ iut_cpc_signal(int action)
 	case UNBIND_REQ:
 		if (verbose > 1)
 			printf("---UNBIND---------->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_UNBIND_REQ;
 		ctrl.len = sizeof(m->unbind_req);
 		data.len = 0;
@@ -1693,7 +6754,7 @@ iut_cpc_signal(int action)
 			printf("---ADDR------------>|  |                               |                    (%d)\n", state);
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_ADDR_REQ;
 		m->addr_req.cc_call_ref = cprim.call_ref;
 		ctrl.len = sizeof(m->addr_req);
@@ -1703,7 +6764,7 @@ iut_cpc_signal(int action)
 		printf("---SETUP----------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SETUP_REQ;
 		m->setup_req.cc_user_ref = cprim.user_ref;
 		m->setup_req.cc_call_type = cprim.call_type;
@@ -1728,7 +6789,7 @@ iut_cpc_signal(int action)
 		printf("---MORE-INFO------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_MORE_INFO_REQ;
 		m->more_info_req.cc_call_ref = cprim.call_ref;
 		m->more_info_req.cc_opt_length = cprim.opt.len;
@@ -1743,7 +6804,7 @@ iut_cpc_signal(int action)
 		printf("---INFORMATION----->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_INFORMATION_REQ;
 		m->information_req.cc_user_ref = cprim.user_ref;
 		m->information_req.cc_subn_length = cprim.subn.len;
@@ -1760,7 +6821,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case CONT_CHECK_REQ:
 		printf("---CONT CHECK------>|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_CONT_CHECK_REQ;
 		m->cont_check_req.cc_addr_length = cprim.addr.len;
 		m->cont_check_req.cc_addr_offset = sizeof(m->cont_check_req);
@@ -1773,7 +6834,7 @@ iut_cpc_signal(int action)
 		printf("---CONT-TEST------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_CONT_TEST_REQ;
 		m->cont_test_req.cc_token_value = cprim.token_value;
 		m->cont_test_req.cc_call_ref = cprim.call_ref;
@@ -1786,7 +6847,7 @@ iut_cpc_signal(int action)
 			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_CONT_REPORT_REQ;
 		m->cont_report_req.cc_user_ref = cprim.user_ref;
 		m->cont_report_req.cc_call_ref = cprim.call_ref;
@@ -1798,7 +6859,7 @@ iut_cpc_signal(int action)
 		printf("---SETUP OK-------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SETUP_RES;
 		m->setup_res.cc_call_ref = cprim.call_ref;
 		m->setup_res.cc_token_value = cprim.token_value;
@@ -1809,7 +6870,7 @@ iut_cpc_signal(int action)
 		printf("---PROCEEDING------>|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_PROCEEDING_REQ;
 		m->proceeding_req.cc_call_ref = cprim.call_ref;
 		m->proceeding_req.cc_flags = cprim.flags;;
@@ -1825,7 +6886,7 @@ iut_cpc_signal(int action)
 		printf("---ALERTING-------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_ALERTING_REQ;
 		m->alerting_req.cc_call_ref = cprim.call_ref;
 		m->alerting_req.cc_flags = cprim.flags;;
@@ -1841,7 +6902,7 @@ iut_cpc_signal(int action)
 		printf("---PROGRESS-------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_PROGRESS_REQ;
 		m->progress_req.cc_call_ref = cprim.call_ref;
 		m->progress_req.cc_event = cprim.event;;
@@ -1858,7 +6919,7 @@ iut_cpc_signal(int action)
 		printf("---IBI------------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_IBI_REQ;
 		m->ibi_req.cc_call_ref = cprim.call_ref;
 		m->ibi_req.cc_flags = cprim.flags;
@@ -1874,7 +6935,7 @@ iut_cpc_signal(int action)
 		printf("---CONNECT--------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_CONNECT_REQ;
 		m->connect_req.cc_call_ref = cprim.call_ref;
 		m->connect_req.cc_flags = cprim.flags;;
@@ -1890,7 +6951,7 @@ iut_cpc_signal(int action)
 		printf("---SETUP-COMPLETE-->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SETUP_COMPLETE_REQ;
 		m->setup_complete_req.cc_call_ref = cprim.call_ref;
 		m->setup_complete_req.cc_opt_length = cprim.opt.len;
@@ -1905,7 +6966,7 @@ iut_cpc_signal(int action)
 		printf("---FORWXFER-------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_FORWXFER_REQ;
 		m->forwxfer_req.cc_call_ref = cprim.call_ref;
 		m->forwxfer_req.cc_opt_length = cprim.opt.len;
@@ -1920,7 +6981,7 @@ iut_cpc_signal(int action)
 		printf("---SUSPEND--------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SUSPEND_REQ;
 		m->suspend_req.cc_call_ref = cprim.call_ref;
 		m->suspend_req.cc_flags = cprim.flags;;
@@ -1936,7 +6997,7 @@ iut_cpc_signal(int action)
 		printf("---SUSPEND-OK------>|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SUSPEND_RES;
 		m->suspend_res.cc_call_ref = cprim.call_ref;
 		m->suspend_res.cc_opt_length = cprim.opt.len;
@@ -1951,7 +7012,7 @@ iut_cpc_signal(int action)
 		printf("---SUSPEND-REJECT-->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SUSPEND_REJECT_REQ;
 		m->suspend_reject_req.cc_call_ref = cprim.call_ref;
 		m->suspend_reject_req.cc_cause = cprim.cause;
@@ -1967,7 +7028,7 @@ iut_cpc_signal(int action)
 		printf("---RESUME---------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESUME_REQ;
 		m->resume_req.cc_call_ref = cprim.call_ref;
 		m->resume_req.cc_flags = cprim.flags;;
@@ -1983,7 +7044,7 @@ iut_cpc_signal(int action)
 		printf("---RESUME-OK------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESUME_RES;
 		m->resume_res.cc_call_ref = cprim.call_ref;
 		m->resume_res.cc_opt_length = cprim.opt.len;
@@ -1998,7 +7059,7 @@ iut_cpc_signal(int action)
 		printf("---RESUME-REJECT--->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESUME_REJECT_REQ;
 		m->resume_reject_req.cc_call_ref = cprim.call_ref;
 		m->resume_reject_req.cc_cause = cprim.cause;
@@ -2014,7 +7075,7 @@ iut_cpc_signal(int action)
 		printf("---REJECT---------->|  |                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_REJECT_REQ;
 		m->reject_req.cc_call_ref = cprim.call_ref;
 		m->reject_req.cc_cause = cprim.cause;
@@ -2032,7 +7093,7 @@ iut_cpc_signal(int action)
 			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RELEASE_REQ;
 		m->release_req.cc_user_ref = cprim.user_ref;
 		m->release_req.cc_call_ref = cprim.call_ref;
@@ -2051,7 +7112,7 @@ iut_cpc_signal(int action)
 			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RELEASE_RES;
 		m->release_res.cc_user_ref = cprim.user_ref;
 		m->release_res.cc_call_ref = cprim.call_ref;
@@ -2065,7 +7126,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case RESET_REQ:
 		printf("---RESET----------->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESET_REQ;
 		m->reset_req.cc_flags = cprim.flags;
 		m->reset_req.cc_addr_length = cprim.addr.len;
@@ -2078,7 +7139,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case RESET_RES:
 		printf("---RESET OK-------->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESET_RES;
 		m->reset_res.cc_flags = cprim.flags;
 		m->reset_res.cc_addr_length = cprim.addr.len;
@@ -2090,7 +7151,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case BLOCKING_REQ:
 		printf("---BLOCKING-------->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_BLOCKING_REQ;
 		m->blocking_req.cc_flags = cprim.flags;
 		m->blocking_req.cc_addr_length = cprim.addr.len;
@@ -2102,7 +7163,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case BLOCKING_RES:
 		printf("---BLOCKING-OK----->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_BLOCKING_RES;
 		m->blocking_res.cc_flags = cprim.flags;
 		m->blocking_res.cc_addr_length = cprim.addr.len;
@@ -2114,7 +7175,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case UNBLOCKING_REQ:
 		printf("---UNBLOCKING------>|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_UNBLOCKING_REQ;
 		m->unblocking_req.cc_flags = cprim.flags;
 		m->unblocking_req.cc_addr_length = cprim.addr.len;
@@ -2126,7 +7187,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case UNBLOCKING_RES:
 		printf("---UNBLOCKING-OK--->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_UNBLOCKING_RES;
 		m->unblocking_res.cc_flags = cprim.flags;
 		m->unblocking_res.cc_addr_length = cprim.addr.len;
@@ -2138,7 +7199,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case QUERY_REQ:
 		printf("---QUERY----------->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_QUERY_REQ;
 		m->query_req.cc_flags = cprim.flags;
 		m->query_req.cc_addr_length = cprim.addr.len;
@@ -2150,7 +7211,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case QUERY_RES:
 		printf("---QUERY OK-------->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_QUERY_RES;
 		m->query_res.cc_flags = cprim.flags;
 		m->query_res.cc_addr_length = cprim.addr.len;
@@ -2162,39 +7223,39 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case IBI:
 		printf(">>>>>>>>>>>>>>>>>>>>|>>|>>> IN-BAND INFORMATION >>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case RINGING:
 		printf(">>>>>>>>>>>>>>>>>>>>|>>|>>>>>>>>> RINGING >>>>>>>>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case COMMUNICATION:
 		printf("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case TONE:
 		printf("^>^>^>^>^>^>^>^>^>^>|>^|^>^>^> CONTINUITY TONE >^>^>^>^|^>^>^>^>^>^>^>^>^>^>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case LOOPBACK:
 		printf("                   _|__|_______________________________|                    \n");
 		printf("         LOOPBACK |_|__|_____________________________>>|                    (%d)\n", state);
 		printf("                    |  |                               |                    \n");
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	default:
 		printf("\?\?\?\?--------------->|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
-		return FAILURE;
+		fflush(stdout);
+		return __RESULT_FAILURE;
 	}
       signal_msg:
 	if ((ret = putmsg(iut_cpc_fd, ctrl.len ? &ctrl : NULL, data.len ? &data : NULL, RS_HIPRI)) < 0) {
 		printf("************** ERROR: putmsg failed                                         \n");
 		printf("                    : %-13s:%40s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return (FAILURE);
+		fflush(stdout);
+		return (__RESULT_FAILURE);
 	}
-	return time_event(SUCCESS);
+	return time_event(__RESULT_SUCCESS);
 }
 
 static int
@@ -2216,7 +7277,7 @@ iut_signal(int action, int fd)
 	case INFO_REQ:
 		if (verbose)
 			printf("---INFO-------------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_INFO_REQ;
 		ctrl.len = sizeof(m->info_req);
 		data.len = 0;
@@ -2224,7 +7285,7 @@ iut_signal(int action, int fd)
 	case OPTMGMT_REQ:
 		if (verbose)
 			printf("---OPTMGMT----------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_OPTMGMT_REQ;
 		m->optmgmt_req.cc_opt_length = mprim.opt.len;
 		m->optmgmt_req.cc_opt_offset = mprim.opt.len ? sizeof(m->optmgmt_req) : 0;
@@ -2238,7 +7299,7 @@ iut_signal(int action, int fd)
 	case BIND_REQ:
 		if (verbose > 1) {
 			printf("---BIND-------------+->|                               |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			if (verbose > 2) {
 				if (mprim.addr.len) {
 					printf(" addr scope =    %2s |  |                               |                    \n", scope_string(mprim.addr.add.scope));
@@ -2247,7 +7308,7 @@ iut_signal(int action, int fd)
 				}
 				printf(" setup inds = %5ld |  |                               |                    \n", mprim.setup_ind);
 				printf(" flags      =  %4lx |  |                               |                    \n", mprim.bind_flags);
-				FFLUSH(stdout);
+				fflush(stdout);
 			}
 		}
 		m->cc_primitive = CC_BIND_REQ;
@@ -2263,7 +7324,7 @@ iut_signal(int action, int fd)
 	case UNBIND_REQ:
 		if (verbose > 1)
 			printf("---UNBIND-----------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_UNBIND_REQ;
 		ctrl.len = sizeof(m->unbind_req);
 		data.len = 0;
@@ -2271,7 +7332,7 @@ iut_signal(int action, int fd)
 	case ADDR_REQ:
 		if (verbose)
 			printf("---ADDR-------------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_ADDR_REQ;
 		ctrl.len = sizeof(m->addr_req);
 		data.len = 0;
@@ -2280,7 +7341,7 @@ iut_signal(int action, int fd)
 		printf("---SETUP------------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SETUP_REQ;
 		m->setup_req.cc_user_ref = mprim.user_ref;
 		m->setup_req.cc_call_type = mprim.call_type;
@@ -2305,7 +7366,7 @@ iut_signal(int action, int fd)
 		printf("---MORE-INFO--------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_MORE_INFO_REQ;
 		m->more_info_req.cc_call_ref = mprim.call_ref;
 		m->more_info_req.cc_opt_length = mprim.opt.len;
@@ -2320,7 +7381,7 @@ iut_signal(int action, int fd)
 		printf("---INFORMATION------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_INFORMATION_REQ;
 		m->information_req.cc_user_ref = mprim.user_ref;
 		m->information_req.cc_subn_length = mprim.subn.len;
@@ -2337,7 +7398,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case CONT_CHECK_REQ:
 		printf("---CONT CHECK-------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_CONT_CHECK_REQ;
 		m->cont_check_req.cc_addr_length = mprim.addr.len;
 		m->cont_check_req.cc_addr_offset = sizeof(m->cont_check_req);
@@ -2350,7 +7411,7 @@ iut_signal(int action, int fd)
 		printf("---CONT-TEST--------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_CONT_TEST_REQ;
 		m->cont_test_req.cc_call_ref = mprim.call_ref;
 		m->cont_test_req.cc_token_value = mprim.token_value;
@@ -2363,7 +7424,7 @@ iut_signal(int action, int fd)
 			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_CONT_REPORT_REQ;
 		m->cont_report_req.cc_user_ref = mprim.user_ref;
 		m->cont_report_req.cc_call_ref = mprim.call_ref;
@@ -2375,7 +7436,7 @@ iut_signal(int action, int fd)
 		printf("---SETUP OK---------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SETUP_RES;
 		m->setup_res.cc_call_ref = mprim.call_ref;
 		m->setup_res.cc_token_value = mprim.token_value;
@@ -2386,7 +7447,7 @@ iut_signal(int action, int fd)
 		printf("---PROCEEDING-------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_PROCEEDING_REQ;
 		m->proceeding_req.cc_call_ref = mprim.call_ref;
 		m->proceeding_req.cc_flags = mprim.flags;;
@@ -2402,7 +7463,7 @@ iut_signal(int action, int fd)
 		printf("---ALERTING---------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_ALERTING_REQ;
 		m->alerting_req.cc_call_ref = mprim.call_ref;
 		m->alerting_req.cc_flags = mprim.flags;;
@@ -2418,7 +7479,7 @@ iut_signal(int action, int fd)
 		printf("---PROGRESS---------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_PROGRESS_REQ;
 		m->progress_req.cc_call_ref = mprim.call_ref;
 		m->progress_req.cc_event = mprim.event;;
@@ -2435,7 +7496,7 @@ iut_signal(int action, int fd)
 		printf("---IBI--------------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_IBI_REQ;
 		m->ibi_req.cc_call_ref = mprim.call_ref;
 		m->ibi_req.cc_call_ref = mprim.call_ref;
@@ -2452,7 +7513,7 @@ iut_signal(int action, int fd)
 		printf("---CONNECT----------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_CONNECT_REQ;
 		m->connect_req.cc_call_ref = mprim.call_ref;
 		m->connect_req.cc_flags = mprim.flags;;
@@ -2468,7 +7529,7 @@ iut_signal(int action, int fd)
 		printf("---SETUP-COMPLETE---+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SETUP_COMPLETE_REQ;
 		m->setup_complete_req.cc_call_ref = mprim.call_ref;
 		m->setup_complete_req.cc_opt_length = mprim.opt.len;
@@ -2483,7 +7544,7 @@ iut_signal(int action, int fd)
 		printf("---FORWXFER---------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_FORWXFER_REQ;
 		m->forwxfer_req.cc_call_ref = mprim.call_ref;
 		m->forwxfer_req.cc_opt_length = mprim.opt.len;
@@ -2498,7 +7559,7 @@ iut_signal(int action, int fd)
 		printf("---SUSPEND----------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SUSPEND_REQ;
 		m->suspend_req.cc_call_ref = mprim.call_ref;
 		m->suspend_req.cc_flags = mprim.flags;;
@@ -2514,7 +7575,7 @@ iut_signal(int action, int fd)
 		printf("---SUSPEND-OK-------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SUSPEND_RES;
 		m->suspend_res.cc_call_ref = mprim.call_ref;
 		m->suspend_res.cc_opt_length = mprim.opt.len;
@@ -2529,7 +7590,7 @@ iut_signal(int action, int fd)
 		printf("---SUSPEND-REJECT---+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_SUSPEND_REJECT_REQ;
 		m->suspend_reject_req.cc_call_ref = mprim.call_ref;
 		m->suspend_reject_req.cc_cause = mprim.cause;
@@ -2545,7 +7606,7 @@ iut_signal(int action, int fd)
 		printf("---RESUME-----------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESUME_REQ;
 		m->resume_req.cc_call_ref = mprim.call_ref;
 		m->resume_req.cc_flags = mprim.flags;;
@@ -2561,7 +7622,7 @@ iut_signal(int action, int fd)
 		printf("---RESUME-OK--------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESUME_RES;
 		m->resume_res.cc_call_ref = mprim.call_ref;
 		m->resume_res.cc_opt_length = mprim.opt.len;
@@ -2576,7 +7637,7 @@ iut_signal(int action, int fd)
 		printf("---RESUME-REJECT----+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESUME_REJECT_REQ;
 		m->resume_reject_req.cc_call_ref = mprim.call_ref;
 		m->resume_reject_req.cc_cause = mprim.cause;
@@ -2594,7 +7655,7 @@ iut_signal(int action, int fd)
 			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RELEASE_REQ;
 		m->release_req.cc_user_ref = mprim.user_ref;
 		m->release_req.cc_call_ref = mprim.call_ref;
@@ -2611,7 +7672,7 @@ iut_signal(int action, int fd)
 		printf("---REJECT-----------+->|                               |                    (%d)\n", state);
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_REJECT_REQ;
 		m->reject_req.cc_call_ref = mprim.call_ref;
 		m->reject_req.cc_cause = mprim.cause;
@@ -2629,7 +7690,7 @@ iut_signal(int action, int fd)
 			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RELEASE_RES;
 		m->release_res.cc_user_ref = mprim.user_ref;
 		m->release_res.cc_call_ref = mprim.call_ref;
@@ -2643,7 +7704,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case RESET_REQ:
 		printf("---RESET------------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESET_REQ;
 		m->reset_req.cc_flags = mprim.flags;
 		m->reset_req.cc_addr_length = mprim.addr.len;
@@ -2656,7 +7717,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case RESET_RES:
 		printf("---RESET OK---------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_RESET_RES;
 		m->reset_res.cc_flags = mprim.flags;
 		m->reset_res.cc_addr_length = mprim.addr.len;
@@ -2668,7 +7729,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case BLOCKING_REQ:
 		printf("---BLOCKING---------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_BLOCKING_REQ;
 		m->blocking_req.cc_flags = mprim.flags;
 		m->blocking_req.cc_addr_length = mprim.addr.len;
@@ -2680,7 +7741,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case BLOCKING_RES:
 		printf("---BLOCKING-OK------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_BLOCKING_RES;
 		m->blocking_res.cc_flags = mprim.flags;
 		m->blocking_res.cc_addr_length = mprim.addr.len;
@@ -2692,7 +7753,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case UNBLOCKING_REQ:
 		printf("---UNBLOCKING-------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_UNBLOCKING_REQ;
 		m->unblocking_req.cc_flags = mprim.flags;
 		m->unblocking_req.cc_addr_length = mprim.addr.len;
@@ -2704,7 +7765,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case UNBLOCKING_RES:
 		printf("---UNBLOCKING-OK----+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_UNBLOCKING_RES;
 		m->unblocking_res.cc_flags = mprim.flags;
 		m->unblocking_res.cc_addr_length = mprim.addr.len;
@@ -2716,7 +7777,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case QUERY_REQ:
 		printf("---QUERY------------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_QUERY_REQ;
 		m->query_req.cc_flags = mprim.flags;
 		m->query_req.cc_addr_length = mprim.addr.len;
@@ -2728,7 +7789,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case QUERY_RES:
 		printf("---QUERY OK---------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		m->cc_primitive = CC_QUERY_RES;
 		m->query_res.cc_flags = mprim.flags;
 		m->query_res.cc_addr_length = mprim.addr.len;
@@ -2740,39 +7801,39 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case IBI:
 		printf(">>>>>>>>>>>>>>>>>>>>|>>|>>> IN-BAND INFORMATION >>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case RINGING:
 		printf(">>>>>>>>>>>>>>>>>>>>|>>|>>>>>>>>> RINGING >>>>>>>>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case COMMUNICATION:
 		printf("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case TONE:
 		printf("^>^>^>^>^>^>^>^>^>^>|>^|^>^>^> CONTINUITY TONE >^>^>^>^|^>^>^>^>^>^>^>^>^>^>(%d)\n", state);
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	case LOOPBACK:
 		printf("                   _|__|_______________________________|                    \n");
 		printf("         LOOPBACK |_|__|_____________________________>>|                    (%d)\n", state);
 		printf("                    |  |                               |                    \n");
-		FFLUSH(stdout);
-		return (SUCCESS);
+		fflush(stdout);
+		return (__RESULT_SUCCESS);
 	default:
 		printf("\?\?\?\?----------------+->|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
-		return FAILURE;
+		fflush(stdout);
+		return __RESULT_FAILURE;
 	}
       signal_msg:
 	if ((ret = putmsg(fd, ctrl.len ? &ctrl : NULL, data.len ? &data : NULL, RS_HIPRI)) < 0) {
 		printf("***************** ERROR: putmsg failed                                         \n");
 		printf("                       : %-13s:%40s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return (FAILURE);
+		fflush(stdout);
+		return (__RESULT_FAILURE);
 	}
-	return time_event(SUCCESS);
+	return time_event(__RESULT_SUCCESS);
 }
 
 static int
@@ -2807,7 +7868,7 @@ pt_decode_data(struct strbuf data)
 	switch (mt) {
 	case ISUP_MT_IAM:
 		printf("                    |--+-IAM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (IAM);
 		imsg.nci = *d++;
 		if (d > e)
@@ -2845,7 +7906,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_SAM:
 		printf("                    |--+-SAM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (SAM);
 		p = d + *d;
 		d++;
@@ -2869,7 +7930,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_INR:
 		printf("                    |--+-INR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (INR);
 		imsg.inri = *d++;
 		if (d > e)
@@ -2877,7 +7938,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_INF:
 		printf("                    |--+-INF--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (INF);
 		imsg.infi = *d++;
 		if (d > e)
@@ -2888,15 +7949,15 @@ pt_decode_data(struct strbuf data)
 		imsg.coti = *d++;
 		if (imsg.coti) {
 			printf("          (success) |--+-COT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-			FFLUSH(stdout);
+			fflush(stdout);
 		} else {
 			printf("          (failure) |--+-COT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-			FFLUSH(stdout);
+			fflush(stdout);
 		}
 		goto decode_none;
 	case ISUP_MT_ACM:
 		printf("                    |--+-ACM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (ACM);
 	      decode_bci:
 		imsg.bci = ((ulong) (*d++));
@@ -2906,22 +7967,22 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_CON:
 		printf("                    |--+-CON--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CON);
 		goto decode_bci;
 	case ISUP_MT_FOT:
 		printf("                    |--+-FOT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (FOT);
 		goto decode_opt;
 	case ISUP_MT_ANM:
 		printf("                    |--+-ANM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (ANM);
 		goto decode_opt;
 	case ISUP_MT_REL:
 		printf("                    |--+-REL--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (REL);
 	      decode_caus:
 		p = d + *d;
@@ -2941,7 +8002,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_SUS:
 		printf("                    |--+-SUS--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (SUS);
 		imsg.sris = *d++;
 		if (d > e)
@@ -2949,7 +8010,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_RES:
 		printf("                    |--+-RES--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (RES);
 		imsg.sris = *d++;
 		if (d > e)
@@ -2957,74 +8018,74 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_RLC:
 		printf("                    |--+-RLC--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (RLC);
 		goto decode_opt;
 	case ISUP_MT_CCR:
 		printf("                    |--+-CCR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CCR);
 		goto decode_none;
 	case ISUP_MT_RSC:
 		printf("                    |--+-RSC--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (RSC);
 		goto decode_none;
 	case ISUP_MT_BLO:
 		printf("                    |--+-BLO--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (BLO);
 		goto decode_none;
 	case ISUP_MT_UBL:
 		printf("                    |--+-UBL--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (UBL);
 		goto decode_none;
 	case ISUP_MT_BLA:
 		printf("                    |--+-BLA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (BLA);
 		goto decode_none;
 	case ISUP_MT_UBA:
 		printf("                    |--+-UBA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (UBA);
 		goto decode_none;
 	case ISUP_MT_GRS:
 		printf("                    |--+-GRS--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (GRS);
 	      decode_rs:
 		p = d + *d;
 		d++;
 		if (p > e) {
 			printf("**** ERROR: pointer out of range p = %p, e = %p\n", p, e);
-			FFLUSH(stdout);
+			fflush(stdout);
 			goto decode_error;
 		}
 		imsg.rs.len = *p++;
 		if (p > e) {
 			printf("**** ERROR: length out of range p = %p, e = %p\n", p, e);
-			FFLUSH(stdout);
+			fflush(stdout);
 			goto decode_error;
 		}
 		if (imsg.rs.len > 33) {
 			printf("**** ERROR: length too large len = %ld\n", (long) imsg.rs.len);
-			FFLUSH(stdout);
+			fflush(stdout);
 			goto decode_error;
 		}
 		for (i = 0; i < imsg.rs.len; i++) {
 			imsg.rs.buf[i] = *p++;
 			if (p > e) {
 				printf("**** ERROR: buffer out of range p = %p, e = %p\n", p, e);
-				FFLUSH(stdout);
+				fflush(stdout);
 				goto decode_error;
 			}
 		}
 		goto done;
 	case ISUP_MT_CGB:
 		printf("                    |--+-CGB--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CGB);
 	      decode_cgi:
 		imsg.cgi = *d++;
@@ -3033,22 +8094,22 @@ pt_decode_data(struct strbuf data)
 		goto decode_rs;
 	case ISUP_MT_CGU:
 		printf("                    |--+-CGU--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CGU);
 		goto decode_cgi;
 	case ISUP_MT_CGBA:
 		printf("                    |--+-CGBA-%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CGBA);
 		goto decode_cgi;
 	case ISUP_MT_CGUA:
 		printf("                    |--+-CGUA-%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CGUA);
 		goto decode_cgi;
 	case ISUP_MT_CMR:
 		printf("                    |--+-CMR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CMR);
 		imsg.cmi = *d++;
 		if (d > e)
@@ -3056,7 +8117,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_CMC:
 		printf("                    |--+-CMC--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CMC);
 		imsg.cmi = *d++;
 		if (d > e)
@@ -3064,7 +8125,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_CMRJ:
 		printf("                    |--+-CMRJ-%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CMRJ);
 		imsg.cmi = *d++;
 		if (d > e)
@@ -3072,7 +8133,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_FAR:
 		printf("                    |--+-FAR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (FAR);
 	      decode_faci:
 		imsg.faci = *d++;
@@ -3081,37 +8142,37 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_FAA:
 		printf("                    |--+-FAA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (FAA);
 		goto decode_faci;
 	case ISUP_MT_FRJ:
 		printf("                    |--+-FRJ--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (FRJ);
 		goto decode_faci;
 	case ISUP_MT_FAD:
 		printf("                    |--+-FAD--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (FAD);
 		goto decode_faci;
 	case ISUP_MT_FAI:
 		printf("                    |--+-FAI--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (FAI);
 		goto decode_faci;
 	case ISUP_MT_LPA:
 		printf("                    |--+-LPA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (LPA);
 		goto decode_none;
 	case ISUP_MT_DRS:
 		printf("                    |--+-DRS--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (DRS);
 		goto decode_opt;
 	case ISUP_MT_PAM:
 		printf("                    |--+-PAM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (PAM);
 		pmsg.pam.len = data.len - (data.buf - (char *) d);
 		bcopy(d, pmsg.pam.buf, pmsg.pam.len);
@@ -3119,17 +8180,17 @@ pt_decode_data(struct strbuf data)
 		break;
 	case ISUP_MT_GRA:
 		printf("                    |--+-GRA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (GRA);
 		goto decode_rs;
 	case ISUP_MT_CQM:
 		printf("                    |--+-CQM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CQM);
 		goto decode_rs;
 	case ISUP_MT_CQR:
 		printf("                    |--+-CQR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CQR);
 		p = d + *d;
 		d++;
@@ -3160,7 +8221,7 @@ pt_decode_data(struct strbuf data)
 		goto done;
 	case ISUP_MT_CPG:
 		printf("                    |--+-CPG--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CPG);
 		imsg.evnt = *d++;
 		if (d > e)
@@ -3168,7 +8229,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_USR:
 		printf("                    |--+-USR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (USR);
 		p = d + *d;
 		d++;
@@ -3185,73 +8246,73 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_UCIC:
 		printf("                    |--+-UCIC-%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (UCIC);
 		goto decode_none;
 	case ISUP_MT_CFN:
 		printf("                    |--+-CFN--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CFN);
 		goto decode_caus;
 	case ISUP_MT_OLM:
 		printf("                    |--+-OLM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (OLM);
 		goto decode_none;
 	case ISUP_MT_CRG:
 		printf("                    |--+-CRG--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CRG);
 		goto decode_none;
 	case ISUP_MT_NRM:
 		printf("                    |--+-NRM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (NRM);
 		goto decode_opt;
 	case ISUP_MT_FAC:
 		printf("                    |--+-FAC--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (FAC);
 		goto decode_opt;
 	case ISUP_MT_UPT:
 		printf("                    |--+-UPT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (UPT);
 		goto decode_opt;
 	case ISUP_MT_UPA:
 		printf("                    |--+-UPA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (UPA);
 		goto decode_opt;
 	case ISUP_MT_IDR:
 		printf("                    |--+-IDR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (IDR);
 		goto decode_opt;
 	case ISUP_MT_IRS:
 		printf("                    |--+-IRS--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (IRS);
 		goto decode_opt;
 	case ISUP_MT_SGM:
 		printf("                    |--+-SGM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (SGM);
 		goto decode_opt;
 	case ISUP_MT_CRA:
 		printf("                    |--+-CRA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CRA);
 		goto decode_none;
 	case ISUP_MT_CRM:
 		printf("                    |--+-CRM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CRM);
 		imsg.nci = *d++;
 		goto decode_none;
 	case ISUP_MT_CVR:
 		printf("                    |--+-CVR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CVR);
 		imsg.cvri = *d++;
 		if (d > e)
@@ -3262,17 +8323,17 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_CVT:
 		printf("                    |--+-CVT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CVT);
 		goto decode_none;
 	case ISUP_MT_EXM:
 		printf("                    |--+-EXM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (EXM);
 		goto decode_opt;
 	case ISUP_MT_NON:
 		printf("                    |--+-NON--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (NON);
 		imsg.ton = *d++;
 		if (d > e)
@@ -3280,29 +8341,29 @@ pt_decode_data(struct strbuf data)
 		goto decode_opt;
 	case ISUP_MT_LLM:
 		printf("                    |--+-LLM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (LLM);
 		goto decode_none;
 	case ISUP_MT_CAK:
 		printf("                    |--+-CAK--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (CAK);
 		goto decode_none;
 	case ISUP_MT_TCM:
 		printf("                    |--+-TCM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (TCM);
 		imsg.cri = *d++;
 		goto decode_none;
 	case ISUP_MT_MCP:
 		printf("                    |--+-MCP--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = (MCP);
 		goto decode_none;
 	default:
 		printf("                    |--+-\?\?\?--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
-		FFLUSH(stdout);
-		ret = (UNKNOWN);
+		fflush(stdout);
+		ret = (__EVENT_UNKNOWN);
 		break;
 	}
       done:
@@ -3311,7 +8372,7 @@ pt_decode_data(struct strbuf data)
 		for (i = 0; i < data.len; i++)
 			printf("%02X ", (unsigned char) data.buf[i]);
 		printf("\n");
-		FFLUSH(stdout);
+		fflush(stdout);
 	}
 	return (ret);
       decode_none:
@@ -3327,8 +8388,8 @@ pt_decode_data(struct strbuf data)
 	goto done;
       decode_error:
 	printf("                    |XX+XXXXXXX DECODE ERROR XXXXXXXXXX|                    (%d)\n", state);
-	FFLUSH(stdout);
-	ret = DECODEERROR;
+	fflush(stdout);
+	ret = __RESULT_DECODE_ERROR;
 	goto done;
 }
 
@@ -3341,13 +8402,13 @@ pt_decode_msg(struct strbuf ctrl, struct strbuf data)
 	case MTP_TRANSFER_REQ:
 		return pt_decode_data(data);
 	}
-	return (UNKNOWN);
+	return (__EVENT_UNKNOWN);
 }
 
 static int
 iut_cpc_decode_data(struct strbuf data)
 {
-	return (UNKNOWN);
+	return (__EVENT_UNKNOWN);
 }
 
 static int
@@ -3362,7 +8423,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 	case CC_OK_ACK:
 		if (show_acks || verbose > 1)
 			printf("<--OK---------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_OK_ACK;
 		break;
 	case CC_ERROR_ACK:
@@ -3408,19 +8469,19 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 			break;
 		}
 		printf("<--ERROR------------|  |(%29s)|                    (%d)\n", s, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_ERROR_ACK;
 		break;
 	case CC_INFO_ACK:
 		if (verbose)
 			printf("<--INFO-------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_INFO_ACK;
 		break;
 	case CC_BIND_ACK:
 		if (verbose > 1) {
 			printf("<--BIND-------------|  |                               |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 		}
 		cprim.addr.len = m->bind_ack.cc_addr_length;
 		bcopy((char *) &m->bind_ack + m->bind_ack.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
@@ -3432,20 +8493,20 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 				printf(" addr cic   = %5ld |  |                               |                    \n", cprim.addr.add.cic);
 			}
 			printf(" setup inds = %5ld |  |                               |                    \n", cprim.setup_ind);
-			FFLUSH(stdout);
+			fflush(stdout);
 		}
 		ret = CPC_BIND_ACK;
 		break;
 	case CC_OPTMGMT_ACK:
 		if (verbose)
 			printf("<--OPTMGMT----------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_OPTMGMT_ACK;
 		break;
 	case CC_ADDR_ACK:
 		if (verbose)
 			printf("<--ADDR-------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_ADDR_ACK;
 		break;
 	case CC_CALL_REATTEMPT_IND:
@@ -3454,35 +8515,35 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		switch ((cprim.reason = m->call_reattempt_ind.cc_reason)) {
 		case ISUP_REATTEMPT_DUAL_SIEZURE:
 			printf("<--CALL-REATTEMPT---|  | (dual siezure)                |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_RESET:
 			printf("<--CALL-REATTEMPT---|  | (reset)                       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_BLOCKING:
 			printf("<--CALL-REATTEMPT---|  | (blocking)                    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_T24_TIMEOUT:
 			printf("<--CALL-REATTEMPT---|  | (t24 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_UNEXPECTED:
 			printf("<--CALL-REATTEMPT---|  | (unexpected message)          |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_COT_FAILURE:
 			printf("<--CALL-REATTEMPT---|  | (continuity check failure)    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_CIRCUIT_BUSY:
 			printf("<--CALL-REATTEMPT---|  | (circuit busy)                |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		default:
 			printf("<--CALL-REATTEMPT---|  | (\?\?\?\?)                        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		}
 		if (verbose)
@@ -3490,7 +8551,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SETUP_IND:
 		printf("<--SETUP------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_SETUP_IND;
 		cprim.user_ref = 0;
 		cprim.call_ref = m->setup_ind.cc_call_ref;
@@ -3507,7 +8568,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_MORE_INFO_IND:
 		printf("<--MORE-INFO--------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_MORE_INFO_IND;
 		cprim.user_ref = m->more_info_ind.cc_user_ref;
 		if (verbose)
@@ -3517,7 +8578,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_INFORMATION_IND:
 		printf("<--INFORMATION------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_INFORMATION_IND;
 		cprim.call_ref = m->information_ind.cc_call_ref;
 		if (verbose)
@@ -3529,7 +8590,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_CONT_CHECK_IND:
 		printf("<--CONT-CHECK-------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_CONT_CHECK_IND;
 		cprim.call_ref = m->cont_check_ind.cc_call_ref;
 		if (verbose)
@@ -3539,7 +8600,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_CONT_TEST_IND:
 		printf("<--CONT-TEST--------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_CONT_TEST_IND;
 		cprim.call_ref = m->cont_test_ind.cc_call_ref;
 		if (verbose)
@@ -3549,7 +8610,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_CONT_REPORT_IND:
 		printf("<--CONT-REPORT------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_CONT_REPORT_IND;
 		cprim.call_ref = m->cont_report_ind.cc_call_ref;
 		if (verbose)
@@ -3558,7 +8619,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SETUP_CON:
 		printf("<--SETUP-OK---------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_SETUP_CON;
 		cprim.user_ref = m->setup_con.cc_user_ref;
 		cprim.call_ref = m->setup_con.cc_call_ref;
@@ -3571,7 +8632,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_PROCEEDING_IND:
 		printf("<--PROCEEDING-------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_PROCEEDING_IND;
 		cprim.call_ref = m->proceeding_ind.cc_call_ref;
 		if (verbose)
@@ -3582,7 +8643,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_ALERTING_IND:
 		printf("<--ALERTING---------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_ALERTING_IND;
 		cprim.call_ref = m->alerting_ind.cc_call_ref;
 		if (verbose)
@@ -3601,31 +8662,31 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		switch (m->progress_ind.cc_event & ISUP_EVNT_MASK) {
 		case ISUP_EVNT_ALERTING:
 			printf("<--PROGRESS---------|  | (alerting)                    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_PROGRESS:
 			printf("<--PROGRESS---------|  | (progress)                    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_IBI:
 			printf("<--PROGRESS---------|  | (in-band info avail)          |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_CFB:
 			printf("<--PROGRESS---------|  | (call forwarded busy)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_CFNA:
 			printf("<--PROGRESS---------|  | (call fowarded no reply)      |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_CFU:
 			printf("<--PROGRESS---------|  | (call forwarded uncond)       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		default:
 			printf("<--PROGRESS---------|  | (\?\?\?\?)                        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		}
 		if (verbose)
@@ -3633,7 +8694,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_IBI_IND:
 		printf("<--IBI--------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_IBI_IND;
 		cprim.call_ref = m->ibi_ind.cc_call_ref;
 		if (verbose)
@@ -3644,7 +8705,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_CONNECT_IND:
 		printf("<--CONNECT----------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_CONNECT_IND;
 		cprim.call_ref = m->connect_ind.cc_call_ref;
 		if (verbose)
@@ -3655,7 +8716,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SETUP_COMPLETE_IND:
 		printf("<--SETUP-COMPLETE---|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_SETUP_COMPLETE_IND;
 		cprim.call_ref = m->setup_complete_ind.cc_call_ref;
 		if (verbose)
@@ -3665,7 +8726,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_FORWXFER_IND:
 		printf("<--FORWXFER---------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_FORWXFER_IND;
 		cprim.call_ref = m->forwxfer_ind.cc_call_ref;
 		if (verbose)
@@ -3675,7 +8736,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SUSPEND_IND:
 		printf("<--SUSPEND----------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_SUSPEND_IND;
 		cprim.call_ref = m->suspend_ind.cc_call_ref;
 		if (verbose)
@@ -3686,7 +8747,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SUSPEND_CON:
 		printf("<--SUSPEND-OK-------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_SUSPEND_CON;
 		cprim.call_ref = m->suspend_con.cc_call_ref;
 		if (verbose)
@@ -3696,7 +8757,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SUSPEND_REJECT_IND:
 		printf("<--SUSPEND-REJECT---|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_SUSPEND_REJECT_IND;
 		cprim.call_ref = m->suspend_reject_ind.cc_call_ref;
 		if (verbose)
@@ -3707,7 +8768,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESUME_IND:
 		printf("<--RESUME-----------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_RESUME_IND;
 		cprim.call_ref = m->resume_ind.cc_call_ref;
 		if (verbose)
@@ -3718,7 +8779,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESUME_CON:
 		printf("<--RESUME-OK--------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_RESUME_CON;
 		cprim.call_ref = m->resume_con.cc_call_ref;
 		if (verbose)
@@ -3728,7 +8789,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESUME_REJECT_IND:
 		printf("<--RESUME-REJECT----|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_RESUME_REJECT_IND;
 		cprim.call_ref = m->resume_reject_ind.cc_call_ref;
 		if (verbose)
@@ -3739,7 +8800,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_REJECT_IND:
 		printf("<--REJECT-----------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_REJECT_IND;
 		cprim.user_ref = m->reject_ind.cc_user_ref;
 		if (verbose)
@@ -3756,59 +8817,59 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		switch (m->call_failure_ind.cc_reason) {
 		case ISUP_CALL_FAILURE_COT_FAILURE:
 			printf("<--CALL-FAILURE-----|  | (continuity check failure)    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_RESET:
 			printf("<--CALL-FAILURE-----|  | (reset)                       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_RECV_RLC:
 			printf("<--CALL-FAILURE-----|  | (received RLC)                |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_BLOCKING:
 			printf("<--CALL-FAILURE-----|  | (blocking)                    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T2_TIMEOUT:
 			printf("<--CALL-FAILURE-----|  | (t2 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T3_TIMEOUT:
 			printf("<--CALL-FAILURE-----|  | (t3 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T6_TIMEOUT:
 			printf("<--CALL-FAILURE-----|  | (t6 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T7_TIMEOUT:
 			printf("<--CALL-FAILURE-----|  | (t7 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T8_TIMEOUT:
 			printf("<--CALL-FAILURE-----|  | (t8 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T9_TIMEOUT:
 			printf("<--CALL-FAILURE-----|  | (t9 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T35_TIMEOUT:
 			printf("<--CALL-FAILURE-----|  | (t35 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T38_TIMEOUT:
 			printf("<--CALL-FAILURE-----|  | (t38 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_CIRCUIT_BUSY:
 			printf("<--CALL-FAILURE-----|  | (circuit busy)                |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		default:
 			printf("<--CALL-FAILURE-----|  | (\?\?\?\?)                        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		}
 		if (verbose)
@@ -3816,7 +8877,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RELEASE_IND:
 		printf("<--RELEASE----------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_RELEASE_IND;
 		cprim.user_ref = m->release_ind.cc_user_ref;
 		cprim.call_ref = m->release_ind.cc_call_ref;
@@ -3830,7 +8891,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RELEASE_CON:
 		printf("<--RELEASE-OK-------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_RELEASE_CON;
 		cprim.user_ref = m->release_con.cc_user_ref;
 		cprim.call_ref = m->release_con.cc_call_ref;
@@ -3843,7 +8904,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESET_IND:
 		printf("<--RESET------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_RESET_IND;
 		cprim.flags = m->reset_ind.cc_flags;
 		cprim.addr.len = m->reset_ind.cc_addr_length;
@@ -3851,7 +8912,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESET_CON:
 		printf("<--RESET-OK---------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_RESET_CON;
 		cprim.flags = m->reset_con.cc_flags;
 		cprim.addr.len = m->reset_con.cc_addr_length;
@@ -3859,7 +8920,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_BLOCKING_IND:
 		printf("<--BLOCK------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_BLOCKING_IND;
 		cprim.flags = m->blocking_ind.cc_flags;
 		cprim.addr.len = m->blocking_ind.cc_addr_length;
@@ -3867,7 +8928,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_BLOCKING_CON:
 		printf("<--BLOCK-OK---------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_BLOCKING_CON;
 		cprim.flags = m->blocking_con.cc_flags;
 		cprim.addr.len = m->blocking_con.cc_addr_length;
@@ -3875,7 +8936,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_UNBLOCKING_IND:
 		printf("<--UNBLOCK----------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_UNBLOCKING_IND;
 		cprim.flags = m->unblocking_ind.cc_flags;
 		cprim.addr.len = m->unblocking_ind.cc_addr_length;
@@ -3883,7 +8944,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_UNBLOCKING_CON:
 		printf("<--UNBLOCK-OK-------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_UNBLOCKING_CON;
 		cprim.flags = m->unblocking_con.cc_flags;
 		cprim.addr.len = m->unblocking_con.cc_addr_length;
@@ -3891,7 +8952,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_QUERY_IND:
 		printf("<--QUERY------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_QUERY_IND;
 		cprim.flags = m->query_ind.cc_flags;
 		cprim.addr.len = m->query_ind.cc_addr_length;
@@ -3899,7 +8960,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_QUERY_CON:
 		printf("<--QUERY-OK---------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_QUERY_CON;
 		cprim.flags = m->query_con.cc_flags;
 		cprim.addr.len = m->query_con.cc_addr_length;
@@ -3907,7 +8968,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_STOP_IND:
 		printf("<--STOP-------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_STOP_IND;
 		break;
 	case CC_MAINT_IND:
@@ -3919,150 +8980,150 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		switch (m->maint_ind.cc_reason) {
 		case ISUP_MAINT_T5_TIMEOUT:
 			printf("<--MAINT------------|  | (t5 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T13_TIMEOUT:
 			printf("<--MAINT------------|  | (t13 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T15_TIMEOUT:
 			printf("<--MAINT------------|  | (t15 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T17_TIMEOUT:
 			printf("<--MAINT------------|  | (t17 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T19_TIMEOUT:
 			printf("<--MAINT------------|  | (t19 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T21_TIMEOUT:
 			printf("<--MAINT------------|  | (t21 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T23_TIMEOUT:
 			printf("<--MAINT------------|  | (t23 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T25_TIMEOUT:
 			printf("<--MAINT------------|  | (t25 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T26_TIMEOUT:
 			printf("<--MAINT------------|  | (t26 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T27_TIMEOUT:
 			printf("<--MAINT------------|  | (t27 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T28_TIMEOUT:
 			printf("<--MAINT------------|  | (t28 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T36_TIMEOUT:
 			printf("<--MAINT------------|  | (t36 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_CGBA:
 			printf("<--MAINT------------|  | (unexpected cgba)             |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_CGUA:
 			printf("<--MAINT------------|  | (unexpected cgua)             |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_MESSAGE:
 			printf("<--MAINT------------|  | (unexpected message)          |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEQUIPPED_CIC:
 			a = (isup_addr_t *) (((unsigned char *) m) + m->maint_ind.cc_addr_offset);
 			printf("<--MAINT------------|  | (unequipped cic = %5ld)      |                    (%d)\n", a->cic, state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_SEGMENTATION_DISCARDED:
 			printf("<--MAINT------------|  | (segmentation discarded)      |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNEQUIPPED:
 			printf("<--MAINT------------|  | (user part unequipped)        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNAVAILABLE:
 			printf("<--MAINT------------|  | (user part unavailable)       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_AVAILABLE:
 			printf("<--MAINT------------|  | (user part available)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_MAN_MADE_BUSY:
 			printf("<--MAINT------------|  | (user part man made busy)     |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_CONGESTED:
 			printf("<--MAINT------------|  | (user part congested)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNCONGESTED:
 			printf("<--MAINT------------|  | (user part uncongested)       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_MISSING_ACK_IN_CGBA:
 			printf("<--MAINT------------|  | (missing ack in cgba)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_MISSING_ACK_IN_CGUA:
 			printf("<--MAINT------------|  | (missing ack in cgua)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_ABNORMAL_ACK_IN_CGBA:
 			printf("<--MAINT------------|  | (abnormal ack in cgba)        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_ABNORMAL_ACK_IN_CGUA:
 			printf("<--MAINT------------|  | (abnormal ack in cgua)        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_BLA:
 			printf("<--MAINT------------|  | (unexpected bla)              |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_UBA:
 			printf("<--MAINT------------|  | (unexpected uba)              |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_RELEASE_UNREC_INFO:
 			printf("<--MAINT------------|  | (unrecognized information)    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_RELEASE_FAILURE:
 			printf("<--MAINT------------|  | (release failure)             |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_MESSAGE_FORMAT_ERROR:
 			printf("<--MAINT------------|  | (message format error)        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		default:
 			printf("<--MAINT------------|  | (\?\?\?\?)                        |                    (%d)\n", state);
-			FFLUSH(stdout);
-			return (FAILURE);
+			fflush(stdout);
+			return (__RESULT_FAILURE);
 		}
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		break;
 	case CC_START_RESET_IND:
 		printf("<--START-RESET------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = CPC_START_RESET_IND;
 		break;
 	default:
 		printf("<--\?\?\?\?-------------|  |                               |                    (%d)\n", state);
-		FFLUSH(stdout);
-		return (UNKNOWN);
+		fflush(stdout);
+		return (__EVENT_UNKNOWN);
 	}
 	return (ret);
 }
@@ -4070,7 +9131,7 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 static int
 iut_mgm_decode_data(struct strbuf data)
 {
-	return (UNKNOWN);
+	return (__EVENT_UNKNOWN);
 }
 
 static int
@@ -4085,7 +9146,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 	case CC_OK_ACK:
 		if (show_acks || verbose > 1)
 			printf("<--OK---------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_OK_ACK;
 		break;
 	case CC_ERROR_ACK:
@@ -4128,19 +9189,19 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 			break;
 		}
 		printf("<--ERROR------------+--|(%29s)|                    (%d)\n", s, state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_ERROR_ACK;
 		break;
 	case CC_INFO_ACK:
 		if (verbose)
 			printf("<--INFO-------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_INFO_ACK;
 		break;
 	case CC_BIND_ACK:
 		if (verbose > 1) {
 			printf("<--BIND-------------+--|                               |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 		}
 		mprim.addr.len = m->bind_ack.cc_addr_length;
 		bcopy((char *) &m->bind_ack + m->bind_ack.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
@@ -4152,20 +9213,20 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 				printf(" addr cic   = %5ld |  |                               |                    \n", mprim.addr.add.cic);
 			}
 			printf(" setup inds = %5ld |  |                               |                    \n", mprim.setup_ind);
-			FFLUSH(stdout);
+			fflush(stdout);
 		}
 		ret = MGM_BIND_ACK;
 		break;
 	case CC_OPTMGMT_ACK:
 		if (verbose)
 			printf("<--OPTMGMT----------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_OPTMGMT_ACK;
 		break;
 	case CC_ADDR_ACK:
 		if (verbose)
 			printf("<--ADDR-------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_ADDR_ACK;
 		break;
 	case CC_CALL_REATTEMPT_IND:
@@ -4174,35 +9235,35 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		switch ((mprim.reason = m->call_reattempt_ind.cc_reason)) {
 		case ISUP_REATTEMPT_DUAL_SIEZURE:
 			printf("<--CALL-REATTEMPT---+--| (dual siezure)                |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_RESET:
 			printf("<--CALL-REATTEMPT---+--| (reset)                       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_BLOCKING:
 			printf("<--CALL-REATTEMPT---+--| (blocking)                    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_T24_TIMEOUT:
 			printf("<--CALL-REATTEMPT---+--| (t24 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_UNEXPECTED:
 			printf("<--CALL-REATTEMPT---+--| (unexpected message)          |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_COT_FAILURE:
 			printf("<--CALL-REATTEMPT---+--| (continuity check failure)    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_REATTEMPT_CIRCUIT_BUSY:
 			printf("<--CALL-REATTEMPT---+--| (circuit busy)                |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		default:
 			printf("<--CALL-REATTEMPT---+--| (\?\?\?\?)                        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		}
 		if (verbose)
@@ -4210,7 +9271,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SETUP_IND:
 		printf("<--SETUP------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_SETUP_IND;
 		mprim.user_ref = 0;
 		mprim.call_ref = m->setup_ind.cc_call_ref;
@@ -4227,7 +9288,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_MORE_INFO_IND:
 		printf("<--MORE-INFO--------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_MORE_INFO_IND;
 		mprim.user_ref = m->more_info_ind.cc_user_ref;
 		if (verbose)
@@ -4237,7 +9298,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_INFORMATION_IND:
 		printf("<--INFORMATION------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_INFORMATION_IND;
 		mprim.call_ref = m->information_ind.cc_call_ref;
 		if (verbose)
@@ -4249,7 +9310,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_CONT_CHECK_IND:
 		printf("<--CONT-CHECK-------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_CONT_CHECK_IND;
 		mprim.call_ref = m->cont_check_ind.cc_call_ref;
 		if (verbose)
@@ -4259,7 +9320,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_CONT_TEST_IND:
 		printf("<--CONT-TEST--------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_CONT_TEST_IND;
 		mprim.call_ref = m->cont_test_ind.cc_call_ref;
 		if (verbose)
@@ -4269,7 +9330,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_CONT_REPORT_IND:
 		printf("<--CONT-REPORT------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_CONT_REPORT_IND;
 		mprim.call_ref = m->cont_report_ind.cc_call_ref;
 		if (verbose)
@@ -4278,7 +9339,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SETUP_CON:
 		printf("<--SETUP-OK---------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_SETUP_CON;
 		mprim.user_ref = m->setup_con.cc_user_ref;
 		mprim.call_ref = m->setup_con.cc_call_ref;
@@ -4291,7 +9352,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_PROCEEDING_IND:
 		printf("<--PROCEEDING-------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_PROCEEDING_IND;
 		mprim.call_ref = m->proceeding_ind.cc_call_ref;
 		if (verbose)
@@ -4302,7 +9363,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_ALERTING_IND:
 		printf("<--ALERTING---------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_ALERTING_IND;
 		mprim.call_ref = m->alerting_ind.cc_call_ref;
 		if (verbose)
@@ -4321,31 +9382,31 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		switch (m->progress_ind.cc_event & ISUP_EVNT_MASK) {
 		case ISUP_EVNT_ALERTING:
 			printf("<--PROGRESS---------+--| (alerting)                    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_PROGRESS:
 			printf("<--PROGRESS---------+--| (progress)                    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_IBI:
 			printf("<--PROGRESS---------+--| (in-band info avail)          |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_CFB:
 			printf("<--PROGRESS---------+--| (call forwarded busy)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_CFNA:
 			printf("<--PROGRESS---------+--| (call fowarded no reply)      |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_EVNT_CFU:
 			printf("<--PROGRESS---------+--| (call forwarded uncond)       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		default:
 			printf("<--PROGRESS---------+--| (\?\?\?\?)                        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		}
 		if (verbose)
@@ -4353,7 +9414,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_IBI_IND:
 		printf("<--IBI--------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_IBI_IND;
 		mprim.call_ref = m->ibi_ind.cc_call_ref;
 		if (verbose)
@@ -4364,7 +9425,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_CONNECT_IND:
 		printf("<--CONNECT----------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_CONNECT_IND;
 		mprim.call_ref = m->connect_ind.cc_call_ref;
 		if (verbose)
@@ -4375,7 +9436,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SETUP_COMPLETE_IND:
 		printf("<--SETUP-COMPLETE---+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_SETUP_COMPLETE_IND;
 		mprim.call_ref = m->setup_complete_ind.cc_call_ref;
 		if (verbose)
@@ -4385,7 +9446,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_FORWXFER_IND:
 		printf("<--FORWXFER---------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_FORWXFER_IND;
 		mprim.call_ref = m->forwxfer_ind.cc_call_ref;
 		if (verbose)
@@ -4395,7 +9456,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SUSPEND_IND:
 		printf("<--SUSPEND----------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_SUSPEND_IND;
 		mprim.call_ref = m->suspend_ind.cc_call_ref;
 		if (verbose)
@@ -4406,7 +9467,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SUSPEND_CON:
 		printf("<--SUSPEND-OK-------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_SUSPEND_CON;
 		mprim.call_ref = m->suspend_con.cc_call_ref;
 		if (verbose)
@@ -4416,7 +9477,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_SUSPEND_REJECT_IND:
 		printf("<--SUSPEND-REJECT---+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_SUSPEND_REJECT_IND;
 		mprim.call_ref = m->suspend_reject_ind.cc_call_ref;
 		if (verbose)
@@ -4427,7 +9488,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESUME_IND:
 		printf("<--RESUME-----------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_RESUME_IND;
 		mprim.call_ref = m->resume_ind.cc_call_ref;
 		if (verbose)
@@ -4438,7 +9499,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESUME_CON:
 		printf("<--RESUME-OK--------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_RESUME_CON;
 		mprim.call_ref = m->resume_con.cc_call_ref;
 		if (verbose)
@@ -4448,7 +9509,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESUME_REJECT_IND:
 		printf("<--RESUME-REJECT----+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_RESUME_REJECT_IND;
 		mprim.call_ref = m->resume_reject_ind.cc_call_ref;
 		if (verbose)
@@ -4459,7 +9520,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_REJECT_IND:
 		printf("<--REJECT-----------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_REJECT_IND;
 		mprim.user_ref = m->reject_ind.cc_user_ref;
 		if (verbose)
@@ -4476,59 +9537,59 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		switch (m->call_failure_ind.cc_reason) {
 		case ISUP_CALL_FAILURE_COT_FAILURE:
 			printf("<--CALL-FAILURE-----+--| (continuity check failure)    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_RESET:
 			printf("<--CALL-FAILURE-----+--| (reset)                       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_RECV_RLC:
 			printf("<--CALL-FAILURE-----+--| (received RLC)                |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_BLOCKING:
 			printf("<--CALL-FAILURE-----+--| (blocking)                    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T2_TIMEOUT:
 			printf("<--CALL-FAILURE-----+--| (t2 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T3_TIMEOUT:
 			printf("<--CALL-FAILURE-----+--| (t3 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T6_TIMEOUT:
 			printf("<--CALL-FAILURE-----+--| (t6 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T7_TIMEOUT:
 			printf("<--CALL-FAILURE-----+--| (t7 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T8_TIMEOUT:
 			printf("<--CALL-FAILURE-----+--| (t8 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T9_TIMEOUT:
 			printf("<--CALL-FAILURE-----+--| (t9 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T35_TIMEOUT:
 			printf("<--CALL-FAILURE-----+--| (t35 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T38_TIMEOUT:
 			printf("<--CALL-FAILURE-----+--| (t38 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_CALL_FAILURE_CIRCUIT_BUSY:
 			printf("<--CALL-FAILURE-----+--| (circuit busy)                |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		default:
 			printf("<--CALL-FAILURE-----+--| (\?\?\?\?)                        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		}
 		if (verbose)
@@ -4536,7 +9597,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RELEASE_IND:
 		printf("<--RELEASE----------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_RELEASE_IND;
 		mprim.user_ref = m->release_ind.cc_user_ref;
 		mprim.call_ref = m->release_ind.cc_call_ref;
@@ -4550,7 +9611,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RELEASE_CON:
 		printf("<--RELEASE-OK-------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_RELEASE_CON;
 		mprim.user_ref = m->release_con.cc_user_ref;
 		mprim.call_ref = m->release_con.cc_call_ref;
@@ -4563,7 +9624,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESET_IND:
 		printf("<--RESET------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_RESET_IND;
 		mprim.flags = m->reset_ind.cc_flags;
 		mprim.addr.len = m->reset_ind.cc_addr_length;
@@ -4571,7 +9632,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_RESET_CON:
 		printf("<--RESET-OK---------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_RESET_CON;
 		mprim.flags = m->reset_con.cc_flags;
 		mprim.addr.len = m->reset_con.cc_addr_length;
@@ -4579,7 +9640,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_BLOCKING_IND:
 		printf("<--BLOCK------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_BLOCKING_IND;
 		mprim.flags = m->blocking_ind.cc_flags;
 		mprim.addr.len = m->blocking_ind.cc_addr_length;
@@ -4587,7 +9648,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_BLOCKING_CON:
 		printf("<--BLOCK-OK---------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_BLOCKING_CON;
 		mprim.flags = m->blocking_con.cc_flags;
 		mprim.addr.len = m->blocking_con.cc_addr_length;
@@ -4595,7 +9656,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_UNBLOCKING_IND:
 		printf("<--UNBLOCK----------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_UNBLOCKING_IND;
 		mprim.flags = m->unblocking_ind.cc_flags;
 		mprim.addr.len = m->unblocking_ind.cc_addr_length;
@@ -4603,7 +9664,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_UNBLOCKING_CON:
 		printf("<--UNBLOCK-OK-------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_UNBLOCKING_CON;
 		mprim.flags = m->unblocking_con.cc_flags;
 		mprim.addr.len = m->unblocking_con.cc_addr_length;
@@ -4611,7 +9672,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_QUERY_IND:
 		printf("<--QUERY------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_QUERY_IND;
 		mprim.flags = m->query_ind.cc_flags;
 		mprim.addr.len = m->query_ind.cc_addr_length;
@@ -4619,7 +9680,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_QUERY_CON:
 		printf("<--QUERY-OK---------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_QUERY_CON;
 		mprim.flags = m->query_con.cc_flags;
 		mprim.addr.len = m->query_con.cc_addr_length;
@@ -4627,7 +9688,7 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_STOP_IND:
 		printf("<--STOP-------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_STOP_IND;
 		break;
 	case CC_MAINT_IND:
@@ -4639,156 +9700,155 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		switch (m->maint_ind.cc_reason) {
 		case ISUP_MAINT_T5_TIMEOUT:
 			printf("<--MAINT------------+--| (t5 timeout)                  |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T13_TIMEOUT:
 			printf("<--MAINT------------+--| (t13 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T15_TIMEOUT:
 			printf("<--MAINT------------+--| (t15 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T17_TIMEOUT:
 			printf("<--MAINT------------+--| (t17 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T19_TIMEOUT:
 			printf("<--MAINT------------+--| (t19 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T21_TIMEOUT:
 			printf("<--MAINT------------+--| (t21 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T23_TIMEOUT:
 			printf("<--MAINT------------+--| (t23 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T25_TIMEOUT:
 			printf("<--MAINT------------+--| (t25 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T26_TIMEOUT:
 			printf("<--MAINT------------+--| (t26 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T27_TIMEOUT:
 			printf("<--MAINT------------+--| (t27 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T28_TIMEOUT:
 			printf("<--MAINT------------+--| (t28 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_T36_TIMEOUT:
 			printf("<--MAINT------------+--| (t36 timeout)                 |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_CGBA:
 			printf("<--MAINT------------+--| (unexpected cgba)             |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_CGUA:
 			printf("<--MAINT------------+--| (unexpected cgua)             |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_MESSAGE:
 			printf("<--MAINT------------+--| (unexpected message)          |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEQUIPPED_CIC:
 			a = (isup_addr_t *) (((unsigned char *) m) + m->maint_ind.cc_addr_offset);
 			printf("<--MAINT------------|  | (unequipped cic = %5ld)      |                    (%d)\n", a->cic, state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_SEGMENTATION_DISCARDED:
 			printf("<--MAINT------------+--| (segmentation discarded)      |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNEQUIPPED:
 			printf("<--MAINT------------+--| (user part unequipped)        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNAVAILABLE:
 			printf("<--MAINT------------+--| (user part unavailable)       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_AVAILABLE:
 			printf("<--MAINT------------+--| (user part available)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_MAN_MADE_BUSY:
 			printf("<--MAINT------------+--| (user part man made busy)     |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_CONGESTED:
 			printf("<--MAINT------------+--| (user part congested)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNCONGESTED:
 			printf("<--MAINT------------+--| (user part uncongested)       |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_MISSING_ACK_IN_CGBA:
 			printf("<--MAINT------------+--| (missing ack in cgba)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_MISSING_ACK_IN_CGUA:
 			printf("<--MAINT------------+--| (missing ack in cgua)         |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_ABNORMAL_ACK_IN_CGBA:
 			printf("<--MAINT------------+--| (abnormal ack in cgba)        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_ABNORMAL_ACK_IN_CGUA:
 			printf("<--MAINT------------+--| (abnormal ack in cgua)        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_BLA:
 			printf("<--MAINT------------+--| (unexpected bla)              |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_UBA:
 			printf("<--MAINT------------+--| (unexpected uba)              |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_RELEASE_UNREC_INFO:
 			printf("<--MAINT------------+--| (unrecognized information)    |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_RELEASE_FAILURE:
 			printf("<--MAINT------------+--| (release failure)             |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		case ISUP_MAINT_MESSAGE_FORMAT_ERROR:
 			printf("<--MAINT------------+--| (message format error)        |                    (%d)\n", state);
-			FFLUSH(stdout);
+			fflush(stdout);
 			break;
 		default:
 			printf("<--MAINT------------+--| (\?\?\?\?)                        |                    (%d)\n", state);
-			FFLUSH(stdout);
-			return (FAILURE);
+			fflush(stdout);
+			return (__RESULT_FAILURE);
 		}
 		if (verbose)
 			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		break;
 	case CC_START_RESET_IND:
 		printf("<--START-RESET------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
+		fflush(stdout);
 		ret = MGM_START_RESET_IND;
 		break;
 	default:
 		printf("<--\?\?\?\?-------------+--|                               |                    (%d)\n", state);
-		FFLUSH(stdout);
-		return (UNKNOWN);
+		fflush(stdout);
+		return (__EVENT_UNKNOWN);
 	}
 	return (ret);
 }
 
 static int show_timeout = 0;
-static int last_event = 0;
 
 #define CPC 0x00000001UL
 #define MGM 0x00000002UL
@@ -4813,14 +9873,14 @@ wait_event(int wait, int source)
 			timer_timeout = 0;
 			if (show_timeout || verbose) {
 				printf("++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++(%d)\n", state);
-				FFLUSH(stdout);
+				fflush(stdout);
 				show_timeout--;
 			}
-			last_event = TIMEOUT;
-			return time_event(TIMEOUT);
+			last_event = __EVENT_TIMEOUT;
+			return time_event(__EVENT_TIMEOUT);
 		}
 		// printf("polling:\n");
-		// FFLUSH(stdout);
+		// fflush(stdout);
 		pfd[0].fd = pt_fd;
 		pfd[0].events = (source & PT) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
 		pfd[0].revents = 0;
@@ -4842,13 +9902,13 @@ wait_event(int wait, int source)
 				break;
 			if (verbose) {
 				printf("X-X-X-X-X-X-X-X-X-X-|-X|X-X-X-X-X- ERROR! -X-X-X-X-X-X-|-X-X-X-X-X-X-X-X-X-X(%d)\n", state);
-				FFLUSH(stdout);
+				fflush(stdout);
 			}
 			break;
 		case 0:
 			if (verbose) {
 				printf("- - - - - - - - - - | -|- - - - - nothing! - - - - - - | - - - - - - - - - -(%d)\n", state);
-				FFLUSH(stdout);
+				fflush(stdout);
 			}
 			last_event = NO_MSG;
 			return time_event(NO_MSG);
@@ -4858,64 +9918,64 @@ wait_event(int wait, int source)
 		case 4:
 		case 5:
 			// printf("polled:\n");
-			// FFLUSH(stdout);
+			// fflush(stdout);
 			if (pfd[4].revents) {
 				int flags = 0;
 				struct strbuf ctrl = { BUFSIZE, 0, (char *) iut_ctl };
 				struct strbuf data = { BUFSIZE, 0, (char *) iut_dat };
 
 				// printf("getmsg from iut_mgm:\n");
-				// FFLUSH(stdout);
+				// fflush(stdout);
 				if (getmsg(iut_mnt_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
-					// FFLUSH(stdout);
+					// fflush(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event = iut_mgm_decode_data(data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_data(data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					}
 				}
 			}
 			// printf("polled:\n");
-			// FFLUSH(stdout);
+			// fflush(stdout);
 			if (pfd[3].revents) {
 				int flags = 0;
 				struct strbuf ctrl = { BUFSIZE, 0, (char *) iut_ctl };
 				struct strbuf data = { BUFSIZE, 0, (char *) iut_dat };
 
 				// printf("getmsg from iut_mgm:\n");
-				// FFLUSH(stdout);
+				// fflush(stdout);
 				if (getmsg(iut_mgm_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
-					// FFLUSH(stdout);
+					// fflush(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event = iut_mgm_decode_data(data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_data(data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					}
 				}
 			}
 			// printf("polled:\n");
-			// FFLUSH(stdout);
+			// fflush(stdout);
 			if (pfd[2].revents) {
 				int flags = 0;
 				struct strbuf ctrl = { BUFSIZE, 0, (char *) iut_ctl };
 				struct strbuf data = { BUFSIZE, 0, (char *) iut_dat };
 
 				// printf("getmsg from iut_mgm:\n");
-				// FFLUSH(stdout);
+				// fflush(stdout);
 				if (getmsg(iut_tst_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
-					// FFLUSH(stdout);
+					// fflush(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event = iut_mgm_decode_data(data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_data(data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					}
 				}
@@ -4926,15 +9986,15 @@ wait_event(int wait, int source)
 				struct strbuf data = { BUFSIZE, 0, (char *) iut_dat };
 
 				// printf("getmsg from iut:\n");
-				// FFLUSH(stdout);
+				// fflush(stdout);
 				if (getmsg(iut_cpc_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
-					// FFLUSH(stdout);
+					// fflush(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event = iut_cpc_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = iut_cpc_decode_msg(ctrl, data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event = iut_cpc_decode_data(data)) != UNKNOWN)
+						if ((last_event = iut_cpc_decode_data(data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					}
 				}
@@ -4945,15 +10005,15 @@ wait_event(int wait, int source)
 				struct strbuf data = { BUFSIZE, 0, (char *) pt_dat };
 
 				// printf("getmsg from pt:\n");
-				// FFLUSH(stdout);
+				// fflush(stdout);
 				if (getmsg(pt_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from pt [%d,%d]:\n",ctrl.len,data.len);
-					// FFLUSH(stdout);
+					// fflush(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event = pt_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = pt_decode_msg(ctrl, data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event = pt_decode_data(data)) != UNKNOWN)
+						if ((last_event = pt_decode_data(data)) != __EVENT_UNKNOWN)
 							return time_event(last_event);
 					}
 				}
@@ -5006,7 +10066,7 @@ event(int source)
 	return wait_event(-1, source);
 }
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Preambles and postambles
@@ -5018,9 +10078,9 @@ preamble_0(void)
 {
 	state = 0;
 	start_tt(1000);
-	// if (send(RESUME) != SUCCESS)
-	// return FAILURE;
-	return SUCCESS;
+	// if (send(RESUME) != __RESULT_SUCCESS)
+	// return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 };
 
 static int
@@ -5029,8 +10089,8 @@ preamble_1(void)
 	/* start with a blocked circuit at SP A */
 	state = 0;
 	start_tt(1000);
-	// if (send(RESUME) != SUCCESS)
-	// return FAILURE;
+	// if (send(RESUME) != __RESULT_SUCCESS)
+	// return __RESULT_FAILURE;
 	state = 1;
 	mprim.addr.add.scope = ISUP_SCOPE_CT;
 	mprim.addr.add.id = 12;
@@ -5040,14 +10100,14 @@ preamble_1(void)
 	iut_mgm_signal(BLOCKING_REQ);
 	state = 2;
 	if (pt_event() != BLO)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	pmsg.cic = 12;
 	send(BLA);
 	state = 4;
 	if (mgm_event() != MGM_BLOCKING_CON)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 static int
@@ -5056,9 +10116,9 @@ postamble_0(void)
 	while (wait_event(0, ANY) != NO_MSG) ;
 	state = 0;
 	stop_tt();
-	if (send(PAUSE) != SUCCESS)
-		return FAILURE;
-	return SUCCESS;
+	if (send(PAUSE) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 };
 
 static int
@@ -5083,11 +10143,11 @@ postamble_1(void)
 		goto failure;
 	stop_tt();
 	send(PAUSE);
-	return SUCCESS;
+	return __RESULT_SUCCESS;
       failure:
 	stop_tt();
 	send(PAUSE);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
 static int
@@ -5113,14 +10173,14 @@ postamble_2(void)
 	state = 6;
 	stop_tt();
 	send(PAUSE);
-	return SUCCESS;
+	return __RESULT_SUCCESS;
       failure:
 	stop_tt();
 	send(PAUSE);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  The Test Cases...
@@ -5128,13 +10188,17 @@ postamble_2(void)
  *  -------------------------------------------------------------------------
  */
 
+#define tgrp_case_1_1 "Circuit supervision"
+#define numb_case_1_1 "1.1"
+#define name_case_1_1 "Non-allocated circuits"
+#define xtra_case_1_1 NULL
+#define sref_case_1_1 NULL
 #define desc_case_1_1 "\
-Circuit supervision\n\
--- Non-allocated circuits\n\
 Verify that on receipt of a CIC relating to a circuit which does not exist,\n\
 SP A will discard the message and alert the maintenance system."
+
 static int
-test_case_1_1(void)
+test_case_1_1_func(void)
 {
 	state = 0;
 	pmsg.cic = 16;
@@ -5148,16 +10212,25 @@ test_case_1_1(void)
 	send(IAM);
 	state = 1;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+struct test_stream test_case_1_1_all = { preamble_0, test_case_1_1_func, postamble_0 };
+
+#define test_case_1_1 { &tst_case_1_1_all, NULL, NULL }
+
+#define test_group_1_2 "Reset of circuits"
+
+#define tgrp_case_1_2_1 test_group_1_2
+#define numb_case_1_2_1 "1.2.1"
+#define name_case_1_2_1 "RSC received on an idle circuit"
+#define xtra_case_1_2_1 NULL
+#define sref_case_1_2_1 NULL
 #define desc_case_1_2_1 "\
-Reset of circuits\n\
--- RSC received on an idle circuit\n\
 Verify that on receipt of a reset circuit message, SP A will respond by sending\n\
 a release complete message."
 static int
@@ -5168,21 +10241,23 @@ test_case_1_2_1(void)
 	send(RSC);
 	state = 1;
 	if (mgm_event() != MGM_RESET_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_mgm_signal(RESET_RES);
 	state = 3;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_2_2 test_group_1_2
+#define numb_case_1_2_2 "1.2.2"
 #define desc_case_1_2_2 "\
 Reset of circuits\n\
 -- RSC sent on an idle circuit\n\
@@ -5200,19 +10275,21 @@ test_case_1_2_2(void)
 	iut_mgm_signal(RESET_REQ);
 	state = 1;
 	if (pt_event() != RSC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = 12;
 	send(RLC);
 	state = 3;
 	if (mgm_event() != MGM_RESET_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_2_3 test_group_1_2
+#define numb_case_1_2_3 "1.2.3"
 #define desc_case_1_2_3 "\
 Reset of circuits\n\
 -- RSC received on a locally blocked circuit\n\
@@ -5230,39 +10307,41 @@ test_case_1_2_3(void)
 	iut_mgm_signal(BLOCKING_REQ);
 	state = 1;
 	if (pt_event() != BLO)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = 12;
 	send(BLA);
 	state = 3;
 	if (mgm_event() != MGM_BLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	pmsg.cic = 12;
 	send(RSC);
 	state = 5;
 	if (mgm_event() != MGM_RESET_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_mgm_signal(RESET_RES);
 	state = 7;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (pt_event() != BLO)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	pmsg.cic = 12;
 	send(BLA);
 	state = 10;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_2_4 test_group_1_2
+#define numb_case_1_2_4 "1.2.4"
 #define desc_case_1_2_4 "\
 Reset of circuits\n\
 -- RSC received on a remotely blocked circuit\n\
@@ -5276,36 +10355,38 @@ test_case_1_2_4(void)
 	send(BLO);
 	state = 1;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 3;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	pmsg.cic = 12;
 	send(RSC);
 	state = 6;
 	if (mgm_event() != MGM_RESET_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	iut_mgm_signal(RESET_RES);
 	state = 8;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_2_5a test_group_1_2
+#define numb_case_1_2_5a "1.2.5a"
 #define desc_case_1_2_5a "\
 Reset of circuits\n\
 -- Circuit group reset received\n\
@@ -5322,22 +10403,24 @@ test_case_1_2_5a(void)
 	send(GRS);
 	state = 1;
 	if (mgm_event() != MGM_RESET_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_mgm_signal(RESET_RES);
 	state = 3;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != GRA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_2_5b test_group_1_2
+#define numb_case_1_2_5b "1.2.5b"
 #define desc_case_1_2_5b "\
 Reset of circuits\n\
 -- Circuit group reset received\n\
@@ -5354,10 +10437,12 @@ test_case_1_2_5b(void)
 	send(GRS);
 	state = 1;
 	if (wait_event(100, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_2_5c test_group_1_2
+#define numb_case_1_2_5c "1.2.5c"
 #define desc_case_1_2_5c "\
 Reset of circuits\n\
 -- Circuit group reset received\n\
@@ -5374,10 +10459,12 @@ test_case_1_2_5c(void)
 	send(GRS);
 	state = 1;
 	if (wait_event(100, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_2_6 test_group_1_2
+#define numb_case_1_2_6 "1.2.6"
 #define desc_case_1_2_6 "\
 Reset of circuits\n\
 -- Circuit group reset sent\n\
@@ -5394,7 +10481,7 @@ test_case_1_2_6(void)
 	iut_mgm_signal(RESET_REQ);
 	state = 1;
 	if (pt_event() != GRS)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = 1;
 	pmsg.rs.buf[0] = imsg.rs.buf[0];
@@ -5406,13 +10493,15 @@ test_case_1_2_6(void)
 	send(GRA);
 	state = 3;
 	if (mgm_event() != MGM_RESET_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_2_7 test_group_1_2
+#define numb_case_1_2_7 "1.2.7"
 #define desc_case_1_2_7 "\
 Reset of circuits\n\
 -- Circuit group reset received on remotely blocked circuits\n\
@@ -5426,29 +10515,29 @@ test_case_1_2_7(void)
 	send(BLO);
 	state = 1;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 3;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	pmsg.cic = 13;
 	send(BLO);
 	state = 6;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 8;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	pmsg.cic = 1;
 	pmsg.rs.buf[0] = 30;
@@ -5456,19 +10545,19 @@ test_case_1_2_7(void)
 	send(GRS);
 	state = 11;
 	if (mgm_event() != MGM_RESET_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	iut_mgm_signal(RESET_RES);
 	state = 13;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (pt_event() != GRA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 #define desc_case_1_3_1_1x "\
@@ -5491,15 +10580,15 @@ test_case_1_3_1_1x(ulong cgi)
 	send(CGB);
 	state = 1;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 3;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != CGBA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	/* FIXME: In here we should really attempt to launch some calls to the blocked circuits */
 	state = 6;
@@ -5514,20 +10603,20 @@ test_case_1_3_1_1x(ulong cgi)
 	send(CGU);
 	state = 7;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 9;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (pt_event() != CGUA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	/* FIXME: In here we should really attempt to launch some calls to the blocked circuits */
 	state = 11;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 #define desc_case_1_3_1_1y "\
@@ -5546,7 +10635,7 @@ test_case_1_3_1_1y(ulong cgi)
 	send(CGB);
 	state = 1;
 	if (wait_event(100, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = 1;
 	pmsg.rs.buf[0] = 0;
@@ -5555,8 +10644,8 @@ test_case_1_3_1_1y(ulong cgi)
 	send(CGU);
 	state = 3;
 	if (wait_event(100, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 #define desc_case_1_3_1_1z "\
@@ -5580,7 +10669,7 @@ test_case_1_3_1_1z(ulong cgi)
 	send(CGB);
 	state = 1;
 	if (wait_event(100, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = 1;
 	pmsg.rs.buf[0] = 34;
@@ -5594,75 +10683,104 @@ test_case_1_3_1_1z(ulong cgi)
 	send(CGU);
 	state = 3;
 	if (wait_event(100, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_1_3 "Circuit group blocking/unblocking"
+#define test_group_1_3_1_1 "CGB and CGU received"
+
+#define tgrp_case_1_3_1_1a test_group_1_3
+#define sgrp_case_1_3_1_1a test_group_1_3_1_1
+#define numb_case_1_3_1_1a "1.3.1.1a"
+#define name_case_1_3_1_1a "Maintenance Oriented"
+#define xtra_case_1_3_1_1a "valid range"
+#define sref_case_1_3_1_1a NULL
 #define desc_case_1_3_1_1a "\
-Circuit group blocking/unblocking\n\
--- CGB and CGU received\n\
--- Maintenance Oriented, valid range\n\
 Verify that the circuit group blocking feature can be correctly initiated."
+
 static int
 test_case_1_3_1_1a(void)
 {
 	return test_case_1_3_1_1x(ISUP_MAINTENANCE_ORIENTED);
 }
 
+#define tgrp_case_1_3_1_1b test_group_1_3
+#define sgrp_case_1_3_1_1b test_group_1_3_1_1
+#define numb_case_1_3_1_1b "1.3.1.1b"
+#define name_case_1_3_1_1b "Maintenance Oriented"
+#define xtra_case_1_3_1_1b "range = 0"
+#define sref_case_1_3_1_1b NULL
 #define desc_case_1_3_1_1b "\
-Circuit group blocking/unblocking\n\
--- CGB and CGU received\n\
--- Maintenance Oriented, range = 0\n\
 Verify that the circuit group blocking feature can be correctly initiated."
+
 static int
 test_case_1_3_1_1b(void)
 {
 	return test_case_1_3_1_1y(ISUP_MAINTENANCE_ORIENTED);
 }
 
+#define tgrp_case_1_3_1_1c test_group_1_3
+#define sgrp_case_1_3_1_1c test_group_1_3_1_1
+#define numb_case_1_3_1_1c "1.3.1.1c"
+#define name_case_1_3_1_1c "Maintenance Oriented"
+#define xtra_case_1_3_1_1c "range > 32"
+#define sref_case_1_3_1_1c NULL
 #define desc_case_1_3_1_1c "\
-Circuit group blocking/unblocking\n\
--- CGB and CGU received\n\
--- Maintenance Oriented, range > 32\n\
 Verify that the circuit group blocking feature can be correctly initiated."
+
 static int
 test_case_1_3_1_1c(void)
 {
 	return test_case_1_3_1_1z(ISUP_MAINTENANCE_ORIENTED);
 }
 
+#define tgrp_case_1_3_1_1d test_group_1_3
+#define sgrp_case_1_3_1_1d test_group_1_3_1_1
+#define numb_case_1_3_1_1d "1.3.1.1d"
+#define name_case_1_3_1_1d "Hardware Failure Oriented"
+#define xtra_case_1_3_1_1d "valid range"
+#define sref_case_1_3_1_1d NULL
 #define desc_case_1_3_1_1d "\
-Circuit group blocking/unblocking\n\
--- CGB and CGU received\n\
--- Hardware Failure Oriented, valid range\n\
 Verify that the circuit group blocking feature can be correctly initiated."
+
 static int
 test_case_1_3_1_1d(void)
 {
 	return test_case_1_3_1_1x(ISUP_HARDWARE_FAILURE_ORIENTED);
 }
 
+#define tgrp_case_1_3_1_1e test_group_1_3
+#define sgrp_case_1_3_1_1e test_group_1_3_1_1
+#define numb_case_1_3_1_1e "1.3.1.1e"
+#define name_case_1_3_1_1e "Hardware Failure Oriented"
+#define xtra_case_1_3_1_1e "range = 0"
+#define sref_case_1_3_1_1e NULL
 #define desc_case_1_3_1_1e "\
-Circuit group blocking/unblocking\n\
--- CGB and CGU received\n\
--- Hardware Failure Oriented, range = 0\n\
 Verify that the circuit group blocking feature can be correctly initiated."
+
 static int
 test_case_1_3_1_1e(void)
 {
 	return test_case_1_3_1_1y(ISUP_HARDWARE_FAILURE_ORIENTED);
 }
 
+#define tgrp_case_1_3_1_1f test_group_1_3
+#define sgrp_case_1_3_1_1f test_group_1_3_1_1
+#define numb_case_1_3_1_1f "1.3.1.1f"
+#define name_case_1_3_1_1f "Hardware Failure Oriented"
+#define xtra_case_1_3_1_1f "range > 32"
+#define sref_case_1_3_1_1f NULL
 #define desc_case_1_3_1_1f "\
-Circuit group blocking/unblocking\n\
--- CGB and CGU received\n\
--- Hardware Failure Oriented, range > 32\n\
 Verify that the circuit group blocking feature can be correctly initiated."
+
 static int
 test_case_1_3_1_1f(void)
 {
 	return test_case_1_3_1_1z(ISUP_HARDWARE_FAILURE_ORIENTED);
 }
+
+#define test_group_1_3_1_2 "CGB anbd CGU sent"
 
 #define desc_case_1_3_1_2x "\
 Circuit group blocking/unblocking\n\
@@ -5681,7 +10799,7 @@ test_case_1_3_1_2x(ulong cgi)
 	iut_mgm_signal(BLOCKING_REQ);
 	state = 1;
 	if (pt_event() != CGB)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	bcopy(imsg.rs.buf, pmsg.rs.buf, imsg.rs.len);
@@ -5690,7 +10808,7 @@ test_case_1_3_1_2x(ulong cgi)
 	send(CGBA);
 	state = 3;
 	if (mgm_event() != MGM_BLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	mprim.addr.add.scope = ISUP_SCOPE_CG;
 	mprim.addr.add.id = 1;
@@ -5700,7 +10818,7 @@ test_case_1_3_1_2x(ulong cgi)
 	iut_mgm_signal(UNBLOCKING_REQ);
 	state = 5;
 	if (pt_event() != CGU)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	pmsg.cic = imsg.cic;
 	bcopy(imsg.rs.buf, pmsg.rs.buf, imsg.rs.len);
@@ -5709,31 +10827,38 @@ test_case_1_3_1_2x(ulong cgi)
 	send(CGUA);
 	state = 7;
 	if (mgm_event() != MGM_UNBLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	/* make sure both SP's can initiate calls */
 	state = 9;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_3_1_2a test_group_1_3
+#define sgrp_case_1_3_1_2a test_group_1_3_1_2
+#define numb_case_1_3_1_2a "1.3.1.2a"
+#define name_case_1_3_1_2a "Maintenance oriented"
+#define xtra_case_1_3_1_2a NULL
+#define sref_case_1_3_1_2a NULL
 #define desc_case_1_3_1_2a "\
-Circuit group blocking/unblocking\n\
--- CGB and CGU sent\n\
--- Maintenance oriented\n\
 Verify that SP A is able to generate one circuit group blocking message and\n\
 one circuit group unblocking message."
+
 static int
 test_case_1_3_1_2a(void)
 {
 	return test_case_1_3_1_2x(ISUP_MAINTENANCE_ORIENTED);
 }
 
+#define tgrp_case_1_3_1_2b test_group_1_3
+#define sgrp_case_1_3_1_2b test_group_1_3_1_2
+#define numb_case_1_3_1_2b "1.3.1.2b"
+#define name_case_1_3_1_2b "Hardware failure oriented"
+#define xtra_case_1_3_1_2b NULL
+#define sref_case_1_3_1_2b NULL
 #define desc_case_1_3_1_2b "\
-Circuit group blocking/unblocking\n\
--- CGB and CGU sent\n\
--- Hardware failure oriented\n\
 Verify that SP A is able to generate one circuit group blocking message and\n\
 one circuit group unblocking message."
 static int
@@ -5742,10 +10867,15 @@ test_case_1_3_1_2b(void)
 	return test_case_1_3_1_2x(ISUP_HARDWARE_FAILURE_ORIENTED);
 }
 
+#define tgrp_case_1_3_2_1 test_group_1_3
+#define sgrp_case_1_3_2_1 NULL
+#define numb_case_1_3_2_1 "1.3.2.1"
+#define name_case_1_3_2_1 "BLO received"
+#define xtra_case_1_3_2_1 NULL
+#define sref_case_1_3_2_1 NULL
 #define desc_case_1_3_2_1 "\
-Circuit blocking/unblocking\n\
--- BLO received\n\
 Verify that the blocking/unblocking procedure can be correctly initiated."
+
 static int
 test_case_1_3_2_1(void)
 {
@@ -5754,15 +10884,15 @@ test_case_1_3_2_1(void)
 	send(BLO);
 	state = 1;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 3;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	/* FIXME: Make sure that a call cannot be made */
 	state = 6;
@@ -5770,26 +10900,30 @@ test_case_1_3_2_1(void)
 	send(UBL);
 	state = 7;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 9;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (pt_event() != UBA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	/* FIXME: Make sure that a call can be made */
 	state = 12;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_3_2_2 test_group_1_3
+#define sgrp_case_1_3_2_2 NULL
+#define numb_case_1_3_2_2 "1.3.2.2"
+#define name_case_1_3_2_2 "BLO sent"
+#define xtra_case_1_3_2_2 NULL
+#define sref_case_1_3_2_2 NULL
 #define desc_case_1_3_2_2 "\
-Circuit blocking/unblocking\n\
--- BLO sent\n\
 Verify that SP A is able to generate blocking messages."
 static int
 test_case_1_3_2_2(void)
@@ -5803,13 +10937,13 @@ test_case_1_3_2_2(void)
 	iut_mgm_signal(BLOCKING_REQ);
 	state = 1;
 	if (pt_event() != BLO)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	send(BLA);
 	state = 3;
 	if (mgm_event() != MGM_BLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	mprim.addr.add.scope = ISUP_SCOPE_CT;
 	mprim.addr.add.id = 12;
@@ -5819,24 +10953,28 @@ test_case_1_3_2_2(void)
 	iut_mgm_signal(UNBLOCKING_REQ);
 	state = 5;
 	if (pt_event() != UBL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	pmsg.cic = imsg.cic;
 	send(UBA);
 	state = 7;
 	if (mgm_event() != MGM_UNBLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	/* make sure that both SP's can initiate calls */
 	state = 9;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_3_2_3 test_group_1_3
+#define sgrp_case_1_3_2_3 NULL
+#define numb_case_1_3_2_3 "1.3.2.3"
+#define name_case_1_3_2_3 "Blocking from both ends; removal of blocking from one end."
+#define xtra_case_1_3_2_3 NULL
+#define sref_case_1_3_2_3 NULL
 #define desc_case_1_3_2_3 "\
-Circuit blocking/unblocking\n\
--- Blocking from both ends; removal of blocking from one end.\n\
 Verify that the blocking/unblocking procedure can be correctly initiated."
 static int
 test_case_1_3_2_3(void)
@@ -5850,27 +10988,27 @@ test_case_1_3_2_3(void)
 	iut_mgm_signal(BLOCKING_REQ);
 	state = 1;
 	if (pt_event() != BLO)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	send(BLA);
 	state = 3;
 	if (mgm_event() != MGM_BLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	pmsg.cic = 12;
 	send(BLO);
 	state = 5;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 7;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	/* FIXME: Make sure that a call cannot be made */
 	state = 10;
@@ -5882,13 +11020,13 @@ test_case_1_3_2_3(void)
 	iut_mgm_signal(UNBLOCKING_REQ);
 	state = 11;
 	if (pt_event() != UBL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	pmsg.cic = imsg.cic;
 	send(UBA);
 	state = 13;
 	if (mgm_event() != MGM_UNBLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	/* FIXME: make sure that both SP's can initiate calls */
 	state = 15;
@@ -5896,27 +11034,32 @@ test_case_1_3_2_3(void)
 	send(UBL);
 	state = 16;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 18;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	if (pt_event() != UBA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	/* Make sure that a call can be made */
 	state = 21;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_3_2_4 test_group_1_3
+#define sgrp_case_1_3_2_4 NULL
+#define numb_case_1_3_2_4 "1.3.2.4"
+#define name_case_1_3_2_4 "IAM received on a remotely blocked circuit"
+#define xtra_case_1_3_2_4 NULL
+#define sref_case_1_3_2_4 NULL
 #define desc_case_1_3_2_4 "\
-Circuit blocking/unblocking\n\
--- IAM received on a remotely blocked circuit\n\
 Verify that an IAM will unblock a remotely blocked circuit."
+
 static int
 test_case_1_3_2_4(void)
 {
@@ -5925,15 +11068,15 @@ test_case_1_3_2_4(void)
 	send(BLO);
 	state = 1;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 3;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	pmsg.nci = 0;
 	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
@@ -5945,39 +11088,39 @@ test_case_1_3_2_4(void)
 	send(IAM);
 	state = 6;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 9;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(SETUP_RES);
 	state = 11;
 	if (cpc_event() != CPC_OK_ACK)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	state = 12;
 	cprim.flags = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	iut_cpc_signal(RINGING);
 	state = 15;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 16;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	iut_cpc_signal(COMMUNICATION);
 	state = 19;
@@ -5988,7 +11131,7 @@ test_case_1_3_2_4(void)
 	send(REL);
 	state = 20;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 21;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -5996,19 +11139,23 @@ test_case_1_3_2_4(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 22;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 23;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_3_2_5 test_group_1_3
+#define sgrp_case_1_3_2_5 NULL
+#define numb_case_1_3_2_5 "1.3.2.5"
+#define name_case_1_3_2_5 "Blocking with CGB, unblocking with UBL"
+#define xtra_case_1_3_2_5 NULL
+#define sref_case_1_3_2_5 NULL
 #define desc_case_1_3_2_5 "\
-Circuit blocking/unblocking\n\
--- Blocking with CGB, unblocking with UBL\n\
 Verify that a circuit blocked by a maintenance oriented group blocking message\n\
 can be unblocked with an unblocking message."
 static int
@@ -6026,29 +11173,29 @@ test_case_1_3_2_5(void)
 	send(CGB);
 	state = 1;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 3;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != CGBA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	pmsg.cic = 12;
 	send(UBL);
 	state = 6;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 8;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != UBA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
 	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
@@ -6081,25 +11228,25 @@ test_case_1_3_2_5(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 11;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 13;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 14;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	send(RINGING);
 	state = 16;
 	send(ANM);
 	state = 17;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	iut_cpc_signal(COMMUNICATION);
 	state = 19;
@@ -6109,13 +11256,13 @@ test_case_1_3_2_5(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 20;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 22;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 23;
 	pmsg.cic = 1;
 	pmsg.rs.buf[0] = 30;
@@ -6128,24 +11275,30 @@ test_case_1_3_2_5(void)
 	send(CGU);
 	state = 24;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 25;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 26;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 27;
 	if (pt_event() != CGUA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 28;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_1_4 "Continuity check procedure"
+
+#define tgrp_case_1_4_1 test_group_1_4
+#define sgrp_case_1_4_1 NULL
+#define numb_case_1_4_1 "1.4.1"
+#define name_case_1_4_1 "CCR received: successful"
+#define xtra_case_1_4_1 NULL
+#define sref_case_1_4_1 NULL
 #define desc_case_1_4_1 "\
-Continuity check procedure\n\
--- CCR received: successful\n\
 Verify that the continuity check procedure for the proper alignment of\n\
 circuits can be correctly performed."
 static int
@@ -6156,7 +11309,7 @@ test_case_1_4_1(void)
 	send(CCR);
 	state = 1;
 	if (tst_event() != MGM_CONT_CHECK_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	mprim.token_value = 0;
 	iut_tst_signal(LOOPBACK);
@@ -6166,7 +11319,7 @@ test_case_1_4_1(void)
 	send(TONE);
 	state = 5;
 	if (wait_event(100, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	pmsg.cic = 12;
 	pmsg.caus.buf[0] = 0x80;
@@ -6176,7 +11329,7 @@ test_case_1_4_1(void)
 	send(REL);
 	state = 7;
 	if (tst_event() != MGM_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	mprim.addr.len = 0;
 	mprim.opt.len = 0;
@@ -6184,19 +11337,23 @@ test_case_1_4_1(void)
 	mprim.user_ref = 0;
 	iut_tst_signal(RELEASE_RES);
 	if (tst_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_4_2 test_group_1_4
+#define sgrp_case_1_4_2 NULL
+#define numb_case_1_4_2 "1.4.2"
+#define name_case_1_4_2 "CCR sent: successful"
+#define xtra_case_1_4_2 NULL
+#define sref_case_1_4_2 NULL
 #define desc_case_1_4_2 "\
-Continuity check procedure\n\
--- CCR sent: successful\n\
 Verify that the continuity check procedure for the proper alignment of circuits\n\
 can be correctly performed."
 static int
@@ -6211,18 +11368,18 @@ test_case_1_4_2(void)
 	iut_tst_signal(CONT_CHECK_REQ);
 	state = 1;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != CCR)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	send(LOOPBACK);
 	state = 4;
 	start_st(timer[t24].lo / 2);
 	iut_tst_signal(TONE);
 	state = 5;
-	if (any_event() != TIMEOUT)
-		return FAILURE;
+	if (any_event() != __EVENT_TIMEOUT)
+		return __RESULT_FAILURE;
 	state = 6;
 	start_tt(100);
 	mprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
@@ -6230,24 +11387,29 @@ test_case_1_4_2(void)
 	iut_tst_signal(RELEASE_REQ);
 	state = 7;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 9;
 	if (tst_event() != MGM_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_4_3 test_group_1_4
+#define sgrp_case_1_4_3 NULL
+#define numb_case_1_4_3 "1.4.3"
+#define name_case_1_4_3 "CCR received: unsuccessful"
+#define xtra_case_1_4_3 NULL
+#define sref_case_1_4_3 NULL
 #define desc_case_1_4_3 "\
-Continuity check procedure\n\
--- CCR received: unsuccessful\n\
 Verify that the messages associated with continuity check procedures for a\n\
 proper alignment of circuits can be correctly received."
+
 static int
 test_case_1_4_3(void)
 {
@@ -6256,7 +11418,7 @@ test_case_1_4_3(void)
 	send(CCR);
 	state = 1;
 	if (tst_event() != MGM_CONT_CHECK_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	mprim.token_value = 0;
 	iut_tst_signal(LOOPBACK);
@@ -6268,9 +11430,9 @@ test_case_1_4_3(void)
 	beg_time = milliseconds(" T24  ");
 	state = 6;
 	start_st(timer[t24].lo);
-	if (any_event() != TIMEOUT) {
+	if (any_event() != __EVENT_TIMEOUT) {
 		check_time(" T24  ", now() - beg_time, timer[t24].lo, timer[t24].hi);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	start_tt(100);
 	state = 7;
@@ -6278,21 +11440,21 @@ test_case_1_4_3(void)
 	send(COT);
 	state = 8;
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	beg_time = milliseconds(" T26  ");
 	state = 10;
 	start_st(timer[t26].lo);
-	if (any_event() != TIMEOUT) {
+	if (any_event() != __EVENT_TIMEOUT) {
 		check_time(" T26  ", now() - beg_time, timer[t26].lo, timer[t26].hi);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	start_tt(100);
 	state = 11;
 	send(CCR);
 	state = 12;
 	if (tst_event() != MGM_CONT_CHECK_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	mprim.token_value = 0;
 	iut_tst_signal(LOOPBACK);
@@ -6304,9 +11466,9 @@ test_case_1_4_3(void)
 	beg_time = milliseconds(" T24  ");
 	state = 17;
 	start_st(timer[t24].lo);
-	if (any_event() != TIMEOUT) {
+	if (any_event() != __EVENT_TIMEOUT) {
 		check_time(" T24  ", now() - beg_time, timer[t24].lo, timer[t24].hi);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	start_tt(100);
 	state = 18;
@@ -6314,21 +11476,21 @@ test_case_1_4_3(void)
 	send(COT);
 	state = 19;
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	beg_time = milliseconds(" T26  ");
 	state = 21;
 	start_st(timer[t26].lo);
-	if (any_event() != TIMEOUT) {
+	if (any_event() != __EVENT_TIMEOUT) {
 		check_time(" T26  ", now() - beg_time, timer[t26].lo, timer[t26].hi);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	start_tt(100);
 	state = 22;
 	send(CCR);
 	state = 23;
 	if (tst_event() != MGM_CONT_CHECK_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 24;
 	mprim.token_value = 0;
 	iut_tst_signal(LOOPBACK);
@@ -6340,9 +11502,9 @@ test_case_1_4_3(void)
 	beg_time = milliseconds(" T24  ");
 	state = 28;
 	start_st(timer[t24].lo);
-	if (any_event() != TIMEOUT) {
+	if (any_event() != __EVENT_TIMEOUT) {
 		check_time(" T24  ", now() - beg_time, timer[t24].lo, timer[t24].hi);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	start_tt(100);
 	state = 29;
@@ -6350,16 +11512,20 @@ test_case_1_4_3(void)
 	send(COT);
 	state = 30;
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 31;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_4_4 test_group_1_4
+#define sgrp_case_1_4_4 NULL
+#define numb_case_1_4_4 "1.4.4"
+#define name_case_1_4_4 "CCR sent: unsuccessful"
+#define xtra_case_1_4_4 NULL
+#define sref_case_1_4_4 NULL
 #define desc_case_1_4_4 "\
-Continuity check procedure\n\
--- CCR sent: unsuccessful\n\
 Verify that the continuity check procedure for the proper alignment of\n\
 circuits can be correctly invoked."
 static int
@@ -6374,10 +11540,10 @@ test_case_1_4_4(void)
 	iut_tst_signal(CONT_CHECK_REQ);
 	state = 1;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != CCR)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	send(LOOPBACK);
 	state = 4;
@@ -6387,10 +11553,10 @@ test_case_1_4_4(void)
 	state = 6;
 	start_st(timer[t24].hi + 100);
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	check_time(" T24  ", now() - beg_time, timer[t24].lo, timer[t24].hi);
 	state = 9;
@@ -6398,13 +11564,13 @@ test_case_1_4_4(void)
 	state = 10;
 	start_st(timer[t26].hi + 100);
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (pt_event() != CCR)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	check_time(" T26  ", now() - beg_time, timer[t26].lo, timer[t26].hi);
 	state = 14;
@@ -6416,10 +11582,10 @@ test_case_1_4_4(void)
 	state = 17;
 	start_st(timer[t24].hi + 100);
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	check_time(" T24  ", now() - beg_time, timer[t24].lo, timer[t24].hi);
 	state = 20;
@@ -6427,13 +11593,13 @@ test_case_1_4_4(void)
 	state = 21;
 	start_st(timer[t26].hi + 100);
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 22;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 23;
 	if (pt_event() != CCR)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 24;
 	mprim.result = ISUP_COT_SUCCESS;
 	mprim.addr.add.scope = ISUP_SCOPE_CT;
@@ -6445,16 +11611,20 @@ test_case_1_4_4(void)
 	iut_tst_signal(CONT_REPORT_REQ);
 	state = 25;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 26;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_1_4_5 test_group_1_4
+#define sgrp_case_1_4_5 NULL
+#define numb_case_1_4_5 "1.4.5"
+#define name_case_1_4_5 "CCR not received unsuccessful; verify T27 timer"
+#define xtra_case_1_4_5 NULL
+#define sref_case_1_4_5 NULL
 #define desc_case_1_4_5 "\
-Continuity check procedure\n\
--- CCR not received unsuccessful; verify T27 timer\n\
 Verify that the continuity check procedure for the proper alignment of\n\
 circuits can be correctly received."
 static int
@@ -6474,10 +11644,10 @@ test_case_1_4_5(void)
 	send(TONE);
 	state = 2;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	if (tst_event() != MGM_CONT_CHECK_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	iut_tst_signal(LOOPBACK);
 	state = 5;
@@ -6488,280 +11658,386 @@ test_case_1_4_5(void)
 	send(COT);
 	state = 7;
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	beg_time = milliseconds(" T27  ");
 	state = 9;
 	start_st(timer[t27].hi + 100);
 	if (pt_event() != RSC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
-	if (check_time(" T27  ", now() - beg_time, timer[t27].lo, timer[t27].hi) != SUCCESS)
-		return FAILURE;
+	if (check_time(" T27  ", now() - beg_time, timer[t27].lo, timer[t27].hi) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
 	start_tt(1000);
 	state = 11;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (cpc_event() != CPC_CALL_FAILURE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	send(RLC);
 	state = 14;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_1_5 "Receipt of unreasonable signalling information messages"
+
+#define tgrp_case_1_5_1 test_group_1_5
+#define sgrp_case_1_5_1 NULL
+#define numb_case_1_5_1 "1.5.1"
+#define name_case_1_5_1 "Receipt of unexpected messages"
+#define xtra_case_1_5_1 NULL
+#define sref_case_1_5_1 NULL
 #define desc_case_1_5_1 "\
-Receipt of unreasonable signalling information messages\n\
--- Receipt of unexpected messages\n\
 Verify that SP A is able to handle unexpected messages."
 static int
 test_case_1_5_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_5_2 test_group_1_5
+#define sgrp_case_1_5_2 NULL
+#define numb_case_1_5_2 "1.5.2"
+#define name_case_1_5_2 "Receipt of unexpected messages during call setup"
+#define xtra_case_1_5_2 NULL
+#define sref_case_1_5_2 NULL
 #define desc_case_1_5_2 "\
-Receipt of unreasonable signalling information messages\n\
--- Receipt of unexpected messages during call setup\n\
 Verify that SP A is able to handle unexpected emssages."
+
 static int
 test_case_1_5_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_5_3 test_group_1_5
+#define sgrp_case_1_5_3 NULL
+#define numb_case_1_5_3 "1.5.3"
+#define name_case_1_5_3 "Receipt of unexpected messages during a call"
+#define xtra_case_1_5_3 NULL
+#define sref_case_1_5_3 NULL
 #define desc_case_1_5_3 "\
-Receipt of unreasonable signalling information messages\n\
--- Receipt of unexpected messages during a call\n\
 Verify that SP A is able to handle unexpected emssages."
 static int
 test_case_1_5_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_1_6_1 "Receipt of unknown messages"
+
+#define tgrp_case_1_6_1_1 test_group_1_6_1
+#define sgrp_case_1_6_1_1 NULL
+#define numb_case_1_6_1_1 "1.6.1.1"
+#define name_case_1_6_1_1 "Receipt of unknown message in forward direction"
+#define xtra_case_1_6_1_1 NULL
+#define sref_case_1_6_1_1 NULL
 #define desc_case_1_6_1_1 "\
-Receipt of unknown messages\n\
--- Receipt of unknown message in forward direction\n\
 Verify that SP A is able to discard an unknown message without disrupting\n\
 normal call handling."
 static int
 test_case_1_6_1_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_6_1_2 test_group_1_6_1
+#define sgrp_case_1_6_1_2 NULL
+#define numb_case_1_6_1_2 "1.6.1.2"
+#define name_case_1_6_1_2 "Receipt of unknown message in backward direction"
+#define xtra_case_1_6_1_2 NULL
+#define sref_case_1_6_1_2 NULL
 #define desc_case_1_6_1_2 "\
-Receipt of unknown messages\n\
--- Receipt of unknown message in backward direction\n\
 Verify that SP A is able to discard an unknown message without disrupting\n\
 normal call handling."
 static int
 test_case_1_6_1_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_1_6_2 "Receipt of unknown parameters"
+
+#define tgrp_case_1_6_2_1 test_group_1_6_2
+#define sgrp_case_1_6_2_1 NULL
+#define numb_case_1_6_2_1 "1.6.2.1"
+#define name_case_1_6_2_1 "Receipt of unknown parameters in forward direction"
+#define xtra_case_1_6_2_1 NULL
+#define sref_case_1_6_2_1 NULL
 #define desc_case_1_6_2_1 "\
-Receipt of unknown parameters\n\
--- Receipt of unknown parameters in forward direction\n\
 Verify that SP A is able to discard an unknown parameter without disrupting\n\
 normal call handling."
 static int
 test_case_1_6_2_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_6_2_2 test_group_1_6_2
+#define sgrp_case_1_6_2_2 NULL
+#define numb_case_1_6_2_2 "1.6.2.2"
+#define name_case_1_6_2_2 "Receipt of unknown parameters in backward direction"
+#define xtra_case_1_6_2_2 NULL
+#define sref_case_1_6_2_2 NULL
 #define desc_case_1_6_2_2 "\
-Receipt of unknown parameters\n\
--- Receipt of unknown parameters in backward direction\n\
 Verify that SP A is able to discard an unknown parameter without disrupting\n\
 normal call handling."
 static int
 test_case_1_6_2_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_1_6_3 "Receipt of unknown parameter values"
+
+#define tgrp_case_1_6_3_1 test_group_1_6_3
+#define sgrp_case_1_6_3_1 NULL
+#define numb_case_1_6_3_1 "1.6.3.1"
+#define name_case_1_6_3_1 "Receipt of unknown parameter values in forward direction"
+#define xtra_case_1_6_3_1 NULL
+#define sref_case_1_6_3_1 NULL
 #define desc_case_1_6_3_1 "\
-Receipt of unknown parameter values\n\
--- Receipt of unknown parameter values in forward direction\n\
 Verify that SP A is able to handle unknown parameter values."
 static int
 test_case_1_6_3_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_6_3_2 test_group_1_6_3
+#define sgrp_case_1_6_3_2 NULL
+#define numb_case_1_6_3_2 "1.6.3.2"
+#define name_case_1_6_3_2 "Receipt of unknown parameter values in backward direction"
+#define xtra_case_1_6_3_2 NULL
+#define sref_case_1_6_3_2 NULL
 #define desc_case_1_6_3_2 "\
-Receipt of unknown parameter values\n\
--- Receipt of unknown parameter values in backward direction\n\
 Verify that SP A is able to handle unknown parameter values."
+
 static int
 test_case_1_6_3_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_1_7_1 "Receipt of unknown messages"
+#define test_group_1_7_1_x "Message Compatibility Information"
+
+#define tgrp_case_1_7_1_1 test_group_1_7_1
+#define sgrp_case_1_7_1_1 test_group_1_7_1_x
+#define numb_case_1_7_1_1 "1.7.1.1"
+#define name_case_1_7_1_1 "Release call"
+#define xtra_case_1_7_1_1 NULL
+#define sref_case_1_7_1_1 NULL
 #define desc_case_1_7_1_1 "\
-Receipt of unknown messages\n\
--- Message Compatibility Information: Release call\n\
 Verify that SP A release the call, if indicated in the Message Compatibility\n\
 Information."
+
 static int
 test_case_1_7_1_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_1_2 test_group_1_7_1
+#define sgrp_case_1_7_1_2 test_group_1_7_1_x
+#define numb_case_1_7_1_2 "1.7.1.2"
+#define name_case_1_7_1_2 "Discard message"
+#define xtra_case_1_7_1_2 NULL
+#define sref_case_1_7_1_2 NULL
 #define desc_case_1_7_1_2 "\
-Receipt of unknown messages\n\
--- Message Compatibility Information: Discard message\n\
 Verify that SP A is able to discard an unknown message, if indicated in the\n\
 Message Compatibility Information."
 static int
 test_case_1_7_1_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_1_3 test_group_1_7_1
+#define sgrp_case_1_7_1_3 test_group_1_7_1_x
+#define numb_case_1_7_1_3 "1.7.1.3"
+#define name_case_1_7_1_3 "Pass on"
+#define xtra_case_1_7_1_3 NULL
+#define sref_case_1_7_1_3 NULL
 #define desc_case_1_7_1_3 "\
-Receipt of unknown messages\n\
--- Message Compatibility Information: Pass on\n\
 Verify that SP A is able to pass on an unknown message, without notification."
 static int
 test_case_1_7_1_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_1_4 test_group_1_7_1
+#define sgrp_case_1_7_1_4 test_group_1_7_1_x
+#define numb_case_1_7_1_4 "1.7.1.4"
+#define name_case_1_7_1_4 "Pass on not possible, release call"
+#define xtra_case_1_7_1_4 NULL
+#define sref_case_1_7_1_4 NULL
 #define desc_case_1_7_1_4 "\
-Receipt of unknown messages\n\
--- Message Compatibility Information: Pass on not possible, release call\n\
 Verify that SP A release the call if pass on not possible and if indicated in\n\
 the Message Compatibility Information."
 static int
 test_case_1_7_1_4(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_1_5 test_group_1_7_1
+#define sgrp_case_1_7_1_5 test_group_1_7_1_x
+#define numb_case_1_7_1_5 "1.7.1.5"
+#define name_case_1_7_1_5 "Pass on not possible, discard information"
+#define xtra_case_1_7_1_5 NULL
+#define sref_case_1_7_1_5 NULL
 #define desc_case_1_7_1_5 "\
-Receipt of unknown messages\n\
--- Message Compatibility Information: Pass on not possible, discard information\n\
 Verify that SP A is able to discard an unknown message if pass on not possible\n\
 and if indicated in the Message Compatibility Information."
 static int
 test_case_1_7_1_5(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_1_6 test_group_1_7_1
+#define sgrp_case_1_7_1_6 test_group_1_7_1_x
+#define numb_case_1_7_1_6 "1.7.1.6"
+#define name_case_1_7_1_6 "Transit interpretation"
+#define xtra_case_1_7_1_6 NULL
+#define sref_case_1_7_1_6 NULL
 #define desc_case_1_7_1_6 "\
-Receipt of unknown messages\n\
--- Message Compatibility Information: Transit interpretation\n\
 Verify that SP A (Type B exchange) is able to ignore the remaining part of the\n\
 Instruction indicator, if A = 0."
 static int
 test_case_1_7_1_6(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_1_7 test_group_1_7_1
+#define sgrp_case_1_7_1_7 test_group_1_7_1_x
+#define numb_case_1_7_1_7 "1.7.1.7"
+#define name_case_1_7_1_7 "not received"
+#define xtra_case_1_7_1_7 NULL
+#define sref_case_1_7_1_7 NULL
 #define desc_case_1_7_1_7 "\
-Receipt of unknown messages\n\
--- Message Compatibility Information not received\n\
 Verify that SP A is able to discard an unknown message without Message\n\
 Compatibility Information."
 static int
 test_case_1_7_1_7(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_1_7_2 "Receipt of unknown parameters"
+#define test_group_1_7_2_x "Parameter Compatibility Information"
+
+#define tgrp_case_1_7_2_1 test_group_1_7_2
+#define sgrp_case_1_7_2_1 test_group_1_7_2_x
+#define numb_case_1_7_2_1 "1.7.2.1"
+#define name_case_1_7_2_1 "Release call"
+#define xtra_case_1_7_2_1 NULL
+#define sref_case_1_7_2_1 NULL
 #define desc_case_1_7_2_1 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information: Release call\n\
 Verify that SP A is able to release the call, if indicated in Parameter\n\
 Compatibility Information."
+
 static int
 test_case_1_7_2_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_2 test_group_1_7_2
+#define sgrp_case_1_7_2_2 test_group_1_7_2_x
+#define numb_case_1_7_2_2 "1.7.2.2"
+#define name_case_1_7_2_2 "Discard message"
+#define xtra_case_1_7_2_2 NULL
+#define sref_case_1_7_2_2 NULL
 #define desc_case_1_7_2_2 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information: Discard message\n\
 Verify that SP A is able to discard a message containing an unknown parameter,\n\
 if indicated in the Parameter Compatibility Information."
 static int
 test_case_1_7_2_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_3 test_group_1_7_2
+#define sgrp_case_1_7_2_3 test_group_1_7_2_x
+#define numb_case_1_7_2_3 "1.7.2.3"
+#define name_case_1_7_2_3 "Discard parameter"
+#define xtra_case_1_7_2_3 NULL
+#define sref_case_1_7_2_3 NULL
 #define desc_case_1_7_2_3 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information: Discard parameter\n\
 Verify that SP A is able to discard an unknown parameter, if indicated in the\n\
 Parameter Compatibility Information."
 static int
 test_case_1_7_2_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_4 test_group_1_7_2
+#define sgrp_case_1_7_2_4 test_group_1_7_2_x
+#define numb_case_1_7_2_4 "1.7.2.4"
+#define name_case_1_7_2_4 "Pass on"
+#define xtra_case_1_7_2_4 NULL
+#define sref_case_1_7_2_4 NULL
 #define desc_case_1_7_2_4 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information: Pass on\n\
 Verify that SP A is able to pass on an unknown parameter, without\n\
 notification."
 static int
 test_case_1_7_2_4(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_5 test_group_1_7_2
+#define sgrp_case_1_7_2_5 test_group_1_7_2_x
+#define numb_case_1_7_2_5 "1.7.2.5"
+#define name_case_1_7_2_5 "Pass on not possisble, release call"
+#define xtra_case_1_7_2_5 NULL
+#define sref_case_1_7_2_5 NULL
 #define desc_case_1_7_2_5 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information: Pass on not possisble, release call\n\
 Verify that SP A releases call if pass on is not possible and if indicated in\n\
 Parameter Compatibility Information."
 static int
 test_case_1_7_2_5(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_6 test_group_1_7_2
+#define sgrp_case_1_7_2_6 test_group_1_7_2_x
+#define numb_case_1_7_2_6 "1.7.2.6"
+#define name_case_1_7_2_6 "Pass on not possisble, discard message"
+#define xtra_case_1_7_2_6 NULL
+#define sref_case_1_7_2_6 NULL
 #define desc_case_1_7_2_6 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information: Pass on not possisble, discard message\n\
 Verify that SP A is able to discard a message containing an unknown parameter\n\
 if pass on is not possible and if indicated in Parameter Compatibility\n\
 Information."
@@ -6769,82 +12045,114 @@ static int
 test_case_1_7_2_6(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_7 test_group_1_7_2
+#define sgrp_case_1_7_2_7 test_group_1_7_2_x
+#define numb_case_1_7_2_7 "1.7.2.7"
+#define name_case_1_7_2_7 "Pass on not possisble, discard parameter"
+#define xtra_case_1_7_2_7 NULL
+#define sref_case_1_7_2_7 NULL
 #define desc_case_1_7_2_7 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information: Pass on not possisble, discard parameter\n\
 Verify that SP A is able to discard an unknown parameter if pass on is not\n\
 possible and if indicated in the Parameter Compatibility Information."
 static int
 test_case_1_7_2_7(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_8 test_group_1_7_2
+#define sgrp_case_1_7_2_8 test_group_1_7_2_x
+#define numb_case_1_7_2_8 "1.7.2.8"
+#define name_case_1_7_2_8 "Transit interpretation"
+#define xtra_case_1_7_2_8 NULL
+#define sref_case_1_7_2_8 NULL
 #define desc_case_1_7_2_8 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information: Transit interpretation\n\
 Verify that SP A (Type B exchange) is able to ignore the remaining part of the\n\
 Instruction indicator, if A = 0."
 static int
 test_case_1_7_2_8(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_9 test_group_1_7_2
+#define sgrp_case_1_7_2_9 test_group_1_7_2_x
+#define numb_case_1_7_2_9 "1.7.2.9"
+#define name_case_1_7_2_9 "not received"
+#define xtra_case_1_7_2_9 NULL
+#define sref_case_1_7_2_9 NULL
 #define desc_case_1_7_2_9 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information not received\n\
 Verify that SP A is able to handle an unknown parameter without Parameter\n\
 Compatibility Information."
 static int
 test_case_1_7_2_9(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_2_10 test_group_1_7_2
+#define sgrp_case_1_7_2_10 test_group_1_7_2_x
+#define numb_case_1_7_2_10 "1.7.2.10"
+#define name_case_1_7_2_10 "not received in REL"
+#define xtra_case_1_7_2_10 NULL
+#define sref_case_1_7_2_10 NULL
 #define desc_case_1_7_2_10 "\
-Receipt of unknown parameters\n\
--- Parameter Compatibility Information not received in REL\n\
 Verify that SP A is able to discard an unknown parameter in a REL without\n\
 Parameter Compatiblity Information."
 static int
 test_case_1_7_2_10(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_1_7_3 "Receipt of unknown parameter values"
+
+#define tgrp_case_1_7_3_1 test_group_1_7_3
+#define sgrp_case_1_7_3_1 NULL
+#define numb_case_1_7_3_1 "1.7.3.1"
+#define name_case_1_7_3_1 "Receipt of unknown parameter values in forward direction"
+#define xtra_case_1_7_3_1 NULL
+#define sref_case_1_7_3_1 NULL
 #define desc_case_1_7_3_1 "\
-Receipt of unknown parameter values\n\
--- Receipt of unknown parameter values in forward direction\n\
 Verify that SP A is able to handle unknown parameter values."
 static int
 test_case_1_7_3_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_1_7_3_2 test_group_1_7_3
+#define sgrp_case_1_7_3_2 NULL
+#define numb_case_1_7_3_2 "1.7.3.2"
+#define name_case_1_7_3_2 "Receipt of unknown parameter values in backward direction"
+#define xtra_case_1_7_3_2 NULL
+#define sref_case_1_7_3_2 NULL
 #define desc_case_1_7_3_2 "\
-Receipt of unknown parameter values\n\
--- Receipt of unknown parameter values in backward direction\n\
 Verify that SP A is able to handle unknown parameter values."
 static int
 test_case_1_7_3_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_2_1 "Both way circuit selection"
+
+#define tgrp_case_2_1_1 test_group_2_1
+#define sgrp_case_2_1_1 NULL
+#define numb_case_2_1_1 "2.1.1"
+#define name_case_2_1_1 "IAM sent by controlling SP"
+#define xtra_case_2_1_1 NULL
+#define sref_case_2_1_1 NULL
 #define desc_case_2_1_1 "\
-Both way circuit selection\n\
--- IAM sent by controlling SP\n\
 Verify that SP A can initiate an outgoing call on a circuit capable of both\n\
 way operation when the controlling SP is A."
 static int
@@ -6875,25 +12183,25 @@ test_case_2_1_1(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -6903,22 +12211,26 @@ test_case_2_1_1(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 10;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 12;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_1_2 test_group_2_1
+#define sgrp_case_2_1_2 NULL
+#define numb_case_2_1_2 "2.1.2"
+#define name_case_2_1_2 "IAM sent by non-controlling SP"
+#define xtra_case_2_1_2 NULL
+#define sref_case_2_1_2 NULL
 #define desc_case_2_1_2 "\
-Both way circuit selection\n\
--- IAM sent by non-controlling SP\n\
 Verify that SP A can initiate an outgoing call on a circuit capable of both\n\
 way operation when the non-controlling SP is A."
 static int
@@ -6949,25 +12261,25 @@ test_case_2_1_2(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -6978,27 +12290,33 @@ test_case_2_1_2(void)
 	send(REL);
 	state = 10;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_2_2 "Called address sending"
+#define test_group_2_2_1 "\"en bloc\" operation"
+
+#define tgrp_case_2_2_1a test_group_2_2
+#define sgrp_case_2_2_1a test_group_2_2_1
+#define numb_case_2_2_1a "2.2.1a"
+#define name_case_2_2_1a "outgoing call"
+#define xtra_case_2_2_1a NULL
+#define sref_case_2_2_1a NULL
 #define desc_case_2_2_1a "\
-Called addresss sending\n\
--- \"en bloc\" operation\n\
--- outgoing call\n\
 Verify that a call can be successfully establish (all digits included in the\n\
 IAM)."
 static int
@@ -7036,25 +12354,25 @@ test_case_2_2_1a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -7064,23 +12382,26 @@ test_case_2_2_1a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 10;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 12;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_2_1b test_group_2_2
+#define sgrp_case_2_2_1b test_group_2_2_1
+#define numb_case_2_2_1b "2.2.1b"
+#define name_case_2_2_1b "incoming call"
+#define xtra_case_2_2_1b NULL
+#define sref_case_2_2_1b NULL
 #define desc_case_2_2_1b "\
-Called addresss sending\n\
--- \"en bloc\" operation\n\
--- incoming call\n\
 Verify that a call can be successfully establish (all digits included in the\n\
 IAM)."
 static int
@@ -7098,31 +12419,31 @@ test_case_2_2_1b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -7133,7 +12454,7 @@ test_case_2_2_1b(void)
 	send(REL);
 	state = 12;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -7141,20 +12462,25 @@ test_case_2_2_1b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_2_2_2 "Overlap operation (with SAM)"
+
+#define tgrp_case_2_2_2a test_group_2_2
+#define sgrp_case_2_2_2a test_group_2_2_2
+#define numb_case_2_2_2a "2.2.2a"
+#define name_case_2_2_2a "outgoing call"
+#define xtra_case_2_2_2a NULL
+#define sref_case_2_2_2a NULL
 #define desc_case_2_2_2a "\
-Called addresss sending\n\
--- Overlap operation (with SAM)\n\
--- outgoing call\n\
 Verify that SP A can initiate a call using an IAM followed by a SAM."
 static int
 test_case_2_2_2a(void)
@@ -7186,10 +12512,10 @@ test_case_2_2_2a(void)
 	cprim.call_ref = 0;
 	iut_cpc_signal(SETUP_REQ);
 	if (cpc_event() != CPC_MORE_INFO_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	cprim.subn.buf[0] = 0x00;
 	cprim.subn.buf[1] = 0x94;
@@ -7200,28 +12526,28 @@ test_case_2_2_2a(void)
 	cprim.opt.len = 0;
 	iut_cpc_signal(INFORMATION_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	if (pt_event() != SAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 5;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 6;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	send(RINGING);
 	state = 8;
 	send(ANM);
 	state = 9;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -7231,23 +12557,26 @@ test_case_2_2_2a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 12;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 14;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_2_2b test_group_2_2
+#define sgrp_case_2_2_2b test_group_2_2_2
+#define numb_case_2_2_2b "2.2.2b"
+#define name_case_2_2_2b "incoming call"
+#define xtra_case_2_2_2b NULL
+#define sref_case_2_2_2b NULL
 #define desc_case_2_2_2b "\
-Called addresss sending\n\
--- Overlap operation (with SAM)\n\
--- incoming call\n\
 Verify that SP A can initiate a call using an IAM followed by a SAM."
 static int
 test_case_2_2_2b(void)
@@ -7264,38 +12593,38 @@ test_case_2_2_2b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	strncpy(pmsg.subn.num, "5551212/", 24);
 	pmsg.subn.len = strnlen(pmsg.subn.num, 24);
 	send(SAM);
 	state = 5;
 	if (cpc_event() != CPC_INFORMATION_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	cprim.flags = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(RINGING);
 	state = 9;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 10;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	iut_cpc_signal(COMMUNICATION);
 	state = 13;
@@ -7306,7 +12635,7 @@ test_case_2_2_2b(void)
 	send(REL);
 	state = 14;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -7314,20 +12643,25 @@ test_case_2_2_2b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_2_3 "Successful Call setup"
+#define test_group_2_3_1 "Ordinary call (with various indications in the ACM)"
+
+#define tgrp_case_2_3_1x test_group_2_3
+#define sgrp_case_2_3_1x test_group_2_3_1
+#define name_case_2_3_1x "outgoing call"
+#define xtra_case_2_3_1x NULL
+#define sref_case_2_3_1x NULL
 #define desc_case_2_3_1x "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- outgoing call\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7365,14 +12699,14 @@ test_case_2_3_1x(ulong bci)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | bci;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	switch (cpc_event()) {
@@ -7381,23 +12715,23 @@ test_case_2_3_1x(ulong bci)
 		send(RINGING);
 		state = 6;
 		if (!(bci & ISUP_BCI_SUBSCRIBER_FREE))
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 7;
 		send(ANM);
 		break;
 	case CPC_PROCEEDING_IND:
 		state = 6;
 		if ((bci & ISUP_BCI_SUBSCRIBER_FREE))
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 7;
 		send(ANM);
 		break;
 	default:
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	state = 8;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	iut_cpc_signal(COMMUNICATION);
 	state = 10;
@@ -7407,24 +12741,26 @@ test_case_2_3_1x(ulong bci)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 11;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 13;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_3_1a test_group_2_3
+#define sgrp_case_2_3_1a test_group_2_3_1
+#define numb_case_2_3_1a "2.3.1a"
+#define name_case_2_3_1a "outgoing call"
+#define xtra_case_2_3_1a "\"subscriber free\" and \"terminating access isdn\""
+#define sref_case_2_3_1a NULL
 #define desc_case_2_3_1a "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- outgoing call\n\
--- \"subscriber free\" and \"terminating access isdn\"\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7433,11 +12769,13 @@ test_case_2_3_1a(void)
 	return test_case_2_3_1x(ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_TERMINATING_ACCESS_ISDN);
 }
 
+#define tgrp_case_2_3_1b test_group_2_3
+#define sgrp_case_2_3_1b test_group_2_3_1
+#define numb_case_2_3_1b "2.3.1b"
+#define name_case_2_3_1b "outgoing call"
+#define xtra_case_2_3_1b "\"subscriber free\" and \"terminating access non-isdn\""
+#define sref_case_2_3_1b NULL
 #define desc_case_2_3_1b "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- outgoing call\n\
--- \"subscriber free\" and \"terminating access non-isdn\"\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7446,11 +12784,13 @@ test_case_2_3_1b(void)
 	return test_case_2_3_1x(ISUP_BCI_SUBSCRIBER_FREE);
 }
 
+#define tgrp_case_2_3_1c test_group_2_3
+#define sgrp_case_2_3_1c test_group_2_3_1
+#define numb_case_2_3_1c "2.3.1c"
+#define name_case_2_3_1c "outgoing call"
+#define xtra_case_2_3_1c "\"no indication\" and \"terminating access isdn\""
+#define sref_case_2_3_1c NULL
 #define desc_case_2_3_1c "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- outgoing call\n\
--- \"no indication\" and \"terminating access isdn\"\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7459,11 +12799,13 @@ test_case_2_3_1c(void)
 	return test_case_2_3_1x(ISUP_BCI_TERMINATING_ACCESS_ISDN);
 }
 
+#define tgrp_case_2_3_1d test_group_2_3
+#define sgrp_case_2_3_1d test_group_2_3_1
+#define numb_case_2_3_1d "2.3.1d"
+#define name_case_2_3_1d "outgoing call"
+#define xtra_case_2_3_1d "\"no indication\" and \"terminating access non-isdn\""
+#define sref_case_2_3_1d NULL
 #define desc_case_2_3_1d "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- outgoing call\n\
--- \"no indication\" and \"terminating access non-isdn\"\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7493,12 +12835,12 @@ test_case_2_3_1y(ulong bci)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = bci | ISUP_BCI_ORDINARY_SUBSCRIBER;
 	cprim.opt.len = 0;
@@ -7507,20 +12849,20 @@ test_case_2_3_1y(ulong bci)
 	else
 		iut_cpc_signal(PROCEEDING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -7531,7 +12873,7 @@ test_case_2_3_1y(ulong bci)
 	send(REL);
 	state = 12;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -7539,21 +12881,23 @@ test_case_2_3_1y(ulong bci)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_3_1e test_group_2_3
+#define sgrp_case_2_3_1e test_group_2_3_1
+#define numb_case_2_3_1e "2.3.1e"
+#define name_case_2_3_1e "incoming call"
+#define xtra_case_2_3_1e "\"subscriber free\" and \"terminating access isdn\""
+#define sref_case_2_3_1e NULL
 #define desc_case_2_3_1e "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- incoming call\n\
--- \"subscriber free\" and \"terminating access isdn\"\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7562,11 +12906,13 @@ test_case_2_3_1e(void)
 	return test_case_2_3_1y(ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_TERMINATING_ACCESS_ISDN);
 }
 
+#define tgrp_case_2_3_1f test_group_2_3
+#define sgrp_case_2_3_1f test_group_2_3_1
+#define numb_case_2_3_1f "2.3.1f"
+#define name_case_2_3_1f "incoming call"
+#define xtra_case_2_3_1f "\"subscriber free\" and \"terminating access non-isdn\""
+#define sref_case_2_3_1f NULL
 #define desc_case_2_3_1f "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- incoming call\n\
--- \"subscriber free\" and \"terminating access non-isdn\"\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7575,11 +12921,13 @@ test_case_2_3_1f(void)
 	return test_case_2_3_1y(ISUP_BCI_SUBSCRIBER_FREE);
 }
 
+#define tgrp_case_2_3_1g test_group_2_3
+#define sgrp_case_2_3_1g test_group_2_3_1
+#define numb_case_2_3_1g "2.3.1g"
+#define name_case_2_3_1g "incoming call"
+#define xtra_case_2_3_1g "\"no indication\" and \"terminating access isdn\""
+#define sref_case_2_3_1g NULL
 #define desc_case_2_3_1g "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- incoming call\n\
--- \"no indication\" and \"terminating access isdn\"\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7588,11 +12936,13 @@ test_case_2_3_1g(void)
 	return test_case_2_3_1y(ISUP_BCI_TERMINATING_ACCESS_ISDN);
 }
 
+#define tgrp_case_2_3_1h test_group_2_3
+#define sgrp_case_2_3_1h test_group_2_3_1
+#define numb_case_2_3_1h "2.3.1h"
+#define name_case_2_3_1h "incoming call"
+#define xtra_case_2_3_1h "\"no indication\" and \"terminating access non-isdn\""
+#define sref_case_2_3_1h NULL
 #define desc_case_2_3_1h "\
-Successful Call setup\n\
--- Ordinary call (with various indications in the ACM)\n\
--- incoming call\n\
--- \"no indication\" and \"terminating access non-isdn\"\n\
 Verify that a call can be successfully completed using various indications in\n\
 address complete messages."
 static int
@@ -7601,10 +12951,14 @@ test_case_2_3_1h(void)
 	return test_case_2_3_1y(0);
 }
 
+#define test_group_2_3_2 "Ordinary call (with ACM, CPG, and ANM)"
+
+#define tgrp_case_2_3_2x test_group_2_3
+#define sgrp_case_2_3_2x test_group_2_3_2
+#define name_case_2_3_2x "outgoing call"
+#define xtra_case_2_3_2x NULL
+#define sref_case_2_3_2x NULL
 #define desc_case_2_3_2x "\
-Successful Call setup\n\
--- Ordinary call (with ACM, CPG, and ANM)\n\
--- outgoing call\n\
 Verify that a call be successfully completed using address complete messages,\n\
 call progress message and answer message."
 static int
@@ -7642,14 +12996,14 @@ test_case_2_3_2x(ulong evnt)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ((evnt != ISUP_EVNT_PROGRESS) ? 0 : ISUP_BCI_SUBSCRIBER_FREE);
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	pmsg.cic = imsg.cic;
@@ -7672,7 +13026,7 @@ test_case_2_3_2x(ulong evnt)
 			send(IBI);
 			break;
 		default:
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
 		break;
 	}
@@ -7680,7 +13034,7 @@ test_case_2_3_2x(ulong evnt)
 	send(ANM);
 	state = 8;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	iut_cpc_signal(COMMUNICATION);
 	state = 10;
@@ -7690,24 +13044,26 @@ test_case_2_3_2x(ulong evnt)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 11;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 13;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_3_2a test_group_2_3
+#define sgrp_case_2_3_2a test_group_2_3_2
+#define numb_case_2_3_2a "2.3.2a"
+#define name_case_2_3_2a "outgoing call"
+#define xtra_case_2_3_2a "\"alerting\""
+#define sref_case_2_3_2a NULL
 #define desc_case_2_3_2a "\
-Successful Call setup\n\
--- Ordinary call (with ACM, CPG, and ANM)\n\
--- outgoing call\n\
--- \"alerting\"\n\
 Verify that a call be successfully completed using address complete messages,\n\
 call progress message and answer message."
 static int
@@ -7716,11 +13072,13 @@ test_case_2_3_2a(void)
 	return test_case_2_3_2x(ISUP_EVNT_ALERTING);
 }
 
+#define tgrp_case_2_3_2b test_group_2_3
+#define sgrp_case_2_3_2b test_group_2_3_2
+#define numb_case_2_3_2b "2.3.2b"
+#define name_case_2_3_2b "outgoing call"
+#define xtra_case_2_3_2b "\"progress\""
+#define sref_case_2_3_2b NULL
 #define desc_case_2_3_2b "\
-Successful Call setup\n\
--- Ordinary call (with ACM, CPG, and ANM)\n\
--- outgoing call\n\
--- \"progress\"\n\
 Verify that a call be successfully completed using address complete messages,\n\
 call progress message and answer message."
 static int
@@ -7729,11 +13087,13 @@ test_case_2_3_2b(void)
 	return test_case_2_3_2x(ISUP_EVNT_PROGRESS);
 }
 
+#define tgrp_case_2_3_2c test_group_2_3
+#define sgrp_case_2_3_2c test_group_2_3_2
+#define numb_case_2_3_2c "2.3.2c"
+#define name_case_2_3_2c "outgoing call"
+#define xtra_case_2_3_2c "\"in-band information or appropriate parttern available\""
+#define sref_case_2_3_2c NULL
 #define desc_case_2_3_2c "\
-Successful Call setup\n\
--- Ordinary call (with ACM, CPG, and ANM)\n\
--- outgoing call\n\
--- \"in-band information or appropriate parttern available\"\n\
 Verify that a call be successfully completed using address complete messages,\n\
 call progress message and answer message."
 static int
@@ -7763,12 +13123,12 @@ test_case_2_3_2y(ulong evnt)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.opt.len = 0;
 	switch ((cprim.event = evnt)) {
@@ -7776,17 +13136,17 @@ test_case_2_3_2y(ulong evnt)
 		cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER;
 		iut_cpc_signal(PROCEEDING_REQ);
 		if (cpc_event() != CPC_OK_ACK)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 5;
 		if (pt_event() != ACM)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 6;
 		iut_cpc_signal(ALERTING_REQ);
 		if (cpc_event() != CPC_OK_ACK)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 7;
 		if (pt_event() != CPG)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 8;
 		iut_cpc_signal(RINGING);
 		break;
@@ -7794,49 +13154,49 @@ test_case_2_3_2y(ulong evnt)
 		cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 		iut_cpc_signal(ALERTING_REQ);
 		if (cpc_event() != CPC_OK_ACK)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 5;
 		if (pt_event() != ACM)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 6;
 		iut_cpc_signal(RINGING);
 		state = 7;
 		iut_cpc_signal(PROGRESS_REQ);
 		if (cpc_event() != CPC_OK_ACK)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 8;
 		if (pt_event() != CPG)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		break;
 	case ISUP_EVNT_IBI:
 		cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER;
 		iut_cpc_signal(PROCEEDING_REQ);
 		if (cpc_event() != CPC_OK_ACK)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 5;
 		if (pt_event() != ACM)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 6;
 		iut_cpc_signal(IBI_REQ);
 		if (cpc_event() != CPC_OK_ACK)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 7;
 		if (pt_event() != CPG)
-			return FAILURE;
+			return __RESULT_FAILURE;
 		state = 8;
 		iut_cpc_signal(RINGING);
 		break;
 	default:
-		return SCRIPTERROR;
+		return __RESULT_SCRIPT_ERROR;
 	}
 	state = 9;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 10;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	iut_cpc_signal(COMMUNICATION);
 	state = 13;
@@ -7847,7 +13207,7 @@ test_case_2_3_2y(ulong evnt)
 	send(REL);
 	state = 14;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -7855,21 +13215,23 @@ test_case_2_3_2y(ulong evnt)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_3_2d test_group_2_3
+#define sgrp_case_2_3_2d test_group_2_3_2
+#define numb_case_2_3_2d "2.3.2d"
+#define name_case_2_3_2d "incoming call"
+#define xtra_case_2_3_2d "\"alerting\""
+#define sref_case_2_3_2d NULL
 #define desc_case_2_3_2d "\
-Successful Call setup\n\
--- Ordinary call (with ACM, CPG, and ANM)\n\
--- incoming call\n\
--- \"alerting\"\n\
 Verify that a call be successfully completed using address complete messages,\n\
 call progress message and answer message."
 static int
@@ -7878,11 +13240,13 @@ test_case_2_3_2d(void)
 	return test_case_2_3_2y(ISUP_EVNT_ALERTING);
 }
 
+#define tgrp_case_2_3_2e test_group_2_3
+#define sgrp_case_2_3_2e test_group_2_3_2
+#define numb_case_2_3_2e "2.3.2e"
+#define name_case_2_3_2e "incoming call"
+#define xtra_case_2_3_2e "\"progress\""
+#define sref_case_2_3_2e NULL
 #define desc_case_2_3_2e "\
-Successful Call setup\n\
--- Ordinary call (with ACM, CPG, and ANM)\n\
--- incoming call\n\
--- \"progress\"\n\
 Verify that a call be successfully completed using address complete messages,\n\
 call progress message and answer message."
 static int
@@ -7891,11 +13255,13 @@ test_case_2_3_2e(void)
 	return test_case_2_3_2y(ISUP_EVNT_PROGRESS);
 }
 
+#define tgrp_case_2_3_2f test_group_2_3
+#define sgrp_case_2_3_2f test_group_2_3_2
+#define numb_case_2_3_2f "2.3.2f"
+#define name_case_2_3_2f "incoming call"
+#define xtra_case_2_3_2f "\"in-band information or appropriate parttern available\""
+#define sref_case_2_3_2f NULL
 #define desc_case_2_3_2f "\
-Successful Call setup\n\
--- Ordinary call (with ACM, CPG, and ANM)\n\
--- incoming call\n\
--- \"in-band information or appropriate parttern available\"\n\
 Verify that a call be successfully completed using address complete messages,\n\
 call progress message and answer message."
 static int
@@ -7904,10 +13270,15 @@ test_case_2_3_2f(void)
 	return test_case_2_3_2y(ISUP_EVNT_IBI);
 }
 
+#define test_group_2_3_3 "Ordinary call with CON"
+
+#define tgrp_case_2_3_3a test_group_2_3
+#define sgrp_case_2_3_3a test_group_2_3_3
+#define numb_case_2_3_3a "2.3.3a"
+#define name_case_2_3_3a "outgoing call"
+#define xtra_case_2_3_3a NULL
+#define sref_case_2_3_3a NULL
 #define desc_case_2_3_3a "\
-Successful Call setup\n\
--- Ordinary call with CON\n\
--- outgoing call\n\
 Verify that a call can be successfully completed with a connect message."
 static int
 test_case_2_3_3a(void)
@@ -7944,18 +13315,18 @@ test_case_2_3_3a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(CON);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	iut_cpc_signal(COMMUNICATION);
 	state = 6;
@@ -7965,23 +13336,26 @@ test_case_2_3_3a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 7;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 9;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_3_3b test_group_2_3
+#define sgrp_case_2_3_3b test_group_2_3_3
+#define numb_case_2_3_3b "2.3.3b"
+#define name_case_2_3_3b "incoming call"
+#define xtra_case_2_3_3b NULL
+#define sref_case_2_3_3b NULL
 #define desc_case_2_3_3b "\
-Successful Call setup\n\
--- Ordinary call with CON\n\
--- incoming call\n\
 Verify that a call can be successfully completed with a connect message."
 static int
 test_case_2_3_3b(void)
@@ -7998,22 +13372,22 @@ test_case_2_3_3b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.opt.len = 0;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 5;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	if (pt_event() != CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	iut_cpc_signal(COMMUNICATION);
 	state = 8;
@@ -8024,7 +13398,7 @@ test_case_2_3_3b(void)
 	send(REL);
 	state = 9;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8032,20 +13406,25 @@ test_case_2_3_3b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_2_3_4 "Call switched via satellite"
+
+#define tgrp_case_2_3_4a test_group_2_3
+#define sgrp_case_2_3_4a test_group_2_3_4
+#define numb_case_2_3_4a "2.3.4a"
+#define name_case_2_3_4a "outgoing call"
+#define xtra_case_2_3_4a NULL
+#define sref_case_2_3_4a NULL
 #define desc_case_2_3_4a "\
-Successful Call setup\n\
--- Call switched via a satellite\n\
--- outgoing call\n\
 Verify the satellite indicator in the initial address message is correctly\n\
 set."
 static int
@@ -8083,25 +13462,25 @@ test_case_2_3_4a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -8111,23 +13490,26 @@ test_case_2_3_4a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 10;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 12;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_3_4b test_group_2_3
+#define sgrp_case_2_3_4b test_group_2_3_4
+#define numb_case_2_3_4b "2.3.4b"
+#define name_case_2_3_4b "incoming call"
+#define xtra_case_2_3_4b NULL
+#define sref_case_2_3_4b NULL
 #define desc_case_2_3_4b "\
-Successful Call setup\n\
--- Call switched via a satellite\n\
--- incoming call\n\
 Verify the satellite indicator in the initial address message is correctly\n\
 set."
 static int
@@ -8145,31 +13527,31 @@ test_case_2_3_4b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -8180,7 +13562,7 @@ test_case_2_3_4b(void)
 	send(REL);
 	state = 12;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8188,20 +13570,25 @@ test_case_2_3_4b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_2_3_5 "Blocking and unblocking during a call (initiated)"
+
+#define tgrp_case_2_3_5a test_group_2_3
+#define sgrp_case_2_3_5a test_group_2_3_5
+#define numb_case_2_3_5a "2.3.5a"
+#define name_case_2_3_5a "outgoing call"
+#define xtra_case_2_3_5a NULL
+#define sref_case_2_3_5a NULL
 #define desc_case_2_3_5a "\
-Successful Call setup\n\
--- Blocking and unblocking during a call (initiated)\n\
--- outgoing call\n\
 Verify that the circuit blocking (during a call) and unblocking (after\n\
 clearing the call) can be correctly performed."
 static int
@@ -8239,25 +13626,25 @@ test_case_2_3_5a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -8269,13 +13656,13 @@ test_case_2_3_5a(void)
 	iut_mgm_signal(BLOCKING_REQ);
 	state = 10;
 	if (pt_event() != BLO)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	pmsg.cic = imsg.cic;
 	send(BLA);
 	state = 12;
 	if (mgm_event() != MGM_BLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8283,13 +13670,13 @@ test_case_2_3_5a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 14;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 16;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	mprim.addr.add.scope = ISUP_SCOPE_CT;
 	mprim.addr.add.id = 12;
@@ -8299,23 +13686,26 @@ test_case_2_3_5a(void)
 	iut_mgm_signal(UNBLOCKING_REQ);
 	state = 18;
 	if (pt_event() != UBL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	pmsg.cic = imsg.cic;
 	send(UBA);
 	state = 20;
 	if (mgm_event() != MGM_UNBLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 21;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_3_5b test_group_2_3
+#define sgrp_case_2_3_5b test_group_2_3_5
+#define numb_case_2_3_5b "2.3.5b"
+#define name_case_2_3_5b "incoming call"
+#define xtra_case_2_3_5b NULL
+#define sref_case_2_3_5b NULL
 #define desc_case_2_3_5b "\
-Successful Call setup\n\
--- Blocking and unblocking during a call (initiated)\n\
--- incoming call\n\
 Verify that the circuit blocking (during a call) and unblocking (after\n\
 clearing the call) can be correctly performed."
 static int
@@ -8333,49 +13723,49 @@ test_case_2_3_5b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
 	send(BLO);
 	state = 12;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 14;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	iut_cpc_signal(COMMUNICATION);
 	state = 18;
@@ -8386,7 +13776,7 @@ test_case_2_3_5b(void)
 	send(REL);
 	state = 19;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8394,33 +13784,38 @@ test_case_2_3_5b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 21;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 22;
 	send(UBL);
 	state = 23;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 24;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 25;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 26;
 	if (pt_event() != UBA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 27;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_2_3_6 "Blocking and unblocking during a call (received)"
+
+#define tgrp_case_2_3_6a test_group_2_3
+#define sgrp_case_2_3_6a test_group_2_3_6
+#define numb_case_2_3_6a "2.3.6a"
+#define name_case_2_3_6a "outgoing call"
+#define xtra_case_2_3_6a NULL
+#define sref_case_2_3_6a NULL
 #define desc_case_2_3_6a "\
-Successful Call setup\n\
--- Blocking and unblocking during a call (received)\n\
--- outgoing call\n\
 Verfiy that the circuit blocking (during a call) and unblocking (after\n\
 clearing the call) can be correctly performed."
 static int
@@ -8458,40 +13853,40 @@ test_case_2_3_6a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	pmsg.cic = 12;
 	send(BLO);
 	state = 9;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 11;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8499,37 +13894,40 @@ test_case_2_3_6a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 14;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 16;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	pmsg.cic = 12;
 	send(UBL);
 	state = 18;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 20;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 21;
 	if (pt_event() != UBA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 22;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_2_3_6b test_group_2_3
+#define sgrp_case_2_3_6b test_group_2_3_6
+#define numb_case_2_3_6b "2.3.6b"
+#define name_case_2_3_6b "incoming call"
+#define xtra_case_2_3_6b NULL
+#define sref_case_2_3_6b NULL
 #define desc_case_2_3_6b "\
-Successful Call setup\n\
--- Blocking and unblocking during a call (received)\n\
--- incoming call\n\
 Verfiy that the circuit blocking (during a call) and unblocking (after\n\
 clearing the call) can be correctly performed."
 static int
@@ -8547,31 +13945,31 @@ test_case_2_3_6b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -8583,15 +13981,15 @@ test_case_2_3_6b(void)
 	iut_mgm_signal(BLOCKING_REQ);
 	state = 12;
 	if (pt_event() != BLO)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	send(BLA);
 	state = 14;
 	if (mgm_event() != MGM_BLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	iut_cpc_signal(COMMUNICATION);
 	state = 17;
@@ -8602,7 +14000,7 @@ test_case_2_3_6b(void)
 	send(REL);
 	state = 18;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8610,10 +14008,10 @@ test_case_2_3_6b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 21;
 	mprim.addr.add.scope = ISUP_SCOPE_CT;
 	mprim.addr.add.id = 12;
@@ -8623,81 +14021,109 @@ test_case_2_3_6b(void)
 	iut_mgm_signal(UNBLOCKING_REQ);
 	state = 22;
 	if (pt_event() != UBL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 23;
 	send(UBA);
 	state = 24;
 	if (mgm_event() != MGM_UNBLOCKING_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 25;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_2_4 "Propagation delay determination procedure"
+
+#define tgrp_case_2_4_1 test_group_2_4
+#define sgrp_case_2_4_1 NULL
+#define numb_case_2_4_1 "2.4.1"
+#define name_case_2_4_1 "IAM sent containing the PDC"
+#define xtra_case_2_4_1 NULL
+#define sref_case_2_4_1 NULL
 #define desc_case_2_4_1 "\
-Propagation delay determination procedure\n\
--- IAM sent containing the PDC\n\
 Verify that SP A is able to increase the PDC by the delay value of the\n\
 outgoing route (D ms)."
 static int
 test_case_2_4_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_2_4_2 test_group_2_4
+#define sgrp_case_2_4_2 NULL
+#define numb_case_2_4_2 "2.4.2"
+#define name_case_2_4_2 "SP supporting the procedure to SP supporting the procedure"
+#define xtra_case_2_4_2 NULL
+#define sref_case_2_4_2 NULL
 #define desc_case_2_4_2 "\
-Propagation delay determination procedure\n\
--- SP supporting the procedure to SP supporting the procedure\n\
 Verify that a call can be successfully completed and the value of the call\n\
 history is higher as the value of the PDC."
 static int
 test_case_2_4_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_2_4_3 test_group_2_4
+#define sgrp_case_2_4_3 NULL
+#define numb_case_2_4_3 "2.4.3"
+#define name_case_2_4_3 "Abnormal procedure, PDC is not recevied"
+#define xtra_case_2_4_3 NULL
+#define sref_case_2_4_3 NULL
 #define desc_case_2_4_3 "\
-Propagation delay determination procedure\n\
--- Abnormal procedure, PDC is not recevied\n\
 Verify that a call can be successfully completed and the PDC is generated in\n\
 SP A."
 static int
 test_case_2_4_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_2_4_4 test_group_2_4
+#define sgrp_case_2_4_4 NULL
+#define numb_case_2_4_4 "2.4.4"
+#define name_case_2_4_4 "ISUP'92 supporting the procedure to Q.767"
+#define xtra_case_2_4_4 NULL
+#define sref_case_2_4_4 NULL
 #define desc_case_2_4_4 "\
-Propagation delay determination procedure\n\
--- ISUP'92 supporting the procedure to Q.767\n\
 Verify that a call can be successfully completed and the PDC is discarded."
 static int
 test_case_2_4_4(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_2_4_5 test_group_2_4
+#define sgrp_case_2_4_5 NULL
+#define numb_case_2_4_5 "2.4.5"
+#define name_case_2_4_5 "Q.767 to ISUP'92 supporting the procedure"
+#define xtra_case_2_4_5 NULL
+#define sref_case_2_4_5 NULL
 #define desc_case_2_4_5 "\
-Propagation delay determination procedure\n\
--- Q.767 to ISUP'92 supporting the procedure\n\
 Verify that a call can be successfully completed and CHI is discarded if\n\
 received."
 static int
 test_case_2_4_5(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_3 "Normal call release"
+#define test_group_3_1 "Calling party clears before address complete"
+
+#define tgrp_case_3_1a test_group_3
+#define sgrp_case_3_1a test_group_3_1
+#define numb_case_3_1a "3.1a"
+#define name_case_3_1a "outgoing call"
+#define xtra_case_3_1a NULL
+#define sref_case_3_1a NULL
 #define desc_case_3_1a "\
-Normal call release\n\
--- Calling party clears before address complete\n\
--- outgoing call\n\
 Verify that the calling party can successfully release a call prior to receipt\n\
 of any backward message."
 static int
@@ -8735,7 +14161,7 @@ test_case_3_1a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8743,24 +14169,27 @@ test_case_3_1a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 3;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 5;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_3_1b test_group_3
+#define sgrp_case_3_1b test_group_3_1
+#define numb_case_3_1b "3.1b"
+#define name_case_3_1b "incoming call"
+#define xtra_case_3_1b NULL
+#define sref_case_3_1b NULL
 #define desc_case_3_1b "\
-Normal call release\n\
--- Calling party clears before address complete\n\
--- incoming call\n\
 Verify that the calling party can successfully release a call prior to receipt\n\
 of any backward message."
 static int
@@ -8778,12 +14207,12 @@ test_case_3_1b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	pmsg.caus.buf[0] = 0x80;
 	pmsg.caus.buf[1] = CC_CAUS_NORMAL_UNSPECIFIED;
@@ -8792,7 +14221,7 @@ test_case_3_1b(void)
 	send(REL);
 	state = 5;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8800,19 +14229,24 @@ test_case_3_1b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_3_2 "Calling party clears before answer"
+
+#define tgrp_case_3_2a test_group_3
+#define sgrp_case_3_2a test_group_3_2
+#define numb_case_3_2a "3.2a"
+#define name_case_3_2a "outgoing call"
+#define xtra_case_3_2a NULL
+#define sref_case_3_2a NULL
 #define desc_case_3_2a "\
-Normal call release\n\
--- Calling party clears before answer\n\
--- outgoing call\n\
 Verify that the calling party can successfully release a call prior to receipt\n\
 of answer."
 static int
@@ -8850,18 +14284,18 @@ test_case_3_2a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
@@ -8871,23 +14305,26 @@ test_case_3_2a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 7;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 9;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_3_2b test_group_3
+#define sgrp_case_3_2b test_group_3_2
+#define numb_case_3_2b "3.2b"
+#define name_case_3_2b "incoming call"
+#define xtra_case_3_2b NULL
+#define sref_case_3_2b NULL
 #define desc_case_3_2b "\
-Normal call release\n\
--- Calling party clears before answer\n\
--- incoming call\n\
 Verify that the calling party can successfully release a call prior to receipt\n\
 of answer."
 static int
@@ -8905,21 +14342,21 @@ test_case_3_2b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
@@ -8930,7 +14367,7 @@ test_case_3_2b(void)
 	send(REL);
 	state = 8;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -8938,19 +14375,24 @@ test_case_3_2b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_3_3 "Calling party clears after answer"
+
+#define tgrp_case_3_3a test_group_3
+#define sgrp_case_3_3a test_group_3_3
+#define numb_case_3_3a "3.3a"
+#define name_case_3_3a "outgoing call"
+#define xtra_case_3_3a NULL
+#define sref_case_3_3a NULL
 #define desc_case_3_3a "\
-Normal call release\n\
--- Calling party clears after answer\n\
--- outgoing call\n\
 Verify that the calling party can successfully release a call after answer."
 static int
 test_case_3_3a(void)
@@ -8987,25 +14429,25 @@ test_case_3_3a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	iut_cpc_signal(COMMUNICATION);
 	state = 8;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
@@ -9014,23 +14456,26 @@ test_case_3_3a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 9;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 11;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_3_3b test_group_3
+#define sgrp_case_3_3b test_group_3_3
+#define numb_case_3_3b "3.3b"
+#define name_case_3_3b "incoming call"
+#define xtra_case_3_3b NULL
+#define sref_case_3_3b NULL
 #define desc_case_3_3b "\
-Normal call release\n\
--- Calling party clears after answer\n\
--- incoming call\n\
 Verify that the calling party can successfully release a call after answer."
 static int
 test_case_3_3b(void)
@@ -9047,31 +14492,31 @@ test_case_3_3b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -9082,7 +14527,7 @@ test_case_3_3b(void)
 	send(REL);
 	state = 12;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -9090,19 +14535,24 @@ test_case_3_3b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_3_4 "Called party clears after answer"
+
+#define tgrp_case_3_4a test_group_3
+#define sgrp_case_3_4a test_group_3_4
+#define numb_case_3_4a "3.4a"
+#define name_case_3_4a "outgoing call"
+#define xtra_case_3_4a NULL
+#define sref_case_3_4a NULL
 #define desc_case_3_4a "\
-Normal call release\n\
--- Called party clears after answer\n\
--- outgoing call\n\
 Verify that a call can be successfully released in the backward direction."
 static int
 test_case_3_4a(void)
@@ -9139,25 +14589,25 @@ test_case_3_4a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -9168,27 +14618,30 @@ test_case_3_4a(void)
 	send(REL);
 	state = 10;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_3_4b test_group_3
+#define sgrp_case_3_4b test_group_3_4
+#define numb_case_3_4b "3.4b"
+#define name_case_3_4b "incoming call"
+#define xtra_case_3_4b NULL
+#define sref_case_3_4b NULL
 #define desc_case_3_4b "\
-Normal call release\n\
--- Called party clears after answer\n\
--- incoming call\n\
 Verify that a call can be successfully released in the backward direction."
 static int
 test_case_3_4b(void)
@@ -9205,31 +14658,31 @@ test_case_3_4b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -9239,7 +14692,7 @@ test_case_3_4b(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 12;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	pmsg.caus.buf[0] = 0x80;
 	pmsg.caus.buf[1] = CC_CAUS_NORMAL_UNSPECIFIED;
@@ -9248,17 +14701,22 @@ test_case_3_4b(void)
 	send(RLC);
 	state = 14;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_3_5 "Suspend initiated by the network"
+
+#define tgrp_case_3_5a test_group_3
+#define sgrp_case_3_5a test_group_3_5
+#define numb_case_3_5a "3.5a"
+#define name_case_3_5a "outgoing call"
+#define xtra_case_3_5a NULL
+#define sref_case_3_5a NULL
 #define desc_case_3_5a "\
-Normal call release\n\
--- Suspend initiated by the network\n\
--- outgoing call\n\
 Verify that the called subscriber can suscessfully clear back and reanswer a\n\
 call."
 static int
@@ -9296,37 +14754,37 @@ test_case_3_5a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	pmsg.sris = ISUP_SRIS_NETWORK_INITIATED;
 	send(SUS);
 	state = 9;
 	if (cpc_event() != CPC_SUSPEND_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	send(RES);
 	state = 11;
 	if (cpc_event() != CPC_RESUME_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	iut_cpc_signal(COMMUNICATION);
 	state = 13;
@@ -9336,23 +14794,26 @@ test_case_3_5a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 14;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 16;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_3_5b test_group_3
+#define sgrp_case_3_5b test_group_3_5
+#define numb_case_3_5b "3.5b"
+#define name_case_3_5b "incoming call"
+#define xtra_case_3_5b NULL
+#define sref_case_3_5b NULL
 #define desc_case_3_5b "\
-Normal call release\n\
--- Suspend initiated by the network\n\
--- incoming call\n\
 Verify that the called subscriber can suscessfully clear back and reanswer a\n\
 call."
 static int
@@ -9370,31 +14831,31 @@ test_case_3_5b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -9402,12 +14863,12 @@ test_case_3_5b(void)
 	iut_cpc_signal(SUSPEND_REQ);
 	state = 12;
 	if (pt_event() != SUS)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	state = 13;
 	iut_cpc_signal(RESUME_REQ);
 	state = 14;
 	if (pt_event() != RES)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	state = 15;
 	iut_cpc_signal(COMMUNICATION);
 	state = 16;
@@ -9418,7 +14879,7 @@ test_case_3_5b(void)
 	send(REL);
 	state = 17;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -9426,20 +14887,25 @@ test_case_3_5b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_3_6 "Suspend and resume initiated by a calling party"
+
+#define tgrp_case_3_6a test_group_3
+#define sgrp_case_3_6a test_group_3_6
+#define numb_case_3_6a "3.6a"
+#define name_case_3_6a "outgoing call"
+#define xtra_case_3_6a NULL
+#define sref_case_3_6a NULL
 #define desc_case_3_6a "\
-Normal call release\n\
--- Suspend and resume initiated by a calling party\n\
--- outgoing call\n\
 Verify that the calling subscriber can suscessfully suspend and resume a\n\
 call."
 static int
@@ -9477,25 +14943,25 @@ test_case_3_6a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -9505,12 +14971,12 @@ test_case_3_6a(void)
 	iut_cpc_signal(SUSPEND_REQ);
 	state = 10;
 	if (pt_event() != SUS)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	iut_cpc_signal(RESUME_REQ);
 	state = 12;
 	if (pt_event() != RES)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	iut_cpc_signal(COMMUNICATION);
 	state = 14;
@@ -9520,23 +14986,26 @@ test_case_3_6a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 15;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 17;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_3_6a test_group_3
+#define sgrp_case_3_6a test_group_3_6
+#define numb_case_3_6b "3.6b"
+#define name_case_3_6b "incoming call"
+#define xtra_case_3_6b NULL
+#define sref_case_3_6b NULL
 #define desc_case_3_6b "\
-Normal call release\n\
--- Suspend and resume initiated by a calling party\n\
--- incoming call\n\
 Verify that the calling subscriber can suscessfully suspend and resume a\n\
 call."
 static int
@@ -9554,31 +15023,31 @@ test_case_3_6b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -9587,14 +15056,14 @@ test_case_3_6b(void)
 	send(SUS);
 	state = 12;
 	if (cpc_event() != CPC_SUSPEND_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	pmsg.sris = ISUP_SRIS_USER_INITIATED;
 	pmsg.opt.len = 0;
 	send(RES);
 	state = 14;
 	if (cpc_event() != CPC_RESUME_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	iut_cpc_signal(COMMUNICATION);
 	state = 16;
@@ -9605,7 +15074,7 @@ test_case_3_6b(void)
 	send(REL);
 	state = 17;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -9613,20 +15082,25 @@ test_case_3_6b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_3_7 "Suspend and resume initiated by a called party"
+
+#define tgrp_case_3_7a test_group_3
+#define sgrp_case_3_7a test_group_3_7
+#define numb_case_3_7a "3.7a"
+#define name_case_3_7a "outgoing call"
+#define xtra_case_3_7a NULL
+#define sref_case_3_7a NULL
 #define desc_case_3_7a "\
-Normal call release\n\
--- Suspend and resume initiated by a called party\n\
--- outgoing call\n\
 Verify that the called subscriber can suscessfully suspend and resume a\n\
 call."
 static int
@@ -9664,25 +15138,25 @@ test_case_3_7a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -9690,12 +15164,12 @@ test_case_3_7a(void)
 	send(SUS);
 	state = 10;
 	if (cpc_event() != CPC_SUSPEND_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	send(RES);
 	state = 12;
 	if (cpc_event() != CPC_RESUME_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	iut_cpc_signal(COMMUNICATION);
 	state = 14;
@@ -9705,23 +15179,26 @@ test_case_3_7a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 15;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 17;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_3_7b test_group_3
+#define sgrp_case_3_7b test_group_3_7
+#define numb_case_3_7b "3.7b"
+#define name_case_3_7b "incoming call"
+#define xtra_case_3_7b NULL
+#define sref_case_3_7b NULL
 #define desc_case_3_7b "\
-Normal call release\n\
--- Suspend and resume initiated by a called party\n\
--- incoming call\n\
 Verify that the called subscriber can suscessfully suspend and resume a\n\
 call."
 static int
@@ -9739,31 +15216,31 @@ test_case_3_7b(void)
 	send(IAM);
 	state = 1;
 	if (cpc_event() != CPC_SETUP_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	iut_cpc_signal(SETUP_RES);
 	state = 3;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	iut_cpc_signal(RINGING);
 	state = 7;
 	iut_cpc_signal(CONNECT_REQ);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ANM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	iut_cpc_signal(COMMUNICATION);
 	state = 11;
@@ -9771,12 +15248,12 @@ test_case_3_7b(void)
 	iut_cpc_signal(SUSPEND_REQ);
 	state = 12;
 	if (pt_event() != SUS)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	state = 13;
 	iut_cpc_signal(RESUME_REQ);
 	state = 14;
 	if (pt_event() != RES)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	state = 15;
 	iut_cpc_signal(COMMUNICATION);
 	state = 16;
@@ -9787,7 +15264,7 @@ test_case_3_7b(void)
 	send(REL);
 	state = 17;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -9795,20 +15272,25 @@ test_case_3_7b(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_3_8 "Collision of REL messages"
+
+#define tgrp_case_3_8a test_group_3
+#define sgrp_case_3_8a test_group_3_8
+#define numb_case_3_8a "3.8a"
+#define name_case_3_8a "REL sent first"
+#define xtra_case_3_8a NULL
+#define sref_case_3_8a NULL
 #define desc_case_3_8a "\
-Normal call release\n\
--- Collision of REL messages\n\
--- REL sent first\n\
 Verify that a release message may be received at an exchange from a succeeding\n\
 or preceding exchange after the release of the switch path is initiated."
 static int
@@ -9846,25 +15328,25 @@ test_case_3_8a(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -9874,7 +15356,7 @@ test_case_3_8a(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 10;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	pmsg.caus.buf[0] = 0x80;
 	pmsg.caus.buf[1] = CC_CAUS_NORMAL_CALL_CLEARING;
@@ -9883,22 +15365,25 @@ test_case_3_8a(void)
 	send(REL);
 	state = 12;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	send(RLC);
 	state = 14;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_3_8b test_group_3
+#define sgrp_case_3_8b test_group_3_8
+#define numb_case_3_8b "3.8b"
+#define name_case_3_8b "REL received first"
+#define xtra_case_3_8b NULL
+#define sref_case_3_8b NULL
 #define desc_case_3_8b "\
-Normal call release\n\
--- Collision of REL messages\n\
--- REL received first\n\
 Verify that a release message may be received at an exchange from a succeeding\n\
 or preceding exchange after the release of the switch path is initiated."
 static int
@@ -9936,25 +15421,25 @@ test_case_3_8b(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	state = 9;
@@ -9965,7 +15450,7 @@ test_case_3_8b(void)
 	send(REL);
 	state = 10;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	cprim.cause = CC_CAUS_NORMAL_CALL_CLEARING;
 	cprim.opt.len = 0;
@@ -9974,20 +15459,25 @@ test_case_3_8b(void)
 	iut_cpc_signal(RELEASE_RES);
 	state = 12;
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_4 "Unsuccessful call setup"
+#define test_group_4_1 "Validate a set of known causes for release"
+
+#define tgrp_case_4_1x test_group_4
+#define sgrp_case_4_1x test_group_4_1
+#define name_case_4_1x "Case A"
+#define xtra_case_4_1x NULL
+#define sref_case_4_1x NULL
 #define desc_case_4_1x "\
-Unsuccessful call setup\n\
--- Validate a set of known causes for release\n\
--- Case A\n\
 Verify that the call will be immediately released by the outgoing signalling\n\
 point if a release message with a given cause is received and the correct\n\
 indication is given to the calling party."
@@ -10026,7 +15516,7 @@ test_case_4_1x(ulong cause)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.caus.buf[0] = 0x80;
 	pmsg.caus.buf[1] = cause;
@@ -10035,7 +15525,7 @@ test_case_4_1x(ulong cause)
 	send(REL);
 	state = 3;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	cprim.cause = 0;
 	cprim.opt.len = 0;
@@ -10043,21 +15533,23 @@ test_case_4_1x(ulong cause)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 6;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_4_1y test_group_4
+#define sgrp_case_4_1y test_group_4_1
+#define name_case_4_1y "Case B"
+#define xtra_case_4_1y NULL
+#define sref_case_4_1y NULL
 #define desc_case_4_1y "\
-Unsuccessful call setup\n\
--- Validate a set of known causes for release\n\
--- Case B\n\
 Verify that the call will be immediately released by the outgoing signalling\n\
 point if a release message with a given cause is received and the correct\n\
 indication is given to the calling party."
@@ -10096,18 +15588,18 @@ test_case_4_1y(ulong cause)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_PROCEEDING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	pmsg.caus.buf[0] = 0x80;
 	pmsg.caus.buf[1] = cause;
@@ -10116,7 +15608,7 @@ test_case_4_1y(ulong cause)
 	send(REL);
 	state = 6;
 	if (cpc_event() != CPC_RELEASE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	cprim.cause = 0;
 	cprim.opt.len = 0;
@@ -10124,21 +15616,23 @@ test_case_4_1y(ulong cause)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_4_1a test_group_4
+#define sgrp_case_4_1a test_group_4_1
+#define numb_case_4_1a "4.1a"
+#define name_case_4_1a "Case A"
+#define xtra_case_4_1a "\"unallocated number\""
+#define sref_case_4_1a NULL
 #define desc_case_4_1a "\
-Unsuccessful call setup\n\
--- Validate a set of known causes for release\n\
--- Case A\n\
--- \"unallocated number\"\n\
 Verify that the call will be immediately released by the outgoing signalling\n\
 point if a release message with a given cause is received and the correct\n\
 indication is given to the calling party."
@@ -10148,11 +15642,13 @@ test_case_4_1a(void)
 	return test_case_4_1x(CC_CAUS_UNALLOCATED_NUMBER);
 }
 
+#define tgrp_case_4_1b test_group_4
+#define sgrp_case_4_1b test_group_4_1
+#define numb_case_4_1b "4.1b"
+#define name_case_4_1b "Case A"
+#define xtra_case_4_1b "\"no circuit available\""
+#define sref_case_4_1b NULL
 #define desc_case_4_1b "\
-Unsuccessful call setup\n\
--- Validate a set of known causes for release\n\
--- Case A\n\
--- \"no circuit available\"\n\
 Verify that the call will be immediately released by the outgoing signalling\n\
 point if a release message with a given cause is received and the correct\n\
 indication is given to the calling party."
@@ -10162,11 +15658,13 @@ test_case_4_1b(void)
 	return test_case_4_1x(CC_CAUS_NO_CCT_AVAILABLE);
 }
 
+#define tgrp_case_4_1c test_group_4
+#define sgrp_case_4_1c test_group_4_1
+#define numb_case_4_1c "4.1c"
+#define name_case_4_1c "Case A"
+#define xtra_case_4_1c "\"switching equipment congestion\""
+#define sref_case_4_1c NULL
 #define desc_case_4_1c "\
-Unsuccessful call setup\n\
--- Validate a set of known causes for release\n\
--- Case A\n\
--- \"switching equipment congestion\"\n\
 Verify that the call will be immediately released by the outgoing signalling\n\
 point if a release message with a given cause is received and the correct\n\
 indication is given to the calling party."
@@ -10176,11 +15674,13 @@ test_case_4_1c(void)
 	return test_case_4_1x(CC_CAUS_SWITCHING_EQUIP_CONGESTION);
 }
 
+#define tgrp_case_4_1d test_group_4
+#define sgrp_case_4_1d test_group_4_1
+#define numb_case_4_1d "4.1d"
+#define name_case_4_1d "Case B"
+#define xtra_case_4_1d "\"unallocated number\""
+#define sref_case_4_1d NULL
 #define desc_case_4_1d "\
-Unsuccessful call setup\n\
--- Validate a set of known causes for release\n\
--- Case B\n\
--- \"unallocated number\"\n\
 Verify that the call will be immediately released by the outgoing signalling\n\
 point if a release message with a given cause is received and the correct\n\
 indication is given to the calling party."
@@ -10190,11 +15690,13 @@ test_case_4_1d(void)
 	return test_case_4_1y(CC_CAUS_UNALLOCATED_NUMBER);
 }
 
+#define tgrp_case_4_1e test_group_4
+#define sgrp_case_4_1e test_group_4_1
+#define numb_case_4_1e "4.1e"
+#define name_case_4_1e "Case B"
+#define xtra_case_4_1e "\"no circuit available\""
+#define sref_case_4_1e NULL
 #define desc_case_4_1e "\
-Unsuccessful call setup\n\
--- Validate a set of known causes for release\n\
--- Case B\n\
--- \"no circuit available\"\n\
 Verify that the call will be immediately released by the outgoing signalling\n\
 point if a release message with a given cause is received and the correct\n\
 indication is given to the calling party."
@@ -10204,11 +15706,13 @@ test_case_4_1e(void)
 	return test_case_4_1y(CC_CAUS_NO_CCT_AVAILABLE);
 }
 
+#define tgrp_case_4_1f test_group_4
+#define sgrp_case_4_1f test_group_4_1
+#define numb_case_4_1f "4.1f"
+#define name_case_4_1f "Case B"
+#define xtra_case_4_1f "\"switching equipment congestion\""
+#define sref_case_4_1f NULL
 #define desc_case_4_1f "\
-Unsuccessful call setup\n\
--- Validate a set of known causes for release\n\
--- Case B\n\
--- \"switching equipment congestion\"\n\
 Verify that the call will be immediately released by the outgoing signalling\n\
 point if a release message with a given cause is received and the correct\n\
 indication is given to the calling party."
@@ -10218,21 +15722,33 @@ test_case_4_1f(void)
 	return test_case_4_1y(CC_CAUS_SWITCHING_EQUIP_CONGESTION);
 }
 
+#define test_group_5_1 "Abnormal situation during a call"
+
+#define tgrp_case_5_1 test_group_5_1
+#define sgrp_case_5_1 NULL
+#define name_case_5_1 "Inability to release in response to a REL after ANM"
+#define xtra_case_5_1 NULL
+#define sref_case_5_1 NULL
+#define numb_case_5_1 "5.1"
 #define desc_case_5_1 "\
-Abnormal situation during a call\n\
--- Inability to release in response to a REL after ANM\n\
 Verify that if the SP is unable to return a circuit to the idle condition in\n\
 response to a release message, the circuit will be blocked."
 static int
 test_case_5_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_5_2 "Timers"
+
+#define tgrp_case_5_2_1 test_group_5_2
+#define sgrp_case_5_2_1 NULL
+#define numb_case_5_2_1 "5.2.1"
+#define name_case_5_2_1 "T7: waiting for ACM or CON"
+#define xtra_case_5_2_1 NULL
+#define sref_case_5_2_1 NULL
 #define desc_case_5_2_1 "\
-Timers\n\
--- T7: waiting for ACM or CON\n\
 Check that at the expiry of T7 the circuit is released."
 static int
 test_case_5_2_1(void)
@@ -10269,18 +15785,18 @@ test_case_5_2_1(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	start_st(timer[t7].hi);
 	beg_time = milliseconds("  T7  ");
 	state = 3;
 	if (cpc_event() != CPC_CALL_FAILURE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 4;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
-	if (check_time("  T7  ", now() - beg_time, timer[t7].lo, timer[t7].hi) != SUCCESS)
+	if (check_time("  T7  ", now() - beg_time, timer[t7].lo, timer[t7].hi) != __RESULT_SUCCESS)
 		goto failure;
 	state = 6;
 	pmsg.cic = imsg.cic;
@@ -10288,19 +15804,23 @@ test_case_5_2_1(void)
 	send(RLC);
 	state = 7;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
       failure:
 	pmsg.cic = imsg.cic;
 	pmsg.opt.len = 0;
 	send(RLC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_2 test_group_5_2
+#define sgrp_case_5_2_2 NULL
+#define numb_case_5_2_2 "5.2.2"
+#define name_case_5_2_2 "T9: waiting for ANM"
+#define xtra_case_5_2_2 NULL
+#define sref_case_5_2_2 NULL
 #define desc_case_5_2_2 "\
-Timers\n\
--- T9: waiting for ANM\n\
 Verify that if an answer message is not received within T9 after receiving an\n\
 address complete message, the connection is released by the outgoing\n\
 signalling point."
@@ -10339,18 +15859,18 @@ test_case_5_2_2(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
@@ -10358,12 +15878,12 @@ test_case_5_2_2(void)
 	beg_time = milliseconds("  T9  ");
 	state = 7;
 	if (cpc_event() != CPC_CALL_FAILURE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
-	if (check_time("  T9  ", now() - beg_time, timer[t9].lo, timer[t9].hi) != SUCCESS)
+	if (check_time("  T9  ", now() - beg_time, timer[t9].lo, timer[t9].hi) != __RESULT_SUCCESS)
 		goto failure;
 	state = 10;
 	pmsg.cic = imsg.cic;
@@ -10371,18 +15891,22 @@ test_case_5_2_2(void)
 	send(RLC);
 	state = 11;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
       failure:
 	pmsg.cic = imsg.cic;
 	pmsg.opt.len = 0;
 	send(RLC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_3 test_group_5_2
+#define sgrp_case_5_2_3 NULL
+#define numb_case_5_2_3 "5.2.3"
+#define name_case_5_2_3 "T1 and T5: failure to receive a RLC"
+#define xtra_case_5_2_3 NULL
+#define sref_case_5_2_3 NULL
 #define desc_case_5_2_3 "\
-Timers\n\
--- T1 and T5: failure to receive a RLC\n\
 Verify that appropriate actions take place at the expiry of timers T1 and T5."
 static int
 test_case_5_2_3(void)
@@ -10405,25 +15929,25 @@ test_case_5_2_3(void)
 			state = 1;
 		case 1:
 			if (cpc_event() != CPC_SETUP_IND)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 2;
 		case 2:
 			iut_cpc_signal(SETUP_RES);
 			state = 3;
 		case 3:
 			if (cpc_event() != CPC_OK_ACK)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 4;
 		case 4:
 			cprim.flags = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 			cprim.opt.len = 0;
 			iut_cpc_signal(ALERTING_REQ);
 			if (cpc_event() != CPC_OK_ACK)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 5;
 		case 5:
 			if (pt_event() != ACM)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 6;
 		case 6:
 			iut_cpc_signal(RINGING);
@@ -10433,11 +15957,11 @@ test_case_5_2_3(void)
 			state = 8;
 		case 8:
 			if (cpc_event() != CPC_SETUP_COMPLETE_IND)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 9;
 		case 9:
 			if (pt_event() != ANM)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 10;
 		case 10:
 			iut_cpc_signal(COMMUNICATION);
@@ -10450,7 +15974,7 @@ test_case_5_2_3(void)
 			state = 12;
 		case 12:
 			if (pt_event() != REL)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 13;
 		case 13:
 			t5_time = milliseconds("  T5  ");
@@ -10463,7 +15987,7 @@ test_case_5_2_3(void)
 			switch (pt_event()) {
 			case REL:
 				rel_time = now();
-				if (check_time("  T1  ", rel_time - t1_time, timer[t1].lo, timer[t1].hi) != SUCCESS)
+				if (check_time("  T1  ", rel_time - t1_time, timer[t1].lo, timer[t1].hi) != __RESULT_SUCCESS)
 					goto failure;
 				t1_time = milliseconds_2nd("  T1  ");
 				start_st(timer[t1].hi);
@@ -10486,7 +16010,7 @@ test_case_5_2_3(void)
 			break;
 		case 17:
 		      state_17:
-			if (check_time("  T5  ", now() - t5_time, timer[t5].lo, timer[t5].hi) != SUCCESS)
+			if (check_time("  T5  ", now() - t5_time, timer[t5].lo, timer[t5].hi) != __RESULT_SUCCESS)
 				goto failure;
 			start_st(timer[t5].hi);
 			state = 18;
@@ -10504,10 +16028,10 @@ test_case_5_2_3(void)
 			state = 20;
 		case 20:
 			if (wait_event(0, ANY) != NO_MSG)
-				return FAILURE;
-			return SUCCESS;
+				return __RESULT_FAILURE;
+			return __RESULT_SUCCESS;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
       failure:
@@ -10516,12 +16040,16 @@ test_case_5_2_3(void)
 	pmsg.caus.buf[1] = CC_CAUS_NORMAL_UNSPECIFIED;
 	pmsg.caus.len = 2;
 	send(RLC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_4 test_group_5_2
+#define sgrp_case_5_2_4 NULL
+#define numb_case_5_2_4 "5.2.4"
+#define name_case_5_2_4 "T6 :waiting for RES (Network) message"
+#define xtra_case_5_2_4 NULL
+#define sref_case_5_2_4 NULL
 #define desc_case_5_2_4 "\
-Timers\n\
--- T6 :waiting for RES (Network) message\n\
 Verify that the call is released at the expiry of timer T6."
 static int
 test_case_5_2_4(void)
@@ -10558,25 +16086,25 @@ test_case_5_2_4(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	iut_cpc_signal(COMMUNICATION);
 	state = 8;
@@ -10584,18 +16112,18 @@ test_case_5_2_4(void)
 	send(SUS);
 	state = 9;
 	if (cpc_event() != CPC_SUSPEND_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	start_st(timer[t6].hi);
 	beg_time = milliseconds("  T6  ");
 	state = 11;
 	if (cpc_event() != CPC_CALL_FAILURE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
-	if (check_time("  T6  ", now() - beg_time, timer[t6].lo, timer[t6].hi) != SUCCESS)
+	if (check_time("  T6  ", now() - beg_time, timer[t6].lo, timer[t6].hi) != __RESULT_SUCCESS)
 		goto failure;
 	state = 14;
 	pmsg.cic = imsg.cic;
@@ -10603,19 +16131,22 @@ test_case_5_2_4(void)
 	send(RLC);
 	state = 15;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
       failure:
 	pmsg.cic = imsg.cic;
 	pmsg.opt.len = 0;
 	send(RLC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_5a test_group_5_2
+#define sgrp_case_5_2_5a NULL
+#define numb_case_5_2_5a "5.2.5a"
+#define name_case_5_2_5a "T8: waiting for COT message if applicable: is required"
+#define xtra_case_5_2_5a NULL
+#define sref_case_5_2_5a NULL
 #define desc_case_5_2_5a "\
-Timers\n\
--- T8: waiting for COT message if applicable\n\
--- is required\n\
 Verify that when the IAM indicates that the continuity check:\n\
 -- is required; or\n\
 -- is performed on a previous circuit,\n\
@@ -10655,23 +16186,26 @@ test_case_5_2_5a(void)
 	if (tst_event() != MGM_CONT_REPORT_IND)
 		goto failure;
 	state = 8;
-	if (check_time("  T8  ", now() - beg_time, timer[t8].lo, timer[t8].hi) != SUCCESS)
+	if (check_time("  T8  ", now() - beg_time, timer[t8].lo, timer[t8].hi) != __RESULT_SUCCESS)
 		goto failure;
 	state = 9;
 	send(RLC);
 	state = 10;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
       failure:
 	send(RSC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_5b test_group_5_2
+#define sgrp_case_5_2_5b NULL
+#define numb_case_5_2_5b "5.2.5b"
+#define name_case_5_2_5b "T8: waiting for COT message if applicable: is performed on a previous circuit"
+#define xtra_case_5_2_5b NULL
+#define sref_case_5_2_5b NULL
 #define desc_case_5_2_5b "\
-Timers\n\
--- T8: waiting for COT message if applicable\n\
--- is performed on a previous circuit\n\
 Verify that when the IAM indicates that the continuity check:\n\
 -- is required; or\n\
 -- is performed on a previous circuit,\n\
@@ -10703,22 +16237,26 @@ test_case_5_2_5b(void)
 	if (cpc_event() != CPC_CALL_FAILURE_IND)
 		goto failure;
 	state = 5;
-	if (check_time("  T8  ", now() - beg_time, timer[t8].lo, timer[t8].hi) != SUCCESS)
+	if (check_time("  T8  ", now() - beg_time, timer[t8].lo, timer[t8].hi) != __RESULT_SUCCESS)
 		goto failure;
 	state = 6;
 	send(RLC);
 	state = 7;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
       failure:
 	send(RSC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_6 test_group_5_2
+#define sgrp_case_5_2_6 NULL
+#define numb_case_5_2_6 "5.2.6"
+#define name_case_5_2_6 "T12 and T13: failure to receive a BLA"
+#define xtra_case_5_2_6 NULL
+#define sref_case_5_2_6 NULL
 #define desc_case_5_2_6 "\
-Timers\n\
--- T12 and T13: failure to receive a BLA\n\
 Verify that appropriate actions take place at the expiry of timers T12 and\n\
 T13."
 static int
@@ -10737,7 +16275,7 @@ test_case_5_2_6(void)
 			mprim.addr.len = sizeof(mprim.addr.add);
 			iut_mgm_signal(BLOCKING_REQ);
 			if (any_event() != BLO)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			t13_time = milliseconds(" T13  ");
 			t12_time = milliseconds_2nd(" T12  ");
 			start_st(timer[t12].hi);
@@ -10747,7 +16285,7 @@ test_case_5_2_6(void)
 			switch (any_event()) {
 			case BLO:
 				blo_time = now();
-				if (check_time(" T12  ", blo_time - t12_time, timer[t12].lo, timer[t12].hi) != SUCCESS) {
+				if (check_time(" T12  ", blo_time - t12_time, timer[t12].lo, timer[t12].hi) != __RESULT_SUCCESS) {
 					state = 3;
 					break;
 				}
@@ -10768,7 +16306,7 @@ test_case_5_2_6(void)
 			state = 3;
 			break;
 		case 3:
-			if (check_time(" T13  ", now() - t13_time, timer[t13].lo, timer[t13].hi) != SUCCESS)
+			if (check_time(" T13  ", now() - t13_time, timer[t13].lo, timer[t13].hi) != __RESULT_SUCCESS)
 				goto failure;
 			t13_time = milliseconds(" T13  ");
 			start_st(timer[t13].hi);
@@ -10778,7 +16316,7 @@ test_case_5_2_6(void)
 			switch (any_event()) {
 			case BLO:
 				blo_time = now();
-				if (check_time(" T13  ", now() - t13_time, timer[t13].lo, timer[t13].hi) != SUCCESS)
+				if (check_time(" T13  ", now() - t13_time, timer[t13].lo, timer[t13].hi) != __RESULT_SUCCESS)
 					goto failure;
 				t13_time = milliseconds(" T13  ");
 				start_st(timer[t13].hi);
@@ -10796,9 +16334,9 @@ test_case_5_2_6(void)
 			send(BLA);
 			iut_mgm_signal(UNBLOCKING_REQ);
 			send(UBA);
-			return SUCCESS;
+			return __RESULT_SUCCESS;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
       failure:
@@ -10807,12 +16345,16 @@ test_case_5_2_6(void)
 	send(BLA);
 	iut_mgm_signal(UNBLOCKING_REQ);
 	send(UBA);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_7 test_group_5_2
+#define sgrp_case_5_2_7 NULL
+#define numb_case_5_2_7 "5.2.7"
+#define name_case_5_2_7 "T14 and T15: failure to receive UBA"
+#define xtra_case_5_2_7 NULL
+#define sref_case_5_2_7 NULL
 #define desc_case_5_2_7 "\
-Timers\n\
--- T14 and T15: failure to receive UBA\n\
 Verify that appropriate actions take place at the expiry of timers T14 and\n\
 T15."
 static int
@@ -10831,14 +16373,14 @@ test_case_5_2_7(void)
 			mprim.addr.len = sizeof(mprim.addr.add);
 			iut_mgm_signal(BLOCKING_REQ);
 			if (any_event() != BLO)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 1;
 			break;
 		case 1:
 			pmsg.cic = imsg.cic;
 			send(BLA);
 			if (any_event() != MGM_BLOCKING_CON)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 2;
 			break;
 		case 2:
@@ -10849,7 +16391,7 @@ test_case_5_2_7(void)
 			mprim.addr.len = sizeof(mprim.addr.add);
 			iut_mgm_signal(UNBLOCKING_REQ);
 			if (any_event() != UBL)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			t15_time = milliseconds(" T15  ");
 			t14_time = milliseconds_2nd(" T14  ");
 			start_st(timer[t14].hi);
@@ -10859,7 +16401,7 @@ test_case_5_2_7(void)
 			switch (any_event()) {
 			case UBL:
 				ubl_time = now();
-				if (check_time(" T14  ", ubl_time - t14_time, timer[t14].lo, timer[t14].hi) != SUCCESS) {
+				if (check_time(" T14  ", ubl_time - t14_time, timer[t14].lo, timer[t14].hi) != __RESULT_SUCCESS) {
 					state = 5;
 					break;
 				}
@@ -10881,7 +16423,7 @@ test_case_5_2_7(void)
 			break;
 		case 5:
 			if (check_time(" T15  ", ubl_time - t15_time, timer[t15].lo, timer[t15].hi)
-			    != SUCCESS)
+			    != __RESULT_SUCCESS)
 				goto failure;
 			t15_time = milliseconds(" T15  ");
 			start_st(timer[t15].hi);
@@ -10891,7 +16433,7 @@ test_case_5_2_7(void)
 			switch (any_event()) {
 			case UBL:
 				ubl_time = now();
-				if (check_time(" T15  ", ubl_time - t15_time, timer[t15].lo, timer[t15].hi) != SUCCESS)
+				if (check_time(" T15  ", ubl_time - t15_time, timer[t15].lo, timer[t15].hi) != __RESULT_SUCCESS)
 					goto failure;
 				t15_time = milliseconds(" T15  ");
 				start_st(timer[t15].hi);
@@ -10907,21 +16449,25 @@ test_case_5_2_7(void)
 			pmsg.cic = imsg.cic;
 			pmsg.opt.len = 0;
 			send(UBA);
-			return SUCCESS;
+			return __RESULT_SUCCESS;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
       failure:
 	pmsg.cic = imsg.cic;
 	pmsg.opt.len = 0;
 	send(UBA);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_8 test_group_5_2
+#define sgrp_case_5_2_8 NULL
+#define numb_case_5_2_8 "5.2.8"
+#define name_case_5_2_8 "T16 and T17: failure to receive a RLC"
+#define xtra_case_5_2_8 NULL
+#define sref_case_5_2_8 NULL
 #define desc_case_5_2_8 "\
-Timers\n\
--- T16 and T17: failure to receive a RLC\n\
 Verify that appropriate actions take place at the expiry of timers T16 and\n\
 T17."
 static int
@@ -10940,7 +16486,7 @@ test_case_5_2_8(void)
 			mprim.addr.len = sizeof(mprim.addr.add);
 			iut_mgm_signal(RESET_REQ);
 			if (any_event() != RSC)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			rsc_time = now();
 			t17_time = milliseconds(" T17  ");
 			t16_time = milliseconds_2nd(" T16  ");
@@ -10950,7 +16496,7 @@ test_case_5_2_8(void)
 			switch (any_event()) {
 			case RSC:
 				rsc_time = now();
-				if (check_time(" T16  ", rsc_time - t16_time, timer[t16].lo, timer[t16].hi) != SUCCESS) {
+				if (check_time(" T16  ", rsc_time - t16_time, timer[t16].lo, timer[t16].hi) != __RESULT_SUCCESS) {
 					state = 3;
 					break;
 				}
@@ -10971,7 +16517,7 @@ test_case_5_2_8(void)
 			state = 3;
 		case 3:
 			if (check_time(" T17  ", rsc_time - t17_time, timer[t17].lo, timer[t17].hi)
-			    != SUCCESS)
+			    != __RESULT_SUCCESS)
 				goto failure;
 			t17_time = milliseconds(" T17  ");
 			start_st(timer[t17].hi);
@@ -10980,7 +16526,7 @@ test_case_5_2_8(void)
 			switch (any_event()) {
 			case RSC:
 				rsc_time = now();
-				if (check_time(" T17  ", rsc_time - t17_time, timer[t17].lo, timer[t17].hi) != SUCCESS)
+				if (check_time(" T17  ", rsc_time - t17_time, timer[t17].lo, timer[t17].hi) != __RESULT_SUCCESS)
 					goto failure;
 				t17_time = milliseconds(" T17  ");
 				start_st(timer[t17].hi);
@@ -10996,21 +16542,25 @@ test_case_5_2_8(void)
 			pmsg.cic = imsg.cic;
 			pmsg.opt.len = 0;
 			send(RLC);
-			return SUCCESS;
+			return __RESULT_SUCCESS;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
       failure:
 	pmsg.cic = imsg.cic;
 	pmsg.opt.len = 0;
 	send(RLC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_9 test_group_5_2
+#define sgrp_case_5_2_9 NULL
+#define numb_case_5_2_9 "5.2.9"
+#define name_case_5_2_9 "T18 and T19: failure to receive a CGBA"
+#define xtra_case_5_2_9 NULL
+#define sref_case_5_2_9 NULL
 #define desc_case_5_2_9 "\
-Timers\n\
--- T18 and T19: failure to receive a CGBA\n\
 Verify that appropriate actions take place at the expiry of timers T18 and\n\
 T19."
 static int
@@ -11029,7 +16579,7 @@ test_case_5_2_9(void)
 			mprim.flags = ISUP_GROUP | ISUP_MAINTENANCE_ORIENTED;
 			iut_mgm_signal(BLOCKING_REQ);
 			if (any_event() != CGB)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			cgb_time = now();
 			t19_time = milliseconds(" T19  ");
 			t18_time = milliseconds_2nd(" T18  ");
@@ -11039,7 +16589,7 @@ test_case_5_2_9(void)
 			switch (any_event()) {
 			case CGB:
 				cgb_time = now();
-				if (check_time(" T18  ", cgb_time - t18_time, timer[t18].lo, timer[t18].hi) != SUCCESS) {
+				if (check_time(" T18  ", cgb_time - t18_time, timer[t18].lo, timer[t18].hi) != __RESULT_SUCCESS) {
 					state = 3;
 					break;
 				}
@@ -11060,7 +16610,7 @@ test_case_5_2_9(void)
 			state = 3;
 		case 3:
 			if (check_time(" T19  ", cgb_time - t19_time, timer[t19].lo, timer[t19].hi)
-			    != SUCCESS)
+			    != __RESULT_SUCCESS)
 				goto failure;
 			t19_time = milliseconds(" T19  ");
 			start_st(timer[t19].hi);
@@ -11069,7 +16619,7 @@ test_case_5_2_9(void)
 			switch (any_event()) {
 			case CGB:
 				cgb_time = now();
-				if (check_time(" T19  ", cgb_time - t19_time, timer[t19].lo, timer[t19].hi) != SUCCESS)
+				if (check_time(" T19  ", cgb_time - t19_time, timer[t19].lo, timer[t19].hi) != __RESULT_SUCCESS)
 					goto failure;
 				t19_time = milliseconds(" T19  ");
 				start_st(timer[t19].hi);
@@ -11089,12 +16639,12 @@ test_case_5_2_9(void)
 			send(CGBA);
 			iut_mgm_signal(UNBLOCKING_REQ);
 			send(CGUA);
-			return SUCCESS;
+			return __RESULT_SUCCESS;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
-	return SCRIPTERROR;
+	return __RESULT_SCRIPT_ERROR;
       failure:
 	pmsg.cic = imsg.cic;
 	bcopy(imsg.rs.buf, pmsg.rs.buf, imsg.rs.len);
@@ -11103,12 +16653,16 @@ test_case_5_2_9(void)
 	send(CGBA);
 	iut_mgm_signal(UNBLOCKING_REQ);
 	send(CGUA);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_10 test_group_5_2
+#define sgrp_case_5_2_10 NULL
+#define numb_case_5_2_10 "5.2.10"
+#define name_case_5_2_10 "T20 and T21: failure to receive a CGUA"
+#define xtra_case_5_2_10 NULL
+#define sref_case_5_2_10 NULL
 #define desc_case_5_2_10 "\
-Timers\n\
--- T20 and T21: failure to receive a CGUA\n\
 Verify that appropriate actions take place at the expiry of timers T20 and\n\
 T21."
 static int
@@ -11127,7 +16681,7 @@ test_case_5_2_10(void)
 			mprim.flags = ISUP_GROUP | ISUP_MAINTENANCE_ORIENTED;
 			iut_mgm_signal(BLOCKING_REQ);
 			if (any_event() != CGB)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 1;
 		case 1:
 			pmsg.cic = imsg.cic;
@@ -11136,7 +16690,7 @@ test_case_5_2_10(void)
 			pmsg.cgi = imsg.cgi;
 			send(CGBA);
 			if (any_event() != MGM_BLOCKING_CON)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			state = 2;
 		case 2:
 			mprim.addr.add.scope = ISUP_SCOPE_CG;
@@ -11146,7 +16700,7 @@ test_case_5_2_10(void)
 			mprim.flags = ISUP_GROUP | ISUP_MAINTENANCE_ORIENTED;
 			iut_mgm_signal(UNBLOCKING_REQ);
 			if (any_event() != CGU)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			cgu_time = now();
 			t21_time = milliseconds(" T21  ");
 			t20_time = milliseconds_2nd(" T20  ");
@@ -11156,7 +16710,7 @@ test_case_5_2_10(void)
 			switch (any_event()) {
 			case CGU:
 				cgu_time = now();
-				if (check_time(" T20  ", cgu_time - t20_time, timer[t20].lo, timer[t20].hi) != SUCCESS) {
+				if (check_time(" T20  ", cgu_time - t20_time, timer[t20].lo, timer[t20].hi) != __RESULT_SUCCESS) {
 					state = 5;
 					break;
 				}
@@ -11177,7 +16731,7 @@ test_case_5_2_10(void)
 			state = 5;
 		case 5:
 			if (check_time(" T21  ", cgu_time - t21_time, timer[t21].lo, timer[t21].hi)
-			    != SUCCESS)
+			    != __RESULT_SUCCESS)
 				goto failure;
 			t21_time = milliseconds(" T20  ");
 			start_st(timer[t21].hi);
@@ -11186,7 +16740,7 @@ test_case_5_2_10(void)
 			switch (any_event()) {
 			case CGU:
 				cgu_time = now();
-				if (check_time(" T21  ", cgu_time - t21_time, timer[t21].lo, timer[t21].hi) != SUCCESS)
+				if (check_time(" T21  ", cgu_time - t21_time, timer[t21].lo, timer[t21].hi) != __RESULT_SUCCESS)
 					goto failure;
 				t21_time = milliseconds(" T21  ");
 				start_st(timer[t21].hi);
@@ -11204,24 +16758,28 @@ test_case_5_2_10(void)
 			pmsg.rs.len = imsg.rs.len;
 			pmsg.cgi = imsg.cgi;
 			send(CGUA);
-			return SUCCESS;
+			return __RESULT_SUCCESS;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
-	return SCRIPTERROR;
+	return __RESULT_SCRIPT_ERROR;
       failure:
 	pmsg.cic = imsg.cic;
 	bcopy(imsg.rs.buf, pmsg.rs.buf, imsg.rs.len);
 	pmsg.rs.len = imsg.rs.len;
 	pmsg.cgi = imsg.cgi;
 	send(CGUA);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_5_2_11 test_group_5_2
+#define sgrp_case_5_2_11 NULL
+#define numb_case_5_2_11 "5.2.11"
+#define name_case_5_2_11 "T22 and T23: failure to receive a GRA"
+#define xtra_case_5_2_11 NULL
+#define sref_case_5_2_11 NULL
 #define desc_case_5_2_11 "\
-Timers\n\
--- T22 and T23: failure to receive a GRA\n\
 Verify that appropriate actions take place at the expiry of timers T22 and\n\
 T23."
 static int
@@ -11240,7 +16798,7 @@ test_case_5_2_11(void)
 			mprim.flags = ISUP_GROUP | ISUP_MAINTENANCE_ORIENTED;
 			iut_mgm_signal(RESET_REQ);
 			if (any_event() != GRS)
-				return FAILURE;
+				return __RESULT_FAILURE;
 			grs_time = now();
 			t23_time = milliseconds(" T23  ");
 			t22_time = milliseconds_2nd(" T22  ");
@@ -11250,7 +16808,7 @@ test_case_5_2_11(void)
 			switch (any_event()) {
 			case GRS:
 				grs_time = now();
-				if (check_time(" T22  ", grs_time - t22_time, timer[t22].lo, timer[t22].hi) != SUCCESS) {
+				if (check_time(" T22  ", grs_time - t22_time, timer[t22].lo, timer[t22].hi) != __RESULT_SUCCESS) {
 					state = 3;
 					break;
 				}
@@ -11271,7 +16829,7 @@ test_case_5_2_11(void)
 			state = 3;
 		case 3:
 			if (check_time(" T23  ", grs_time - t23_time, timer[t23].lo, timer[t23].hi)
-			    != SUCCESS)
+			    != __RESULT_SUCCESS)
 				goto failure;
 			t23_time = milliseconds(" T23  ");
 			start_st(timer[t23].hi);
@@ -11280,7 +16838,7 @@ test_case_5_2_11(void)
 			switch (any_event()) {
 			case GRS:
 				grs_time = now();
-				if (check_time(" T23  ", grs_time - t23_time, timer[t23].lo, timer[t23].hi) != SUCCESS)
+				if (check_time(" T23  ", grs_time - t23_time, timer[t23].lo, timer[t23].hi) != __RESULT_SUCCESS)
 					goto failure;
 				t23_time = milliseconds(" T23  ");
 				start_st(timer[t23].hi);
@@ -11301,12 +16859,12 @@ test_case_5_2_11(void)
 			pmsg.rs.buf[4] = 0x00;
 			pmsg.rs.len = 5;
 			send(GRA);
-			return SUCCESS;
+			return __RESULT_SUCCESS;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
-	return SCRIPTERROR;
+	return __RESULT_SCRIPT_ERROR;
       failure:
 	pmsg.cic = imsg.cic;
 	pmsg.rs.buf[0] = imsg.rs.buf[0];
@@ -11316,12 +16874,18 @@ test_case_5_2_11(void)
 	pmsg.rs.buf[4] = 0x00;
 	pmsg.rs.len = 5;
 	send(GRA);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define test_group_5_3 "Reset of circuits during a call"
+
+#define tgrp_case_5_3_1 test_group_5_3
+#define sgrp_case_5_3_1 NULL
+#define numb_case_5_3_1 "5.3.1"
+#define name_case_5_3_1 "Of an outgoing circuit"
+#define xtra_case_5_3_1 NULL
+#define sref_case_5_3_1 NULL
 #define desc_case_5_3_1 "\
-Reset of circuits during a call\n\
--- Of an outgoing circuit\n\
 Verify that on receipt of a reset message the call is immediately released --\n\
 outgoing call."
 static int
@@ -11359,52 +16923,56 @@ test_case_5_3_1(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 4;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	send(RINGING);
 	state = 6;
 	send(ANM);
 	state = 7;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	iut_cpc_signal(COMMUNICATION);
 	pmsg.cic = 12;
 	send(RSC);
 	state = 9;
 	if (cpc_event() != CPC_CALL_FAILURE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (mgm_event() != MGM_RESET_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	iut_mgm_signal(RESET_RES);
 	state = 12;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_5_3_2 test_group_5_3
+#define sgrp_case_5_3_2 NULL
+#define numb_case_5_3_2 "5.3.2"
+#define name_case_5_3_2 "Of an incoming circuit"
+#define xtra_case_5_3_2 NULL
+#define sref_case_5_3_2 NULL
 #define desc_case_5_3_2 "\
-Reset of circuits during a call\n\
--- Of an incoming circuit\n\
 Verify that on receipt of a reset message the call is immediately released --\n\
 incoming call."
 static int
@@ -11433,7 +17001,7 @@ test_case_5_3_2(void)
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (pt_event() != ACM)
 		goto failure;
@@ -11458,30 +17026,36 @@ test_case_5_3_2(void)
 	send(RSC);
 	state = 12;
 	if (mgm_event() != MGM_RESET_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	iut_mgm_signal(RESET_RES);
 	state = 14;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	if (cpc_event() != CPC_CALL_FAILURE_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
       failure:
 	send(RSC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define test_group_6_1 "Continuity check call"
+
+#define tgrp_case_6_1_1 test_group_6_1
+#define sgrp_case_6_1_1 NULL
+#define numb_case_6_1_1 "6.1.1"
+#define name_case_6_1_1 "Continuity check required"
+#define xtra_case_6_1_1 NULL
+#define sref_case_6_1_1 NULL
 #define desc_case_6_1_1 "\
-Continuity check call\n\
--- Continuity check required\n\
 Verify that a call can be set up on a circuit requiring a continuity check."
 static int
 test_case_6_1_1(void)
@@ -11518,10 +17092,10 @@ test_case_6_1_1(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	send(LOOPBACK);
 	state = 4;
@@ -11532,25 +17106,25 @@ test_case_6_1_1(void)
 	iut_tst_signal(CONT_REPORT_REQ);
 	state = 6;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 9;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	send(RINGING);
 	state = 11;
 	send(ANM);
 	state = 12;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	iut_cpc_signal(COMMUNICATION);
 	state = 14;
@@ -11560,22 +17134,26 @@ test_case_6_1_1(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 15;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 17;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_6_1_2 test_group_6_1
+#define sgrp_case_6_1_2 NULL
+#define numb_case_6_1_2 "6.1.2"
+#define name_case_6_1_2 "COT applied on a previous circuit"
+#define xtra_case_6_1_2 NULL
+#define sref_case_6_1_2 NULL
 #define desc_case_6_1_2 "\
-Continuity check call\n\
--- COT applied on a previous circuit\n\
 Verify that if a continuity check is being peformed on a previous circuit, a\n\
 backward message is delayed until receipt of the COT message."
 static int
@@ -11598,7 +17176,7 @@ test_case_6_1_2(void)
 	beg_time = milliseconds(" Delay");
 	state = 3;
 	start_st(timer[t8].lo / 2);
-	if (any_event() != TIMEOUT)
+	if (any_event() != __EVENT_TIMEOUT)
 		goto failure;
 	state = 4;
 	pmsg.coti = ISUP_COT_SUCCESS;
@@ -11617,7 +17195,7 @@ test_case_6_1_2(void)
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ACM)
 		goto failure;
@@ -11649,22 +17227,26 @@ test_case_6_1_2(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	if (pt_event() != RLC)
 		goto failure;
 	state = 19;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
       failure:
 	send(RSC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_6_1_3 test_group_6_1
+#define sgrp_case_6_1_3 NULL
+#define numb_case_6_1_3 "6.1.3"
+#define name_case_6_1_3 "Calling party clears during a COT"
+#define xtra_case_6_1_3 NULL
+#define sref_case_6_1_3 NULL
 #define desc_case_6_1_3 "\
-Continuity check call\n\
--- Calling party clears during a COT\n\
 Verify that the calling party can successfully clear the call during the\n\
 continuity check phase."
 static int
@@ -11702,10 +17284,10 @@ test_case_6_1_3(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	send(LOOPBACK);
 	state = 4;
@@ -11717,25 +17299,29 @@ test_case_6_1_3(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 6;
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 9;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_6_1_4 test_group_6_1
+#define sgrp_case_6_1_4 NULL
+#define numb_case_6_1_4 "6.1.4"
+#define name_case_6_1_4 "Delay of through connect"
+#define xtra_case_6_1_4 NULL
+#define sref_case_6_1_4 NULL
 #define desc_case_6_1_4 "\
-Continuity check call\n\
--- Delay of through connect\n\
 Verify that the switching through of the speech path is delayed until the\n\
 residual check-tone has propagated through the return of the speech path."
 static int
@@ -11773,10 +17359,10 @@ test_case_6_1_4(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	send(LOOPBACK);
 	state = 4;
@@ -11787,25 +17373,25 @@ test_case_6_1_4(void)
 	iut_tst_signal(CONT_REPORT_REQ);
 	state = 6;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 9;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	send(RINGING);
 	state = 11;
 	send(ANM);
 	state = 12;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	iut_cpc_signal(COMMUNICATION);
 	state = 14;
@@ -11815,22 +17401,26 @@ test_case_6_1_4(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 15;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	pmsg.cic = imsg.cic;
 	send(RLC);
 	state = 17;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_6_1_5 test_group_6_1
+#define sgrp_case_6_1_5 NULL
+#define numb_case_6_1_5 "6.1.5"
+#define name_case_6_1_5 "COT unsuccessful"
+#define xtra_case_6_1_5 NULL
+#define sref_case_6_1_5 NULL
 #define desc_case_6_1_5 "\
-Continuity check call\n\
--- COT unsuccessful\n\
 Verify that a repeat attempt of the continuity check is made on the failed\n\
 circuit."
 static int
@@ -11868,10 +17458,10 @@ test_case_6_1_5(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	send(LOOPBACK);
 	state = 4;
@@ -11881,13 +17471,13 @@ test_case_6_1_5(void)
 	start_st(timer[t24].hi + 100);
 	state = 6;
 	if (cpc_event() != CPC_CALL_REATTEMPT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	check_time(" T24  ", now() - beg_time, timer[t24].lo, timer[t24].hi);
 	state = 10;
@@ -11895,13 +17485,13 @@ test_case_6_1_5(void)
 	state = 11;
 	start_st(timer[t25].hi + 100);
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	if (pt_event() != CCR)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	check_time(" T25  ", now() - beg_time, timer[t25].lo, timer[t25].hi);
 	state = 15;
@@ -11913,10 +17503,10 @@ test_case_6_1_5(void)
 	state = 18;
 	start_st(timer[t24].hi + 100);
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	check_time(" T24  ", now() - beg_time, timer[t24].lo, timer[t24].hi);
 	state = 21;
@@ -11924,13 +17514,13 @@ test_case_6_1_5(void)
 	state = 22;
 	start_st(timer[t26].hi + 100);
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 23;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 24;
 	if (pt_event() != CCR)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 25;
 	check_time(" T26  ", now() - beg_time, timer[t26].lo, timer[t26].hi);
 	state = 26;
@@ -11943,16 +17533,22 @@ test_case_6_1_5(void)
 	iut_tst_signal(CONT_REPORT_REQ);
 	state = 29;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 30;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define test_group_6_2 "Automatic repeat attempt"
+
+#define tgrp_case_6_2_1 test_group_6_2
+#define sgrp_case_6_2_1 NULL
+#define numb_case_6_2_1 "6.2.1"
+#define name_case_6_2_1 "Dual seizure for non-controlling SP"
+#define xtra_case_6_2_1 NULL
+#define sref_case_6_2_1 NULL
 #define desc_case_6_2_1 "\
-Automatic repeat attempt\n\
--- Dual seizure for non-controlling SP\n\
 Verify that an automatic repeat attempt will be made on detection of a dual\n\
 siezure."
 static int
@@ -12020,7 +17616,7 @@ test_case_6_2_1(void)
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != ACM)
 		goto failure;
@@ -12119,25 +17715,29 @@ test_case_6_2_1(void)
 	cprim.user_ref = 0;
 	iut_cpc_signal(RELEASE_RES);
 	if (cpc_event() != CPC_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 31;
 	if (pt_event() != RLC)
 		goto failure;
 	state = 32;
 	if (wait_event(0, ANY) != NO_MSG)
 		goto failure;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
       failure:
 	pmsg.cic = cicy;
 	send(RSC);
 	pmsg.cic = cicx;
 	send(RSC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define tgrp_case_6_2_2 test_group_6_2
+#define sgrp_case_6_2_2 NULL
+#define numb_case_6_2_2 "6.2.2"
+#define name_case_6_2_2 "Blocking of a circuit"
+#define xtra_case_6_2_2 NULL
+#define sref_case_6_2_2 NULL
 #define desc_case_6_2_2 "\
-Automatic repeat attempt\n\
--- Blocking of a circuit\n\
 Verify that an automatic repeat attempt will be made on receipt of the\n\
 blocking message after sending an Initial address message and before any\n\
 backward messsages have been received."
@@ -12179,27 +17779,27 @@ test_case_6_2_2(void)
 	state = 1;
 	state = 2;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	cic = pmsg.cic = imsg.cic;
 	send(BLO);
 	state = 4;
 	if (mgm_event() != MGM_BLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	iut_mgm_signal(BLOCKING_RES);
 	state = 6;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (cpc_event() != CPC_CALL_REATTEMPT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (pt_event() != BLA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 10;
 	send(RLC);
 	state = 11;
@@ -12234,25 +17834,25 @@ test_case_6_2_2(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 12;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 14;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 15;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 16;
 	send(RINGING);
 	state = 17;
 	send(ANM);
 	state = 18;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 19;
 	iut_cpc_signal(COMMUNICATION);
 	state = 20;
@@ -12264,35 +17864,39 @@ test_case_6_2_2(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 21;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 22;
 	send(RLC);
 	state = 23;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 24;
 	pmsg.cic = cic;
 	send(UBL);
 	state = 25;
 	if (mgm_event() != MGM_UNBLOCKING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 26;
 	iut_mgm_signal(UNBLOCKING_RES);
 	state = 27;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 28;
 	if (pt_event() != UBA)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 29;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_6_2_3 test_group_6_2
+#define sgrp_case_6_2_3 NULL
+#define numb_case_6_2_3 "6.2.3"
+#define name_case_6_2_3 "Circuit reset"
+#define xtra_case_6_2_3 NULL
+#define sref_case_6_2_3 NULL
 #define desc_case_6_2_3 "\
-Automatic repeat attempt\n\
--- Circuit reset\n\
 Verify that an automatic repeat attempt will be made on receipt of circuit\n\
 reset after sending of an Initial address message and before a backward\n\
 message has been received."
@@ -12334,24 +17938,24 @@ test_case_6_2_3(void)
 	state = 1;
 	state = 2;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	cic = pmsg.cic = imsg.cic;
 	send(RSC);
 	state = 4;
 	if (mgm_event() != MGM_RESET_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	iut_mgm_signal(RESET_RES);
 	state = 6;
 	if (mgm_event() != MGM_OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (cpc_event() != CPC_CALL_REATTEMPT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (pt_event() != RLC)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
 	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
@@ -12384,25 +17988,25 @@ test_case_6_2_3(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 10;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 11;
 	pmsg.cic = imsg.cic;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 12;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 13;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 14;
 	send(RINGING);
 	state = 15;
 	send(ANM);
 	state = 16;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 17;
 	iut_cpc_signal(COMMUNICATION);
 	state = 18;
@@ -12414,21 +18018,25 @@ test_case_6_2_3(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 19;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	send(RLC);
 	state = 21;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 22;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_6_2_4 test_group_6_2
+#define sgrp_case_6_2_4 NULL
+#define numb_case_6_2_4 "6.2.4"
+#define name_case_6_2_4 "Continuity check failure"
+#define xtra_case_6_2_4 NULL
+#define sref_case_6_2_4 NULL
 #define desc_case_6_2_4 "\
-Automatic repeat attempt\n\
--- Continuity check failure\n\
 Verify that an automatic repeat attempt will be made on continuity check\n\
 failure."
 static int
@@ -12468,10 +18076,10 @@ test_case_6_2_4(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 1;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	cicx = imsg.cic;
 	send(LOOPBACK);
@@ -12482,13 +18090,13 @@ test_case_6_2_4(void)
 	state = 6;
 	start_st(timer[t24].hi + 100);
 	if (cpc_event() != CPC_CALL_REATTEMPT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 7;
 	if (tst_event() != MGM_CONT_REPORT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 9;
 	check_time(" T24  ", now() - beg_time, timer[t24].lo, timer[t24].hi);
 	state = 10;
@@ -12526,12 +18134,12 @@ test_case_6_2_4(void)
 	iut_cpc_signal(SETUP_REQ);
 	state = 12;
 	if (pt_event() != IAM)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 13;
 	send(LOOPBACK);
 	state = 14;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	iut_tst_signal(TONE);
 	state = 16;
@@ -12541,25 +18149,25 @@ test_case_6_2_4(void)
 	iut_tst_signal(CONT_REPORT_REQ);
 	state = 17;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	pmsg.cic = cicy;
 	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_SUBSCRIBER_FREE;
 	send(ACM);
 	state = 19;
 	if (cpc_event() != CPC_SETUP_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	cprim.user_ref = 0;
 	state = 20;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 21;
 	send(RINGING);
 	state = 22;
 	send(ANM);
 	state = 23;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 24;
 	iut_cpc_signal(COMMUNICATION);
 	state = 25;
@@ -12571,23 +18179,23 @@ test_case_6_2_4(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 26;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 27;
 	send(RLC);
 	state = 28;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 29;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 30;
 	if (tst_event() != MGM_CONT_TEST_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 31;
 	iut_cpc_signal(TONE);
 	state = 32;
 	if (pt_event() != CCR)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 33;
 	send(LOOPBACK);
 	state = 34;
@@ -12596,16 +18204,20 @@ test_case_6_2_4(void)
 	iut_tst_signal(CONT_REPORT_REQ);
 	state = 35;
 	if (pt_event() != COT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 36;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_6_2_5 test_group_6_2
+#define sgrp_case_6_2_5 NULL
+#define numb_case_6_2_5 "6.2.5"
+#define name_case_6_2_5 "Receipt of unreasonable signalling information"
+#define xtra_case_6_2_5 NULL
+#define sref_case_6_2_5 NULL
 #define desc_case_6_2_5 "\
-Automatic repeat attempt\n\
--- Receipt of unreasonable signalling information\n\
 Verify that an automatic repeat attempt will be made on receipt of\n\
 unreasonable signalling information after sending the Intitial address message\n\
 and before one of the backward signals has been received."
@@ -12704,14 +18316,14 @@ test_case_6_2_5(void)
 	cprim.user_ref = 0;
 	state = 11;
 	if (cpc_event() != CPC_ALERTING_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 12;
 	send(RINGING);
 	state = 13;
 	send(ANM);
 	state = 14;
 	if (cpc_event() != CPC_CONNECT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 15;
 	iut_cpc_signal(COMMUNICATION);
 	state = 16;
@@ -12723,29 +18335,35 @@ test_case_6_2_5(void)
 	iut_cpc_signal(RELEASE_REQ);
 	state = 17;
 	if (pt_event() != REL)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 18;
 	send(RLC);
 	state = 19;
 	if (cpc_event() != CPC_RELEASE_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 20;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
       failure:
 	pmsg.cic = cicy;
 	send(RSC);
 	pmsg.cic = cicx;
 	send(RSC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
 static int iut_option(void);
 
+#define test_group_6_3 "Dual seizure"
+
+#define tgrp_case_6_3_1 test_group_6_3
+#define sgrp_case_6_3_1 NULL
+#define numb_case_6_3_1 "6.3.1"
+#define name_case_6_3_1 "Dual seizure for controlling SP"
+#define xtra_case_6_3_1 NULL
+#define sref_case_6_3_1 NULL
 #define desc_case_6_3_1 "\
-Dual seizure\n\
--- Dual seizure for controlling SP\n\
 Verify that on detection of dual siezure, the call initiated by the\n\
 controlling signalling point is completed and the non-controlling signalling\n\
 point is backed off."
@@ -12755,8 +18373,8 @@ test_case_6_3_1(void)
 	ulong cicx = 31;
 
 	iut_tg_opt.flags |= ISUP_TGF_GLARE_PRIORITY;
-	if (iut_option() != SUCCESS)
-		return INCONCLUSIVE;
+	if (iut_option() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
 	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
@@ -12835,176 +18453,243 @@ test_case_6_3_1(void)
 	state = 14;
 	if (wait_event(0, ANY) != NO_MSG)
 		goto failure;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
       failure:
 	pmsg.cic = cicx;
 	send(RSC);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define test_group_6_4 "Semi-automatic operation"
+
+#define tgrp_case_6_4_1 test_group_6_4
+#define sgrp_case_6_4_1 NULL
+#define numb_case_6_4_1 "6.4.1"
+#define name_case_6_4_1 "FOT sent following a call to a subscriber"
+#define xtra_case_6_4_1 NULL
+#define sref_case_6_4_1 NULL
 #define desc_case_6_4_1 "\
-Semi-automatic operation\n\
--- FOT sent following a call to a subscriber\n\
 Verify that the FOT is correctly sent."
 static int
 test_case_6_4_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_4_2 test_group_6_4
+#define sgrp_case_6_4_2 NULL
+#define numb_case_6_4_2 "6.4.2"
+#define name_case_6_4_2 "FOT received following a call to a subscriber"
+#define xtra_case_6_4_2 NULL
+#define sref_case_6_4_2 NULL
 #define desc_case_6_4_2 "\
-Semi-automatic operation\n\
--- FOT received following a call to a subscriber\n\
 Verify that the FOT is correctly received."
 static int
 test_case_6_4_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_4_3 test_group_6_4
+#define sgrp_case_6_4_3 NULL
+#define numb_case_6_4_3 "6.4.3"
+#define name_case_6_4_3 "FOT sent following a call via codes 11 and 12"
+#define xtra_case_6_4_3 NULL
+#define sref_case_6_4_3 NULL
 #define desc_case_6_4_3 "\
-Semi-automatic operation\n\
--- FOT sent following a call via codes 11 and 12\n\
 Verify that the FOT is correctly sent."
 static int
 test_case_6_4_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_4_4 test_group_6_4
+#define sgrp_case_6_4_4 NULL
+#define numb_case_6_4_4 "6.4.4"
+#define name_case_6_4_4 "FOT received following a call via codes 11 and 12"
+#define xtra_case_6_4_4 NULL
+#define sref_case_6_4_4 NULL
 #define desc_case_6_4_4 "\
-Semi-automatic operation\n\
--- FOT received following a call via codes 11 and 12\n\
 Verify that the FOT is correctly received."
 static int
 test_case_6_4_4(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_6_5 "Simple segmentation"
+
+#define tgrp_case_6_5_1 test_group_6_5
+#define sgrp_case_6_5_1 NULL
+#define numb_case_6_5_1 "6.5.1"
+#define name_case_6_5_1 "Sending of SGM"
+#define xtra_case_6_5_1 NULL
+#define sref_case_6_5_1 NULL
 #define desc_case_6_5_1 "\
-Simple segmentation\n\
--- Sending of SGM\n\
 Verify that a call can be successfully completed if segmentation is applied."
 static int
 test_case_6_5_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_5_2 test_group_6_5
+#define sgrp_case_6_5_2 NULL
+#define numb_case_6_5_2 "6.5.2"
+#define name_case_6_5_2 "Receipt of SGM"
+#define xtra_case_6_5_2 NULL
+#define sref_case_6_5_2 NULL
 #define desc_case_6_5_2 "\
-Simple segmentation\n\
--- Receipt of SGM\n\
 Verify that a call can be successfully completed if segmentation is applied."
 static int
 test_case_6_5_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_5_3 test_group_6_5
+#define sgrp_case_6_5_3 NULL
+#define numb_case_6_5_3 "6.5.3"
+#define name_case_6_5_3 "Receipt of SGM after timer T34 expired"
+#define xtra_case_6_5_3 NULL
+#define sref_case_6_5_3 NULL
 #define desc_case_6_5_3 "\
-Simple segmentation\n\
--- Receipt of SGM after timer T34 expired\n\
 Verify that a call can be successfully completed and the SGM will be\n\
 discarded."
 static int
 test_case_6_5_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_5_4 test_group_6_5
+#define sgrp_case_6_5_4 NULL
+#define numb_case_6_5_4 "6.5.4"
+#define name_case_6_5_4 "Receipt of SGM in forward direction"
+#define xtra_case_6_5_4 NULL
+#define sref_case_6_5_4 NULL
 #define desc_case_6_5_4 "\
-Simple segmentation\n\
--- Receipt of SGM in forward direction\n\
 Verify that SP A is able to discard a SGM message without disrupting normal\n\
 call handling."
 static int
 test_case_6_5_4(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_5_5 test_group_6_5
+#define sgrp_case_6_5_5 NULL
+#define numb_case_6_5_5 "6.5.5"
+#define name_case_6_5_5 "Receipt of SGM in backward direction"
+#define xtra_case_6_5_5 NULL
+#define sref_case_6_5_5 NULL
 #define desc_case_6_5_5 "\
-Simple segmentation\n\
--- Receipt of SGM in backward direction\n\
 Verify that SP A is able to discard a SGM message without disrupting normal\n\
 call handling."
 static int
 test_case_6_5_5(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_6_6 "Fallback"
+
+#define tgrp_case_6_6_1 test_group_6_6
+#define sgrp_case_6_6_1 NULL
+#define numb_case_6_6_1 "6.6.1"
+#define name_case_6_6_1 "Fallback does not occur"
+#define xtra_case_6_6_1 NULL
+#define sref_case_6_6_1 NULL
 #define desc_case_6_6_1 "\
-Fallback\n\
--- Fallback does not occur\n\
 Verify that a call can be successfully completed."
 static int
 test_case_6_6_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_6_2 test_group_6_6
+#define sgrp_case_6_6_2 NULL
+#define numb_case_6_6_2 "6.6.2"
+#define name_case_6_6_2 "Fallback occurs behind SP A"
+#define xtra_case_6_6_2 NULL
+#define sref_case_6_6_2 NULL
 #define desc_case_6_6_2 "\
-Fallback\n\
--- Fallback occurs behind SP A\n\
 Verify that a call can be successfully completed using Fallback that was\n\
 indicated behind SP A."
 static int
 test_case_6_6_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_6_3 test_group_6_6
+#define sgrp_case_6_6_3 NULL
+#define numb_case_6_6_3 "6.6.3"
+#define name_case_6_6_3 "Fallback occurs in SP A"
+#define xtra_case_6_6_3 NULL
+#define sref_case_6_6_3 NULL
 #define desc_case_6_6_3 "\
-Fallback\n\
--- Fallback occurs in SP A\n\
 Verify that SP A is able to perform fallback."
 static int
 test_case_6_6_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_6_6_4 test_group_6_6
+#define sgrp_case_6_6_4 NULL
+#define numb_case_6_6_4 "6.6.4"
+#define name_case_6_6_4 "Abnormal procedure, Fallback connection types sent to an exchange not supporting the fallback procedure"
+#define xtra_case_6_6_4 NULL
+#define sref_case_6_6_4 NULL
 #define desc_case_6_6_4 "\
-Fallback\n\
--- Abnormal procedure, Fallback connection types sent to an exchange not\n\
-   supporting the fallback procedure\n\
 Verify that SP A is able to release the call."
 static int
 test_case_6_6_4(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_7_1 "64 kbit/s unrestricted"
+
+#define tgrp_case_7_1_1 test_group_7_1
+#define sgrp_case_7_1_1 NULL
+#define numb_case_7_1_1 "7.1.1"
+#define name_case_7_1_1 "Successful call setup"
+#define xtra_case_7_1_1 NULL
+#define sref_case_7_1_1 NULL
 #define desc_case_7_1_1 "\
-64 kbit/s unrestricted\n\
--- Successful call setup\n\
 Verify that a 64 kbit/s call can be successfully completed using appropriate\n\
 transmission medium requirement and user service information parameters."
 static int
 test_case_7_1_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_7_1_2 test_group_7_1
+#define sgrp_case_7_1_2 NULL
+#define numb_case_7_1_2 "7.1.2"
+#define name_case_7_1_2 "Unsuccessful call setup"
+#define xtra_case_7_1_2 NULL
+#define sref_case_7_1_2 NULL
 #define desc_case_7_1_2 "\
-64 kbit/s unrestricted\n\
--- Unsuccessful call setup\n\
 Verify that the call will be immediately released by the outgoing SP if a\n\
 release message with a given cause is received and, for circuits equipped with\n\
 echo control, the echo control device is enabled."
@@ -13012,24 +18697,34 @@ static int
 test_case_7_1_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_7_1_3 test_group_7_1
+#define sgrp_case_7_1_3 NULL
+#define numb_case_7_1_3 "7.1.3"
+#define name_case_7_1_3 "Dual siezure"
+#define xtra_case_7_1_3 NULL
+#define sref_case_7_1_3 NULL
 #define desc_case_7_1_3 "\
-64 kbit/s unrestricted\n\
--- Dual siezure\n\
 Verify that an automatic repeat attempt will be made on detection of dual\n\
 siezure."
 static int
 test_case_7_1_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_7_2 "3.1 kHz audio"
+
+#define tgrp_case_7_2_1 test_group_7_2
+#define sgrp_case_7_2_1 NULL
+#define numb_case_7_2_1 "7.2.1"
+#define name_case_7_2_1 "Successful call setup"
+#define xtra_case_7_2_1 NULL
+#define sref_case_7_2_1 NULL
 #define desc_case_7_2_1 "\
-3.1 kHz audio\n\
--- Successful call setup\n\
 Verify that a 3.1 kHz audio call can be successfully completed using\n\
 appropriate transmission medium requirement and user service information\n\
 parameters."
@@ -13037,48 +18732,66 @@ static int
 test_case_7_2_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_7_3 "Multirate connection types"
+
+#define tgrp_case_7_3_1 test_group_7_3
+#define sgrp_case_7_3_1 NULL
+#define numb_case_7_3_1 "7.3.1"
+#define name_case_7_3_1 "Successful multirate outgoing call setup"
+#define xtra_case_7_3_1 NULL
+#define sref_case_7_3_1 NULL
 #define desc_case_7_3_1 "\
-Multirate connection types\n\
--- Successful multirate outgoing call setup\n\
 Verify that SP A is able to set up an outgoing call with a multirate bearer\n\
 service."
 static int
 test_case_7_3_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_7_3_2 test_group_7_3
+#define sgrp_case_7_3_2 NULL
+#define numb_case_7_3_2 "7.3.2"
+#define name_case_7_3_2 "Successful multirate incoming call setup"
+#define xtra_case_7_3_2 NULL
+#define sref_case_7_3_2 NULL
 #define desc_case_7_3_2 "\
-Multirate connection types\n\
--- Successful multirate incoming call setup\n\
 Verify that SP A is able to handle an incoming call with a multirate bearer\n\
 service."
 static int
 test_case_7_3_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_7_3_3 test_group_7_3
+#define sgrp_case_7_3_3 NULL
+#define numb_case_7_3_3 "7.3.3"
+#define name_case_7_3_3 "Unsuccessful multirate incoming call setup -- one circuit already busy"
+#define xtra_case_7_3_3 NULL
+#define sref_case_7_3_3 NULL
 #define desc_case_7_3_3 "\
-Multirate connection types\n\
--- Unsuccessful multirate incoming call setup -- one circuit already busy\n\
 Verify that a 1920 kbit/s multirate call is rejected by SP A is one of the\n\
 circuits necessary for the call is already busy."
 static int
 test_case_7_3_3(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_7_3_4 test_group_7_3
+#define sgrp_case_7_3_4 NULL
+#define numb_case_7_3_4 "7.3.4"
+#define name_case_7_3_4 "Dual seizure of different connection types: Controlling exchange"
+#define xtra_case_7_3_4 NULL
+#define sref_case_7_3_4 NULL
 #define desc_case_7_3_4 "\
-Multirate connection types\n\
--- Dual seizure of different connection types: Controlling exchange\n\
 Verify that SP A is able to detect dual seizure for calls for different\n\
 multirate connection types and it completes the call involving the greater\n\
 number of circuits."
@@ -13086,12 +18799,16 @@ static int
 test_case_7_3_4(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_7_3_5 test_group_7_3
+#define sgrp_case_7_3_5 NULL
+#define numb_case_7_3_5 "7.3.5"
+#define name_case_7_3_5 "Dual seizure of connection types: Non-controlling exchange"
+#define xtra_case_7_3_5 NULL
+#define sref_case_7_3_5 NULL
 #define desc_case_7_3_5 "\
-Multirate connection types\n\
--- Dual seizure of connection types: Non-controlling exchange\n\
 Verify that SP A is able to detect dual seizure for calls of different\n\
 multirate connection types and it reattempts the call involving the smaller\n\
 number of circuits."
@@ -13099,25 +18816,33 @@ static int
 test_case_7_3_5(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_7_3_6 test_group_7_3
+#define sgrp_case_7_3_6 NULL
+#define numb_case_7_3_6 "7.3.6"
+#define name_case_7_3_6 "Abnormal procedure, Multirate connection types call sent to an exchange not supporting the procedure"
+#define xtra_case_7_3_6 NULL
+#define sref_case_7_3_6 NULL
 #define desc_case_7_3_6 "\
-Multirate connection types\n\
--- Abnormal procedure, Multirate connection types call sent to an exchange not\n\
-   supporting the procedure\n\
 Verify that SP A is able to release the call."
 static int
 test_case_7_3_6(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_8_1 "Automatic congestion control"
+
+#define tgrp_case_8_1_1 test_group_8_1
+#define sgrp_case_8_1_1 NULL
+#define numb_case_8_1_1 "8.1.1"
+#define name_case_8_1_1 "Receipt of a release message containing an automatic congestion level parameter"
+#define xtra_case_8_1_1 NULL
+#define sref_case_8_1_1 NULL
 #define desc_case_8_1_1 "\
-Automatic congestion control\n\
--- Receipt of a release message containing an automatic congestion level\n\
-   parameter\n\
 Verify that the adjacent exchange (SP A), after receiving a release message\n\
 containing an automatic congestion level parameter reduces the traffic to the\n\
 overload affected exchange (SP B)."
@@ -13125,25 +18850,34 @@ static int
 test_case_8_1_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_8_1_2 test_group_8_1
+#define sgrp_case_8_1_2 NULL
+#define numb_case_8_1_2 "8.1.2"
+#define name_case_8_1_2 "Sending of a release message containing an automatic congestion level parameter"
+#define xtra_case_8_1_2 NULL
+#define sref_case_8_1_2 NULL
 #define desc_case_8_1_2 "\
-Automatic congestion control\n\
--- Sending of a release message containing an automatic congestion level\n\
-   parameter\n\
 Verify that the SP A is able to send a release message containing an automatic\n\
 congestion level parameter."
 static int
 test_case_8_1_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define test_group_8_2 "ISUP availability control"
+
+#define tgrp_case_8_2_1 test_group_8_2
+#define sgrp_case_8_2_1 NULL
+#define numb_case_8_2_1 "8.2.1"
+#define name_case_8_2_1 "Receipt of an UPT"
+#define xtra_case_8_2_1 NULL
+#define sref_case_8_2_1 NULL
 #define desc_case_8_2_1 "\
-ISUP availability control\n\
--- Receipt of an UPT\n\
 Verify that on receipt of a user part test message SP A will respond by\n\
 sending a user part available message."
 static int
@@ -13152,13 +18886,17 @@ test_case_8_2_1(void)
 	state = 0;
 	send(UPT);
 	if (any_event() != UPA)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_8_2_2 test_group_8_2
+#define sgrp_case_8_2_2 NULL
+#define numb_case_8_2_2 "8.2.2"
+#define name_case_8_2_2 "Sending of a UPT"
+#define xtra_case_8_2_2 NULL
+#define sref_case_8_2_2 NULL
 #define desc_case_8_2_2 "\
-ISUP availability control\n\
--- Sending of a UPT\n\
 Verify that SP A is able to send a user part test message."
 static int
 test_case_8_2_2(void)
@@ -13167,24 +18905,28 @@ test_case_8_2_2(void)
 	send(USER_PART_UNAVAILABLE);
 	state = 1;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != UPT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	send(UPA);
 	state = 4;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
+#define tgrp_case_8_2_3 test_group_8_2
+#define sgrp_case_8_2_3 NULL
+#define numb_case_8_2_3 "8.2.3"
+#define name_case_8_2_3 "T4: failure to receive a response to a UPT"
+#define xtra_case_8_2_3 NULL
+#define sref_case_8_2_3 NULL
 #define desc_case_8_2_3 "\
-ISUP availability control\n\
--- T4: failure to receive a response to a UPT\n\
 Verify that SP A is able to restart the availability test procedure after the\n\
 expiry of timer T4."
 static int
@@ -13196,921 +18938,346 @@ test_case_8_2_3(void)
 	send(USER_PART_UNAVAILABLE);
 	state = 1;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 2;
 	if (pt_event() != UPT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 3;
 	upt_time = now();
 	t4_time = milliseconds("  T4  ");
 	state = 4;
 	start_st(timer[t4].hi);
 	if (pt_event() != UPT)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 5;
 	upt_time = now();
-	if (check_time("  T4  ", upt_time - t4_time, timer[t4].lo, timer[t4].hi) != SUCCESS)
+	if (check_time("  T4  ", upt_time - t4_time, timer[t4].lo, timer[t4].hi) != __RESULT_SUCCESS)
 		goto failure;
 	state = 6;
 	send(UPA);
 	state = 7;
 	if (mnt_event() != MGM_MAINT_IND)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	state = 8;
 	if (wait_event(0, ANY) != NO_MSG)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
       failure:
 	send(UPA);
-	return FAILURE;
+	return __RESULT_FAILURE;
 }
 
+#define test_group_9_1 "Echo control procedures according to Q.767"
+
+#define tgrp_case_9_1_1 test_group_9_1
+#define sgrp_case_9_1_1 NULL
+#define numb_case_9_1_1 "9.1.1"
+#define name_case_9_1_1 "Q.767 echo control procedure for call set up (initiated in SP A)"
+#define xtra_case_9_1_1 NULL
+#define sref_case_9_1_1 NULL
 #define desc_case_9_1_1 "\
-Echo control procedures according to Q.767\n\
--- Q.767 echo control procedure for call set up (initiated in SP A)\n\
 Verify that a call can be successfully established with the inclusion of echo\n\
 control devices."
 static int
 test_case_9_1_1(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
+#define tgrp_case_9_1_2 test_group_9_1
+#define sgrp_case_9_1_2 NULL
+#define numb_case_9_1_2 "9.1.2"
+#define name_case_9_1_2 "Q.767 echo control procedure for call set up (initiated in SP B)"
+#define xtra_case_9_1_2 NULL
+#define sref_case_9_1_2 NULL
 #define desc_case_9_1_2 "\
-Echo control procedures according to Q.767\n\
--- Q.767 echo control procedure for call set up (initiated in SP B)\n\
 Verify that a call can be successfully established, if SP A does not include\n\
 an outgoing half echo control device."
 static int
 test_case_9_1_2(void)
 {
 	state = 0;
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 
-static int
-pt_open(void)
-{
-	int pfd[2];
-
-	if (verbose > 1) {
-		printf("                    .  .                            X--X---pipe()           (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if ((pipe(pfd) < 0)) {
-		printf("                                              ****ERROR: pipe failed\n");
-		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	pt_fd = pfd[0];
-	pt_lnk_fd = pfd[1];
-	if (verbose > 1) {
-		printf("                    .  .                            |  |<--I_SRDOPT---------(%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(pt_fd, I_SRDOPT, RMSGD) < 0) {
-		printf("                                              ****ERROR: ioctl failed\n");
-		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("                    .  .                            |  |<--I_PUSH-----------(%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(pt_fd, I_PUSH, "pipemod") < 0) {
-		printf("                                              ****ERROR: push failed\n");
-		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	return SUCCESS;
-}
-
-static int
-pt_close(void)
-{
-	if (verbose > 1) {
-		printf("                    .  .                            |  |<--I_POP------------(%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(pt_fd, I_POP, 0) < 0) {
-		printf("                                              ****ERROR: pop failed\n");
-		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("                    .  .                            X--X---close()          (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (close(pt_fd) < 0) {
-		printf("                                              ****ERROR: close pipe[0] failed\n");
-		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (close(pt_lnk_fd) < 0) {
-		printf("                                              ****ERROR: close pipe[1] failed\n");
-		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	return SUCCESS;
-}
-
-static int
-pt_start(void)
-{
-	if (pt_open() != SUCCESS)
-		return FAILURE;
-	return SUCCESS;
-}
-
-static int
-pt_stop(void)
-{
-	if (pt_close() != SUCCESS)
-		return FAILURE;
-	return SUCCESS;
-}
-
-/* 
- *  IUT Intitialization and Configuration
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Test case child scheduler
+ *
+ *  -------------------------------------------------------------------------
  */
-static int
-iut_open(void)
+int
+run_stream(int child, struct test_stream *stream)
 {
-	if (verbose > 1) {
-		printf("---open()-----------X  .                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if ((iut_cpc_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
-		printf("***************ERROR: open failed\n");
-		printf("                    : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---open()-tst-------+--X                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if ((iut_tst_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
-		printf("******************ERROR: open tst failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---open()-mgm-------+--X                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if ((iut_mgm_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
-		printf("******************ERROR: open mgm failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---open()-mnt-------+--X                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if ((iut_mnt_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
-		printf("******************ERROR: open mnt failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---I_SRDOPT-------->|  |                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_cpc_fd, I_SRDOPT, RMSGD) < 0) {
-		printf("***************ERROR: ioctl failed\n");
-		printf("                    : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---I_SRDOPT-tst-----+->|                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_tst_fd, I_SRDOPT, RMSGD) < 0) {
-		printf("******************ERROR: ioctl tst failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---I_SRDOPT-mgm-----+->|                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_SRDOPT, RMSGD) < 0) {
-		printf("******************ERROR: ioctl mgm failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---I_SRDOPT-mnt-----+->|                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mnt_fd, I_SRDOPT, RMSGD) < 0) {
-		printf("******************ERROR: ioctl mnt failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	return SUCCESS;
-}
+	int result = __RESULT_SCRIPT_ERROR;
+	int pre_result = __RESULT_SCRIPT_ERROR;
+	int post_result = __RESULT_SCRIPT_ERROR;
 
-static int
-iut_close(void)
-{
-	if (verbose > 1) {
-		printf("---close()----------+--X                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (close(iut_mnt_fd) < 0) {
-		printf("******************ERROR: close mnt failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---close()----------+--X                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (close(iut_mgm_fd) < 0) {
-		printf("******************ERROR: close mgm failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---close()----------+--X                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (close(iut_tst_fd) < 0) {
-		printf("******************ERROR: close tst failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	if (verbose > 1) {
-		printf("---close()----------X  .                            |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (close(iut_cpc_fd) < 0) {
-		printf("***************ERROR: close cpc failed\n");
-		printf("                    : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	return SUCCESS;
-}
+	oldact = 0;		/* previous action for this child */
+	cntact = 0;		/* count of this action for this child */
+	oldevt = 0;		/* previous return for this child */
+	cntevt = 0;		/* count of this return for this child */
 
-static int
-iut_config(void)
-{
-	int i;
-	struct strioctl ioc;
-	struct {
-		struct isup_config conf;
-		struct isup_conf_sp sp;
-	} conf_sp;
-	struct {
-		struct isup_config conf;
-		struct isup_conf_sr sr;
-	} conf_sr;
-	struct {
-		struct isup_config conf;
-		struct isup_conf_tg tg;
-	} conf_tg;
-	struct {
-		struct isup_config conf;
-		struct isup_conf_cg cg;
-	} conf_cg;
-	struct {
-		struct isup_config conf;
-		struct isup_conf_ct ct;
-	} conf_ct;
-
-	conf_sp.conf.type = ISUP_OBJ_TYPE_SP;
-	conf_sp.conf.id = 1;
-	conf_sp.conf.cmd = ISUP_ADD;
-	conf_sp.sp.add = loc_addr;
-	conf_sp.sp.proto.pvar = SS7_PVAR_ITUT_96;
-	conf_sp.sp.proto.popt = SS7_POPT_UPT;
-	ioc.ic_cmd = ISUP_IOCSCONFIG;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(conf_sp);
-	ioc.ic_dp = (char *) &conf_sp;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD sp = 1)          |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: adding sp=1\n");
-		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	conf_sr.conf.type = ISUP_OBJ_TYPE_SR;
-	conf_sr.conf.id = 1;
-	conf_sr.conf.cmd = ISUP_ADD;
-	conf_sr.sr.spid = 1;
-	conf_sr.sr.add = rem_addr;
-	conf_sr.sr.proto.pvar = SS7_PVAR_ITUT_96;
-	conf_sr.sr.proto.popt = SS7_POPT_UPT;
-	ioc.ic_cmd = ISUP_IOCSCONFIG;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(conf_sr);
-	ioc.ic_dp = (char *) &conf_sr;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD sr = 1)          |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: adding sr=1\n");
-		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	conf_tg.conf.type = ISUP_OBJ_TYPE_TG;
-	conf_tg.conf.id = 1;
-	conf_tg.conf.cmd = ISUP_ADD;
-	conf_tg.tg.srid = 1;
-	conf_tg.tg.proto.pvar = SS7_PVAR_ITUT_96;
-	conf_tg.tg.proto.popt = SS7_POPT_UPT;
-	ioc.ic_cmd = ISUP_IOCSCONFIG;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(conf_tg);
-	ioc.ic_dp = (char *) &conf_tg;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD tg = 1)          |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: adding tg=1\n");
-		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	conf_cg.conf.type = ISUP_OBJ_TYPE_CG;
-	conf_cg.conf.id = 1;
-	conf_cg.conf.cmd = ISUP_ADD;
-	conf_cg.cg.srid = 1;
-	conf_cg.cg.proto.pvar = SS7_PVAR_ITUT_96;
-	conf_cg.cg.proto.popt = SS7_POPT_UPT;
-	ioc.ic_cmd = ISUP_IOCSCONFIG;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(conf_cg);
-	ioc.ic_dp = (char *) &conf_cg;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD cg = 1)          |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: adding cg=1\n");
-		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	ioc.ic_cmd = ISUP_IOCSCONFIG;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(conf_ct);
-	ioc.ic_dp = (char *) &conf_ct;
-	for (i = 1; i < 32; i++) {
-		if (i == 16)
-			continue;
-		conf_ct.conf.type = ISUP_OBJ_TYPE_CT;
-		conf_ct.conf.id = i;
-		conf_ct.conf.cmd = ISUP_ADD;
-		conf_ct.ct.cgid = 1;
-		conf_ct.ct.tgid = 1;
-		conf_ct.ct.cic = i;
-		if (verbose > 2) {
-			printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD ct = %2d)         |  |                    (%d)\n", state, i);
-			FFLUSH(stdout);
+	print_preamble(child);
+	state = 100;
+	failure_string = NULL;
+	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
+		switch (pre_result) {
+		case __RESULT_NOTAPPL:
+			print_notapplicable(child);
+			result = __RESULT_NOTAPPL;
+			break;
+		case __RESULT_SKIPPED:
+			print_skipped(child);
+			result = __RESULT_SKIPPED;
+			break;
+		default:
+			print_inconclusive(child);
+			result = __RESULT_INCONCLUSIVE;
+			break;
 		}
-		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-			printf("******************ERROR: adding ct=%d\n", i);
-			printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-			FFLUSH(stdout);
-			return FAILURE;
+	} else {
+		print_test(child);
+		state = 200;
+		failure_string = NULL;
+		switch (stream->testcase(child)) {
+		default:
+		case __RESULT_INCONCLUSIVE:
+			print_inconclusive(child);
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_NOTAPPL:
+			print_notapplicable(child);
+			result = __RESULT_NOTAPPL;
+			break;
+		case __RESULT_SKIPPED:
+			print_skipped(child);
+			result = __RESULT_SKIPPED;
+			break;
+		case __RESULT_FAILURE:
+			print_failed(child);
+			result = __RESULT_FAILURE;
+			break;
+		case __RESULT_SCRIPT_ERROR:
+			print_script_error(child);
+			result = __RESULT_SCRIPT_ERROR;
+			break;
+		case __RESULT_SUCCESS:
+			print_passed(child);
+			result = __RESULT_SUCCESS;
+			break;
+		}
+		print_postamble(child);
+		state = 300;
+		failure_string = NULL;
+		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
+			switch (post_result) {
+			case __RESULT_NOTAPPL:
+				print_notapplicable(child);
+				result = __RESULT_NOTAPPL;
+				break;
+			case __RESULT_SKIPPED:
+				print_skipped(child);
+				result = __RESULT_SKIPPED;
+				break;
+			default:
+				print_inconclusive(child);
+				if (result == __RESULT_SUCCESS)
+					result = __RESULT_INCONCLUSIVE;
+				break;
+			}
 		}
 	}
-	return SUCCESS;
+	print_test_end(child);
+	exit(result);
 }
 
-static int
-iut_unconfig(void)
-{
-	int i;
-	struct isup_config conf;
-	struct strioctl ioc = { ISUP_IOCCCONFIG, 0, sizeof(conf), (char *) &conf };
+/*
+ *  Fork multiple children to do the actual testing.
+ *  The conn child (child[0]) is the connecting process, the resp child
+ *  (child[1]) is the responding process.
+ */
 
-	for (i = 1; i < 32; i++) {
-		if (i == 16)
-			continue;
-		conf.type = ISUP_OBJ_TYPE_CT;
-		conf.id = i;
-		conf.cmd = ISUP_DEL;
-		if (verbose > 2) {
-			printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL ct = %2d)         |  |                    (%d)\n", i, state);
-			FFLUSH(stdout);
+int
+test_run(struct test_stream *stream[], ulong duration)
+{
+	int children = 0;
+	pid_t this_child, child[3] = { 0, };
+	int this_status, status[3] = { 0, };
+
+	if (start_tt(duration) != __RESULT_SUCCESS)
+		goto inconclusive;
+	if (server_exec && stream[2]) {
+		switch ((child[2] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
+		case -1:	/* error */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			if (child[1])
+				kill(child[1], SIGKILL);	/* toast stream[1] child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
 		}
-		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-			printf("******************ERROR: deleting ct=%d\n", i);
-			printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-			FFLUSH(stdout);
-			return FAILURE;
+	} else
+		status[2] = __RESULT_SUCCESS;
+	if (server_exec && stream[1]) {
+		switch ((child[1] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
+		case -1:	/* error */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
 		}
-	}
-	conf.type = ISUP_OBJ_TYPE_CG;
-	conf.id = 1;
-	conf.cmd = ISUP_DEL;
-	if (verbose > 2) {
-		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL cg = 1)          |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: deleting cg=%d\n", 1);
-		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	conf.type = ISUP_OBJ_TYPE_TG;
-	conf.id = 1;
-	conf.cmd = ISUP_DEL;
-	if (verbose > 2) {
-		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL tg = 1)          |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: deleting tg=%d\n", 1);
-		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	conf.type = ISUP_OBJ_TYPE_SR;
-	conf.id = 1;
-	conf.cmd = ISUP_DEL;
-	if (verbose > 2) {
-		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL sr = 1)          |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: deleting sr=%d\n", 1);
-		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	conf.type = ISUP_OBJ_TYPE_SP;
-	conf.id = 1;
-	conf.cmd = ISUP_DEL;
-	if (verbose > 2) {
-		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL sp = 1)          |  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: deleting sp=%d\n", 1);
-		printf("                       : %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	return SUCCESS;
-}
-
-static int
-iut_link(void)
-{
-	struct {
-		struct isup_config config;
-		struct isup_conf_mtp mtp;
-	} conf;
-	struct strioctl ioc;
-
-	if (verbose > 1) {
-		printf("---I_LINK-----------+->|<---------------------------X  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if ((pt_lnk_id = ioctl(iut_mgm_fd, I_LINK, pt_lnk_fd)) == -1) {
-		printf("***************** ERROR: link failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	conf.config.type = ISUP_OBJ_TYPE_MT;
-	conf.config.id = 1;
-	conf.config.cmd = ISUP_ADD;
-	conf.mtp.spid = 1;
-	conf.mtp.srid = 1;
-	conf.mtp.muxid = pt_lnk_id;
-	conf.mtp.proto.pvar = SS7_PVAR_ITUT_96;
-	conf.mtp.proto.popt = 0;
-	ioc.ic_cmd = ISUP_IOCSCONFIG;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(conf);
-	ioc.ic_dp = (char *) &conf;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSCONFIG--+->| ISUP_ADD (mtp = 1)            |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("***************** ERROR: config failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	return SUCCESS;
-}
-
-static int
-iut_unlink(void)
-{
-#if 0
-	struct isup_config conf;
-	struct strioctl ioc;
-
-	conf.type = ISUP_OBJ_TYPE_MT;
-	conf.id = 1;
-	conf.cmd = ISUP_DEL;
-	ioc.ic_cmd = ISUP_IOCCCONFIG;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(conf);
-	ioc.ic_dp = (char *) &conf;
-	if (verbose > 2) {
-		printf("---ISUP_IOCCCONFIG--+->| ISUP_DEL (mtp = 1)            |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("******************ERROR: config failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-#endif
-	if (verbose > 1) {
-		printf("---I_UNLINK---------+->|<---------------------------X  |                    (%d)\n", state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_UNLINK, pt_lnk_id) < 0) {
-		printf("******************ERROR: unlink failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	return SUCCESS;
-}
-
-static int
-iut_option(void)
-{
-	int i;
-	struct {
-		struct isup_option hdr;
-		union {
-			struct isup_opt_conf_ct ct_opt;
-			struct isup_opt_conf_cg cg_opt;
-			struct isup_opt_conf_tg tg_opt;
-			struct isup_opt_conf_sr sr_opt;
-			struct isup_opt_conf_sp sp_opt;
-			struct isup_opt_conf_mtp mtp_opt;
-			struct isup_opt_conf_df df_opt;
-		} opts;
-	} opt;
-	struct strioctl ioc;
-
-	/* circuit options */
-	opt.opts.ct_opt = iut_ct_opt;
-	ioc.ic_cmd = ISUP_IOCSOPTIONS;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.ct_opt);
-	ioc.ic_dp = (char *) &opt;
-	for (i = 1; i < 32; i++) {
-		if (i == 16)
-			continue;
-		opt.hdr.type = ISUP_OBJ_TYPE_CT;
-		opt.hdr.id = i;
-		if (verbose > 2) {
-			printf("---ISUP_IOCSOPTIONS-+->| ct id = %2d                    |                    (%d)\n", i, state);
-			FFLUSH(stdout);
+	} else
+		status[1] = __RESULT_SUCCESS;
+	if (client_exec && stream[0]) {
+		switch ((child[0] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
+		case -1:	/* error */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
 		}
-		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-			printf("***************** ERROR: set option failed\n");
-			printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-			FFLUSH(stdout);
-			return FAILURE;
+	} else
+		status[0] = __RESULT_SUCCESS;
+	for (; children > 0; children--) {
+	      waitagain:
+		if ((this_child = wait(&this_status)) > 0) {
+			if (WIFEXITED(this_status)) {
+				if (this_child == child[0]) {
+					child[0] = 0;
+					if ((status[0] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[1])
+							kill(child[1], SIGKILL);
+						if (child[2])
+							kill(child[2], SIGKILL);
+					}
+				}
+				if (this_child == child[1]) {
+					child[1] = 0;
+					if ((status[1] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[0])
+							kill(child[0], SIGKILL);
+						if (child[2])
+							kill(child[2], SIGKILL);
+					}
+				}
+				if (this_child == child[2]) {
+					child[2] = 0;
+					if ((status[2] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[0])
+							kill(child[0], SIGKILL);
+						if (child[1])
+							kill(child[1], SIGKILL);
+					}
+				}
+			} else if (WIFSIGNALED(this_status)) {
+				int signal = WTERMSIG(this_status);
+
+				if (this_child == child[0]) {
+					print_terminated(0, signal);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					child[0] = 0;
+				}
+				if (this_child == child[1]) {
+					print_terminated(1, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					child[1] = 0;
+				}
+				if (this_child == child[2]) {
+					print_terminated(2, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					child[2] = 0;
+				}
+			} else if (WIFSTOPPED(this_status)) {
+				int signal = WSTOPSIG(this_status);
+
+				if (this_child == child[0]) {
+					print_stopped(0, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[0] = __RESULT_FAILURE;
+					child[0] = 0;
+				}
+				if (this_child == child[1]) {
+					print_stopped(1, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[1] = __RESULT_FAILURE;
+					child[1] = 0;
+				}
+				if (this_child == child[2]) {
+					print_stopped(2, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[2] = __RESULT_FAILURE;
+					child[2] = 0;
+				}
+			}
+		} else {
+			if (timer_timeout) {
+				timer_timeout = 0;
+				print_timeout(3);
+			}
+			if (child[0])
+				kill(child[0], SIGKILL);
+			if (child[1])
+				kill(child[1], SIGKILL);
+			if (child[2])
+				kill(child[2], SIGKILL);
+			goto waitagain;
 		}
 	}
-	/* circuit group options */
-	opt.opts.cg_opt = iut_cg_opt;
-	opt.hdr.type = ISUP_OBJ_TYPE_CG;
-	opt.hdr.id = 1;
-	ioc.ic_cmd = ISUP_IOCSOPTIONS;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.cg_opt);
-	ioc.ic_dp = (char *) &opt;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSOPTIONS-+->| cg id = %2d                    |                    (%d)\n", 1, state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("***************** ERROR: set option failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	/* trunk group options */
-	opt.opts.tg_opt = iut_tg_opt;
-	if (timer_scale > 1) {
-		/* scale timers down by scaling factor */
-		opt.opts.tg_opt.t1 = iut_tg_opt.t1 / timer_scale;	/* waiting for RLC retry */
-		opt.opts.tg_opt.t2 = iut_tg_opt.t2 / timer_scale;	/* waiting for RES */
-		opt.opts.tg_opt.t3 = iut_tg_opt.t3 / timer_scale;	/* waiting OVL timeout */
-		opt.opts.tg_opt.t5 = iut_tg_opt.t5 / timer_scale;	/* waiting for RLC
-									   maintenance */
-		opt.opts.tg_opt.t6 = iut_tg_opt.t6 / timer_scale;	/* waiting for RES */
-		opt.opts.tg_opt.t7 = iut_tg_opt.t7 / timer_scale;	/* waiting for ACM/ANM/CON */
-		opt.opts.tg_opt.t8 = iut_tg_opt.t8 / timer_scale;	/* waiting for COT */
-		opt.opts.tg_opt.t9 = iut_tg_opt.t9 / timer_scale;	/* waiting for ANM/CON */
-		opt.opts.tg_opt.t10 = iut_tg_opt.t10 / timer_scale;	/* waiting more
-									   information.
-									   Interworking */
-		opt.opts.tg_opt.t11 = iut_tg_opt.t11 / timer_scale;	/* waiting for ACM,
-									   Interworking */
-		opt.opts.tg_opt.t12 = iut_tg_opt.t12 / timer_scale;	/* waiting for BLA retry */
-		opt.opts.tg_opt.t13 = iut_tg_opt.t13 / timer_scale;	/* waiting for BLA
-									   maintenance */
-		opt.opts.tg_opt.t14 = iut_tg_opt.t14 / timer_scale;	/* waiting for UBA retry */
-		opt.opts.tg_opt.t15 = iut_tg_opt.t15 / timer_scale;	/* waiting for UBA
-									   maintenance */
-		opt.opts.tg_opt.t16 = iut_tg_opt.t16 / timer_scale;	/* waiting for RLC retry */
-		opt.opts.tg_opt.t17 = iut_tg_opt.t17 / timer_scale;	/* waiting for RLC
-									   maintenance */
-		opt.opts.tg_opt.t24 = iut_tg_opt.t24 / timer_scale;	/* waiting for continuity
-									   IAM */
-		opt.opts.tg_opt.t25 = iut_tg_opt.t25 / timer_scale;	/* waiting for continuity
-									   CCR retry */
-		opt.opts.tg_opt.t26 = iut_tg_opt.t26 / timer_scale;	/* waiting for continuity
-									   CCR maintenance */
-		opt.opts.tg_opt.t27 = iut_tg_opt.t27 / timer_scale;	/* waiting for COT reset */
-		opt.opts.tg_opt.t31 = iut_tg_opt.t31 / timer_scale;	/* call reference guard */
-		opt.opts.tg_opt.t32 = iut_tg_opt.t32 / timer_scale;	/* waiting to send E2E
-									   message */
-		opt.opts.tg_opt.t33 = iut_tg_opt.t33 / timer_scale;	/* waiting for INF */
-		opt.opts.tg_opt.t34 = iut_tg_opt.t34 / timer_scale;	/* waiting for SEG */
-		opt.opts.tg_opt.t35 = iut_tg_opt.t35 / timer_scale;	/* waiting more
-									   information. */
-		opt.opts.tg_opt.t36 = iut_tg_opt.t36 / timer_scale;	/* waiting for COT/REL */
-		opt.opts.tg_opt.t37 = iut_tg_opt.t37 / timer_scale;	/* waiting echo control
-									   device */
-		opt.opts.tg_opt.t38 = iut_tg_opt.t38 / timer_scale;	/* waiting for RES */
-		opt.opts.tg_opt.tacc_r = iut_tg_opt.tacc_r / timer_scale;	/* */
-		opt.opts.tg_opt.tccr = iut_tg_opt.tccr / timer_scale;	/* */
-		opt.opts.tg_opt.tccr_r = iut_tg_opt.tccr_r / timer_scale;	/* */
-		opt.opts.tg_opt.tcra = iut_tg_opt.tcra / timer_scale;	/* */
-		opt.opts.tg_opt.tcrm = iut_tg_opt.tcrm / timer_scale;	/* */
-		opt.opts.tg_opt.tcvt = iut_tg_opt.tcvt / timer_scale;	/* */
-		opt.opts.tg_opt.texm_d = iut_tg_opt.texm_d / timer_scale;	/* */
-	}
-	opt.hdr.type = ISUP_OBJ_TYPE_TG;
-	opt.hdr.id = 1;
-	ioc.ic_cmd = ISUP_IOCSOPTIONS;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.tg_opt);
-	ioc.ic_dp = (char *) &opt;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSOPTIONS-+->| tg id = %2d                    |                    (%d)\n", 1, state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("***************** ERROR: set option failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	/* signalling relation options */
-	opt.opts.sr_opt = iut_sr_opt;
-	if (timer_scale > 1) {
-		opt.opts.sr_opt.t4 = iut_sr_opt.t4 / timer_scale;	/* waiting for UPA/other */
-		opt.opts.sr_opt.t18 = iut_sr_opt.t18 / timer_scale;	/* waiting CGBA retry */
-		opt.opts.sr_opt.t19 = iut_sr_opt.t19 / timer_scale;	/* waiting CGBA maintenance 
-									 */
-		opt.opts.sr_opt.t20 = iut_sr_opt.t20 / timer_scale;	/* waiting CGUA retry */
-		opt.opts.sr_opt.t21 = iut_sr_opt.t21 / timer_scale;	/* waiting CGUA maintenance 
-									 */
-		opt.opts.sr_opt.t22 = iut_sr_opt.t22 / timer_scale;	/* waiting GRA retry */
-		opt.opts.sr_opt.t23 = iut_sr_opt.t23 / timer_scale;	/* waiting GRA maintenance */
-		opt.opts.sr_opt.t28 = iut_sr_opt.t28 / timer_scale;	/* waiting CQR */
-		opt.opts.sr_opt.t29 = iut_sr_opt.t29 / timer_scale;	/* congestion attack timer */
-		opt.opts.sr_opt.t30 = iut_sr_opt.t30 / timer_scale;	/* congestion decay timer */
-		opt.opts.sr_opt.tcgb = iut_sr_opt.tcgb / timer_scale;	/* */
-		opt.opts.sr_opt.tgrs = iut_sr_opt.tgrs / timer_scale;	/* */
-		opt.opts.sr_opt.thga = iut_sr_opt.thga / timer_scale;	/* */
-		opt.opts.sr_opt.tscga = iut_sr_opt.tscga / timer_scale;	/* */
-		opt.opts.sr_opt.tscga_d = iut_sr_opt.tscga_d / timer_scale;	/* */
-	}
-	opt.hdr.type = ISUP_OBJ_TYPE_SR;
-	opt.hdr.id = 1;
-	ioc.ic_cmd = ISUP_IOCSOPTIONS;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.sr_opt);
-	ioc.ic_dp = (char *) &opt;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSOPTIONS-+->| sr id = %2d                    |                    (%d)\n", 1, state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("***************** ERROR: set option failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	/* signalling point options */
-	opt.opts.sp_opt = iut_sp_opt;
-	opt.hdr.type = ISUP_OBJ_TYPE_SP;
-	opt.hdr.id = 1;
-	ioc.ic_cmd = ISUP_IOCSOPTIONS;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.sp_opt);
-	ioc.ic_dp = (char *) &opt;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSOPTIONS-+->| sp id = %2d                    |                    (%d)\n", 1, state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("***************** ERROR: set option failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	/* message transfer part options */
-	opt.opts.mtp_opt = iut_mtp_opt;
-	opt.hdr.type = ISUP_OBJ_TYPE_MT;
-	opt.hdr.id = 1;
-	ioc.ic_cmd = ISUP_IOCSOPTIONS;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.mtp_opt);
-	ioc.ic_dp = (char *) &opt;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSOPTIONS-+->| mtp id = %2d                   |                    (%d)\n", 1, state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("***************** ERROR: set option failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	/* default options */
-	opt.opts.df_opt = iut_df_opt;
-	opt.hdr.type = ISUP_OBJ_TYPE_DF;
-	opt.hdr.id = 0;
-	ioc.ic_cmd = ISUP_IOCSOPTIONS;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.df_opt);
-	ioc.ic_dp = (char *) &opt;
-	if (verbose > 2) {
-		printf("---ISUP_IOCSOPTIONS-+->| df id = %2d                    |                    (%d)\n", 0, state);
-		FFLUSH(stdout);
-	}
-	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
-		printf("***************** ERROR: set option failed\n");
-		printf("                       : %s; %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
-		return FAILURE;
-	}
-	return SUCCESS;
-};
-
-static int
-iut_bind(void)
-{
-	mprim.addr.add.scope = iut_tst_addr.scope;
-	mprim.addr.add.id = iut_tst_addr.id;
-	mprim.addr.add.cic = iut_tst_addr.cic;
-	mprim.addr.len = sizeof(mprim.addr.add);
-	mprim.bind_flags = CC_TOKEN_REQUEST | CC_TEST;
-	iut_tst_signal(BIND_REQ);
-	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_tst_addr.scope || mprim.addr.add.id != iut_tst_addr.id || mprim.addr.add.cic != iut_tst_addr.cic)
-		return FAILURE;
-	mprim.addr.add.scope = iut_mgm_addr.scope;
-	mprim.addr.add.id = iut_mgm_addr.id;
-	mprim.addr.add.cic = iut_mgm_addr.cic;
-	mprim.addr.len = sizeof(mprim.addr.add);
-	mprim.bind_flags = CC_TOKEN_REQUEST | CC_MANAGEMENT;
-	iut_mgm_signal(BIND_REQ);
-	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_mgm_addr.scope || mprim.addr.add.id != iut_mgm_addr.id || mprim.addr.add.cic != iut_mgm_addr.cic)
-		return FAILURE;
-	mprim.addr.add.scope = iut_mnt_addr.scope;
-	mprim.addr.add.id = iut_mnt_addr.id;
-	mprim.addr.add.cic = iut_mnt_addr.cic;
-	mprim.addr.len = sizeof(mprim.addr.add);
-	mprim.bind_flags = CC_TOKEN_REQUEST | CC_MAINTENANCE;
-	iut_mnt_signal(BIND_REQ);
-	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_mnt_addr.scope || mprim.addr.add.id != iut_mnt_addr.id || mprim.addr.add.cic != iut_mnt_addr.cic)
-		return FAILURE;
-	cprim.addr.add.scope = iut_cpc_addr.scope;
-	cprim.addr.add.id = iut_cpc_addr.id;
-	cprim.addr.add.cic = iut_cpc_addr.cic;
-	cprim.addr.len = sizeof(cprim.addr.add);
-	cprim.bind_flags = CC_TOKEN_REQUEST;
-	iut_cpc_signal(BIND_REQ);
-	if (any_event() != CPC_BIND_ACK || cprim.addr.len != sizeof(cprim.addr.add) || cprim.addr.add.scope != iut_cpc_addr.scope || cprim.addr.add.id != iut_cpc_addr.id || cprim.addr.add.cic != iut_cpc_addr.cic)
-		return FAILURE;
-#if 0
-	iut_tst_signal(ADDR_REQ);
-	if (any_event() != MGM_ADDR_ACK)
-		return FAILURE;
-	iut_mgm_signal(ADDR_REQ);
-	if (any_event() != MGM_ADDR_ACK)
-		return FAILURE;
-	iut_mnt_signal(ADDR_REQ);
-	if (any_event() != MGM_ADDR_ACK)
-		return FAILURE;
-	iut_cpc_signal(ADDR_REQ);
-	if (any_event() != CPC_ADDR_ACK)
-		return FAILURE;
-#endif
-	return SUCCESS;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto inconclusive;
+	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
+		return (__RESULT_NOTAPPL);
+	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
+		return (__RESULT_SKIPPED);
+	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE || status[2] == __RESULT_FAILURE)
+		return (__RESULT_FAILURE);
+	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
+		return (__RESULT_SUCCESS);
+      inconclusive:
+	return (__RESULT_INCONCLUSIVE);
 }
 
-static int
-iut_unbind(void)
-{
-	iut_cpc_signal(UNBIND_REQ);
-	if (any_event() != CPC_OK_ACK)
-		return FAILURE;
-	iut_tst_signal(UNBIND_REQ);
-	if (any_event() != MGM_OK_ACK)
-		return FAILURE;
-	iut_mgm_signal(UNBIND_REQ);
-	if (any_event() != MGM_OK_ACK)
-		return FAILURE;
-	iut_mnt_signal(UNBIND_REQ);
-	if (any_event() != MGM_OK_ACK)
-		return FAILURE;
-	return SUCCESS;
-}
-
-static int
-iut_start(void)
-{
-	if (iut_open() != SUCCESS)
-		return FAILURE;
-	if (iut_config() != SUCCESS)
-		return FAILURE;
-	if (iut_link() != SUCCESS)
-		return FAILURE;
-	if (iut_option() != SUCCESS)
-		return FAILURE;
-	if (iut_bind() != SUCCESS)
-		return FAILURE;
-	return SUCCESS;
-}
-
-static int
-iut_stop(void)
-{
-	if (iut_unbind() != SUCCESS)
-		return FAILURE;
-	if (iut_unlink() != SUCCESS)
-		return FAILURE;
-	if (iut_unconfig() != SUCCESS)
-		return FAILURE;
-	if (iut_close() != SUCCESS)
-		return FAILURE;
-	return SUCCESS;
-}
-
-static int
-begin_tests(void)
-{
-	if (pt_start() != SUCCESS)
-		return FAILURE;
-	if (iut_start() != SUCCESS)
-		return FAILURE;
-	show_acks = 1;
-	return SUCCESS;
-}
-
-static int
-end_tests(void)
-{
-	show_acks = 0;
-	if (iut_stop() != SUCCESS)
-		return FAILURE;
-	if (pt_stop() != SUCCESS)
-		return FAILURE;
-	return SUCCESS;
-}
-
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Test case lists
@@ -14120,322 +19287,520 @@ end_tests(void)
 
 struct test_case {
 	const char *numb;		/* test case number */
+	const char *tgrp;		/* test case group */
+	const char *sgrp;		/* test case subgroup */
 	const char *name;		/* test case name */
+	const char *xtra;		/* test case extra information */
+	const char *desc;		/* test case description */
+	const char *sref;		/* test case standards section reference */
 	int (*preamble) (void);		/* test preamble */
 	int (*testcase) (void);		/* test case */
 	int (*postamble) (void);	/* test postamble */
+	ulong duration;			/* maximum duration */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
+	int expect;			/* expected result */
 } tests[] = {
 	{
-	"1.1.", desc_case_1_1, &preamble_0, &test_case_1_1, &postamble_0, 0, 0}, {
-	"1.2.1.", desc_case_1_2_1, &preamble_0, &test_case_1_2_1, &postamble_0, 0, 0}, {
-	"1.2.2.", desc_case_1_2_2, &preamble_0, &test_case_1_2_2, &postamble_0, 0, 0}, {
-	"1.2.3.", desc_case_1_2_3, &preamble_0, &test_case_1_2_3, &postamble_1, 0, 0}, {
-	"1.2.4.", desc_case_1_2_4, &preamble_0, &test_case_1_2_4, &postamble_2, 0, 0}, {
-	"1.2.5a.", desc_case_1_2_5a, &preamble_1, &test_case_1_2_5a, &postamble_1, 0, 0}, {
-	"1.2.5b.", desc_case_1_2_5b, &preamble_0, &test_case_1_2_5b, &postamble_0, 0, 0}, {
-	"1.2.5c.", desc_case_1_2_5c, &preamble_0, &test_case_1_2_5c, &postamble_0, 0, 0}, {
-	"1.2.6.", desc_case_1_2_6, &preamble_0, &test_case_1_2_6, &postamble_0, 0, 0}, {
-	"1.2.7.", desc_case_1_2_7, &preamble_0, &test_case_1_2_7, &postamble_0, 0, 0}, {
-	"1.3.1.1a.", desc_case_1_3_1_1a, &preamble_0, &test_case_1_3_1_1a, &postamble_0, 0, 0}, {
-	"1.3.1.1b.", desc_case_1_3_1_1b, &preamble_0, &test_case_1_3_1_1b, &postamble_0, 0, 0}, {
-	"1.3.1.1c.", desc_case_1_3_1_1c, &preamble_0, &test_case_1_3_1_1c, &postamble_0, 0, 0}, {
-	"1.3.1.1d.", desc_case_1_3_1_1d, &preamble_0, &test_case_1_3_1_1d, &postamble_0, 0, 0}, {
-	"1.3.1.1e.", desc_case_1_3_1_1e, &preamble_0, &test_case_1_3_1_1e, &postamble_0, 0, 0}, {
-	"1.3.1.1f.", desc_case_1_3_1_1f, &preamble_0, &test_case_1_3_1_1f, &postamble_0, 0, 0}, {
-	"1.3.1.2a.", desc_case_1_3_1_2a, &preamble_0, &test_case_1_3_1_2a, &postamble_0, 0, 0}, {
-	"1.3.1.2b.", desc_case_1_3_1_2b, &preamble_0, &test_case_1_3_1_2b, &postamble_0, 0, 0}, {
-	"1.3.2.1.", desc_case_1_3_2_1, &preamble_0, &test_case_1_3_2_1, &postamble_0, 0, 0}, {
-	"1.3.2.2.", desc_case_1_3_2_2, &preamble_0, &test_case_1_3_2_2, &postamble_0, 0, 0}, {
-	"1.3.2.3.", desc_case_1_3_2_3, &preamble_0, &test_case_1_3_2_3, &postamble_0, 0, 0}, {
-	"1.3.2.4.", desc_case_1_3_2_4, &preamble_0, &test_case_1_3_2_4, &postamble_0, 0, 0}, {
-	"1.3.2.5.", desc_case_1_3_2_5, &preamble_0, &test_case_1_3_2_5, &postamble_0, 0, 0}, {
-	"1.4.1.", desc_case_1_4_1, &preamble_0, &test_case_1_4_1, &postamble_0, 0, 0}, {
-	"1.4.2.", desc_case_1_4_2, &preamble_0, &test_case_1_4_2, &postamble_0, 0, 0}, {
-	"1.4.3.", desc_case_1_4_3, &preamble_0, &test_case_1_4_3, &postamble_0, 0, 0}, {
-	"1.4.4.", desc_case_1_4_4, &preamble_0, &test_case_1_4_4, &postamble_0, 0, 0}, {
-	"1.4.5.", desc_case_1_4_5, &preamble_0, &test_case_1_4_5, &postamble_0, 0, 0}, {
-	"1.5.1.", desc_case_1_5_1, &preamble_0, &test_case_1_5_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.5.2.", desc_case_1_5_2, &preamble_0, &test_case_1_5_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.5.3.", desc_case_1_5_3, &preamble_0, &test_case_1_5_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.6.1.1.", desc_case_1_6_1_1, &preamble_0, &test_case_1_6_1_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.6.1.2.", desc_case_1_6_1_2, &preamble_0, &test_case_1_6_1_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.6.2.1.", desc_case_1_6_2_1, &preamble_0, &test_case_1_6_2_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.6.2.2.", desc_case_1_6_2_2, &preamble_0, &test_case_1_6_2_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.6.3.1.", desc_case_1_6_3_1, &preamble_0, &test_case_1_6_3_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.6.3.2.", desc_case_1_6_3_2, &preamble_0, &test_case_1_6_3_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.1.1.", desc_case_1_7_1_1, &preamble_0, &test_case_1_7_1_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.1.2.", desc_case_1_7_1_2, &preamble_0, &test_case_1_7_1_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.1.3.", desc_case_1_7_1_3, &preamble_0, &test_case_1_7_1_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.1.4.", desc_case_1_7_1_4, &preamble_0, &test_case_1_7_1_4, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.1.5.", desc_case_1_7_1_5, &preamble_0, &test_case_1_7_1_5, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.1.6.", desc_case_1_7_1_6, &preamble_0, &test_case_1_7_1_6, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.1.7.", desc_case_1_7_1_7, &preamble_0, &test_case_1_7_1_7, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.1.", desc_case_1_7_2_1, &preamble_0, &test_case_1_7_2_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.2.", desc_case_1_7_2_2, &preamble_0, &test_case_1_7_2_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.3.", desc_case_1_7_2_3, &preamble_0, &test_case_1_7_2_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.4.", desc_case_1_7_2_4, &preamble_0, &test_case_1_7_2_4, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.5.", desc_case_1_7_2_5, &preamble_0, &test_case_1_7_2_5, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.6.", desc_case_1_7_2_6, &preamble_0, &test_case_1_7_2_6, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.7.", desc_case_1_7_2_7, &preamble_0, &test_case_1_7_2_7, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.8.", desc_case_1_7_2_8, &preamble_0, &test_case_1_7_2_8, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.9.", desc_case_1_7_2_9, &preamble_0, &test_case_1_7_2_9, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.2.10.", desc_case_1_7_2_10, &preamble_0, &test_case_1_7_2_10, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.3.1.", desc_case_1_7_3_1, &preamble_0, &test_case_1_7_3_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"1.7.3.2.", desc_case_1_7_3_2, &preamble_0, &test_case_1_7_3_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"2.1.1.", desc_case_2_1_1, &preamble_0, &test_case_2_1_1, &postamble_0, 0, 0}, {
-	"2.1.2.", desc_case_2_1_2, &preamble_0, &test_case_2_1_2, &postamble_0, 0, 0}, {
-	"2.2.1a.", desc_case_2_2_1a, &preamble_0, &test_case_2_2_1a, &postamble_0, 0, 0}, {
-	"2.2.1b.", desc_case_2_2_1b, &preamble_0, &test_case_2_2_1b, &postamble_0, 0, 0}, {
-	"2.2.2a.", desc_case_2_2_2a, &preamble_0, &test_case_2_2_2a, &postamble_0, 0, 0}, {
-	"2.2.2b.", desc_case_2_2_2b, &preamble_0, &test_case_2_2_2b, &postamble_0, 0, 0}, {
-	"2.3.1a.", desc_case_2_3_1a, &preamble_0, &test_case_2_3_1a, &postamble_0, 0, 0}, {
-	"2.3.1b.", desc_case_2_3_1b, &preamble_0, &test_case_2_3_1b, &postamble_0, 0, 0}, {
-	"2.3.1c.", desc_case_2_3_1c, &preamble_0, &test_case_2_3_1c, &postamble_0, 0, 0}, {
-	"2.3.1d.", desc_case_2_3_1d, &preamble_0, &test_case_2_3_1d, &postamble_0, 0, 0}, {
-	"2.3.1e.", desc_case_2_3_1e, &preamble_0, &test_case_2_3_1e, &postamble_0, 0, 0}, {
-	"2.3.1f.", desc_case_2_3_1f, &preamble_0, &test_case_2_3_1f, &postamble_0, 0, 0}, {
-	"2.3.1g.", desc_case_2_3_1g, &preamble_0, &test_case_2_3_1g, &postamble_0, 0, 0}, {
-	"2.3.1h.", desc_case_2_3_1h, &preamble_0, &test_case_2_3_1h, &postamble_0, 0, 0}, {
-	"2.3.2a.", desc_case_2_3_2a, &preamble_0, &test_case_2_3_2a, &postamble_0, 0, 0}, {
-	"2.3.2b.", desc_case_2_3_2b, &preamble_0, &test_case_2_3_2b, &postamble_0, 0, 0}, {
-	"2.3.2c.", desc_case_2_3_2c, &preamble_0, &test_case_2_3_2c, &postamble_0, 0, 0}, {
-	"2.3.2d.", desc_case_2_3_2d, &preamble_0, &test_case_2_3_2d, &postamble_0, 0, 0}, {
-	"2.3.2e.", desc_case_2_3_2e, &preamble_0, &test_case_2_3_2e, &postamble_0, 0, 0}, {
-	"2.3.2f.", desc_case_2_3_2f, &preamble_0, &test_case_2_3_2f, &postamble_0, 0, 0}, {
-	"2.3.3a.", desc_case_2_3_3a, &preamble_0, &test_case_2_3_3a, &postamble_0, 0, 0}, {
-	"2.3.3b.", desc_case_2_3_3b, &preamble_0, &test_case_2_3_3b, &postamble_0, 0, 0}, {
-	"2.3.4a.", desc_case_2_3_4a, &preamble_0, &test_case_2_3_4a, &postamble_0, 0, 0}, {
-	"2.3.4b.", desc_case_2_3_4b, &preamble_0, &test_case_2_3_4b, &postamble_0, 0, 0}, {
-	"2.3.5a.", desc_case_2_3_5a, &preamble_0, &test_case_2_3_5a, &postamble_0, 0, 0}, {
-	"2.3.5b.", desc_case_2_3_5b, &preamble_0, &test_case_2_3_5b, &postamble_0, 0, 0}, {
-	"2.3.6a.", desc_case_2_3_6a, &preamble_0, &test_case_2_3_6a, &postamble_0, 0, 0}, {
-	"2.3.6b.", desc_case_2_3_6b, &preamble_0, &test_case_2_3_6b, &postamble_0, 0, 0}, {
-	"2.4.1.", desc_case_2_4_1, &preamble_0, &test_case_2_4_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"2.4.2.", desc_case_2_4_2, &preamble_0, &test_case_2_4_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"2.4.3.", desc_case_2_4_3, &preamble_0, &test_case_2_4_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"2.4.4.", desc_case_2_4_4, &preamble_0, &test_case_2_4_4, &postamble_0, 0, INCONCLUSIVE}, {
-	"2.4.5.", desc_case_2_4_5, &preamble_0, &test_case_2_4_5, &postamble_0, 0, INCONCLUSIVE}, {
-	"3.1a.", desc_case_3_1a, &preamble_0, &test_case_3_1a, &postamble_0, 0, 0}, {
-	"3.1b.", desc_case_3_1b, &preamble_0, &test_case_3_1b, &postamble_0, 0, 0}, {
-	"3.2a.", desc_case_3_2a, &preamble_0, &test_case_3_2a, &postamble_0, 0, 0}, {
-	"3.2b.", desc_case_3_2b, &preamble_0, &test_case_3_2b, &postamble_0, 0, 0}, {
-	"3.3a.", desc_case_3_3a, &preamble_0, &test_case_3_3a, &postamble_0, 0, 0}, {
-	"3.3b.", desc_case_3_3b, &preamble_0, &test_case_3_3b, &postamble_0, 0, 0}, {
-	"3.4a.", desc_case_3_4a, &preamble_0, &test_case_3_4a, &postamble_0, 0, 0}, {
-	"3.4b.", desc_case_3_4b, &preamble_0, &test_case_3_4b, &postamble_0, 0, 0}, {
-	"3.5a.", desc_case_3_5a, &preamble_0, &test_case_3_5a, &postamble_0, 0, 0}, {
-	"3.5b.", desc_case_3_5b, &preamble_0, &test_case_3_5b, &postamble_0, 0, 0}, {
-	"3.6a.", desc_case_3_6a, &preamble_0, &test_case_3_6a, &postamble_0, 0, 0}, {
-	"3.6b.", desc_case_3_6b, &preamble_0, &test_case_3_6b, &postamble_0, 0, 0}, {
-	"3.7a.", desc_case_3_7a, &preamble_0, &test_case_3_7a, &postamble_0, 0, 0}, {
-	"3.7b.", desc_case_3_7b, &preamble_0, &test_case_3_7b, &postamble_0, 0, 0}, {
-	"3.8a.", desc_case_3_8a, &preamble_0, &test_case_3_8a, &postamble_0, 0, 0}, {
-	"3.8b.", desc_case_3_8b, &preamble_0, &test_case_3_8b, &postamble_0, 0, 0}, {
-	"4.1a.", desc_case_4_1a, &preamble_0, &test_case_4_1a, &postamble_0, 0, 0}, {
-	"4.1b.", desc_case_4_1b, &preamble_0, &test_case_4_1b, &postamble_0, 0, 0}, {
-	"4.1c.", desc_case_4_1c, &preamble_0, &test_case_4_1c, &postamble_0, 0, 0}, {
-	"4.1d.", desc_case_4_1d, &preamble_0, &test_case_4_1d, &postamble_0, 0, 0}, {
-	"4.1e.", desc_case_4_1e, &preamble_0, &test_case_4_1e, &postamble_0, 0, 0}, {
-	"4.1f.", desc_case_4_1f, &preamble_0, &test_case_4_1f, &postamble_0, 0, 0}, {
-	"5.1.", desc_case_5_1, &preamble_0, &test_case_5_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"5.2.1.", desc_case_5_2_1, &preamble_0, &test_case_5_2_1, &postamble_0, 0, 0}, {
-	"5.2.2.", desc_case_5_2_2, &preamble_0, &test_case_5_2_2, &postamble_0, 0, 0}, {
-	"5.2.3.", desc_case_5_2_3, &preamble_0, &test_case_5_2_3, &postamble_0, 0, 0}, {
-	"5.2.4.", desc_case_5_2_4, &preamble_0, &test_case_5_2_4, &postamble_0, 0, 0}, {
-	"5.2.5a.", desc_case_5_2_5a, &preamble_0, &test_case_5_2_5a, &postamble_0, 0, 0}, {
-	"5.2.5b.", desc_case_5_2_5b, &preamble_0, &test_case_5_2_5b, &postamble_0, 0, 0}, {
-	"5.2.6.", desc_case_5_2_6, &preamble_0, &test_case_5_2_6, &postamble_0, 0, 0}, {
-	"5.2.7.", desc_case_5_2_7, &preamble_0, &test_case_5_2_7, &postamble_0, 0, 0}, {
-	"5.2.8.", desc_case_5_2_8, &preamble_0, &test_case_5_2_8, &postamble_0, 0, 0}, {
-	"5.2.9.", desc_case_5_2_9, &preamble_0, &test_case_5_2_9, &postamble_0, 0, 0}, {
-	"5.2.10.", desc_case_5_2_10, &preamble_0, &test_case_5_2_10, &postamble_0, 0, 0}, {
-	"5.2.11.", desc_case_5_2_11, &preamble_0, &test_case_5_2_11, &postamble_0, 0, 0}, {
-	"5.3.1.", desc_case_5_3_1, &preamble_0, &test_case_5_3_1, &postamble_0, 0, 0}, {
-	"5.3.2.", desc_case_5_3_2, &preamble_0, &test_case_5_3_2, &postamble_0, 0, 0}, {
-	"6.1.1.", desc_case_6_1_1, &preamble_0, &test_case_6_1_1, &postamble_0, 0, 0}, {
-	"6.1.2.", desc_case_6_1_2, &preamble_0, &test_case_6_1_2, &postamble_0, 0, 0}, {
-	"6.1.3.", desc_case_6_1_3, &preamble_0, &test_case_6_1_3, &postamble_0, 0, 0}, {
-	"6.1.4.", desc_case_6_1_4, &preamble_0, &test_case_6_1_4, &postamble_0, 0, 0}, {
-	"6.1.5.", desc_case_6_1_5, &preamble_0, &test_case_6_1_5, &postamble_0, 0, 0}, {
-	"6.2.1.", desc_case_6_2_1, &preamble_0, &test_case_6_2_1, &postamble_0, 0, 0}, {
-	"6.2.2.", desc_case_6_2_2, &preamble_0, &test_case_6_2_2, &postamble_0, 0, 0}, {
-	"6.2.3.", desc_case_6_2_3, &preamble_0, &test_case_6_2_3, &postamble_0, 0, 0}, {
-	"6.2.4.", desc_case_6_2_4, &preamble_0, &test_case_6_2_4, &postamble_0, 0, 0}, {
-	"6.2.5.", desc_case_6_2_5, &preamble_0, &test_case_6_2_5, &postamble_0, 0, 0}, {
-	"6.3.1.", desc_case_6_3_1, &preamble_0, &test_case_6_3_1, &postamble_0, 0, 0}, {
-	"6.4.1.", desc_case_6_4_1, &preamble_0, &test_case_6_4_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.4.2.", desc_case_6_4_2, &preamble_0, &test_case_6_4_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.4.3.", desc_case_6_4_3, &preamble_0, &test_case_6_4_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.4.3.", desc_case_6_4_4, &preamble_0, &test_case_6_4_4, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.5.1.", desc_case_6_5_1, &preamble_0, &test_case_6_5_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.5.2.", desc_case_6_5_2, &preamble_0, &test_case_6_5_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.5.3.", desc_case_6_5_3, &preamble_0, &test_case_6_5_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.5.4.", desc_case_6_5_4, &preamble_0, &test_case_6_5_4, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.5.4.", desc_case_6_5_5, &preamble_0, &test_case_6_5_5, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.6.1.", desc_case_6_6_1, &preamble_0, &test_case_6_6_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.6.2.", desc_case_6_6_2, &preamble_0, &test_case_6_6_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.6.3.", desc_case_6_6_3, &preamble_0, &test_case_6_6_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"6.6.4.", desc_case_6_6_4, &preamble_0, &test_case_6_6_4, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.1.1.", desc_case_7_1_1, &preamble_0, &test_case_7_1_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.1.2.", desc_case_7_1_2, &preamble_0, &test_case_7_1_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.1.3.", desc_case_7_1_3, &preamble_0, &test_case_7_1_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.2.1.", desc_case_7_2_1, &preamble_0, &test_case_7_2_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.3.1.", desc_case_7_3_1, &preamble_0, &test_case_7_3_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.3.2.", desc_case_7_3_2, &preamble_0, &test_case_7_3_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.3.3.", desc_case_7_3_3, &preamble_0, &test_case_7_3_3, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.3.4.", desc_case_7_3_4, &preamble_0, &test_case_7_3_4, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.3.5.", desc_case_7_3_5, &preamble_0, &test_case_7_3_5, &postamble_0, 0, INCONCLUSIVE}, {
-	"7.3.6.", desc_case_7_3_6, &preamble_0, &test_case_7_3_6, &postamble_0, 0, INCONCLUSIVE}, {
-	"8.1.1.", desc_case_8_1_1, &preamble_0, &test_case_8_1_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"8.1.2.", desc_case_8_1_2, &preamble_0, &test_case_8_1_2, &postamble_0, 0, INCONCLUSIVE}, {
-	"8.2.1.", desc_case_8_2_1, &preamble_0, &test_case_8_2_1, &postamble_0, 0, 0}, {
-	"8.2.2.", desc_case_8_2_2, &preamble_0, &test_case_8_2_2, &postamble_0, 0, 0}, {
-	"8.2.3.", desc_case_8_2_3, &preamble_0, &test_case_8_2_3, &postamble_0, 0, 0}, {
-	"9.1.1.", desc_case_9_1_1, &preamble_0, &test_case_9_1_1, &postamble_0, 0, INCONCLUSIVE}, {
-	"9.1.2.", desc_case_9_1_2, &preamble_0, &test_case_9_1_2, &postamble_0, 0, INCONCLUSIVE}, {
+	numb_case_1_1, tgrp_case_1_1, sgrp_case_1_1, name_case_1_1, xtra_case_1_1, desc_case_1_1, sref_case_1_1, &preamble_0, &test_case_1_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_1, tgrp_case_1_2_1, sgrp_case_1_2_1, name_case_1_2_1, xtra_case_1_2_1, desc_case_1_2_1, sref_case_1_2_1, &preamble_0, &test_case_1_2_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_2, tgrp_case_1_2_2, sgrp_case_1_2_2, name_case_1_2_2, xtra_case_1_2_2, desc_case_1_2_2, sref_case_1_2_2, &preamble_0, &test_case_1_2_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_3, tgrp_case_1_2_3, sgrp_case_1_2_3, name_case_1_2_3, xtra_case_1_2_3, desc_case_1_2_3, sref_case_1_2_3, &preamble_0, &test_case_1_2_3, &postamble_1, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_4, tgrp_case_1_2_4, sgrp_case_1_2_4, name_case_1_2_4, xtra_case_1_2_4, desc_case_1_2_4, sref_case_1_2_4, &preamble_0, &test_case_1_2_4, &postamble_2, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_5a, tgrp_case_1_2_5a, sgrp_case_1_2_5a, name_case_1_2_5a, xtra_case_1_2_5a, desc_case_1_2_5a, sref_case_1_2_5a, &preamble_1, &test_case_1_2_5a, &postamble_1, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_5b, tgrp_case_1_2_5b, sgrp_case_1_2_5b, name_case_1_2_5b, xtra_case_1_2_5b, desc_case_1_2_5b, sref_case_1_2_5b, &preamble_0, &test_case_1_2_5b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_5c, tgrp_case_1_2_5c, sgrp_case_1_2_5c, name_case_1_2_5c, xtra_case_1_2_5c, desc_case_1_2_5c, sref_case_1_2_5c, &preamble_0, &test_case_1_2_5c, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_6, tgrp_case_1_2_6, sgrp_case_1_2_6, name_case_1_2_6, xtra_case_1_2_6, desc_case_1_2_6, sref_case_1_2_6, &preamble_0, &test_case_1_2_6, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_2_7, tgrp_case_1_2_7, sgrp_case_1_2_7, name_case_1_2_7, xtra_case_1_2_7, desc_case_1_2_7, sref_case_1_2_7, &preamble_0, &test_case_1_2_7, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_1_1a, tgrp_case_1_3_1_1a, sgrp_case_1_3_1_1a, name_case_1_3_1_1a, xtra_case_1_3_1_1a, desc_case_1_3_1_1a, sref_case_1_3_1_1a, &preamble_0, &test_case_1_3_1_1a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_1_1b, tgrp_case_1_3_1_1b, sgrp_case_1_3_1_1b, name_case_1_3_1_1b, xtra_case_1_3_1_1b, desc_case_1_3_1_1b, sref_case_1_3_1_1b, &preamble_0, &test_case_1_3_1_1b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_1_1c, tgrp_case_1_3_1_1c, sgrp_case_1_3_1_1c, name_case_1_3_1_1c, xtra_case_1_3_1_1c, desc_case_1_3_1_1c, sref_case_1_3_1_1c, &preamble_0, &test_case_1_3_1_1c, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_1_1d, tgrp_case_1_3_1_1d, sgrp_case_1_3_1_1d, name_case_1_3_1_1d, xtra_case_1_3_1_1d, desc_case_1_3_1_1d, sref_case_1_3_1_1d, &preamble_0, &test_case_1_3_1_1d, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_1_1e, tgrp_case_1_3_1_1e, sgrp_case_1_3_1_1e, name_case_1_3_1_1e, xtra_case_1_3_1_1e, desc_case_1_3_1_1e, sref_case_1_3_1_1e, &preamble_0, &test_case_1_3_1_1e, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_1_1f, tgrp_case_1_3_1_1f, sgrp_case_1_3_1_1f, name_case_1_3_1_1f, xtra_case_1_3_1_1f, desc_case_1_3_1_1f, sref_case_1_3_1_1f, &preamble_0, &test_case_1_3_1_1f, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_1_2a, tgrp_case_1_3_1_2a, sgrp_case_1_3_1_2a, name_case_1_3_1_2a, xtra_case_1_3_1_2a, desc_case_1_3_1_2a, sref_case_1_3_1_2a, &preamble_0, &test_case_1_3_1_2a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_1_2b, tgrp_case_1_3_1_2b, sgrp_case_1_3_1_2b, name_case_1_3_1_2b, xtra_case_1_3_1_2b, desc_case_1_3_1_2b, sref_case_1_3_1_2b, &preamble_0, &test_case_1_3_1_2b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_2_1, tgrp_case_1_3_2_1, sgrp_case_1_3_2_1, name_case_1_3_2_1, xtra_case_1_3_2_1, desc_case_1_3_2_1, sref_case_1_3_2_1, &preamble_0, &test_case_1_3_2_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_2_2, tgrp_case_1_3_2_2, sgrp_case_1_3_2_2, name_case_1_3_2_2, xtra_case_1_3_2_2, desc_case_1_3_2_2, sref_case_1_3_2_2, &preamble_0, &test_case_1_3_2_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_2_3, tgrp_case_1_3_2_3, sgrp_case_1_3_2_3, name_case_1_3_2_3, xtra_case_1_3_2_3, desc_case_1_3_2_3, sref_case_1_3_2_3, &preamble_0, &test_case_1_3_2_3, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_2_4, tgrp_case_1_3_2_4, sgrp_case_1_3_2_4, name_case_1_3_2_4, xtra_case_1_3_2_4, desc_case_1_3_2_4, sref_case_1_3_2_4, &preamble_0, &test_case_1_3_2_4, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_3_2_5, tgrp_case_1_3_2_5, sgrp_case_1_3_2_5, name_case_1_3_2_5, xtra_case_1_3_2_5, desc_case_1_3_2_5, sref_case_1_3_2_5, &preamble_0, &test_case_1_3_2_5, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_4_1, tgrp_case_1_4_1, sgrp_case_1_4_1, name_case_1_4_1, xtra_case_1_4_1, desc_case_1_4_1, sref_case_1_4_1, &preamble_0, &test_case_1_4_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_4_2, tgrp_case_1_4_2, sgrp_case_1_4_2, name_case_1_4_2, xtra_case_1_4_2, desc_case_1_4_2, sref_case_1_4_2, &preamble_0, &test_case_1_4_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_4_3, tgrp_case_1_4_3, sgrp_case_1_4_3, name_case_1_4_3, xtra_case_1_4_3, desc_case_1_4_3, sref_case_1_4_3, &preamble_0, &test_case_1_4_3, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_4_4, tgrp_case_1_4_4, sgrp_case_1_4_4, name_case_1_4_4, xtra_case_1_4_4, desc_case_1_4_4, sref_case_1_4_4, &preamble_0, &test_case_1_4_4, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_4_5, tgrp_case_1_4_5, sgrp_case_1_4_5, name_case_1_4_5, xtra_case_1_4_5, desc_case_1_4_5, sref_case_1_4_5, &preamble_0, &test_case_1_4_5, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_1_5_1, tgrp_case_1_5_1, sgrp_case_1_5_1, name_case_1_5_1, xtra_case_1_5_1, desc_case_1_5_1, sref_case_1_5_1, &preamble_0, &test_case_1_5_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_5_2, tgrp_case_1_5_2, sgrp_case_1_5_2, name_case_1_5_2, xtra_case_1_5_2, desc_case_1_5_2, sref_case_1_5_2, &preamble_0, &test_case_1_5_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_5_3, tgrp_case_1_5_3, sgrp_case_1_5_3, name_case_1_5_3, xtra_case_1_5_3, desc_case_1_5_3, sref_case_1_5_3, &preamble_0, &test_case_1_5_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_6_1_1, tgrp_case_1_6_1_1, sgrp_case_1_6_1_1, name_case_1_6_1_1, xtra_case_1_6_1_1, desc_case_1_6_1_1, sref_case_1_6_1_1, &preamble_0, &test_case_1_6_1_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_6_1_2, tgrp_case_1_6_1_2, sgrp_case_1_6_1_2, name_case_1_6_1_2, xtra_case_1_6_1_2, desc_case_1_6_1_2, sref_case_1_6_1_2, &preamble_0, &test_case_1_6_1_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_6_2_1, tgrp_case_1_6_2_1, sgrp_case_1_6_2_1, name_case_1_6_2_1, xtra_case_1_6_2_1, desc_case_1_6_2_1, sref_case_1_6_2_1, &preamble_0, &test_case_1_6_2_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_6_2_2, tgrp_case_1_6_2_2, sgrp_case_1_6_2_2, name_case_1_6_2_2, xtra_case_1_6_2_2, desc_case_1_6_2_2, sref_case_1_6_2_2, &preamble_0, &test_case_1_6_2_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_6_3_1, tgrp_case_1_6_3_1, sgrp_case_1_6_3_1, name_case_1_6_3_1, xtra_case_1_6_3_1, desc_case_1_6_3_1, sref_case_1_6_3_1, &preamble_0, &test_case_1_6_3_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_6_3_2, tgrp_case_1_6_3_2, sgrp_case_1_6_3_2, name_case_1_6_3_2, xtra_case_1_6_3_2, desc_case_1_6_3_2, sref_case_1_6_3_2, &preamble_0, &test_case_1_6_3_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_1_1, tgrp_case_1_7_1_1, sgrp_case_1_7_1_1, name_case_1_7_1_1, xtra_case_1_7_1_1, desc_case_1_7_1_1, sref_case_1_7_1_1, &preamble_0, &test_case_1_7_1_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_1_2, tgrp_case_1_7_1_2, sgrp_case_1_7_1_2, name_case_1_7_1_2, xtra_case_1_7_1_2, desc_case_1_7_1_2, sref_case_1_7_1_2, &preamble_0, &test_case_1_7_1_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_1_3, tgrp_case_1_7_1_3, sgrp_case_1_7_1_3, name_case_1_7_1_3, xtra_case_1_7_1_3, desc_case_1_7_1_3, sref_case_1_7_1_3, &preamble_0, &test_case_1_7_1_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_1_4, tgrp_case_1_7_1_4, sgrp_case_1_7_1_4, name_case_1_7_1_4, xtra_case_1_7_1_4, desc_case_1_7_1_4, sref_case_1_7_1_4, &preamble_0, &test_case_1_7_1_4, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_1_5, tgrp_case_1_7_1_5, sgrp_case_1_7_1_5, name_case_1_7_1_5, xtra_case_1_7_1_5, desc_case_1_7_1_5, sref_case_1_7_1_5, &preamble_0, &test_case_1_7_1_5, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_1_6, tgrp_case_1_7_1_6, sgrp_case_1_7_1_6, name_case_1_7_1_6, xtra_case_1_7_1_6, desc_case_1_7_1_6, sref_case_1_7_1_6, &preamble_0, &test_case_1_7_1_6, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_1_7, tgrp_case_1_7_1_7, sgrp_case_1_7_1_7, name_case_1_7_1_7, xtra_case_1_7_1_7, desc_case_1_7_1_7, sref_case_1_7_1_7, &preamble_0, &test_case_1_7_1_7, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_1, tgrp_case_1_7_2_1, sgrp_case_1_7_2_1, name_case_1_7_2_1, xtra_case_1_7_2_1, desc_case_1_7_2_1, sref_case_1_7_2_1, &preamble_0, &test_case_1_7_2_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_3, tgrp_case_1_7_2_3, sgrp_case_1_7_2_3, name_case_1_7_2_3, xtra_case_1_7_2_3, desc_case_1_7_2_3, sref_case_1_7_2_3, &preamble_0, &test_case_1_7_2_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_4, tgrp_case_1_7_2_4, sgrp_case_1_7_2_4, name_case_1_7_2_4, xtra_case_1_7_2_4, desc_case_1_7_2_4, sref_case_1_7_2_4, &preamble_0, &test_case_1_7_2_4, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_5, tgrp_case_1_7_2_5, sgrp_case_1_7_2_5, name_case_1_7_2_5, xtra_case_1_7_2_5, desc_case_1_7_2_5, sref_case_1_7_2_5, &preamble_0, &test_case_1_7_2_5, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_6, tgrp_case_1_7_2_6, sgrp_case_1_7_2_6, name_case_1_7_2_6, xtra_case_1_7_2_6, desc_case_1_7_2_6, sref_case_1_7_2_6, &preamble_0, &test_case_1_7_2_6, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_7, tgrp_case_1_7_2_7, sgrp_case_1_7_2_7, name_case_1_7_2_7, xtra_case_1_7_2_7, desc_case_1_7_2_7, sref_case_1_7_2_7, &preamble_0, &test_case_1_7_2_7, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_8, tgrp_case_1_7_2_8, sgrp_case_1_7_2_8, name_case_1_7_2_8, xtra_case_1_7_2_8, desc_case_1_7_2_8, sref_case_1_7_2_8, &preamble_0, &test_case_1_7_2_8, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_9, tgrp_case_1_7_2_9, sgrp_case_1_7_2_9, name_case_1_7_2_9, xtra_case_1_7_2_9, desc_case_1_7_2_9, sref_case_1_7_2_9, &preamble_0, &test_case_1_7_2_9, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_2_10, tgrp_case_1_7_2_10, sgrp_case_1_7_2_10, name_case_1_7_2_10, xtra_case_1_7_2_10, desc_case_1_7_2_10, sref_case_1_7_2_10, &preamble_0, &test_case_1_7_2_10, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_3_1, tgrp_case_1_7_3_1, sgrp_case_1_7_3_1, name_case_1_7_3_1, xtra_case_1_7_3_1, desc_case_1_7_3_1, sref_case_1_7_3_1, &preamble_0, &test_case_1_7_3_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_1_7_3_2, tgrp_case_1_7_3_2, sgrp_case_1_7_3_2, name_case_1_7_3_2, xtra_case_1_7_3_2, desc_case_1_7_3_2, sref_case_1_7_3_2, &preamble_0, &test_case_1_7_3_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_2_1_1, tgrp_case_2_1_1, sgrp_case_2_1_1, name_case_2_1_1, xtra_case_2_1_1, desc_case_2_1_1, sref_case_2_1_1, &preamble_0, &test_case_2_1_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_1_2, tgrp_case_2_1_2, sgrp_case_2_1_2, name_case_2_1_2, xtra_case_2_1_2, desc_case_2_1_2, sref_case_2_1_2, &preamble_0, &test_case_2_1_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_2_1a, tgrp_case_2_2_1a, sgrp_case_2_2_1a, name_case_2_2_1a, xtra_case_2_2_1a, desc_case_2_2_1a, sref_case_2_2_1a, &preamble_0, &test_case_2_2_1a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_2_1b, tgrp_case_2_2_1b, sgrp_case_2_2_1b, name_case_2_2_1b, xtra_case_2_2_1b, desc_case_2_2_1b, sref_case_2_2_1b, &preamble_0, &test_case_2_2_1b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_2_2a, tgrp_case_2_2_2a, sgrp_case_2_2_2a, name_case_2_2_2a, xtra_case_2_2_2a, desc_case_2_2_2a, sref_case_2_2_2a, &preamble_0, &test_case_2_2_2a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_2_2b, tgrp_case_2_2_2b, sgrp_case_2_2_2b, name_case_2_2_2b, xtra_case_2_2_2b, desc_case_2_2_2b, sref_case_2_2_2b, &preamble_0, &test_case_2_2_2b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_1a, tgrp_case_2_3_1a, sgrp_case_2_3_1a, name_case_2_3_1a, xtra_case_2_3_1a, desc_case_2_3_1a, sref_case_2_3_1a, &preamble_0, &test_case_2_3_1a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_1b, tgrp_case_2_3_1b, sgrp_case_2_3_1b, name_case_2_3_1b, xtra_case_2_3_1b, desc_case_2_3_1b, sref_case_2_3_1b, &preamble_0, &test_case_2_3_1b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_1c, tgrp_case_2_3_1c, sgrp_case_2_3_1c, name_case_2_3_1c, xtra_case_2_3_1c, desc_case_2_3_1c, sref_case_2_3_1c, &preamble_0, &test_case_2_3_1c, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_1d, tgrp_case_2_3_1d, sgrp_case_2_3_1d, name_case_2_3_1d, xtra_case_2_3_1d, desc_case_2_3_1d, sref_case_2_3_1d, &preamble_0, &test_case_2_3_1d, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_1e, tgrp_case_2_3_1e, sgrp_case_2_3_1e, name_case_2_3_1e, xtra_case_2_3_1e, desc_case_2_3_1e, sref_case_2_3_1e, &preamble_0, &test_case_2_3_1e, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_1f, tgrp_case_2_3_1f, sgrp_case_2_3_1f, name_case_2_3_1f, xtra_case_2_3_1f, desc_case_2_3_1f, sref_case_2_3_1f, &preamble_0, &test_case_2_3_1f, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_1g, tgrp_case_2_3_1g, sgrp_case_2_3_1g, name_case_2_3_1g, xtra_case_2_3_1g, desc_case_2_3_1g, sref_case_2_3_1g, &preamble_0, &test_case_2_3_1g, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_1h, tgrp_case_2_3_1h, sgrp_case_2_3_1h, name_case_2_3_1h, xtra_case_2_3_1h, desc_case_2_3_1h, sref_case_2_3_1h, &preamble_0, &test_case_2_3_1h, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_2a, tgrp_case_2_3_2a, sgrp_case_2_3_2a, name_case_2_3_2a, xtra_case_2_3_2a, desc_case_2_3_2a, sref_case_2_3_2a, &preamble_0, &test_case_2_3_2a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_2b, tgrp_case_2_3_2b, sgrp_case_2_3_2b, name_case_2_3_2b, xtra_case_2_3_2b, desc_case_2_3_2b, sref_case_2_3_2b, &preamble_0, &test_case_2_3_2b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_2c, tgrp_case_2_3_2c, sgrp_case_2_3_2c, name_case_2_3_2c, xtra_case_2_3_2c, desc_case_2_3_2c, sref_case_2_3_2c, &preamble_0, &test_case_2_3_2c, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_2d, tgrp_case_2_3_2d, sgrp_case_2_3_2d, name_case_2_3_2d, xtra_case_2_3_2d, desc_case_2_3_2d, sref_case_2_3_2d, &preamble_0, &test_case_2_3_2d, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_2e, tgrp_case_2_3_2e, sgrp_case_2_3_2e, name_case_2_3_2e, xtra_case_2_3_2e, desc_case_2_3_2e, sref_case_2_3_2e, &preamble_0, &test_case_2_3_2e, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_2f, tgrp_case_2_3_2f, sgrp_case_2_3_2f, name_case_2_3_2f, xtra_case_2_3_2f, desc_case_2_3_2f, sref_case_2_3_2f, &preamble_0, &test_case_2_3_2f, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_3a, tgrp_case_2_3_3a, sgrp_case_2_3_3a, name_case_2_3_3a, xtra_case_2_3_3a, desc_case_2_3_3a, sref_case_2_3_3a, &preamble_0, &test_case_2_3_3a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_3b, tgrp_case_2_3_3b, sgrp_case_2_3_3b, name_case_2_3_3b, xtra_case_2_3_3b, desc_case_2_3_3b, sref_case_2_3_3b, &preamble_0, &test_case_2_3_3b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_4a, tgrp_case_2_3_4a, sgrp_case_2_3_4a, name_case_2_3_4a, xtra_case_2_3_4a, desc_case_2_3_4a, sref_case_2_3_4a, &preamble_0, &test_case_2_3_4a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_4b, tgrp_case_2_3_4b, sgrp_case_2_3_4b, name_case_2_3_4b, xtra_case_2_3_4b, desc_case_2_3_4b, sref_case_2_3_4b, &preamble_0, &test_case_2_3_4b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_5a, tgrp_case_2_3_5a, sgrp_case_2_3_5a, name_case_2_3_5a, xtra_case_2_3_5a, desc_case_2_3_5a, sref_case_2_3_5a, &preamble_0, &test_case_2_3_5a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_5b, tgrp_case_2_3_5b, sgrp_case_2_3_5b, name_case_2_3_5b, xtra_case_2_3_5b, desc_case_2_3_5b, sref_case_2_3_5b, &preamble_0, &test_case_2_3_5b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_6a, tgrp_case_2_3_6a, sgrp_case_2_3_6a, name_case_2_3_6a, xtra_case_2_3_6a, desc_case_2_3_6a, sref_case_2_3_6a, &preamble_0, &test_case_2_3_6a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_3_6b, tgrp_case_2_3_6b, sgrp_case_2_3_6b, name_case_2_3_6b, xtra_case_2_3_6b, desc_case_2_3_6b, sref_case_2_3_6b, &preamble_0, &test_case_2_3_6b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_2_4_1, tgrp_case_2_4_1, sgrp_case_2_4_1, name_case_2_4_1, xtra_case_2_4_1, desc_case_2_4_1, sref_case_2_4_1, &preamble_0, &test_case_2_4_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_2_4_2, tgrp_case_2_4_2, sgrp_case_2_4_2, name_case_2_4_2, xtra_case_2_4_2, desc_case_2_4_2, sref_case_2_4_2, &preamble_0, &test_case_2_4_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_2_4_3, tgrp_case_2_4_3, sgrp_case_2_4_3, name_case_2_4_3, xtra_case_2_4_3, desc_case_2_4_3, sref_case_2_4_3, &preamble_0, &test_case_2_4_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_2_4_4, tgrp_case_2_4_4, sgrp_case_2_4_4, name_case_2_4_4, xtra_case_2_4_4, desc_case_2_4_4, sref_case_2_4_4, &preamble_0, &test_case_2_4_4, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_2_4_5, tgrp_case_2_4_5, sgrp_case_2_4_5, name_case_2_4_5, xtra_case_2_4_5, desc_case_2_4_5, sref_case_2_4_5, &preamble_0, &test_case_2_4_5, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_3_1a, tgrp_case_3_1a, sgrp_case_3_1a, name_case_3_1a, xtra_case_3_1a, desc_case_3_1a, sref_case_3_1a, &preamble_0, &test_case_3_1a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_1b, tgrp_case_3_1b, sgrp_case_3_1b, name_case_3_1b, xtra_case_3_1b, desc_case_3_1b, sref_case_3_1b, &preamble_0, &test_case_3_1b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_2a, tgrp_case_3_2a, sgrp_case_3_2a, name_case_3_2a, xtra_case_3_2a, desc_case_3_2a, sref_case_3_2a, &preamble_0, &test_case_3_2a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_2b, tgrp_case_3_2b, sgrp_case_3_2b, name_case_3_2b, xtra_case_3_2b, desc_case_3_2b, sref_case_3_2b, &preamble_0, &test_case_3_2b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_3a, tgrp_case_3_3a, sgrp_case_3_3a, name_case_3_3a, xtra_case_3_3a, desc_case_3_3a, sref_case_3_3a, &preamble_0, &test_case_3_3a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_3b, tgrp_case_3_3b, sgrp_case_3_3b, name_case_3_3b, xtra_case_3_3b, desc_case_3_3b, sref_case_3_3b, &preamble_0, &test_case_3_3b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_4a, tgrp_case_3_4a, sgrp_case_3_4a, name_case_3_4a, xtra_case_3_4a, desc_case_3_4a, sref_case_3_4a, &preamble_0, &test_case_3_4a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_4b, tgrp_case_3_4b, sgrp_case_3_4b, name_case_3_4b, xtra_case_3_4b, desc_case_3_4b, sref_case_3_4b, &preamble_0, &test_case_3_4b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_5a, tgrp_case_3_5a, sgrp_case_3_5a, name_case_3_5a, xtra_case_3_5a, desc_case_3_5a, sref_case_3_5a, &preamble_0, &test_case_3_5a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_5b, tgrp_case_3_5b, sgrp_case_3_5b, name_case_3_5b, xtra_case_3_5b, desc_case_3_5b, sref_case_3_5b, &preamble_0, &test_case_3_5b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_6a, tgrp_case_3_6a, sgrp_case_3_6a, name_case_3_6a, xtra_case_3_6a, desc_case_3_6a, sref_case_3_6a, &preamble_0, &test_case_3_6a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_6b, tgrp_case_3_6b, sgrp_case_3_6b, name_case_3_6b, xtra_case_3_6b, desc_case_3_6b, sref_case_3_6b, &preamble_0, &test_case_3_6b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_7a, tgrp_case_3_7a, sgrp_case_3_7a, name_case_3_7a, xtra_case_3_7a, desc_case_3_7a, sref_case_3_7a, &preamble_0, &test_case_3_7a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_7b, tgrp_case_3_7b, sgrp_case_3_7b, name_case_3_7b, xtra_case_3_7b, desc_case_3_7b, sref_case_3_7b, &preamble_0, &test_case_3_7b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_8a, tgrp_case_3_8a, sgrp_case_3_8a, name_case_3_8a, xtra_case_3_8a, desc_case_3_8a, sref_case_3_8a, &preamble_0, &test_case_3_8a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_3_8b, tgrp_case_3_8b, sgrp_case_3_8b, name_case_3_8b, xtra_case_3_8b, desc_case_3_8b, sref_case_3_8b, &preamble_0, &test_case_3_8b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_4_1a, tgrp_case_4_1a, sgrp_case_4_1a, name_case_4_1a, xtra_case_4_1a, desc_case_4_1a, sref_case_4_1a, &preamble_0, &test_case_4_1a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_4_1b, tgrp_case_4_1b, sgrp_case_4_1b, name_case_4_1b, xtra_case_4_1b, desc_case_4_1b, sref_case_4_1b, &preamble_0, &test_case_4_1b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_4_1c, tgrp_case_4_1c, sgrp_case_4_1c, name_case_4_1c, xtra_case_4_1c, desc_case_4_1c, sref_case_4_1c, &preamble_0, &test_case_4_1c, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_4_1d, tgrp_case_4_1d, sgrp_case_4_1d, name_case_4_1d, xtra_case_4_1d, desc_case_4_1d, sref_case_4_1d, &preamble_0, &test_case_4_1d, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_4_1e, tgrp_case_4_1e, sgrp_case_4_1e, name_case_4_1e, xtra_case_4_1e, desc_case_4_1e, sref_case_4_1e, &preamble_0, &test_case_4_1e, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_4_1f, tgrp_case_4_1f, sgrp_case_4_1f, name_case_4_1f, xtra_case_4_1f, desc_case_4_1f, sref_case_4_1f, &preamble_0, &test_case_4_1f, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, xtra_case_5_1, desc_case_5_1, sref_case_5_1, &preamble_0, &test_case_5_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_5_2_1, tgrp_case_5_2_1, sgrp_case_5_2_1, name_case_5_2_1, xtra_case_5_2_1, desc_case_5_2_1, sref_case_5_2_1, &preamble_0, &test_case_5_2_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_2, tgrp_case_5_2_2, sgrp_case_5_2_2, name_case_5_2_2, xtra_case_5_2_2, desc_case_5_2_2, sref_case_5_2_2, &preamble_0, &test_case_5_2_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_3, tgrp_case_5_2_3, sgrp_case_5_2_3, name_case_5_2_3, xtra_case_5_2_3, desc_case_5_2_3, sref_case_5_2_3, &preamble_0, &test_case_5_2_3, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_4, tgrp_case_5_2_4, sgrp_case_5_2_4, name_case_5_2_4, xtra_case_5_2_4, desc_case_5_2_4, sref_case_5_2_4, &preamble_0, &test_case_5_2_4, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_5a, tgrp_case_5_2_5a, sgrp_case_5_2_5a, name_case_5_2_5a, xtra_case_5_2_5a, desc_case_5_2_5a, sref_case_5_2_5a, &preamble_0, &test_case_5_2_5a, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_5b, tgrp_case_5_2_5b, sgrp_case_5_2_5b, name_case_5_2_5b, xtra_case_5_2_5b, desc_case_5_2_5b, sref_case_5_2_5b, &preamble_0, &test_case_5_2_5b, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_6, tgrp_case_5_2_6, sgrp_case_5_2_6, name_case_5_2_6, xtra_case_5_2_6, desc_case_5_2_6, sref_case_5_2_6, &preamble_0, &test_case_5_2_6, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_7, tgrp_case_5_2_7, sgrp_case_5_2_7, name_case_5_2_7, xtra_case_5_2_7, desc_case_5_2_7, sref_case_5_2_7, &preamble_0, &test_case_5_2_7, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_8, tgrp_case_5_2_8, sgrp_case_5_2_8, name_case_5_2_8, xtra_case_5_2_8, desc_case_5_2_8, sref_case_5_2_8, &preamble_0, &test_case_5_2_8, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_9, tgrp_case_5_2_9, sgrp_case_5_2_9, name_case_5_2_9, xtra_case_5_2_9, desc_case_5_2_9, sref_case_5_2_9, &preamble_0, &test_case_5_2_9, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_10, tgrp_case_5_2_10, sgrp_case_5_2_10, name_case_5_2_10, xtra_case_5_2_10, desc_case_5_2_10, sref_case_5_2_10, &preamble_0, &test_case_5_2_10, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_2_11, tgrp_case_5_2_11, sgrp_case_5_2_11, name_case_5_2_11, xtra_case_5_2_11, desc_case_5_2_11, sref_case_5_2_11, &preamble_0, &test_case_5_2_11, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_3_1, tgrp_case_5_3_1, sgrp_case_5_3_1, name_case_5_3_1, xtra_case_5_3_1, desc_case_5_3_1, sref_case_5_3_1, &preamble_0, &test_case_5_3_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_5_3_2, tgrp_case_5_3_2, sgrp_case_5_3_2, name_case_5_3_2, xtra_case_5_3_2, desc_case_5_3_2, sref_case_5_3_2, &preamble_0, &test_case_5_3_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_1_1, tgrp_case_6_1_1, sgrp_case_6_1_1, name_case_6_1_1, xtra_case_6_1_1, desc_case_6_1_1, sref_case_6_1_1, &preamble_0, &test_case_6_1_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_1_2, tgrp_case_6_1_2, sgrp_case_6_1_2, name_case_6_1_2, xtra_case_6_1_2, desc_case_6_1_2, sref_case_6_1_2, &preamble_0, &test_case_6_1_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_1_3, tgrp_case_6_1_3, sgrp_case_6_1_3, name_case_6_1_3, xtra_case_6_1_3, desc_case_6_1_3, sref_case_6_1_3, &preamble_0, &test_case_6_1_3, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_1_4, tgrp_case_6_1_4, sgrp_case_6_1_4, name_case_6_1_4, xtra_case_6_1_4, desc_case_6_1_4, sref_case_6_1_4, &preamble_0, &test_case_6_1_4, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_1_5, tgrp_case_6_1_5, sgrp_case_6_1_5, name_case_6_1_5, xtra_case_6_1_5, desc_case_6_1_5, sref_case_6_1_5, &preamble_0, &test_case_6_1_5, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_2_1, tgrp_case_6_2_1, sgrp_case_6_2_1, name_case_6_2_1, xtra_case_6_2_1, desc_case_6_2_1, sref_case_6_2_1, &preamble_0, &test_case_6_2_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_2_2, tgrp_case_6_2_2, sgrp_case_6_2_2, name_case_6_2_2, xtra_case_6_2_2, desc_case_6_2_2, sref_case_6_2_2, &preamble_0, &test_case_6_2_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_2_3, tgrp_case_6_2_3, sgrp_case_6_2_3, name_case_6_2_3, xtra_case_6_2_3, desc_case_6_2_3, sref_case_6_2_3, &preamble_0, &test_case_6_2_3, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_2_4, tgrp_case_6_2_4, sgrp_case_6_2_4, name_case_6_2_4, xtra_case_6_2_4, desc_case_6_2_4, sref_case_6_2_4, &preamble_0, &test_case_6_2_4, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_2_5, tgrp_case_6_2_5, sgrp_case_6_2_5, name_case_6_2_5, xtra_case_6_2_5, desc_case_6_2_5, sref_case_6_2_5, &preamble_0, &test_case_6_2_5, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_3_1, tgrp_case_6_3_1, sgrp_case_6_3_1, name_case_6_3_1, xtra_case_6_3_1, desc_case_6_3_1, sref_case_6_3_1, &preamble_0, &test_case_6_3_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_6_4_1, tgrp_case_6_4_1, sgrp_case_6_4_1, name_case_6_4_1, xtra_case_6_4_1, desc_case_6_4_1, sref_case_6_4_1, &preamble_0, &test_case_6_4_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_4_2, tgrp_case_6_4_2, sgrp_case_6_4_2, name_case_6_4_2, xtra_case_6_4_2, desc_case_6_4_2, sref_case_6_4_2, &preamble_0, &test_case_6_4_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_4_3, tgrp_case_6_4_3, sgrp_case_6_4_3, name_case_6_4_3, xtra_case_6_4_3, desc_case_6_4_3, sref_case_6_4_3, &preamble_0, &test_case_6_4_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_4_3, tgrp_case_6_4_4, sgrp_case_6_4_4, name_case_6_4_4, xtra_case_6_4_4, desc_case_6_4_4, sref_case_6_4_4, &preamble_0, &test_case_6_4_4, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_5_1, tgrp_case_6_5_1, sgrp_case_6_5_1, name_case_6_5_1, xtra_case_6_5_1, desc_case_6_5_1, sref_case_6_5_1, &preamble_0, &test_case_6_5_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_5_2, tgrp_case_6_5_2, sgrp_case_6_5_2, name_case_6_5_2, xtra_case_6_5_2, desc_case_6_5_2, sref_case_6_5_2, &preamble_0, &test_case_6_5_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_5_3, tgrp_case_6_5_3, sgrp_case_6_5_3, name_case_6_5_3, xtra_case_6_5_3, desc_case_6_5_3, sref_case_6_5_3, &preamble_0, &test_case_6_5_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_5_4, tgrp_case_6_5_4, sgrp_case_6_5_4, name_case_6_5_4, xtra_case_6_5_4, desc_case_6_5_4, sref_case_6_5_4, &preamble_0, &test_case_6_5_4, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_5_4, tgrp_case_6_5_5, sgrp_case_6_5_5, name_case_6_5_5, xtra_case_6_5_5, desc_case_6_5_5, sref_case_6_5_5, &preamble_0, &test_case_6_5_5, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_6_1, tgrp_case_6_6_1, sgrp_case_6_6_1, name_case_6_6_1, xtra_case_6_6_1, desc_case_6_6_1, sref_case_6_6_1, &preamble_0, &test_case_6_6_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_6_2, tgrp_case_6_6_2, sgrp_case_6_6_2, name_case_6_6_2, xtra_case_6_6_2, desc_case_6_6_2, sref_case_6_6_2, &preamble_0, &test_case_6_6_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_6_3, tgrp_case_6_6_3, sgrp_case_6_6_3, name_case_6_6_3, xtra_case_6_6_3, desc_case_6_6_3, sref_case_6_6_3, &preamble_0, &test_case_6_6_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_6_6_4, tgrp_case_6_6_4, sgrp_case_6_6_4, name_case_6_6_4, xtra_case_6_6_4, desc_case_6_6_4, sref_case_6_6_4, &preamble_0, &test_case_6_6_4, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_1_1, tgrp_case_7_1_1, sgrp_case_7_1_1, name_case_7_1_1, xtra_case_7_1_1, desc_case_7_1_1, sref_case_7_1_1, &preamble_0, &test_case_7_1_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_1_2, tgrp_case_7_1_2, sgrp_case_7_1_2, name_case_7_1_2, xtra_case_7_1_2, desc_case_7_1_2, sref_case_7_1_2, &preamble_0, &test_case_7_1_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_1_3, tgrp_case_7_1_3, sgrp_case_7_1_3, name_case_7_1_3, xtra_case_7_1_3, desc_case_7_1_3, sref_case_7_1_3, &preamble_0, &test_case_7_1_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_2_1, tgrp_case_7_2_1, sgrp_case_7_2_1, name_case_7_2_1, xtra_case_7_2_1, desc_case_7_2_1, sref_case_7_2_1, &preamble_0, &test_case_7_2_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_3_1, tgrp_case_7_3_1, sgrp_case_7_3_1, name_case_7_3_1, xtra_case_7_3_1, desc_case_7_3_1, sref_case_7_3_1, &preamble_0, &test_case_7_3_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_3_2, tgrp_case_7_3_2, sgrp_case_7_3_2, name_case_7_3_2, xtra_case_7_3_2, desc_case_7_3_2, sref_case_7_3_2, &preamble_0, &test_case_7_3_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_3_3, tgrp_case_7_3_3, sgrp_case_7_3_3, name_case_7_3_3, xtra_case_7_3_3, desc_case_7_3_3, sref_case_7_3_3, &preamble_0, &test_case_7_3_3, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_3_4, tgrp_case_7_3_4, sgrp_case_7_3_4, name_case_7_3_4, xtra_case_7_3_4, desc_case_7_3_4, sref_case_7_3_4, &preamble_0, &test_case_7_3_4, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_3_5, tgrp_case_7_3_5, sgrp_case_7_3_5, name_case_7_3_5, xtra_case_7_3_5, desc_case_7_3_5, sref_case_7_3_5, &preamble_0, &test_case_7_3_5, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_7_3_6, tgrp_case_7_3_6, sgrp_case_7_3_6, name_case_7_3_6, xtra_case_7_3_6, desc_case_7_3_6, sref_case_7_3_6, &preamble_0, &test_case_7_3_6, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_8_1_1, tgrp_case_8_1_1, sgrp_case_8_1_1, name_case_8_1_1, xtra_case_8_1_1, desc_case_8_1_1, sref_case_8_1_1, &preamble_0, &test_case_8_1_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_8_1_2, tgrp_case_8_1_2, sgrp_case_8_1_2, name_case_8_1_2, xtra_case_8_1_2, desc_case_8_1_2, sref_case_8_1_2, &preamble_0, &test_case_8_1_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_8_2_1, tgrp_case_8_2_1, sgrp_case_8_2_1, name_case_8_2_1, xtra_case_8_2_1, desc_case_8_2_1, sref_case_8_2_1, &preamble_0, &test_case_8_2_1, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_8_2_2, tgrp_case_8_2_2, sgrp_case_8_2_2, name_case_8_2_2, xtra_case_8_2_2, desc_case_8_2_2, sref_case_8_2_2, &preamble_0, &test_case_8_2_2, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_8_2_3, tgrp_case_8_2_3, sgrp_case_8_2_3, name_case_8_2_3, xtra_case_8_2_3, desc_case_8_2_3, sref_case_8_2_3, &preamble_0, &test_case_8_2_3, &postamble_0, 0, 0, 0, __RESULT_SUCCESS}, {
+	numb_case_9_1_1, tgrp_case_9_1_1, sgrp_case_9_1_1, name_case_9_1_1, xtra_case_9_1_1, desc_case_9_1_1, sref_case_9_1_1, &preamble_0, &test_case_9_1_1, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
+	numb_case_9_1_2, tgrp_case_9_1_2, sgrp_case_9_1_2, name_case_9_1_2, xtra_case_9_1_2, desc_case_9_1_2, sref_case_9_1_2, &preamble_0, &test_case_9_1_2, &postamble_0, 0, 0, 0, __RESULT_INCONCLUSIVE}, {
 	NULL,}
 };
 
 static int summary = 0;
 
+void
+print_header(void)
+{
+	if (verbose <= 0)
+		return;
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "\n%s - %s - %s - Conformance Test Suite\n", lstdname, lpkgname, shortname);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
 int
-do_tests(void)
+do_tests(int num_tests)
 {
 	int i;
-	int result = INCONCLUSIVE;
+	int result = __RESULT_INCONCLUSIVE;
+	int notapplicable = 0;
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
+	int skipped = 0;
+	int notselected = 0;
+	int aborted = 0;
+	int repeat = 0;
+	int oldverbose = verbose;
 
-	printf("\n\nQ.784 conformance test program for streams-isup driver.\n");
-	FFLUSH(stdout);
-	if (begin_tests() == SUCCESS) {
+	print_header();
+	show = 0;
+	if (verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "\nUsing device %s\n\n", devname);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (num_tests == 1 || begin_tests(0) == __RESULT_SUCCESS) {
+		if (num_tests != 1)
+			end_tests(0);
+		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
-			if (tests[i].result)
-				continue;
+		      rerun:
 			if (!tests[i].run) {
-				tests[i].result = INCONCLUSIVE;
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				notselected++;
 				continue;
 			}
-			printf("\nTest Case Q.784/%s:\n%s\n", tests[i].numb, tests[i].name);
-			printf("--------------------+--+---------Preamble--------------+--------------------\n");
-			FFLUSH(stdout);
-			if (tests[i].preamble() != SUCCESS) {
-				printf("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n", state);
-				FFLUSH(stdout);
-				result = INCONCLUSIVE;
+			if (aborted) {
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				inconclusive++;
+				continue;
+			}
+			if (verbose > 0) {
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
+				if (verbose > 1 && tests[i].tgrp)
+					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
+				if (verbose > 1 && tests[i].sgrp)
+					fprintf(stdout, "\nTest Subgroup: %s", tests[i].sgrp);
+				if (tests[i].xtra)
+					fprintf(stdout, "\nTest Case %s-%s/%s: %s (%s)\n", sstdname, shortname, tests[i].numb, tests[i].name, tests[i].xtra);
+				else
+					fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
+				if (verbose > 1 && tests[i].sref)
+					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
+				if (verbose > 1 && tests[i].desc)
+					fprintf(stdout, "%s\n", tests[i].desc);
+				fprintf(stdout, "\n");
+				fflush(stdout);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			if ((result = tests[i].result) == 0) {
+				ulong duration = test_duration;
+
+				if (duration > tests[i].duration) {
+					if (tests[i].duration && duration > tests[i].duration)
+						duration = tests[i].duration;
+					if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
+						goto inconclusive;
+					result = test_run(tests[i].stream, duration);
+					(*tests[i].stop) (i);
+				} else
+					result = __RESULT_SKIPPED;
+				if (result == tests[i].expect) {
+					switch (result) {
+					case __RESULT_SUCCESS:
+					case __RESULT_NOTAPPL:
+					case __RESULT_SKIPPED:
+						/* autotest can handle these */
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+					case __RESULT_FAILURE:
+						/* these are expected failures */
+						result = __RESULT_SUCCESS;
+						break;
+					}
+				}
 			} else {
-				printf("--------------------|--|-----------Test----------------|--------------------\n");
-				FFLUSH(stdout);
-				switch (tests[i].testcase()) {
+				if (result == tests[i].expect) {
+					switch (result) {
+					case __RESULT_SUCCESS:
+					case __RESULT_NOTAPPL:
+					case __RESULT_SKIPPED:
+						/* autotest can handle these */
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+					case __RESULT_FAILURE:
+						/* these are expected failures */
+						result = __RESULT_SUCCESS;
+						break;
+					}
+				}
+				switch (result) {
+				case __RESULT_SUCCESS:
+					print_passed(3);
+					break;
+				case __RESULT_FAILURE:
+					print_failed(3);
+					break;
+				case __RESULT_NOTAPPL:
+					print_notapplicable(3);
+					break;
+				case __RESULT_SKIPPED:
+					print_skipped(3);
+					break;
 				default:
-				case INCONCLUSIVE:
-					printf("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n", state);
-					FFLUSH(stdout);
-					result = INCONCLUSIVE;
-					break;
-				case FAILURE:
-					printf("XXXXXXXXXXXXXXXXXXXX|XX|XXXXXXXXX FAILED XXXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX(%d)\n", state);
-					FFLUSH(stdout);
-					result = FAILURE;
-					break;
-				case SCRIPTERROR:
-					printf("####################|##|####### SCRIPT ERROR ###########|###################(%d)\n", state);
-					FFLUSH(stdout);
-					result = SCRIPTERROR;
-					break;
-				case SUCCESS:
-					printf("********************|**|********* PASSED **************|********************(%d)\n", state);
-					FFLUSH(stdout);
-					result = SUCCESS;
+				case __RESULT_INCONCLUSIVE:
+					print_inconclusive(3);
 					break;
 				}
 			}
-			printf("--------------------|--|----------Postamble------------|--------------------\n");
-			FFLUSH(stdout);
-			if (tests[i].postamble() != SUCCESS) {
-				printf("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n", state);
-				FFLUSH(stdout);
-				if (result == SUCCESS)
-					result = INCONCLUSIVE;
-			}
-			printf("--------------------+--+-------------------------------+--------------------\n");
-			FFLUSH(stdout);
 			switch (result) {
-			case SUCCESS:
+			case __RESULT_SUCCESS:
 				successes++;
-				printf("*********\n");
-				printf("********* Test Case SUCCESSFUL\n");
-				printf("*********\n\n");
-				FFLUSH(stdout);
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "*********\n");
+					fprintf(stdout, "********* Test Case SUCCESSFUL\n");
+					fprintf(stdout, "*********\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
-			case FAILURE:
-				failures++;
-				printf("XXXXXXXXX\n");
-				printf("XXXXXXXXX Test Case FAILED\n");
-				printf("XXXXXXXXX\n\n");
-				FFLUSH(stdout);
+			case __RESULT_FAILURE:
+				if (!repeat_verbose || repeat)
+					failures++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_NOTAPPL:
+				notapplicable++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case NOT APPLICABLE\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_SKIPPED:
+				skipped++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case SKIPPED\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
 			default:
-			case INCONCLUSIVE:
-				inconclusive++;
-				printf("?????????\n");
-				printf("????????? Test Case INCONCLUSIVE\n");
-				printf("?????????\n\n");
-				FFLUSH(stdout);
+			case __RESULT_INCONCLUSIVE:
+			      inconclusive:
+				if (!repeat_verbose || repeat)
+					inconclusive++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "?????????\n");
+					fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
+					fprintf(stdout, "?????????\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
 			}
+			if (repeat_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+				goto rerun;
+			if (repeat_on_success && (result == __RESULT_SUCCESS))
+				goto rerun;
+			if (repeat) {
+				repeat = 0;
+				verbose = oldverbose;
+			} else if (repeat_verbose && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE)) {
+				repeat = 1;
+				verbose = 5;
+				goto rerun;
+			}
 			tests[i].result = result;
+			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+				aborted = 1;
 		}
-		end_tests();
-		if (summary) {
-			printf("\n\n");
-			FFLUSH(stdout);
+		if (summary && verbose) {
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "\n");
+			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
 				if (tests[i].run) {
-					printf("Test Case Q.784/%-10s ", tests[i].numb);
-					FFLUSH(stdout);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "Test Case %s-%s/%-10s ", sstdname, shortname, tests[i].numb);
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					switch (tests[i].result) {
-					case SUCCESS:
-						printf("SUCCESS\n");
-						FFLUSH(stdout);
+					case __RESULT_SUCCESS:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "SUCCESS\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
-					case FAILURE:
-						printf("FAILURE\n");
-						FFLUSH(stdout);
+					case __RESULT_FAILURE:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "FAILURE\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_NOTAPPL:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "NOT APPLICABLE\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_SKIPPED:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "SKIPPED\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					default:
-					case INCONCLUSIVE:
-						printf("INCONCLUSIVE\n");
-						FFLUSH(stdout);
+					case __RESULT_INCONCLUSIVE:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "INCONCLUSIVE\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					}
 				}
 			}
 		}
-		printf("Done.\n\n");
-		printf("========= %2d successes   \n", successes);
-		printf("========= %2d failures    \n", failures);
-		printf("========= %2d inconclusive\n", inconclusive);
-		FFLUSH(stdout);
-		return (0);
+		if (verbose > 0 && num_tests > 1) {
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "\n");
+			fprintf(stdout, "========= %3d successes     \n", successes);
+			fprintf(stdout, "========= %3d failures      \n", failures);
+			fprintf(stdout, "========= %3d inconclusive  \n", inconclusive);
+			fprintf(stdout, "========= %3d not applicable\n", notapplicable);
+			fprintf(stdout, "========= %3d skipped       \n", skipped);
+			fprintf(stdout, "========= %3d not selected  \n", notselected);
+			fprintf(stdout, "============================\n");
+			fprintf(stdout, "========= %3d total         \n", successes + failures + inconclusive + notapplicable + skipped + notselected);
+			if (!(aborted + failures))
+				fprintf(stdout, "\nDone.\n\n");
+			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		if (aborted) {
+			dummy = lockf(fileno(stderr), F_LOCK, 0);
+			if (verbose > 0)
+				fprintf(stderr, "\n");
+			fprintf(stderr, "Test Suite aborted due to failure.\n");
+			if (verbose > 0)
+				fprintf(stderr, "\n");
+			fflush(stderr);
+			dummy = lockf(fileno(stderr), F_ULOCK, 0);
+		} else if (failures) {
+			dummy = lockf(fileno(stderr), F_LOCK, 0);
+			if (verbose > 0)
+				fprintf(stderr, "\n");
+			fprintf(stderr, "Test Suite failed.\n");
+			if (verbose > 0)
+				fprintf(stderr, "\n");
+			fflush(stderr);
+			dummy = lockf(fileno(stderr), F_ULOCK, 0);
+		}
+		if (num_tests == 1) {
+			if (successes)
+				return (0);
+			if (failures)
+				return (1);
+			if (inconclusive)
+				return (1);
+			if (notapplicable)
+				return (0);
+			if (skipped)
+				return (77);
+		}
+		return (aborted);
 	} else {
-		printf("Test setup failed!\n");
-		FFLUSH(stdout);
-		end_tests();
+		end_tests(0);
+		show = 1;
+		dummy = lockf(fileno(stderr), F_LOCK, 0);
+		fprintf(stderr, "Test Suite setup failed!\n");
+		fflush(stderr);
+		dummy = lockf(fileno(stderr), F_ULOCK, 0);
 		return (2);
 	}
 }
 
 void
-copying(int argc, char *argvp[])
+copying(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (verbose <= 0)
 		return;
+	print_header();
 	fprintf(stdout, "\
-Q.784 ISUP Basic Call Test Specification - Conformance Test Program\n\
+\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
@@ -14479,13 +19844,13 @@ paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor
 regulations).\n\
 \n\
 ");
-	FFLUSH(stdout);
+	fflush(stdout);
 }
 
 void
 version(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
@@ -14504,7 +19869,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 void
 usage(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (verbose <= 0)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
@@ -14518,9 +19883,10 @@ Usage:\n\
 void
 help(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
+\n\
 Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
@@ -14529,16 +19895,49 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
-    -m, --messages\n\
-        enables message output\n\
-    -s, --summary\n\
-        print summary\n\
+    -u, --iut\n\
+        IUT connects instead of PT.\n\
+    -D, --decl-std [STANDARD]\n\
+        specify the SS7 standard version to test.\n\
+    -c, --client\n\
+        execute client side (PTU) of test case only.\n\
+    -S, --server\n\
+        execute server side (IUT) of test case only.\n\
+    -a, --again\n\
+        repeat failed tests verbose.\n\
+    -w, --wait\n\
+        have server wait indefinitely.\n\
+    -r, --repeat\n\
+        repeat test cases on success or failure.\n\
+    -R, --repeat-fail\n\
+        repeat test cases on failure.\n\
+    -p, --client-port [PORT]\n\
+        port number from which to connect [default: %3$d+index*3]\n\
+    -P, --server-port [PORT]\n\
+        port number to which to connect or upon which to listen\n\
+        [default: %3$d+index*3+2]\n\
+    -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
+        client host names(s) or IP numbers\n\
+        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
+    -I, --server-host [HOSTNAME[,HOSTNAME]*]\n\
+        server host names(s) or IP numbers\n\
+        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
+    -d, --device DEVICE\n\
+        device name to open [default: %2$s].\n\
+    -e, --exit\n\
+        exit on the first failed or inconclusive test case.\n\
+    -l, --list [RANGE]\n\
+        list test case names within a range [default: all] and exit.\n\
     -f, --fast [SCALE]\n\
-        run tests fast with optional timer SCALE factor (default 100)\n\
-    -t, --tests SUBSTRING\n\
-        specifies the initial SUBSTRING of the test number to run\n\
-    -o, --onetest STRING\n\
-        specifies the test number STRING to run\n\
+        increase speed of tests by scaling timers [default: 50]\n\
+    -s, --summary\n\
+        print a test case summary at end of testing [default: off]\n\
+    -o, --onetest [TESTCASE]\n\
+        run a single test case.\n\
+    -t, --tests [RANGE]\n\
+        run a range of test cases.\n\
+    -m, --messages\n\
+        display messages. [default: off]\n\
     -q, --quiet\n\
         suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
@@ -14547,14 +19946,23 @@ Options:\n\
     -h, --help, -?, --?\n\
         print this usage message and exit\n\
     -V, --version\n\
-        print the version and exit\n\
+        print version and exit\n\
     -C, --copying\n\
-        print copying permissions and exit\n\
-", argv[0]);
+        print copying permission and exit\n\
+Symbols:\n\
+    [STANDARD]\n\
+        SS7_PVAR_ITUT_83  SS7_PVAR_ETSI_88  SS7_PVAR_ANSI_92  SS7_PVAR_SING_88\n\
+        SS7_PVAR_ITUT_93  SS7_PVAR_ETSI_93  SS7_PVAR_JTTC_94  SS7_PVAR_SPAN_88\n\
+        SS7_PVAR_ITUT_96  SS7_PVAR_ETSI_96  SS7_PVAR_ANSI_96\n\
+        SS7_PVAR_ITUT_00  SS7_PVAR_ETSI_00  SS7_PVAR_ANSI_00  SS7_PVAR_CHIN_00\n\
+\n\
+", argv[0], devname, TEST_PORT_NUMBER);
 }
 
+#define HOST_BUF_LEN 128
+
 int
-main(int argc, char **argv)
+main(int argc, char *argv[])
 {
 	size_t l, n;
 	int range = 0;
@@ -14574,58 +19982,216 @@ main(int argc, char **argv)
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"iut",		no_argument,		NULL, 'u'},
+			{"draft",	required_argument,	NULL, 'D'},
+			{"decl-std",	required_argument,	NULL, 'D'},
+			{"client",	no_argument,		NULL, 'c'},
+			{"server",	no_argument,		NULL, 'S'},
+			{"again",	no_argument,		NULL, 'a'},
+			{"wait",	no_argument,		NULL, 'w'},
+			{"client-port",	required_argument,	NULL, 'p'},
+			{"server-port",	required_argument,	NULL, 'P'},
+			{"client-host",	required_argument,	NULL, 'i'},
+			{"server-host",	required_argument,	NULL, 'I'},
+			{"repeat",	no_argument,		NULL, 'r'},
+			{"repeat-fail",	no_argument,		NULL, 'R'},
+			{"device",	required_argument,	NULL, 'd'},
+			{"exit",	no_argument,		NULL, 'e'},
+			{"list",	optional_argument,	NULL, 'l'},
 			{"fast",	optional_argument,	NULL, 'f'},
 			{"summary",	no_argument,		NULL, 's'},
 			{"onetest",	required_argument,	NULL, 'o'},
 			{"tests",	required_argument,	NULL, 't'},
 			{"messages",	no_argument,		NULL, 'm'},
 			{"quiet",	no_argument,		NULL, 'q'},
-			{"verbose",	no_argument,		NULL, 'v'},
+			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{ 0, }
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "uD:cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "uD:cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'u':	/* --iut */
+			iut_connects = 1;
+			break;
+		case 'D':	/* --decl-std */
+			ss7_pvar = strtoul(optarg, NULL, 0);
+			switch (ss7_pvar) {
+			case SS7_PVAR_ITUT_88:
+			case SS7_PVAR_ITUT_93:
+			case SS7_PVAR_ITUT_96:
+			case SS7_PVAR_ITUT_00:
+			case SS7_PVAR_ETSI_88:
+			case SS7_PVAR_ETSI_93:
+			case SS7_PVAR_ETSI_96:
+			case SS7_PVAR_ETSI_00:
+			case SS7_PVAR_ANSI_92:
+			case SS7_PVAR_ANSI_96:
+			case SS7_PVAR_ANSI_00:
+			case SS7_PVAR_JTTC_94:
+			case SS7_PVAR_CHIN_00:
+			case SS7_PVAR_SING | SS7_PVAR_88:
+			case SS7_PVAR_SPAN | SS7_PVAR_88:
+				break;
+			default:
+				if (!strcmp(optarg, "SS7_PVAR_ITUT_88"))
+					ss7_pvar = SS7_PVAR_ITUT_88;
+				else if (!strcmp(optarg, "SS7_PVAR_ITUT_93"))
+					ss7_pvar = SS7_PVAR_ITUT_93;
+				else if (!strcmp(optarg, "SS7_PVAR_ITUT_96"))
+					ss7_pvar = SS7_PVAR_ITUT_96;
+				else if (!strcmp(optarg, "SS7_PVAR_ITUT_00"))
+					ss7_pvar = SS7_PVAR_ITUT_00;
+				else if (!strcmp(optarg, "SS7_PVAR_ETSI_88"))
+					ss7_pvar = SS7_PVAR_ETSI_88;
+				else if (!strcmp(optarg, "SS7_PVAR_ETSI_93"))
+					ss7_pvar = SS7_PVAR_ETSI_93;
+				else if (!strcmp(optarg, "SS7_PVAR_ETSI_96"))
+					ss7_pvar = SS7_PVAR_ETSI_96;
+				else if (!strcmp(optarg, "SS7_PVAR_ETSI_00"))
+					ss7_pvar = SS7_PVAR_ETSI_00;
+				else if (!strcmp(optarg, "SS7_PVAR_ANSI_92"))
+					ss7_pvar = SS7_PVAR_ANSI_92;
+				else if (!strcmp(optarg, "SS7_PVAR_ANSI_96"))
+					ss7_pvar = SS7_PVAR_ANSI_96;
+				else if (!strcmp(optarg, "SS7_PVAR_ANSI_00"))
+					ss7_pvar = SS7_PVAR_ANSI_00;
+				else if (!strcmp(optarg, "SS7_PVAR_JTTC_94"))
+					ss7_pvar = SS7_PVAR_JTTC_94;
+				else if (!strcmp(optarg, "SS7_PVAR_CHIN_00"))
+					ss7_pvar = SS7_PVAR_CHIN_00;
+				else if (!strcmp(optarg, "SS7_PVAR_SING_88"))
+					ss7_pvar = SS7_PVAR_SING | SS7_PVAR_88;
+				else if (!strcmp(optarg, "SS7_PVAR_SPAN_88"))
+					ss7_pvar = SS7_PVAR_SPAN | SS7_PVAR_88;
+				else
+					goto bad_option;
+			}
+			break;
+		case 'c':	/* --client */
+			client_exec = 1;
+			break;
+		case 'S':	/* --server */
+			server_exec = 1;
+			break;
+		case 'a':	/* --again */
+			repeat_verbose = 1;
+			break;
+		case 'w':	/* --wait */
+			test_duration = INFINITE_WAIT;
+			break;
+		case 'r':	/* --repeat */
+			repeat_on_success = 1;
+			repeat_on_failure = 1;
+			break;
+		case 'R':	/* --repeat-fail */
+			repeat_on_failure = 1;
+			break;
+		case 'd':
+			if (optarg) {
+				snprintf(devname, sizeof(devname), "%s", optarg);
+				break;
+			}
+			goto bad_option;
+		case 'e':
+			exit_on_failure = 1;
+			break;
+		case 'l':
+			if (optarg) {
+				l = strnlen(optarg, 16);
+				fprintf(stdout, "\n");
+				for (n = 0, t = tests; t->numb; t++)
+					if (!strncmp(t->numb, optarg, l)) {
+						if (verbose > 2 && t->tgrp)
+							fprintf(stdout, "Test Group: %s\n", t->tgrp);
+						if (verbose > 2 && t->sgrp)
+							fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
+						if (t->xtra)
+							fprintf(stdout, "Test Case %s-%s/%s: %s (%s)\n", sstdname, shortname, t->numb, t->name, t->xtra);
+						else
+							fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+						if (verbose > 2 && t->sref)
+							fprintf(stdout, "Test Reference: %s\n", t->sref);
+						if (verbose > 1 && t->desc)
+							fprintf(stdout, "%s\n\n", t->desc);
+						fflush(stdout);
+						n++;
+					}
+				if (!n) {
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fflush(stderr);
+					goto bad_option;
+				}
+				if (verbose <= 1)
+					fprintf(stdout, "\n");
+				fflush(stdout);
+				exit(0);
+			} else {
+				fprintf(stdout, "\n");
+				for (t = tests; t->numb; t++) {
+					if (verbose > 2 && t->tgrp)
+						fprintf(stdout, "Test Group: %s\n", t->tgrp);
+					if (verbose > 2 && t->sgrp)
+						fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
+					if (t->xtra)
+						fprintf(stdout, "Test Case %s-%s/%s: %s (%s)\n", sstdname, shortname, t->numb, t->name, t->xtra);
+					else
+						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+					if (verbose > 2 && t->sref)
+						fprintf(stdout, "Test Reference: %s\n", t->sref);
+					if (verbose > 1 && t->desc)
+						fprintf(stdout, "%s\n\n", t->desc);
+					fflush(stdout);
+				}
+				if (verbose <= 1)
+					fprintf(stdout, "\n");
+				fflush(stdout);
+				exit(0);
+			}
+			break;
 		case 'f':
 			if (optarg)
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long) timer_scale);
 			break;
 		case 's':
 			summary = 1;
 			break;
 		case 'o':
-			if (!range) {
-				for (t = tests; t->numb; t++)
-					t->run = 0;
-				tests_to_run = 0;
-			}
-			range = 1;
-			for (n = 0, t = tests; t->numb; t++)
-				if (!strncmp(t->numb, optarg, 16)) {
-					if (!t->result) {
+			if (optarg) {
+				if (!range) {
+					for (t = tests; t->numb; t++)
+						t->run = 0;
+					tests_to_run = 0;
+				}
+				range = 1;
+				for (n = 0, t = tests; t->numb; t++)
+					if (!strncmp(t->numb, optarg, 16)) {
+						// if (!t->result) {
 						t->run = 1;
 						n++;
 						tests_to_run++;
+						// }
 					}
+				if (!n) {
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fflush(stderr);
+					goto bad_option;
 				}
-			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
-				FFLUSH(stderr);
+				break;
 			}
-			break;
+			goto bad_option;
 		case 't':
 			l = strnlen(optarg, 16);
 			if (!range) {
@@ -14636,21 +20202,25 @@ main(int argc, char **argv)
 			range = 1;
 			for (n = 0, t = tests; t->numb; t++)
 				if (!strncmp(t->numb, optarg, l)) {
-					if (!t->result) {
-						t->run = 1;
-						n++;
-						tests_to_run++;
-					}
+					// if (!t->result) {
+					t->run = 1;
+					n++;
+					tests_to_run++;
+					// }
 				}
 			if (!n) {
 				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
-				FFLUSH(stderr);
+				fflush(stderr);
+				goto bad_option;
 			}
 			break;
 		case 'm':
 			show_msg = 1;
 			break;
-		case 'v':
+		case 'q':	/* -q, --quiet */
+			verbose = 0;
+			break;
+		case 'v':	/* -v, --verbose */
 			if (optarg == NULL) {
 				verbose++;
 				show_msg++;
@@ -14665,7 +20235,7 @@ main(int argc, char **argv)
 		case 'h':	/* -h, --help */
 			help(argc, argv);
 			exit(0);
-		case 'V':
+		case 'V':	/* -V, --version */
 			version(argc, argv);
 			exit(0);
 		case 'C':
@@ -14689,13 +20259,32 @@ main(int argc, char **argv)
 			exit(2);
 		}
 	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	if (!tests_to_run) {
-		fprintf(stderr, "ERROR: no tests to run\n");
-		FFLUSH(stderr);
-		exit(1);
+	switch (tests_to_run) {
+	case 0:
+		if (verbose > 0) {
+			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
+			fflush(stderr);
+		}
+		exit(2);
+	case 1:
+		break;
+	default:
+		copying(argc, argv);
 	}
-	copying(argc, argv);
-	return do_tests();
+	if (client_exec == 0 && server_exec == 0) {
+		client_exec = 1;
+		server_exec = 1;
+	}
+#if 0
+	if (client_ppa_specified) {
+	}
+	if (server_ppa_specified) {
+	}
+#endif
+	exit(do_tests(tests_to_run));
 }

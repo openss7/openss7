@@ -71,10 +71,12 @@ man_MANS = \
 	man4/mgi_ioctl.4 \
 	man4/mg-lm.4 \
 	man4/mx.4 \
-	man4/mx_ioctl.4 \
-	man4/mx-pmod.4 \
-	man4/mx_pmod.4 \
 	man4/mxi_ioctl.4 \
+	man4/mx_ioctl.4 \
+	man4/mx_mux.4 \
+	man4/mx-mux.4 \
+	man4/mx_pmod.4 \
+	man4/mx-pmod.4 \
 	man4/mx_sdl.4 \
 	man4/v401p.4 \
 	man5/strchan.5 \
@@ -328,10 +330,12 @@ dist_noinst_MANS = \
 	man4/mgi_ioctl.4.man \
 	man4/mg-lm.4.man \
 	man4/mx.4.man \
-	man4/mx_ioctl.4.man \
-	man4/mx-pmod.4.man \
-	man4/mx_pmod.4.man \
 	man4/mxi_ioctl.4.man \
+	man4/mx_ioctl.4.man \
+	man4/mx_mux.4.man \
+	man4/mx-mux.4.man \
+	man4/mx_pmod.4.man \
+	man4/mx-pmod.4.man \
 	man4/mx_sdl.4.man \
 	man4/v401p.4.man \
 	man5/strchan.5.man \

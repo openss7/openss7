@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- Affero General Public License (GPL) Version 3, so long as the software is
+ Affero General Public License (AGPL) Version 3, so long as the software is
  distributed with, and only used for the testing of, OpenSS7 modules, drivers,
  and libraries.
 
@@ -40,17 +40,18 @@
 
  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
  behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
- is classified as "Commercial Computer Software" under paragraph 252.227-7014
- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
- successor regulations) and the Government is acquiring only the license rights
- granted herein (the license rights customarily provided to non-Government
- users).  If the Software is supplied to any unit or agency of the Government
- other than DoD, it is classified as "Restricted Computer Software" and the
- Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
- (or any successor regulations).
+ to you.  If the Software is supplied by the Department of Defense ("DoD"),
+ it is classified as "Commercial Computer Software" under paragraph
+ 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
+ ("DFARS") (or any successor regulations) and the Government is acquiring
+ only the license rights granted herein (the license rights customarily
+ provided to non-Government users).  If the Software is supplied to any unit
+ or agency of the Government other than DoD, it is classified as "Restricted
+ Computer Software" and the Government's rights in the Software are defined
+ in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
+ any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor
+ regulations).
 
  -----------------------------------------------------------------------------
 
@@ -124,13 +125,6 @@ static char const ident[] = "$RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0
 #include <getopt.h>
 #endif
 
-#if TEST_M2PA
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#endif				/* TEST_M2PA */
-
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
 #include <ss7/sdli.h>
@@ -143,10 +137,6 @@ static char const ident[] = "$RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0
 #include <ss7/sdti_ioctl.h>
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
-#if TEST_M2PA
-#include <sys/npi.h>
-#include <sys/npi_sctp.h>
-#endif				/* TEST_M2PA */
 
 #if __BYTE_ORDER == __BIG_ENDIAN
 #   define __constant_ntohl(x)	(x)
@@ -237,13 +227,6 @@ static int repeat_on_success = 0;
 static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
 
-#if TEST_M2PA
-static int client_port_specified = 0;
-static int server_port_specified = 0;
-static int client_host_specified = 0;
-static int server_host_specified = 0;
-#endif
-
 static int verbose = 1;
 
 static int client_exec = 0;		/* execute client side */
@@ -254,9 +237,7 @@ static int show_acks = 0;
 static int show_timeout = 0;
 static int show_fisus = 1;
 
-#if TEST_X400
 static int show_msus = 1;
-#endif
 
 //static int show_data = 1;
 
@@ -265,26 +246,6 @@ static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 static int last_prio = 0;
-
-#if TEST_M2PA
-static int PRIM_type = 0;
-static int NPI_error = 0;
-static int CONIND_number = 2;
-static int TOKEN_value = 0;
-static int SEQ_number = 1;
-static int SERV_type = N_CLNS;
-static int CURRENT_state = NS_UNBND;
-N_info_ack_t last_info = { 0, };
-
-static int DATA_xfer_flags = 0;
-static int BIND_flags = 0;
-static int RESET_orig = N_UNDEFINED;
-static int RESET_reason = 0;
-static int DISCON_reason = 0;
-static int CONN_flags = 0;
-static int ERROR_type = 0;
-static int RESERVED_field[2] = { 0, 0 };
-#endif
 
 #define TEST_PROTOCOL 132
 
@@ -347,24 +308,6 @@ static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
 static int test_timout = 200;
 
-#if TEST_M2PA
-static int test_bufsize = 256;
-static int test_nidu = 256;
-static int OPTMGMT_flags = 0;
-static struct sockaddr_in *ADDR_buffer = NULL;
-static socklen_t ADDR_length = sizeof(*ADDR_buffer);
-static struct sockaddr_in *DEST_buffer = NULL;
-static socklen_t DEST_length = 0;
-static struct sockaddr_in *SRC_buffer = NULL;
-static socklen_t SRC_length = 0;
-static unsigned char *PROTOID_buffer = NULL;
-static size_t PROTOID_length = 0;
-static char *DATA_buffer = NULL;
-static size_t DATA_length = 0;
-static int test_resfd = -1;
-static void *QOS_buffer = NULL;
-static int QOS_length = 0;
-#else
 static unsigned short addrs[3][1] = {
 	{(PTU_TEST_SLOT << 12) | (PTU_TEST_SPAN << 8) | (PTU_TEST_CHAN << 0)},
 	{(IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0)},
@@ -373,7 +316,6 @@ static unsigned short addrs[3][1] = {
 static int anums[3] = { 1, 1, 1 };
 static unsigned short *ADDR_buffer = NULL;
 static size_t ADDR_length = sizeof(unsigned short);
-#endif
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -386,22 +328,7 @@ int flags = 0;
 
 int dummy = 0;
 
-#if TEST_M2PA
-#ifndef SCTP_VERSION_2
-#define SCTP_VERSION_2
-#endif
-
-#if 1
-#ifndef SCTP_VERSION_2
-typedef struct addr {
-	uint16_t port __attribute__ ((packed));
-	struct in_addr addr[3] __attribute__ ((packed));
-} addr_t;
-#endif				/* SCTP_VERSION_2 */
-#endif
-#else
 typedef unsigned short ppa_t;
-#endif
 
 struct timeval when;
 
@@ -500,98 +427,13 @@ enum {
  *  -------------------------------------------------------------------------
  */
 
-#if TEST_X400
 static int ss7_pvar = SS7_PVAR_ITUT_00;
-#endif				/* TEST_X400 */
 
 struct test_stats {
 	sdl_stats_t sdl;
 	sdt_stats_t sdt;
 	sl_stats_t sl;
 } iutstat;
-
-#if TEST_M2PA
-#define M2PA_VERSION_DRAFT3	0x30
-#define M2PA_VERSION_DRAFT3_1	0x31
-#define M2PA_VERSION_DRAFT4	0x40
-#define M2PA_VERSION_DRAFT4_1	0x41
-#define M2PA_VERSION_DRAFT4_9	0x49
-#define M2PA_VERSION_DRAFT5	0x50
-#define M2PA_VERSION_DRAFT5_1	0x51
-#define M2PA_VERSION_DRAFT6	0x60
-#define M2PA_VERSION_DRAFT6_1	0x61
-#define M2PA_VERSION_DRAFT6_9	0x69
-#define M2PA_VERSION_DRAFT7	0x70
-#define M2PA_VERSION_DRAFT9	0x90
-#define M2PA_VERSION_DRAFT10	0xa0
-#define M2PA_VERSION_DRAFT11	0xb0
-#define M2PA_VERSION_RFC4165	0xc1
-#define M2PA_VERSION_DEFAULT	M2PA_VERSION_RFC4165
-
-static int m2pa_version = M2PA_VERSION_DEFAULT;
-
-struct {
-	N_qos_sel_info_sctp_t info;
-	N_qos_sel_data_sctp_t data;
-	N_qos_sel_conn_sctp_t conn;
-} qos[3] = {
-	{
-		{
-			N_QOS_SEL_INFO_SCTP,	/* n_qos_type */
-			    2,	/* i_streams */
-			    2,	/* o_streams */
-			    5,	/* ppi */
-			    0,	/* sid */
-			    -1L,	/* max_in */
-			    -1L,	/* max_retran */
-			    -1L,	/* ck_life */
-			    -1L,	/* ck_inc */
-			    -1L,	/* hmac */
-			    -1L,	/* thrott */
-			    -1L,	/* max_sack */
-			    -1L,	/* rto_ini */
-			    -1L,	/* rto_min */
-			    -1L,	/* rto_max */
-			    -1L,	/* rtx_path */
-			    -1L,	/* hb_itvl */
-			    0	/* options */
-		}, {
-			N_QOS_SEL_DATA_SCTP,	/* n_qos_type */
-			    5,	/* ppi */
-			    1,	/* sid */
-			    0,	/* ssn */
-			    0,	/* tsn */
-			    0	/* more */
-	},}, {
-		{
-			N_QOS_SEL_INFO_SCTP,	/* n_qos_type */
-			    2,	/* i_streams */
-			    2,	/* o_streams */
-			    5,	/* ppi */
-			    0,	/* sid */
-			    -1L,	/* max_in */
-			    -1L,	/* max_retran */
-			    -1L,	/* ck_life */
-			    -1L,	/* ck_inc */
-			    -1L,	/* hmac */
-			    -1L,	/* thrott */
-			    -1L,	/* max_sack */
-			    -1L,	/* rto_ini */
-			    -1L,	/* rto_min */
-			    -1L,	/* rto_max */
-			    -1L,	/* rtx_path */
-			    -1L,	/* hb_itvl */
-			    0,	/* options */
-		}, {
-			N_QOS_SEL_DATA_SCTP,	/* n_qos_type */
-			    5,	/* ppi */
-			    1,	/* sid */
-			    0,	/* ssn */
-			    0,	/* tsn */
-			    0	/* more */
-	},}, {
-},};
-#endif				/* TEST_M2PA */
 
 struct test_config {
 	lmi_option_t opt;
@@ -606,20 +448,11 @@ struct test_config {
 	{
 		.ifname = NULL,	/* */
 		    .ifflags = 0,	/* */
-#if TEST_X400
 		    .iftype = SDL_TYPE_DS0,	/* */
 		    .ifrate = 64000,	/* */
 		    .ifgtype = SDL_GTYPE_NONE,	/* */
 		    .ifgrate = 0,	/* */
 		    .ifmode = SDL_MODE_NONE,	/* */
-#endif				/* TEST_X400 */
-#if TEST_M2PA
-		    .iftype = SDL_TYPE_PACKET,	/* */
-		    .ifrate = 10000000,	/* */
-		    .ifgtype = SDL_GTYPE_SCTP,	/* */
-		    .ifgrate = 10000000,	/* */
-		    .ifmode = SDL_MODE_PEER,	/* */
-#endif				/* TEST_M2PA */
 		    .ifgmode = SDL_GMODE_NONE,	/* */
 		    .ifgcrc = SDL_GCRC_NONE,	/* */
 		    .ifclock = SDL_CLOCK_NONE,	/* */
