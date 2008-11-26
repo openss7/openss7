@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-11-26 12:01:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008-11-26 12:23:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-26 12:01:51 $ by $Author: brian $
+# Last Modified $Date: 2008-11-26 12:23:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -435,7 +435,6 @@ EXTRA_DIST			+= $(mods_source_FILES) $(drvs_source_FILES)
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
 				scripts/texi/args.texi.in \
-				scripts/texi/fdl13.texi \
 				scripts/texi/fdl.texi \
 				scripts/texi/gpl.texi \
 				scripts/texi/install.texi \
@@ -624,6 +623,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.71  2008-11-26 12:23:12  brian
+# - correction for FDL update
+#
 # Revision 0.9.2.70  2008-11-26 12:01:51  brian
 # - updated to FDL 1.3
 #
