@@ -7,7 +7,7 @@
 -sob
 -bbo
 -ncdb
--l85
+-l95
 -lc85
 -i8
 -ip8

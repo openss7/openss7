@@ -780,7 +780,6 @@ mx_attach(queue_t *q, mx_ulong ppa, mx_ulong style)
 	int card = (ppa >> 16) & 0x0ff;
 	int span = (ppa >> 8) & 0x0ff;
 	int i, p, slot = (ppa >> 0) & 0x0ff;
-	uint32_t xmask = (vp->channels == 24) ? VP_T1_CHAN_VALID_MASK : VP_E1_CHAN_VALID_MASK;
 
 	/* locate card */
 	vp = &vp_cards[card];
@@ -793,8 +792,8 @@ mx_attach(queue_t *q, mx_ulong ppa, mx_ulong style)
 		mx->smask = (1 << (span - 1));
 		mx->spans = 1;
 	}
-
 	/* fill out channel mask and count */
+	xmask = (vp->channels == 24) ? VP_T1_CHAN_VALID_MASK : VP_E1_CHAN_VALID_MASK;
 	for (mx->cmask = 0, i = 0, p = 1; i < vp->spans; i++, p <<= 1) {
 		if (!(mx->smask & p))
 			continue;

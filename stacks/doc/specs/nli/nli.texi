@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: nli.texi,v 0.9.2.7 2008-09-20 11:04:41 brian Exp $
+% @(#) $Id: nli.texi,v 0.9.2.9 2008-11-26 12:57:42 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-09-20 11:04:41 $ by $Author: brian $
+% Last Modified $Date: 2008-11-26 12:57:42 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -125,6 +125,11 @@ no obligation to provide any feature listed herein.
 @set MANUAL_TITLE Network Layer Interface
 @set MANUAL_TYPE Specification
 
+@set PART X.25 Packet Layer
+@set LONG X.25 Packet Layer Protocol
+@set SHORT PLP
+@set INTERFACE NLI
+
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
@@ -143,8 +148,8 @@ no obligation to provide any feature listed herein.
 This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
 the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
 as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
-X.25 Packet Layer Protocol (PLP) to these components as well as providing a basis for network layer
-control for other network protocols.
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -238,8 +243,8 @@ no obligation to provide any feature listed herein.
 @defcodeindex pr
 @c Define an index of primitive values
 @defcodeindex pv
-@c @c Define an index of primitive error values
-@c @defcodeindex pe
+@c Define an index of primitive error values
+@defcodeindex pe
 @c Define an index of protocol states
 @defcodeindex st
 @c Define an index of input-output controls
@@ -254,7 +259,7 @@ no obligation to provide any feature listed herein.
 @c @c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
-@c @syncodeindex pe cp
+@syncodeindex pe cp
 @syncodeindex st cp
 @syncodeindex mp cp
 @syncodeindex tp cp
@@ -276,16 +281,16 @@ no obligation to provide any feature listed herein.
 @code{\name\}@pvindex \name\
 @end macro
 
-@c @macro perr{name}
-@c @code{\name\}@peindex \name\
-@c @end macro
+@macro perr{name}
+@var{[\name\]}@peindex \name\
+@end macro
 
 @macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
 @macro parm{name}
-@code{\name\}@vrindex \name\
+@var{\name\}@vrindex \name\
 @end macro
 
 @macro pioc{name}
@@ -310,16 +315,16 @@ no obligation to provide any feature listed herein.
 @code{\name\}
 @end macro
 
-@c @macro perr{name}
-@c @code{\name\}
-@c @end macro
+@macro perr{name}
+@var{[\name\]}
+@end macro
 
 @macro psta{name}
 @code{\name\}
 @end macro
 
 @macro parm{name}
-@code{\name\}
+@var{\name\}
 @end macro
 
 @macro pioc{name}
@@ -338,16 +343,22 @@ no obligation to provide any feature listed herein.
 @end ifnottex
 
 @menu
+* Preface::
 * Introduction::
 * Model of the X.25 Packet Layer::
-* NLI Services::
-* NLI Message Primitives::
+* NLI Services Definition::
+* NLI Primitives::
+@c * Diagnostics Requirements::
 * NLI Input-Output Controls::
 * NLI Management Information Base::
+@c * Addendum for @value{SHORT} Conformance::
+@c * Mapping NLI Primitives::
+@c * State/Event Tables::
+@c * Precedence Tables::
 * Allowable Sequence of NLI Primitives::
-@c * Precedence of NPI Primitives::
-@c * Guidelines for Protocol Independent NS Users::
-@c * Required Information for NS Provider-Specific Addenda::
+@c * Precedence of NLI Primitives::
+@c * Guidelines for Protocol Independent NLI Users::
+@c * Required Information for NLI Provider-Specific Addenda::
 * NLI Header Files::
 * NLI Library::
 * NLI Drivers and Modules::
@@ -369,10 +380,105 @@ no obligation to provide any feature listed herein.
 @page
 @heading List of Figures
 @listoffloats Figure
-@c @page
-@c @heading List of Tables
-@c @listoffloats Table
+@page
+@heading List of Tables
+@listoffloats Table
 @end iftex
+
+@node Preface
+@unnumbered Preface
+
+@section Security Warning
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used
+in advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the document are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action of contract, negligence or other tortious action, arising out
+of or in connection with any use of this document or the performance or implementation of the
+contents thereof.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a
+reference point for the industry.  While @cite{OpenSS7 Corporation} believes that these interfaces
+are well defined in this release of the document, minor changes may be made prior to products
+conforming to the interfaces being made available.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
+(@value{SHORT}) protocol stacks.  It provides abstraction of the signalling link interface to these
+components as well as providing a basis for signalling link control for other X.25 Packet Layer
+protocols.
+
+@section Purpose
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
+
+@section Intent
+
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@section Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Disclaimer
+
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document
+is an @strong{UNCONTROLLED VERSION}.
+
+@smallexample
+@verbatim
+$Log: nli.texi,v $
+Revision 0.9.2.9  2008-11-26 12:57:42  brian
+- corrections to FDL update
+
+Revision 0.9.2.8  2008-11-26 12:01:49  brian
+- updated to FDL 1.3
+
+
+
+
+
+
+
+
+@end verbatim
+@end smallexample
 
 @node Introduction
 @chapter Introduction
@@ -558,8 +664,8 @@ NLI.  An X.25 user can also be a user program that conforms to the NLI and
 accesses the X.25 packet layer using @manref{putmsg(2s)}, @manref{putpmsg(2)},
 @manref{getmsg(2s)}, @manref{getpmsg(2)}, and @manref{ioctl(2)} system calls.
 
-@node NLI Services
-@chapter NLI Services
+@node NLI Services Definition
+@chapter NLI Services Definition
 @cindex NLI services
 
 @menu
@@ -867,7 +973,7 @@ NPI when TOA is Alternative Address is:
 @node CONS Quality of Service Parameters
 @subsection CONS Quality of Service Parameters
 
-Negotiable X.25 facilities are supported by the PLP driver.  This section
+Negotiable X.25 facilities are supported by the @value{SHORT} driver.  This section
 describes the request and negotiation of these facilities, and the data
 structures used by the NLI primitives.
 
@@ -1289,9 +1395,9 @@ packet or window sizes).  If any non-X.25 facilities are supplied, the
 appropriate marker is inserted before the supplied facilities.
 @end table
 
-@node NLI Message Primitives
-@chapter NLI Message Primitives
-@cindex NLI message primitives
+@node NLI Primitives
+@chapter NLI Primitives
+@cindex NLI primitives
 
 @menu
 * Connect Request/Indication::
@@ -3935,7 +4041,7 @@ The @dfn{X.25 Packet Layer Entity (PLE) Configuration Table},
 @mobj{x25PLEConfigTable}, is a table that provides specific configuration
 information for various @dfn{X.25 Packet Layer Entities}.
 
-Provides a table of X.25 Packet Layer Protocol (PLP) Entities.  Each X.25 Packet
+Provides a table of @value{LONG} (@value{SHORT}) Entities.  Each X.25 Packet
 Layer Entity corresponds to an X.25 DTE or DCE over which permanent virtual
 circuits exist or virtual calls can be placed.  ITU-T Rec. X.283 | ISO/IEC 10733.
 Each entry corresponds to an instance of an x25PLE managed object, which
@@ -4827,6 +4933,18 @@ In the OSI context, this will always be an NSAP address but in other uses it may
 not.  In any case, it may be null, for example, when used by ISO 8473.
 @end table
 
+@c @node Addendum for @value{SHORT} Conformance
+@c @chapter Addendum for @value{SHORT} Conformance
+
+@c @node Mapping NLI Primitives
+@c @chapter Mapping NLI Primitives
+
+@c @node State/Event Tables
+@c @appendix State/Event Tables
+
+@c @node Precedence Tables
+@c @appendix Precedence Tables
+
 @node Allowable Sequence of NLI Primitives
 @chapter Allowable Sequence of NLI Primitives
 
@@ -4858,14 +4976,14 @@ not.  In any case, it may be null, for example, when used by ISO 8473.
 @section PVC Operation
 @cindex PVC operation
 
-@c @node Precedence of NPI Primitives
-@c @chapter Precedence of NPI Primitives
+@c @node Precedence of NLI Primitives
+@c @chapter Precedence of NLI Primitives
 
-@c @node Guidelines for Protocol Independent NS Users
-@c @appendix Guidelines for Protocol Independent NS Users
+@c @node Guidelines for Protocol Independent NLI Users
+@c @appendix Guidelines for Protocol Independent NLI Users
 
-@c @node Required Information for NS Provider-Specific Addenda
-@c @appendix Required Information for NS Provider-Specific Addenda
+@c @node Required Information for NLI Provider-Specific Addenda
+@c @appendix Required Information for NLI Provider-Specific Addenda
 
 @node NLI Header Files
 @appendix NLI Header Files
@@ -4947,8 +5065,7 @@ drivers, and pushable modules, and their organization.
 @section NLI Multiplexing Driver
 @cindex NLI multiplexing driver
 
-The NLI @dfn{STREAMS} multiplexing driver implements the X.25 Packet Layer
-Protocol (PLP)
+The NLI @dfn{STREAMS} multiplexing driver implements the @value{LONG} (@value{SHORT})
 and provides the Network Layer Interface (NLI), Version 3, at it
 upper multiplex.  Data links are linked beneath the driver at the lower
 multiplex.  Linked Streams under @cite{@value{PACKAGE_TITLE}} conform to the
@@ -4970,7 +5087,7 @@ LAPB-compatible DTE data link procedures, Second Edition, July 1, 1995,
 International Organization for Standardization.}''
 Available from @uref{http://www.iso.org/,ISO}.}
 or subnetwork@footnote{``@cite{ISO/IEC 8881:1989, Information Processing Systems
--- Data Communications -- User of the X.25 Packet Level Protocol in Local Area
+-- Data Communications -- User of the @value{LONG} in Local Area
 Networks, 1989, ISO/IEC, International Organization for Standardization.}''
 Available from @uref{http://www.iso.org/,ISO}.}
 interface.@footnote{``@cite{ANSI/IEEE Standard 802.2-1998 [ISO/IEC
@@ -5132,7 +5249,7 @@ nuimap @{-C|--copying@}
 
 @subheading Description
 
-X.25 Packet Layer Protocol drivers supporting the NLI provide a mechanism for
+@value{LONG} drivers supporting the NLI provide a mechanism for
 mapping Network User Identities to a set of X.25 facilities that are subscribed
 by the Network User Identity.  @command{nuimap} provides a mechanism whereby the
 user can modify these mappings, or system configuration scripts can load or dump
@@ -5425,7 +5542,7 @@ nuimap @{-C|--copying@}
 
 @subheading Description
 
-X.25 Packet Layer Protocol drivers upporting the NLI provide a mechanism for
+@value{LONG} drivers upporting the NLI provide a mechanism for
 attaching Permanent Virtual Circuits (PVC) for use by upper layer protocols.
 @command{pvcmap} provides a mechanism whereby the administrator can modify the
 local and remote packet and window sizes associated with PVC for each logical
@@ -7452,7 +7569,11 @@ X.25}.  @xref{Listen Request/Response}.
 @item @dfn{HDLC} @tab High-Level Data Link Control
 @item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
 @item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISDNI} @tab ISDN Interface
+@item @dfn{ISDN} @tab Integrated Services Digital Network
 @item @dfn{ISO} @tab International Organization for Standardization
+@item @dfn{ISUPI} @tab ISUP Interface
+@item @dfn{ISUP} @tab ISDN User Part
 @item @dfn{ITU} @tab International Telecommunications Union
 @item @dfn{ITU-T} @tab ITU Telecom Sector
 @item @dfn{LAN} @tab Local Area Network
@@ -7468,6 +7589,8 @@ X.25}.  @xref{Listen Request/Response}.
 @item @dfn{LLI} @tab Logical Link Inteface
 @item @dfn{LSAP} @tab Link Service Access Point
 @item @dfn{MAC} @tab Media Access Control
+@item @dfn{MTPI} @tab Message Transfer Part Interface
+@item @dfn{MTP} @tab Message Transfer Part 
 @item @dfn{NLI} @tab Network Layer Interface
 @item @dfn{NPDU} @tab Network Protocol Data Unit
 @item @dfn{NPI} @tab Network Provider Interface
@@ -7489,15 +7612,28 @@ X.25}.  @xref{Listen Request/Response}.
 @item @dfn{QOS} @tab Quality of Service
 @item @dfn{RPOA} @tab Recognized Private Operating Agency
 @item @dfn{SAP} @tab Service Access Point
+@item @dfn{SCCPI} @tab Signalling Connection Control Part Interface
+@item @dfn{SCCP} @tab Signalling Connection Control Part
+@item @dfn{SDLI} @tab Signalling Data Link Interface
+@item @dfn{SDL} @tab Signalling Data Link
+@item @dfn{SDTI} @tab Signalling Data Terminal Interface
+@item @dfn{SDT} @tab Signalling Data Terminal
 @item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLI} @tab Signalling Link Interface
 @item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SL} @tab Signalling Link
 @item @dfn{SNPA} @tab Subnetwork Point of Attachment
 @item @dfn{SSAP} @tab Source Service Access Point
 @item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TCAP} @tab Transaction Capabilities Application Part
+@item @dfn{TCI} @tab Transaction Component Interface
+@item @dfn{TC} @tab Component Handling Sub-Layer
 @item @dfn{TLI} @tab Transport Layer Interface
 @item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
 @item @dfn{TOA} @tab Type of Address
 @item @dfn{TPI} @tab Transport Provider Interface
+@item @dfn{TRI} @tab Transaction Interface
+@item @dfn{TR} @tab Transaction Handling Sub-Layer
 @item @dfn{VC} @tab Virtual Circuit
 @item @dfn{WAN} @tab Wide Area Network
 @item @dfn{X.121} @tab ITU-T Recommendation X.121
@@ -7646,7 +7782,7 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 @c * Primitive Structure and Type Index::
 @c * Primitive Structure Field Index::
 @c * Primitive Values Index::
-@c @c * Primitive Error Values Index::
+@c * Primitive Error Values Index::
 @c * Input-Output Control Index::
 @c * MIB Object Index::
 @c * Manual Page Index::
@@ -7681,10 +7817,10 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 @c @section Primitive Values Index
 @c @printindex pv
 @c 
-@c @c @page
-@c @c @node Primitive Error Values Index
-@c @c @section Primitive Error Values Index
-@c @c @printindex pe
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
 @c 
 @c @page
 @c @node Input-Output Control Index

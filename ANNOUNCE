@@ -521,6 +521,9 @@ Reply-To: bidulock@openss7.org
 Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
+Status: O
+Content-Length: 1074
+Lines: 29
 
 Begin4
 Title:			openss7
@@ -564,6 +567,9 @@ Reply-To: bidulock@openss7.org
 Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
+Status: O
+Content-Length: 5844
+Lines: 130
 
 Package openss7-0.9.2.G was released under AGPLv3 2008-10-31.
 
