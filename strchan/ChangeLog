@@ -1,5 +1,40 @@
 2008-12-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.ac: document MXI
+	* doc/specs/Makefile.am: document MXI
+	* doc/specs/chi/Makefile.am: document MXI
+	* doc/specs/chi/chi.texi: document MXI
+
+	* doc/specs/mxi/Makefile.am: document MXI
+	* doc/specs/mxi/mxi.h: document MXI
+	* doc/specs/mxi/mxi.texi: document MXI
+	* doc/specs/mxi/mxi01.fig: document MXI
+	* doc/specs/mxi/mxi02.fig: document MXI
+	* doc/specs/mxi/mxi03.fig: document MXI
+	* doc/specs/mxi/mxi04.fig: document MXI
+	* doc/specs/mxi/mxi05.fig: document MXI
+	* doc/specs/mxi/mxi06.fig: document MXI
+	* doc/specs/mxi/mxi07.fig: document MXI
+	* doc/specs/mxi/mxi08.fig: document MXI
+	* doc/specs/mxi/mxi09.fig: document MXI
+	* doc/specs/mxi/mxi10.fig: document MXI
+	* doc/specs/mxi/mxi11.fig: document MXI
+	* doc/specs/mxi/mxi12.fig: document MXI
+	* doc/specs/mxi/mxi13.fig: document MXI
+	* doc/specs/mxi/mxi14.fig: document MXI
+	* doc/specs/mxi/mxi15.fig: document MXI
+	* doc/specs/mxi/mxi16.fig: document MXI
+	* doc/specs/mxi/mxi17.fig: document MXI
+	* doc/specs/mxi/mxi_ioctl.h: document MXI
+	* doc/specs/mxi/mxib1.fig: document MXI
+	* doc/specs/mxi/mxib2.fig: document MXI
+	* doc/specs/mxi/mxib3.fig: document MXI
+	* doc/specs/mxi/mxib4.fig: document MXI
+	* doc/specs/mxi/mxib5.fig: document MXI
+	* doc/specs/mxi/mxib6.fig: document MXI
+	* doc/specs/mxi/mxit01.tbl: document MXI
+	* doc/specs/mxi/mxit02.tbl: document MXI
+
 	* configure.ac: document CHI
 	* doc/Makefile.am: document CHI
 	* src/drivers/matrix.c: document CHI
