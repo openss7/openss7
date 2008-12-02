@@ -1,3 +1,43 @@
+2008-12-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: document CHI
+	* doc/Makefile.am: document CHI
+	* src/drivers/matrix.c: document CHI
+	* src/mibs/OPENSS7-MX-MIB.mib: document CHI
+
+	* doc/specs/.cvsignore: document CHI
+	* doc/specs/Makefile.am: document CHI
+	* doc/specs/chi/.cvsignore: document CHI
+	* doc/specs/chi/Makefile.am: document CHI
+	* doc/specs/chi/chi.h: document CHI
+	* doc/specs/chi/chi.texi: document CHI
+	* doc/specs/chi/chi01.fig: document CHI
+	* doc/specs/chi/chi02.fig: document CHI
+	* doc/specs/chi/chi03.fig: document CHI
+	* doc/specs/chi/chi04.fig: document CHI
+	* doc/specs/chi/chi05.fig: document CHI
+	* doc/specs/chi/chi06.fig: document CHI
+	* doc/specs/chi/chi07.fig: document CHI
+	* doc/specs/chi/chi08.fig: document CHI
+	* doc/specs/chi/chi09.fig: document CHI
+	* doc/specs/chi/chi10.fig: document CHI
+	* doc/specs/chi/chi11.fig: document CHI
+	* doc/specs/chi/chi12.fig: document CHI
+	* doc/specs/chi/chi13.fig: document CHI
+	* doc/specs/chi/chi14.fig: document CHI
+	* doc/specs/chi/chi15.fig: document CHI
+	* doc/specs/chi/chi16.fig: document CHI
+	* doc/specs/chi/chi17.fig: document CHI
+	* doc/specs/chi/chi_ioctl.h: document CHI
+	* doc/specs/chi/chib1.fig: document CHI
+	* doc/specs/chi/chib2.fig: document CHI
+	* doc/specs/chi/chib3.fig: document CHI
+	* doc/specs/chi/chib4.fig: document CHI
+	* doc/specs/chi/chib5.fig: document CHI
+	* doc/specs/chi/chib6.fig: document CHI
+	* doc/specs/chi/chit01.tbl: document CHI
+	* doc/specs/chi/chit02.tbl: document CHI
+
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* strchan.lsm.in: change repo directory

@@ -1,6 +1,7 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-02 06:51:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-02 06:51:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -18,9 +19,10 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License along
-# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+# 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,47 +47,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-02 06:51:28 $ by $Author: brian $
+# Last Modified $Date: 2008-12-02 06:51:29 $ by $Author: brian $
 #
 # =============================================================================
 
-include ../am/openss7.am
+include ../../am/openss7.am
 
-if PKG_BUILD_INDEP
-## PKG_BUILD_INDEP
+SUBDIRS = chi
 
-SUBDIRS = . man manual specs projects
+## =============================================================================
+##
+## $Log: Makefile.am,v $
+## Revision 0.9.2.1  2008-12-02 06:51:29  brian
+## - document CHI
+##
+## =============================================================================
 
-if PERFORM_CHECKS
-## PERFORM_CHECKS
-dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_decls
-TESTS_ENVIRONMENT	+= PKG_MANPATH='$(PKG_MANPATH)' \
-			   mandir='$(mandir)'
-CLEANFILES		+= $(top_builddir)/check_decls.log
-DISTCLEANFILES		+= *.err *.out
-## PERFORM_CHECKS
-endif
-
-## PKG_BUILD_INDEP
-endif
-
-# =============================================================================
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.5  2008-12-02 06:51:28  brian
-# - document CHI
-#
-# Revision 0.9.2.4  2008-04-28 23:39:49  brian
-# - updated headers for release
-#
-# Revision 0.9.2.3  2007/11/06 09:04:25  brian
-# - working up documentation
-#
-# Revision 0.9.2.2  2007/08/14 06:47:14  brian
-# - GPLv3 header update
-#
-# Revision 0.9.2.1  2006/10/13 07:57:30  brian
-# - added initial STREAMS Channel package
-#
-# =============================================================================
-## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
