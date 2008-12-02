@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-02 06:51:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-02 08:24:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-02 06:51:29 $ by $Author: brian $
+# Last Modified $Date: 2008-12-02 08:24:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,7 +63,6 @@ info_TEXINFOS		+= chi.texi
 chi_TEXINFOS		= \
 			  chi.h \
 			  chi_ioctl.h \
-			  lmi.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
@@ -122,8 +121,11 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2008-12-02 08:24:42  brian
+## - document MXI
+##
 ## Revision 0.9.2.1  2008-12-02 06:51:29  brian
 ## - document CHI
 ##
 ## =============================================================================
-
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

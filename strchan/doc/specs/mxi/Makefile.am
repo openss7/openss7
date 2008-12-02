@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-02 08:24:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-02 08:24:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,22 +47,82 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-02 08:24:42 $ by $Author: brian $
+# Last Modified $Date: 2008-12-02 08:24:43 $ by $Author: brian $
 #
 # =============================================================================
 
-include ../../am/openss7.am
+include ../../../am/openss7.am
 
-SUBDIRS = chi mxi
+info_TEXINFOS		=
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= mxi.texi
+
+mxi_TEXINFOS		= \
+			  mxi.h \
+			  mxi_ioctl.h \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
+if MAINTAINER_MODE
+if AMDEP
+mxi_TEXINFOS		+= \
+			   texi/args.texi
+endif
+endif
+
+EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
+			  $(info_TEXINFOS) \
+			  $(mxi_TEXINFOS)
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+FIG_FIGS		= \
+			  mxi01.fig \
+			  mxi02.fig \
+			  mxi03.fig \
+			  mxi04.fig \
+			  mxi05.fig \
+			  mxi06.fig \
+			  mxi07.fig \
+			  mxi08.fig \
+			  mxi09.fig \
+			  mxi10.fig \
+			  mxi11.fig \
+			  mxi12.fig \
+			  mxi13.fig \
+			  mxi14.fig \
+			  mxi15.fig \
+			  mxi16.fig \
+			  mxi17.fig \
+			  mxib1.fig \
+			  mxib2.fig \
+			  mxib3.fig \
+			  mxib4.fig \
+			  mxib5.fig \
+			  mxib6.fig
+
+TBL_TBLS		= \
+			  mxit01.tbl \
+			  mxit02.tbl
+
+## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
+endif
+
+include ../../../am/info.am
 
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
-## Revision 0.9.2.2  2008-12-02 08:24:42  brian
+## Revision 0.9.2.1  2008-12-02 08:24:43  brian
 ## - document MXI
 ##
-## Revision 0.9.2.1  2008-12-02 06:51:29  brian
-## - document CHI
-##
 ## =============================================================================
-
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
