@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: mxi.texi,v 0.9.2.1 2008-12-02 08:24:43 brian Exp $
+% @(#) $Id: mxi.texi,v 0.9.2.2 2008-12-06 09:03:38 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-12-02 08:24:43 $ by $Author: brian $
+% Last Modified $Date: 2008-12-06 09:03:38 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -346,7 +346,7 @@ no obligation to provide any feature listed herein.
 * MXI Utilities::
 * MXI File Formats::
 * MXI Compatibility and Porting::
-* License::
+* Licenses::
 * Glossary::
 * Acronyms::
 * References::
@@ -447,6 +447,9 @@ is an @strong{UNCONTROLLED VERSION}.
 @smallexample
 @verbatim
 $Log: mxi.texi,v $
+Revision 0.9.2.2  2008-12-06 09:03:38  brian
+- corrections and updates
+
 Revision 0.9.2.1  2008-12-02 08:24:43  brian
 - document MXI
 
@@ -3799,28 +3802,28 @@ Drivers that provide the MXI interace fall into two categories:
 @subsection MXI Pseudo-device Drivers
 
 Pseudo-device drivers that accept or provide the MXI interface for the purpose of providing or
-controlling access the the channels available on a system.
+controlling access the multiplexed facilities available on a system.
 
-@subsubsection Multiplexing Driver---@code{ch}
+@subsubsection Multiplexing Driver---@code{mx}
 
-The @file{ch} driver is a pseudo-device multiplexing driver that provides simple multiplexing
+The @file{mx} driver is a pseudo-device multiplexing driver that provides simple multiplexing
 services between MXI Streams at the lower service interface to MXI Streams at the upper service
 interface.
-This multiplexing driver is a simplified form of the @file{matrix} or @file{chmux} drivers.
+This multiplexing driver is a simplified form of the @file{matrix} or @file{mxmux} drivers.
 
-@subsubsection Multiplexing Driver---@code{chmux}
+@subsubsection Multiplexing Driver---@code{mxmux}
 
-The @file{chmux} driver is a pseudo-device multiplexing driver that provides simple multiplexing
-services between MXI Streams at the upper service interface and either MXI or MXI Streams at the
-lower service interface.  It performs forward and inverse multiplexing of channels to spans, but
-does not perform switching between lower service interfaces.
+The @file{mxmux} driver is a pseudo-device multiplexing driver that provides simple multiplexing
+services between MXI Streams at the upper service interface and MXI Streams at the lower service
+interface.  It performs interconnection of MXS user Streams to spans, but does not perform switching
+between lower service interfaces.
 This multiplexing driver is a simplified form of the @file{matrix} driver and super-sets the
-functionality of the @file{ch} driver.
+functionality of the @file{mx} driver.
 
 @subsubsection Switching Matrix Multiplexing Driver---@code{matrix}
 
 The @file{matrix} driver is a pseudo-device multiplexing driver that provides complete switching
-matrix and multiplexing services between MXI or MXI Streams at the upper service interface and MXI
+matrix and multiplexing services between CHI or MXI Streams at the upper service interface and CHI
 or MXI Streams at the lower service interface.  It performs forward and inverse multiplexing of
 channels to spans, and performs pseudo-digital cross-connect and dynamic switching of single-,
 multi- and full-rate channels within the switching matrix.  This driver super-sets the functionality
@@ -3828,27 +3831,28 @@ of the @file{chmux} and @file{mxmux} drivers.
 
 @subsection MXI Device Drivers
 
-Real device drivers that provide the MXI interface for the purpose of accessing discrete
-non-multiplexed channels available on a hardware device (e.g. a V.35 interface card driver).
+Real device drivers that provide the MXI interface for the purpose of accessing multiplexed channels
+available on a hardware device (e.g. a T1 interface card driver).  The MXI interface provides a full
+abstraction of the underlying device driver.  The MXI interface is one of the best ways of
+developing a device driver in support of a multiplexed medium where discrete channels multiplexed
+into the medium share common timing and syncrhonization.  The hardware example is T1, J1 or E1 spans
+(or even channelized DS3, E3, or SDH VTs).  The software example is RTP, PWE2E, G
 
-@subsubsection Device Driver---@code{acb56}
+@subsubsection Device Driver---@code{v401p}
 
-The @manref{acb56(4)} driver is a real device driver that provides access to a V.35 interface.  It
-is used primarily by the @cite{OpenSS7 Project} as a V.35 interface for SS7, BSC, SDLC, HDLC or
-X.21.
+The @manref{v401p(4)} driver is a real device driver that provides access to 4 T1, J1 or E1
+interfaces.  It is used primarily by the @cite{OpenSS7 Project} as a G.703/G.704 interface for SS7,
+BSC, SDLC, HDLC, X.21, or voice.
 
 @page
 @node MXI Modules
 @section MXI Modules
 
 @cite{STREAMS} pushable modules are an excellent way of adapting a MXS user Stream that conforms to
-the general concept of a communications channel into a complex communications protocol.  They are
-also excellent for providing media conversion.  For example, it is possible to push the
-@manref{hdlc(4)} module onto a MXS user Stream and result with a High-Level Data Link Control (HDLC)
-Stream that provides raw HDLC framing as specified in ISO/IEC 3309 described in reference
-@ref{ISO3309}.  As another example, it is possible to push a conversion module onto a MXS user
-Stream correspondin to a mu-law compressed voice channel and convert the media stream to an A-law
-compressed voice channel.
+the general concept of a communications multiplex into a complex communications protocol.  They are
+also excellent for providing media conversion.
+For example, it is possible to push a conversion module onto a MXS user Stream correspondin to a
+mu-law compressed voice channel and convert the media stream to an A-law compressed voice channel.
 
 @subsection Modules that convert MXI
 
@@ -3856,28 +3860,17 @@ The modules (described in the subsections that follow) convert between a MXI int
 service boundary and a MXI interface at the upper service boundary.  Conversion is performed on the
 media stream rather than between service interfaces.
 
-@subsubsection Compression Conversion---@code{ch-conv}
+@subsubsection Compression Conversion---@code{mx-conv}
 
-The @file{ch-conv} module converts one MXI interface to another MXI interface, performing conversion
+The @file{mx-conv} module converts one MXI interface to another MXI interface, performing conversion
 on the media stream in the process.  The module is capable of converting between 14-bit signed or
 unsigned linear, G.711 A-law compressed PCM and G.711 mu-law compressed PCM.
 
 @subsection Modules that convert from MXI
 
-The modules (described in the subsections that follow) conver between a MXI interface at the lower
+The modules (described in the subsections that follow) convert between a MXI interface at the lower
 service boundary and another interface at the upper service boundary.  Conversion is performed
 between the service interfaces and might or might not include conversion of the bit stream.
-
-@subsubsection High-Level Data Link Control Module---@code{hdlc}
-
-The @file{hdlc} module converst from a MXI Stream to a Stream supporting the High-Level Data Link
-Control procedures and the Communications Device Interface (CDI) for use with SS7, ISDN, X.25,
-Frame Relay and ISO 3309.
-
-@subsubsection Signalling Data Link Module---@code{sdl}
-
-The @file{sdl} module converts from a MXI Stream to a Stream supporting the Signalling Data Link
-Interface (SDLI) for SS7.
 
 @subsection Modules that convert to MXI
 
@@ -3932,6 +3925,38 @@ conditions on carrier facilities is normally required for CAS, ISDN and SS7 ISUP
 intermediate digital multiplex equipment (i.e. DCCS) can cause distrupt the transparent passing of
 carrier alarm information between endpoints.}
 
+@node MXI in Zaptel Driver
+@section MXI in Zaptel Driver
+
+@node MXI in Y.1453 TDM-IP Module
+@section MXI in Y.1453 TDM-IP Module
+
+This is a ITU-T Recommendation Y.1453 TDM-IP module.  It pushes over a UDP Stream that provides
+connectivity to the peer TDM-IP system.  The upper boundary service interface is the MXI interface.
+The lower boundary service interface is the UDP-TPI interface.
+
+In general, the UDP Stream may be opened, options configured, bound to a local IP address and port
+number, and connected to a remote IP address and port number.  This module can then be pushed.
+Pushing the module will flush the Stream and any data messages received on the Stream will be
+discarded until the Stream is configured, enabled and connected.
+
+Once the module is pushed, the MXI Stream can be linked beneath the MATRIX multiplexing driver and
+the channels available and the multiplex facility will be made available to the switching matrix.
+
+@node MXI in IAX Module
+@section MXI in IAX Module
+
+This is an IAX module.  It pushes over a UDP Stream that provides connectivity to the peer IAX
+system.  The upper boundary service interface is the MXI interface.  The lower boundary service
+interface is the UDP-TPI interface.
+
+In general, the UDP Stream may be opened, options configured, bound to a local IP address and port
+number, and connected to a remote IP address and port number.  This module can then be pushed.
+Pushing the module will flush the Stream and any data messages received on the Stream will be
+discarded until the Stream is configured, enabled and connected.
+
+Once the module is pushed, the MXI Stream can be linked beneath the MATRIX multiplexing driver and
+the channels available and the multiplex facility will be made available to the switching matrix.
 
 @node MXI in SS7 Stack
 @section MXI in SS7 Stack
@@ -4055,8 +4080,8 @@ ISDN B-channels) can be used as a Frame Relay data link.
 @node MXI Compatibility and Porting
 @appendix MXI Compatibility and Porting
 
-@node License
-@unnumbered License
+@node Licenses
+@unnumbered Licenses
 
 @menu
 * GNU Affero General Public License::
@@ -4064,6 +4089,7 @@ ISDN B-channels) can be used as a Frame Relay data link.
 @end menu
 
 @include texi/agpl3.texi
+@page
 @include texi/fdl13.texi
 
 @node Glossary

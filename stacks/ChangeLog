@@ -1,3 +1,8 @@
+2008-12-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/sdli/sdli.texi: corrections and updates
+	* doc/specs/sccpi/.cvsignore: correct ignore file
+
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/libxnet.texi: update to FDL 1.3

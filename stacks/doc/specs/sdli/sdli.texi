@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: sdli.texi,v 0.9.2.9 2008-11-26 12:01:34 brian Exp $
+% @(#) $Id: sdli.texi,v 0.9.2.10 2008-12-06 09:03:37 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-11-26 12:01:34 $ by $Author: brian $
+% Last Modified $Date: 2008-12-06 09:03:37 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -443,6 +443,9 @@ is an @strong{UNCONTROLLED VERSION}.
 @smallexample
 @verbatim
 $Log: sdli.texi,v $
+Revision 0.9.2.10  2008-12-06 09:03:37  brian
+- corrections and updates
+
 Revision 0.9.2.9  2008-11-26 12:01:34  brian
 - updated to FDL 1.3
 
@@ -476,8 +479,8 @@ Revision 0.9.2.1  2007/07/04 08:24:57  brian
 @chapter Introduction
 @cpindex STREAMS
 
-This document specifies a @cite{STREAMS}-based kernel-level instantiation of the ITU-T
-@value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a a signalling data
+This document specifies a @cite{STREAMS}-based kernel-level instantiation of the
+@value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a signalling data
 link service to access and use any of a variety of conforming signalling data link providers without
 specific knowledge of the provider's protocol.  The service interface is designed to support any
 network signalling data link protocol and user signalling data link protocol.  This interface only
@@ -564,10 +567,10 @@ user at the boundary between the signalling data link provider and the signallin
 entity.  The interface consists of a set of primitives defined as @cite{STREAMS} messages that
 provide access to the signalling data link layer services, and are transferred between the SDLS user
 entity and the SDLS provider.  These primitives are of two types; ones that originate from the SDLS
-user, and other that originate from the SDLS provider.  The primitives that originate from the SDLS
+user, and others that originate from the SDLS provider.  The primitives that originate from the SDLS
 user make requests to the SDLS provider, or respond to an indication of an event of the SDLS
 provider.  The primitives that originate from the SDLS provider are either confirmations of a
-request or are indications to the CCS user that an event has occurred.  @figref{1} shows the model
+request or are indications to the SDLS user that an event has occurred.  @figref{1} shows the model
 of the SDLI.
 
 @figuresized{sdli01,1,Model of the SDLI,3.0in}
@@ -585,11 +588,11 @@ The features of the SDLI are defined in terms of the services provided by the SD
 individual primitives that may flow between the SDLS user and the SDLS provider.
 
 The SDLI Services are broken into two groups: local management services and protocol services.
-Local management services are responsible for the local management of streams, assignment of streams
-to physical points of attachment, enabling and disabling of streams, management of options
-associated with a stream, and general acknowledgement and event reporting for the stream.  Protocol
-services consist of connecting a stream to a medium, exchanging bits with the medium, and
-disconnecting the stream from the medium.
+Local management services are responsible for the local management of Streams, assignment of Streams
+to physical points of attachment, enabling and disabling of Streams, management of options
+associated with a Stream, and general acknowledgement and event reporting for the Stream.  Protocol
+services consist of connecting a Stream to a medium, exchanging bits with the medium, and
+disconnecting the Stream from the medium.
 
 @subsection Local Management
 
@@ -617,10 +620,10 @@ detailed in @ref{Protocol Service Primitives}.  The protocol services interface 
 The SDLI is typically implemented as a device driver controlling a TDM (Time Division Multiplexing)
 device that provides access to channels.  The purpose behind exposing this low level interface is
 that almost all communications channel devices can be placed into a @emph{raw} mode, where a bit
-stream can be exchanged between the driver and the medium.  The SDLI provides a interface that, once
+stream can be exchanged between the driver and the medium.  The SDLI provides an interface that, once
 implemented as a driver for a new device, can provide complete and verified SS7 signalling link
 capabilities by pushing generic SDT (Signalling Data Terminal) and SL (Signalling Link) modules over
-an open device stream.
+an open device Stream.
 
 This allows SDT and SL modules to be verified independently for correct operation and then simply
 used for all manner of new device drivers that can implement the SDLI interface.
@@ -706,34 +709,34 @@ A successful invocation of the information reporting service is illustrated in @
 @node Physical Point of Attachment Service
 @subsection Physical Point of Attachment Service
 
-The local management interface provides the LMS user with the ability to associate a stream to a
-physical point of appearance (@dfn{PPA}) or to disassociate a stream from a PPA.  The local
+The local management interface provides the LMS user with the ability to associate a Stream to a
+physical point of appearance (@dfn{PPA}) or to disassociate a Stream from a PPA.  The local
 management interface provides for two styles of LMS provider:
 
 @subsubheading Style 1 LMS Provider
 
-A @dfn{Style 1} LMS provider is a provider that associates a stream with a PPA at the time of the
-first @manref{open(2)} call for the device, and disassociates a stream from a PPA at the time of the
+A @dfn{Style 1} LMS provider is a provider that associates a Stream with a PPA at the time of the
+first @manref{open(2)} call for the device, and disassociates a Stream from a PPA at the time of the
 last @manref{close(2)} call for the device.
 
 Physical points of attachment (PPA) are assigned to major and minor device number combinations.
-When the major and minor device number combination is opened, the opened stream is automatically
+When the major and minor device number combination is opened, the opened Stream is automatically
 associated with the PPA for the major and minor device number combination.  The last close of the
-device disassociates the PPA from the stream.
+device disassociates the PPA from the Stream.
 
-Freshly opened @dfn{Style 1} LMS provider streams start life in the @psta{LMI_DISABLED} state.
+Freshly opened @dfn{Style 1} LMS provider Streams start life in the @psta{LMI_DISABLED} state.
 
 This approach is suitable for LMS providers implemented as real or pseudo-device drivers and is
 applicable when the number of minor devices is small and static.
 
 @subsubheading Style 2 LMS Provider
 
-A @dfn{Style 2} LMS provider is a provider that associates a stream with a PPA at the time that the
-LMS user issues the @prim{LMI_ATTACH_REQ} message.  Freshly opened streams are not associated with
-any PPA.  The @dfn{Style 2} LMS provider stream is disassociated from a PPA when the stream is
+A @dfn{Style 2} LMS provider is a provider that associates a Stream with a PPA at the time that the
+LMS user issues the @prim{LMI_ATTACH_REQ} message.  Freshly opened Streams are not associated with
+any PPA.  The @dfn{Style 2} LMS provider Stream is disassociated from a PPA when the Stream is
 closed or when the LMS user issues the @prim{LMI_DETACH_REQ} message.
 
-Freshly opened @dfn{Style 2} LMS provider streams start life in the @psta{LMI_UNATTACHED} state.
+Freshly opened @dfn{Style 2} LMS provider Streams start life in the @psta{LMI_UNATTACHED} state.
 
 This approach is suitable for LMS providers implemented as clone real or pseudo-device drivers  and
 is applicable when the number of minor devices is large or dynamic.
@@ -747,13 +750,13 @@ is applicable when the number of minor devices is large or dynamic.
 @subsubsection PPA Attachment Service
 
 The PPA attachment service provides the LMS user with the ability to attach a @dfn{Style 2} LMS
-provider stream to a physical point of appearance (PPA).
+provider Stream to a physical point of appearance (PPA).
 
 @itemize @bullet
 
 @item @b{@prim{LMI_ATTACH_REQ}}:
 The @prim{LMI_ATTACH_REQ} message is issued by the LMS user to request that a @dfn{Style 2} LMS
-provider stream be attached to a specified physical point of appearance (PPA).
+provider Stream be attached to a specified physical point of appearance (PPA).
 
 @item @b{@prim{LMI_OK_ACK}}:
 Upon successful receipt and processing of the @prim{LMI_ATTACH_REQ} message, the LMS provider
@@ -774,13 +777,13 @@ A successful invocation of the attachment service is illustrated in @figref{3}.
 @subsubsection PPA Detachment Service
 
 The PPA detachment service provides the LMS user with the ability to detach a @dfn{Style 2} LMS
-provider stream from a physical point of attachment (PPA).
+provider Stream from a physical point of attachment (PPA).
 
 @itemize @bullet
 
 @item @b{@prim{LMI_DETACH_REQ}}:
 The @prim{LMI_DETACH_REQ} message is issued by the LMS user to request that a @dfn{Style 2} LMS
-provider stream be detached from the attached physical point of appearance (PPA).
+provider Stream be detached from the attached physical point of appearance (PPA).
 
 @item @b{@prim{LMI_OK_ACK}}:
 Upon successful receipt and processing of the @prim{LMI_DETACH_REQ} message, the LMS provider
@@ -799,7 +802,7 @@ A successful invocation of the detachment service is illustrated in @figref{4}.
 @node Initialization Service
 @subsection Initialization Service
 
-The initialization service provides the LMS user with the abilty to enable and disable the stream
+The initialization service provides the LMS user with the abilty to enable and disable the Stream
 for the associated PPA.
 
 @menu
@@ -811,7 +814,7 @@ for the associated PPA.
 @subsubsection Interface Enable Service
 
 The interface enable service provides the LMS user with the ability to enable an LMS provider
-stream that is associated with a PPA.  Enabling the interface permits the LMS user to exchange
+Stream that is associated with a PPA.  Enabling the interface permits the LMS user to exchange
 protocol service interface messages with the LMS provider.
 
 @itemize @bullet
@@ -838,7 +841,7 @@ A successful invocation of the enable service is illustrated in @figref{5}.
 @subsubsection Interface Disable Service
 
 The interface disable service provides the LMS user with the ability to disable an LMS provider
-stream that is associated with a PPA.  Disabling the interface withdraws the LMS user's ability to
+Stream that is associated with a PPA.  Disabling the interface withdraws the LMS user's ability to
 exchange protocol service interface messages with the LMS provider.
 
 @itemize @bullet
@@ -872,7 +875,7 @@ generic and provider-specific options associated with the LMS provider.
 @item @b{@prim{LMI_OPTMGMT_REQ}}:
 The LMS user issues a @prim{LMI_OPTMGMT_REQ} message when it wishes to interrogate or affect the
 setting of various generic or provider-specific options associated with the LMS provider for the
-stream upon which the message is issued.
+Stream upon which the message is issued.
 
 @item @b{@prim{LMI_OPTMGMT_ACK}}:
 Upon successful receipt of the @prim{LMI_OPTMGMT_REQ} message, and successful options processing, the
@@ -966,9 +969,9 @@ the responsibility of multiplex or digital cross-connect switch.
 @itemize @bullet
 
 @item @b{@prim{SDL_CONNECT_REQ}}:
-The @prim{SDL_CONNECT_REQ} message is used by the SDLS user to request that the stream be connected to
+The @prim{SDL_CONNECT_REQ} message is used by the SDLS user to request that the Stream be connected to
 the medium.  Connection to the medium might require some switching or other mechanism to prepare the
-stream for data transmission and receiption.  Connections can be formed for the receive direction or
+Stream for data transmission and reception.  Connections can be formed for the receive direction or
 the transmit direction independently.
 
 @end itemize
@@ -988,7 +991,7 @@ received from the medium.
 
 @item @b{@prim{SDL_BITS_FOR_TRANSMISSION_REQ}}:
 The @prim{SDL_BITS_FOR_TRANSMISSION_REQ} message is used by the SDLS user to place raw bits onto
-the medium.  The stream must have first been successfully activated in the transmit direction using
+the medium.  The Stream must have first been successfully activated in the transmit direction using
 the @prim{SDL_CONNECT_REQ} message.
 
 @item @b{@prim{SDL_RECEIVED_BITS_IND}}:
@@ -1005,27 +1008,27 @@ A successful invocation of the data transfer service is illustrated in @figref{1
 @subsection Disconnection Service
 
 The disconnection service provides the ability for the SDLS user to disconnect from the medium,
-withdrawing from the purpose of transmitting bits, receiving bits, or both.  It allow allows the
-SDLS provider to autonomously indicate that the medium has been disconnected from the stream.  In
-SS7, this is a Level 1 function, possible the responsibility of a multiplex or digital cross-connect
+withdrawing from the purpose of transmitting bits, receiving bits, or both.  It allows the
+SDLS provider to autonomously indicate that the medium has been disconnected from the Stream.  In
+SS7, this is a Level 1 function, possibly the responsibility of a multiplex or digital cross-connect
 switch.
 
 @itemize @bullet
 
 @item @b{@prim{SDL_DISCONNECT_REQ}}:
-The @prim{SDL_DISCONNECT_REQ} message is used by the SDLS user to request that the stream be
+The @prim{SDL_DISCONNECT_REQ} message is used by the SDLS user to request that the Stream be
 disconnected from the medium.  Disconnection from the medium might require some switching or other
-mechanism.  Disconnection can be perofrmed for the receive direction or the transmit direction
+mechanism.  Disconnection can be performed for the receive direction or the transmit direction
 independently.
 
 @item @b{@prim{SDL_DISCONNECT_IND}}:
 The @prim{SDL_DISCONNECT_IND} message is used by the SDLS provider to indicate to the SDLS user
-that the stream has been disconnected from the medium.  Disconnection is indicated for both the
+that the Stream has been disconnected from the medium.  Disconnection is indicated for both the
 receive and transmit directions.
 
 @end itemize
 
-A successful invocation of the disconnection service by  the SDLS user is illustrated in @figref{13}.
+A successful invocation of the disconnection service by the SDLS user is illustrated in @figref{13}.
 
 @figuresized{sdli13,13,Message Flow: Successful Disconnection Service by SDLS User,4.0in}
 
@@ -1155,7 +1158,7 @@ No PPA attached, awaiting @prim{LMI_ATTACH_REQ}.
 Waiting for attach.
 @end ignore
 @item LMI_UNUSABLE
-Device cannot be used, STREAM in hung state.
+Device cannot be used, Stream in hung state.
 @item LMI_DISABLED
 PPA attached, awaiting @prim{LMI_ENABLE_REQ}.
 @ignore
@@ -1182,7 +1185,7 @@ This primitive is issued by the LMS provider in the @psta{LMI_ATTACH_PENDING} or
 
 @subsubheading New State
 
-The new state is @psta{LMI_UNATTACHED} or @psta{LMI_DISABLED}, depending on thee primitive to
+The new state is @psta{LMI_UNATTACHED} or @psta{LMI_DISABLED}, depending on the primitive to
 which the message is responding.
 
 @page
@@ -1544,7 +1547,7 @@ Start of device-specific error codes.
 @subsubheading Description
 
 This LMS provider originated primitive acknowledges receipt and successful processing of the
-@prim{LMI_INFO_REQ} primitive and provides the request information concerning the LMS provider.
+@prim{LMI_INFO_REQ} primitive and provides the requested information concerning the LMS provider.
 
 @subsubheading Format
 @tpindex lmi_info_ack_t
@@ -1631,7 +1634,7 @@ This is a variable length field.  The length of the field is determined by the l
 or @msg{M_PCPROTO} message block.
 
 For a @dfn{Style 2} driver, when @parm{lmi_ppa_style} is @pval{LMI_STYLE2}, and when in an attached state,
-this field providers the current PPA associated with the stream; the length is typically 4 bytes.
+this field provides the current PPA associated with the Stream; the length is typically 4 bytes.
 
 For a @dfn{Style 1} driver, when @parm{lmi_ppa_style} is @pval{LMI_STYLE1}, the length it 0 bytes.
 
@@ -1662,9 +1665,9 @@ of Attachment Service}).
 
 @subsubheading Description
 
-This LMS user originated primitive requests that the stream upon which the primitive is issued by
+This LMS user originated primitive requests that the Stream upon which the primitive is issued be
 associated with the specified Physical Point of Attachment (PPA).  This primitive is only applicable
-to @dfn{Style 2} LMS provider streams, that is, streams that return @pval{LMI_STYLE2} in the
+to @dfn{Style 2} LMS provider Streams, that is, Streams that return @pval{LMI_STYLE2} in the
 @parm{lmi_ppa_style} field of the @prim{LMI_INFO_ACK}.
 
 @subsubheading Format
@@ -1691,7 +1694,7 @@ The attach request primitive contains the following parameters:
 Specifies the service primitive type.  Always @prim{LMI_ATTACH_REQ}.
 
 @item lmi_ppa
-Specifies the Physical Point of Attachment (PPA) to which to associated the @dfn{Style 2} stream.
+Specifies the Physical Point of Attachment (PPA) to which to associate the @dfn{Style 2} Stream.
 This is a variable length identifier whose length is determined by the length of the @msg{M_PROTO} message
 block.
 
@@ -1813,9 +1816,9 @@ Start of device-specific error codes.
 
 @subsubheading Description
 
-This LMS user originated primitive request that the stream upon which the primitive is issued be
+This LMS user originated primitive requests that the Stream upon which the primitive is issued be
 disassociated from the Physical Point of Appearance (PPA) to which it is currently attached.  This
-primitive is only applicable to @dfn{Style 2} LMS provider streams, that is, streams that return
+primitive is only applicable to @dfn{Style 2} LMS provider Streams, that is, Streams that return
 @pval{LMI_STYLE2} in the @parm{lmi_ppa_style} field of the @prim{LMI_INFO_ACK}.
 
 @subsubheading Format
@@ -1976,7 +1979,7 @@ These service primitives implement the initialization service (@pxref{Initializa
 
 @subsubheading Description
 
-This LMS user originated primitive request that the LMS provider perform the actions necessary to
+This LMS user originated primitive requests that the LMS provider perform the actions necessary to
 enable the protocol service interface and confirm that it is enabled.  This primitive is applicable
 to both styles of PPA.
 
@@ -2031,7 +2034,7 @@ When successful, the LMS provider acknowledges successful completion of the enab
 @prim{LMI_ENABLE_CON} primitive.  The new state is @psta{LMI_ENABLED}.
 
 @item @b{Unsuccessful (non-fatal errors)}:
-When unsuccessful, the LMS provider acknowledges the failure of the  enable service wtih an
+When unsuccessful, the LMS provider acknowledges the failure of the enable service wtih an
 @prim{LMI_ERROR_ACK} primitive containing the error.  The new state remains unchanged.
 
 @end itemize
@@ -2466,7 +2469,7 @@ Specifies the length of the options.
 Specifies the offset, from the beginning of the @msg{M_PROTO} message block, of the start of the options.
 
 @item lmi_mgmt_flags
-Specifies the management flags which determine what operation the LMS provider is expected to
+Specifies the management flags that determine what operation the LMS provider is expected to
 perform on the specified options.  This field can assume one of the following values:
 
 @table @pval
@@ -2662,7 +2665,7 @@ The LMS provider negotiated a value of lower quality for one or more of the opti
 the LMS user.
 
 @item LMI_READONLY
-The LMS provider failed to negotiate one ore more of the options specified by the LMS user because
+The LMS provider failed to negotiate one or more of the options specified by the LMS user because
 the option is treated as read-only by the LMS provider.
 
 @item LMI_NOTSUPPORT
@@ -2682,7 +2685,7 @@ The new state remains unchanged.
 
 @subsubheading Rules
 
-The LMS provider follows the following rules when processing option management service requests:
+The LMS provider observes the following rules when processing option management service requests:
 
 @itemize ---
 
@@ -3001,7 +3004,7 @@ The new state remains unchanged.
 
 Protocol service primitives implement the Signalling Data Link Interface protocol.  Protocol service
 primitives provide the SDLS user with the ability to connect transmission or reception directions of
-the bit stream, pass bits for transmission and accept recevied bits.
+the bit stream, pass bits for transmission and accept received bits.
 
 These service primitives implement the protocol services (@pxref{Protocol Services}).
 
@@ -3028,7 +3031,7 @@ These service primitives implement the connection service (@pxref{Connection Ser
 
 @subsubheading Description
 
-This SDLS user originated service primitive allows the SDLS user to connect the user stream to the
+This SDLS user originated service primitive allows the SDLS user to connect the user Stream to the
 medium in the transmit, receive, or both, directions.
 
 @subsubheading Format
@@ -3061,10 +3064,10 @@ the following flags:
 @table @pval
 
 @item SDL_RX_DIRECTION
-Specifies that the SDLS user stream is to be connected to the medium in the receive direction.
+Specifies that the SDLS user Stream is to be connected to the medium in the receive direction.
 
 @item SDL_TX_DIRECTION
-Specifies that the SDLS user stream is to be connected to the medium in the transmit direction.
+Specifies that the SDLS user Stream is to be connected to the medium in the transmit direction.
 
 @end table
 
@@ -3205,8 +3208,8 @@ The state remains unchanged.
 @node Disconnection Service Primitives
 @subsection Disconnection Service Primitives
 
-The disconnection service primitives permit the SDLS user to disconnect the stream from the line
-(circuit or channel) for the transmit, receive, or both, directions.  They also alow the SDLS
+The disconnection service primitives permit the SDLS user to disconnect the Stream from the line
+(circuit or channel) for the transmit, receive, or both, directions.  They also allow the SDLS
 provider to indicate that a disconnection has occured outside of SDLS user control.
 
 These service primitives implement the disconnection service (@pxref{Disconnection Service}).
@@ -3221,7 +3224,7 @@ These service primitives implement the disconnection service (@pxref{Disconnecti
 
 @subsubheading Description
 
-This SDLS user originated service primitive allow the SDLS user to disconnect the SDLS user stream
+This SDLS user originated service primitive allows the SDLS user to disconnect the SDLS user Stream
 from the bit-stream in the transmit, receive, or both, directions.
 
 @subsubheading Format
@@ -3254,10 +3257,10 @@ the following flags:
 @table @pval
 
 @item SDL_RX_DIRECTION
-Specifies that the SDLS user stream is to be disconnected from the medium in the receive direction.
+Specifies that the SDLS user Stream is to be disconnected from the medium in the receive direction.
 
 @item SDL_TX_DIRECTION
-Specifies that the SDLS user stream is to be disconnected from the medium in the transmit direction.
+Specifies that the SDLS user Stream is to be disconnected from the medium in the transmit direction.
 
 @end table
 
@@ -3325,8 +3328,8 @@ These errors are issued by the SDL provider when it detects errors that are not 
 SDL user, or if it is unable to report a correctible error to the SDLS user.  Fatal errors are
 indicated via the STREAMS message type @msg{M_ERROR} with the UNIX system error @errno{EPROTO}.  The
 @msg{M_ERROR} STREAMS message type will result in the failure of all the UNIX system calls on the
-stream.  The SDLS user can recover from a fatal error by having all the processes close the files
-associated with the stream, and then reopening them for processing.
+Stream.  The SDLS user can recover from a fatal error by having all the processes close the files
+associated with the Stream, and then reopening them for processing.
 
 @ignore
 @node Addendum for ITU-T Q.703 Conformance
@@ -3403,8 +3406,8 @@ signalling data link layer.
 
 @item Local management
 
-The phase in connection and connectionless modes in which a SDL user initializes a stream and
-attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+The phase in connection and connectionless modes in which a SDL user initializes a Stream and
+attaches a PPA address to the Stream.  Primitives in this phase generate local operations only.
 
 @item PPA
 

@@ -1,3 +1,8 @@
+2008-12-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/chi/chi.texi: updates
+	* doc/specs/mxi/mxi.texi: updates
+
 2008-12-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: document MXI
