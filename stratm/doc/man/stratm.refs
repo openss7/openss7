@@ -8326,3 +8326,75 @@ Part 1: Protocol Specification
 %I Frame Relay Forum Technical Committee
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.12/FRF.12.pdf
+
+%K af91
+%L AF.91
+%E Serge Sasyan
+%R AF-SAA-API-DLPI-0091.000
+%T Native ATM Services Data Link Provider Interface (DLPI) Addendum Version 1.0
+%D February 1998
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-saa-api-dlpi-0091.000.pdf
+
+%K i431
+%L I.431
+%A ITU
+%R ITU-T Recommendation I.431
+%T Integrated Services Digital Network (ISDN) \(em ISDN User-Network Interfaces \(em Primary Rate User-Network Interface \(em Layer 1 Specification
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.431/
+
+%K i4321
+%L I.432.1
+%A ITU
+%R ITU-T Recommendation I.432.1
+%T B-ISDN user-network inteface \(em Physical layer specification: General characteristics
+%D February 1999
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.432.1/
+
+%K i4322
+%L I.432.2
+%A ITU
+%R ITU-T Recommendation I.432.2
+%T B-ISDN user-network inteface \(em Physical layer specification: 155 520 kbit/s and 622 080 kbit/s operation
+%D February 1999
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.432.2/
+
+%K i4323
+%L I.432.3
+%A ITU
+%R ITU-T Recommendation I.432.3
+%T B-ISDN user-network inteface \(em Physical layer specification: 1544 kbit/s and 2048 kbits operation
+%D February 1999
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.432.3/
+
+%K g804
+%L G.804
+%A ITU
+%R ITU-T Recommendation G.804
+%T ATM cell mapping into plesiochronous digital hierarchy (PDH)
+%D June 2004
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-G.804/
+

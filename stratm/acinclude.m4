@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:48 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-06 12:58:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 08:20:48 $ by $Author: brian $
+# Last Modified $Date: 2008-12-06 12:58:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -436,8 +436,8 @@ AC_DEFUN([_ATM_STRCONF], [dnl
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_prefix='atm'
     AC_CACHE_CHECK([for atm major device number base], [atm_cv_majbase], [dnl
-	if test ${xti_cv_majbase-0} -gt 2 ; then
-	    ((atm_cv_majbase=xti_cv_majbase-2))
+	if test ${isdn_cv_majbase-0} -gt 2 ; then
+	    ((atm_cv_majbase=isdn_cv_majbase-2))
 	else
 	    atm_cv_majbase=218
 	    if test ${streams_cv_package:-LfS} = LfS ; then
@@ -448,8 +448,8 @@ AC_DEFUN([_ATM_STRCONF], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for atm module id base], [atm_cv_midbase], [dnl
-	if test ${xti_cv_midbase-0} -gt 0 ; then
-	    ((atm_cv_midbase=xti_cv_midbase+10))
+	if test ${isdn_cv_midbase-0} -gt 0 ; then
+	    ((atm_cv_midbase=isdn_cv_midbase+10))
 	else
 	    atm_cv_midbase=90
 	    if test ${streams_cv_package:-LfS} = LfS ; then
@@ -475,6 +475,9 @@ AC_DEFUN([_ATM_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.2  2008-12-06 12:58:16  brian
+# - updates for stratm package
+#
 # Revision 0.9.2.1  2008-12-06 08:20:48  brian
 # - added base release files for stratm package
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-06 12:58:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 08:20:48 $ by $Author: brian $
+# Last Modified $Date: 2008-12-06 12:58:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,18 +79,40 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
-				  @PACKAGE_TARNAME@_mknod
+				  @PACKAGE_TARNAME@_mknod \
+				  test-atm
 
-pkglibexec_PROGRAMS		= 
+pkglibexec_PROGRAMS		= test-atm
 
-sbin_PROGRAMS			= \
-				  @PACKAGE_TARNAME@_mknod
+sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
+
+bin_PROGRAMS			= 
+
+dist_sbin_SCRIPTS		= 
+
+#ATM_EXTRA_TESTS		=
+#ATM_EXTRA_TOOLS		=
+
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+test_atm_SOURCES		= src/test/test-atm.c
+test_atm_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+test_atm_LDADD			= $(STREAMS_LDADD)
+test_atm_LDFLAGS		= $(STREAMS_LDFLAGS)
+test_atm_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_atm_CFLAGS			= $(USER_CFLAGS)
+
+#xxxxxx_SOURCES			= src/xxxxxx.c
+#xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+#xxxxxx_LDADD			= $(STREAMS_LDADD)
+#xxxxxx_LDFLAGS			= $(STREAMS_LDFLAGS)
+#xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+#xxxxxx_CFLAGS			= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
@@ -102,57 +124,42 @@ ADDON_LIBS			=
 ADDON_MODS			= 
 ADDON_OBJS			= 
 
-noinst_LIBRARIES		= libX25mods.a libX25drvs.a $(ADDON_LIBS)
+noinst_LIBRARIES		= libATMlink.a libATMmods.a libATMdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
-nodist_EXTRA_libX25mods_a_SOURCES = \
-				  src/modules/phys.c \
-				  src/modules/aal1.c \
-				  src/modules/aal2.c \
-				  src/modules/aal5.c \
-				  src/modules/sscop.c \
-				  src/modules/sscopmce.c
+## =====================================================================
 
-dist_EXTRA_libX25mods_a_SOURCES = \
-				  src/modules/phys.c \
-				  src/modules/aal1.c \
-				  src/modules/aal2.c \
-				  src/modules/aal5.c \
-				  src/modules/sscop.c \
-				  src/modules/sscopmce.c
+EXTRA_libATMlink_a_SOURCES	= 
+libATMlink_a_SOURCES		=
+libATMlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libATMlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libATMlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libATMlink_a_OBJECTS):	$(libATMlink_a_DEPENDENCIES)
 
-mods_source_FILES		= $(nodist_EXTRA_libX25mods_a_SOURCES)
+## =====================================================================
 
-nodist_libX25mods_a_SOURCES	= $(mods_source_FILES)
+EXTRA_libATMmods_a_SOURCES	=
+libATMmods_a_SOURCES		= src/modules/phys.c src/modules/aal1.c src/modules/aal2.c src/modules/aal5.c src/modules/sscop.c src/modules/sscopmce.c
+libATMmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libATMmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libATMmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+libATMmods_a_OBJECTS:		$(libATMmods_a_DEPENDENCIES)
 
-libX25mods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libX25mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
-libX25mods_a_CFLAGS		= $(KERNEL_CFLAGS)
+## =====================================================================
 
-nodist_EXTRA_libX25drvs_a_SOURCES = \
-				  src/drivers/atm.c
-
-dist_EXTRA_libX25drvs_a_SOURCES = \
-				  src/drivers/atm.c
-
-drvs_source_FILES		= $(nodist_EXTRA_libX25drvs_a_SOURCES)
-
-nodist_libX25drvs_a_SOURCES	= $(drvs_source_FILES)
-
-libX25drvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libX25drvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
-libX25drvs_a_CFLAGS		= $(KERNEL_CFLAGS)
-libX25drvs_a_OBJECTS:		$(libX25drvs_a_DEPENDENCIES)
+EXTRA_libATMdrvs_a_SOURCES	=
+libATMdrvs_a_SOURCES		= src/drivers/atm.c
+libATMdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libATMdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libATMdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+libATMdrvs_a_OBJECTS:		$(libATMdrvs_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 
 
 ## RPM_BUILD_KERNEL
 endif
-
 ## PKG_BUILD_ARCH
 endif
-
-EXTRA_DIST			+= $(mods_source_FILES) $(drvs_source_FILES)
 
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
@@ -169,8 +176,8 @@ EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3
 ##
 ## Rules for building kernel objects
 ##
-KERNEL_OBJECTS			= $(libX25mods_a_OBJECTS) $(libX25drvs_a_OBJECTS) $(ADDON_OBJS)
-KERNEL_MODULES			= $(libX25mods_a_OBJECTS) $(libX25drvs_a_OBJECTS) $(ADDON_MODS)
+KERNEL_OBJECTS			= $(libATMlink_a_OBJECTS) $(libATMmods_a_OBJECTS) $(libATMdrvs_a_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libATMmods_a_OBJECTS) $(libATMdrvs_a_OBJECTS) $(ADDON_MODS)
 KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
@@ -200,15 +207,18 @@ endif
 ##
 ## Rules for building libraries
 ##
-LIBRARY_VERSION_FILES		= 
-
-include am/libraries.am
+##LIBRARY_VERSION_FILES		=
+##
+##include am/libraries.am
 
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
 GENKSYMS_CPPFLAGS		= \
+				  -I./pkg -I$(srcdir)/pkg \
+				  -I./src/drivers -I$(srcdir)/src/drivers \
+				  -I./src/modules -I$(srcdir)/src/modules \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
@@ -225,11 +235,6 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 SUBDIRS = src
-
-if PKG_BUILD_ARCH
-SUBDIRS += intl po
-CLEANFILES += po/stamp-po
-endif
 
 SUBDIRS += .
 
@@ -325,7 +330,6 @@ include am/release.am
 include am/doxy.am
 
 EXTRA_DIST			+= \
-				  README-LiS \
 				  debian/README.Debian \
 				  debian/TODO.Debian
 
@@ -347,6 +351,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-12-06 12:58:16  brian
+# - updates for stratm package
+#
 # Revision 0.9.2.1  2008-12-06 08:20:48  brian
 # - added base release files for stratm package
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-31 10:43:45 $
+# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-12-06 12:58:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-31 10:43:45 $ by $Author: brian $
+# Last Modified $Date: 2008-12-06 12:58:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -902,6 +902,9 @@
 %if %{NEED_isdn}
 %global need_isdn           %{nil}
 %endif
+%if %{NEED_atm}
+%global need_atm            %{nil}
+%endif
 %if %{NEED_ss7}
 %global need_ss7            %{nil}
 %endif
@@ -1182,6 +1185,9 @@ BuildPrereq:    striso%{_strextra}-devel >= @ISO_VERSION@
 %if %{NEED_isdn}
 BuildPrereq:    strisdn%{_strextra}-devel >= @ISDN_VERSION@
 %endif
+%if %{NEED_atm}
+BuildPrereq:    stratm%{_strextra}-devel >= @ATM_VERSION@
+%endif
 %if %{NEED_ss7}
 BuildPrereq:    strss7%{_strextra}-devel >= @SS7_VERSION@
 %endif
@@ -1326,6 +1332,9 @@ Prereq:         striso%{_strextra} >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
 Prereq:         strisdn%{_strextra} >= @ISDN_VERSION@
+%endif
+%if %{NEED_atm}
+Prereq:         stratm%{_strextra} >= @ATM_VERSION@
 %endif
 %if %{NEED_ss7}
 Prereq:         strss7%{_strextra} >= @SS7_VERSION@
@@ -2520,6 +2529,9 @@ Prereq:         striso%{_strextra}-lib >= @ISO_VERSION@
 %if %{NEED_isdn}
 Prereq:         strisdn%{_strextra}-lib >= @ISDN_VERSION@
 %endif
+%if %{NEED_atm}
+Prereq:         stratm%{_strextra}-lib >= @ATM_VERSION@
+%endif
 %if %{NEED_ss7}
 Prereq:         strss7%{_strextra}-lib >= @SS7_VERSION@
 %endif
@@ -2693,6 +2705,9 @@ Requires:       striso-devel >= @ISO_VERSION@
 %if %{NEED_isdn}
 Requires:       strisdn-devel >= @ISDN_VERSION@
 %endif
+%if %{NEED_atm}
+Requires:       stratm-devel >= @ATM_VERSION@
+%endif
 %if %{NEED_ss7}
 Requires:       strss7-devel >= @SS7_VERSION@
 %endif
@@ -2822,6 +2837,9 @@ Prereq:         striso%{_strextra}-%{_kversion} >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
 Prereq:         strisdn%{_strextra}-%{_kversion} >= @ISDN_VERSION@
+%endif
+%if %{NEED_atm}
+Prereq:         stratm%{_strextra}-%{_kversion} >= @ATM_VERSION@
 %endif
 %if %{NEED_ss7}
 Prereq:         strss7%{_strextra}-%{_kversion} >= @SS7_VERSION@
@@ -3204,6 +3222,9 @@ Prereq:         striso%{_strextra}-devel-%{_kversion} >= @ISO_VERSION@
 %if %{NEED_isdn}
 Prereq:         strisdn%{_strextra}-devel-%{_kversion} >= @ISDN_VERSION@
 %endif
+%if %{NEED_atm}
+Prereq:         stratm%{_strextra}-devel-%{_kversion} >= @ATM_VERSION@
+%endif
 %if %{NEED_ss7}
 Prereq:         strss7%{_strextra}-devel-%{_kversion} >= @SS7_VERSION@
 %endif
@@ -3273,6 +3294,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 0.9.2.30  2008-12-06 12:58:14  brian
+# - updates for stratm package
+#
 # Revision 0.9.2.29  2008-10-31 10:43:45  brian
 # - do not pass majbase to rpm configure
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-11-26 12:23:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-12-06 12:58:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-26 12:23:08 $ by $Author: brian $
+# Last Modified $Date: 2008-12-06 12:58:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -127,28 +127,31 @@ ADDON_OBJS			=
 noinst_LIBRARIES		= libISDNlink.a libISDNmods.a libISDNdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
+## =====================================================================
+
 EXTRA_libISDNlink_a_SOURCES	= 
-libISDNlink_a_SOURCES		= 
+libISDNlink_a_SOURCES		=
 libISDNlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libISDNlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libISDNlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libISDNlink_a_OBJECTS):	$(libISDNlink_a_DEPENDENCIES)
 
-$(libISDNlink_a_OBJECTS):	$(libISDNlink_a_SOURCES) $(libISDNlink_a_DEPENDENCIES)
+## =====================================================================
 
 EXTRA_libISDNmods_a_SOURCES	=
-libISDNmods_a_SOURCES		= 
+libISDNmods_a_SOURCES		=
 libISDNmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libISDNmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libISDNmods_a_CFLAGS		= $(KERNEL_CFLAGS)
-
 $(libISDNmods_a_OBJECTS):	$(libISDNmods_a_DEPENDENCIES)
+
+## =====================================================================
 
 EXTRA_libISDNdrvs_a_SOURCES	=
 libISDNdrvs_a_SOURCES		=
 libISDNdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libISDNdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libISDNdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
-
 $(libISDNdrvs_a_OBJECTS):	$(libISDNdrvs_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 
@@ -342,6 +345,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2008-12-06 12:58:18  brian
+# - updates for stratm package
+#
 # Revision 0.9.2.12  2008-11-26 12:23:08  brian
 # - correction for FDL update
 #

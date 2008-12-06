@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:48 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-06 12:58:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 08:20:48 $ by $Author: brian $
+# Last Modified $Date: 2008-12-06 12:58:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([stratm],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:48 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-06 12:58:16 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -107,8 +107,8 @@ AC_PROG_YACC
 
 LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION([0.17])
-AM_GNU_GETTEXT
+dnl AM_GNU_GETTEXT_VERSION([0.17])
+dnl AM_GNU_GETTEXT
 
 dnl
 dnl Checks for libraries.
@@ -197,6 +197,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.2  2008-12-06 12:58:16  brian
+# - updates for stratm package
+#
 # Revision 0.9.2.1  2008-12-06 08:20:48  brian
 # - added base release files for stratm package
 #

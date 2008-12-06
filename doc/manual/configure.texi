@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 0.9.2.5 2008-05-03 13:23:24 brian Exp $
+@c @(#) $Id: configure.texi,v 0.9.2.6 2008-12-06 12:58:13 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-05-03 13:23:24 $ by $Author: brian $
+@c Last Modified $Date: 2008-12-06 12:58:13 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -223,6 +223,16 @@ When the @command{strisdn} add-on package is excluded, none of the packages whic
 can be built unless the @command{strisdn} package was otherwise installed on the build system.
 The default is to include the
 @cite{STREAMS ISDN Stacks} (@command{strisdn-@value{VERSION_STRISDN}})
+add-on package in the build.
+
+@item --without-STRATM
+@opindex STRATM
+
+When disabled, excludes the @command{stratm-@value{VERSION_STRATM}} add-on package from the build.
+When the @command{stratm} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{stratmp} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS ATM Stacks} (@command{stratm-@value{VERSION_STRATM}})
 add-on package in the build.
 
 @item --without-STACKS
