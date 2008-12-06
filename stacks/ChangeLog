@@ -1,5 +1,14 @@
 2008-12-06  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/mtp3b/aal1.c: added working file
+	* src/modules/mtp3b/aal2.c: added working file
+	* src/modules/mtp3b/aal5.c: added working file
+	* src/modules/mtp3b/atm.c: added working file
+	* src/modules/mtp3b/mtp3b.c: added working file
+	* src/modules/mtp3b/phys.c: added working file
+	* src/modules/mtp3b/sscop.c: added working file
+	* src/modules/mtp3b/sscopmce.c: added working file
+
 	* doc/specs/sdli/sdli.texi: corrections and updates
 	* doc/specs/sccpi/.cvsignore: correct ignore file
 
