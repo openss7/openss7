@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cdi.h,v 0.9.2.6 2008-10-30 13:37:48 brian Exp $
+ @(#) $Id: cdi.h,v 0.9.2.7 2008-12-06 09:03:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 13:37:48 $ by $Author: brian $
+ Last Modified $Date: 2008-12-06 09:03:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi.h,v $
+ Revision 0.9.2.7  2008-12-06 09:03:39  brian
+ - corrections and updates
+
  Revision 0.9.2.6  2008-10-30 13:37:48  brian
  - updated headers for release
 
@@ -59,7 +62,7 @@
 #ifndef _SYS_CDI_H
 #define _SYS_CDI_H
 
-#ident "@(#) $RCSfile: cdi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cdi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -175,6 +178,8 @@
 #define CD_BISYNC	0x01	/* Character-synchronous */
 #define CD_LAN		0x02	/* ISO 8802-3,4,5 local-area network MAC */
 #define CD_NODEV	0x03	/* no device, ppa used for X-ray */
+#define CD_DAED		0x04	/* Delimination Alignment and Error Detection (SS7) */
+#define CD_ATM		0x05	/* ATM cells */
 
 /*
  * CDI duplex types

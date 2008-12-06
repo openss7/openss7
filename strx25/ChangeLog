@@ -1,3 +1,7 @@
+2008-12-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* po/.cvsignore: fix ignore file
+
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* strx25.lsm.in: change repo directory
