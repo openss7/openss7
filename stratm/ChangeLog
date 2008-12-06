@@ -1,0 +1,169 @@
+2008-12-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added package file
+	* ANNOUNCE: added package file
+	* AUTHORS: added package file
+	* ChangeLog: added package file
+	* configure.ac: added package file
+	* .cvsignore: added package file
+	* .debepoch: added package file
+	* debian/changelog.in: added package file
+	* debian/control.in: added package file
+	* debian/copyright: added package file
+	* debian/mscript_header.in: added package file
+	* debian/mscript_postinst.in: added package file
+	* debian/mscript_postrm.in: added package file
+	* debian/mscript_preinst.in: added package file
+	* debian/mscript_prerm.in: added package file
+	* debian/README.Debian: added package file
+	* debian/rules.in: added package file
+	* debian/stratm-core.postinst.in: added package file
+	* debian/stratm-core.postrm.in: added package file
+	* debian/stratm-core.preinst.in: added package file
+	* debian/stratm-core.prerm.in: added package file
+	* debian/stratm-devel.preinst.in: added package file
+	* debian/stratm-dev.postinst.in: added package file
+	* debian/stratm-dev.preinst.in: added package file
+	* debian/stratm-dev.prerm.in: added package file
+	* debian/stratm-doc.postinst.in: added package file
+	* debian/stratm-doc.preinst.in: added package file
+	* debian/stratm-doc.prerm.in: added package file
+	* debian/stratm-init.postinst.in: added package file
+	* debian/stratm-init.postrm.in: added package file
+	* debian/stratm-init.preinst.in: added package file
+	* debian/stratm-init.prerm.in: added package file
+	* debian/stratm-lib.preinst.in: added package file
+	* debian/stratm-source.preinst.in: added package file
+	* debian/stratm-util.preinst.in: added package file
+	* debian/TODO.Debian: added package file
+	* .debrelease: added package file
+	* doc/.cvsignore: added package file
+	* doc/drafts/atm/Makefile: added package file
+	* doc/drafts/draft2.me: added package file
+	* doc/drafts/draft3.me: added package file
+	* doc/drafts/draft4.me: added package file
+	* doc/drafts/draft.me: added package file
+	* doc/drafts/fixup: added package file
+	* doc/drafts/idrefs: added package file
+	* doc/Makefile.am: added package file
+	* doc/man/.cvsignore: added package file
+	* doc/man/Makefile.am: added package file
+	* doc/man/man8/stratm_mknod.8.man: added package file
+	* doc/man/stratm.macros: added package file
+	* doc/man/stratm.refs: added package file
+	* doc/manual/bugs.texi: added package file
+	* doc/manual/configure.texi: added package file
+	* doc/manual/.cvsignore: added package file
+	* doc/manual/descrip.texi: added package file
+	* doc/manual/Makefile.am: added package file
+	* doc/manual/news.texi: added package file
+	* doc/manual/prerequisites.texi: added package file
+	* doc/manual/releases.texi: added package file
+	* doc/manual/rpm.texi: added package file
+	* doc/manual/stratm.texi: added package file
+	* doc/manual/todo.texi: added package file
+	* doc/manual/tree.texi: added package file
+	* .gnupguser: added package file
+	* .indent.pro: added package file
+	* lib32/.cvsignore: added package file
+	* lib32/Makefile.am: added package file
+	* Makefile.am: added package file
+	* Module.mkvars.in: added package file
+	* NEWS: added package file
+	* .pkgepoch: added package file
+	* .pkgpatchlevel: added package file
+	* .pkgrelease: added package file
+	* README: added package file
+	* README-LiS: added package file
+	* .rpmepoch: added package file
+	* .rpmrelease: added package file
+	* src/.cvsignore: added package file
+	* src/drivers/atm.c: added package file
+	* src/drivers/streams.conf: added package file
+	* src/include/.cvsignore: added package file
+	* src/include/Makefile.am: added package file
+	* src/include/sys/atm_dlpi.h: added package file
+	* src/include/sys/stratm/config.h.in: added package file
+	* src/include/sys/stratm/version.h.in: added package file
+	* src/Makefile.am: added package file
+	* src/modules/aal1.c: added package file
+	* src/modules/aal2.c: added package file
+	* src/modules/aal5.c: added package file
+	* src/modules/mtp3b.c: added package file
+	* src/modules/phys.c: added package file
+	* src/modules/sscop.c: added package file
+	* src/modules/sscopmce.c: added package file
+	* src/modules/streams.conf: added package file
+	* src/snmp/makestubs: added package file
+	* src/util/init/README: added package file
+	* src/util/init/stratm: added package file
+	* src/util/init/stratm.sh: added package file
+	* src/util/modutils/stratm.in: added package file
+	* src/util/sysconfig/netconfig: added package file
+	* src/util/sysconfig/README: added package file
+	* src/util/sysconfig/sock2path: added package file
+	* src/util/sysconfig/stratm: added package file
+	* src/util/sysconfig/stratm.conf: added package file
+	* stratm.dox.in: added package file
+	* stratm.gif: added package file
+	* stratm.lsm.in: added package file
+	* stratm.spec.in: added package file
+	* stratm.tif: added package file
+	* stratm.xcf: added package file
+	* stratm.xpm: added package file
+	* tests/atlocal.in: added package file
+	* tests/.cvsignore: added package file
+	* tests/dummy1.m4: added package file
+	* tests/dummy2.m4: added package file
+	* tests/dummy3.m4: added package file
+	* tests/dummy4.m4: added package file
+	* tests/kernel.at: added package file
+	* tests/local.at: added package file
+	* tests/Makefile.am: added package file
+	* tests/testsuite.at: added package file
+	* THANKS: added package file
+
+2008-12-06  Brian Bidulock  <bidulock@openss7.org>
+
+	Started the stratm package.
+
+-----
+
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+details.
+
+You should have received a copy of the GNU Affero General Public License along
+with this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+behalf of the U.S. Government ("Government"), the following provisions apply
+to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+is classified as "Commercial Computer Software" under paragraph 252.227-7014
+of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+successor regulations) and the Government is acquiring only the license rights
+granted herein (the license rights customarily provided to non-Government
+users).  If the Software is supplied to any unit or agency of the Government
+other than DoD, it is classified as "Restricted Computer Software" and the
+Government's rights in the Software are defined in paragraph 52.227-19 of the
+Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+(or any successor regulations).
+
+
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn nocin nosi
