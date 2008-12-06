@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: prerequisites.texi,v 0.9.2.14 2008-10-25 13:20:23 brian Exp $
+@c @(#) $Id: prerequisites.texi,v 0.9.2.15 2008-12-06 12:58:21 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-10-25 13:20:23 $ by $Author: brian $
+@c Last Modified $Date: 2008-12-06 12:58:21 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -133,6 +133,10 @@ OpenSS7 STREAMS ISO
 @item
 OpenSS7 STREAMS ISDN
 (@uref{http://www.openss7.org/tarballs/strisdn-@value{VERSION_STRISDN}.tar.bz2,, strisdn-@value{VERSION_STRISDN}} or better)
+
+@item
+OpenSS7 STREAMS ATM
+(@uref{http://www.openss7.org/tarballs/stratm-@value{VERSION_STRATM}.tar.bz2,, stratm-@value{VERSION_STRATM}} or better)
 
 @item
 OpenSS7 STREAMS SS7
@@ -252,6 +256,10 @@ unsupported.}
 @item
 @cite{OpenSS7 STREAMS ISDN},
 @uref{http://www.openss7.org/tarballs/strisdn-@value{VERSION_STRISDN}.tar.bz2, strisdn-@value{VERSION_STRISDN}}.
+
+@item
+@cite{OpenSS7 STREAMS ATM},
+@uref{http://www.openss7.org/tarballs/stratm-@value{VERSION_STRATM}.tar.bz2, stratm-@value{VERSION_STRATM}}.
 
 @item
 @cite{OpenSS7 STREAMS SS7},

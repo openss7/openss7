@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2008-10-31 06:54:52 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-12-06 12:58:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-31 06:54:52 $ by $Author: brian $
+# Last Modified $Date: 2008-12-06 12:58:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,6 +79,7 @@ m4_include([m4/chan.m4])
 m4_include([m4/x25.m4])
 m4_include([m4/iso.m4])
 m4_include([m4/isdn.m4])
+m4_include([m4/atm.m4])
 m4_include([m4/doxy.m4])
 m4_include([m4/lib32.m4])
 m4_include([m4/perl.m4])
@@ -127,6 +128,7 @@ AC_DEFUN([AC_SS7], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ATM_CPPFLAGS:+ }}${ATM_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ISDN_CPPFLAGS:+ }}${ISDN_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ISO_CPPFLAGS:+ }}${ISO_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${X25_CPPFLAGS:+ }}${X25_CPPFLAGS}"
@@ -178,6 +180,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${X25_MANPATH:+${X25_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${ISO_MANPATH:+${ISO_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${ISDN_MANPATH:+${ISDN_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${ATM_MANPATH:+${ATM_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -198,6 +201,7 @@ AC_DEFUN([_SS7_OPTIONS], [dnl
     _SS7_CHECK_ISO
     _SS7_CHECK_SIGTRAN
     _SS7_CHECK_ISDN
+    _SS7_CHECK_ATM
     _SS7_CHECK_CHAN
     _SS7_CHECK_VOIP
     _SS7_CHECK_GSM
@@ -408,6 +412,24 @@ AC_DEFUN([_SS7_CHECK_ISDN], [dnl
 # =============================================================================
 
 # =============================================================================
+# _SS7_CHECK_ATM
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_ATM], [dnl
+    AC_ARG_WITH([atm],
+	AS_HELP_STRING([--with-atm],
+	    [include atm modules in build. @<:@default=no@:>@]),
+	[with_atm="$withval"],
+	[with_atm='no'])
+    AC_MSG_CHECKING([for ATM modules])
+    if test :"$with_atm" = :yes ; then
+	ss7_cv_atm='yes'
+    fi
+    AM_CONDITIONAL([WITH_ATM], [test :"$ss7_cv_atm" = :yes])dnl
+    AC_MSG_RESULT([${ss7_cv_atm:-no}])
+])# _SS7_CHECK_ATM
+# =============================================================================
+
+# =============================================================================
 # _SS7_CHECK_CHAN
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7_CHECK_CHAN], [dnl
@@ -482,6 +504,7 @@ AC_DEFUN([_SS7_SETUP], [dnl
     _X25
     _ISO
     _ISDN
+    _ATM
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _SS7_OTHER_SCTP
@@ -1874,8 +1897,8 @@ AC_DEFUN([_SS7_STRCONF], [dnl
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_prefix='ss7'
     AC_CACHE_CHECK([for ss7 major device number base], [ss7_cv_majbase], [dnl
-	if test ${isdn_cv_majbase-0} -gt 24 ; then
-	    ((ss7_cv_majbase=isdn_cv_majbase-24))
+	if test ${atm_cv_majbase-0} -gt 24 ; then
+	    ((ss7_cv_majbase=atm_cv_majbase-24))
 	else
 	    ss7_cv_majbase=180
 	    if test ${streams_cv_package:-LfS} = LfS ; then
@@ -1886,8 +1909,8 @@ AC_DEFUN([_SS7_STRCONF], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for ss7 module id base], [ss7_cv_midbase], [dnl
-	if test ${isdn_cv_midbase-0} -gt 0 ; then
-	    ((ss7_cv_midbase=isdn_cv_midbase+10))
+	if test ${atm_cv_midbase-0} -gt 0 ; then
+	    ((ss7_cv_midbase=atm_cv_midbase+10))
 	else
 	    ss7_cv_midbase=140
 	    if test ${streams_cv_package:-LfS} = LfS ; then
@@ -1913,6 +1936,9 @@ AC_DEFUN([_SS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.82  2008-12-06 12:58:15  brian
+# - updates for stratm package
+#
 # Revision 0.9.2.81  2008-10-31 06:54:52  brian
 # - move config files, better strconf handling
 #

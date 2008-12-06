@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-28 17:04:32 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-12-06 12:58:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:04:32 $ by $Author: brian $
+# Last Modified $Date: 2008-12-06 12:58:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,6 +78,7 @@ m4_include([m4/chan.m4])
 m4_include([m4/x25.m4])
 m4_include([m4/iso.m4])
 m4_include([m4/isdn.m4])
+m4_include([m4/atm.m4])
 m4_include([m4/ss7.m4])
 m4_include([m4/sigtran.m4])
 m4_include([m4/voip.m4])
@@ -124,6 +125,7 @@ dnl		     src/include/sys/openss7/version.h])
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SIGTRAN_CPPFLAGS:+ }}${SIGTRAN_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ATM_CPPFLAGS:+ }}${ATM_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ISDN_CPPFLAGS:+ }}${ISDN_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ISO_CPPFLAGS:+ }}${ISO_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${X25_CPPFLAGS:+ }}${X25_CPPFLAGS}"
@@ -177,6 +179,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${X25_MANPATH:+${X25_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${ISO_MANPATH:+${ISO_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${ISDN_MANPATH:+${ISDN_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${ATM_MANPATH:+${ATM_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${SIGTRAN_MANPATH:+${SIGTRAN_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
@@ -745,6 +748,35 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 	    fi
 	fi
     fi
+    AC_ARG_WITH([STRATM],
+		AS_HELP_STRING([--without-STRATM],
+			       [do not include STRATM in master pack @<:@included@:>@]),
+		[with_STRATM="${withval:-yes}"],
+		[with_STRATM='yes'])
+    AC_CACHE_CHECK([for sub-package stratm],[os7_cv_stratm_dir],[dnl
+	    os7_cv_stratm_dir=''
+	    for dir in $srcdir/stratm $srcdir/stratm-* ; do
+		if test -d "$dir" -a -e "$dir/configure.ac" -a -r "$dir/configure.ac" ; then
+		    os7_cv_stratm_dir="$(basename $dir)"
+		fi
+	    done
+	])
+    if test :"${os7_cv_stratm_dir:-no}" = :no ; then
+	with_STRATM='no'
+    else
+	if test :"${os7_cv_stratm_dir:-no}" != :stratm ; then
+	    if test -e $srcdir/stratm ; then
+		if test -L $srcdir/stratm ; then
+		    if test "$(readlink $srcdir/stratm)" != "$os7_cv_stratm_dir" ; then
+			rm -f $srcdir/stratm
+			( cd $srcdir ; ln -sf $os7_cv_stratm_dir stratm )
+		    fi
+		fi
+	    else
+		( cd $srcdir ; ln -sf $os7_cv_stratm_dir stratm )
+	    fi
+	fi
+    fi
     AC_ARG_WITH([STACKS],
 		AS_HELP_STRING([--without-STACKS],
 			       [do not include STACKS in master pack @<:@included@:>@]),
@@ -1025,6 +1057,13 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-isdn'"
 	ac_configure_args="$ac_configure_args --without-isdn"
     fi
+    if test :"${with_STRATM:-yes}" != :no ; then
+	: _ATM
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_atm --without-atm\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-atm'"
+	ac_configure_args="$ac_configure_args --without-atm"
+    fi
     if test :"${with_STACKS:-yes}" != :no ; then
 	: _SS7
     else
@@ -1211,6 +1250,16 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
 	AC_CONFIG_SUBDIRS([strisdn])
     fi
     AM_CONDITIONAL([WITH_STRISDN], [test :${with_STRISDN:-yes} = :yes -a :${os7_cv_strisdn_dir:-no} != :no])dnl
+    if test :${with_STRATM:-yes} = :yes -a :${os7_cv_stratm_dir:-no} != :no ; then
+	_OS7_REQUIRE([strchan], [0.9.2.7], [stratm])
+	_OS7_REQUIRE([strxns], [0.9.2.7], [stratm])
+	_OS7_REQUIRE([strxnet], [0.9.2.12], [stratm])
+	_OS7_REQUIRE([strx25], [0.9.2.1], [stratm])
+	_OS7_REQUIRE([striso], [0.9.2.4], [stratm])
+	_OS7_REQUIRE([strisdn], [0.9.2.4], [stratm])
+	AC_CONFIG_SUBDIRS([stratm])
+    fi
+    AM_CONDITIONAL([WITH_STRATM], [test :${with_STRATM:-yes} = :yes -a :${os7_cv_stratm_dir:-no} != :no])dnl
     if test :${with_STACKS:-yes} = :yes -a :${os7_cv_strss7_dir:-no} != :no ; then
 	_OS7_REQUIRE([strxnet], [0.9.2.12], [strss7])
 	_OS7_REQUIRE([strinet], [0.9.2.7], [strss7])
@@ -1218,6 +1267,7 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
 	_OS7_REQUIRE([strx25], [0.9.2.1], [strss7])
 	_OS7_REQUIRE([striso], [0.9.2.4], [strss7])
 	_OS7_REQUIRE([strisdn], [0.9.2.4], [strss7])
+	_OS7_REQUIRE([stratm], [0.9.2.1], [strss7])
 	AC_CONFIG_SUBDIRS([stacks])
     fi
     AM_CONDITIONAL([WITH_STACKS], [test :${with_STACKS:-yes} = :yes -a :${os7_cv_strss7_dir:-no} != :no])dnl
@@ -1250,6 +1300,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.60  2008-12-06 12:58:12  brian
+# - updates for stratm package
+#
 # Revision 0.9.2.59  2008-09-28 17:04:32  brian
 # - adjustments
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-06 12:58:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 08:20:51 $ by $Author: brian $
+# Last Modified $Date: 2008-12-06 12:58:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,11 +54,8 @@
 ##
 include ../am/openss7.am
 
-
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
-
-EXTRA_PROGRAMS			+= 
 
 pkglibexec32_PROGRAMS		=
 
@@ -70,14 +67,14 @@ if PKG_BUILD_ARCH
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-#test_tirdwr_SOURCES		= $(top_srcdir)/src/test/test-tirdwr.c
-#test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
-#test_tirdwr_LDADD		= $(STREAMS_LDADD32)
-#test_tirdwr_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-#test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-#test_tirdwr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+pkglibexec32_PROGRAMS		+= test-atm
 
-#pkglibexec32_PROGRAMS		+= test-tirdwr
+test_atm_SOURCES		= $(top_srcdir)/src/test/test-atm.c
+test_atm_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+test_atm_LDADD			= $(STREAMS_LDADD32)
+test_atm_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
+test_atm_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_atm_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 ## RPM_BUILD_USER
 endif
@@ -93,6 +90,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-12-06 12:58:16  brian
+# - updates for stratm package
+#
 # Revision 0.9.2.1  2008-12-06 08:20:51  brian
 # - added base release files for stratm package
 #

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.8 2008-05-03 13:23:24 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.9 2008-12-06 12:58:13 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-05-03 13:23:24 $ by $Author: brian $
+@c Last Modified $Date: 2008-12-06 12:58:13 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -84,6 +84,7 @@ describe some of the kernel modules installed by add-on packages in the @value{P
 * strx25 Kernel Modules::
 * striso Kernel Modules::
 * strisdn Kernel Modules::
+* stratm Kernel Modules::
 * strss7 Kernel Modules::
 * sigtran Kernel Modules::
 * strvoip Kernel Modules::
@@ -686,6 +687,26 @@ A number of these drivers and modules were formerly part of the commercial @comm
 releases.
 
 Kernel modules installed by @command{strisdn-@value{VERSION_STRISDN}} are as follows:
+
+@table @asis
+
+@item 
+
+This add-on package currently installs no kernel modules.  Modules will be added from the commercial
+release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
+
+@end table
+
+@node stratm Kernel Modules
+@subsubsection stratm
+
+The @command{stratm-@value{VERSION_STRATM}} add-on package provides a range of @dfn{STREAMS}
+drivers and modules as kernel modules.  The drivers and modules implement various protocol
+components in, or related to, the @cite{Asynchronous Transfer Mode (ATM)}.
+A number of these drivers and modules were formerly part of the commercial @command{strss7} package
+releases.
+
+Kernel modules installed by @command{stratm-@value{VERSION_STRATM}} are as follows:
 
 @table @asis
 
