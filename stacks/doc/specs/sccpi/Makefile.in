@@ -16,7 +16,7 @@
 
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -65,9 +65,9 @@
 #
 # =============================================================================
 
-# @(#) $RCSfile: Makefile.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:32 $
+# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.144 $) $Date: 2008-10-22 00:20:03 $
 
-# @(#) $RCSfile: Makefile.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:32 $
+# @(#) $RCSfile: info.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.65 $) $Date: 2008-10-27 22:20:11 $
 
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
