@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/14 19:47:06 $
+-- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2008-12-02 06:51:28 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008/01/14 19:47:06 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-02 06:51:28 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MX-MIB.mib,v $
+-- Revision 0.9.2.4  2008-12-02 06:51:28  brian
+-- - document CHI
+--
 -- Revision 0.9.2.3  2008/01/14 19:47:06  brian
 -- - updated and corrected mibs
 --
@@ -1457,12 +1460,12 @@ mxChanAvailabilityStatus OBJECT-TYPE
            the same value is present in the span availability status.
          
          - offLine(3), the channel requires a routing operation to be 
-           performed to place it online an make it available for use.  
+           performed to place it online and make it available for use.  
            The operation may be manual or automatic, or both.  The 
            operational state is disabled.  This value is present when 
            the same value is present in the span availability status.
          
-         - offDuty(4), the channel has been made inactve by an internal 
+         - offDuty(4), the channel has been made inactive by an internal 
            control process in accordance with a predetermined time 
            schedule.  Under normal conditions, the control process can 
            be expected to reactivate the channel at some scheduled time.
@@ -1520,7 +1523,7 @@ mxChanSap OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Indicates the name of the service access point that represents 
-         the user of the channel.  WHen the value is the null string, it 
+         the user of the channel.  When the value is the null string, it 
          indicates that there is no user of the channel."
     ::= { mxChanEntry 9 }
 
@@ -2209,7 +2212,7 @@ mxNearEndTotalEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        "Each entry in the table provides near end perofrmance 
+        "Each entry in the table provides near end performance 
          statistics for a given span.  Spans whose drivers or equipment 
          does not support the reporting of near end performance 
          measurements will not have an entry in this table, or may have 
