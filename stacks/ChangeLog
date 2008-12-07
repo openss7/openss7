@@ -1,3 +1,11 @@
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/dlpi_aix.h: add extended DLPI headers
+	* src/include/sys/dlpi_ext.h: add extended DLPI headers
+	* src/include/sys/dlpi_ioctl.h: add extended DLPI headers
+	* src/include/sys/dlpi_sgi.h: add extended DLPI headers
+	* src/include/sys/dlpi_sun.h: add extended DLPI headers
+
 2008-12-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/mtp3b/aal1.c: added working file
