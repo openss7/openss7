@@ -1,5 +1,16 @@
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: first good build
+	* doc/Makefile.am: first good build
+	* src/drivers/atm.c: first good build
+	* src/include/sys/stratm/config.h.in: first good build
+	* src/modules/aal2.c: first good build
+	* src/modules/aal5.c: first good build
+	* src/modules/sscop.c: first good build
+	* src/modules/sscopmce.c: first good build
+
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
 	* configure.ac: working up package compile
 	* stratm.lsm.in: working up package compile
 	* stratm.spec.in: working up package compile

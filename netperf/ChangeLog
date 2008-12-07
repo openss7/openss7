@@ -1,3 +1,7 @@
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* netperf.spec.in: new stratm package
+
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* netperf.lsm.in: change repo directory

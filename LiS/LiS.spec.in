@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.96 $) $Date: 2008-10-27 13:01:07 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.97 $) $Date: 2008-12-07 10:40:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 13:01:07 $ by $Author: brian $
+# Last Modified $Date: 2008-12-07 10:40:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -109,6 +109,7 @@
 %global NEED_x25        0
 %global NEED_iso        0
 %global NEED_isdn       0
+%global NEED_atm        0
 %global NEED_ss7        0
 %global NEED_sigtran    0
 
@@ -121,6 +122,9 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.97  2008-12-07 10:40:14  brian
+# - new stratm package
+#
 # Revision 1.1.6.96  2008-10-27 13:01:07  brian
 # - updated spec files
 #

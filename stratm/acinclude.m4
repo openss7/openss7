@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-06 12:58:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 12:58:16 $ by $Author: brian $
+# Last Modified $Date: 2008-12-07 10:40:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,22 +68,23 @@ m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
-dnl m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
 m4_include([m4/nsl.m4])
 m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
-m4_include([m4/ss7.m4])
 m4_include([m4/chan.m4])
+m4_include([m4/x25.m4])
+m4_include([m4/iso.m4])
+m4_include([m4/ss7.m4])
 m4_include([m4/doxy.m4])
 
 # =============================================================================
 # AC_ATM
 # -----------------------------------------------------------------------------
 AC_DEFUN([AC_ATM], [dnl
-    _OPENSS7_PACKAGE([ATM], [OpenSS7 X.25 Networking])
+    _OPENSS7_PACKAGE([ATM], [OpenSS7 STREAMS ATM])
     _ATM_OPTIONS
     _AUTOPR
     _MAN_CONVERSION
@@ -121,6 +122,8 @@ AC_DEFUN([AC_ATM], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ISO_CPPFLAGS:+ }}${ISO_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${X25_CPPFLAGS:+ }}${X25_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${CHAN_CPPFLAGS:+ }}${CHAN_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SCTP_CPPFLAGS:+ }}${SCTP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
@@ -166,6 +169,8 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${SCTP_MANPATH:+${SCTP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${CHAN_MANPATH:+${CHAN_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${X25_MANPATH:+${X25_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${ISO_MANPATH:+${ISO_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${SS7_MANPATH:+${SS7_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
@@ -182,7 +187,6 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ATM_OPTIONS], [dnl
     _ATM_CHECK_ATM
-    _ATM_CHECK_SCTP
 ])# _ATM_OPTIONS
 # =============================================================================
 
@@ -191,20 +195,6 @@ AC_DEFUN([_ATM_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ATM_CHECK_ATM], [dnl
 ])# _ATM_CHECK_ATM
-# =============================================================================
-
-# =============================================================================
-# _ATM_CHECK_SCTP
-# -----------------------------------------------------------------------------
-AC_DEFUN([_ATM_CHECK_SCTP], [dnl
-])# _ATM_CHECK_SCTP
-# =============================================================================
-
-# =============================================================================
-# _ATM_OTHER_SCTP
-# -----------------------------------------------------------------------------
-AC_DEFUN([_ATM_OTHER_SCTP], [dnl
-])# _ATM_OTHER_SCTP
 # =============================================================================
 
 # =============================================================================
@@ -223,10 +213,11 @@ AC_DEFUN([_ATM_SETUP], [dnl
     _INET
     _SCTP
     _CHAN
+    _X25
+    _ISO
     _SS7_CHECK
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
-    _ATM_OTHER_SCTP
     _ATM_SETUP_MODULE
     _ATM_CONFIG_KERNEL
 ])# _ATM_SETUP
@@ -257,8 +248,12 @@ AC_DEFUN([_ATM_SETUP_MODULE], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ATM_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h linux/brlock.h \
-			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
+			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
+			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
+			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
+			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/smp_lock.h \
+			  linux/devfs_fs_kernel.h linux/compile.h linux/utsrelease.h \
+			  linux/brlock.h linux/snmp.h net/xfrm.h net/dst.h \
 			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -266,6 +261,9 @@ AC_DEFUN([_ATM_CONFIG_KERNEL], [dnl
 #include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
@@ -281,7 +279,7 @@ AC_DEFUN([_ATM_CONFIG_KERNEL], [dnl
 #include <net/dst.h>
 #endif
 #include <linux/sched.h>
-    ])
+])
     _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *,
 			uintptr_t, intptr_t, uchar, pm_message_t], [:], [:], [
 #include <linux/compiler.h>
@@ -383,20 +381,6 @@ AC_DEFUN([_ATM_CONFIG_KERNEL], [dnl
 #define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5,a6)
 #endif])dnl
     ])
-#    AC_SUBST([EXPOSED_SYMBOLS])
-#    EXPOSED_SYMBOLS="\
-#	mtp_n_uderror_ind \
-#	mtp_n_unitdata_ind \
-#	mtp_n_unitdata_req \
-#	sccp_n_uderror_ind \
-#	sccp_n_unitdata_ind \
-#	sccp_n_unitdata_req \
-#	sctp_data_ind \
-#	sctp_data_req \
-#	sctp_datack_ind \
-#	sctp_datack_req \
-#	sctp_exdata_ind \
-#	sctp_exdata_req"
 ])# _ATM_CONFIG_KERNEL
 # =============================================================================
 
@@ -417,10 +401,10 @@ AC_DEFUN([_ATM_CONFIG], [dnl
     pkg_bld=`(cd . ; /bin/pwd)`
     atm_cv_config="${pkg_bld}/src/include/sys/stratm/config.h"
     atm_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
-    atm_cv_ldadd="${pkg_bld}/libsatm.la"
-    atm_cv_ldflags="-L${pkg_bld}/.libs/"
-    atm_cv_ldadd32="${pkg_bld}/lib32/libsatm.la"
-    atm_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
+    atm_cv_ldadd= # "${pkg_bld}/libatm.la"
+    atm_cv_ldflags= # "-L${pkg_bld}/.libs/"
+    atm_cv_ldadd32= # "${pkg_bld}/lib32/libatm.la"
+    atm_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
     atm_cv_manpath="${pkg_bld}/doc/man"
     atm_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     atm_cv_modmap="${pkg_bld}/Modules.map"
@@ -475,6 +459,9 @@ AC_DEFUN([_ATM_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.3  2008-12-07 10:40:23  brian
+# - new stratm package
+#
 # Revision 0.9.2.2  2008-12-06 12:58:16  brian
 # - updates for stratm package
 #

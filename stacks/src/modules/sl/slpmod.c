@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:20 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-12-07 10:40:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:20 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.12  2008-12-07 10:40:22  brian
+ - new stratm package
+
  Revision 0.9.2.11  2008-09-22 20:31:20  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:20 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-12-07 10:40:22 $"
 
 static char const ident[] =
-    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:20 $";
+    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-12-07 10:40:22 $";
 
 /*
  *  This is SLPMOD, an SL module that is pushed over a pipe end to form an internal
@@ -89,7 +92,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:20 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-12-07 10:40:22 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -219,14 +222,15 @@ struct sl_pair {
 #define PRIV(q)		((struct sl_pair *)(q)->q_ptr)
 #define SL_PRIV(q)	(((q)->q_flag & QREADR) ? &PRIV(q)->r_priv : &PRIV(q)->w_priv)
 
-#define STRLOGNO	0	/* log Stream errors */
-#define STRLOGIO	1	/* log Stream input-output */
-#define STRLOGST	2	/* log Stream state transitions */
-#define STRLOGTO	3	/* log Stream timeouts */
-#define STRLOGRX	4	/* log Stream primitives received */
-#define STRLOGTX	5	/* log Stream primitives issued */
-#define STRLOGTE	6	/* log Stream timer events */
-#define STRLOGDA	7	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 /**
  * sdt_iocname: display SDT ioctl command name

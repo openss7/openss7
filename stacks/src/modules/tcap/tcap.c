@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:22 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-12-07 10:40:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:22 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.27  2008-12-07 10:40:22  brian
+ - new stratm package
+
  Revision 0.9.2.26  2008-09-22 20:31:22  brian
  - added module version and truncated logs
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:22 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-12-07 10:40:22 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:22 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-12-07 10:40:22 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -118,7 +121,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:22 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.27 $) $Date: 2008-12-07 10:40:22 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -199,14 +202,15 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
  *  =========================================================================
  */
 
-#define STRLOGNO	0	/* log always */
-#define STRLOGIO	1	/* log Stream input-output controls */
-#define STRLOGST	2	/* log Stream state transitions */
-#define STRLOGTO	3	/* log Stream timeout */
-#define STRLOGRX	4	/* log Stream received primitives */
-#define STRLOGTX	5	/* log Stream issued primitives */
-#define STRLOGTE	6	/* log Stream timer events */
-#define STRLOGDA	7	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 static inline const char *
 msgname(uchar type)

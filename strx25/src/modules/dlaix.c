@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $
+ @(#) $RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:47 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlaix.c,v $
+ Revision 0.9.2.3  2008-12-07 10:40:37  brian
+ - new stratm package
+
  Revision 0.9.2.2  2008-09-22 20:31:47  brian
  - added module version and truncated logs
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
+#ident "@(#) $RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:37 $"
 
-static char const ident[] = "$RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $";
+static char const ident[] = "$RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:37 $";
 
 /*
  * This is a DLPI module that is pushed over a CD-HDLC stream to form
@@ -84,7 +87,7 @@ static char const ident[] = "$RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.2 
 #define DLAIX_DESCRIP	"LAPB OVER HDLC MODULE FOR LINUX FAST-STREAMS"
 #define DLAIX_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define DLAIX_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define DLAIX_REVISION	"OpenSS7 $RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
+#define DLAIX_REVISION	"OpenSS7 $RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:37 $"
 #define DLAIX_DEVICE	"SVR 4.2MP LAPB over HDLC Module (LAPB) for X.25"
 #define DLAIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLAIX_LICENSE	"GPL"
@@ -205,13 +208,15 @@ struct priv {
 #define DL_PRIV(q) (&PRIV(q)->dlpi)
 #define CD_PRIV(q) (&PRIV(q)->cdi)
 
-#define STRLOGIO    0		/* input-output controls */
-#define STRLOGST    1		/* state transitions */
-#define STRLOGTO    2		/* timeouts */
-#define STRLOGRX    3		/* primitives received */
-#define STRLOGTX    4		/* primitives issued */
-#define STRLOGTE    5		/* timer events */
-#define STRLOGDA    6		/* data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 static inline const char *
 dl_iocname(int cmd)

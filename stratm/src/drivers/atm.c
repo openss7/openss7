@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: atm.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:51 $
+ @(#) $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-06 08:20:51 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: atm.c,v $
+ Revision 0.9.2.2  2008-12-07 10:40:24  brian
+ - new stratm package
+
  Revision 0.9.2.1  2008-12-06 08:20:51  brian
  - added base release files for stratm package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: atm.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:51 $"
+#ident "@(#) $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:24 $"
 
-static char const ident[] = "$RCSfile: atm.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:51 $";
+static char const ident[] = "$RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:24 $";
 
 /*
  * This is an ATM multiplexing driver.  The driver links CDI Streams beneath the multiplexing driver
@@ -72,8 +75,20 @@ static char const ident[] = "$RCSfile: atm.c,v $ $Name: OpenSS7-0_9_2 $($Revisio
  * For the upper interface boundary, see DLPI.  For the lower interface boundary, see CDI.
  */
 
+#define _LFS_SOURCE	1
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+
+#include <sys/os7/compat.h>
+#include <sys/strsun.h>
+#include <sys/strconf.h>
+
+#include <sys/cdi.h>
+#include <sys/dlpi.h>
+#include <sys/atm_dlpi.h>
+
 #define ATM_DESCRIP	"ATM STREAMS MULTIPLEXING DRIVER."
-#define ATM_REVISION	"OpenSS7 $RCSfile: atm.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:51 $"
+#define ATM_REVISION	"OpenSS7 $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:24 $"
 #define ATM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ATM_DEVICE	"Provides OpenSS7 ATM I.432.X Pseudo-Device Driver."
 #define ATM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -144,6 +159,7 @@ struct dl {
 	dl_info_ack_t info;
 };
 
+rwlock_t atm_lock = RW_LOCK_UNLOCKED;
 caddr_t atm_opens;
 
 #define DL_PRIV(q) (struct dl *)(q->q_ptr)
@@ -159,7 +175,6 @@ struct cd {
 caddr_t atm_links;
 
 #define CD_PRIV(q) (struct cd *)(q->q_ptr)
-
 
 /*
  * PRINTING THINGS
@@ -1408,9 +1423,6 @@ dl_info_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1459,9 +1471,6 @@ dl_attach_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1479,9 +1488,6 @@ dl_detach_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1501,9 +1507,6 @@ dl_bind_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1521,9 +1524,6 @@ dl_unbind_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1543,9 +1543,6 @@ dl_subs_bind_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1563,9 +1560,6 @@ dl_subs_unbind_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1659,9 +1653,6 @@ dl_connect_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1679,9 +1670,6 @@ dl_connect_res(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1701,9 +1689,6 @@ dl_token_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1721,9 +1706,6 @@ dl_disconnect_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1743,9 +1725,6 @@ dl_phys_addr_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1764,9 +1743,6 @@ dl_set_phys_addr_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1784,9 +1760,6 @@ dl_get_statistics_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1811,9 +1784,6 @@ cd_info_ack(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -1831,9 +1801,6 @@ cd_ok_ack(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
@@ -1853,9 +1820,6 @@ cd_error_ack(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -1873,9 +1837,6 @@ cd_enable_con(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
@@ -1895,9 +1856,6 @@ cd_disable_con(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -1915,9 +1873,6 @@ cd_error_ind(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
@@ -1937,9 +1892,6 @@ cd_unitdata_ack(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -1957,9 +1909,6 @@ cd_unitdata_ind(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
@@ -1979,9 +1928,6 @@ cd_bad_frame_ind(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -2000,9 +1946,6 @@ cd_modem_sig_ind(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -2013,14 +1956,34 @@ cd_modem_sig_ind(struct cd *cd, queue_t *q, mblk_t *mp)
 /*
  * STREAMS MESSAGE TYPE HANDLING
  */
+noinline fastcall __unlikely int
+dl_reply_error(struct dl *dl, queue_t *q, mblk_t *msg, dl_ulong prim, dl_long error)
+{
+	/* FIXME */
+	freemsg(msg);
+	return (0);
+}
+noinline fastcall __unlikely int
+cd_reply_error(struct cd *cd, queue_t *q, mblk_t *msg, cd_ulong prim, cd_long error)
+{
+	/* FIXME */
+	freemsg(msg);
+	return (0);
+}
 
 noinline fastcall int
 dl_w_data(struct dl *dl, queue_t *q, mblk_t *mp)
 {
+	/* FIXME */
+	freemsg(mp);
+	return (0);
 }
 noinline fastcall int
 cd_r_data(struct cd *cd, queue_t *q, mblk_t *mp)
 {
+	/* FIXME */
+	freemsg(mp);
+	return (0);
 }
 
 noinline fastcall int
@@ -2181,10 +2144,16 @@ cd_r_ctl(struct cd *cd, queue_t *q, mblk_t *mp)
 noinline fastcall int
 dl_w_ioctl(struct dl *dl, queue_t *q, mblk_t *mp)
 {
+	/* nothing for now */
+	freemsg(mp);
+	return (0);
 }
 noinline fastcall int
 cd_r_ioctl(struct cd *cd, queue_t *q, mblk_t *mp)
 {
+	/* nothing for now */
+	freemsg(mp);
+	return (0);
 }
 
 noinline fastcall int
@@ -2229,6 +2198,9 @@ m_r_flush(queue_t *q, mblk_t *mp)
 noinline fastcall int
 m_r_error(queue_t *q, mblk_t *mp)
 {
+	/* nothing for now */
+	freemsg(mp);
+	return (0);
 }
 
 noinline fastcall int
@@ -2473,6 +2445,8 @@ dl_wsrv(queue_t *q)
 static streamscall int
 atm_muxrsrv(queue_t *q)
 {
+	/* FIXME */
+	return (0);
 }
 
 /**
@@ -2486,6 +2460,8 @@ atm_muxrsrv(queue_t *q)
 static streamscall int
 atm_muxwsrv(queue_t *q)
 {
+	/* FIXME */
+	return (0);
 }
 
 /**
@@ -2538,15 +2514,42 @@ cd_rput(queue_t *q, mblk_t *mp)
 static streamscall int
 atm_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
-	major_t cmajor = getmajor(*devp);
-	minor_t cminor = getminor(*devp);
-	struct atm *atm;
+	struct dl *dl;
 	int err;
+
+	if (q->q_ptr)
+		return (0);
+	if (sflag != CLONEOPEN)
+		return (ENXIO);
+	write_lock(&atm_lock);
+	if ((err = mi_open_comm(&atm_opens, sizeof(*dl), q, devp, oflags, sflag, crp))) {
+		write_unlock(&atm_lock);
+		return (err);
+	}
+	dl = (typeof(dl)) q->q_ptr;
+	bzero(dl, sizeof(*dl));
+	dl->cd = NULL;
+	dl->next = NULL;
+	dl->prev = &dl->next;
+	dl->oq = RD(q);
+	dl->iq = WR(q);
+	dl->state.state = DL_UNATTACHED;
+	dl->oldstate.state = DL_UNATTACHED;
+	dl->info.dl_primitive = DL_INFO_ACK;
+	dl->info.dl_current_state = DL_UNATTACHED;
+	/* FIXME: more */
+	write_unlock(&atm_lock);
+	return (0);
 }
 
 static streamscall int
 atm_qclose(queue_t *q, int oflags, cred_t *crp)
 {
+	qprocsoff(q);
+	write_lock(&atm_lock);
+	mi_close_comm(&atm_opens, q);
+	write_unlock(&atm_lock);
+	return (0);
 }
 
 static modID_t modid = DRV_ID;
@@ -2573,8 +2576,8 @@ static struct module_info atm_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat atm_rstat = __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat atm_wstat = __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat atm_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat atm_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static struct qinit atm_rdinit = {
 	.qi_putp = NULL,

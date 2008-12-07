@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi.h,v 0.9.2.6 2008-04-28 23:39:56 brian Exp $
+ @(#) $Id: chi.h,v 0.9.2.7 2008-12-07 10:40:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:39:56 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi.h,v $
+ Revision 0.9.2.7  2008-12-07 10:40:27  brian
+ - new stratm package
+
  Revision 0.9.2.6  2008-04-28 23:39:56  brian
  - updated headers for release
 
@@ -74,7 +77,7 @@
 #ifndef __SYS_CHI_H__
 #define __SYS_CHI_H__
 
-#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -274,7 +277,7 @@ typedef struct CH_optmgmt_ack {
 } CH_optmgmt_ack_t;
 
 /*
-   management flags for CH_OPTMGMT 
+   management flags for CH_OPTMGMT
  */
 #define CH_SET_OPT	0x01
 #define CH_GET_OPT	0x02
@@ -323,7 +326,7 @@ typedef struct CH_error_ack {
 } CH_error_ack_t;
 
 /*
-   error types 
+   error types
  */
 #define CHSYSERR	 0	/* UNIX system error */
 #define CHBADADDR	 1	/* Bad address format or content */
@@ -406,7 +409,7 @@ typedef struct CH_connect_req {
 } CH_connect_req_t;
 
 /*
-   connect flags 
+   connect flags
  */
 #define CHF_RX_DIR	0x01
 #define CHF_TX_DIR	0x02

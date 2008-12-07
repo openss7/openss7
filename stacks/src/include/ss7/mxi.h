@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.8 2008-10-30 13:36:56 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.9 2008-12-07 10:40:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 13:36:56 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi.h,v $
+ Revision 0.9.2.9  2008-12-07 10:40:17  brian
+ - new stratm package
+
  Revision 0.9.2.8  2008-10-30 13:36:56  brian
  - updated headers for release
 
@@ -68,7 +71,7 @@
 #ifndef __SS7_MXI_H__
 #define __SS7_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -193,9 +196,21 @@ typedef struct MX_parms_circuit {
 	mx_ulong mp_opt_flags;		/* options flags */
 } MX_parms_circuit_t;
 
+#define MX_PARMS_CHANMAP	0x02	/* parms structure type */
+typedef struct MX_parms_chanmap {
+	mx_ulong mp_type;		/* always MX_PARM_CHANMAP */
+	mx_ulong mp_spans;		/* number of spans */
+	mx_ulong mp_span_offset;	/* offset of first span */
+	mx_long mp_span_increment;	/* increment of next span from previous span */
+	mx_ulong mp_slot_offset;	/* offset from beginning of span */
+	mx_long mp_slot_increment;	/* increment of next slot from previous slot */
+	mx_ulong mp_chan_map;		/* channel (bit) map (lsb = slot 0, msb = slot 31) */
+} MX_parms_chanmap_t;
+
 union MX_parms {
 	mx_ulong mp_type;		/* structure type */
 	MX_parms_circuit_t circuit;	/* circuit structure */
+	MX_parms_chanmap_t chanmap;	/* chanmap structure */
 };
 
 #define MX_PARM_OPT_CLRCH	0x01	/* supports clear channel */

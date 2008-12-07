@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-10-31 06:54:56 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-12-07 10:40:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-31 06:54:56 $ by $Author: brian $
+# Last Modified $Date: 2008-12-07 10:40:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,6 +78,7 @@ m4_include([m4/chan.m4])
 m4_include([m4/x25.m4])
 m4_include([m4/iso.m4])
 m4_include([m4/isdn.m4])
+m4_include([m4/atm.m4])
 m4_include([m4/ss7.m4])
 m4_include([m4/sigtran.m4])
 m4_include([m4/doxy.m4])
@@ -126,6 +127,7 @@ AC_DEFUN([AC_VOIP], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SIGTRAN_CPPFLAGS:+ }}${SIGTRAN_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ATM_CPPFLAGS:+ }}${ATM_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ISDN_CPPFLAGS:+ }}${ISDN_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ISO_CPPFLAGS:+ }}${ISO_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${X25_CPPFLAGS:+ }}${X25_CPPFLAGS}"
@@ -177,6 +179,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${X25_MANPATH:+${X25_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${ISO_MANPATH:+${ISO_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${ISDN_MANPATH:+${ISDN_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${ATM_MANPATH:+${ATM_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${SIGTRAN_MANPATH:+${SIGTRAN_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${SS7_MANPATH:+${SS7_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
@@ -238,6 +241,7 @@ AC_DEFUN([_VOIP_SETUP], [dnl
     _X25
     _ISO
     _ISDN
+    _ATM
     _SS7
     _SIGTRAN
     # here we have our flags set and can perform preprocessor and compiler
@@ -470,6 +474,9 @@ AC_DEFUN([_VOIP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.19  2008-12-07 10:40:35  brian
+# - new stratm package
+#
 # Revision 0.9.2.18  2008-10-31 06:54:56  brian
 # - move config files, better strconf handling
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $
+ @(#) $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-07 06:57:10 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: aal5.c,v $
+ Revision 0.9.2.3  2008-12-07 10:40:24  brian
+ - new stratm package
+
  Revision 0.9.2.2  2008-12-07 06:57:10  brian
  - working on package compile
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $"
+#ident "@(#) $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $"
 
-static char const ident[] = "$RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $";
+static char const ident[] = "$RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $";
 
 /*
  * This is an ATM Adaption Layer (AAL) Type 5 (AAL5) for passing packets of variable length across
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <sys/dlpi.h>
 
 #define AAL5_DESCRIP	"MTP3B-AAL5 STREAMS MODULE."
-#define AAL5_REVISION	"OpenSS7 $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $"
+#define AAL5_REVISION	"OpenSS7 $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $"
 #define AAL5_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define AAL5_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL5 module."
 #define AAL5_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -157,11 +160,9 @@ static caddr_t a5_opens;
 /*
  * PRINTING STUFF
  */
-
 /*
  * Printing primitives
  */
-
 static inline fastcall const char *
 dl_primname(const dl_ulong prim)
 {
@@ -281,7 +282,6 @@ dl_primname(const dl_ulong prim)
  * Printing States
  */
 
-
 static inline fastcall const char *
 dl_statename(const dl_ulong state)
 {
@@ -334,7 +334,6 @@ dl_statename(const dl_ulong state)
 		return ("(unknown)");
 	}
 }
-
 
 static inline fastcall const char *
 dl_errname(const dl_long error)
@@ -400,7 +399,6 @@ dl_errname(const dl_long error)
 		return ("(unknown)");
 	}
 }
-
 
 static inline fastcall const char *
 dl_strerror(const dl_long error)
@@ -470,9 +468,6 @@ dl_strerror(const dl_long error)
 /*
  * STATE CHANGES
  */
-
-
-
 
 static inline fastcall dl_ulong
 dl_get_state(struct dl *dl)
@@ -2911,6 +2906,11 @@ dl_rput_msg(queue_t *q, mblk_t *mp)
 		return m_r_other(q, mp);
 	}
 }
+
+/*
+ * QUEUE PUT AND SERVICE PROCEDURES
+ */
+
 static streamscall int
 dl_wput(queue_t *q, mblk_t *mp)
 {
@@ -2975,6 +2975,10 @@ dl_rput(queue_t *q, mblk_t *mp)
 	}
 	return (0);
 }
+
+/*
+ * STREAMS OPEN AND CLOSE ROUTINES
+ */
 
 /**
  * a5_qopen: - STREAMS open routine
