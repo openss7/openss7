@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-06 12:58:16 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 06:57:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 12:58:16 $ by $Author: brian $
+# Last Modified $Date: 2008-12-07 06:57:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([stratm],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-06 12:58:16 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 06:57:10 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -188,7 +188,9 @@ AC_CONFIG_FILES([Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
-		 doc/manual/texi/args.texi])
+		 doc/manual/texi/args.texi
+		 src/drivers/streams.conf
+		 src/modules/streams.conf])
 
 _OPENSS7_OUTPUT
 
@@ -197,6 +199,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.3  2008-12-07 06:57:10  brian
+# - working on package compile
+#
 # Revision 0.9.2.2  2008-12-06 12:58:16  brian
 # - updates for stratm package
 #
