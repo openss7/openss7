@@ -3,11 +3,11 @@ Title:			@PACKAGE@
 Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
 Description:		@PACKAGE_TITLE@.
-			OpenSS7(TM) X.25 Networking for Linux Fast-STREAMS.
+			OpenSS7(TM) ATM Networking for Linux Fast-STREAMS.
 			The @PACKAGE@ package includes kernel modules, SVR 4.2
 			STREAMS drivers, modules, libraries, utilities, test
 			programs, daemons, and development environment for the
-			development and execution of OpenSS7 X.25 Networking
+			development and execution of OpenSS7 ATM Networking
 			protocol stack components and applications for the
 			SVR 4.2 STREAMS environment.
 			This distribution is currently applicable to Linux 2.4
@@ -17,7 +17,7 @@ Description:		@PACKAGE_TITLE@.
 			Supports a wide range of old and new linux distributions
 			and production kernels.
 			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
-Keywords:		X.25, ISO 8208, HDLC, LLC, NLI, NPI
+Keywords:		ATM, AAL2, AAL5, SSCOP, SSCOP-MCE, MTP3b
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ repos/tarballs/

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: stratm.spec.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:48 $
+# @(#) $RCSfile: stratm.spec.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 08:20:48 $ by $Author: brian $
+# Last Modified $Date: 2008-12-07 06:57:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,18 +65,18 @@
 
 #global binfiles    %{nil}
 %global sbinfiles   %{nil}
-%global modules     streams-x25-plp streams-x25-llc2 streams-x25-lapb streams-xot
+%global modules     streams-atm streams-phys streams-aal2 streams-aal5 streams-sscop streams-sscopmce streams-mtp3b
 %global nonrpmmods  %{nil}
 #global preloads    
-%global libraries   sx25
+#global libraries   
 #global locales     %{nil}
 %global tools       %{base}_mknod
-%global infofiles   %{base} wan lli nli x25_porting
+%global infofiles   %{base}
 #global pngfiles    *.png
 %global initfiles   %{base}
 %global nonrpminit  %{nil}
 %global conffiles   %{name}.conf
-#global testfiles   *test*
+%global testfiles   *test*
 %global testscripts testsuite
 %global sendpr      %{nil}
 #global mibfiles    *.mib
@@ -106,9 +106,10 @@
 %global NEED_inet       1
 %global NEED_sctp       1
 %global NEED_chan       1
-%global NEED_x25        0
-%global NEED_iso        0
-%global NEED_isdn       0
+%global NEED_x25        1
+%global NEED_iso        1
+%global NEED_isdn       1
+%global NEED_atm        0
 %global NEED_ss7        0
 %global NEED_sigtran    0
 
@@ -118,91 +119,12 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: stratm.spec.in,v $
-# Revision 0.9.2.1  2008-12-06 08:20:48  brian
-# - added base release files for stratm package
-#
-# Revision 0.9.2.21  2008-10-28 07:46:52  brian
-# - correct list of info files
+# Revision 0.9.2.2  2008-12-07 06:57:10  brian
+# - working on package compile
 #
 
-* Mon Oct 27 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.20  2008-10-27 13:01:14  brian
-- updated spec files
-
-* Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.19  2008/09/29 06:28:11  brian
-- support older versions of rpm
-
-* Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.18  2008-09-28 17:00:26  brian
-- updated spec files
-
-* Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.17  2008-09-28 03:46:51  brian
-- updated spec files
-
-* Fri Sep 26 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.16  2008-09-26 08:48:11  brian
-- sync spec files before rework
-
-* Wed Sep 24 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.15  2008-09-24 21:03:02  brian
-- latest spec file tweaks
-
-* Wed Sep 24 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.14  2008-09-24 16:27:29  brian
-- more spec file tweaks
-
-* Wed Sep 24 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.13  2008-09-24 03:29:57  brian
-- corrections to interdependencies between subpackages
-
-* Mon Sep 22 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.12  2008-09-22 17:37:39  brian
-- build and release updates
-
-* Sun Sep 21 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.11  2008-09-21 10:55:19  brian
-- update spec files
-
-* Sat Sep 20 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.10  2008-09-20 11:01:08  brian
-- corrections to requires
-
-* Wed Sep 17 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.9  2008-09-17 06:03:26  brian
-- much improved spec files ready for repo building
-
-* Tue Sep 16 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.8  2008-09-16 10:00:28  brian
-- support autoupdating kernel modules for various distros
-
-* Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.7  2008-09-10 20:46:16  brian
-- install init scripts on fresh install
-
-* Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.6  2008-09-10 17:44:47  brian
-- correct list macro quotation
-
-* Thu Aug 28 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.5  2008-08-28 02:37:52  brian
-- build and release file updates for release
-
-* Wed Aug 20 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.4  2008-08-20 10:56:59  brian
-- fixes and build updates from newnet trip
-
-* Mon Aug 11 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.3  2008-08-11 22:24:07  brian
-- handle snmp in spec files
-
-* Sun May  4 2008 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.2  2008-05-04 16:16:57  brian
-- changes and corrections for release
-
-* Sun May  4 2008 Brian Bidulock <bidulock@openss7.org>
-- Began this RPM build for OpenSS7 X.25.
-- Borrowed heavily from the OpenSS7 ISO build.
+* Sat Dec  6 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.1  2008-12-06 08:20:48  brian
+- added base release files for stratm package
 
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi

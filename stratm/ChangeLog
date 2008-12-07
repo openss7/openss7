@@ -1,3 +1,17 @@
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: working up package compile
+	* stratm.lsm.in: working up package compile
+	* stratm.spec.in: working up package compile
+	* src/drivers/streams.conf: remove
+	* src/drivers/streams.conf.in: create
+	* src/modules/aal1.c: working up package compile
+	* src/modules/aal2.c: working up package compile
+	* src/modules/aal5.c: working up package compile
+	* src/modules/phys.c: working up package compile
+	* src/modules/streams.conf: remove
+	* src/modules/streams.conf.in: create
+
 2008-12-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: added package file

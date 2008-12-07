@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: phys.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:52 $
+ @(#) $RCSfile: phys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-06 08:20:52 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 06:57:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: phys.c,v $
+ Revision 0.9.2.2  2008-12-07 06:57:10  brian
+ - working on package compile
+
  Revision 0.9.2.1  2008-12-06 08:20:52  brian
  - added base release files for stratm package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: phys.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:52 $"
+#ident "@(#) $RCSfile: phys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $"
 
-static char const ident[] = "$RCSfile: phys.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:52 $";
+static char const ident[] =
+    "$RCSfile: phys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $";
 
 /*
  * This is an ATM PHYS MDIF pushable module.  The driver pushes over a CHI Stream that represents a
@@ -81,8 +85,19 @@ static char const ident[] = "$RCSfile: phys.c,v $ $Name: OpenSS7-0_9_2 $($Revisi
  * bit-by-bit basis.
  */
 
+#define _LFS_SOURCE	1
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+
+#include <sys/os7/compat.h>
+#include <sys/strsun.h>
+#include <sys/strconf.h>
+
+#include <sys/cdi.h>
+#include <sys/chi.h>
+
 #define PHYS_DESCRIP	"MTP3B-PHYS STREAMS MODULE."
-#define PHYS_REVISION	"OpenSS7 $RCSfile: phys.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:52 $"
+#define PHYS_REVISION	"OpenSS7 $RCSfile: phys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $"
 #define PHYS_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define PHYS_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-PHYS module."
 #define PHYS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -130,6 +145,9 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 struct state {
 	uint32_t state;
+	uint32_t pending;
+	uint32_t conn_tx;
+	uint32_t conn_rx;
 };
 
 struct cd;
@@ -141,6 +159,7 @@ struct cd {
 	queue_t *iq;
 	struct state state, oldstate;
 	cd_info_ack_t info;
+	uint32_t ppa;
 };
 
 struct ch {
@@ -149,18 +168,332 @@ struct ch {
 	queue_t *oq;
 	struct state state, oldstate;
 	struct CH_info_ack info;
+	uint32_t ppa;
+	mblk_t *dmsg;
+	size_t dlen;
 };
 
 struct priv {
-	queue_t rq;
-	queue_t wq;
+	queue_t *rq;
+	queue_t *wq;
 	struct cd cd;
 	struct ch ch;
 };
 
+static rwlock_t ph_lock = RW_LOCK_UNLOCKED;
+static caddr_t ph_opens;
+
+/*
+ * PRINTING STUFF
+ */
+
+/*
+ * Printing primitives
+ */
+
+/* Upper */
+static inline fastcall const char *
+cd_primname(const cd_ulong prim)
+{
+	switch (prim) {
+	case CD_INFO_REQ:
+		return ("CD_INFO_REQ");
+	case CD_INFO_ACK:
+		return ("CD_INFO_ACK");
+	case CD_ATTACH_REQ:
+		return ("CD_ATTACH_REQ");
+	case CD_DETACH_REQ:
+		return ("CD_DETACH_REQ");
+	case CD_ENABLE_REQ:
+		return ("CD_ENABLE_REQ");
+	case CD_DISABLE_REQ:
+		return ("CD_DISABLE_REQ");
+	case CD_OK_ACK:
+		return ("CD_OK_ACK");
+	case CD_ERROR_ACK:
+		return ("CD_ERROR_ACK");
+	case CD_ENABLE_CON:
+		return ("CD_ENABLE_CON");
+	case CD_DISABLE_CON:
+		return ("CD_DISABLE_CON");
+	case CD_ERROR_IND:
+		return ("CD_ERROR_IND");
+	case CD_ALLOW_INPUT_REQ:
+		return ("CD_ALLOW_INPUT_REQ");
+	case CD_READ_REQ:
+		return ("CD_READ_REQ");
+	case CD_UNITDATA_REQ:
+		return ("CD_UNITDATA_REQ");
+	case CD_WRITE_READ_REQ:
+		return ("CD_WRITE_READ_REQ");
+	case CD_UNITDATA_ACK:
+		return ("CD_UNITDATA_ACK");
+	case CD_UNITDATA_IND:
+		return ("CD_UNITDATA_IND");
+	case CD_HALT_INPUT_REQ:
+		return ("CD_HALT_INPUT_REQ");
+	case CD_ABORT_OUTPUT_REQ:
+		return ("CD_ABORT_OUTPUT_REQ");
+	case CD_MUX_NAME_REQ:
+		return ("CD_MUX_NAME_REQ");
+	case CD_BAD_FRAME_IND:
+		return ("CD_BAD_FRAME_IND");
+	case CD_MODEM_SIG_REQ:
+		return ("CD_MODEM_SIG_REQ");
+	case CD_MODEM_SIG_IND:
+		return ("CD_MODEM_SIG_IND");
+	case CD_MODEM_SIG_POLL:
+		return ("CD_MODEM_SIG_POLL");
+	default:
+		return ("(unknown)");
+	}
+}
+
+/* Lower */
+static inline fastcall const char *
+ch_primname(const ch_ulong prim)
+{
+	switch (prim) {
+	case CH_INFO_REQ:
+		return ("CH_INFO_REQ");
+	case CH_OPTMGMT_REQ:
+		return ("CH_OPTMGMT_REQ");
+	case CH_ATTACH_REQ:
+		return ("CH_ATTACH_REQ");
+	case CH_ENABLE_REQ:
+		return ("CH_ENABLE_REQ");
+	case CH_CONNECT_REQ:
+		return ("CH_CONNECT_REQ");
+	case CH_DATA_REQ:
+		return ("CH_DATA_REQ");
+	case CH_DISCONNECT_REQ:
+		return ("CH_DISCONNECT_REQ");
+	case CH_DISABLE_REQ:
+		return ("CH_DISABLE_REQ");
+	case CH_DETACH_REQ:
+		return ("CH_DETACH_REQ");
+	case CH_INFO_ACK:
+		return ("CH_INFO_ACK");
+	case CH_OPTMGMT_ACK:
+		return ("CH_OPTMGMT_ACK");
+	case CH_OK_ACK:
+		return ("CH_OK_ACK");
+	case CH_ERROR_ACK:
+		return ("CH_ERROR_ACK");
+	case CH_ENABLE_CON:
+		return ("CH_ENABLE_CON");
+	case CH_CONNECT_CON:
+		return ("CH_CONNECT_CON");
+	case CH_DATA_IND:
+		return ("CH_DATA_IND");
+	case CH_DISCONNECT_IND:
+		return ("CH_DISCONNECT_IND");
+	case CH_DISCONNECT_CON:
+		return ("CH_DISCONNECT_CON");
+	case CH_DISABLE_IND:
+		return ("CH_DISABLE_IND");
+	case CH_DISABLE_CON:
+		return ("CH_DISABLE_CON");
+	case CH_EVENT_IND:
+		return ("CH_EVENT_IND");
+	default:
+		return ("(unknown)");
+	}
+}
+
+/*
+ * Printing States
+ */
+
+/* Upper */
+static inline fastcall const char *
+cd_statename(const cd_ulong state)
+{
+	switch (state) {
+	case CD_UNATTACHED:
+		return ("CD_UNATTACHED");
+	case CD_UNUSABLE:
+		return ("CD_UNUSABLE");
+	case CD_DISABLED:
+		return ("CD_DISABLED");
+	case CD_ENABLE_PENDING:
+		return ("CD_ENABLE_PENDING");
+	case CD_ENABLED:
+		return ("CD_ENABLED");
+	case CD_READ_ACTIVE:
+		return ("CD_READ_ACTIVE");
+	case CD_INPUT_ALLOWED:
+		return ("CD_INPUT_ALLOWED");
+	case CD_DISABLE_PENDING:
+		return ("CD_DISABLE_PENDING");
+	case CD_OUTPUT_ACTIVE:
+		return ("CD_OUTPUT_ACTIVE");
+	case CD_XRAY:
+		return ("CD_XRAY");
+	case CD_NOT_AUTH:
+		return ("CD_NOT_AUTH");
+	default:
+		return ("(unknown)");
+	}
+}
+
+/* Lower */
+static inline fastcall const char *
+ch_statename(const ch_ulong state)
+{
+	switch (state) {
+	case CHS_UNINIT:
+		return ("CHS_UNINIT");
+	case CHS_UNUSABLE:
+		return ("CHS_UNUSABLE");
+	case CHS_DETACHED:
+		return ("CHS_DETACHED");
+	case CHS_WACK_AREQ:
+		return ("CHS_WACK_AREQ");
+	case CHS_WACK_UREQ:
+		return ("CHS_WACK_UREQ");
+	case CHS_ATTACHED:
+		return ("CHS_ATTACHED");
+	case CHS_WACK_EREQ:
+		return ("CHS_WACK_EREQ");
+	case CHS_WCON_EREQ:
+		return ("CHS_WCON_EREQ");
+	case CHS_WACK_RREQ:
+		return ("CHS_WACK_RREQ");
+	case CHS_WCON_RREQ:
+		return ("CHS_WCON_RREQ");
+	case CHS_ENABLED:
+		return ("CHS_ENABLED");
+	case CHS_WACK_CREQ:
+		return ("CHS_WACK_CREQ");
+	case CHS_WCON_CREQ:
+		return ("CHS_WCON_CREQ");
+	case CHS_WACK_DREQ:
+		return ("CHS_WACK_DREQ");
+	case CHS_WCON_DREQ:
+		return ("CHS_WCON_DREQ");
+	case CHS_CONNECTED:
+		return ("CHS_CONNECTED");
+	default:
+		return ("(unknown)");
+	}
+}
+
+/*
+ * STATE CHANGES
+ */
+
+static inline fastcall cd_ulong
+cd_get_state(struct cd *cd)
+{
+	return cd->state.state;
+}
+static inline fastcall cd_ulong
+cd_set_state(struct cd *cd, const cd_ulong newstate)
+{
+	const cd_ulong oldstate = cd_get_state(cd);
+
+	if (likely(oldstate != newstate)) {
+		mi_strlog(cd->iq, STRLOGST, SL_TRACE, "%s <- %s", cd_statename(newstate),
+			  cd_statename(oldstate));
+		cd->state.state = newstate;
+		cd->info.cd_state = newstate;
+	}
+	return (newstate);
+}
+static inline fastcall cd_ulong
+cd_save_state(struct cd *cd)
+{
+	cd->oldstate = cd->state;
+	return (cd->state.state);
+}
+static inline fastcall cd_ulong
+cd_restore_state(struct cd *cd)
+{
+	cd->state = cd->oldstate;
+	return (cd->info.cd_state = cd->state.state);
+}
+static inline fastcall cd_ulong
+cd_set_pending(struct cd *cd, const cd_ulong pending)
+{
+	return (cd->state.pending = pending);
+}
+static inline fastcall cd_ulong
+cd_get_pending(struct cd *cd)
+{
+	return cd->state.pending;
+}
+static inline fastcall cd_ulong
+cd_clear_pending(struct cd *cd)
+{
+	const cd_ulong pending = cd->state.pending;
+
+	cd->state.pending = -1U;
+	return (pending);
+}
+
+static inline fastcall ch_ulong
+ch_get_state(struct ch *ch)
+{
+	return ch->state.state;
+}
+static inline fastcall ch_ulong
+ch_set_state(struct ch *ch, const ch_ulong newstate)
+{
+	const ch_ulong oldstate = ch_get_state(ch);
+
+	if (likely(oldstate != newstate)) {
+		mi_strlog(ch->iq, STRLOGST, SL_TRACE, "%s <- %s", ch_statename(newstate),
+			  ch_statename(oldstate));
+		ch->state.state = newstate;
+		ch->info.ch_state = newstate;
+	}
+	return (newstate);
+}
+static inline fastcall ch_ulong
+ch_save_state(struct ch *ch)
+{
+	ch->oldstate = ch->state;
+	return (ch->state.state);
+}
+static inline fastcall ch_ulong
+ch_restore_state(struct ch *ch)
+{
+	ch->state = ch->oldstate;
+	return (ch->info.ch_state = ch->state.state);
+}
+static inline fastcall ch_ulong
+ch_set_pending(struct ch *ch, const ch_ulong pending)
+{
+	return (ch->state.pending = pending);
+}
+static inline fastcall ch_ulong
+ch_get_pending(struct ch *ch)
+{
+	return ch->state.pending;
+}
+static inline fastcall ch_ulong
+ch_clear_pending(struct ch *ch)
+{
+	const ch_ulong pending = ch->state.pending;
+
+	ch->state.pending = -1U;
+	return (pending);
+}
+
 /*
  * MESSAGE LOGGING
  */
+
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 static inline fastcall void
 ph_stripmsg(mblk_t *msg, mblk_t *dp)
@@ -195,6 +528,7 @@ cd_txprim(struct cd *cd, queue_t *q, mblk_t *msg, mblk_t *mp, cd_ulong prim)
 		putnext(cd->oq, mp);
 		return (0);
 	}
+	freeb(mp);
 	return (-EBUSY);
 }
 
@@ -218,6 +552,7 @@ ch_txprim(struct ch *ch, queue_t *q, mblk_t *msg, mblk_t *mp, ch_ulong prim)
 		putnext(ch->oq, mp);
 		return (0);
 	}
+	freeb(mp);
 	return (-EBUSY);
 }
 
@@ -257,7 +592,7 @@ ch_rxprim(struct ch *ch, queue_t *q, mblk_t *mp, ch_ulong prim)
 }
 
 /*
- * CD PROVIDER TO CD USER PRIMTIIVES
+ * CD PROVIDER TO CD USER PRIMITIVES
  */
 
 /**
@@ -310,11 +645,11 @@ cd_ok_ack(struct cd *cd, queue_t *q, mblk_t *msg, cd_ulong prim)
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		switch ((state = cd_get_state(cd))) {
-		case CD_ATTACH_PENDING:
+		case CD_UNATTACHED:
 			prim = CD_ATTACH_REQ;
 			state = CD_DISABLED;
 			break;
-		case CD_DETACH_PENDING:
+		case CD_DISABLED:
 			prim = CD_DETACH_REQ;
 			state = CD_UNATTACHED;
 			break;
@@ -362,11 +697,11 @@ cd_error_ack(struct cd *cd, queue_t *q, mblk_t *msg, ch_ulong prim, ch_long erro
 	cd_ulong state;
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
-		switch ((state = cd_get_state(ch))) {
-		case CD_ATTACH_PENDING:
+		switch ((state = cd_get_state(cd))) {
+		case CD_UNATTACHED:
 			state = CD_UNATTACHED;
 			break;
-		case CD_DETACH_PENDING:
+		case CD_DISABLED:
 			state = CD_DISABLED;
 			break;
 		case CD_ENABLE_PENDING:
@@ -392,6 +727,72 @@ cd_error_ack(struct cd *cd, queue_t *q, mblk_t *msg, ch_ulong prim, ch_long erro
       outstate:
 	freeb(mp);
 	return (-EFAULT);
+}
+static inline fastcall int
+cd_error(struct cd *cd, queue_t *q, mblk_t *msg, unsigned char rerror, unsigned char werror)
+{
+	mblk_t *mp;
+
+	if (likely(!!(mp = mi_allocb(q, 2, BPRI_MED)))) {
+		DB_TYPE(mp) = M_ERROR;
+		mp->b_wptr[0] = rerror;
+		mp->b_wptr[1] = rerror;
+		mp->b_wptr += 2;
+		putnext(cd->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+noinline fastcall __unlikely int
+cd_reply_error(struct cd *cd, queue_t *q, mblk_t *msg, const cd_ulong prim, const cd_long error)
+{
+	switch (error) {
+	case 0:
+		freemsg(msg);
+		return (0);
+	case -EAGAIN:
+	case -EDEADLK:
+	case -ENOBUFS:
+	case -ENOMEM:
+	case -EBUSY:
+		return (error);
+	}
+	switch (prim) {
+	case CD_INFO_REQ:
+		goto ack;
+	case CD_ATTACH_REQ:
+		goto ack;
+	case CD_DETACH_REQ:
+		goto ack;
+	case CD_ENABLE_REQ:
+		goto ack;
+	case CD_DISABLE_REQ:
+		goto ack;
+	case CD_ALLOW_INPUT_REQ:
+		goto ack;
+	case CD_READ_REQ:
+		goto ack;
+	case CD_UNITDATA_REQ:
+		goto error;
+	case CD_WRITE_READ_REQ:
+		goto ack;
+	case CD_HALT_INPUT_REQ:
+		goto ack;
+	case CD_ABORT_OUTPUT_REQ:
+		goto ack;
+	case CD_MUX_NAME_REQ:
+		goto ack;
+	case CD_MODEM_SIG_REQ:
+		goto ack;
+	case CD_MODEM_SIG_POLL:
+		goto ack;
+	default:
+		goto error;
+	}
+      error:
+	return cd_error(cd, q, msg, EPROTO, EPROTO);
+      ack:
+	return cd_error_ack(cd, q, msg, prim, error);
 }
 static inline fastcall int
 cd_enable_con(struct cd *cd, queue_t *q, mblk_t *msg)
@@ -597,6 +998,7 @@ ch_info_req(struct ch *ch, queue_t *q, mblk_t *msg)
 {
 	struct CH_info_req *p;
 	mblk_t *mp;
+	static const size_t mlen = sizeof(*p);
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		DB_TYPE(mp) = M_PROTO;
@@ -612,6 +1014,7 @@ ch_optmgmt_req(struct ch *ch, queue_t *q, mblk_t *msg)
 {
 	struct CH_optmgmt_req *p;
 	mblk_t *mp;
+	static const size_t mlen = sizeof(*p);
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		DB_TYPE(mp) = M_PROTO;
@@ -649,6 +1052,7 @@ ch_enable_req(struct ch *ch, queue_t *q, mblk_t *msg)
 {
 	struct CH_enable_req *p;
 	mblk_t *mp;
+	static const size_t mlen = sizeof(*p);
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		DB_TYPE(mp) = M_PROTO;
@@ -665,6 +1069,7 @@ ch_connect_req(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, ch_ulong 
 {
 	struct CH_connect_req *p;
 	mblk_t *mp;
+	static const size_t mlen = sizeof(*p);
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		DB_TYPE(mp) = M_PROTO;
@@ -683,6 +1088,7 @@ ch_data_req(struct ch *ch, queue_t *q, mblk_t *msg)
 {
 	struct CH_data_req *p;
 	mblk_t *mp;
+	static const size_t mlen = sizeof(*p);
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		DB_TYPE(mp) = M_PROTO;
@@ -698,6 +1104,7 @@ ch_disconnect_req(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, ch_ulo
 {
 	struct CH_disconnect_req *p;
 	mblk_t *mp;
+	static const size_t mlen = sizeof(*p);
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		DB_TYPE(mp) = M_PROTO;
@@ -732,6 +1139,7 @@ ch_detach_req(struct ch *ch, queue_t *q, mblk_t *msg)
 {
 	struct CH_detach_req *p;
 	mblk_t *mp;
+	static const size_t mlen = sizeof(*p);
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		DB_TYPE(mp) = M_PROTO;
@@ -742,6 +1150,25 @@ ch_detach_req(struct ch *ch, queue_t *q, mblk_t *msg)
 		return ch_txprim(ch, q, msg, mp, CH_DETACH_REQ);
 	}
 	return (-ENOBUFS);
+}
+
+noinline fastcall __unlikely int
+ch_reply_error(struct ch *ch, queue_t *q, mblk_t *msg, const ch_ulong prim, const ch_long error)
+{
+	switch (error) {
+	case 0:
+		freemsg(msg);
+		return (0);
+	case -EAGAIN:
+	case -ENOBUFS:
+	case -ENOMEM:
+	case -EDEADLK:
+	case -EBUSY:
+		return (error);
+	}
+	/* FIXME: need to log error */
+	freemsg(msg);
+	return (0);
 }
 
 /*
@@ -775,7 +1202,7 @@ cd_info_req(struct cd *cd, queue_t *q, mblk_t *mp)
  *
  * Requests that the Stream be attached to a 32-bit PPA address.  This 32-bit PPA address is the
  * same as the 32-bit PPA address used by the CH Stream beneath.  If the CD interface is in the
- * correct state, simply pass the request on setting the state to CD_ATTACH_PENDING.
+ * correct state, simply pass the request on.
  */
 noinline fastcall __unlikely int
 cd_attach_req(struct cd *cd, queue_t *q, mblk_t *mp)
@@ -791,13 +1218,12 @@ cd_attach_req(struct cd *cd, queue_t *q, mblk_t *mp)
 		goto notsupp;
 	/* remember PPA for later */
 	cd->ppa = p->cd_ppa;
-	cd_set_state(cd, CD_ATTACH_PENDING);
 	cd_set_pending(cd, CD_ATTACH_REQ);
-	return ch_attach_req(cd->ch, q, mp, cd->ppa)
+	return ch_attach_req(cd->ch, q, mp, cd->ppa);
       notsupp:
 	err = CD_NOTSUPP;
 	goto error;
-      oustate:
+      outstate:
 	err = CD_OUTSTATE;
 	goto error;
       protoshort:
@@ -819,7 +1245,6 @@ cd_detach_req(struct cd *cd, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (unlikely(cd->info.cd_ppa_style != CD_STYLE2))
 		goto notsupp;
-	cd_set_state(cd, CD_DETACH_PENDING);
 	cd_set_pending(cd, CD_DETACH_REQ);
 	return ch_detach_req(cd->ch, q, mp);
       notsupp:
@@ -944,6 +1369,7 @@ cd_read_req(struct cd *cd, queue_t *q, mblk_t *mp)
       error:
 	return (err);
 }
+
 /**
  * cd_write: - process received M_DATA message from above
  * @cd: CD private structure (locked)
@@ -971,7 +1397,7 @@ cd_write(struct cd *cd, queue_t *q, mblk_t *msg, mblk_t *dp)
 	default:
 		goto outstate;
 	}
-	if (unlikely(msglen(dp) != 53))
+	if (unlikely(msgsize(dp) != 53))
 		goto writefail;
 	if (unlikely(!pullupmsg(dp, 53))) {
 		mi_bufcall(q, 53, BPRI_MED);
@@ -1024,7 +1450,7 @@ cd_unitdata_req(struct cd *cd, queue_t *q, mblk_t *mp)
       notsupp:
 	err = CD_NOTSUPP;
 	goto error;
-writefail:
+      writefail:
 	err = CD_WRITEFAIL;
 	goto error;
       protoshort:
@@ -1132,7 +1558,7 @@ cd_abort_output_req(struct cd *cd, queue_t *q, mblk_t *mp)
 noinline fastcall __unlikely int
 cd_mux_name_req(struct cd *cd, queue_t *q, mblk_t *mp)
 {
-	cd_mux_name_req_t *p = (typeof(p)) mp->b_rptr;
+	ch_ulong *p = (typeof(p)) mp->b_rptr;
 	int err;
 
 	if (unlikely(!MBLKIN(mp, 0, sizeof(*p))))
@@ -1291,7 +1717,9 @@ ch_cd_prim(const ch_ulong prim)
 	case CH_DISABLE_CON:
 		return CD_DISABLE_CON;
 	case CH_EVENT_IND:
-	      return CD_ERROR_IND:
+		return CD_ERROR_IND;
+	default:
+		return -1U;
 	}
 }
 
@@ -1414,7 +1842,7 @@ ch_error_ack(struct ch *ch, queue_t *q, mblk_t *mp)
 	ch_set_state(ch, state);
 	return cd_error_ack(ch->cd, q, mp, ch_cd_prim(p->ch_error_primitive),
 			    ch_cd_error(p->ch_error_type, p->ch_unix_error));
-      oustate:
+      outstate:
 	err = CHOUTSTATE;
 	goto error;
       protoshort:
@@ -1473,7 +1901,7 @@ ch_connect_con(struct ch *ch, queue_t *q, mblk_t *mp)
 	}
 	ch_set_state(ch, CHS_CONNECTED);
 	return cd_ok_ack(ch->cd, q, mp, CD_ALLOW_INPUT_REQ);
-      oustate:
+      outstate:
 	err = CHOUTSTATE;
 	goto error;
       protoshort:
@@ -1482,6 +1910,7 @@ ch_connect_con(struct ch *ch, queue_t *q, mblk_t *mp)
       error:
 	return (err);
 }
+
 /**
  * ch_read: - process received M_DATA message from below
  * @ch: CH private structure (locked)
@@ -1532,11 +1961,10 @@ ch_read(struct ch *ch, queue_t *q, mblk_t *msg, mblk_t *dp)
 	size_t dlen;
 	int err;
 
-	switch (__builtin_expect(cd_get_state(cd), CD_INPUT_ALLOWED)) {
-	case CD_INPUT_ALLOWED:
-	case CD_READ_ACTIVE:
+	switch (__builtin_expect(ch_get_state(ch), CHS_CONNECTED)) {
+	case CHS_CONNECTED:
 		break;
-	case CD_DISABLED:
+	case CHS_ENABLED:
 		goto discard;
 	default:
 		goto outstate;
@@ -1552,12 +1980,12 @@ ch_read(struct ch *ch, queue_t *q, mblk_t *msg, mblk_t *dp)
 	   until they have been extracted from the byte Stream. */
 	/* Hunting for ATM headers and syncrhonizing on the headers is described in ITU-T
 	   Recommendation I.432.1, but is also described in AF-PHYS-00016. */
-	dlen = msglen(dp);
-	ch->dmsg = linkmsg(ch->dsmg, dp);
+	dlen = msgsize(dp);
+	ch->dmsg = linkmsg(ch->dmsg, dp);
 	ch->dlen += dlen;
 	/* FIXME: process received bytes so far. */
       outstate:
-	err = CD_OUTSTATE;
+	err = CHOUTSTATE;
 	goto error;
       discard:
 	ph_stripmsg(msg, dp);
@@ -1567,6 +1995,7 @@ ch_read(struct ch *ch, queue_t *q, mblk_t *msg, mblk_t *dp)
 	return (err);
 
 }
+
 /**
  * ch_data_ind: - process CH_DATA_IND primitive from downstream
  * @ch: CH private structure (locked)
@@ -1658,6 +2087,12 @@ ch_disconnect_con(struct ch *ch, queue_t *q, mblk_t *mp)
       error:
 	return (err);
 }
+static inline fastcall cd_ulong
+ch_cd_cause(const ch_ulong cause)
+{
+	/* FIXME */
+	return (cause);
+}
 noinline fastcall __unlikely int
 ch_disable_ind(struct ch *ch, queue_t *q, mblk_t *mp)
 {
@@ -1737,6 +2172,10 @@ ch_other_ind(struct ch *ch, queue_t *q, mblk_t *mp)
       error:
 	return (err);
 }
+
+/*
+ * STREAMS MESSAGE TYPE HANDLING
+ */
 
 /**
  * cd_w_data: - process received M_DATA message from above
@@ -1904,19 +2343,31 @@ ch_r_proto(struct ch *ch, queue_t *q, mblk_t *mp)
 static fastcall int
 cd_w_ctl(struct cd *cd, queue_t *q, mblk_t *mp)
 {
+	/* FIXME: for now */
+	freemsg(mp);
+	return (0);
 }
 static fastcall int
 ch_r_ctl(struct ch *ch, queue_t *q, mblk_t *mp)
 {
+	/* FIXME: for now */
+	freemsg(mp);
+	return (0);
 }
 
 static fastcall int
 cd_w_ioctl(struct cd *cd, queue_t *q, mblk_t *mp)
 {
+	/* FIXME: for now */
+	freemsg(mp);
+	return (0);
 }
 static fastcall int
 ch_r_ioctl(struct ch *ch, queue_t *q, mblk_t *mp)
 {
+	/* FIXME: for now */
+	freemsg(mp);
+	return (0);
 }
 
 static fastcall int
@@ -1946,16 +2397,29 @@ m_r_flush(queue_t *q, mblk_t *mp)
 static fastcall int
 m_r_error(queue_t *q, mblk_t *mp)
 {
+	/* FIXME: for now */
+	freemsg(mp);
+	return (0);
 }
 
 static fastcall int
 m_w_other(queue_t *q, mblk_t *mp)
 {
+	/* FIXME: for now */
+	freemsg(mp);
+	return (0);
 }
 static fastcall int
 m_r_other(queue_t *q, mblk_t *mp)
 {
+	/* FIXME: for now */
+	freemsg(mp);
+	return (0);
 }
+
+/*
+ * STREAMS MESSAGE HANDLING
+ */
 
 static fastcall int
 cd_wsrv_msg(struct cd *cd, queue_t *q, mblk_t *mp)
@@ -2040,6 +2504,9 @@ cd_wput_msg(queue_t *q, mblk_t *mp)
 			case M_IOCDATA:
 				err = cd_w_ioctl(&priv->cd, q, mp);
 				break;
+			default:
+				err = -EFAULT;
+				break;
 			}
 			mi_unlock((caddr_t) priv);
 		} else
@@ -2048,6 +2515,8 @@ cd_wput_msg(queue_t *q, mblk_t *mp)
 	}
 	case M_FLUSH:
 		return m_w_flush(q, mp);
+	default:
+		return m_w_other(q, mp);
 	}
 }
 static fastcall int
@@ -2074,19 +2543,22 @@ ch_rput_msg(queue_t *q, mblk_t *mp)
 		if (likely(!!(priv = (typeof(priv)) mi_trylock(q)))) {
 			switch (__builtin_expect(type, M_PCPROTO)) {
 			case M_HPDATA:
-				err = ch_r_data(ch, q, mp);
+				err = ch_r_data(&priv->ch, q, mp);
 				break;
 			case M_PCPROTO:
-				err = ch_r_proto(ch, q, mp);
+				err = ch_r_proto(&priv->ch, q, mp);
 				break;
 			case M_PCCTL:
-				err = ch_r_ctl(ch, q, mp);
+				err = ch_r_ctl(&priv->ch, q, mp);
 				break;
 			case M_IOCACK:
 			case M_IOCNAK:
 			case M_COPYIN:
 			case M_COPYOUT:
-				err = ch_r_ioctl(ch, q, mp);
+				err = ch_r_ioctl(&priv->ch, q, mp);
+				break;
+			default:
+				err = -EFAULT;
 				break;
 			}
 			mi_unlock((caddr_t) priv);
@@ -2099,6 +2571,8 @@ ch_rput_msg(queue_t *q, mblk_t *mp)
 	case M_ERROR:
 	case M_HANGUP:
 		return m_r_error(q, mp);
+	default:
+		return m_r_other(q, mp);
 	}
 }
 static streamscall int
@@ -2282,7 +2756,7 @@ static struct qinit ph_rdinit = {
 	.qi_putp = ch_rput,
 	.qi_srvp = ch_rsrv,
 	.qi_qopen = ph_qopen,
-	.qi_close = ph_qclose,
+	.qi_qclose = ph_qclose,
 	.qi_minfo = &ph_minfo,
 	.qi_mstat = &ph_rstat,
 };
@@ -2312,7 +2786,7 @@ physinit(void)
 	int err;
 
 	cmn_err(CE_NOTE, MOD_BANNER);
-	if ((err = register_strmod(&ph_fmod, modid)) < 0) {
+	if ((err = register_strmod(&ph_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: could not register module %d, err = %d\n", MOD_NAME,
 			(int) modid, -err);
 		return (err);
@@ -2327,7 +2801,7 @@ physterminate(void)
 {
 	int err;
 
-	if ((err = unregister_strmod(&ph_fmod, modid)) < 0) {
+	if ((err = unregister_strmod(&ph_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: could not unregister module %d, err = %d\n", MOD_NAME,
 			(int) modid, -err);
 		return (err);
