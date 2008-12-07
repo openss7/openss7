@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cdi.h,v 0.9.2.7 2008-12-06 09:03:39 brian Exp $
+ @(#) $Id: cdi.h,v 0.9.2.8 2008-12-07 10:40:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-06 09:03:39 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi.h,v $
+ Revision 0.9.2.8  2008-12-07 10:40:38  brian
+ - new stratm package
+
  Revision 0.9.2.7  2008-12-06 09:03:39  brian
  - corrections and updates
 
@@ -62,7 +65,7 @@
 #ifndef _SYS_CDI_H
 #define _SYS_CDI_H
 
-#ident "@(#) $RCSfile: cdi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cdi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -450,6 +453,13 @@ typedef struct {
 } cd_bad_frame_ind_t;
 
 /*
+ * CD_MUX_NAME_REQ, M_PROTO type
+ */
+typedef struct {
+	cd_ulong cd_primitive;
+} cd_mux_name_req_t;
+
+/*
  * CD_MODEM_SIG_REQ, M_PROTO type
  *
  * Assert the modem signals with '1' bits in the cd_sigs mask and drop those
@@ -458,7 +468,6 @@ typedef struct {
 typedef struct {
 	cd_ulong cd_primitive;
 	cd_ulong cd_sigs;
-
 } cd_modem_sig_req_t;
 
 /*
@@ -472,12 +481,10 @@ typedef struct {
 typedef struct {
 	cd_ulong cd_primitive;
 	cd_ulong cd_sigs;
-
 } cd_modem_sig_ind_t;
 
 typedef struct {
 	cd_ulong cd_primitive;
-
 } cd_modem_sig_poll_t;
 
 /*
@@ -517,6 +524,7 @@ union CD_primitives {
 	cd_enable_con_t enable_con;
 	cd_disable_con_t disable_con;
 	cd_bad_frame_ind_t bad_frame_ind;
+	cd_mux_name_req_t mux_name_req;
 	cd_modem_sig_req_t modem_sig_req;
 	cd_modem_sig_ind_t modem_sig_ind;
 	cd_modem_sig_poll_t modem_sig_poll;
@@ -542,6 +550,7 @@ union CD_primitives {
 #define CD_ENABLE_CON_SIZE		sizeof(cd_enable_con_t)
 #define CD_DISABLE_CON_SIZE		sizeof(cd_disable_con_t)
 #define CD_BAD_FRAME_IND_SIZE		sizeof(cd_bad_frame_ind_t)
+#define CD_MUX_NAME_REQ_SIZE		sizeof(cd_mux_name_req_t)
 #define CD_MODEM_SIG_REQ_SIZE		sizeof(cd_modem_sig_req_t)
 #define CD_MODEM_SIG_IND_SIZE		sizeof(cd_modem_sig_ind_t)
 #define CD_MODEM_SIG_POLL_SIZE		sizeof(cd_modem_sig_poll_t)

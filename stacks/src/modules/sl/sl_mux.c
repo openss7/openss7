@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:19 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-12-07 10:40:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:19 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.32  2008-12-07 10:40:22  brian
+ - new stratm package
+
  Revision 0.9.2.31  2008-09-22 20:31:19  brian
  - added module version and truncated logs
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:19 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-12-07 10:40:22 $"
 
 static char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:19 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-12-07 10:40:22 $";
 
 /*
  *  This is a signalling link multiplexing driver for signalling link management.  The purpose of
@@ -110,7 +113,7 @@ static char const ident[] =
 #include <ss7/sl_mux.h>
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:19 $"
+#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-12-07 10:40:22 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corportation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -234,14 +237,15 @@ static kmem_cachep_t sl_priv_cachep = NULL;
 
 /* LOGGING */
 
-#define STRLOGNO    0		/* Log errors */
-#define STRLOGIO    1		/* Log intput-output controls */
-#define STRLOGST    2		/* Log state transitions */
-#define STRLOGTO    3		/* Log timeouts */
-#define STRLOGRX    4		/* Log received primitives */
-#define STRLOGTX    5		/* Log issued primitives */
-#define STRLOGTE    6		/* Log timer events */
-#define STRLOGDA    7		/* Log data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 /*
  *  ===========================================================================

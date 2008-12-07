@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:29 $
+ @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:29 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr_mod.c,v $
+ Revision 0.9.2.10  2008-12-07 10:40:23  brian
+ - new stratm package
+
  Revision 0.9.2.9  2008-10-11 04:31:29  brian
  - handle -Wpointer-sign
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:29 $"
+#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:23 $"
 
 static char const ident[] =
-    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:29 $";
+    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:23 $";
 
 /*
  * This is TR-MOD.  It is a simplified Transaction Interface (TRI) module for TCAP that can be
@@ -113,7 +116,7 @@ static char const ident[] =
 #include <ss7/tcap_ioctl.h>
 
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS MODULE."
-#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:29 $"
+#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:23 $"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -246,13 +249,15 @@ struct priv {
 
 #define PAD4(len) ((len + 3) & ~3)
 
-#define STRLOGIO	0	/* log Stream input-output controls */
-#define STRLOGST	1	/* log Stream state transitions */
-#define STRLOGTO	2	/* log Stream timeouts */
-#define STRLOGRX	3	/* log Stream primitives received */
-#define STRLOGTX	4	/* log Stream primitives issued */
-#define STRLOGTE	5	/* log Stream timer events */
-#define STRLOGDA	6	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 static inline const char *
 tr_iocname(int cmd)

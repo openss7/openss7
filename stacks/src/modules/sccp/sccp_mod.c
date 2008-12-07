@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:31:29 $
+ @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:29 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp_mod.c,v $
+ Revision 0.9.2.6  2008-12-07 10:40:20  brian
+ - new stratm package
+
  Revision 0.9.2.5  2008-10-11 04:31:29  brian
  - handle -Wpointer-sign
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:31:29 $"
+#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:20 $"
 
 static char const ident[] =
-    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:31:29 $";
+    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:20 $";
 
 /*
  * This is SCCP-MOD.  It is a simplified Signalling Connection Control Part (SCCPI) module for SCCP
@@ -105,7 +108,7 @@ static char const ident[] =
 #include <ss7/mtpi_ioctl.h>
 
 #define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS MODULE."
-#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:31:29 $"
+#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:20 $"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -350,13 +353,15 @@ struct priv {
 
 #define PAD4(len) ((len + 3) & ~3)
 
-#define STRLOGIO	0	/* log Stream input-output controls */
-#define STRLOGST	1	/* log Stream state transitions */
-#define STRLOGTO	2	/* log Stream timeouts */
-#define STRLOGRX	3	/* log Stream primitives received */
-#define STRLOGTX	4	/* log Stream primitives issued */
-#define STRLOGTE	5	/* log Stream timer events */
-#define STRLOGDA	6	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 static inline const char *
 sc_iocname(int cmd)

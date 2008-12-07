@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $
+ @(#) $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-17 19:02:27 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_sccp.c,v $
+ Revision 0.9.2.3  2008-12-07 10:40:20  brian
+ - new stratm package
+
  Revision 0.9.2.2  2008-11-17 19:02:27  brian
  - conversion modules compile
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $"
+#ident "@(#) $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:20 $"
 
-static char const ident[] = "$RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $";
+static char const ident[] = "$RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:20 $";
 
 /*
  * This is a pushable STREAMS module that converts between the SCCPI (Signalling Connection Control
@@ -92,7 +95,7 @@ static char const ident[] = "$RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2
 #define NPI_SCCP_DESCRIP	"SCCPI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define NPI_SCCP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define NPI_SCCP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_SCCP_REVISION	"OpenSS7 $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-17 19:02:27 $"
+#define NPI_SCCP_REVISION	"OpenSS7 $RCSfile: npi_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:20 $"
 #define NPI_SCCP_DEVICE		"SVR 4.2MP SCCPI to NPI Conversion Module (NPI) for SCCP"
 #define NPI_SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_SCCP_LICENSE	"GPL"
@@ -139,14 +142,15 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #define NPI_SCCP_MOD_ID		CONFIG_STREAMS_NPI_SCCP_MODID
 #endif				/* NPI_SCCP_MOD_ID */
 
-#define STRLOGERR	0
-#define STRLOGNO	1
-#define STRLOGRX	2
-#define STRLOGTX	3
-#define STRLOGST	4
-#define STRLOGTO	5
-#define STRLOGTE	6
-#define STRLOGDA	7
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 /*
  * STREAMS DEFINITIONS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $
+ @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-12-07 10:40:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:18 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_pmod.c,v $
+ Revision 0.9.2.9  2008-12-07 10:40:21  brian
+ - new stratm package
+
  Revision 0.9.2.8  2008-09-22 20:31:18  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $"
+#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-12-07 10:40:21 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $";
+    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-12-07 10:40:21 $";
 
 /*
  *  This is a module that can be pushed over one end of a STREAMS-based pipe to form a simulation of
@@ -96,7 +99,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $A"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-12-07 10:40:21 $A"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports STREAMS-based Pipes."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -218,14 +221,15 @@ struct sdt_pair {
 #define PRIV(q)		((struct sdt_pair *)(q)->q_ptr)
 #define SDT_PRIV(q)	(((q)->q_flag & QREADR) ? &PRIV(q)->r_priv : &PRIV(q)->w_priv)
 
-#define STRLOGNO	0	/* log Stream errors */
-#define STRLOGIO	1	/* log Stream input-output */
-#define STRLOGST	2	/* log Stream state transitions */
-#define STRLOGTO	3	/* log Stream timeouts */
-#define STRLOGRX	4	/* log Stream primitives received */
-#define STRLOGTX	5	/* log Stream primitives issued */
-#define STRLOGTE	6	/* log Stream timer events */
-#define STRLOGDA	7	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 /**
  * sdt_iocname: display SDT ioctl command name

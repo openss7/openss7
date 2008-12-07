@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:13 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-12-07 10:40:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:13 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_tpi.c,v $
+ Revision 0.9.2.32  2008-12-07 10:40:19  brian
+ - new stratm package
+
  Revision 0.9.2.31  2008-09-22 20:31:13  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:13 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-12-07 10:40:19 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:13 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-12-07 10:40:19 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message Transfer Part Interface)
@@ -91,7 +94,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:13 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-12-07 10:40:19 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -165,12 +168,15 @@ typedef struct mtp {
 
 static caddr_t mtp_opens = NULL;
 
-#define STRLOGST	1	/* log Stream state transitions */
-#define STRLOGTO	2	/* log Stream timeouts */
-#define STRLOGRX	3	/* log Stream primitives received */
-#define STRLOGTX	4	/* log Stream primitives issued */
-#define STRLOGTE	5	/* log Stream timer events */
-#define STRLOGDA	6	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 /*
  *  =========================================================================

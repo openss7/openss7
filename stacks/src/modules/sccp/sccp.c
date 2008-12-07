@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-30 18:34:53 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-12-07 10:40:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:34:53 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.31  2008-12-07 10:40:20  brian
+ - new stratm package
+
  Revision 0.9.2.30  2008-10-30 18:34:53  brian
  - corrected types
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-30 18:34:53 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-12-07 10:40:20 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-30 18:34:53 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-12-07 10:40:20 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -105,7 +108,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-30 18:34:53 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-12-07 10:40:20 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -164,13 +167,15 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #define DRV_BANNER	SCCP_SPLASH
 #endif				/* MODULE */
 
-#define STRLOGNO    0
-#define STRLOGST    1
-#define STRLOGRX    2
-#define STRLOGTX    3
-#define STRLOGTO    4
-#define STRLOGTE    5
-#define STRLOGDA    6
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 /*
  *  =========================================================================

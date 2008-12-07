@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.16 2008-10-30 13:37:41 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.17 2008-12-07 10:40:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 13:37:41 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.h,v $
+ Revision 0.9.2.17  2008-12-07 10:40:35  brian
+ - new stratm package
+
  Revision 0.9.2.16  2008-10-30 13:37:41  brian
  - updated headers for release
 
@@ -73,15 +76,25 @@
 #ifndef __SYS_STRUTIL_STRLOG_H__
 #define __SYS_STRUTIL_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
 #ifndef __SYS_STRLOG_H__
-#warning "Do no include sys/strutil/strlog.h directly, include sys/strlog.h instead."
+#warning "Do not include sys/strutil/strlog.h directly, include sys/strlog.h instead."
 #endif
 
 #include <stdarg.h>
+
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002

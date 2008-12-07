@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:28 $
+ @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:28 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_pmod.c,v $
+ Revision 0.9.2.10  2008-12-07 10:40:27  brian
+ - new stratm package
+
  Revision 0.9.2.9  2008-09-22 20:31:28  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:28 $"
+#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:27 $"
 
 static char const ident[] =
-    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:28 $";
+    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:27 $";
 
 /*
  *  This is CH-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -88,7 +91,7 @@ static char const ident[] =
 //#undef unfreezestr
 
 #define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:28 $"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:27 $"
 #define CH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -199,14 +202,15 @@ struct ch_pair {
 #define PRIV(q)	    ((struct ch_pair *)(q)->q_ptr)
 #define CH_PRIV(q)  (((q)->q_flag & QREADR) ? &PRIV(q)->r_priv : &PRIV(q)->w_priv)
 
-#define STRLOGNO	0	/* log Stream errors */
-#define STRLOGIO	1	/* log Stream input-output */
-#define STRLOGST	2	/* log Stream state transitions */
-#define STRLOGTO	3	/* log Stream timeouts */
-#define STRLOGRX	4	/* log Stream primitives received */
-#define STRLOGTX	5	/* log Stream primitives issued */
-#define STRLOGTE	6	/* log Stream timer events */
-#define STRLOGDA	7	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 /**
  * ch_iocname: display CH ioctl command name

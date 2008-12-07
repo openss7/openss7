@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-10-31 06:54:54 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-12-07 10:40:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-31 06:54:54 $ by $Author: brian $
+# Last Modified $Date: 2008-12-07 10:40:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -244,7 +244,8 @@ AC_DEFUN([_ISDN_SETUP_MODULE], [dnl
 # =============================================================================
 # _ISDN_CONFIG_KERNEL
 # -----------------------------------------------------------------------------
-# Later we should have some checks here for things like OSS, ALS, Zaptel, etc.
+# These are a bunch of kernel configuration checks primarily in support of 2.5
+# and 2.6 kernels.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISDN_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
@@ -252,7 +253,9 @@ AC_DEFUN([_ISDN_CONFIG_KERNEL], [dnl
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
 			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
 			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/smp_lock.h \
-			  linux/devfs_fs_kernel.h linux/compile.h linux/utsrelease.h], [:], [:], [
+			  linux/devfs_fs_kernel.h linux/compile.h linux/utsrelease.h \
+			  linux/brlock.h linux/snmp.h net/xfrm.h net/dst.h \
+			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -266,10 +269,20 @@ AC_DEFUN([_ISDN_CONFIG_KERNEL], [dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#ifdef HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#ifdef HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
 #include <linux/sched.h>
 ])
     _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *,
-			uintptr_t, intptr_t, uchar], [:], [:], [
+			uintptr_t, intptr_t, uchar, pm_message_t], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -302,6 +315,7 @@ AC_DEFUN([_ISDN_CONFIG_KERNEL], [dnl
 #include <linux/kthread.h>
 #endif
 #include <linux/time.h>		/* for struct timespec */
+#include <linux/pm.h>
 ])
     AH_TEMPLATE([kmem_cachep_t], [This kmem_cache_t is deprecated in recent
 	2.6.20 kernels.  When it is deprecated, define this to struct
@@ -446,6 +460,9 @@ AC_DEFUN([_ISDN_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.19  2008-12-07 10:40:30  brian
+# - new stratm package
+#
 # Revision 0.9.2.18  2008-10-31 06:54:54  brian
 # - move config files, better strconf handling
 #

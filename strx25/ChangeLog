@@ -1,3 +1,9 @@
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* strx25.spec.in: new stratm package
+	* src/modules/cdpmod.c: new stratm package
+	* src/modules/dlaix.c: new stratm package
+
 2008-12-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* po/.cvsignore: fix ignore file

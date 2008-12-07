@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 08:20:49 $ by $Author: brian $
+# Last Modified $Date: 2008-12-07 10:40:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,7 +54,7 @@ include ../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = . man manual specs
+SUBDIRS = . man manual
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
@@ -73,6 +73,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-12-07 10:40:23  brian
+# - new stratm package
+#
 # Revision 0.9.2.1  2008-12-06 08:20:49  brian
 # - added base release files for stratm package
 #

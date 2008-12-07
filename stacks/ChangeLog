@@ -1,5 +1,30 @@
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* strss7.spec.in: new stratm package
+	* src/include/ss7/cdi.h: new stratm package
+	* src/include/ss7/mxi.h: new stratm package
+	* src/include/sys/cdi.h: new stratm package
+	* src/include/sys/dlpi.h: new stratm package
+	* src/modules/mtp/mtp.c: new stratm package
+	* src/modules/mtp/mtp_min.c: new stratm package
+	* src/modules/mtp/mtp_mod.c: new stratm package
+	* src/modules/mtp/mtp_npi.c: new stratm package
+	* src/modules/mtp/mtp_tpi.c: new stratm package
+	* src/modules/sccp/npi_sccp.c: new stratm package
+	* src/modules/sccp/sccp.c: new stratm package
+	* src/modules/sccp/sccp_mod.c: new stratm package
+	* src/modules/sccp/tpi_sccp.c: new stratm package
+	* src/modules/sdl/sdl_ch.c: new stratm package
+	* src/modules/sdl/sdl_pmod.c: new stratm package
+	* src/modules/sdt/sdt_pmod.c: new stratm package
+	* src/modules/sl/sl_mux.c: new stratm package
+	* src/modules/sl/slpmod.c: new stratm package
+	* src/modules/tcap/tc_mod.c: new stratm package
+	* src/modules/tcap/tcap.c: new stratm package
+	* src/modules/tcap/tr_mod.c: new stratm package
+
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/include/sys/dlpi_aix.h: add extended DLPI headers
 	* src/include/sys/dlpi_ext.h: add extended DLPI headers
 	* src/include/sys/dlpi_ioctl.h: add extended DLPI headers

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $
+ @(#) $RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-07 06:57:10 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: aal2.c,v $
+ Revision 0.9.2.3  2008-12-07 10:40:24  brian
+ - new stratm package
+
  Revision 0.9.2.2  2008-12-07 06:57:10  brian
  - working on package compile
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $"
+#ident "@(#) $RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $"
 
-static char const ident[] = "$RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $";
+static char const ident[] = "$RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $";
 
 /*
  * This is an ATM Adaptation Layer (AAL) Type 2 (AAL2) for passing packets of fixed length across
@@ -82,7 +85,7 @@ static char const ident[] = "$RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <sys/dlpi.h>
 
 #define AAL2_DESCRIP	"MTP3B-AAL2 STREAMS MODULE."
-#define AAL2_REVISION	"OpenSS7 $RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $"
+#define AAL2_REVISION	"OpenSS7 $RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $"
 #define AAL2_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define AAL2_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL2 module."
 #define AAL2_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -764,8 +767,8 @@ ch_txprim(struct ch *ch, queue_t *q, mblk_t *msg, mblk_t *mp, ch_ulong prim)
 	if (likely(pcmsg(DB_TYPE(mp)) || bcanputnext(ch->oq, mp->b_band))) {
 		int level;
 
-		switch (__builtin_expect(prim, CH_DATA_REQ)) {
-		case CH_DATA_REQ:
+		switch (__builtin_expect(prim, CH_DATA_IND)) {
+		case CH_DATA_IND:
 			level = STRLOGDA;
 			break;
 		default:
@@ -799,8 +802,8 @@ ch_rxprim(struct ch *ch, queue_t *q, mblk_t *mp, ch_ulong prim)
 {
 	int level;
 
-	switch (__builtin_expect(prim, CH_DATA_IND)) {
-	case CH_DATA_IND:
+	switch (__builtin_expect(prim, CH_DATA_REQ)) {
+	case CH_DATA_REQ:
 		level = STRLOGDA;
 		break;
 	default:
@@ -2586,6 +2589,11 @@ dl_rput_msg(queue_t *q, mblk_t *mp)
 		return m_r_other(q, mp);
 	}
 }
+
+/*
+ * QUEUE PUT AND SERVICE PROCEDURES
+ */
+
 static streamscall int
 ch_wput(queue_t *q, mblk_t *mp)
 {
@@ -2650,6 +2658,10 @@ dl_rput(queue_t *q, mblk_t *mp)
 	}
 	return (0);
 }
+
+/*
+ * STREAMS OPEN AND CLOSE ROUTINES
+ */
 
 /**
  * a2_qopen: - STREAMS open routine

@@ -1,3 +1,8 @@
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: new stratm package
+	* strvoip.spec.in: new stratm package
+
 2008-12-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/iax.c: added working file

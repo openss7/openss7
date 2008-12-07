@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strchan.spec.in,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-10-28 07:46:50 $
+# @(#) $RCSfile: strchan.spec.in,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-12-07 10:40:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-28 07:46:50 $ by $Author: brian $
+# Last Modified $Date: 2008-12-07 10:40:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,13 +65,13 @@
 
 #global binfiles    %{nil}
 %global sbinfiles   %{nil}
-%global modules     ch_pmod mx_pmod
+%global modules     streams-ch_pmod streams-mx_pmod
 %global nonrpmmods  %{nil}
 #global preloads    
 #global libraries   
 #global locales     %{nil}
 %global tools       %{base}_mknod
-%global infofiles   %{base} mg
+%global infofiles   %{base} mg chi mxi
 #global pngfiles    *.png
 %global initfiles   %{base}
 %global nonrpminit  %{nil}
@@ -85,7 +85,7 @@
 #global netconfig   %{base}
 #global sock2path   %{base}
 %global manual      doc/manual
-#global specs       doc/specs
+%global specs       doc/specs
 #global drafts      doc/drafts
 #global papers      doc/papers
 %global projects    doc/projects
@@ -109,6 +109,7 @@
 %global NEED_x25        0
 %global NEED_iso        0
 %global NEED_isdn       0
+%global NEED_atm        0
 %global NEED_ss7        0
 %global NEED_sigtran    0
 
@@ -118,6 +119,9 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strchan.spec.in,v $
+# Revision 0.9.2.38  2008-12-07 10:40:25  brian
+# - new stratm package
+#
 # Revision 0.9.2.37  2008-10-28 07:46:50  brian
 # - correct list of info files
 #

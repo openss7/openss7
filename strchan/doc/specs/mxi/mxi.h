@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.1 2008-12-02 08:24:43 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.2 2008-12-07 10:40:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-02 08:24:43 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi.h,v $
+ Revision 0.9.2.2  2008-12-07 10:40:26  brian
+ - new stratm package
+
  Revision 0.9.2.1  2008-12-02 08:24:43  brian
  - document MXI
 
@@ -86,7 +89,7 @@
 #ifndef __SYS_MXI_H__
 #define __SYS_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -295,7 +298,7 @@ typedef struct MX_optmgmt_ack {
 } MX_optmgmt_ack_t;
 
 /*
-   management flags for MX_OPTMGMT 
+   management flags for MX_OPTMGMT
  */
 #define MX_SET_OPT      0x01
 #define MX_GET_OPT      0x02
@@ -344,7 +347,7 @@ typedef struct MX_error_ack {
 } MX_error_ack_t;
 
 /*
-   error types 
+   error types
  */
 #define MXSYSERR         0      /* UNIX system error */
 #define MXBADADDR        1      /* Bad address format or content */
@@ -427,7 +430,7 @@ typedef struct MX_connect_req {
 } MX_connect_req_t;
 
 /*
-   connect flags 
+   connect flags
  */
 #define MXF_RX_DIR      0x01
 #define MXF_TX_DIR      0x02

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:31:29 $
+ @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-07 10:40:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:29 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc_mod.c,v $
+ Revision 0.9.2.7  2008-12-07 10:40:22  brian
+ - new stratm package
+
  Revision 0.9.2.6  2008-10-11 04:31:29  brian
  - handle -Wpointer-sign
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:31:29 $"
+#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-07 10:40:22 $"
 
 static char const ident[] =
-    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:31:29 $";
+    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-07 10:40:22 $";
 
 /*
  * This is TC-MOD.  It is a simplified Transaction Component Interface (TCI) module for TCAP that
@@ -127,7 +130,7 @@ static char const ident[] =
 #include <sys/xti_tcap.h>
 
 #define TC_DESCRIP	"SS7/TCAP-TC (TCAP Component Handling) STREAMS MODULE."
-#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:31:29 $"
+#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-07 10:40:22 $"
 #define TC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TC_DEVICE	"Provides OpenSS7 TCAP-TC module."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -343,13 +346,15 @@ struct priv {
 #define TC_PRIV(q)  (&PRIV(q)->w_priv)
 #define TR_PRIV(q)  (&PRIV(q)->r_priv)
 
-#define STRLOGIO	0	/* log Stream input-output controls */
-#define STRLOGST	1	/* log Stream state transitions */
-#define STRLOGTO	2	/* log Stream timeouts */
-#define STRLOGRX	3	/* log Stream primitives received */
-#define STRLOGTX	4	/* log Stream primitives issued */
-#define STRLOGTE	5	/* log Stream timer events */
-#define STRLOGDA	6	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 static inline const char *
 tc_iocname(int cmd)

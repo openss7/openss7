@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-10-11 04:31:28 $
+ @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-12-07 10:40:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:28 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_mod.c,v $
+ Revision 0.9.2.8  2008-12-07 10:40:19  brian
+ - new stratm package
+
  Revision 0.9.2.7  2008-10-11 04:31:28  brian
  - handle -Wpointer-sign
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-10-11 04:31:28 $"
+#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-12-07 10:40:19 $"
 
-static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-10-11 04:31:28 $";
+static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-12-07 10:40:19 $";
 
 /*
  * MTP-MOD is a minimal MTP in the spirit of Q.710 but which also supports ANSI and other variants.
@@ -105,7 +108,7 @@ static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.
 #include <ss7/mtpi_ioctl.h>
 
 #define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS MODULE."
-#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-10-11 04:31:28 $"
+#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-12-07 10:40:19 $"
 #define MT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MT_DEVICE	"Provides OpenSS7 MTP Minimal Module."
 #define MT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -284,13 +287,15 @@ struct priv {
 static kmem_cachep_t mtp_mt_cachep = NULL;	/* MTP User cache */
 static kmem_cachep_t mtp_sl_cachep = NULL;	/* SL Provider cache */
 
-#define STRLOGIO	0	/* log Stream input-output operations */
-#define STRLOGST	1	/* log Stream state transitions */
-#define STRLOGTO	2	/* log Stream timeouts */
-#define STRLOGRX	3	/* log Stream primitives received */
-#define STRLOGTX	4	/* log Stream primitives issued */
-#define STRLOGTE	5	/* log Stream timer events */
-#define STRLOGDA	6	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 static inline const char *
 mt_iocname(int cmd)

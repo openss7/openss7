@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:18 $
+ @(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:18 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_ch.c,v $
+ Revision 0.9.2.6  2008-12-07 10:40:21  brian
+ - new stratm package
+
  Revision 0.9.2.5  2008-09-22 20:31:18  brian
  - added module version and truncated logs
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:18 $"
+#ident "@(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:21 $"
 
-static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:18 $";
+static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:21 $";
 
 #define _MPS_SOURCE 1
 #define _LFS_SOURCE 1
@@ -90,7 +93,7 @@ static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.5
 #include <sys/chi_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:18 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:21 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL-CH module."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -222,13 +225,15 @@ struct sdl_pair {
 #define SDL_PRIV(q) (&((struct sdl_pair *)(q)->q_ptr)->r_priv)
 #define  CH_PRIV(q) (&((struct sdl_pair *)(q)->q_ptr)->w_priv)
 
-#define STRLOGER	0	/* log Stream errors */
-#define STRLOGST	1	/* log Stream state transitions */
-#define STRLOGTO	2	/* log Stream timeouts */
-#define STRLOGRX	3	/* log Stream primitives received */
-#define STRLOGTX	4	/* log Stream primitives issued */
-#define STRLOGTE	5	/* log Stream timer events */
-#define STRLOGDA	6	/* log Stream data */
+#define STRLOGERR	0	/* log error information */
+#define STRLOGNO	0	/* log notice information */
+#define STRLOGST	1	/* log state transitions */
+#define STRLOGTO	2	/* log timeouts */
+#define STRLOGRX	3	/* log primitives received */
+#define STRLOGTX	4	/* log primitives issued */
+#define STRLOGTE	5	/* log timer events */
+#define STRLOGIO	6	/* log additional data */
+#define STRLOGDA	7	/* log data */
 
 static inline const char *
 sdl_iocname(int cmd)
@@ -609,7 +614,7 @@ m_error(struct sdl *sdl, queue_t *q, mblk_t *msg, int err)
 		*mp->b_wptr++ = err;
 		*mp->b_wptr++ = err;
 		freemsg(msg);
-		mi_strlog(q, STRLOGER, SL_TRACE, "<- M_ERROR");
+		mi_strlog(q, STRLOGERR, SL_TRACE, "<- M_ERROR");
 		sdl_set_m_state(sdl, LMI_UNUSABLE);
 		putnext(sdl->q, mp);
 		return (0);
@@ -682,7 +687,7 @@ lmi_ok_ack(struct sdl *sdl, queue_t *q, mblk_t *msg, sdl_long prim)
 			p->lmi_state = sdl_set_m_state(sdl, LMI_UNATTACHED);
 			break;
 		default:
-			mi_strlog(q, STRLOGER, SL_ERROR, "LMI_OK_ACK for wrong primitive");
+			mi_strlog(q, STRLOGERR, SL_ERROR, "LMI_OK_ACK for wrong primitive");
 			p->lmi_state = sdl_get_m_state(sdl);
 			break;
 		}
@@ -1764,7 +1769,7 @@ ch_info_ack(struct ch *ch, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -1838,7 +1843,7 @@ ch_ok_ack(struct ch *ch, queue_t *q, mblk_t *mp)
 			qenable(ch->q);
 			break;
 		default:
-			mi_strlog(q, STRLOGER, SL_ERROR, "CH_OK_ACK in wrong state.");
+			mi_strlog(q, STRLOGERR, SL_ERROR, "CH_OK_ACK in wrong state.");
 			break;
 		}
 		break;
@@ -1846,7 +1851,7 @@ ch_ok_ack(struct ch *ch, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -1936,7 +1941,7 @@ ch_error_ack(struct ch *ch, queue_t *q, mblk_t *mp)
 	}
 	return lmi_error_ack(ch->sdl, q, mp, prim, errno);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -1959,7 +1964,7 @@ ch_enable_con(struct ch *ch, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -1987,7 +1992,7 @@ ch_connect_con(struct ch *ch, queue_t *q, mblk_t *mp)
 	qenable(ch->q);
 	return (0);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -2011,7 +2016,7 @@ ch_data_ind(struct ch *ch, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -2036,7 +2041,7 @@ ch_disconnect_ind(struct ch *ch, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -2062,7 +2067,7 @@ ch_disconnect_con(struct ch *ch, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -2083,7 +2088,7 @@ ch_disable_ind(struct ch *ch, queue_t *q, mblk_t *mp)
 	sdl_set_m_state(ch->sdl, LMI_UNUSABLE);
 	return lmi_error_ind(ch->sdl, q, mp, LMI_DISC);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
@@ -2106,14 +2111,14 @@ ch_disable_con(struct ch *ch, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
       badprim:
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	return m_error(ch->sdl, q, mp, EFAULT);
 }
 
 static noinline __unlikely int
 ch_other_ind(struct ch *ch, queue_t *q, mblk_t *mp)
 {
-	mi_strlog(q, STRLOGER, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
+	mi_strlog(q, STRLOGERR, SL_ERROR, "%s: invalid primitive on read queue", __FUNCTION__);
 	freemsg(mp);
 	return (0);
 }
@@ -2822,11 +2827,11 @@ sdl_m_proto(queue_t *q, mblk_t *mp)
       done:
 	return (err);
       discard:
-	mi_strlog(q, STRLOGER, SL_ERROR, "M_(PC)PROTO block too short.");
+	mi_strlog(q, STRLOGERR, SL_ERROR, "M_(PC)PROTO block too short.");
 	freemsg(mp);
 	goto done;
       edeadlk:
-	mi_strlog(q, STRLOGER, SL_TRACE, "Hit locks.");
+	mi_strlog(q, STRLOGERR, SL_TRACE, "Hit locks.");
 	err = -EDEADLK;
 	goto unlock_done;
 }
@@ -3034,11 +3039,11 @@ ch_m_proto(queue_t *q, mblk_t *mp)
       done:
 	return (err);
       discard:
-	mi_strlog(q, STRLOGER, SL_ERROR, "M_(PC)PROTO block too short.");
+	mi_strlog(q, STRLOGERR, SL_ERROR, "M_(PC)PROTO block too short.");
 	freemsg(mp);
 	goto done;
       edeadlk:
-	mi_strlog(q, STRLOGER, SL_TRACE, "Hit locks.");
+	mi_strlog(q, STRLOGERR, SL_TRACE, "Hit locks.");
 	err = -EDEADLK;
 	goto unlock_done;
 }

@@ -1,3 +1,8 @@
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in: new stratm package
+
+
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* LiS.lsm.in: change repo directory

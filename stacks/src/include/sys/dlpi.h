@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.8 2008-10-30 18:42:04 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.9 2008-12-07 10:40:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:42:04 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.h,v $
+ Revision 0.9.2.9  2008-12-07 10:40:18  brian
+ - new stratm package
+
  Revision 0.9.2.8  2008-10-30 18:42:04  brian
  - type alignment
 
@@ -80,7 +83,7 @@
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -285,6 +288,9 @@ typedef u_int16_t dl_ushort;
 #define DL_CODLS			0x01	/* connection-oriented service */
 #define DL_CLDLS			0x02	/* connectionless data link service */
 #define DL_ACLDLS			0x04	/* acknowledged connectionless service */
+#ifdef _HPUX_SOURCE
+#define DL_HP_RAWDLS			0x08	/* raw data link service */
+#endif				/* _HPUX_SOURCE */
 
 /*
    DLPI provider style.
@@ -1105,6 +1111,14 @@ typedef struct {
 	dl_ulong dl_status;		/* success or failure of previous req */
 } dl_reply_update_status_ind_t;
 
+#ifdef _SUN_SOURCE
+#include <sys/dlpi_sun.h>
+#endif				/* _SUN_SOURCE */
+
+#ifdef _HPUX_SOURCE
+#include <sys/dlpi_ext.h>
+#endif				/* _HPUX_SOURCE */
+
 union DL_primitives {
 	dl_ulong dl_primitive;
 	dl_info_req_t info_req;
@@ -1160,6 +1174,43 @@ union DL_primitives {
 	dl_reply_status_ind_t reply_status_ind;
 	dl_reply_update_req_t reply_update_req;
 	dl_reply_update_status_ind_t reply_update_status_ind;
+#ifdef _SUN_SOURCE
+	dl_notify_req_t notify_req;
+	dl_notify_ack_t notify_ack;
+	dl_notify_ind_t notify_ind;
+	dl_aggr_req_t aggr_req;
+	dl_aggr_ind_t aggr_ind;
+	dl_unaggr_req_t unaggr_req;
+	dl_capability_req_t capability_req;
+	dl_capability_ack_t capability_ack;
+	dl_control_req_t control_req;
+	dl_control_ack_t control_ack;
+	dl_passive_req_t passive_req;
+	dl_intr_mode_req_t intr_mode_req;
+#endif					/* _SUN_SOURCE */
+#ifdef _HPUX_SOURCE
+	dl_hp_ppa_req_t ppa_req;
+	dl_hp_ppa_ack_t ppa_ack;
+	dl_hp_multicast_list_req_t multicast_list_req;
+	dl_hp_multicast_list_ack_t multicast_list_ack;
+	dl_hp_rawdata_req_t rawdata_req;
+	dl_hp_rawdata_ind_t rawdata_ind;
+	dl_hp_hw_reset_req_t hw_reset_req;
+	dl_hp_info_req_t hp_info_req;
+	dl_hp_info_ack_t hp_info_ack;
+	dl_hp_set_ack_to_req_t set_ack_to_req;
+	dl_hp_set_p_to_req_t set_p_to_req;
+	dl_hp_set_rej_to_req_t set_rej_to_req;
+	dl_hp_set_busy_to_req_t set_busy_to_req;
+	dl_hp_set_send_ack_to_req_t set_send_ack_to_req;
+	dl_hp_set_max_retries_req_t set_max_retries_req;
+	dl_hp_set_ack_threshold_req_t set_ack_threshold_req;
+	dl_hp_set_local_win_req_t set_local_win_req;
+	dl_hp_set_remote_win_req_t set_remote_win_req;
+	dl_hp_clear_stats_req_t clear_stats_req;
+	dl_hp_set_local_busy_req_t set_local_busy_req;
+	dl_hp_clear_local_busy_req_t clear_local_busy_req;
+#endif					/* _HPUX_SOURCE */
 };
 
 #define DL_INFO_REQ_SIZE		sizeof(dl_info_req_t)
@@ -1215,5 +1266,48 @@ union DL_primitives {
 #define DL_REPLY_STATUS_IND_SIZE	sizeof(dl_reply_status_ind_t)
 #define DL_REPLY_UPDATE_REQ_SIZE	sizeof(dl_reply_update_req_t)
 #define DL_REPLY_UPDATE_STATUS_IND_SIZE	sizeof(dl_reply_update_status_ind_t)
+
+#ifdef _SUN_SOURCE
+
+#define DL_NOTIFY_REQ_SIZE		sizeof(dl_notify_req_t)
+#define DL_NOTIFY_ACK_SIZE		sizeof(dl_notify_ack_t)
+#define DL_NOTIFY_IND_SIZE		sizeof(dl_notify_ind_t)
+#define DL_AGGR_REQ_SIZE		sizeof(dl_aggr_req_t)
+#define DL_AGGR_IND_SIZE		sizeof(dl_aggr_ind_t)
+#define DL_UNAGGR_REQ_SIZE		sizeof(dl_unaggr_req_t)
+#define DL_CAPABILITY_REQ_SIZE		sizeof(dl_capability_req_t)
+#define DL_CAPABILITY_ACK_SIZE		sizeof(dl_capability_ack_t)
+#define DL_CONTROL_REQ_SIZE		sizeof(dl_control_req_t)
+#define DL_CONTROL_ACK_SIZE		sizeof(dl_control_ack_t)
+#define DL_PASSIVE_REQ_SIZE		sizeof(dl_passive_req_t)
+#define DL_INTR_MODE_REQ_SIZE		sizeof(dl_intr_mode_req_t)
+
+#endif				/* _SUN_SOURCE */
+
+#ifdef _HPUX_SOURCE
+
+#define DL_HP_PPA_REQ_SIZE		sizeof(dl_hp_ppa_req_t)
+#define DL_HP_PPA_ACK_SIZE		sizeof(dl_hp_ppa_ack_t)
+#define DL_HP_MULTICAST_LIST_REQ_SIZE	sizeof(dl_hp_multicast_list_req_t)
+#define DL_HP_MULTICAST_LIST_ACK_SIZE	sizeof(dl_hp_multicast_list_ack_t)
+#define DL_HP_RAWDATA_REQ_SIZE		sizeof(dl_hp_rawdata_req_t)
+#define DL_HP_RAWDATA_IND_SIZE		sizeof(dl_hp_rawdata_ind_t)
+#define DL_HP_HW_RESET_REQ_SIZE		sizeof(dl_hp_hw_reset_req_t)
+#define DL_HP_INFO_REQ_SIZE		sizeof(dl_hp_info_req_t)
+#define DL_HP_INFO_ACK_SIZE		sizeof(dl_hp_info_ack_t)
+#define DL_HP_SET_ACK_TO_REQ_SIZE	sizeof(dl_hp_set_ack_to_req_t)
+#define DL_HP_SET_P_TO_REQ_SIZE		sizeof(dl_hp_set_p_to_req_t)
+#define DL_HP_SET_REJ_TO_REQ_SIZE	sizeof(dl_hp_set_rej_to_req_t)
+#define DL_HP_SET_BUSY_TO_REQ_SIZE	sizeof(dl_hp_set_busy_to_req_t)
+#define DL_HP_SET_SEND_ACK_TO_REQ_SIZE	sizeof(dl_hp_set_send_ack_to_req_t)
+#define DL_HP_SET_MAX_RETRIES_REQ_SIZE	sizeof(dl_hp_set_max_retries_req_t)
+#define DL_HP_SET_ACK_THRESHOLD_REQ_SIZE sizeof(dl_hp_set_ack_threshold_req_t)
+#define DL_HP_SET_LOCAL_WIN_REQ_SIZE	sizeof(dl_hp_set_local_win_req_t)
+#define DL_HP_SET_REMOTE_WIN_REQ_SIZE	sizeof(dl_hp_set_remote_win_req_t)
+#define DL_HP_CLEAR_STATS_REQ_SIZE	sizeof(dl_hp_clear_stats_req_t)
+#define DL_HP_SET_LOCAL_BUSY_REQ_SIZE	sizeof(dl_hp_set_local_busy_req_t)
+#define DL_HP_CLEAR_LOCAL_BUSY_REQ_SIZE	sizeof(dl_hp_clear_local_busy_req_t)
+
+#endif				/* _HPUX_SOURCE */
 
 #endif				/* _SYS_DLPI_H */

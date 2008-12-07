@@ -1,3 +1,14 @@
+2008-12-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* strchan.spec.in: new stratm package
+	* doc/specs/chi/chi.h: new stratm package
+	* doc/specs/mxi/mxi.h: new stratm package
+	* src/drivers/streams.conf.in: new stratm package
+	* src/include/sys/chi.h: new stratm package
+	* src/include/sys/mxi.h: new stratm package
+	* src/modules/ch_pmod.c: new stratm package
+	* src/modules/mx_pmod.c: new stratm package
+
 2008-12-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/specs/chi/chi.texi: updates

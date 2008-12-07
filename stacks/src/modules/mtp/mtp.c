@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-11 04:31:27 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-12-07 10:40:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:27 $ by $Author: brian $
+ Last Modified $Date: 2008-12-07 10:40:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.30  2008-12-07 10:40:18  brian
+ - new stratm package
+
  Revision 0.9.2.29  2008-10-11 04:31:27  brian
  - handle -Wpointer-sign
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-11 04:31:27 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-12-07 10:40:18 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-11 04:31:27 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-12-07 10:40:18 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -108,10 +111,11 @@ static char const ident[] =
 #define STRLOGRX	3	/* log Stream primitives received */
 #define STRLOGTX	4	/* log Stream primitives issued */
 #define STRLOGTE	5	/* log Stream timer events */
-#define STRLOGDA	6	/* log Stream data */
+#define STRLOGIO	6	/* log Stream additional data */
+#define STRLOGDA	7	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-11 04:31:27 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-12-07 10:40:18 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
