@@ -1,0 +1,105 @@
+OpenSS7 STREAMS ATM -- history of user visible changes.  2008-12-07
+$Id: NEWS,v 0.9.2.2 2008-12-07 10:58:14 brian Exp $
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+The sections that follow provide information on OpenSS7 releases of the
+`OpenSS7 STREAMS ATM' package.
+
+ Initial release stratm-stratm-0.9.2.1.20081103
+-----------------------------------------------
+
+This is the second separate `OpenSS7 Project' release of the
+`OpenSS7 STREAMS ATM' package.  The package contains modules and
+drivers formerly part of the `strss7' and `striso' packages and which
+have been moved to this subpackage.
+
+With `OpenSS7 Master Package' release `openss7-0.9.2.D', the ATM and
+Frame Relay components were separated from the `strss7' package and
+placed into the `striso' package.  With release `openss7-0.9.2.G', the
+ATM and Frame Relay components were separated from the `striso' package
+and placed into this package.  All previous ATM and Frame Relay
+components have been strapped into this release and have been
+revalidated against `Linux Fast-STREAMS' using validation test suites.
+See `TODO' in the release, or `Schedule',in the manual, for more
+information about release schedule.
+
+This is a beta release and is part of the `OpenSS7 Master Package'
+(`openss7-0.9.2.G'|).
+
+Major features since the last public release are:
+
+   - Includes all ATM drivers and modules.  Drivers include WAN, LLC2,
+     LAPB, LLI and NLI.  Conversion modules are also provided for CDI,
+     DLPI, NPI and TPI.  An ATM module is provided for OpenGroup
+     standard use with the XTI/TLI library from the `strxnet' package.
+     CONS module for use of ATM by the `striso' package.
+
+   - Includes all Frame Relay drivers and modules.  Drivers include the
+     Frame Relay driver, `fr(4)', IP over FR driver, `ifr(4)',
+     Multi-Protocol over FR Encapsulation driver, `mfe(4)',
+
+   - Full conformance validation test suites for each protocol
+     components.
+
+   - Full management an SNMP agents for all of the protocol layers.
+     Integration of SNMP management with the OpenSS7 SNMP management
+     tool.
+
+
+_This is a public, stable, production grade release of the package: it
+deprecates previous releases.  Please upgrade to the current release
+before reporting bugs._
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+`rpm(8)' and `dpkg(1)' based distributions, and can be used on
+production kernels without patching or recompiling the kernel.
+
+This package is publicly released strictly under the `GNU Affero
+General Public License Version 3'; however, commercial licensing is
+available.  The release is available as an `autoconf(1)' tarball, SRPM,
+DSC, and a set of binary RPMs and DEBs for popular distributions.  See
+the package page (http://www.openss.org/stratm_pkg.html) for the
+`autoconf(1)' tarballs, SRPMs, DSCs and binary RPMs and DEBs.  See the
+repository page (http://www.openss7.org/repos.html) for information
+concerning network installation and update sources.
+
+See ChangeLog
+(http://www.openss7.org/codefiles/stratm-0.9.2.1.20081103/ChangeLog) and
+NEWS (http://www.openss7.org/codefiles/stratm-0.9.2.1.20081103/NEWS) in
+the release for more information.  Also, see the `stratm.pdf' manual in
+the release (also in html (http://www.openss7.org/stratm_manual.html)).
+
+For the news release, see `http://www.openss7.org/rel20081029_M.html'.
+
+ Initial release stratm-0.9.2.1
+-------------------------------
+
+Initial autoconf/RPM packaging of the `stratm' release.
+
+This is the initial open source release of the `OpenSS7 STREAMS ATM'
+package.  This release contains modules and drivers formerly only
+available with Commercial releases of the `strss7' package and which
+are only recently available as open source with the release of this
+package.
+
+With OpenSS7 Master Package release `openss7-0.9.2.D', the ISO/OSI
+components were separated from the `strss7' package and placed in this
+package.  Not all of the ISO/OSI components previously part of the
+`strss7' package have been strapped into this release.  Components will
+be re-validated against `Linux Fast-STREAMS' on a module-by-module and
+driver-by-driver basis.  See `TODO' in the release, or `Schedule',in
+the manual, for information about the release schedule.
+
+In this initial release, the major component first available is LAPB.
+`lapb(4)' is a pushable "STREAMS" module that is pushed over a `cdi(4)'
+HDLC channel to form an ATM data link providing the Data Link Provider
+Interface, `dlpi(7)'.  A complete test suite will be available in a
+further release.
+
+Subsequent releases in 4Q 2008 will include the additional full ISO/OSI
+ATM< CONS, CLNS, and TP0 through TP4, drivers with conformance test
+suites.
+
