@@ -1,5 +1,19 @@
 2008-12-16  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/bugs.texi: document BUG #026
+	* include/sys/streams/strsubr.h: fix for BUG #026.
+	* src/kernel/strprocfs.c: fix for BUG #026.
+	* src/kernel/strsched.c: fix for BUG #026.
+
+	* doc/man/man9/bufcall.9.man: document consistent with bugfix
+	* doc/man/man9/qbufcall.9.man: document consistent with bugfix
+	* doc/man/man9/qtimeout.9.man: document consistent with bugfix
+	* doc/man/man9/qunbufcall.9.man: document consistent with bugfix
+	* doc/man/man9/quntimeout.9.man: document consistent with bugfix
+	* doc/man/man9/timeout.9.man: document consistent with bugfix
+	* doc/man/man9/unbufcall.9.man: document consistent with bugfix
+	* doc/man/man9/untimeout.9.man: document consistent with bugfix
+
 	* doc/man/streams.refs: do not truncate keys to 6 chars
 	* doc/man/man1/strchg.1.man: do not truncate keys to 6 chars
 	* doc/man/man1/strconf.1.man: do not truncate keys to 6 chars

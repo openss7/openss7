@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 03:06:48 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-12-16 08:34:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-21 03:06:48 $ by $Author: brian $
+ Last Modified $Date: 2008-12-16 08:34:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 0.9.2.62  2008-12-16 08:34:19  brian
+ - document and fix BUG #026
+
  Revision 0.9.2.61  2008-10-21 03:06:48  brian
  - tweaks for 2.6.26.5-45.fc9 kernel
 
@@ -90,10 +93,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 03:06:48 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-12-16 08:34:19 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 03:06:48 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-12-16 08:34:19 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1315,7 +1318,6 @@ get_streams_strevent_hdr(char *page, int maxlen)
 	len += snprintf(page + len, maxlen - len, ", x.t.cpu");
 	len += snprintf(page + len, maxlen - len, ", x.t.timer.expires }");
 	len += snprintf(page + len, maxlen - len, ", se_id");
-	len += snprintf(page + len, maxlen - len, ", se_seq");
 	return (len);
 }
 STATIC int
@@ -1343,7 +1345,6 @@ get_streams_strevent(char *page, int maxlen, int type, struct strevent *se)
 		len += snprintf(page + len, maxlen - len, ", %lu }", se->x.t.timer.expires);
 	}
 	len += snprintf(page + len, maxlen - len, ", %d", se->se_id);
-	len += snprintf(page + len, maxlen - len, ", %d", se->se_seq);
       done:
 	return (len);
 }

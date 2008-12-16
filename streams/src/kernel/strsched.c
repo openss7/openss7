@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2008-10-17 06:04:53 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2008-12-16 08:34:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-17 06:04:53 $ by $Author: brian $
+ Last Modified $Date: 2008-12-16 08:34:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.175  2008-12-16 08:34:19  brian
+ - document and fix BUG #026
+
  Revision 0.9.2.174  2008-10-17 06:04:53  brian
  - fixed putnext qprocsoff bug
 
@@ -207,10 +210,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2008-10-17 06:04:53 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2008-12-16 08:34:19 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2008-10-17 06:04:53 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2008-12-16 08:34:19 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -876,7 +879,7 @@ __freeq(queue_t *rq)
 	atomic_dec(&si->si_cnt);
 	assert(!waitqueue_active(&qu->qu_qwait));
 	/* Put Stream head */
-	_ctrace(sd_release(&qu->qu_str));
+	sd_release(&qu->qu_str);
 	/* clean it good */
 	queinfo_init(qu);
 	/* put back in cache */
@@ -1106,7 +1109,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 
 #if 0
 			md->msgblk.m_func = func;
-			_ctrace(md->msgblk.m_queue = NULL);
+			md->msgblk.m_queue = NULL;
 #endif
 #if defined CONFIG_STREAMS_DEBUG
 			streams_write_lock(&smi->si_rwlock, flags);
@@ -1808,9 +1811,6 @@ sq_release(struct syncq **sqp)
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 #define EVENT_ID_BITS 16
-#define EVENT_ID_MASK ((1<<EVENT_ID_BITS)-1)
-#define EVENT_ID_SHIFT (sizeof(bcid_t)*8-EVENT_ID_BITS)
-#define EVENT_SEQ_MASK ((1<<EVENT_ID_SHIFT)-1)
 #define EVENT_LIMIT (1<<EVENT_ID_BITS)
 #define EVENT_HASH_SIZE (1<<10)
 #define EVENT_HASH_MASK (EVENT_HASH_SIZE-1)
@@ -1829,20 +1829,11 @@ seinfo_ctor(kmem_cachep_t cachep, void *obj)
 #endif
 	{
 		struct seinfo *s = obj;
-		struct strevent **sep, *se = obj;
 
 		bzero(s, sizeof(*s));
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&s->s_list);
 #endif
-		/* XXX: are these strict locks necessary? */
-		write_lock(&event_hash_lock);
-		sep = &event_hash[event_id & EVENT_HASH_MASK];
-		se->se_id = event_id;
-		se->se_prev = *sep;
-		*sep = se;
-		event_id += 2;	/* stay odd so no zero check on wrap */
-		write_unlock(&event_hash_lock);
 	}
 }
 STATIC struct strevent *
@@ -1856,6 +1847,7 @@ event_alloc(int type, queue_t *q)
 		   procedures and must be called with GFP_ATOMIC. */
 		if (likely((se = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 			struct seinfo *s = (struct seinfo *) se;
+			unsigned long flags;
 
 			s->s_type = type;
 #if defined CONFIG_STREAMS_DEBUG
@@ -1867,6 +1859,21 @@ event_alloc(int type, queue_t *q)
 			atomic_inc(&si->si_cnt);
 			if (atomic_read(&si->si_cnt) > si->si_hwl)
 				si->si_hwl = atomic_read(&si->si_cnt);
+			/* XXX: are these strict locks necessary? */
+			write_lock_irqsave(&event_hash_lock, flags);
+			do {
+				struct strevent *se2;
+
+				/* ensure that id is not reused */
+				for (se2 = event_hash[event_id & EVENT_HASH_MASK];
+				     se2 && se2->se_id != event_id; se2 = se2->se_next) ;
+				if (se2 == NULL)
+					break;
+				event_id += 2;	/* stay odd so no zero check on wrap */
+			} while (1);	/* EVENT_LIMIT guarantees that this loop is not indefinite */
+			se->se_id = event_id;
+			event_id += 2;	/* stay odd so no zero check on wrap */
+			write_unlock_irqrestore(&event_hash_lock, flags);
 		}
 	}
 	return (se);
@@ -1875,34 +1882,36 @@ STATIC void
 event_free(struct strevent *se)
 {
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
+	unsigned long flags;
+	struct strevent **sep;
 
 #if defined CONFIG_STREAMS_DEBUG
 	struct seinfo *s = (struct seinfo *) se;
 
 	if (s->s_queue)
-		_ctrace(qput(&s->s_queue));
+		qput(&s->s_queue);
 	write_lock(&si->si_rwlock);
 	list_del_init(&s->s_list);
 	write_unlock(&si->si_rwlock);
 #endif
+	write_lock_irqsave(&event_hash_lock, flags);
+	for (sep = &event_hash[se->se_id & EVENT_HASH_MASK];
+	     *sep && *sep != se; sep = &(*sep)->se_prev) ;
+	if (*sep)
+		*sep = XCHG(&(*sep)->se_prev, NULL);
+	write_unlock_irqrestore(&event_hash_lock, flags);
 	atomic_dec(&si->si_cnt);
-	se->se_seq++;
-	se->se_seq &= EVENT_SEQ_MASK;
 	kmem_cache_free(si->si_cache, se);
 }
 STATIC struct strevent *
 find_event(int event_id)
 {
 	struct strevent **sep;
-	int id = (event_id >> EVENT_ID_SHIFT) & EVENT_ID_MASK;
-	int seq = event_id & EVENT_SEQ_MASK;
 
-	sep = &event_hash[id & EVENT_HASH_MASK];
-	read_lock(&event_hash_lock);
-	for (; *sep; sep = &(*sep)->se_prev)
-		if ((*sep)->se_id == id && (*sep)->se_seq == seq)
-			break;
-	read_unlock(&event_hash_lock);
+	for (sep = &event_hash[event_id & EVENT_HASH_MASK];
+	     *sep && (*sep)->se_id != event_id; sep = &(*sep)->se_prev) ;
+	if (*sep)
+		*sep = XCHG(&(*sep)->se_prev, NULL);
 	return (*sep);
 }
 
@@ -1912,7 +1921,11 @@ find_event(int event_id)
 streams_fastcall struct strevent *
 sealloc(void)
 {
-	return _ctrace(event_alloc(SE_STREAM, NULL));
+	struct strevent *se;
+
+	if ((se = event_alloc(SE_STREAM, NULL)))
+		se->se_id = 0;
+	return (se);
 }
 
 EXPORT_SYMBOL_GPL(sealloc);	/* include/sys/streams/strsubr.h */
@@ -2013,7 +2026,7 @@ strsched_event(struct strevent *se)
 	prefetchw(se);
 	t = this_thread;
 	prefetchw(t);
-	id = ((se->se_id << EVENT_ID_SHIFT) | (se->se_seq & EVENT_SEQ_MASK));
+	id = se->se_id;
 
 	se->se_next = NULL;
 	{
@@ -2046,7 +2059,7 @@ strsched_bufcall(struct strevent *se)
 	prefetchw(se);
 	t = this_thread;
 	prefetchw(t);
-	id = ((se->se_id << EVENT_ID_SHIFT) | (se->se_seq & EVENT_SEQ_MASK));
+	id = se->se_id;
 
 	se->se_next = NULL;
 	{
@@ -2116,7 +2129,7 @@ strsched_timeout(struct strevent *se)
 {
 	long id;
 
-	id = ((se->se_id << EVENT_ID_SHIFT) | (se->se_seq & EVENT_SEQ_MASK));
+	id = se->se_id;
 	se->x.t.timer.data = (long) se;
 	se->x.t.timer.function = timeout_function;
 	add_timer(&se->x.t.timer);
@@ -2130,7 +2143,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = _ctrace(event_alloc(SE_STREAM, q)))) {
+	if ((se = event_alloc(SE_STREAM, q))) {
 		se->x.e.procp = procp;
 		se->x.e.events = events;
 		id = strsched_event(se);
@@ -2145,7 +2158,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = _ctrace(event_alloc(SE_BUFCALL, q)))) {
+	if ((se = event_alloc(SE_BUFCALL, q))) {
 		se->x.b.queue = q ? qget(q) : NULL;
 		se->x.b.func = func;
 		se->x.b.arg = arg;
@@ -2161,7 +2174,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = _ctrace(event_alloc(SE_TIMEOUT, q)))) {
+	if ((se = event_alloc(SE_TIMEOUT, q))) {
 		se->x.t.queue = q ? qget(q) : NULL;
 		se->x.t.func = func;
 		se->x.t.arg = arg;
@@ -2180,14 +2193,14 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = _ctrace(event_alloc(SE_WELDQ, q)))) {
+	if ((se = event_alloc(SE_WELDQ, q))) {
 		se->x.w.queue = q ? qget(q) : NULL;
 		se->x.w.func = func;
 		se->x.w.arg = arg;
-		_ctrace(se->x.w.q1 = qget(q1));
-		_ctrace(se->x.w.q2 = qget(q2));
-		_ctrace(se->x.w.q3 = qget(q3));
-		_ctrace(se->x.w.q4 = qget(q4));
+		se->x.w.q1 = qget(q1);
+		se->x.w.q2 = qget(q2);
+		se->x.w.q3 = qget(q3);
+		se->x.w.q4 = qget(q4);
 		id = strsched_event(se);
 	}
 	return (id);
@@ -2199,14 +2212,14 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = _ctrace(event_alloc(SE_UNWELDQ, q)))) {
+	if ((se = event_alloc(SE_UNWELDQ, q))) {
 		se->x.w.queue = q ? qget(q) : NULL;
 		se->x.w.func = func;
 		se->x.w.arg = arg;
-		_ctrace(se->x.w.q1 = qget(q1));
-		_ctrace(se->x.w.q2 = qget(q2));
-		_ctrace(se->x.w.q3 = qget(q3));
-		_ctrace(se->x.w.q4 = qget(q4));
+		se->x.w.q1 = qget(q1);
+		se->x.w.q2 = qget(q2);
+		se->x.w.q3 = qget(q3);
+		se->x.w.q4 = qget(q4);
 		id = strsched_event(se);
 	}
 	return (id);
@@ -2275,9 +2288,12 @@ streams_fastcall void
 unbufcall(register bcid_t bcid)
 {
 	struct strevent *se;
+	unsigned long flags;
 
+	write_lock_irqsave(&event_hash_lock, flags);
 	if ((se = find_event(bcid)))
 		se->x.b.func = NULL;
+	write_unlock_irqrestore(&event_hash_lock, flags);
 }
 
 EXPORT_SYMBOL(unbufcall);	/* include/sys/streams/stream.h */
@@ -2336,17 +2352,20 @@ untimeout(toid_t toid)
 {
 	struct strevent *se;
 	clock_t rem = 0;
+	unsigned long flags;
 
+	write_lock_irqsave(&event_hash_lock, flags);
 	if ((se = find_event(toid))) {
 		se->x.t.func = NULL;
 		if (se->x.t.queue)
-			_ctrace(qput(&se->x.t.queue));
+			qput(&se->x.t.queue);
 		rem = se->x.t.timer.expires - jiffies;
 		if (rem < 0)
 			rem = 0;
 		if (del_timer(&se->x.t.timer))
 			event_free(se);
 	}
+	write_unlock_irqrestore(&event_hash_lock, flags);
 	return (rem);
 }
 
@@ -3859,7 +3878,7 @@ sq_doput_synced(mblk_t *mp)
 	else
 		/* deferred function is a qstrfunc function */
 		strfunc(m_func, m_queue, mp, m_private);
-	_ctrace(qput(&m_queue));
+	qput(&m_queue);
 }
 
 STATIC void
@@ -3905,6 +3924,7 @@ do_bufcall_synced(struct strevent *se)
 {
 	void streamscall (*func) (long);
 
+	read_lock(&event_hash_lock);
 	if (likely((func = se->x.b.func) != NULL)) {
 		queue_t *q;
 
@@ -3933,6 +3953,7 @@ do_bufcall_synced(struct strevent *se)
 		} else
 			(*func) (se->x.b.arg);
 	}
+	read_unlock(&event_hash_lock);
 }
 
 /**
@@ -3963,6 +3984,7 @@ do_timeout_synced(struct strevent *se)
 {
 	void streamscall (*func) (caddr_t);
 
+	read_lock(&event_hash_lock);
 	if (likely((func = se->x.t.func) != NULL)) {
 		queue_t *q;
 
@@ -3997,6 +4019,7 @@ do_timeout_synced(struct strevent *se)
 				streams_local_restore(pl);
 		}
 	}
+	read_unlock(&event_hash_lock);
 }
 
 /**
@@ -4110,12 +4133,12 @@ do_weldq_synced(struct strevent *se)
 		} else if (sd3) {
 			pwunlock(sd3, pl3);
 		}
-		_ctrace(qput(&q1));
-		_ctrace(qput(&q2));
-		_ctrace(qput(&q3));
-		_ctrace(qput(&q4));
-		_ctrace(qput(&qn1));
-		_ctrace(qput(&qn3));
+		qput(&q1);
+		qput(&q2);
+		qput(&q3);
+		qput(&q4);
+		qput(&qn1);
+		qput(&qn3);
 	}
 	{
 		weld_fcn_t func;
@@ -4208,7 +4231,7 @@ do_mblk_func(mblk_t *b)
 		/* deferred function is a qstrfunc function */
 		qstrfunc_sync(m_func, m_queue, b, m_private);
 	if (m_queue)
-		_ctrace(qput(&m_queue));
+		qput(&m_queue);
 }
 #endif
 
@@ -4239,7 +4262,7 @@ do_bufcall_event(struct strevent *se)
 	} else
 #endif
 		do_bufcall_synced(se);
-	sefree(se);
+	event_free(se);
 }
 
 /*
@@ -4262,7 +4285,7 @@ do_timeout_event(struct strevent *se)
 	} else
 #endif
 		do_timeout_synced(se);
-	sefree(se);
+	event_free(se);
 }
 
 /* 
@@ -4287,7 +4310,7 @@ do_weldq_event(struct strevent *se)
 	} else
 #endif
 		do_weldq_synced(se);
-	sefree(se);
+	event_free(se);
 }
 
 /*
@@ -4312,7 +4335,7 @@ do_unweldq_event(struct strevent *se)
 	} else
 #endif
 		do_unweldq_synced(se);
-	sefree(se);
+	event_free(se);
 }
 
 streams_noinline streams_fastcall void *
@@ -4639,7 +4662,7 @@ doevents(struct strthread *t)
 					continue;
 				default:
 					assert(0);
-					sefree(se);
+					event_free(se);
 					continue;
 				}
 			} while (unlikely((se = se_next) != NULL));
@@ -4937,34 +4960,34 @@ __runqueues_slow(struct strthread *t)
 {
 	/* free flush chains if necessary */
 	if (unlikely(test_bit(flushwork, &t->flags) != 0))
-		_ctrace(freechains(t));
+		freechains(t);
 #if !defined CONFIG_STREAMS_NORECYCLE
 	/* free mdbblocks to cache, if memory needed */
 	if (unlikely(test_bit(freeblks, &t->flags) != 0))
-		_ctrace(freeblocks(t));
+		freeblocks(t);
 #endif
 #if defined CONFIG_STREAMS_SYNCQS
 	/* do deferred m_func's first */
 	if (unlikely(test_bit(strmfuncs, &t->flags) != 0))
-		_ctrace(domfuncs(t));
+		domfuncs(t);
 #endif
 #if defined CONFIG_STREAMS_SYNCQS
 	/* catch up on backlog first */
 	if (unlikely(test_bit(qsyncflag, &t->flags) != 0))
-		_ctrace(backlog(t));
+		backlog(t);
 #endif
 	/* do timeouts */
 	if (unlikely(test_bit(strtimout, &t->flags) != 0))
-		_ctrace(timeouts(t));
+		timeouts(t);
 	/* do stream head write queue scanning */
 	if (unlikely(test_bit(scanqflag, &t->flags) != 0))
-		_ctrace(scanqueues(t));
+		scanqueues(t);
 	/* do pending events */
 	if (unlikely(test_bit(strevents, &t->flags) != 0))
-		_ctrace(doevents(t));
+		doevents(t);
 	/* do buffer calls if necessary */
 	if (unlikely(test_bit(strbcflag, &t->flags) != 0))
-		_ctrace(bufcalls(t));
+		bufcalls(t);
 }
 
 /*
@@ -5002,7 +5025,7 @@ __runqueues(struct softirq_action *unused)
 		++runs;
 		/* run queue service procedures if necessary */
 		if (likely(test_bit(qrunflag, &t->flags) != 0))	/* PROFILED */
-			_ctrace(queuerun(t));
+			queuerun(t);
 		if (unlikely
 		    (((volatile unsigned long) t->
 		      flags & (FLUSHWORK | FREEBLKS | STRMFUNCS | QSYNCFLAG | STRTIMOUT | SCANQFLAG
@@ -5269,7 +5292,7 @@ streams_fastcall __unlikely void
 freestr(struct stdata *sd)
 {
 	/* FIXME: need to deallocate anything attached to the stream head */
-	_ctrace(sd_put(&sd));
+	sd_put(&sd);
 }
 
 EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
@@ -5308,10 +5331,6 @@ EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
 #endif				/* defined SLAB_DESTROY_BY_RCU */
 #endif				/* defined CONFIG_STREAMS_DEBUG */
 
-#ifndef SLAB_NO_REAP
-#define SLAB_NO_REAP 0
-#endif
-
 STATIC struct cacheinfo {
 	const char *name;
 	size_t size;
@@ -5332,8 +5351,7 @@ STATIC struct cacheinfo {
 	"DYN_MDBBLOCK", sizeof(struct mdbblock), 0, STREAMS_CACHE_FLAGS, &mdbblock_ctor, NULL},
 	{
 	"DYN_LINKBLK", sizeof(struct linkinfo), 0, STREAMS_CACHE_FLAGS, &linkinfo_ctor, NULL}, {
-	"DYN_STREVENT", sizeof(struct seinfo), 0, STREAMS_CACHE_FLAGS | SLAB_NO_REAP,
-		    &seinfo_ctor, NULL}, {
+	"DYN_STREVENT", sizeof(struct seinfo), 0, STREAMS_CACHE_FLAGS, &seinfo_ctor, NULL}, {
 	"DYN_QBAND", sizeof(struct qbinfo), 0, STREAMS_CACHE_FLAGS, &qbinfo_ctor, NULL}, {
 	"DYN_STRAPUSH", sizeof(struct apinfo), 0, STREAMS_CACHE_FLAGS, &apinfo_ctor, NULL}, {
 	"DYN_DEVINFO", sizeof(struct devinfo), 0, STREAMS_CACHE_FLAGS, &devinfo_ctor, NULL}, {
