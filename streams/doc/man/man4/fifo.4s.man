@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: fifo.4s.man,v 0.9.2.10 2008-04-28 12:53:40 brian Exp $
+.\" @(#) $Id: fifo.4s.man,v 0.9.2.11 2008-12-16 08:30:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 12:53:40 $ by $Author: brian $
+.\" Last Modified $Date: 2008-12-16 08:30:55 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: fifo.4s.man,v $
+.\" Revision 0.9.2.11  2008-12-16 08:30:55  brian
+.\" - do not truncate keys to 6 chars
+.\"
 .\" Revision 0.9.2.10  2008-04-28 12:53:40  brian
 .\" - update file headers for release
 .\"
@@ -76,6 +79,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-truncate 40
 .R2
 .so streams.macros
 .\"

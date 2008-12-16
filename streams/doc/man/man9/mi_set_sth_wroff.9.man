@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_set_sth_wroff.9.man,v 0.9.2.6 2008-04-28 12:53:52 brian Exp $
+.\" @(#) $Id: mi_set_sth_wroff.9.man,v 0.9.2.7 2008-12-16 08:31:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 12:53:52 $ by $Author: brian $
+.\" Last Modified $Date: 2008-12-16 08:31:10 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_set_sth_wroff.9.man,v $
+.\" Revision 0.9.2.7  2008-12-16 08:31:10  brian
+.\" - do not truncate keys to 6 chars
+.\"
 .\" Revision 0.9.2.6  2008-04-28 12:53:52  brian
 .\" - update file headers for release
 .\"
@@ -79,6 +82,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-truncate 40
 .R2
 .so streams.macros
 .\"
