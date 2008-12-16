@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.89 2008-10-27 23:36:16 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.90 2008-12-16 08:34:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-27 23:36:16 $ by $Author: brian $
+ Last Modified $Date: 2008-12-16 08:34:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.90  2008-12-16 08:34:19  brian
+ - document and fix BUG #026
+
  Revision 0.9.2.89  2008-10-27 23:36:16  brian
  - need declaration for check target
 
@@ -128,7 +131,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.89 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.90 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do not include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -209,7 +212,6 @@ struct strevent {
 	struct strevent *se_next;
 	struct strevent *se_prev;	/* actually hash list */
 	int se_id;			/* identifier for this event structure */
-	int se_seq;			/* use sequence number */
 };
 
 #define se_procp    x.e.procp
