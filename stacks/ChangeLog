@@ -1,3 +1,8 @@
+2008-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/mib2c: update mib generator
+	* src/snmp/mib2c.openss7.conf: update mib generator
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.spec.in: new stratm package
