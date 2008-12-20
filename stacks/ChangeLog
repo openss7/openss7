@@ -3,6 +3,44 @@
 	* src/snmp/mib2c: update mib generator
 	* src/snmp/mib2c.openss7.conf: update mib generator
 
+	* doc/specs/sccpi/Makefile.am: remove missing figure
+	* doc/specs/sccpi/sccpi.texi: comment missing figure
+	* src/mibs/OPENSS7-SL-MUX-MIB.mib: move mib to proper arc
+	* src/snmp/makestubs: add new mibs
+	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: update mib
+	* src/snmp/mibs/OPENSS7-MTP-MIB2.mib: update mib
+	* src/snmp/mibs/OPENSS7-MTP-MIB3.mib: update mib
+	* src/snmp/mibs/OPENSS7-MTP-TC.mib: update mib
+	* src/snmp/mibs/OPENSS7-SCCP-MIB.mib: update mib
+	* src/snmp/mibs/OPENSS7-SL-MUX-MIB.mib: update mib
+	* src/snmp/mibs/OPENSS7-SMI-MIB.mib: update mib
+	* src/snmp/mibs/OPENSS7-SS7-MIB.mib: update mib
+
+	* doc/specs/sccpi/sccpi_mgmt.fig: add figure
+	* src/snmp/cdr2MIB.c: new mib agent
+	* src/snmp/cdr2MIB.h: new mib agent
+	* src/snmp/mtpMIB.c: new mib agent
+	* src/snmp/mtpMIB.h: new mib agent
+	* src/snmp/mtpMIB2.c: new mib agent
+	* src/snmp/mtpMIB2.h: new mib agent
+	* src/snmp/mtpOmMIB.c: new mib agent
+	* src/snmp/mtpOmMIB.h: new mib agent
+	* src/snmp/sccpMIB.c: new mib agent
+	* src/snmp/sccpMIB.h: new mib agent
+	* src/snmp/sccpOmMIB.c: new mib agent
+	* src/snmp/sccpOmMIB.h: new mib agent
+	* src/snmp/ss7MIB.c: new mib agent
+	* src/snmp/ss7MIB.h: new mib agent
+	* src/snmp/ss7OmMIB.c: new mib agent
+	* src/snmp/ss7OmMIB.h: new mib agent
+	* src/snmp/tcapMIB.c: new mib agent
+	* src/snmp/tcapMIB.h: new mib agent
+	* src/snmp/x400pMIB.c: new mib agent
+	* src/snmp/x400pMIB.h: new mib agent
+	* src/snmp/mibs/HC-PerfHist-TC-MIB.mib: add mib
+	* src/snmp/mibs/OPENSS7-SS7-OM-MIB.mib: add mib
+	* src/snmp/mibs/PerfHist-TC-MIB.mib: add mib
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.spec.in: new stratm package

@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SL-MUX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:34:39 $
+-- @(#) $RCSfile: OPENSS7-SL-MUX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-12-20 12:55:40 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,17 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-10-11 04:34:39 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-20 12:55:40 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SL-MUX-MIB.mib,v $
+-- Revision 0.9.2.8  2008-12-20 12:55:40  brian
+-- - add new mibs and agents
+--
+-- Revision 0.9.2.7  2008-12-12 05:34:24  brian
+-- - correction
+--
 -- Revision 0.9.2.6  2008-10-11 04:34:39  brian
 -- - cleanup MIBs
 --
@@ -76,8 +82,8 @@ IMPORTS
 		FROM SNMPv2-SMI
 	RowStatus
 		FROM SNMPv2-TC
-	openss7
-		FROM OPENSS7-MIB;
+	openss7, openss7Modules
+		FROM OPENSS7-SMI;
 
 slMuxMIB MODULE-IDENTITY
 	LAST-UPDATED
@@ -111,7 +117,7 @@ slMuxMIB MODULE-IDENTITY
 		 the SL multiplexer.  This MIB provides the ability to 
 		 establish these Streams and reference them from other 
 		 MIBs."
-	::= { openss7 17 751 0 }
+	::= { openss7Modules 40 }
 
 -- top level organization of the MIB
 

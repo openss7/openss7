@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-17 14:04:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-20 12:55:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-17 14:04:32 $ by $Author: brian $
+# Last Modified $Date: 2008-12-20 12:55:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -137,8 +137,7 @@ FIG_FIGS		= \
 			  sccpi_fig6.fig \
 			  sccpi_fig7.fig \
 			  sccpi_fig8.fig \
-			  sccpi_fig9.fig \
-			  sccpi_figc1.fig
+			  sccpi_fig9.fig
 
 TBL_TBLS		= \
 			  sccpi_tab01.tbl \
@@ -208,6 +207,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2008-12-20 12:55:39  brian
+## - add new mibs and agents
+##
 ## Revision 0.9.2.1  2008-11-17 14:04:32  brian
 ## - added documentation and conversion modules
 ##
