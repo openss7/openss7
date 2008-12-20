@@ -1,3 +1,23 @@
+2008-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: added manpages
+	* doc/man/man4/ch.4.man: updated manpage
+	* doc/man/man4/mx-mux.4.man: updated manpage
+	* src/drivers/matrix.c: updates
+	* src/mibs/OPENSS7-MX-MIB.mib: updated mib
+	* src/mibs/RFC4805-MIB.txt: updated mib
+	* doc/man/man4/ch-mux.4.man: added manpage
+	* doc/man/man4/ch_mux.4.man: added manpage
+	* doc/man/man4/matrix.4.man: added manpage
+	* src/mibs/RFC2127-MIB.txt: added mib
+	* src/mibs/RFC2128-MIB.txt: added mib
+	* src/mibs/RFC2494-EXT-MIB.mib: added mib
+	* src/mibs/RFC2494-MIB.txt: added mib
+	* src/mibs/RFC2495-MIB.txt: added mib
+	* src/mibs/RFC2496-MIB.txt: added mib
+	* src/mibs/RFC3895-MIB.txt: added mib
+	* src/mibs/RFC3896-MIB.txt: added mib
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* strchan.spec.in: new stratm package

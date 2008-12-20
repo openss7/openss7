@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-12-20 12:48:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-26 13:13:54 $ by $Author: brian $
+# Last Modified $Date: 2008-12-20 12:48:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,14 +61,17 @@ man_MANS = \
 	man4/cd_daed.4 \
 	man4/cd_hdlc.4 \
 	man4/ch.4 \
-	man4/ch_ioctl.4 \
-	man4/ch-pmod.4 \
-	man4/ch_pmod.4 \
 	man4/chi_ioctl.4 \
+	man4/ch_ioctl.4 \
+	man4/ch_mux.4 \
+	man4/ch-mux.4 \
+	man4/ch_pmod.4 \
+	man4/ch-pmod.4 \
+	man4/matrix.4 \
 	man4/MG.4 \
 	man4/mg.4 \
-	man4/mg_ioctl.4 \
 	man4/mgi_ioctl.4 \
+	man4/mg_ioctl.4 \
 	man4/mg-lm.4 \
 	man4/mx.4 \
 	man4/mxi_ioctl.4 \
@@ -320,14 +323,17 @@ dist_noinst_MANS = \
 	man4/cd_daed.4.man \
 	man4/cd_hdlc.4.man \
 	man4/ch.4.man \
-	man4/ch_ioctl.4.man \
-	man4/ch-pmod.4.man \
-	man4/ch_pmod.4.man \
 	man4/chi_ioctl.4.man \
+	man4/ch_ioctl.4.man \
+	man4/ch_mux.4.man \
+	man4/ch-mux.4.man \
+	man4/ch_pmod.4.man \
+	man4/ch-pmod.4.man \
+	man4/matrix.4.man \
 	man4/MG.4.man \
 	man4/mg.4.man \
-	man4/mg_ioctl.4.man \
 	man4/mgi_ioctl.4.man \
+	man4/mg_ioctl.4.man \
 	man4/mg-lm.4.man \
 	man4/mx.4.man \
 	man4/mxi_ioctl.4.man \
@@ -613,6 +619,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2008-12-20 12:48:39  brian
+# - added manpages and mibs
+#
 # Revision 0.9.2.12  2008-11-26 13:13:54  brian
 # - sync with working copy
 #
