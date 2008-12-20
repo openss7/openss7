@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: quntimeout.9.man,v 0.9.2.12 2008-04-28 16:47:05 brian Exp $
+.\" @(#) $Id: quntimeout.9.man,v 0.9.2.13 2008-12-20 12:37:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 16:47:05 $ by $Author: brian $
+.\" Last Modified $Date: 2008-12-20 12:37:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: quntimeout.9.man,v $
+.\" Revision 0.9.2.13  2008-12-20 12:37:21  brian
+.\" - updated manpages
+.\"
 .\" Revision 0.9.2.12  2008-04-28 16:47:05  brian
 .\" - updates for release
 .\"
@@ -87,6 +90,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-truncate 40
 .R2
 .so strcompat.macros
 .\"
@@ -178,7 +182,21 @@ callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt
 .SH MP-STREAMS
 .PP
 .BR quntimeout ()
-is MP-safe.
+is MP-safe; however, the caller of
+.BR quntimeout ()
+must ensure that the callback function has not returned from running before
+calling
+.BR quntimeout ().
+.PP
+Because the module is permitted to unload after calling
+.BR quntimeout ()
+for all outstanding timer callbacks the call to
+.BR quntimeout ()
+will not return until either the callback function has completed, or the
+callback function has been cancelled.  Therefore the callback function will be
+guaranteed not to run once 
+.BR quntimeout ()
+has returned for all outstanding callbacks.
 .\"
 .\"
 .SH NOTICES
@@ -203,10 +221,12 @@ is ignored.
 .PP
 Because
 .B @PACKAGE_TITLE@
-uses outdating pointers, if
-.BR quntimeout ()
-is called, it should be promptly.  Also, the callback function should remove
-all global references to
+uses object indices to
+.B strevent
+structures that expire once the callback function has run, when
+.BR untimeout ()
+is called, it must be called promptly and should never be called after the callback function has
+already completed.  Also, the callback function should remove all global references to
 .I toid
 so that stale timeout call handles do not exist in the system.
 .\"
