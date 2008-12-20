@@ -291,6 +291,27 @@
   </group>
 
   <group>
+    <id>stratm</id>
+    <name>Linux Fast-STREAMS ATM Drivers</name>
+    <description>This group contains Linux Fast-STREAMS ATM Drivers.</description>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">stratm-core-streams</packagereq>
+      <packagereq type="mandatory">stratm-base</packagereq>
+      <packagereq type="mandatory">stratm-init</packagereq>
+      <packagereq type="mandatory">stratm-streams-util</packagereq>
+      <packagereq type="optional">stratm-core-streams-debuginfo</packagereq>
+      <packagereq type="optional">stratm-core-streams-devel</packagereq>
+      <packagereq type="optional">stratm-debuginfo</packagereq>
+      <packagereq type="optional">stratm-devel</packagereq>
+      <packagereq type="optional">stratm-doc</packagereq>
+      <packagereq type="optional">stratm-streams-debuginfo</packagereq>
+      <packagereq type="optional">stratm-test</packagereq>
+    </packagelist>
+  </group>
+
+  <group>
     <id>strss7</id>
     <name>Linux Fast-STREAMS SS7 Subsystem</name>
     <description>This group contains Linux Fast-STREAMS SS7 Subsystem.</description>
@@ -394,6 +415,7 @@
       <groupid>striso</groupid>
       <groupid>netperf</groupid>
       <groupid>strisdn</groupid>
+      <groupid>stratm</groupid>
       <groupid>strss7</groupid>
       <groupid>sigtran</groupid>
       <groupid>strvoip</groupid>
@@ -691,6 +713,27 @@
   </group>
 
   <group>
+    <id>stratm-LiS</id>
+    <name>Linux STREAMS ATM Drivers</name>
+    <description>This group contains Linux STREAMS ATM Drivers.</description>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">stratm-core-LiS</packagereq>
+      <packagereq type="mandatory">stratm-base</packagereq>
+      <packagereq type="mandatory">stratm-init</packagereq>
+      <packagereq type="mandatory">stratm-LiS-util</packagereq>
+      <packagereq type="optional">stratm-core-LiS-debuginfo</packagereq>
+      <packagereq type="optional">stratm-core-LiS-devel</packagereq>
+      <packagereq type="optional">stratm-debuginfo</packagereq>
+      <packagereq type="optional">stratm-devel</packagereq>
+      <packagereq type="optional">stratm-doc</packagereq>
+      <packagereq type="optional">stratm-LiS-debuginfo</packagereq>
+      <packagereq type="optional">stratm-test</packagereq>
+    </packagelist>
+  </group>
+
+  <group>
     <id>strss7-LiS</id>
     <name>Linux STREAMS SS7 Subsystem</name>
     <description>This group contains Linux STREAMS SS7 Subsystem.</description>
@@ -794,6 +837,7 @@
       <groupid>striso-LiS</groupid>
       <groupid>netperf-LiS</groupid>
       <groupid>strisdn-LiS</groupid>
+      <groupid>stratm-LiS</groupid>
       <groupid>strss7-LiS</groupid>
       <groupid>sigtran-LiS</groupid>
       <groupid>strvoip-LiS</groupid>

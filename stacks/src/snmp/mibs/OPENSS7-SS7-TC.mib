@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SS7-TC.mib,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:22 $
+-- @(#) $RCSfile: OPENSS7-SS7-TC.mib,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-12-14 10:31:28 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,17 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 07:11:22 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-14 10:31:28 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SS7-TC.mib,v $
+-- Revision 0.9.2.9  2008-12-14 10:31:28  brian
+-- - renumber
+--
+-- Revision 0.9.2.8  2008-12-12 05:08:54  brian
+-- - add user parts
+--
 -- Revision 0.9.2.7  2008-04-29 07:11:22  brian
 -- - updating headers for release
 --
@@ -75,7 +81,7 @@
 OPENSS7-SS7-TC DEFINITIONS ::= BEGIN
 
 IMPORTS
-    openss7Q
+    openss7, openss7Q, openss7Q700
         FROM OPENSS7-SMI
     MODULE-IDENTITY
         FROM SNMPv2-SMI
@@ -101,7 +107,7 @@ ss7TC MODULE-IDENTITY
     REVISION    "200709260000Z"
     DESCRIPTION 
         "First release of this module."
-    ::= { openss7Q 700 }
+    ::= { openss7Q700 1 }
 
 
 Ss7LoadShareAlgorithm ::= TEXTUAL-CONVENTION
@@ -181,22 +187,22 @@ NetworkPointCode ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1d:1d-"
     STATUS      current
     DESCRIPTION 
-        "This is a network referenced signalling point code which 
-         uniquely identifies both the national or international SS7 
-         network (point code numbering space) to which the point code 
-         belongs as well as the point code within the network.  The 
-         first octet is a newtork identifier which identifies the larger 
-         national or international SS7 network; the second octet is the 
-         'network' portion of the signalling point code as defined in 
-         Q.704; the third, the 'cluster'; and, the fourth and last, the 
-         'member'.  This is displayed with a colon separating the 
-         network number and the normal numbers and dashes notation for 
-         the signalling point code: e.g. 1:5-1-1.  Note that an ITU-T 
-         signalling point code is unpacked by network, cluster and 
-         member into separate octets.  Also note that when the first 
-         octet is zero (0) it does not specify a global larger network 
-         and thus the network point code applies only to a locally 
-         defined network."
+	"This is a network referenced signalling point code that 
+	 uniquely identifies both the national or international SS7 
+	 network (point code numbering space) to which the point code 
+	 belongs as well as the point code within the network.  The 
+	 first octet is a network identifier that identifies the larger 
+	 national or international SS7 network; the second octet is the 
+	 'network' portion of the signalling point code as defined in 
+	 Q.704; the third, the 'cluster'; and, the fourth and last, the 
+	 'member'.  This is displayed with a colon separating the 
+	 network number and the normal numbers and dashes notation for 
+	 the signalling point code: e.g. 1:5-1-1.  Note that an ITU-T 
+	 signalling point code is unpacked by network, cluster and 
+	 member into separate octets.  Also note that when the first 
+	 octet is zero (0) it does not specify a global larger network 
+	 and thus the network point code applies only to a locally 
+	 defined network."
     SYNTAX      OCTET STRING (SIZE(4))
 
 MtpLinkFailureReason ::= TEXTUAL-CONVENTION
@@ -238,12 +244,13 @@ MtpUserPart ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION 
         "This textual convention provides an enumerated user part value 
-         which corresponds to the MTP SI value for the user part.  SI 
+         that corresponds to the MTP SI value for the user part.  SI 
          values snmm(0), sntm(1) and snsm(2) are reserved for MTP 
          management messages; other values may be assigned to user 
          parts."
     SYNTAX      INTEGER { snmm(0), sntm(1), snsm(2), sccp(3), tup(4), 
-                    isup(5), dup1(6), dup2(7), mtup(8) }
+                    isup(5), dup1(6), dup2(7), mtup(8), b-isup(9), 
+		    siup(10) }
 
 Ss7ProtocolVariant ::= TEXTUAL-CONVENTION
     STATUS      current

@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2008-12-02 06:51:28 $
+-- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-12-20 12:48:40 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-02 06:51:28 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-20 12:48:40 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MX-MIB.mib,v $
+-- Revision 0.9.2.5  2008-12-20 12:48:40  brian
+-- - added manpages and mibs
+--
 -- Revision 0.9.2.4  2008-12-02 06:51:28  brian
 -- - document CHI
 --
@@ -1213,7 +1216,7 @@ mxSpanEvents OBJECT-TYPE
            detection of a V5.2 link identification signal (G.965).
          
          - lorc(7), loss of receive clock condition, present when the 
-           receive clock has not transitioned fro on channel time.
+           receive clock has not transitioned for one channel time.
          
          - lotc(8), loss of transmit clock condition, present when the 
            TCLK pin has not transitioned for one channel time.
