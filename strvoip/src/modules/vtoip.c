@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vtoip.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 09:06:06 $
+ @(#) $RCSfile: vtoip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-20 12:44:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,37 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-06 09:06:06 $ by $Author: brian $
+ Last Modified $Date: 2008-12-20 12:44:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vtoip.c,v $
+ Revision 0.9.2.2  2008-12-20 12:44:35  brian
+ - added manpages
+
  Revision 0.9.2.1  2008-12-06 09:06:06  brian
  - added working files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vtoip.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 09:06:06 $"
+#ident "@(#) $RCSfile: vtoip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-20 12:44:35 $"
 
-static char const ident[] = "$RCSfile: vtoip.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 09:06:06 $";
+static char const ident[] = "$RCSfile: vtoip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-20 12:44:35 $";
 
 /*
- * This is a Y.1452 VToIP (Voice Trunking over IP) module.  It pushes over a UDP Stream that
- * provides connectivity to the peer VToIP system.  The upper boundary service interface is the MXI
- * interface.  The lower boundary service interface is the UDP-TPI interface.
+ * This is a Y.1452 VToIP (Voice Trunking over IP) module.  It pushes over a UDP
+ * Stream that provides connectivity to the peer VToIP system.  The upper
+ * boundary service interface is the MXI interface.  The lower boundary service
+ * interface is the UDP-TPI interface.
  *
- * In general, the UDP Stream may be opened, options configured, bound to a local IP address and
- * port number, and connected to a remote IP address and port number.  This module can then be
- * pushed.  Pushing the module will flush the Stream and any data messages received on the Stream
- * will be discarded until the Stream is configured, enabled and connected.
+ * In general, the UDP Stream may be opened, options configured, bound to a
+ * local IP address and port number, and connected to a remote IP address and
+ * port number.  This module can then be pushed.  Pushing the module will flush
+ * the Stream and any data messages received on the Stream will be discarded
+ * until the Stream is configured, enabled and connected.
  *
- * Once the module is pushed, the MXI Stream can be linked under the MATRIX multiplexing driver and
- * the channels available in the multiplex facility will be made available to the switching matrix.
+ * Once the module is pushed, the MXI Stream can be linked under the MATRIX
+ * multiplexing driver and the channels available in the multiplex facility will
+ * be made available to the switching matrix.
  */
 

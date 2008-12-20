@@ -1,3 +1,11 @@
+2008-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: added manpages
+	* src/modules/vtoip.c: updates
+	* doc/man/man4/iax.4.man: added manpage
+	* doc/man/man4/tdm-ip.4.man: added manpage
+	* doc/man/man4/vtoip.4.man: added manpage
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: new stratm package
