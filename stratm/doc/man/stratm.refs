@@ -166,25 +166,25 @@
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
 %R TCI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9a, Draft 8
 %T Transaction Component Interface (TCI) Specification
 %D July 15, 2007
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tci.pdf
-%O Distributed with package strss7-0.9.2.
+%O Distributed with package strss7-0.9a.
 
 %L TRI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
 %R TRI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9a, Draft 8
 %T Transaction Interface (TRI) Specification
 %D July 15, 2007
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tri.pdf
-%O Distributed with package strss7-0.9.2.
+%O Distributed with package strss7-0.9a.
 
 %L TPI
 %A Open\ Group
@@ -197,6 +197,7 @@
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
 %S Open Group CAE Specification
+%O Distributed with package strxnet-0.9.2.
 
 %L NPI
 %A UNIX\ International,\ Inc.
@@ -209,6 +210,7 @@
 %I UNIX International Press
 %U http://www.openss7.org/docs/npi.pdf
 %S Open Group CAE Specification
+%O Distributed with package strxns-0.9.2.
 
 %L DLPI
 %A UNIX International,\ Inc.
@@ -220,6 +222,8 @@
 %C Parsippany, New Jersey
 %I UNIX International Press
 %U http://www.openss7.org/doc/dlpi.pdf
+%S Open Group CAE Specification
+%O Distributed with package strxns-0.9.2.
 
 %L TLI
 %A UNIX\ International,\ Inc.
@@ -292,7 +296,7 @@
 %R NLI
 %J Revision 0.9.2, Draft 1
 %T OpenSS7 CAE Specification: Network Layer Interface (NLI) Specification
-%D July 15, 2008
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/nli.pdf
@@ -304,7 +308,7 @@
 %R LLI
 %J Revision 0.9.2, Draft 1
 %T OpenSS7 CAE Specification: Link Layer Interface (LLI) Specification
-%D July 15, 2008
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lli.pdf
@@ -314,9 +318,9 @@
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R CDI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9.2, Draft 7
 %T OpenSS7 CAE Specification: Communications Device Interface (CDI) Specification
-%D July 15, 2007
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/cdi.pdf
@@ -328,7 +332,7 @@
 %R WAN
 %J Revision 0.9.2, Draft 1
 %T OpenSS7 CAE Specification: Wide Area Network (WAN) Interface Specification
-%D July 15, 2008
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/wan.pdf
@@ -338,83 +342,85 @@
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R LMI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9a, Draft 8
 %T Local Management Interface (LMI) Specification
-%D July 15, 2007
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lmi.pdf
-%O Distributed with package strss7-0.9.2.
+%O Distributed with package strss7-0.9a.
 
 %L SLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R SLI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9a, Draft 8
 %T Signalling Link Interface (SLI) Specification
-%D July 15, 2007
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sli.pdf
-%O Distributed with package strss7-0.9.2.
+%O Distributed with package strss7-0.9a.
 
 %L SDTI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R SDTI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9a, Draft 8
 %T Signalling Data Terminal Interface (SDTI) Specification
-%D July 15, 2007
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdti.pdf
-%O Distributed with package strss7-0.9.2.
+%O Distributed with package strss7-0.9a.
 
 %L SDLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R SDLI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9a, Draft 8
 %T Signalling Data Link Interface (SDLI) Specification
-%D July 15, 2007
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdli.pdf
-%O Distributed with package strss7-0.9.2.
+%O Distributed with package strss7-0.9a.
 
 %L MTPI
 %A Brian Bidulock
 %Q OpenSS7\ Corporation
 %R MTPI
-%J Revision 0.9.2, Draft 1
+%J Revision 0.9a, Draft 8
 %T Message Transfer Provider Interface (MTPI)  Specification
-%D July 15, 2007
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/specs/mtpi.pdf
-%O Distributed with package strss7-0.9.2.
+%O Distributed with package strss7-0.9a.
 
 %L CHI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R CHI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9.2, Draft 4
 %T Channel Interface (CHI) Specification
-%D July 15, 2007
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/chi.pdf
+%O Distributed with package strchan-0.9.2.
 
 %L MXI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R MXI
-%J Revision 0.9.2, Draft 2
+%J Revision 0.9.2, Draft 4
 %T Multiplex Interface (MXI) Specification
-%D July 15, 2007
+%D October 31, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/mxi.pdf
+%O Distributed with package strchan-0.9.2.
 
 %K xxx
 %A X Programmer's Group
@@ -5734,6 +5740,7 @@ Part 1: Protocol Specification
 %A OpenSS7
 %Q OpenSS7
 %T Linux Fast-STREAMS (LfS) 0.9.2 Source Code
+%D October 31, 2008
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/
@@ -5744,6 +5751,7 @@ Part 1: Protocol Specification
 %A OpenSS7
 %Q OpenSS7
 %T STREAMS Compatibility Modules (strcompat) 0.9.2 Source Code
+%D October 31, 2008
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/
@@ -6825,7 +6833,7 @@ Part 1: Protocol Specification
 %R RFC 2225
 %A M. Laubach
 %A J. Halpern
-%T Classical IP and ARM over ATM
+%T Classical IP and ARP over ATM
 %D April 1998
 %O (Obsoletes by RFC 1577, RFC 1626) (Status: PROPOSED STANDARD)
 %Q Internet Engineering Task Force \(em Network Working Group
@@ -8304,6 +8312,26 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3020.txt
 
+%K frf12
+%L FRF.1.2
+%R FRF.1.2
+%T The Frame Relay Forum PVC User-to-Network Interface (UNI) Implementation Agreement
+%D July 2000
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.1/FRF.1.2.pdf
+
+%K frf22
+%L FRF.2.2
+%R FRF.2.2
+%T PVC Network-to-Network Interface (NNI) Implementation Agreement
+%D March 2002
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.2/FRF.2.2.pdf
+
 %K frf32
 %L FRF.3.2
 %E Andrew G. Malis
@@ -8316,6 +8344,87 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.3/FRF.3.2.pdf
 
+%K frf41
+%L FRF.4.1
+%R FRF.4.1
+%T The Frame Relay Forum SVC User-to-Network Interface (UNI) Implementation Agreement
+%D January 21, 2000
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.4/FRF.4.1.pdf
+
+%K frf5
+%L FRF.5
+%R FRF.5
+%T Frame Relay/ATM PVC Network Interworking Implementation Agreement
+%D December 20, 1994
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.5/FRF.5.pdf
+
+%K frf7
+%L FRF.7
+%E George Swallow
+%R FRF.7
+%T Frame Relay PVC Multicast Service and Protocol Description
+%D October 21, 1994
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.7/FRF.7.pdf
+
+%K frf81
+%L FRF.8.1
+%R FRF.8.1
+%T Frame Relay/ATM PVC Service Interworking Implementation Agreement
+%D February 2000
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.8/FRF.8.1.pdf
+
+%K frf82
+%L FRF.8.2
+%R FRF.8.2
+%T Frame Relay/ATM PVC Service Interworking Implementation Agreement
+%D February 2004
+%C Freemont, CA
+%I MPLS and Frame Relay Alliance Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.8/FRF.8.2.pdf
+
+%K frf9
+%L FRF.9
+%R FRF.9
+%T Data Compression Over Frame Relay
+%D January 22, 1996
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.9/FRF.9.pdf
+
+%K frf101
+%L FRF.10.1
+%R FRF.10.1
+%T The Frame Relay Forum SVC Network-to-Network Interface (NNI) Implementation Agreement
+%D January 21, 2000
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.10/FRF.10.1.pdf
+
+%K frf111
+%L FRF.11.1
+%R FRF.11.1
+%T Voice over Frame Relay Implementation Agreement
+%D December 1998
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.11/FRF.11.1.pdf
+
 %K frf12
 %L FRF.12
 %E Andrew G. Malis
@@ -8326,6 +8435,36 @@ Part 1: Protocol Specification
 %I Frame Relay Forum Technical Committee
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.12/FRF.12.pdf
+
+%K frf14
+%L FRF.14
+%R FRF.14
+%T Physical Layer Interface Implementation Agreement
+%D December 1998
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.14/FRF.14.pdf
+
+%K frf15
+%L FRF.15
+%R FRF.15
+%T End-to-End Multilink Frame Relay Implementation Agreement
+%D August 1999
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.15/FRF.15.pdf
+
+%K frf161
+%L FRF.16.1
+%R FRF.16.1
+%T Multilink Frame Relay UNI/NNI Implementation Agreement
+%D May 2002
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.16/FRF.16.1.pdf
 
 %K af91
 %L AF.91
@@ -8398,3 +8537,514 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-G.804/
 
+%K af43
+%L AF.43
+%R AF-PHY-0043.000
+%T A Cell-Based Transmission Convergence Sublayer for Clear Channel Interfaces
+%D November 1995
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-phy-0043.000.pdf
+
+%K af16
+%L AF.16
+%R AF-PHY-0016.000
+%T DS1 Physical Layer Interface Specification
+%D September 1994
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-phy-0016.000.pdf
+
+%K af54
+%L AF.54
+%R AF-PHY-0054.000
+%T DS3 Physical Layer Interface Specification
+%D January 1996
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-phy-0054.000.pdf
+
+%K af64
+%L AF.64
+%R AF-PHY-0064.000
+%T E1 Physical Layer Interface Specification
+%D September 1996
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-phy-0064.000.pdf
+
+%K af130
+%L AF.130
+%R AF-PHY-0130.000
+%T ATM on Fractional E1/T1
+%D October 1999
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-phy-0130.000.pdf
+
+%K af134
+%L AF.134
+%R AF-PHY-0134.000
+%T Physical Layer Control
+%D October 1999
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-phy-0134.000.pdf
+
+%K af145
+%L AF.145
+%R AF-VMOA-0145.001
+%T Loop Emulation Service Using AAL2 Revision 1
+%D February 2003
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vmoa-0145.001.pdf
+
+%K af174
+%L AF.174
+%R AF-VMOA-0174.000
+%T Loop Emulation Service Using AAL2 File Transfer Addendum
+%D October 2001
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vmoa-0174.000.pdf
+
+%K af175
+%L AF.175
+%R AF-VMOA-0175.001
+%T Loop Emulation Service Using AAL2 CP-IWF MIB Addendum \(em Revision 1
+%D February 2003
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vmoa-0175.001.pdf
+
+%K af78
+%L AF.78
+%R AF-VTOA-0078.000
+%T Circuit Emulation Service Interoperability Specification Version 2.0
+%D January 1997
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vtoa-0078.000.pdf
+
+%K af83
+%L AF.83
+%E Francois Audet
+%E Sanjay Kumar
+%R AF-VTOA-0083.000
+%T Voice and Telephony Over ATM to the Desktop Specification
+%D May 1997
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vtoa-0083.000.pdf
+
+%K af831
+%L AF.83.1
+%E Francois Audet
+%E Sanjay Kumar
+%R AF-VTOA-0083.001
+%T Voice and Telephony Over ATM to the Desktop Specification
+%D February 1999
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vtoa-0083.001.pdf
+
+%K af85
+%L AF.85
+%R AF-VTOA-0085.000
+%T Specifications of (DBCES) dynamic bandwidth utilization \(em in 64kbps time slot trunking over ATM \(em using CES
+%D July 1997
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vtoa-0085.000.pdf
+
+%K af89
+%L AF.89
+%R AF-VTOA-0089.000
+%T Voice and Telephony Over ATM \(em ATM Trunking using AAL1 for Narrowband Services Version 1.0
+%D July 1997
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vtoa-0089.000.pdf
+
+%K af891
+%L AF.89.1
+%R AF-VTOA-0089.001
+%T Voice and Telephony Over ATM \(em ATM Trunking using AAL1 for Narrowband Services Version 1.1
+%D February 2000
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vtoa-0089.001.pdf
+
+%K af113
+%L AF.113
+%R AF-VTOA-0113.000
+%T ATM Trunking using AAL2 for Narrowband Services
+%D February 1999
+%C Mountain View, CA
+%I ATM Forum Technical Committee
+%Q The ATM Forum
+%U http://www.ipmplsforum.org/ftp/pub/approved-specs/af-vtoa-0113.000.pdf
+
+%K y1413
+%L Y.1413
+%A ITU
+%R ITU-T Recommendation Y.1413
+%T TDM-MPLS network interworking \(em User plane interworking
+%D March 2004
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Y.1413/
+
+%K y1414
+%L Y.1414
+%A ITU
+%R ITU-T Recommendation Y.1414
+%T Voice services \(em MPLS network interworking
+%D July 2004
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Y.1414/
+
+%K y1452
+%L Y.1452
+%A ITU
+%R ITU-T Recommendation Y.1452
+%T Voice trunking over IP networks
+%D March 2006
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Y.1452/
+
+%K y1453
+%L Y.1453
+%A ITU
+%R ITU-T Recommendation Y.1453
+%T TDM-IP interworking \(em User plane interworking
+%D March 2006
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Y.1453/
+
+%K y1454
+%L Y.1454
+%A ITU
+%R ITU-T Recommendation Y.1454
+%T Tandem free operation (TFO) \(em IP network interworking \(em User plane interworking
+%D December 2006
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Y.1454/
+
+%K y1530
+%L Y.1530
+%A ITU
+%R ITU-T Recommendation Y.1530
+%T Call processing performance for voice service in hybrid IP networks
+%D May 2004
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Y.1530/
+
+%K y1730
+%L Y.1730
+%A ITU
+%R ITU-T Recommendation Y.1730
+%T Requirements for OAM functions in Ethernet-based networks and Ethernet services
+%D January 2004
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Y.1730/
+
+%K y1731
+%L Y.1731
+%A ITU
+%R ITU-T Recommendation Y.1731
+%T OAM functions and mechanisms for Ethernet based networks
+%D May 2006
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Y.1731/
+
+%K i3631
+%L I.363.1
+%A ITU
+%R ITU-T Recommendation I.363.1
+%T B-ISDN ATM Adaptation Layer specification: Type 1 AAL
+%D August 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.363.1/
+
+%K i3632
+%L I.363.2
+%A ITU
+%R ITU-T Recommendation I.363.2
+%T B-ISDN ATM Adaptation Layer specification: Type 2 AAL
+%D November 2000
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.363.2/
+
+%K i3633
+%L I.363.3
+%A ITU
+%R ITU-T Recommendation I.363.3
+%T B-ISDN ATM Adaptation Layer specification: Type 3/4 AAL
+%D August 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.363.3/
+
+%K i3635
+%L I.363.5
+%A ITU
+%R ITU-T Recommendation I.363.5
+%T B-ISDN ATM Adaptation Layer specification: Type 5 AAL
+%D August 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.363.5/
+
+%K i364
+%L I.364
+%A ITU
+%R ITU-T Recommendation I.364
+%T Support of the broadband connectionless data bearer service by the B-ISDN
+%D February 1999
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.364/
+
+%K i3651
+%L I.365.1
+%A ITU
+%R ITU-T Recommendation I.365.1
+%T Frame relaying service specific convergence sublayer (FR-SSCS)
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.365.1/
+
+%K i3652
+%L I.365.2
+%A ITU
+%R ITU-T Recommendation I.365.2
+%T B-ISDN ATM adaptation layer sublayers: service specific coordination function to provide the connection oriented network service
+%D November 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.365.2/
+
+%K i3653
+%L I.365.3
+%A ITU
+%R ITU-T Recommendation I.365.3
+%T B-ISDN ATM adaptation layer sublayers: service specific coordination function to provide the connection-oriented transport service
+%D Novermber 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.365.3/
+
+%K i3654
+%L I.365.4
+%A ITU
+%R ITU-T Recommendation I.365.4
+%T B-ISDN ATM adaptation layer sublayers: service specific coordination function for HDLC applications
+%D August 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.365.4/
+
+%K i3661
+%L I.366.1
+%A ITU
+%R ITU-T Recommendation I.366.1
+%T Segmentation and Reassembly Service Specific Convergence Sublayer for the AAL type 2
+%D June 1998
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.366.1/
+
+%K i3662
+%L I.366.2
+%A ITU
+%R ITU-T Recommendation I.366.2
+%T AAL type 2 service specific convergence sublayer for narrow-band services
+%D November 2000
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.366.2/
+
+%K i430
+%L I.430
+%A ITU
+%R ITU-T Recommendation I.430
+%T Basic user-network interface \(em layer 1 specification
+%D November 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.430/
+
+%K i431
+%L I.431
+%A ITU
+%R ITU-T Recommendation I.431
+%T Primary rate user-network interface \(em layer 1 specification
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.431/
+
+%K i432.1
+%L I.432.1
+%A ITU
+%R ITU-T Recommendation I.432.1
+%T B-ISDN user-network interace \(em Physical layer specification: General characteristics
+%D February 1999
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.432.1/
+
+%K i432.2
+%L I.432.2
+%A ITU
+%R ITU-T Recommendation I.432.2
+%T B-ISDN user-network interface \(em Physical layer specification: 155 520 kbit/s and 622 080 kbit/s operation
+%D February 1999
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.432.2/
+
+%K i432.3
+%L I.432.3
+%A ITU
+%R ITU-T Recommendation I.432.3
+%T B-ISDN user-network interface \(em Physical layer specification: 1544 kbit/s and 2048 kbit/s operation
+%D February 1999
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.432.3/
+
+%K i432.4
+%L I.432.4
+%A ITU
+%R ITU-T Recommendation I.432.4
+%T B-ISDN user-network interface \(em Physical layer specification: 51 840 kbit/s operation
+%D February 1999
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.432.4/
+
+%K i432.5
+%L I.432.5
+%A ITU
+%R ITU-T Recommendation I.432.5
+%T B-ISDN user-network interface \(em Physical layer specification: 25 600 kbit/s operation
+%D June 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.432.5/
+
+%K i480
+%L I.480
+%A ITU
+%R ITU-T Recommendation I.480
+%T 1+1 protection switching for cell-based physical layer
+%D March 2000
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.480/
+
+%K i530
+%L I.530
+%A ITU
+%R ITU-T Recommendation I.530
+%T Network interworking between and ISDN and a Public Switched Telephone Network (PSTN)
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.530/
+
+%K i580
+%L I.580
+%A ITU
+%R ITU-T Recommendation I.580
+%T General arrangements for interworking between B-ISDN and 64 kbit/s based ISDN
+%D November 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-I.580/
