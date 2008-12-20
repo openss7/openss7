@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mx-mux.4.man,v 0.9.2.2 2008-12-20 12:48:39 brian Exp $
+.\" @(#) $Id: ch-mux.4.man,v 0.9.2.1 2008-12-20 12:48:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -57,12 +57,9 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: mx-mux.4.man,v $
-.\" Revision 0.9.2.2  2008-12-20 12:48:39  brian
+.\" $Log: ch-mux.4.man,v $
+.\" Revision 0.9.2.1  2008-12-20 12:48:39  brian
 .\" - added manpages and mibs
-.\"
-.\" Revision 0.9.2.1  2008-11-26 13:13:57  brian
-.\" - sync with working copy
 .\"
 .\" =========================================================================
 .R1
@@ -82,122 +79,119 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH MX-MUX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.TH CH-MUX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .\"
 .\"
 .SH NAME
-.B mx-mux, mx_mux
-\- Multiplex (MX) Media Multiplexing Driver
+.B ch-mux, ch_mux
+\- Channel (CH) Media Multiplexing Driver
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <ss7/mxi.h>
+.B #include <ss7/chi.h>
 .br
-.B #include <ss7/mxi_ioctl.h>
+.B #include <ss7/chi_ioctl.h>
 .br
-.B #include <ss7/mx_mux.h
-.HP
-.BI "int " mx_stream " = open(" device ", " flags );
+.B #include <ss7/ch_mux.h
 .HP
 .BI "int " ch_stream " = open(" device ", " flags );
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.B MX-MUX
-is an implementation of a local multplex control for devices conforming
-to the
-.BR mxi (7)
+.B CH-MUX
+is an implementation of a local channel multiplex control for devices
+conforming to the
+.BR chi (7)
 interface.
-.B MX-MUX
-provides for the control of the matrix and underlying interfaces and
+.B CH-MUX
+provides for the control of the matrix and underlying interfaces as
 communications facilities.  It provides pseudo-digital cross-connect as
-well as multiplex and invert multiplex switching services to its users
+well as multiplex and invert multiplex switching services to its user
 and is effectively a virtual DCCS and channel bank.
 .PP
-.B MX-MUX
+.B CH-MUX
 is implemented as a
 .IR STREAMS (4)
 multiplexing pseudo-device driver.
-.B MX
-Streams can be linked under the the multiplexing driver using the
+.B CH
+Streams can be linked under the multiplexing driver using the
 .IR I_LINK (7)
 or
 .IR I_PLINK (7)
 input-output control commands of
 .BR streamio (7).
-.B MX
+.B CH
 Streams can be configured using
-.BR mxi_ioctl (4)
+.BR chi_ioctl (4)
 input-output controls.
 .\"
-.SS "Lower Multiplex Service Interface"
+.SS Upper Multiplex Service Interface
 .PP
-The MX-MUX driver supports driver Streams linked under the multiplexing
+.\"
+.SS Lower Multiplex Service Interface
+.PP
+The CH-MUX driver supports driver Streams linked under the multiplexing
 driver that provide channelized access to device or pseudo-device
-drivers supporting the MX Interface (MXI),
+drivers supporting the CH Interface (CHI),
 .[
-mxi revision 0.9.2
+chi revision 0.9.2
 .]
-.BR mxi (7)
-raw multiplex interface.  Each of these Streams linked beneath the MX
+.BR chi (7),
+raw channel interface.  Each of these Streams linked beneath the CH
 multiplexing driver represents communications channels to and from a
 device or pseudo-device driver.
 .PP
-Lower multplex Streams are always MX Style 1 or attached MX Style 2
-Streams.  That is, MX Style 2 Streams must be attached to a PPA before
-being linked beneath the MX-MUX multiplexing driver.
-.\"
-.SS "Upper Multiplex Service Interface"
-.\"
-.\"
+Lower multiplex Streams are always CH Style 1 or attached CH Style 2
+Streams.  That is, CH Style 2 Streams must be attached to a PPA before
+being linked beneath the CH-MUX multiplexing driver.
 .\"
 .SS Configuration
 .PP
-The MX-MUX driver is configured by opening MX Streams on a real or
-pseudo device driver that provides the MX interface and then linking
-these MX Streams beneath the MX-MUX multiplexing driver using the
+The CH-MUX driver is configured by opening CH Streams on a real or
+pseudo-device driver that provides the CH interface and then linking
+these CH Streams beneath the CH-MUX multiplexing driver using the
 .IR I_LINK (7)
 or
 .IR I_PLINK (7)
 input-output control commands provided by
 .BR streamio (7).
-Once, linked, the MX Streams are not immediately available to the MX-MUX
-driver: they first must be configured using MX input-output control
+Once, linked, the CH Streams are not immediately available to the CH-MUX
+driver: they frist must be configured using CH input-output control
 management commands.  A management control command must be used to
 assign a Style 1 minor device number to the lower Stream as well as a
-global PPA and CLEI.  The Style 1 minor device number is used as a minor
-device number when opening the MX-MUX driver using a non-clone minor
-device to obtain a Style 1 MX Stream.  The global PPA or CLEI can be
-used by a Style 1 clone MX-MUX driver device Stream to attach to the
+global PPA and CLEI.  They Style 1 minor device number is used as a
+minor device number when opening the CH-MUX driver using a non-clone
+minor device to obtain a Style 1 CH Stream.  The global PPA or CLEI can
+be used by a Style 1 clone CH-MUX driver device Stream to attach to the
 associated PPA.
 .PP
-Lower MX Streams that are linked beneath the multiplexing driver using
+Lower CH Stream that are linked beneath the multiplexing driver using
 the
 .IR I_LINK (7)
 input-output control can only be managed and connected to by control
 Streams that performed the
 .IR I_LINK (7)
-operation.  Lower MX Streams that are linked beneath the multiplexing
+operation.  Lower CH Streams that are linked beneath the multiplexing
 driver using the
 .IR I_PLINK (7)
-input-output control can be managed only by the single MX-MUX management
-Stream.  Note that, to reduce comlexity in the initial driver,
+input-output control can be managed only by the single CH-MUX management
+Stream.  Note that, to reduce complexity in the initial driver,
 .IR I_LINK (7)
 operations are not yet supported.
 .PP
-Normally the MX-MUX driver is not configured by user-supplied management
+Normally the CH-MUX driver is not configured by user-supplied management
 programs.  Instead, the
-.BR mxMIB (8)
+.BR chMIB (8)
 SNMP management agent is responsible for performing, maintaining and
 managing this configuration.  When the
-.BR mxMIB (8)
-SNMP management agent start up, it uses persistent configuration
-information to open device drivers providing MX Streams and links them
-beneath the MX-MUX multiplexing driver and performs minor device number
+.BR chMIB (8)
+SNMP management agent starts up, it uses persistent configuration
+information to open device drivers providing CH Streams and links them
+beneath the CH-MUX multiplexing driver and performs minor device number
 and global PPA and CLEI assignment.  The
-.BR mxMIB (8)
+.BR chMIB (8)
 SNMP management agent is also for reporting statistics, operational
 measurements, events and alarms in addition to maintaining the
 configuration.
@@ -206,21 +200,18 @@ configuration.
 .SH INTERFACE
 .PP
 The
-.B MX-MUX
+.B CH-MUX
 driver provides one interface at the lower multiplex: the
-.BR mxi (7)
-interface for time-division multiplexed channel groups (i.e. spans or
-VT).
+.BR chi (7)
+interface for syncrhonous communications channels.
 .PP
 The
-.B MX-MUX
-driver provides three interfaces at the upper multiplex: the
+.B CH-MUX
+driver provides two interfaces at the upper multiplex: the
 .BR chi (7)
-interface for single- and multi-rate channels, the
-.BR mxi (7)
-interface for time-division multiplexed channel groups (i.e. spans or
-VT); and a management control interface for controlling connection made
-across the matrix.
+interface for single- and multi-rate channels, and a management control
+interface for controlling connections made across the multiplexing
+driver.
 .\"
 .\"
 .SH ADDRESSES
@@ -228,40 +219,36 @@ across the matrix.
 Circuit addresses are 32-bit identifiers that are assigned to circuits
 or circuit groups.  Each circuit (upper or lower) has a unique
 identifier within the
-.B MX-MUX
+.BR CH-MUX
 driver.  One of the identifiers for a circuit within a circuit group can
 be used to identify the circuit group as a whole.  Flags are used in
 management primitives to indicate whether a particular identifier refers
 to a circuit or a circuit group.
 .PP
 Assignment of circuit identifiers, asside from requirements for
-uniqeness, are arbitrary.  For operation with ISUP, a good choice would
-be to assign some bit range of the identifier to be identical to the
-ISUP circuit identification code for the circuit and the remainder to
-uniquely identify one like ISUP CIC from another.
+uniqueness, are arbitrary.  For operation within ISUP, a good choice
+would be to assign some bit range of the identifier to be identical to
+the ISUP circuit identification code for the circuit and the remainder
+to uniquely identify one like ISUP CIC from another.
 .\"
 .\"
 .SH IOCTLS
 .PP
-All interfaces support a set of management IO controls using
+All interfaces support a set of management input-output controls using
 .BR ioctl (2)
 and
 .IR I_STR (7)
 input-output control commands to the
-.BR streamio (7)
+.BR sreamio (7)
 system calls on the
-.I mx_stream
-or
 .I ch_stream
 file descriptor.  These management controls are documented in
-.BR mx_ioctl (4)
-and
 .BR ch_ioctl (4).
 .\"
 .\"
 .SH NOTICES
 .PP
-Drivers providing MX Streams to this MX-MUX driver should also support
+Drivers providing CH Streams to this CH-MUX driver should also support
 pseudo-digital or digital cross-connect directly within the driver.
 Only when pseudo-digital cross-connect is needed between drivers should
 this matrix be used.
@@ -269,48 +256,42 @@ this matrix be used.
 .\"
 .SH FILES
 .PP
-.BR <ss7/mxi.h> ,
-.BR <ss7/mxi_ioctl.h> ,
-.BR <ss7/mx_ioctl.h> .
+.RB < ss7/chi.h >,
+.RB < ss7/chi_ioctl.h >,
+.RB < ss7/ch_ioctl.h >.
 .\"
 .\"
 .SH DEVICES
 .PP
 .TP
-.B /dev/streams/mx/mx
-The clone device for opening upper MX Style 2 Streams.
+.B /dev/streams/ch-mux/ch
+The clone device for opening upper CH Style 2 Streams.
 .TP
-.B /dev/streams/mx/ch
+.B /dev/streams/clone/ch-mux
 The clone device for opening upper CH Style 2 Streams.
 .\"
 .\"
 .SH BUGS
 .PP
 The
-.B MX-MUX
+.B CH-MUX
 driver has no known bugs.
 .\"
 .\"
-.SH SEE ALSO
+.SH "SEE ALSO"
 .PP
 .BR mxi (7),
 .BR chi (7),
-.BR CH-MUX (4).
+.BR mx-mux (4).
 .\"
 .\"
-.SH VERSIONS
+.SH VERSION
 .PP
 The
-.B MX-MUX
+.B CH-MUX
 interface is specific to the
 .B OpenSS7
 channel stack.  This is Version 1 of the interface.
-.PP
-MXI interfaces are consistent with MXI Revision 0.9.2,
-.[
-mxi revision 0.9.2
-.]
-.BR mxi (7).
 .PP
 CHI interfaces are consistent with CHI Revision 0.9.2,
 .[
@@ -319,7 +300,7 @@ chi revision 0.9.2
 .BR chi (7).
 .PP
 The
-.B MX-MUX
+.B CH-MUX
 driver does not appear until
 .B strchan
 release 0.9.2, but was previously part of commercial

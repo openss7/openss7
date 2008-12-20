@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-02 06:51:28 $
+ @(#) $RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-20 12:48:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-02 06:51:28 $ by $Author: brian $
+ Last Modified $Date: 2008-12-20 12:48:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: matrix.c,v $
+ Revision 0.9.2.3  2008-12-20 12:48:39  brian
+ - added manpages and mibs
+
  Revision 0.9.2.2  2008-12-02 06:51:28  brian
  - document CHI
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-02 06:51:28 $"
+#ident "@(#) $RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-20 12:48:39 $"
 
 static char const ident[] =
-    "$RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-02 06:51:28 $";
+    "$RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-20 12:48:39 $";
 
 /*
  * This is the MATRIX multiplexing driver.  Its purpose is to allow a single
@@ -157,7 +160,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MATRIX_DESCRIP		"MATRIX (MX) STREAMS MULTIPLEXING DRIVER."
-#define MATRIX_REVISION		"OpenSS7 $RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-02 06:51:28 $"
+#define MATRIX_REVISION		"OpenSS7 $RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-20 12:48:39 $"
 #define MATRIX_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define MATRIX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MATRIX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2352,6 +2355,13 @@ ch_w_optmgmt_req(struct ch *ch, queue_t *q, mblk_t *mp)
  * lower Stream using the PPA address or CLEI string and associates the upper Stream with the lower
  * Stream by linking the upper Stream into the lower Stream's private structure's list of upper
  * private structures.
+ *
+ * Note that the lower stream may be either a CH Stream or an MX Stream.  When it is a CH Stream the
+ * mapping of the upper to lower stream is trivial.  When it is an MX Stream, the PPA can specify
+ * either the entire MX Stream, a fractional MX Stream (by specifying the primary channel of a
+ * pre-configured fraction), or an individual channel (by specifying a specific channel).  When an
+ * individual channel is specified, the CH_CONNECT_REQ can still request connection to multiple
+ * channels for a multi-rate switched connection.
  */
 noinline fastcall int
 ch_w_attach_req(struct ch *ch, queue_t *q, mblk_t *mp)

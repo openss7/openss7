@@ -1,0 +1,556 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: matrix.4.man,v 0.9.2.1 2008-12-20 12:48:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-12-20 12:48:39 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: matrix.4.man,v $
+.\" Revision 0.9.2.1  2008-12-20 12:48:39  brian
+.\" - added manpages and mibs
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.TH MATRIX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B matrix
+\- Switching Matrix Multiplexing Driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/chi.h>
+.br
+.B #include <ss7/chi_ioctl.h>
+.br
+.B #include <ss7/mxi.h>
+.br
+.B #include <ss7/mxi_ioctl.h>
+.HP
+.BI "int " ch_stream " = open(" device ", " flags );
+.HP
+.BI "int " mx_stream " = open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B MATRIX
+is an implementation of a local channel and multiplex control as well a
+a pseudo-digital cross-connect and software switching matrix component
+of the OpenSS7 channel media stack.  It provides system centralized
+switching and local access to and control of devices conforming to the
+.BR mxi (7)
+and
+.BR chi (7)
+interfaces.
+.B MATRIX
+provides for the control of the software switching matrix and underlying
+interfaces and comunications facilities.  It provides pseudo-digital
+cross-connect as well as multiplex and invert multiplex switching
+services to its users and is effectively a virtual switching matrix,
+DCCS and channel bank.
+.PP
+.B MATRIX
+is implemented as a
+.IR STREAMS (4)
+multiplexing pseudo-device driver.
+.BR MX " and " CH
+Streams can be linked under the multiplexing driver using the
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+input-output control commands of
+.BR streamio (7).
+.B MX
+Streams can be configured using
+.BR mxi_ioctl (4)
+input-output control commands and
+.B CH
+Streams using
+.BR chi_ioctl (4)
+input-output control commands.
+.\"
+.SS "Upper Multiplex Service Interface"
+.PP
+.\"
+.SS "Lower Multiplex Service Interface"
+.PP
+The
+.B MATRIX
+driver supports driver Streams linked under the multiplexing driver that
+provide channelized access to device or pseudo-device drivers supporting
+the
+.IR "MX Interface (MXI)" ,
+.[
+mxi revision 0.9.2
+.]
+.BR mxi (7)
+raw multiplex interface or the
+.IR "CH Interface (CHI)" ,
+.[
+chi revision 0.9.2
+.]
+.BR chi (7)
+media channel interface.
+Each of these Streams linked beneath the
+.BR MATRIX
+driver represents communications channels to and from a device or
+pseudo-device driver.  Some may be read hardware device drivers and
+other may be virtual multiplexes or channel implemented as abstractions
+over ATM or IP.
+.PP
+Lower multiplex Streams are always
+.I Style 1
+or attached
+.I Style 2
+MX or CH Streams.  That is,
+.I Style 2
+Streams must be attached to a PPA before being linked beneath the
+.B MATRIX
+multiplexing driver.
+.\"
+.SS Configuration
+.PP
+The
+.B MATRIX
+driver is configured by opening
+.BR MX " or " CH
+Streams on a real or pseudo-device driver that provides the MXI or CHI
+interface and then linking these MX or CH Streams beneath the
+.B MATRIX
+multiplexing driver using the
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+input-output control commands provided by
+.BR streamio (7).
+Once linked, the MX or CH Streams are not immediately available to the
+.B MATRIX
+driver: they first must be configured using MX or CH input-output
+control management commands.  A management control command must be used
+to assign a
+.I Style 1
+minor device number to the lower Stream as well as a global PPA and
+CLEI.  They
+.I Style 1
+minor device number is used as a minor device number when opening the
+.B MATRIX
+driver using a non-clone minor device to obtain a
+.I Style 1
+MX or CH Stream.  The global PPA or CLEI can be used by a
+.I Style 1
+clone
+.B MATRIX
+driver device Stream to attach to the associated PPA.
+.PP
+Lower MX or CH Streams that are linked beneath the multiplexing driver
+using the
+.IR I_LINK (7)
+input-output control command can only be managed and connected to by
+control Streams that performed the
+.IR I_LINK (7)
+operation.  Lower MX or CH Streams that are linked beneath the
+multiplexing driver using the
+.IR I_PLINK (7)
+input-output control can be managed only by the single MX or CH
+management Stream.  Note that, to reduce complexity in the initial
+driver,
+.IR I_LINK (7)
+operations are not yet supported.
+.PP
+Normally the
+.B MATRIX
+driver is not configured by user-supplied management programs.  Instead,
+the
+.BR swMIB (8)
+SNMP management agent is responsible for performing, maintaining and
+managing this configuration.  When the
+.BR swMIB (8)
+SNMP management agent starts up, it uses persistent configuration
+information to open device drivers providing MX and CH Streams and links
+then beneath the
+.B MATRIX
+multiplexing driver and performs minor device number and global PPA and
+CLEI assignment.  The
+.BR swMIB (8)
+SNMP management agent is also for reporting statistics, operational
+measurements, events and alarms in addition to maintaining the
+configuration.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B MATRIX
+driver is the software switching matrix workhorse of the
+.B "@PACKAGE_TITLE@"
+package.  Both CHI and MXI Streams can be opened on the upper multiplex.
+Both CHI and MXI Streams can be linked on the lower multiplex.  Any
+channel of any Stream, whether upper or lower, can be connected through
+the multiplex to any other channel.
+.PP
+The
+.B MATRIX
+driver can perform simple isochronous conversion functions (e.g. mu-law
+to a-law), digital padding, echo cancellation,
+compression/decompression, minor rate adaption (e.g., 8-bit A-law into
+5-bit GSM), that do not cause flow control considerations as it peforms
+simple matrix operations.  Preestablished or canned tones and
+announcements can be supported by the driver.  Dynamic announcements
+need to be provided by an external module or in hardware.  Complex
+operations such as HDLC conversion need to be provided upstream or in
+hardware.
+.PP
+The
+.B MATRIX
+driver is intended to support single-rate and multi-rate channels;
+however, single-rate and multi-rate connections must match and no
+multi-rate conversion will be performed.  The purpose of the
+.B MATRIX
+driver is to perform simple circuit switching, pseudo-digital
+cross-connect and channel back operations, and do them very fast.
+.PP
+The
+.B MATRIX
+driver can be modelled as a hardware Time-Space-Time switch, hoewever,
+switching is performed primarily in software.  (When the driver connects
+two channels from the lower multiplex, the data path may be through
+hardware instead of software.)
+.PP
+The
+.B MATRIX
+driver, however, may be able to perform channel insertion and deletion
+from a span.  For example, an entire E1 or T1 span can be can be
+connected, channel for channel, to another E1 or T1 span.  The driver
+has the ability to remove or insert one or more channels on either side
+of the span connection.  The purpose of channel insertion and deletion
+is to pull signalling channels out of span, particularly for ISDN
+primary rate connections and SS7 signalling.
+.\"
+.\"
+.SH OPERATION
+.PP
+At boot time, or when a new span or circuit is brought into service, a
+management program opens a device or pseudo-device driver to obtain a
+Stream representing the new channel (CHI) or span (MXI) and links the
+Stream beneath the MATRIX multiplexing driver.  Input-output controls
+are then used to assign the channel or span (and timeslots within the
+span) to circuit identification numbers within the matrix.  These
+channel identification numbers and the mapping to specific hardware
+should be maintained in configuration files.
+.PP
+For example, when a T1 span is put into service on a V401p card, the
+management program opens a Stream on the V401P MX device that represents
+a T1 span, attaches the Stream to the T1 span, and then links the Stream
+beneath the
+.B MATRIX
+driver.  A configuration table is used to determine the circuit number
+assignments for the card and T1 span selected.  An input-output control
+is issued to the
+.B MATRIX
+driver with the multiplex index of the linked span, and the circuit
+number assignments for the span.  This input-output control also
+identifies other particulars about the span (number of channels, DS0 or
+DS0A, etc).  The
+.B MATRIX
+driver provides the ability for management programs to determine the
+lower multiplex identifier that is associated with any circuit or
+circuit group.  This allows the management program to perform an
+.IR I_PLINK (7)
+operation and close the Stream.  It can later discover the multiplex ID
+from the circuit assignment (contained in the configuration table) with
+an input-output control to the
+.B MATRIX
+driver, tso that it knows the multiplex ID to use to remove the circuit
+or span from service with an
+.IR I_PUNLINK (7)
+operation.
+.PP
+As another example, an Ephemeral connection manager process that is
+listening for Ephemeral connection requests on the connection management
+Stream of the
+.BR mg (4)
+driver, receives a request to establish an RTP Stream to a remote host.
+The Ephemeral connection manager opens a
+.BR rawip (4)
+device, and pushes the
+.BR rtp (4)
+module over the device.  The
+.BR rtp (4)
+module is set to convert the media Stream to that appropriate for the
+channel to which the Ephemeral connection will ultimately occur, and the
+Stream, which provides a CHI interface, is linked under the
+.B MATRIX
+driver.  It assigns a circuit identification number with an input-output
+control.  The Ephemeral connection manager then requests that the
+.B MATRIX
+driver connect the Ephemeral connection to a Gateway circuit (one that
+is already available for switching connection) through the matrix.
+.PP
+While CHI and MXI Streams on the lower multiplex are attached to their
+circuits or connections for the full time that they are linked, CHI and
+MXI Streams on the upper multiplex are not so.  When a user-level
+program opens a Stream on the upper multiplex, it remains unattached to
+any particular channel.  CHI or MIX primitives are used to connect the
+upper multiplex Stream to either a lower or another upper multiplex
+Stream.
+.PP
+Upper multiplex Streams provide the ability to terminate circuit
+connections within another
+.I STREAMS
+module or driver above the
+.B MATRIX
+driver.  For example, a number of CHI Streams can be opened on the upper
+multiplex and are identified by their device numbers and any assigned
+termination identifiers.  These Streams, which represent unconnected
+circuits, can then be linked under a tones or announcements dirver.
+When a switching process such as the
+.BR mg (4)
+driver wishes to provide a tone or announcement to a circuit or an
+ephemeral connection, it requests that the
+.B MATRIX
+driver connect the circuit or ephemeral connection to one on the upper
+multiplex that terminates at the tones and announcements driver.  By
+sending control messages to the tones and announcements driver, the
+.BR mg (4)
+driver can then play progress tones or announcements to the user at the
+other end of the locally terminated connection.
+.PP
+As a final example, CH Streams can be opened on the upper multiplex and
+connected to a media channel on the lower multiplex for the purpose of
+monitoring both the receive and transmit directions of communications on
+another connection.  This permits wiretapping applications.
+.\"
+.\"
+.SH INTERFACE
+.PP
+The
+.B MATRIX
+driver provides two interfaces at the lower multiplex: the
+.BR mxi (7)
+interface for time-division multiplexed channel groups (i.e. spans or
+VT), and the
+.BR chi (7)
+interface for discrete single- or multi-rate channels.
+.PP
+The
+.B MX-MUX
+driver provides four interfaces at the upper multiplex: the
+.BR chi (7)
+interface for single- and multi-rate channels, the
+.BR mxi (7)
+interface for time-division multiplexed channel groups (i.e. spans or
+VT); and two management control interfaces (one for CH and one for MX)
+for controlling lower multiplex Streams and connections made across the
+matrix.
+.\"
+.\"
+.SH ADDRESSES
+.PP
+Multiplex and circuit addresses are 32-bit identifiers that are assigned
+to circuits or circuit groups.  Each circuit (upper or lower) has a
+unique identifier within the
+.B MATRIX
+driver.  One of the identifiers for a circuit within a circuit group can
+be used to identify the circuit group as a whole.  Flags are used in
+management primitives to indicate whether a particular identifier refers
+to a circuit or a circuit group.
+.PP
+Assignment of circuit identifiers, asside from requirements for
+uniqueness, are arbitrary.  For operation with ISUP, a good choice would
+be to assign some bit range of the identifier to be identical to the
+ISUP circuit identification code for the circuit and the remainder to
+uniquely identify one otherwise identical ISUP CIC from another.
+.PP
+For PDH device and pseudo-device drivers, the following is recommended:
+the most significant component identifies the device driver; the next
+most significant component, the device (card); then next, the span; then
+next, the channel group; the least significant, the primary channel.
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management input-output controls using
+.BR ioctl (2)
+and
+.IR I_STR (7)
+input-output control commands to the
+.BR streamio (7)
+system calls on the
+.I ch_stream
+or
+.I mx_stream
+file descriptors.  These management controls are documented in
+.BR ch_ioctl (4)
+and
+.BR mx_ioctl (4).
+.\"
+.\"
+.SH NOTICES
+.PP
+Unlike other OpenSS7 protocol modules and drivers providing transport
+communications services,
+.B MATRIX
+does not provide a data communications protocol, per se, and therefore
+does not provide a
+.BR sockets (3)
+interface.  This is because the special needs of switch multiplex
+control are divorced from the sockets paradigm.  (On the other hand,
+they are quite compatable with the
+.IR STREAMS (4)
+framework.)
+.PP
+For performance reasons, SS7 and ISDN primary rate signalling channels
+were not passed through the software switch matrix.  This permitted
+signalling channels to be subject to a different set of flow control
+rules and priorities.  SS7 and ISDN primary rate signalling channels
+could be dropped and inserted into a channel group directly from the
+hardware driver (e.g., V401P driver).  However, the high performance of
+Linux Fast-STREAMS has permitted SS7 and ISDN signalling links to be
+passed through the switch matrix without performance penalty.
+.PP
+Drivers providing MX Streams to this MATRIX driver should also support
+pseudo-digital or digital cross-connect directly within the driver.
+Only when pseudo-digital cross-connect is needed between driver should
+this soft switching matrix be used.
+.\"
+.\"
+.SH FILES
+.PP
+.RB < ss7/chi.h >,
+.RB < ss7/chi_ioctl.h >,
+.RB < ss7/ch_ioctl.h >,
+.RB < ss7/mxi.h >,
+.RB < ss7/mxi_ioctl.h >,
+.RB < ss7/mx_ioctl.h >.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/streams/clone/ch
+The clone device for opening upper CH Style 2 Streams.
+.TP
+.B /dev/streams/ch/ch
+The non-clone device for opening upper CH management Streams.
+.TP
+.B /dev/streams/clone/mx
+The clone device for opening upper MX Style 2 Streams.
+.TP
+.B /dev/streams/mx/mx
+The non-clone device for opening upper MX management Streams.
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B MATRIX
+driver has no known bugs.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mxi (7),
+.BR chi (7),
+.BR ch (4),
+.BR ch-mux (4),
+.BR mx (4),
+.BR mx-mux (4).
+.\"
+.\"
+.SH VERSION
+.PP
+The
+.B MATRIX
+driver is specific to the
+.B OpenSS7
+channel stack.  This is Version 1 of the driver.
+.PP
+.B CHI
+interfaces are consistent with
+.IR "CHI Revision 0.9.2" ,
+.[
+chi revision 0.9.2
+.]
+.BR chi (7).
+.B MXI
+interfaces are consistent with
+.IR "MXI Revision 0.9.2" ,
+.[
+mxi revision 0.9.2
+.]
+.BR mxi (7).
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
