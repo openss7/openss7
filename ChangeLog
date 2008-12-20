@@ -1,3 +1,36 @@
+2008-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* netperf/netperf.refs: update references
+	* strnsl/doc/man/strnsl.refs: update references
+	* stratm/doc/man/stratm.refs: update references
+	* stratm/doc/drafts/idrefs: update references
+	* strcompat/doc/man/strcompat.refs: update references
+	* strxnet/doc/man/strxnet.refs: update references
+	* LiS/man/lis.refs: update references
+	* osr61/doc/man/osr61.refs: update references
+	* sigtran/doc/man/sigtran.refs: update references
+	* sigtran/doc/drafts/idrefs: update references
+	* strinet/doc/man/strinet.refs: update references
+	* sctp/doc/man/sctp.refs: update references
+	* strchan/doc/man/strchan.refs: update references
+	* strsock/doc/man/strsock.refs: update references
+	* strvoip/doc/man/strvoip.refs: update references
+	* strbcm/doc/man/strbcm.refs: update references
+	* iperf/doc/man/iperf.refs: update references
+	* strutil/doc/man/strutil.refs: update references
+	* openss7.refs: update references
+	* streams/doc/man/streams.refs: update references
+	* stacks/doc/man/strss7.refs: update references
+	* stacks/doc/drafts/idrefs: update references
+	* strtty/doc/man/strtty.refs: update references
+	* strx25/doc/man/strx25.refs: update references
+	* strx25/doc/drafts/idrefs: update references
+	* strisdn/doc/man/strisdn.refs: update references
+	* striso/doc/man/striso.refs: update references
+	* striso/doc/drafts/idrefs: update references
+	* strxns/doc/man/strxns.refs: update references
+	* strsctp/doc/man/strsctp.refs: update references
+
 2008-11-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.lsm.in: change repo directory
