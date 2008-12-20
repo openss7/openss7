@@ -1,3 +1,10 @@
+2008-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/qbufcall.9.man: update manual page
+	* doc/man/man9/qtimeout.9.man: update manual page
+	* doc/man/man9/qunbufcall.9.man: update manual page
+	* doc/man/man9/quntimeout.9.man: update manual page
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* strcompat.spec.in: new stratm package
