@@ -1,3 +1,19 @@
+2008-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/mibs/ATM-APS-MIB.mib: added mib files
+	* src/mibs/ATM-FORUM-AUTO-CONFIG.mib: added mib files
+	* src/mibs/ATM-FORUM-SNMP-M4-MIB.mib: added mib files
+	* src/mibs/ATM-SOFT-PVC-MIB.mib: added mib files
+	* src/mibs/ATM-SOFT-PVC-MIB.old.mib: added mib files
+	* src/mibs/ATM-TRACE-MIB.mib: added mib files
+	* src/mibs/ATMF-CES-MIB.mib: added mib files
+	* src/mibs/ATMF-CES.mib: added mib files
+	* src/mibs/IMA-MIB.mib: added mib files
+	* src/mibs/LAN-EMULATION-CLIENT-MIB.mib: added mib files
+	* src/mibs/MPOA-MIB.mib: added mib files
+	* src/mibs/PNNI-MIB.mib: added mib files
+	* src/mibs/PNNI-MOB-EXT-MIB.mib: added mib files
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: first good build
