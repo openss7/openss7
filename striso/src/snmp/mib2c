@@ -170,10 +170,10 @@ $varlen = $varLengths[$varlen];
 foreach $vtable (@table_list) {
     foreach $ptable (@processtable) {
 	$variables{$ptable}{'processed'} .= 
-	    (eval "\"$variables{$ptable}{'code'}\"") . "\n\n";
+	    (eval "\"$variables{$ptable}{'code'}\"") . "\n";
     }
     $var_routines .= 
-	(eval "\"$variables{'code-var_table'}{'code'}\"") . "\n\n";
+	(eval "\"$variables{'code-var_table'}{'code'}\"") . "\n";
 }
 
 #============================================
@@ -193,7 +193,7 @@ close(DOTH);
 #============================================
 
 open(DOTC,">$outputName.c");
-print DOTC (eval "\"$variables{'code-main-part'}{'code'}\"") . "\n\n";;
+print DOTC (eval "\"$variables{'code-main-part'}{'code'}\"") . "\n";;
 close(DOTC);
 
 #============================================

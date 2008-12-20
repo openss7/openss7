@@ -1,3 +1,5 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+
 DS1-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -149,30 +151,31 @@ dsx1ConfigEntry OBJECT-TYPE
     INDEX       { dsx1LineIndex }
     ::= { dsx1ConfigTable 1 }
 
-Dsx1ConfigEntry ::= SEQUENCE {
-    dsx1LineIndex                   InterfaceIndex,
-    dsx1IfIndex                     InterfaceIndex,
-    dsx1TimeElapsed                 Integer32,
-    dsx1ValidIntervals              Integer32,
-    dsx1LineType                    INTEGER,
-    dsx1LineCoding                  INTEGER,
-    dsx1SendCode                    INTEGER,
-    dsx1CircuitIdentifier           DisplayString,
-    dsx1LoopbackConfig              INTEGER,
-    dsx1LineStatus                  Integer32,
-    dsx1SignalMode                  INTEGER,
-    dsx1TransmitClockSource         INTEGER,
-    dsx1Fdl                         Integer32,
-    dsx1InvalidIntervals            Integer32,
-    dsx1LineLength                  Integer32,
-    dsx1LineStatusLastChange        TimeStamp,
-    dsx1LineStatusChangeTrapEnable  INTEGER,
-    dsx1LoopbackStatus              Integer32,
-    dsx1Ds1ChannelNumber            Integer32,
-    dsx1Channelization              INTEGER,
-    dsx1LineMode                    INTEGER,
-    dsx1LineBuildOut                INTEGER,
-    dsx1LineImpedance               INTEGER
+Dsx1ConfigEntry ::=
+    SEQUENCE {
+        dsx1LineIndex                   InterfaceIndex,
+        dsx1IfIndex                     InterfaceIndex,
+        dsx1TimeElapsed                 Integer32,
+        dsx1ValidIntervals              Integer32,
+        dsx1LineType                    INTEGER,
+        dsx1LineCoding                  INTEGER,
+        dsx1SendCode                    INTEGER,
+        dsx1CircuitIdentifier           DisplayString,
+        dsx1LoopbackConfig              INTEGER,
+        dsx1LineStatus                  Integer32,
+        dsx1SignalMode                  INTEGER,
+        dsx1TransmitClockSource         INTEGER,
+        dsx1Fdl                         Integer32,
+        dsx1InvalidIntervals            Integer32,
+        dsx1LineLength                  Integer32,
+        dsx1LineStatusLastChange        TimeStamp,
+        dsx1LineStatusChangeTrapEnable  INTEGER,
+        dsx1LoopbackStatus              Integer32,
+        dsx1Ds1ChannelNumber            Integer32,
+        dsx1Channelization              INTEGER,
+        dsx1LineMode                    INTEGER,
+        dsx1LineBuildOut                INTEGER,
+        dsx1LineImpedance               INTEGER
 }
 
 dsx1LineIndex OBJECT-TYPE
@@ -2732,3 +2735,5 @@ ds1NMibE1PriNCompliance MODULE-COMPLIANCE
     ::= { ds1Compliances 10 }
 
 END -- end of module DS1-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

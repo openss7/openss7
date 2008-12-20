@@ -9,7 +9,7 @@ END-INFO-DIR-ENTRY
 This file documents the OpenSS7 Signalling Connection Control Part Interface
 (SCCPI).
 
-This is Edition 0.9a, last updated 2008-11-17, for OpenSS7 SS7 Stack version
+This is Edition 0.9a, last updated 2008-12-17, for OpenSS7 SS7 Stack version
 0.9a release 8.20081103 published by OpenSS7 Corporation
 (http://www.openss7.com/).
 
@@ -4115,10 +4115,6 @@ File: sccpi.info,  Node: SCCPI Drivers and Modules,  Next: SCCPI Utilities,  Pre
 Appendix F SCCPI Drivers and Modules
 ************************************
 
-
-
-                   _Figure C-1.  SCCPI Drivers and Modules_
-
 
 File: sccpi.info,  Node: SCCPI Utilities,  Next: SCCPI File Formats,  Prev: SCCPI Drivers and Modules,  Up: Top
 
@@ -5654,23 +5650,22 @@ Node: Precedence Tables154767
 Node: SCCPI Header Files154936
 Node: SCCPI Library155104
 Node: SCCPI Drivers and Modules155268
-Ref: Figure C-1155455
-Node: SCCPI Utilities155515
-Node: SCCPI File Formats155686
-Node: SCCPI Compatibility and Porting155868
-Node: License156068
-Node: GNU Affero General Public License156273
-Node: GNU Free Documentation License193040
-Node: Glossary218024
-Node: Acronyms219168
-Node: References223012
-Ref: Q.700223121
-Ref: Q.701223373
-Ref: Q.702223670
-Ref: Q.703223922
-Ref: Q.704224169
-Ref: CDIAPI224440
-Ref: Q.771224594
-Node: Index224879
+Node: SCCPI Utilities155453
+Node: SCCPI File Formats155623
+Node: SCCPI Compatibility and Porting155805
+Node: License156005
+Node: GNU Affero General Public License156210
+Node: GNU Free Documentation License192977
+Node: Glossary217961
+Node: Acronyms219105
+Node: References222949
+Ref: Q.700223058
+Ref: Q.701223310
+Ref: Q.702223607
+Ref: Q.703223859
+Ref: Q.704224106
+Ref: CDIAPI224377
+Ref: Q.771224531
+Node: Index224816
 
 End Tag Table

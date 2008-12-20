@@ -181,9 +181,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/codeset.m4 \
 	$(top_srcdir)/m4/inet.m4 $(top_srcdir)/m4/sctp.m4 \
 	$(top_srcdir)/m4/chan.m4 $(top_srcdir)/m4/x25.m4 \
 	$(top_srcdir)/m4/iso.m4 $(top_srcdir)/m4/isdn.m4 \
-	$(top_srcdir)/m4/doxy.m4 $(top_srcdir)/m4/lib32.m4 \
-	$(top_srcdir)/m4/perl.m4 $(top_srcdir)/m4/snmp.m4 \
-	$(top_srcdir)/m4/agent.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/atm.m4 $(top_srcdir)/m4/doxy.m4 \
+	$(top_srcdir)/m4/lib32.m4 $(top_srcdir)/m4/perl.m4 \
+	$(top_srcdir)/m4/snmp.m4 $(top_srcdir)/m4/agent.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/scripts/mkinstalldirs
@@ -222,6 +223,16 @@ AP_CONFIG = @AP_CONFIG@
 AP_DISTRIBUTION = @AP_DISTRIBUTION@
 AP_SCRIPT = @AP_SCRIPT@
 AR = @AR@
+ATM_CPPFLAGS = @ATM_CPPFLAGS@
+ATM_LDADD = @ATM_LDADD@
+ATM_LDADD32 = @ATM_LDADD32@
+ATM_LDFLAGS = @ATM_LDFLAGS@
+ATM_LDFLAGS32 = @ATM_LDFLAGS32@
+ATM_MANPATH = @ATM_MANPATH@
+ATM_MODFLAGS = @ATM_MODFLAGS@
+ATM_MODMAP = @ATM_MODMAP@
+ATM_SYMVER = @ATM_SYMVER@
+ATM_VERSION = @ATM_VERSION@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOM4TE = @AUTOM4TE@
@@ -1006,8 +1017,7 @@ info_TEXINFOS = $(am__append_1)
 @DEVELOPMENT_TRUE@@PKG_BUILD_INDEP_TRUE@			  sccpi_fig6.fig \
 @DEVELOPMENT_TRUE@@PKG_BUILD_INDEP_TRUE@			  sccpi_fig7.fig \
 @DEVELOPMENT_TRUE@@PKG_BUILD_INDEP_TRUE@			  sccpi_fig8.fig \
-@DEVELOPMENT_TRUE@@PKG_BUILD_INDEP_TRUE@			  sccpi_fig9.fig \
-@DEVELOPMENT_TRUE@@PKG_BUILD_INDEP_TRUE@			  sccpi_figc1.fig
+@DEVELOPMENT_TRUE@@PKG_BUILD_INDEP_TRUE@			  sccpi_fig9.fig
 
 @DEVELOPMENT_TRUE@@PKG_BUILD_INDEP_TRUE@TBL_TBLS = \
 @DEVELOPMENT_TRUE@@PKG_BUILD_INDEP_TRUE@			  sccpi_tab01.tbl \

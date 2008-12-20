@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-TC.mib,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-10-11 04:34:39 $
+-- @(#) $RCSfile: OPENSS7-MTP-TC.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.8 $) $Date: 2008-12-20 12:55:44 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-10-11 04:34:39 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-20 12:55:44 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-TC.mib,v $
+-- Revision 0.9.2.8  2008-12-20 12:55:44  brian
+-- - add new mibs and agents
+--
 -- Revision 0.9.2.7  2008-10-11 04:34:39  brian
 -- - cleanup MIBs
 --
@@ -79,14 +82,12 @@ IMPORTS
 		FROM SMNPv2-SMI
 	TEXTUAL-CONVENTION
 		FROM SNMPv2-TC
-	openss7Q751
+	openss7, openss7Q, openss7Q704
 		FROM OPENSS7-SMI;
 
 mtpTC MODULE-IDENTITY
-	LAST-UPDATED
-		"200712022032Z"
-	ORGANIZATION
-		"OpenSS7 Corporation"
+	LAST-UPDATED "200812201153Z"
+	ORGANIZATION "OpenSS7 Corporation"
 	CONTACT-INFO
 		"Brian Bidulock
 		 OpenSS7 Corporation
@@ -99,7 +100,10 @@ mtpTC MODULE-IDENTITY
 		 E-mail: bidulock@openss7.org"
 	DESCRIPTION
 		"Textual conventions for MTP."
-	::= { openss7Q751 0 }
+	REVISION "200812201153Z"
+	DESCRIPTION
+		"Additional workup."
+	::= { openss7Q704 1 }
 
 MtpAvailabilityStatus ::= TEXTUAL-CONVENTION
 	STATUS		current
