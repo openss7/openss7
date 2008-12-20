@@ -1,4 +1,4 @@
---@@ GDMOCHECK $Revision: 0.9.2.4 $
+--@@ GDMOCHECK $Revision: 0.9.2.5 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
@@ -16,7 +16,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: T1.116.1D.gdmo,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/15 20:20:38 $
+--  @(#) $RCSfile: T1.116.1D.gdmo,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-20 12:40:32 $
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -61,7 +61,7 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/12/15 20:20:38 $ by $Author: brian $
+--  Last Modified $Date: 2008-12-20 12:40:32 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -366,7 +366,7 @@ signallingPointData MANAGED OBJECT CLASS
 					DEFINED AS
 						"This managed object class contains informations about signalling point. The 
 						preferred granularityPeriod are 5 or 30 minutes. All attributes are read-only 
-						and are referenced by an instance of ss7FirstandIntervalThresholdData managed 
+						and are referenced by an instance of ss7FirstAndIntervalThresholdData managed 
 						object class so does discardedMSUs attribute when it is used as a first and 
 						interval measurement.";;
 			ATTRIBUTES
@@ -1048,6 +1048,9 @@ REGISTERED AS { mtpNameBinding 30 };
 --  =============================================================================
 --  
 --  $Log: T1.116.1D.gdmo,v $
+--  Revision 0.9.2.5  2008-12-20 12:40:32  brian
+--  - updated gdmos
+--
 --  Revision 0.9.2.4  2007/12/15 20:20:38  brian
 --  - updates
 --
