@@ -1,3 +1,8 @@
+2008-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/perl/Q.751.1.gdmo: added Annex E stats
+	* src/perl/T1.116.1D.gdmo: spelling error
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* striso.spec.in: new stratm package
