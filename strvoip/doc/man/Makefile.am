@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 02:07:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-20 12:44:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 02:07:51 $ by $Author: brian $
+# Last Modified $Date: 2008-12-20 12:44:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,9 @@ MANS_UNUSED = \
 	man4/sipt.4 \
 	man4/sipt_ioctl.4 \
 	man4/VOIP.4 \
+	man4/tdm-ip.4 \
+	man4/iax.4 \
+	man4/vtoip.4 \
 	man7/bicci.7 \
 	man7/cci_bicc.7 \
 	man7/cci_h225.7 \
@@ -98,6 +101,9 @@ man_MANS = \
 	man4/sipt.4 \
 	man4/sipt_ioctl.4 \
 	man4/VOIP.4 \
+	man4/tdm-ip.4 \
+	man4/iax.4 \
+	man4/vtoip.4 \
 	man5/strvoip.5 \
 	man7/bicci.7 \
 	man7/cci_bicc.7 \
@@ -128,6 +134,9 @@ dist_noinst_MANS = \
 	man4/sipt.4.man \
 	man4/sipt_ioctl.4.man \
 	man4/VOIP.4.man \
+	man4/tdm-ip.4.man \
+	man4/iax.4.man \
+	man4/vtoip.4.man \
 	man5/strvoip.5.man \
 	man7/bicci.7.man \
 	man7/cci_bicc.7.man \
@@ -151,6 +160,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2008-12-20 12:44:35  brian
+# - added manpages
+#
 # Revision 0.9.2.6  2008-04-29 02:07:51  brian
 # - updated headers for release
 #
