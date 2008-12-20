@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2008-12-16 08:34:19 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2008-12-20 13:00:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-16 08:34:19 $ by $Author: brian $
+ Last Modified $Date: 2008-12-20 13:00:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.176  2008-12-20 13:00:01  brian
+ - working changes
+
  Revision 0.9.2.175  2008-12-16 08:34:19  brian
  - document and fix BUG #026
 
@@ -210,10 +213,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2008-12-16 08:34:19 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2008-12-20 13:00:01 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2008-12-16 08:34:19 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2008-12-20 13:00:01 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1866,7 +1869,7 @@ event_alloc(int type, queue_t *q)
 
 				/* ensure that id is not reused */
 				for (se2 = event_hash[event_id & EVENT_HASH_MASK];
-				     se2 && se2->se_id != event_id; se2 = se2->se_next) ;
+				     se2 && se2->se_id != event_id; se2 = se2->se_prev) ;
 				if (se2 == NULL)
 					break;
 				event_id += 2;	/* stay odd so no zero check on wrap */
@@ -1906,13 +1909,13 @@ event_free(struct strevent *se)
 STATIC struct strevent *
 find_event(int event_id)
 {
-	struct strevent **sep;
+	struct strevent **sep, *se;
 
 	for (sep = &event_hash[event_id & EVENT_HASH_MASK];
 	     *sep && (*sep)->se_id != event_id; sep = &(*sep)->se_prev) ;
-	if (*sep)
-		*sep = XCHG(&(*sep)->se_prev, NULL);
-	return (*sep);
+	if ((se = *sep))
+		*sep = XCHG(&se->se_prev, NULL);
+	return (se);
 }
 
 /**
@@ -1921,11 +1924,7 @@ find_event(int event_id)
 streams_fastcall struct strevent *
 sealloc(void)
 {
-	struct strevent *se;
-
-	if ((se = event_alloc(SE_STREAM, NULL)))
-		se->se_id = 0;
-	return (se);
+	return event_alloc(SE_STREAM, NULL);
 }
 
 EXPORT_SYMBOL_GPL(sealloc);	/* include/sys/streams/strsubr.h */

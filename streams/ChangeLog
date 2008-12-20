@@ -1,3 +1,9 @@
+2008-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: sync
+	* src/kernel/strsched.c: more fixes
+	* src/perl/mibbrowser: change loaded mib list
+
 2008-12-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: document BUG #026
