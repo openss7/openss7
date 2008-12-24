@@ -1,10 +1,10 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Sep 12 07:07:40 MDT 2007
+--@@ Date: Tue Dec 23 23:50:53 MST 2008
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "M.3100.gdmo" >--
@@ -20,9 +20,9 @@ MODULE "ITU-T Rec. Q.824.1 (1995)"
 
 bChannel MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :accessChannel;
+		"ITU-T Rec. Q.824.0":accessChannel;
 	CHARACTERIZED BY
-		"CCITT Rec. M.3100" :channelNumberPackage,
+		"CCITT Rec. M.3100":channelNumberPackage,
 		bChannelPkg PACKAGE
 			BEHAVIOUR
 				bChannelBhv BEHAVIOUR
@@ -35,7 +35,7 @@ REGISTERED AS { cAISDNObjectClass 1 };
 
 dChannel MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :accessChannel;
+		"ITU-T Rec. Q.824.0":accessChannel;
 	CHARACTERIZED BY
 		dChannelPkg PACKAGE
 			BEHAVIOUR
@@ -50,7 +50,7 @@ REGISTERED AS { cAISDNObjectClass 2 };
 
 accessPortISDNBasicRate MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :accessPort;
+		"ITU-T Rec. Q.824.0":accessPort;
 	CHARACTERIZED BY
 		accessPortISDNBasicRatePkg PACKAGE
 			BEHAVIOUR
@@ -64,7 +64,7 @@ REGISTERED AS { cAISDNObjectClass 3 };
 
 accessPortISDNPrimaryRate MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :accessPort;
+		"ITU-T Rec. Q.824.0":accessPort;
 	CHARACTERIZED BY
 		accessPortISDNPrimaryRatePkg PACKAGE
 			BEHAVIOUR
@@ -79,7 +79,7 @@ REGISTERED AS { cAISDNObjectClass 4 };
 
 accessPortProfileISDN MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :accessPortProfile;
+		"ITU-T Rec. Q.824.0":accessPortProfile;
 	CHARACTERIZED BY
 		accessPortProfileISDNPkg PACKAGE
 			BEHAVIOUR
@@ -181,7 +181,7 @@ accessPortProfileISDNPrimaryRate MANAGED OBJECT CLASS
 
 callingNumberScreening MANAGED OBJECT CLASS
 	DERIVED FROM
-		"CCITT Rec. X.721(1992)" :top;
+		"CCITT Rec. X.721(1992)":top;
 	CHARACTERIZED BY
 		callingNumberScreeningPkg PACKAGE
 			BEHAVIOUR
@@ -285,16 +285,16 @@ callingNumberScreening MANAGED OBJECT CLASS
 					GET-REPLACE,
 				callingPartyDefaultDirectoryNNumber GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721 | ISO/IEC 10165-2" :attributeValueChange,
-				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectCreation,
-				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectDeletion;;;
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion;;;
 REGISTERED AS { cAISDNObjectClass 8 };
 -- 3.3.5 Network User Identification
 
 
 x25NetworkUserIdentification MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :optionalUserFacilities;
+		"ITU-T Rec. Q.824.0":optionalUserFacilities;
 	CHARACTERIZED BY
 		x25NetworkUserIdentificationPkg PACKAGE
 			BEHAVIOUR
@@ -320,9 +320,9 @@ x25NetworkUserIdentification MANAGED OBJECT CLASS
 					DEFAULT VALUE CAOptionalUserFacilitiesModule.false
 					GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992" :attributeValueChange,
-				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992" :objectCreation,
-				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992" :objectDeletion;;;
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectDeletion;;;
 REGISTERED AS { cAISDNObjectClass 9 };
 -- 3.4 Layer Entities
 -- 3.4.1 Layer Entity LAPB
@@ -333,7 +333,7 @@ REGISTERED AS { cAISDNObjectClass 9 };
 
 layerEntityLAPB MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :layerEntity;
+		"ITU-T Rec. Q.824.0":layerEntity;
 	CHARACTERIZED BY
 		layerEntityLAPBPkg PACKAGE
 			BEHAVIOUR
@@ -346,7 +346,7 @@ layerEntityLAPB MANAGED OBJECT CLASS
 						bearerServiceForPacketSwitchedDataobject class by pointers to instances of this 
 						object class.";;
 			ATTRIBUTES
-				"ITU-T Rec. X.282" :sequenceModulus GET-REPLACE;;;
+				"ITU-T Rec. X.282":sequenceModulus GET-REPLACE;;;
 	CONDITIONAL PACKAGES
 		x25DCETimersPkg
 			PRESENT IF
@@ -357,7 +357,7 @@ REGISTERED AS { cAISDNObjectClass 10 };
 
 layerEntityLAPD MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :layerEntity;
+		"ITU-T Rec. Q.824.0":layerEntity;
 	CHARACTERIZED BY
 		layerEntityLAPDPkg PACKAGE
 			BEHAVIOUR
@@ -384,7 +384,7 @@ REGISTERED AS { cAISDNObjectClass 11 };
 
 layerEntityX25PLP MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :layerEntity;
+		"ITU-T Rec. Q.824.0":layerEntity;
 	CHARACTERIZED BY
 		layerEntityX25PLPPkg PACKAGE
 			BEHAVIOUR
@@ -419,19 +419,19 @@ layerEntityX25PLP MANAGED OBJECT CLASS
 				outgoingDefaultThruputClass REPLACE-WITH-DEFAULT
 					DEFAULT VALUE CAISDNModule.baud9600
 					GET-REPLACE,
-				"ITU-T Rec. X.283" :onlineFacilityRegistration GET-REPLACE,
-				"ITU-T Rec. X.283" :extendedPacketSequencing GET-REPLACE,
-				"ITU-T Rec. X.283" :dBitModification GET-REPLACE,
-				"ITU-T Rec. X.283" :packetRetransmission GET-REPLACE,
-				"ITU-T Rec. X.283" :nonStandardDefaultPacketSizes GET-REPLACE,
-				"ITU-T Rec. X.283" :nonStandardDefaultWindowSizes GET-REPLACE,
-				"ITU-T Rec. X.283" :flowControlParameterNegotiation REPLACE-WITH-DEFAULT
+				"ITU-T Rec. X.283":onlineFacilityRegistration GET-REPLACE,
+				"ITU-T Rec. X.283":extendedPacketSequencing GET-REPLACE,
+				"ITU-T Rec. X.283":dBitModification GET-REPLACE,
+				"ITU-T Rec. X.283":packetRetransmission GET-REPLACE,
+				"ITU-T Rec. X.283":nonStandardDefaultPacketSizes GET-REPLACE,
+				"ITU-T Rec. X.283":nonStandardDefaultWindowSizes GET-REPLACE,
+				"ITU-T Rec. X.283":flowControlParameterNegotiation REPLACE-WITH-DEFAULT
 					DEFAULT VALUE CAISDNModule.false
 					GET-REPLACE,
-				"ITU-T Rec. X.283" :throughputClassNegotiation REPLACE-WITH-DEFAULT
+				"ITU-T Rec. X.283":throughputClassNegotiation REPLACE-WITH-DEFAULT
 					DEFAULT VALUE CAISDNModule.false
 					GET-REPLACE,
-				"ITU-T Rec. X.283" :fastSelectAcceptance REPLACE-WITH-DEFAULT
+				"ITU-T Rec. X.283":fastSelectAcceptance REPLACE-WITH-DEFAULT
 					DEFAULT VALUE CAISDNModule.false
 					GET-REPLACE;;;
 	CONDITIONAL PACKAGES
@@ -447,7 +447,7 @@ REGISTERED AS { cAISDNObjectClass 12 };
 
 layerEntityX25PLPShared MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :layerEntity;
+		"ITU-T Rec. Q.824.0":layerEntity;
 	CHARACTERIZED BY
 		layerEntityX25PLPSharedPkg PACKAGE
 			BEHAVIOUR
@@ -482,19 +482,19 @@ layerEntityX25PLPShared MANAGED OBJECT CLASS
 				outgoingDefaultThruputClass REPLACE-WITH-DEFAULT
 					DEFAULT VALUE CAISDNModule.baud9600
 					GET-REPLACE,
-				"ITU-T Rec. X.283" :onlineFacilityRegistration GET-REPLACE,
-				"ITU-T Rec. X.283" :extendedPacketSequencing GET-REPLACE,
-				"ITU-T Rec. X.283" :dBitModification GET-REPLACE,
-				"ITU-T Rec. X.283" :packetRetransmission GET-REPLACE,
-				"ITU-T Rec. X.283" :nonStandardDefaultPacketSizes GET-REPLACE,
-				"ITU-T Rec. X.283" :nonStandardDefaultWindowSizes GET-REPLACE,
-				"ITU-T Rec. X.283" :flowControlParameterNegotiation REPLACE-WITH-DEFAULT
+				"ITU-T Rec. X.283":onlineFacilityRegistration GET-REPLACE,
+				"ITU-T Rec. X.283":extendedPacketSequencing GET-REPLACE,
+				"ITU-T Rec. X.283":dBitModification GET-REPLACE,
+				"ITU-T Rec. X.283":packetRetransmission GET-REPLACE,
+				"ITU-T Rec. X.283":nonStandardDefaultPacketSizes GET-REPLACE,
+				"ITU-T Rec. X.283":nonStandardDefaultWindowSizes GET-REPLACE,
+				"ITU-T Rec. X.283":flowControlParameterNegotiation REPLACE-WITH-DEFAULT
 					DEFAULT VALUE CAISDNModule.false
 					GET-REPLACE,
-				"ITU-T Rec. X.283" :throughputClassNegotiation REPLACE-WITH-DEFAULT
+				"ITU-T Rec. X.283":throughputClassNegotiation REPLACE-WITH-DEFAULT
 					DEFAULT VALUE CAISDNModule.false
 					GET-REPLACE,
-				"ITU-T Rec. X.283" :fastSelectAcceptance REPLACE-WITH-DEFAULT
+				"ITU-T Rec. X.283":fastSelectAcceptance REPLACE-WITH-DEFAULT
 					DEFAULT VALUE CAISDNModule.false
 					GET-REPLACE;;;
 	CONDITIONAL PACKAGES
@@ -511,7 +511,7 @@ REGISTERED AS { cAISDNObjectClass 13 };
 
 cataloguedAccessPortISDNPrimaryRate MANAGED OBJECT CLASS
 	DERIVED FROM
-		"CCITT Rec. X.721(1992)" :top;
+		"CCITT Rec. X.721(1992)":top;
 	CHARACTERIZED BY
 		cataloguedAccessPortISDNPrimaryRatePkg PACKAGE
 			BEHAVIOUR
@@ -523,16 +523,16 @@ cataloguedAccessPortISDNPrimaryRate MANAGED OBJECT CLASS
 				cataloguedAccessPortISDNPrimaryRateId GET SET-BY-CREATE,
 				bitRateOfPrimaryRateInterface GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721" :objectCreation,
-				"CCITT Rec. X.721" :objectDeletion,
-				"CCITT Rec. X.721" :attributeValueChange;;;
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
 REGISTERED AS { cAISDNObjectClass 14 };
 -- 4.2 Catalogued Access Port Profile ISDN
 
 
 cataloguedAccessPortProfileISDN MANAGED OBJECT CLASS
 	DERIVED FROM
-		"CCITT Rec. X.721(1992)" :top;
+		"CCITT Rec. X.721(1992)":top;
 	CHARACTERIZED BY
 		cataloguedAccessPortProfileISDNPkg PACKAGE
 			BEHAVIOUR
@@ -545,9 +545,9 @@ cataloguedAccessPortProfileISDN MANAGED OBJECT CLASS
 				cataloguedAccessPortProfileISDNId GET SET-BY-CREATE,
 				channelSelection GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721" :objectCreation,
-				"CCITT Rec. X.721" :objectDeletion,
-				"CCITT Rec. X.721" :attributeValueChange;;;
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
 REGISTERED AS { cAISDNObjectClass 15 };
 -- 4.3 Catalogued Access Port Profile ISDN Basic Rate
 
@@ -565,16 +565,16 @@ cataloguedAccessPortProfileISDNBasicRate MANAGED OBJECT CLASS
 			ATTRIBUTES
 				numberOfDChannelLinks GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721" :objectCreation,
-				"CCITT Rec. X.721" :objectDeletion,
-				"CCITT Rec. X.721" :attributeValueChange;;;
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
 REGISTERED AS { cAISDNObjectClass 16 };
 -- 4.4 Catalogued Layer Entity DSS 1
 
 
 cataloguedLayerEntityDSS1 MANAGED OBJECT CLASS
 	DERIVED FROM
-		"CCITT Rec. X.721" :top;
+		"CCITT Rec. X.721":top;
 	CHARACTERIZED BY
 		cataloguedLayerEntityDSS1Pkg PACKAGE
 			BEHAVIOUR
@@ -602,16 +602,16 @@ cataloguedLayerEntityDSS1 MANAGED OBJECT CLASS
 				dChannelT322 GET-REPLACE,
 				dChannelT330 GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721" :objectCreation,
-				"CCITT Rec. X.721" :objectDeletion,
-				"CCITT Rec. X.721" :attributeValueChange;;;
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
 REGISTERED AS { cAISDNObjectClass 17 };
 -- 4.5 Catalogued Layer Entity LAPD
 
 
 cataloguedLayerEntityLAPD MANAGED OBJECT CLASS
 	DERIVED FROM
-		"CCITT Rec. X.721(1992)" :top;
+		"CCITT Rec. X.721(1992)":top;
 	CHARACTERIZED BY
 		cataloguedLayerEntityLAPDPkg PACKAGE
 			BEHAVIOUR
@@ -629,9 +629,9 @@ cataloguedLayerEntityLAPD MANAGED OBJECT CLASS
 				maxBitsPerInformationFrame GET-REPLACE,
 				maxTransmissionAttempts GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721" :objectCreation,
-				"CCITT Rec. X.721" :objectDeletion,
-				"CCITT Rec. X.721" :attributeValueChange;;;
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
 REGISTERED AS { cAISDNObjectClass 18 };
 -- 5 ISDN Terminal Object Classes
 -- 5.1 Terminal Configuration
@@ -639,7 +639,7 @@ REGISTERED AS { cAISDNObjectClass 18 };
 
 terminalConfiguration MANAGED OBJECT CLASS
 	DERIVED FROM
-		"CCITT Rec. X.721" :top;
+		"CCITT Rec. X.721":top;
 	CHARACTERIZED BY
 		terminalConfigurationPkg PACKAGE
 			BEHAVIOUR
@@ -662,16 +662,16 @@ terminalConfiguration MANAGED OBJECT CLASS
 				featureIndicatorsPerStopHunt GET-REPLACE,
 				featureIndicatorsPerHuntMakeBusy GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721 | ISO/IEC 10165-2 " :attributeValueChange,
-				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectCreation,
-				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectDeletion;;;
+				"CCITT Rec. X.721 | ISO/IEC 10165-2 ":attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion;;;
 REGISTERED AS { cAISDNObjectClass 19 };
 -- 5.2 Terminal Service Profile
 
 
 terminalServiceProfile MANAGED OBJECT CLASS
 	DERIVED FROM
-		"CCITT Rec. X.721(1992)" :top;
+		"CCITT Rec. X.721(1992)":top;
 	CHARACTERIZED BY
 		terminalServiceProfilePkg PACKAGE
 			BEHAVIOUR
@@ -694,7 +694,7 @@ terminalServiceProfile MANAGED OBJECT CLASS
 						use.";;
 			ATTRIBUTES
 				terminalServiceProfileId GET SET-BY-CREATE,
-				"Q.824.0" :accessPortProfilePtr GET-REPLACE,
+				"Q.824.0":accessPortProfilePtr GET-REPLACE,
 				directoryNumberAppearanceIdentifierList GET-REPLACE ADD-REMOVE,
 				directoryNumberReference GET-REPLACE,
 				numberOfBChannels REPLACE-WITH-DEFAULT
@@ -706,9 +706,9 @@ terminalServiceProfile MANAGED OBJECT CLASS
 					GET-REPLACE,
 				tspid GET-REPLACE;
 			NOTIFICATIONS
-				"CCITT Rec. X.721 | ISO/IEC 10165-2" :attributeValueChange,
-				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectCreation,
-				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectDeletion;;;
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion;;;
 REGISTERED AS { cAISDNObjectClass 20 };
 -- 6 Bearer Service Object Classes
 -- 6.1 Bearer Services
@@ -717,7 +717,7 @@ REGISTERED AS { cAISDNObjectClass 20 };
 
 bearerServiceFor384kbpsData MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. 824.0" :bearerService;
+		"ITU-T Rec. 824.0":bearerService;
 	CHARACTERIZED BY
 		bearerServiceFor384kbpsDataPkg PACKAGE
 			BEHAVIOUR
@@ -752,7 +752,7 @@ REGISTERED AS { cAISDNObjectClass 21 };
 
 bearerServiceFor1536kbpsData MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. 824.0" :bearerService;
+		"ITU-T Rec. 824.0":bearerService;
 	CHARACTERIZED BY
 		bearerServiceFor1536kbpsDataPkg PACKAGE
 			BEHAVIOUR
@@ -789,7 +789,7 @@ REGISTERED AS { cAISDNObjectClass 22 };
 
 bearerServiceFor1920kbpsData MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. 824.0" :bearerService;
+		"ITU-T Rec. 824.0":bearerService;
 	CHARACTERIZED BY
 		bearerServiceFor1920kbpsDataPkg PACKAGE
 			BEHAVIOUR
@@ -811,7 +811,7 @@ REGISTERED AS { cAISDNObjectClass 23 };
 
 bearerServiceForMuliple-RateData MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. 824.0" :bearerService;
+		"ITU-T Rec. 824.0":bearerService;
 	CHARACTERIZED BY
 		bearerServiceForMultipleRateDataPkg PACKAGE
 			BEHAVIOUR
@@ -840,7 +840,7 @@ REGISTERED AS { cAISDNObjectClass 24 };
 
 circuit3D1kHz MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :bearerService;
+		"ITU-T Rec. Q.824.0":bearerService;
 	CHARACTERIZED BY
 		circuit3D1kHzPkg PACKAGE
 			BEHAVIOUR
@@ -927,7 +927,7 @@ REGISTERED AS { cAISDNObjectClass 27 };
 
 circuitMultiUse MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :bearerService;
+		"ITU-T Rec. Q.824.0":bearerService;
 	CHARACTERIZED BY
 		circuitMultiUsePkg PACKAGE
 			BEHAVIOUR
@@ -951,7 +951,7 @@ REGISTERED AS { cAISDNObjectClass 28 };
 
 circuitUnrestrictedDigitalDataRateAdaptedFrom56kbit/s MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. 824.0" :bearerService;
+		"ITU-T Rec. 824.0":bearerService;
 	CHARACTERIZED BY
 		circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPkg PACKAGE
 			BEHAVIOUR
@@ -971,7 +971,7 @@ REGISTERED AS { cAISDNObjectClass 29 };
 
 circuitSpeech MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :bearerService;
+		"ITU-T Rec. Q.824.0":bearerService;
 	CHARACTERIZED BY
 		circuitSpeechPkg PACKAGE
 			BEHAVIOUR
@@ -999,7 +999,7 @@ REGISTERED AS { cAISDNObjectClass 30 };
 
 circuitUnrestrictedDigitalData MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :bearerService;
+		"ITU-T Rec. Q.824.0":bearerService;
 	CHARACTERIZED BY
 		circuitUnrestrictedDigitalDataPkg PACKAGE
 			BEHAVIOUR
@@ -1020,7 +1020,7 @@ REGISTERED AS { cAISDNObjectClass 31 };
 
 packet MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :bearerService;
+		"ITU-T Rec. Q.824.0":bearerService;
 	CHARACTERIZED BY
 		packetPkg PACKAGE
 			BEHAVIOUR
@@ -1074,7 +1074,7 @@ REGISTERED AS { cAISDNObjectClass 34 };
 
 serviceManagerISDN MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :serviceManager;
+		"ITU-T Rec. Q.824.0":serviceManager;
 	CHARACTERIZED BY
 		serviceManagerISDNPkg PACKAGE
 			BEHAVIOUR
@@ -1104,7 +1104,7 @@ REGISTERED AS { cAISDNObjectClass 35 };
 
 serviceManagerRetrieveService MANAGED OBJECT CLASS
 	DERIVED FROM
-		"ITU-T Rec. Q.824.0" :serviceManager;
+		"ITU-T Rec. Q.824.0":serviceManager;
 	CHARACTERIZED BY
 		serviceManagerRetrieveServicePkg PACKAGE
 			BEHAVIOUR
@@ -1392,13 +1392,13 @@ REGISTERED AS { cAISDNPackage 24 };
 
 x25DCETimersPkg PACKAGE
 	ATTRIBUTES
-		"ITU-T Rec. X.282" :t1Timer GET-REPLACE,
-		"ITU-T Rec. X.282" :t2Timer GET-REPLACE,
-		"ITU-T Rec. X.282" :t3Timer GET-REPLACE,
-		"ITU-T Rec. X.282" :t4Timer GET-REPLACE,
-		"ITU-T Rec. X.282" :n1 GET-REPLACE,
-		"ITU-T Rec. X.282" :n2 GET-REPLACE,
-		"ITU-T Rec. X.282" :k GET-REPLACE;
+		"ITU-T Rec. X.282":t1Timer GET-REPLACE,
+		"ITU-T Rec. X.282":t2Timer GET-REPLACE,
+		"ITU-T Rec. X.282":t3Timer GET-REPLACE,
+		"ITU-T Rec. X.282":t4Timer GET-REPLACE,
+		"ITU-T Rec. X.282":n1 GET-REPLACE,
+		"ITU-T Rec. X.282":n2 GET-REPLACE,
+		"ITU-T Rec. X.282":k GET-REPLACE;
 REGISTERED AS { cAISDNPackage 25 };
 -- 9 Attribute templates
 -- This clause contains the ASN.1 definitions for all attributes in the described object classes. These definitions identify the
@@ -2761,7 +2761,7 @@ REGISTERED AS { cAISDNParameter 1 };
 cataloguedAccessPortISDN-managedElement NAME BINDING
 	SUBORDINATE OBJECT CLASS cataloguedAccessPortISDN AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100" :managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cataloguedAccessPortISDNId;
 	CREATE;
@@ -2785,7 +2785,7 @@ REGISTERED AS { cAISDNNameBinding 4 };
 cataloguedAccessPortProfileISDN-managedElement NAME BINDING
 	SUBORDINATE OBJECT CLASS cataloguedAccessPortProfileISDN AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)" :managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cataloguedAccessPortProfileISDNId;
 	CREATE;
@@ -2797,7 +2797,7 @@ REGISTERED AS { cAISDNNameBinding 5 };
 cataloguedLayerEntityLAPD-managedElement NAME BINDING
 	SUBORDINATE OBJECT CLASS cataloguedLayerEntityLAPD AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)" :managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cataloguedLayerEntityLAPDId;
 	CREATE;
@@ -2809,7 +2809,7 @@ REGISTERED AS { cAISDNNameBinding 6 };
 cataloguedLayerEntityDSS1-managedElement NAME BINDING
 	SUBORDINATE OBJECT CLASS cataloguedLayerEntityDSS1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100" :managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cataloguedLayerEntityDSS1Id;
 	CREATE;
@@ -2821,7 +2821,7 @@ REGISTERED AS { cAISDNNameBinding 7 };
 terminalConfiguration-managedElement NAME BINDING
 	SUBORDINATE OBJECT CLASS terminalConfiguration AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)" :managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		terminalConfigurationId;
 	CREATE;
@@ -2833,7 +2833,7 @@ REGISTERED AS { cAISDNNameBinding 11 };
 terminalServiceProfile-managedElement NAME BINDING
 	SUBORDINATE OBJECT CLASS terminalServiceProfile AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)" :managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		terminalServiceProfileId;
 	CREATE;
@@ -2847,7 +2847,7 @@ x25NetworkUserIdentification-accessPortProfileISDN NAME BINDING
 	NAMED BY
 	SUPERIOR OBJECT CLASS accessPortProfileISDN AND SUBCLASSES;
 	WITH ATTRIBUTE
-		"ITU-T Rec. Q.824.0" :optionalUserFacilitiesId;
+		"ITU-T Rec. Q.824.0":optionalUserFacilitiesId;
 	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT;
 	DELETE DELETES-CONTAINED-OBJECTS;
 REGISTERED AS { cAISDNNameBinding 13 };
@@ -3186,19 +3186,14 @@ retrieveService ACTION
 	WITH INFORMATION SYNTAX CAISDNModule.RetrieveCustomerServiceRequest;
 	WITH REPLY SYNTAX CAISDNModule.RetrieveCustomerServiceReply;
 REGISTERED AS { cAISDNAction 8 };
+
 END
 --< GDMO.EndDocument "ITU-T Rec. Q.824.1 (1995)" >--
 --@@ 
 --@@ end of gdmos
 --@@ 
 --@@
---@@ These modules reference "CCITT Rec. M.3100" 3 times.
---@@ These modules reference "CCITT Rec. M.3100(1992)" 4 times.
---@@ These modules reference "CCITT Rec. X.721" 17 times.
---@@ These modules reference "CCITT Rec. X.721 | ISO/IEC 10165-2" 8 times.
 --@@ These modules reference "CCITT Rec. X.721 | ISO/IEC 10165-2 " 1 times.
---@@ These modules reference "CCITT Rec. X.721 | ISO/IEC 10165-2:1992" 3 times.
---@@ These modules reference "CCITT Rec. X.721(1992)" 5 times.
 --@@ These modules reference "ITU-T Rec. 824.0" 5 times.
 --@@ These modules reference "ITU-T Rec. Q.824.0" 18 times.
 --@@ These modules reference "ITU-T Rec. X.282" 8 times.
@@ -3206,311 +3201,1033 @@ END
 --@@ These modules reference "Q.824.0" 1 times.
 --@@
 --@@
---@@ These modules reference MANAGED OBJECT CLASS accessChannel in module "ITU-T Rec. Q.824.0".
---@@ These modules reference MANAGED OBJECT CLASS accessPort in module "ITU-T Rec. Q.824.0".
---@@ These modules reference MANAGED OBJECT CLASS accessPortProfile in module "ITU-T Rec. Q.824.0".
---@@ These modules reference MANAGED OBJECT CLASS bearerService in module "ITU-T Rec. 824.0".
---@@ These modules reference MANAGED OBJECT CLASS bearerService in module "ITU-T Rec. Q.824.0".
---@@ These modules reference MANAGED OBJECT CLASS layerEntity in module "ITU-T Rec. Q.824.0".
---@@ These modules reference MANAGED OBJECT CLASS managedElement in module "CCITT Rec. M.3100".
---@@ These modules reference MANAGED OBJECT CLASS managedElement in module "CCITT Rec. M.3100(1992)".
---@@ These modules reference MANAGED OBJECT CLASS optionalUserFacilities in module "ITU-T Rec. Q.824.0".
---@@ These modules reference MANAGED OBJECT CLASS serviceManager in module "ITU-T Rec. Q.824.0".
---@@ These modules reference MANAGED OBJECT CLASS top in module "CCITT Rec. X.721".
---@@ These modules reference MANAGED OBJECT CLASS top in module "CCITT Rec. X.721(1992)".
+--@@ These modules define " CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define " ITU-T X.721|ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec X.721 | ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. 721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. 721 | ISO/IEC10162:1992"
+--@@ These modules define "CCITT Rec. 721| ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. M.3100"
+--@@ These modules define "CCITT Rec. M.3100(1992)"
+--@@ These modules define "CCITT Rec. X.283 (1997) | ISO/IEC 10733 : 1998"
+--@@ These modules define "CCITT Rec. X.721"
+--@@ These modules define "CCITT Rec. X.721 (1992)"
+--@@ These modules define "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO /IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2 :1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721(1992)"
+--@@ These modules define "CCITT Rec. X.721|ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. X.723 (1993)"
+--@@ These modules define "CCITT Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "CCITT Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "CCITT Recommendation Q.822"
+--@@ These modules define "CCITT X.521"
+--@@ These modules define "DMI"
+--@@ These modules define "DMI:1992"
+--@@ These modules define "GMI"
+--@@ These modules define "GNM"
+--@@ These modules define "ISIS"
+--@@ These modules define "ISO 10589: 2001"
+--@@ These modules define "ISO/IEC 10165-2"
+--@@ These modules define "ISO/IEC 10589"
+--@@ These modules define "ISO/IEC 10589: 2001"
+--@@ These modules define "ISO/IEC 10733"
+--@@ These modules define "ITU Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T G.774.1 (02/2001)"
+--@@ These modules define "ITU-T G.774.4 (02/2001)"
+--@@ These modules define "ITU-T Rec. G.774"
+--@@ These modules define "ITU-T Rec. G.774 : 2001"
+--@@ These modules define "ITU-T Rec. G.774.3"
+--@@ These modules define "ITU-T Rec. G.774.3 : 2001"
+--@@ These modules define "ITU-T Rec. G.774.5"
+--@@ These modules define "ITU-T Rec. M.3100 (1992)"
+--@@ These modules define "ITU-T Rec. M.3100 (1995)"
+--@@ These modules define "ITU-T Rec. M.3100: 1995"
+--@@ These modules define "ITU-T Rec. M.3100:1995"
+--@@ These modules define "ITU-T Rec. Q.821 (2000)"
+--@@ These modules define "ITU-T Rec. Q.822"
+--@@ These modules define "ITU-T Rec. Q.822 (1994)"
+--@@ These modules define "ITU-T Rec. Q.824.0 (1995)"
+--@@ These modules define "ITU-T Rec. Q.824.1 (1995)"
+--@@ These modules define "ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992"
+--@@ These modules define "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998"
+--@@ These modules define "ITU-T Rec. X.284 (1997)"
+--@@ These modules define "ITU-T Rec. X.521"
+--@@ These modules define "ITU-T Rec. X.721 (1992)"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T Rec. X.721 : 1992"
+--@@ These modules define "ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. X.723 (1993)"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1993"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994"
+--@@ These modules define "ITU-T Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995"
+--@@ These modules define "ITU-T Rec. X.738 (1993)/Cor.1 (1998): | ISO/IEC 10164-13 : 1995/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.738 (1993)/Cor.2 (2000): | ISO/IEC 10164-13 : 1995/Cor.2 : 2002"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994"
+--@@ These modules define "ITU-T Rec. X.739 (1993)/Cor.1 (1998) | ISO/IEC 10164-11 : 1994/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.739 (1993)|ISO/IEC 10164-11:1994"
+--@@ These modules define "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+--@@ These modules define "ITU-T Rec. X.742 (1995)/Cor.1 (1998) | ISO/IEC 10164-10 : 1995/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.742 (1995)/Cor.2 (2000) | ISO/IEC 10164-10 : 1995/Cor.2 : 2001"
+--@@ These modules define "ITU-T Rec. X.742 | ISO/IEC 10164-10"
+--@@ These modules define "ITU-T Rec. X.742 | ISO/IEC 10164-10 : 1995"
+--@@ These modules define "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993"
+--@@ These modules define "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12:1994"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.1 (1997) | ISO/IEC 10164-12 : 1993/Cor.1 : 1998"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.2 (1998) | ISO/IEC 10164-12 : 1993/Cor.2 : 1999"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.3 (2000) | ISO/IEC 10164-12 : 1993/Cor.3 : 2001"
+--@@ These modules define "ITU-T Rec. X.745 | ISO/IEC 10164-12"
+--@@ These modules define "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002"
+--@@ These modules define "ITU-T Rec. X.746 | ISO/IEC 10164-15"
+--@@ These modules define "ITU-T Recommendation G.774-04"
+--@@ These modules define "ITU-T Recommendation M.3100"
+--@@ These modules define "ITU-T Recommendation M.3100 : 1992"
+--@@ These modules define "ITU-T Recommendation M.3100: 1995"
+--@@ These modules define "ITU-T Recommendation M.3100:1995"
+--@@ These modules define "ITU-T Recommendation Q.822"
+--@@ These modules define "ITU-T Recommendation X.721"
+--@@ These modules define "ITU-T Recommendation X.721:1992"
+--@@ These modules define "ITU-T Recommendation X.739 | ISO/IEC 10164-11"
+--@@ These modules define "ITU-T Recommendation X.746"
+--@@ These modules define "ITU-T X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T X.721|ISO/IEC 10165-2:1992"
+--@@ These modules define "M.3100:1995"
+--@@ These modules define "NLMO"
+--@@ These modules define "Rec. CCITT X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Rec. G.774.3"
+--@@ These modules define "Rec. M.3100"
+--@@ These modules define "Rec. M.3100 : 1992"
+--@@ These modules define "Rec. M.3100:1995"
+--@@ These modules define "Rec. Q.822"
+--@@ These modules define "Rec. X. 723 | ISO/IEC 10165-5"
+--@@ These modules define "Rec. X.721 (1992)"
+--@@ These modules define "Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721|ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.723 (1993)"
+--@@ These modules define "Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "Rec. X.723 | ISO/IEC 10165-5 : 1994"
+--@@ These modules define "Rec. X.738 (1993)"
+--@@ These modules define "Rec. X.738|ISO/IEC 10164-13:1992"
+--@@ These modules define "Rec. X.739"
+--@@ These modules define "Rec. X.739 (1993)"
+--@@ These modules define "Rec. X.739 (1993) | ISO/IEC 10164-11:1994"
+--@@ These modules define "Rec. X.742 (1995)"
+--@@ These modules define "Rec. X.745 (1993)"
+--@@ These modules define "Rec. X.745 (1993) | ISO/IEC 10164-12:1994"
+--@@ These modules define "Rec. X.745 (1993) | ISO/IEC 10164-12:1994 "
+--@@ These modules define "Rec. X.746 (1995)"
+--@@ These modules define "Recommendation G.774"
+--@@ These modules define "Recommendation G.774 : 1992"
+--@@ These modules define "Recommendation G.774.01"
+--@@ These modules define "Recommendation G.774.03"
+--@@ These modules define "Recommendation G.774.05"
+--@@ These modules define "Recommendation G.774.3"
+--@@ These modules define "Recommendation G.774.3: 1994"
+--@@ These modules define "Recommendation G.774.5"
+--@@ These modules define "Recommendation M.3100"
+--@@ These modules define "Recommendation M.3100 : 1992"
+--@@ These modules define "Recommendation M.3100: 1992"
+--@@ These modules define "Recommendation M.3100: 1995"
+--@@ These modules define "Recommendation M.3100:1992"
+--@@ These modules define "Recommendation M.3100:1995"
+--@@ These modules define "Recommendation Q.821:1992"
+--@@ These modules define "Recommendation Q.822"
+--@@ These modules define "Recommendation Q.822 : 1993"
+--@@ These modules define "Recommendation Q.822:1994"
+--@@ These modules define "Recommendation X.721"
+--@@ These modules define "Recommendation X.721 "
+--@@ These modules define "Recommendation X.721 : 1992"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2: 1992"
+--@@ These modules define "Recommendation X.721: 1992"
+--@@ These modules define "Recommendation X.721:1992"
+--@@ These modules define "Recommendation X.738 : 1992"
+--@@ These modules define "Recommendation X.738:1993"
+--@@ These modules define "Recommendation X.739"
+--@@ These modules define "Recommendation X.739:1993"
+--@@ These modules define "Recommendation X.742 | ISO/IEC 10164-10: 1995"
+--@@ These modules define "X.721"
+--@@ These modules define "X.721:1992"
+--@@ These modules define "X.723"
+--@@ These modules define "X.739"
+--@@ These modules define "X.742"
+--@@ These modules define "X.745"
+--@@ These modules define "X.746"
 --@@
---@@ These modules define MANAGED OBJECT CLASS accessPortISDNBasicRate.
---@@ These modules define MANAGED OBJECT CLASS accessPortISDNPrimaryRate.
---@@ These modules define MANAGED OBJECT CLASS accessPortProfileISDN.
---@@ These modules define MANAGED OBJECT CLASS accessPortProfileISDNBasicRate.
---@@ These modules define MANAGED OBJECT CLASS accessPortProfileISDNPrimaryRate.
---@@ These modules define MANAGED OBJECT CLASS bChannel.
---@@ These modules define MANAGED OBJECT CLASS bearerServiceFor1536kbpsData.
---@@ These modules define MANAGED OBJECT CLASS bearerServiceFor1920kbpsData.
---@@ These modules define MANAGED OBJECT CLASS bearerServiceFor384kbpsData.
---@@ These modules define MANAGED OBJECT CLASS bearerServiceForMuliple-RateData.
---@@ These modules define MANAGED OBJECT CLASS callingNumberScreening.
---@@ These modules define MANAGED OBJECT CLASS cataloguedAccessPortISDNPrimaryRate.
---@@ These modules define MANAGED OBJECT CLASS cataloguedAccessPortProfileISDN.
---@@ These modules define MANAGED OBJECT CLASS cataloguedAccessPortProfileISDNBasicRate.
---@@ These modules define MANAGED OBJECT CLASS cataloguedLayerEntityDSS1.
---@@ These modules define MANAGED OBJECT CLASS cataloguedLayerEntityLAPD.
---@@ These modules define MANAGED OBJECT CLASS circuit3D1kHz.
---@@ These modules define MANAGED OBJECT CLASS circuitCombinedSwitchedDigitalData.
---@@ These modules define MANAGED OBJECT CLASS circuitCombinedVoiceBand.
---@@ These modules define MANAGED OBJECT CLASS circuitMultiUse.
---@@ These modules define MANAGED OBJECT CLASS circuitSpeech.
---@@ These modules define MANAGED OBJECT CLASS circuitUnrestrictedDigitalData.
---@@ These modules define MANAGED OBJECT CLASS circuitUnrestrictedDigitalDataRateAdaptedFrom56kbit/s.
---@@ These modules define MANAGED OBJECT CLASS dChannel.
---@@ These modules define MANAGED OBJECT CLASS layerEntityLAPB.
---@@ These modules define MANAGED OBJECT CLASS layerEntityLAPD.
---@@ These modules define MANAGED OBJECT CLASS layerEntityX25PLP.
---@@ These modules define MANAGED OBJECT CLASS layerEntityX25PLPShared.
---@@ These modules define MANAGED OBJECT CLASS packet.
---@@ These modules define MANAGED OBJECT CLASS packetBChannel.
---@@ These modules define MANAGED OBJECT CLASS packetDChannel.
---@@ These modules define MANAGED OBJECT CLASS serviceManagerISDN.
---@@ These modules define MANAGED OBJECT CLASS serviceManagerRetrieveService.
---@@ These modules define MANAGED OBJECT CLASS terminalConfiguration.
---@@ These modules define MANAGED OBJECT CLASS terminalServiceProfile.
---@@ These modules define MANAGED OBJECT CLASS x25NetworkUserIdentification.
---@@
---@@ These modules reference PACKAGE channelNumberPackage in module "CCITT Rec. M.3100".
---@@
---@@ These modules define PACKAGE accessPortISDNBasicRatePkg.
---@@ These modules define PACKAGE accessPortISDNPrimaryRatePkg.
---@@ These modules define PACKAGE accessPortProfileISDNBasicRatePkg.
---@@ These modules define PACKAGE accessPortProfileISDNPkg.
---@@ These modules define PACKAGE accessPortProfileISDNPrimaryRatePkg.
---@@ These modules define PACKAGE activeTerminalListPkg.
---@@ These modules define PACKAGE assignmentOfTimeslotsPkg.
---@@ These modules define PACKAGE automaticNegotiationPkg.
---@@ These modules define PACKAGE bChannelPkg.
---@@ These modules define PACKAGE bearerServiceFor1536kbpsDataPkg.
---@@ These modules define PACKAGE bearerServiceFor1536kbpsDataPrimaryICPkg.
---@@ These modules define PACKAGE bearerServiceFor1920kbpsDataPkg.
---@@ These modules define PACKAGE bearerServiceFor1920kbpsDataPrimaryICPkg.
---@@ These modules define PACKAGE bearerServiceFor384kbpsDataPkg.
---@@ These modules define PACKAGE bearerServiceFor384kbpsDataPrimaryICPkg.
---@@ These modules define PACKAGE bearerServiceForAudioICPkg.
---@@ These modules define PACKAGE bearerServiceForMultipleRateDataPkg.
---@@ These modules define PACKAGE bearerServiceForMultipleRateDataPrimaryICPkg.
---@@ These modules define PACKAGE bearerServiceListPkg.
---@@ These modules define PACKAGE callReferencePkg.
---@@ These modules define PACKAGE callingNumberScreeningPkg.
---@@ These modules define PACKAGE cataloguedAccessPortISDNPrimaryRatePkg.
---@@ These modules define PACKAGE cataloguedAccessPortProfileISDNBasicRatePkg.
---@@ These modules define PACKAGE cataloguedAccessPortProfileISDNPkg.
---@@ These modules define PACKAGE cataloguedLayerEntityDSS1Pkg.
---@@ These modules define PACKAGE cataloguedLayerEntityLAPDPkg.
---@@ These modules define PACKAGE circuit3D1kHzPkg.
---@@ These modules define PACKAGE circuitCombinedSwitchedDigitalDataPkg.
---@@ These modules define PACKAGE circuitCombinedVoiceBandPkg.
---@@ These modules define PACKAGE circuitMultiUsePkg.
---@@ These modules define PACKAGE circuitMultiUsePrimaryICPkg.
---@@ These modules define PACKAGE circuitSpeechPkg.
---@@ These modules define PACKAGE circuitSpeechPrimaryICPkg.
---@@ These modules define PACKAGE circuitUnrestrictedDigitalDataPkg.
---@@ These modules define PACKAGE circuitUnrestrictedDigitalDataPrimaryICPkg.
---@@ These modules define PACKAGE circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPkg.
---@@ These modules define PACKAGE circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPrimaryICPkg.
---@@ These modules define PACKAGE dChannelPkg.
---@@ These modules define PACKAGE deactivationCapabilitiesPkg.
---@@ These modules define PACKAGE layerEntityLAPBPkg.
---@@ These modules define PACKAGE layerEntityLAPDPkg.
---@@ These modules define PACKAGE layerEntityX25PLPPkg.
---@@ These modules define PACKAGE layerEntityX25PLPSharedPkg.
---@@ These modules define PACKAGE linkSettingPkg.
---@@ These modules define PACKAGE manageISDNTerminalPackage.
---@@ These modules define PACKAGE maxCombinedThruputBChanPkg.
---@@ These modules define PACKAGE maxCombinedThruputDChanPkg.
---@@ These modules define PACKAGE nT2ISDNaccessPortProfilePkg.
---@@ These modules define PACKAGE networkProvidedTonePkg.
---@@ These modules define PACKAGE numberOfDChannelLinksPkg.
---@@ These modules define PACKAGE optionalDeactivationPkg.
---@@ These modules define PACKAGE packetBChannelPkg.
---@@ These modules define PACKAGE packetDChannelPkg.
---@@ These modules define PACKAGE packetPkg.
---@@ These modules define PACKAGE selectionProceduresPkg.
---@@ These modules define PACKAGE serviceManagerISDNPkg.
---@@ These modules define PACKAGE serviceManagerRetrieveServicePkg.
---@@ These modules define PACKAGE terminalConfigurationPkg.
---@@ These modules define PACKAGE terminalServiceProfilePkg.
---@@ These modules define PACKAGE x25DCETimersPkg.
---@@ These modules define PACKAGE x25NetworkUserIdentificationPkg.
---@@
---@@ These modules reference ATTRIBUTE optionalUserFacilitiesId in module "ITU-T Rec. Q.824.0".
---@@
---@@ These modules define ATTRIBUTE accessChannelPtrList.
---@@ These modules define ATTRIBUTE activeTerminalList.
---@@ These modules define ATTRIBUTE assignmentOfTimeslots.
---@@ These modules define ATTRIBUTE automaticXIDnotification.
---@@ These modules define ATTRIBUTE bearerServiceFor1536kbpsDataPrimaryIC.
---@@ These modules define ATTRIBUTE bearerServiceFor1920DataPrimaryIC.
---@@ These modules define ATTRIBUTE bearerServiceFor384kbpsDataPrimaryIC.
---@@ These modules define ATTRIBUTE bearerServiceForMultipleRateDataPrimaryIC.
---@@ These modules define ATTRIBUTE bearerServiceList.
---@@ These modules define ATTRIBUTE bitRateOfPrimaryRateInterface.
---@@ These modules define ATTRIBUTE callingNumberScreeningId.
---@@ These modules define ATTRIBUTE callingPartyDefaultDN.
---@@ These modules define ATTRIBUTE callingPartyNumberDiscardCtrl.
---@@ These modules define ATTRIBUTE callingPartyNumberProvisionNecessary.
---@@ These modules define ATTRIBUTE callingPartyValidDirectoryNumberList.
---@@ These modules define ATTRIBUTE cataloguedAccessPortISDNPrimaryRateId.
---@@ These modules define ATTRIBUTE cataloguedAccessPortProfileISDNId.
---@@ These modules define ATTRIBUTE cataloguedLayerEntityDSS1Id.
---@@ These modules define ATTRIBUTE cataloguedLayerEntityLAPDId.
---@@ These modules define ATTRIBUTE channelSelection.
---@@ These modules define ATTRIBUTE circuitAudioPrimaryIC.
---@@ These modules define ATTRIBUTE circuitMultiUsePrimaryIC.
---@@ These modules define ATTRIBUTE circuitSpeechPrimaryIC.
---@@ These modules define ATTRIBUTE circuitUnrestrictedDigitalDataPrimaryIC.
---@@ These modules define ATTRIBUTE circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPrimaryIC.
---@@ These modules define ATTRIBUTE dChannelPacketDefaultDirectoryNumber.
---@@ These modules define ATTRIBUTE dChannelPacketDirectoryNumberList.
---@@ These modules define ATTRIBUTE dChannelPrimaryPtr.
---@@ These modules define ATTRIBUTE dChannelSecondaryPtr.
---@@ These modules define ATTRIBUTE dChannelT301.
---@@ These modules define ATTRIBUTE dChannelT303.
---@@ These modules define ATTRIBUTE dChannelT304.
---@@ These modules define ATTRIBUTE dChannelT305.
---@@ These modules define ATTRIBUTE dChannelT306.
---@@ These modules define ATTRIBUTE dChannelT307.
---@@ These modules define ATTRIBUTE dChannelT308.
---@@ These modules define ATTRIBUTE dChannelT309.
---@@ These modules define ATTRIBUTE dChannelT310.
---@@ These modules define ATTRIBUTE dChannelT312.
---@@ These modules define ATTRIBUTE dChannelT314.
---@@ These modules define ATTRIBUTE dChannelT316.
---@@ These modules define ATTRIBUTE dChannelT317.
---@@ These modules define ATTRIBUTE dChannelT320.
---@@ These modules define ATTRIBUTE dChannelT321.
---@@ These modules define ATTRIBUTE dChannelT322.
---@@ These modules define ATTRIBUTE dChannelT330.
---@@ These modules define ATTRIBUTE dTECompatibilty.
---@@ These modules define ATTRIBUTE deactivationCapabilities.
---@@ These modules define ATTRIBUTE directoryNumberAppearanceIdentifierList.
---@@ These modules define ATTRIBUTE directoryNumberReference.
---@@ These modules define ATTRIBUTE earlyCutThruRemoteNetworkInterwork.
---@@ These modules define ATTRIBUTE earlyCutThruUserProvidedAudibleRing.
---@@ These modules define ATTRIBUTE featureActivatorsAllDirectoryNumber.
---@@ These modules define ATTRIBUTE featureActivatorsPerDirectoryNumber.
---@@ These modules define ATTRIBUTE featureActivatorsPerHuntMakeBusy.
---@@ These modules define ATTRIBUTE featureActivatorsPerStopHunt.
---@@ These modules define ATTRIBUTE featureIndicatorsAllDirectoryNumber.
---@@ These modules define ATTRIBUTE featureIndicatorsPerDirectoryNumber.
---@@ These modules define ATTRIBUTE featureIndicatorsPerHuntMakeBusy.
---@@ These modules define ATTRIBUTE featureIndicatorsPerStopHunt.
---@@ These modules define ATTRIBUTE incomingDefaultThruputClass.
---@@ These modules define ATTRIBUTE incomingMaxPacketSize.
---@@ These modules define ATTRIBUTE incomingWindowSize.
---@@ These modules define ATTRIBUTE interfaceType.
---@@ These modules define ATTRIBUTE layer2InfoEntityPtr.
---@@ These modules define ATTRIBUTE layer3InfoEntityPtr.
---@@ These modules define ATTRIBUTE layerEntityLAPDPtr.
---@@ These modules define ATTRIBUTE linkLevelWindowSize.
---@@ These modules define ATTRIBUTE linkOption.
---@@ These modules define ATTRIBUTE maxBitsPerInformationFrame.
---@@ These modules define ATTRIBUTE maxCombinedThruputClass.
---@@ These modules define ATTRIBUTE maxNumberOfCallReference.
---@@ These modules define ATTRIBUTE maxTransmissionAttempts.
---@@ These modules define ATTRIBUTE networkProvidedTones.
---@@ These modules define ATTRIBUTE networkUserIdentification.
---@@ These modules define ATTRIBUTE networkUserIdentificationOverride.
---@@ These modules define ATTRIBUTE networkUserIdentificationSelection.
---@@ These modules define ATTRIBUTE networkUserIdentificationSupplement.
---@@ These modules define ATTRIBUTE networkUserIdentificationUserValidate.
---@@ These modules define ATTRIBUTE notificationClass.
---@@ These modules define ATTRIBUTE numberOfDChannelLinks.
---@@ These modules define ATTRIBUTE outgoingDefaultThruputClass.
---@@ These modules define ATTRIBUTE outgoingMaxPacketSize.
---@@ These modules define ATTRIBUTE outgoingWindowSize.
---@@ These modules define ATTRIBUTE screenCallingPartyNumber.
---@@ These modules define ATTRIBUTE semiPermAccessPacketHandlerDefaultDN.
---@@ These modules define ATTRIBUTE signallingParameterNegotiation.
---@@ These modules define ATTRIBUTE terminalConfigurationId.
---@@ These modules define ATTRIBUTE terminalConfigurationPtr.
---@@ These modules define ATTRIBUTE terminalLimit.
---@@ These modules define ATTRIBUTE terminalServiceProfileId.
---@@ These modules define ATTRIBUTE tspid.
---@@
---@@ These modules reference NOTIFICATION attributeValueChange in module "CCITT Rec. X.721".
---@@ These modules reference NOTIFICATION attributeValueChange in module "CCITT Rec. X.721 | ISO/IEC 10165-2".
---@@ These modules reference NOTIFICATION attributeValueChange in module "CCITT Rec. X.721 | ISO/IEC 10165-2 ".
---@@ These modules reference NOTIFICATION attributeValueChange in module "CCITT Rec. X.721 | ISO/IEC 10165-2:1992".
---@@ These modules reference NOTIFICATION objectCreation in module "CCITT Rec. X.721".
---@@ These modules reference NOTIFICATION objectCreation in module "CCITT Rec. X.721 | ISO/IEC 10165-2".
---@@ These modules reference NOTIFICATION objectCreation in module "CCITT Rec. X.721 | ISO/IEC 10165-2:1992".
---@@ These modules reference NOTIFICATION objectDeletion in module "CCITT Rec. X.721".
---@@ These modules reference NOTIFICATION objectDeletion in module "CCITT Rec. X.721 | ISO/IEC 10165-2".
---@@ These modules reference NOTIFICATION objectDeletion in module "CCITT Rec. X.721 | ISO/IEC 10165-2:1992".
---@@
---@@ These modules define no NOTIFICATION.
 --@@ 
---@@ objects accessChannel referenced but never defined!
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessChannel
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessChannel
---@@ objects accessPort referenced but never defined!
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessPort
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessPort
---@@ objects accessPortProfile referenced but never defined!
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessPortProfile
---@@ objects bearerService referenced but never defined!
---@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
 --@@ objects cataloguedAccessPortISDN referenced but never defined!
 --@@ ClassReference references undefined "":cataloguedAccessPortISDN
---@@ objects layerEntity referenced but never defined!
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":layerEntity
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":layerEntity
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":layerEntity
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":layerEntity
---@@ objects managedElement referenced but never defined!
---@@ ClassReference references undefined "CCITT Rec. M.3100":managedElement
---@@ ClassReference references undefined "CCITT Rec. M.3100(1992)":managedElement
---@@ ClassReference references undefined "CCITT Rec. M.3100(1992)":managedElement
---@@ ClassReference references undefined "CCITT Rec. M.3100":managedElement
---@@ ClassReference references undefined "CCITT Rec. M.3100(1992)":managedElement
---@@ ClassReference references undefined "CCITT Rec. M.3100(1992)":managedElement
---@@ ClassReference references undefined "":managedElement
---@@ objects optionalUserFacilities referenced but never defined!
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":optionalUserFacilities
---@@ objects serviceManager referenced but never defined!
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":serviceManager
---@@ ClassReference references undefined "ITU-T Rec. Q.824.0":serviceManager
---@@ objects top referenced but never defined!
---@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
---@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
---@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
---@@ ClassReference references undefined "CCITT Rec. X.721":top
---@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
---@@ ClassReference references undefined "CCITT Rec. X.721":top
---@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
---@@ packages channelNumberPackage referenced but never defined!
---@@ PackageReference references undefined "CCITT Rec. M.3100":channelNumberPackage
 --@@ attributes cataloguedAccessPortISDNId referenced but never defined!
 --@@ AttributeReference references undefined "":cataloguedAccessPortISDNId
---@@ attributes layerEntityId referenced but never defined!
---@@ AttributeReference references undefined "":layerEntityId
---@@ attributes optionalUserFacilitiesId referenced but never defined!
---@@ AttributeReference references undefined "ITU-T Rec. Q.824.0":optionalUserFacilitiesId
---@@ notifications attributeValueChange referenced but never defined!
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":attributeValueChange
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":attributeValueChange
---@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
---@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
---@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
---@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
---@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2 ":attributeValueChange
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":attributeValueChange
---@@ notifications objectCreation referenced but never defined!
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectCreation
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation
---@@ notifications objectDeletion referenced but never defined!
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectDeletion
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
---@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion
---@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- itut_x283::networkEntity
+--@@ |  +- itut_x284::transportEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ |  +- itut_x283::cLNS
+--@@ |  +- itut_x284::clmodeTPM
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- itut_x283::cONS
+--@@ |  +- itut_x284::comodeTPM
+--@@ +- itut_x723::sap1
+--@@ |  +- itut_x284::tSAP
+--@@ +- itut_x723::sap2
+--@@ |  +- itut_x283::nSAP
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- itut_x283::networkConnection
+--@@ |  +- itut_x284::transportConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- itut_x283::networkSubsystem
+--@@ |  +- itut_x284::transportSubsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ |  +- itut_q824_0::administeredCircuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessChannel
+--@@ |  |  |  |  +- itut_q824_1::bChannel
+--@@ |  |  |  |  +- itut_q824_1::dChannel
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessChannel
+--@@ |  |  |  |  +- itut_q824_1::bChannel
+--@@ |  |  |  |  +- itut_q824_1::dChannel
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessPort
+--@@ |  |  |  |  +- itut_q824_1::accessPortISDNBasicRate
+--@@ |  |  |  |  +- itut_q824_1::accessPortISDNPrimaryRate
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessPort
+--@@ |  |  |  |  +- itut_q824_1::accessPortISDNBasicRate
+--@@ |  |  |  |  +- itut_q824_1::accessPortISDNPrimaryRate
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_q824_0::accessPortProfile
+--@@ |  +- itut_q824_1::accessPortProfileISDN
+--@@ |  |  +- itut_q824_1::accessPortProfileISDNBasicRate
+--@@ |  |  +- itut_q824_1::accessPortProfileISDNPrimaryRate
+--@@ +- itut_q824_0::bearerService
+--@@ |  +- itut_q824_1::bearerServiceFor384kbpsData
+--@@ |  +- itut_q824_1::bearerServiceFor1536kbpsData
+--@@ |  +- itut_q824_1::bearerServiceFor1920kbpsData
+--@@ |  +- itut_q824_1::bearerServiceForMuliple_RateData
+--@@ |  +- itut_q824_1::circuit3D1kHz
+--@@ |  |  +- itut_q824_1::circuitCombinedVoiceBand
+--@@ |  +- itut_q824_1::circuitMultiUse
+--@@ |  +- itut_q824_1::circuitUnrestrictedDigitalDataRateAdaptedFrom56kbit_s
+--@@ |  +- itut_q824_1::circuitSpeech
+--@@ |  |  +- itut_q824_1::circuitCombinedVoiceBand
+--@@ |  +- itut_q824_1::circuitUnrestrictedDigitalData
+--@@ |  |  +- itut_q824_1::circuitCombinedSwitchedDigitalData
+--@@ |  +- itut_q824_1::packet
+--@@ |  |  +- itut_q824_1::packetBChannel
+--@@ |  |  +- itut_q824_1::packetDChannel
+--@@ +- itut_q824_0::customerProfile
+--@@ +- itut_q824_0::directoryNumber
+--@@ |  +- itut_q824_0::directoryNumberE164
+--@@ |  +- itut_q824_0::directoryNumberX121
+--@@ +- itut_q824_0::layerEntity
+--@@ |  +- itut_q824_1::layerEntityLAPB
+--@@ |  +- itut_q824_1::layerEntityLAPD
+--@@ |  +- itut_q824_1::layerEntityX25PLP
+--@@ |  +- itut_q824_1::layerEntityX25PLPShared
+--@@ +- itut_q824_0::routingBlock
+--@@ +- itut_q824_0::cataloguedOptionalUserFacilities
+--@@ +- itut_q824_0::cataloguedSupplementaryService
+--@@ +- itut_q824_0::cataloguedTeleservice
+--@@ +- itut_q824_0::customizedResource
+--@@ +- itut_q824_0::optionalUserFacilities
+--@@ |  +- itut_q824_1::x25NetworkUserIdentification
+--@@ +- itut_q824_0::supplementaryServiceServiceDependent
+--@@ +- itut_q824_0::supplementaryServiceServiceIndependent
+--@@ +- itut_q824_0::teleservice
+--@@ +- itut_q824_0::serviceManager
+--@@ |  +- itut_q824_1::serviceManagerISDN
+--@@ |  +- itut_q824_1::serviceManagerRetrieveService
+--@@ +- itut_q824_0::servicePackage
+--@@ +- iso_10589_2::adjacency
+--@@ +- iso_10589_2::virtualAdjacency
+--@@ +- iso_10589_2::destination
+--@@ |  +- iso_10589_2::destinationSystem
+--@@ |  +- iso_10589_2::destinationArea
+--@@ +- iso_10589_2::reachableAddress
+--@@ +- itut_x283::linkage
+--@@ +- itut_x283::x25PLE
+--@@ |  +- itut_x283::x25PLE_DTE
+--@@ |  +- itut_x283::x25PLE_DCE
+--@@ +- itut_x283::x25PLEIVMO
+--@@ |  +- itut_x283::x25PLEIVMO_DTE
+--@@ |  +- itut_x283::x25PLEIVMO_DCE
+--@@ +- itut_x283::virtualCircuit
+--@@ |  +- itut_x283::virtualCircuit_DTE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DTE
+--@@ |  |  +- itut_x283::virtualCall_DTE
+--@@ |  +- itut_x283::virtualCircuit_DCE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DCE
+--@@ |  |  +- itut_x283::virtualCall_DCE
+--@@ +- itut_x283::virtualCallIVMO
+--@@ +- itut_x283::dSeriesCounts
+--@@ +- itut_x284::transportConnectionIVMO
+--@@ +- itut_x284::ncmsPM
+--@@ +- itut_x284::ncc
+--@@ +- itut_x284::nccIVMO
+--@@ +- itut_q824_1::callingNumberScreening
+--@@ +- itut_q824_1::cataloguedAccessPortISDNPrimaryRate
+--@@ +- itut_q824_1::cataloguedAccessPortProfileISDN
+--@@ |  +- itut_q824_1::cataloguedAccessPortProfileISDNBasicRate
+--@@ +- itut_q824_1::cataloguedLayerEntityDSS1
+--@@ +- itut_q824_1::cataloguedLayerEntityLAPD
+--@@ +- itut_q824_1::terminalConfiguration
+--@@ +- itut_q824_1::terminalServiceProfile
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ >- itut_x283::networkSubsystem
+--@@ |  >- itut_x283::networkEntity
+--@@ |  |  >- itut_x283::cLNS
+--@@ |  |  |  >- iso_10589_2::virtualAdjacency
+--@@ |  |  |  >- iso_10589_2::destinationSystem
+--@@ |  |  |  >- iso_10589_2::destinationArea
+--@@ |  |  |  >- itut_x283::linkage
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  >- itut_x283::cLNS +++
+--@@ |  |  >- itut_x283::cONS
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  |  >- itut_x283::networkConnection
+--@@ |  |  >- itut_x283::cONS +++
+--@@ |  >- itut_x283::networkEntity +++
+--@@ |  >- itut_x283::nSAP
+--@@ |  >- itut_x283::nSAP
+--@@ |  >- itut_x283::x25PLEIVMO
+--@@ |  >- itut_x283::x25PLE
+--@@ |  |  >- itut_x283::virtualCallIVMO
+--@@ |  >- itut_x283::x25PLE +++
+--@@ >- itut_x284::transportSubsystem
+--@@ |  >- itut_x284::transportEntity
+--@@ |  |  >- itut_x284::clmodeTPM
+--@@ |  |  >- itut_x284::clmodeTPM
+--@@ |  |  >- itut_x284::comodeTPM
+--@@ |  |  |  >- itut_x284::transportConnection
+--@@ |  |  |  >- itut_x284::transportConnectionIVMO
+--@@ |  |  >- itut_x284::comodeTPM +++
+--@@ |  |  >- itut_x284::tSAP
+--@@ |  |  >- itut_x284::tSAP
+--@@ |  |  >- itut_x284::ncmsPM
+--@@ |  |  |  >- itut_x284::ncc
+--@@ |  |  |  >- itut_x284::nccIVMO
+--@@ |  |  >- itut_x284::ncmsPM +++
+--@@ |  >- itut_x284::transportEntity +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_q824_0::accessPortProfile
+--@@ |  >- itut_q824_0::cataloguedOptionalUserFacilities
+--@@ |  >- itut_q824_0::cataloguedSupplementaryService
+--@@ |  >- itut_q824_0::cataloguedTeleservice
+--@@ |  >- itut_q824_0::customerProfile
+--@@ |  |  >- itut_q824_0::administeredCircuitEndPointSubgroup
+--@@ |  |  >- itut_q824_0::bearerService
+--@@ |  |  |  >- itut_q824_0::optionalUserFacilities
+--@@ |  |  |  >- itut_q824_0::supplementaryServiceServiceDependent
+--@@ |  |  >- itut_q824_0::customizedResource
+--@@ |  |  >- itut_q824_0::layerEntity
+--@@ |  |  >- itut_q824_0::routingBlock
+--@@ |  |  >- itut_q824_0::supplementaryServiceServiceIndependent
+--@@ |  |  >- itut_q824_0::teleservice
+--@@ |  |  |  >- itut_q824_0::supplementaryServiceServiceDependent
+--@@ |  >- itut_q824_0::directoryNumber
+--@@ |  >- itut_q824_0::serviceManager
+--@@ |  >- itut_q824_0::servicePackage
+--@@ |  >- itut_q824_1::cataloguedAccessPortProfileISDN
+--@@ |  >- itut_q824_1::cataloguedLayerEntityLAPD
+--@@ |  >- itut_q824_1::cataloguedLayerEntityDSS1
+--@@ |  >- itut_q824_1::terminalConfiguration
+--@@ |  >- itut_q824_1::terminalServiceProfile
+--@@ |  >- itut_q824_1::layerEntityX25PLPShared
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_q824_0::accessPort
+--@@ >- itut_q824_0::accessChannel
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_q824_0::accessPort +++
+--@@ itut_q824_1::accessPortProfileISDN
+--@@ >- itut_q824_1::callingNumberScreening
+--@@ >- itut_q824_1::x25NetworkUserIdentification
+--@@ itut_x283::x25PLE_DTE
+--@@ >- itut_x283::permanentVirtualCircuit_DTE
+--@@ >- itut_x283::virtualCall_DTE
+--@@ itut_x283::x25PLE_DCE
+--@@ >- itut_x283::permanentVirtualCircuit_DCE
+--@@ >- itut_x283::virtualCall_DCE
+--@@ |  >- itut_x283::dSeriesCounts
+--@@ |  >- itut_x283::dSeriesCounts
+--@@ >- itut_x283::virtualCall_DCE +++
+--@@
 --@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

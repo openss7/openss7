@@ -1,10 +1,10 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Sep 19 11:45:18 MDT 2007
+--@@ Date: Tue Dec 23 23:54:33 MST 2008
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "TS 132 111-4 V4.6.0 (2003-09)"

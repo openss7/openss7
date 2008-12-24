@@ -1,3 +1,17 @@
+2008-12-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/perl/EN300371.gdmo: gdmo updates
+	* src/perl/Makefile: gdmo updates
+	* src/perl/Q.751.2.gdmo: gdmo updates
+	* src/perl/Q.824.1.gdmo: gdmo updates
+	* src/perl/Q.825.gdmo: gdmo updates
+	* src/perl/TS102004-1.gdmo: gdmo updates
+	* src/perl/TS132106-4.gdmo: gdmo updates
+	* src/perl/TS132106-7.gdmo: gdmo updates
+	* src/perl/TS132111-4.gdmo: gdmo updates
+	* src/perl/TS300819.gdmo: gdmo updates
+	* src/perl/X.462.gdmo: gdmo updates
+
 2008-12-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/perl/Q.751.1.gdmo: added Annex E stats

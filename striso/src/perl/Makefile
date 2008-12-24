@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/15 20:20:36 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-24 16:35:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/15 20:20:36 $ by $Author: brian $
+# Last Modified $Date: 2008-12-24 16:35:02 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile,v $
+# Revision 0.9.2.5  2008-12-24 16:35:02  brian
+# - gdmo updates
+#
 # Revision 0.9.2.4  2007/12/15 20:20:36  brian
 # - updates
 #
@@ -66,6 +69,8 @@
 
 GDMOS = \
 	EN300292.gdmo \
+	EN300304.gdmo \
+	EN300371.gdmo \
 	ES200653.gdmo \
 	ES201097-1.gdmo \
 	G.774.03.gdmo \
@@ -96,17 +101,25 @@ GDMOS = \
 	Q.821.gdmo \
 	Q.822.gdmo \
 	Q.824.0.gdmo \
+	Q.824.1.gdmo \
+	Q.825.gdmo \
 	Q.826.gdmo \
 	Q.836.1.gdmo \
 	Q.2751.1.gdmo \
 	T1.116.1D.gdmo \
 	T1.116.1.gdmo \
+	TS102004-1.gdmo \
+	TS132106-4.gdmo \
+	TS132106-7.gdmo \
+	TS132111-4.gdmo \
+	TS300819.gdmo \
 	X.162.gdmo \
 	X.281.gdmo \
 	X.282.gdmo \
 	X.283.gdmo \
 	X.284.gdmo \
 	X.287.gdmo \
+	X.462.gdmo \
 	X.521.gdmo \
 	X.721.gdmo \
 	X.723.gdmo \
@@ -179,6 +192,8 @@ NEW_GDMOS = $(GDMOS:%.gdmo=%.new.gdmo)
 
 ASNS = \
 	EN300292.asn \
+	EN300304.asn \
+	EN300371.asn \
 	ES200653.asn \
 	ES201097-1.asn \
 	G.774.03.asn \
@@ -206,6 +221,8 @@ ASNS = \
 	Q.821.asn \
 	Q.822.asn \
 	Q.824.0.asn \
+	Q.824.1.asn \
+	Q.825.asn \
 	Q.826.asn \
 	Q.836.1.asn \
 	SCCP.asn \
@@ -215,6 +232,7 @@ ASNS = \
 	X.282.asn \
 	X.283.asn \
 	X.284.asn \
+	X.462.asn \
 	X.721.asn \
 	X.723.asn \
 	X.725.asn \
@@ -241,7 +259,6 @@ ASNS = \
 
 EXTRA_ASNS = \
 	ASN1.asn \
-	Q.824.1.asn \
 	MTP.asn \
 	X.283.1993.asn \
 	X.283.1997.asn \
