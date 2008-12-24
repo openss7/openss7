@@ -1,3 +1,18 @@
+2008-12-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/ds1.c: updated mib
+	* src/snmp/ds1.h: updated mib
+	* src/snmp/ds1EXT.c: updated mib
+	* src/snmp/ds1EXT.h: updated mib
+	* src/snmp/makestubs: updated mib
+	* src/snmp/mxMIB.c: updated mib
+	* src/snmp/mxMIB.h: updated mib
+	* src/snmp/phyMIB.c: updated mib
+	* src/snmp/phyMIB.h: updated mib
+	* src/snmp/x400pMIB.c: updated mib
+	* src/snmp/x400pMIB.h: updated mib
+	* src/snmp/mibs/OPENSS7-X400P-MX-MIB.mib: updated mib
+
 2008-12-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: added manpages
