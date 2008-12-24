@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-11-26 12:23:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-12-24 13:08:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-26 12:23:05 $ by $Author: brian $
+# Last Modified $Date: 2008-12-24 13:08:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,6 +72,7 @@ include am/pr.am
 
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
+snmpdlmod_LTLIBRARIES		=
 
 AM_YFLAGS			= -d -k
 
@@ -85,6 +86,7 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
+				  ss7confd \
 				  test-inet_raw \
 				  test-inet_udp \
 				  test-inet_tcp \
@@ -153,11 +155,34 @@ sbin_PROGRAMS			= \
 				  ss7capd \
 				  test-sl
 
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= ss7confd
+endif
+
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"@PACKAGE_TARNAME@_mknod\"
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+ss7confd_SOURCES		= src/snmp/ss7MIB.c \
+				  src/snmp/ss7MIB.h \
+				  src/snmp/x400pMIB.c \
+				  src/snmp/x400pMIB.h \
+				  src/snmp/mtpMIB.c \
+				  src/snmp/mtpMIB.h \
+				  src/snmp/sccpMIB.c \
+				  src/snmp/sccpMIB.h \
+				  src/snmp/sccpOmMIB.c \
+				  src/snmp/sccpOmMIB.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
+ss7confd_LDFLAGS		= $(SNMP_LDFLAGS)
+ss7confd_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
+ss7confd_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"ss7confd\"
+ss7confd_CFLAGS			= $(USER_CFLAGS)
 
 ss7statsd_SOURCES		= src/util/ss7statsd.c
 ss7statsd_LDADD			= $(STREAMS_LDADD)
@@ -1022,6 +1047,28 @@ endif
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
+ss7MIB_la_SOURCES		= \
+				  src/snmp/ss7MIB.c \
+				  src/snmp/ss7MIB.h \
+				  src/snmp/x400pMIB.c \
+				  src/snmp/x400pMIB.h \
+				  src/snmp/mtpMIB.c \
+				  src/snmp/mtpMIB.h \
+				  src/snmp/sccpMIB.c \
+				  src/snmp/sccpMIB.h \
+				  src/snmp/sccpOmMIB.c \
+				  src/snmp/sccpOmMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
+ss7MIB_la_DEPENDENCIES		=
+ss7MIB_la_LDFLAGS		= -module -avoid-version -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
+ss7MIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
+ss7MIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+ss7MIB_la_CFLAGS		= $(USER_CFLAGS)
+
 test_timod_SOURCES		= src/test/tli/test-timod.c
 test_timod_LDADD		= libxnet.la
 test_timod_LDFLAGS		=
@@ -1303,6 +1350,10 @@ libxnet_la_LIBADD		= $(STREAMS_LDADD)
 ## WITH_XNET
 endif
 
+if WITH_SNMP_AGENT
+snmpdlmod_LTLIBRARIES		+= ss7MIB.la
+endif
+
 ## RPM_BUILD_USER
 endif
 
@@ -1470,6 +1521,12 @@ include am/release.am
 ##
 include am/doxy.am
 
+##
+## Rules for SNMP modules.
+##
+SNMPORDER			= 01
+include am/snmp.am
+
 EXTRA_DIST			+= \
 				  debian/README.Debian \
 				  debian/TODO.Debian
@@ -1492,6 +1549,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.109  2008-12-24 13:08:22  brian
+## - building ss7confd
+##
 ## Revision 0.9.2.108  2008-11-26 12:23:05  brian
 ## - correction for FDL update
 ##

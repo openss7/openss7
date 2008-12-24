@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-OM-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-14 12:55:56 $
+-- @(#) $RCSfile: OPENSS7-MTP-OM-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-24 13:08:28 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-14 12:55:56 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-24 13:08:28 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-OM-MIB.mib,v $
+-- Revision 0.9.2.3  2008-12-24 13:08:28  brian
+-- - building ss7confd
+--
 -- Revision 0.9.2.2  2008-12-14 12:55:56  brian
 -- - working up mibs
 --
@@ -74,6 +77,8 @@ IMPORTS
     HCPerfIntervalThreshold, HCPerfCurrentCount, HCPerfIntervalCount,
     HCPerfTotalCount
 	FROM HC-PerfHist-TC-MIB
+    NetworkPointCode, MtpUserPart, MtpCongestionLevel
+	FROM OPENSS7-MTP-MIB
     CommonLanguageName
 	FROM OPENSS7-TC
     AdministrativeState, OperationalState, UsageState, ProceduralStatus, 

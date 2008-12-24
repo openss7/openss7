@@ -1,3 +1,38 @@
+2008-12-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: building ss7confd
+	* src/snmp/cdr2MIB.c: building ss7confd
+	* src/snmp/cdr2MIB.h: building ss7confd
+	* src/snmp/mib2c.openss7.conf: building ss7confd
+	* src/snmp/mib2c.storage.conf: building ss7confd
+	* src/snmp/mtpMIB.c: building ss7confd
+	* src/snmp/mtpMIB.h: building ss7confd
+	* src/snmp/mtpMIB2.c: building ss7confd
+	* src/snmp/mtpMIB2.h: building ss7confd
+	* src/snmp/mtpOmMIB.c: building ss7confd
+	* src/snmp/mtpOmMIB.h: building ss7confd
+	* src/snmp/sccpMIB.c: building ss7confd
+	* src/snmp/sccpMIB.h: building ss7confd
+	* src/snmp/sccpOmMIB.c: building ss7confd
+	* src/snmp/sccpOmMIB.h: building ss7confd
+	* src/snmp/ss7MIB.c: building ss7confd
+	* src/snmp/ss7MIB.h: building ss7confd
+	* src/snmp/ss7OmMIB.c: building ss7confd
+	* src/snmp/ss7OmMIB.h: building ss7confd
+	* src/snmp/tcapMIB.c: building ss7confd
+	* src/snmp/tcapMIB.h: building ss7confd
+	* src/snmp/x400pMIB.c: building ss7confd
+	* src/snmp/x400pMIB.h: building ss7confd
+	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: building ss7confd
+	* src/snmp/mibs/OPENSS7-MTP-MIB2.mib: building ss7confd
+	* src/snmp/mibs/OPENSS7-MTP-MIB3.mib: building ss7confd
+	* src/snmp/mibs/OPENSS7-MTP-OM-MIB.mib: building ss7confd
+	* src/snmp/mibs/OPENSS7-SCCP-MIB.mib: building ss7confd
+	* src/snmp/mibs/OPENSS7-SCCP-OM-MIB.mib: building ss7confd
+	* src/snmp/mibs/OPENSS7-SL-MUX-MIB.mib: building ss7confd
+	* src/snmp/mibs/OPENSS7-SS7-MIB.mib: building ss7confd
+	* src/snmp/mibs/OPENSS7-X400P-MIB.mib: building ss7confd
+
 2008-12-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/mib2c: update mib generator
