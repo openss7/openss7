@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SL-MUX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-12-20 12:55:44 $
+-- @(#) $RCSfile: OPENSS7-SL-MUX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-24 13:08:29 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-20 12:55:44 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-24 13:08:29 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SL-MUX-MIB.mib,v $
+-- Revision 0.9.2.10  2008-12-24 13:08:29  brian
+-- - building ss7confd
+--
 -- Revision 0.9.2.9  2008-12-20 12:55:44  brian
 -- - add new mibs and agents
 --
@@ -78,47 +81,45 @@
 OPENSS7-SL-MUX-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE
-		FROM SNMPv2-SMI
-	RowStatus
-		FROM SNMPv2-TC
-	openss7, openss7Modules
-		FROM OPENSS7-SMI;
+    MODULE-IDENTITY, OBJECT-TYPE
+	FROM SNMPv2-SMI
+    RowStatus
+	FROM SNMPv2-TC
+    openss7, openss7Modules
+	FROM OPENSS7-SMI;
 
 slMuxMIB MODULE-IDENTITY
-	LAST-UPDATED "200812201153Z"
-	ORGANIZATION "The OpenSS7 Project"
-	CONTACT-INFO
-		"Brian Bidulock
-		 OpenSS7 Corporation
-		 1469 Jefferys Crescent
-		 Emonton, Alberta T6L 6T1
-		 CANADA
-		 Tel: +1 780 490 1141
-		 Fax: +1 780 490 1241
-		 Mob: +1 780 953 0557
-		 mailto:bidulock@openss7.org"
-	DESCRIPTION
-		"MIB module for the Signalling Link Multiplexer.
+    LAST-UPDATED "200812201153Z"
+    ORGANIZATION "The OpenSS7 Project"
+    CONTACT-INFO
+	"Brian Bidulock
+	 OpenSS7 Corporation
+	 1469 Jefferys Crescent
+	 Emonton, Alberta T6L 6T1
+	 CANADA
+	 Tel: +1 780 490 1141
+	 Fax: +1 780 490 1241
+	 Mob: +1 780 953 0557
+	 mailto:bidulock@openss7.org"
+    DESCRIPTION
+	"MIB module for the Signalling Link Multiplexer.
 
-		 The SL-MUX is a signalling link multiplexer implemented 
-		 as a STREAMS multiplexing driver that is used to 
-		 organize and manage signalling links on the OpenSS7 
-		 platform.  Streams are opened on device drivers to 
-		 obtain signalling link Streams which are then linked 
-		 under the multiplexing driver and assigned a global PPA 
-		 (Physical Point of Attachement) and a CLEI (Common 
-		 Language Equipment Identifier) or other administrative 
-		 string.  Signalling links so established can be 
-		 accessed by opening a Stream on the SL multiplexer.  
-		 The multiplexer hides device specifics from the user of 
-		 the SL multiplexer.  This MIB provides the ability to 
-		 establish these Streams and reference them from other 
-		 MIBs."
-	REVISION "200812201153Z"
-	DESCRIPTION
-	    "Additional workup."
-	::= { openss7Modules 40 }
+	 The SL-MUX is a signalling link multiplexer implemented as a 
+	 STREAMS multiplexing driver that is used to organize and manage 
+	 signalling links on the OpenSS7 platform.  Streams are opened 
+	 on device drivers to obtain signalling link Streams which are 
+	 then linked under the multiplexing driver and assigned a global 
+	 PPA (Physical Point of Attachement) and a CLEI (Common Language 
+	 Equipment Identifier) or other administrative string.  
+	 Signalling links so established can be accessed by opening a 
+	 Stream on the SL multiplexer.  The multiplexer hides device 
+	 specifics from the user of the SL multiplexer.  This MIB 
+	 provides the ability to establish these Streams and reference 
+	 them from other MIBs."
+    REVISION "200812201153Z"
+    DESCRIPTION
+	"Additional workup."
+    ::= { openss7Modules 40 }
 
 -- top level organization of the MIB
 
@@ -140,80 +141,56 @@ slMuxObjects		OBJECT IDENTIFIER ::= { slMuxConformance 2 }
 -- ====================================================================
 
 GlobalPPA ::= TEXTUAL-CONVENTION
-	DISPLAY-HINT	"1x:"
-	STATUS		current
-	DESCRIPTION
-		"The GlobalPPA textual convention defines a Global PPA 
-		 (Physical Point of Attachement).  The syntax is a 4 
-		 octet string.  Embedded in the octet string is the 
-		 encoding of a reference to a specific TDM channel on 
-		 the managed element."
-	SYNTAX		OCTET STRING (SIZE(4))
+    DISPLAY-HINT "1x:"
+    STATUS current
+    DESCRIPTION
+	"The GlobalPPA textual convention defines a Global PPA (Physical 
+	 Point of Attachement).  The syntax is a 4 octet string.  
+	 Embedded in the octet string is the encoding of a reference to 
+	 a specific TDM channel on the managed element."
+    SYNTAX OCTET STRING (SIZE(4))
 
 LocalPPA ::= TEXTUAL-CONVENTION
-	DISPLAY-HINT	"1x:"
-	STATUS		current
-	DESCRIPTION
-		"The LocalPPA textual convention defines a Local PPA 
-		 (Physical Point of Attachment).  The syntax is a 2 
-		 octet string.  The interpretation of the bits within 
-		 the octets is device specific."
-	SYNTAX		OCTET STRING (SIZE(2))
+    DISPLAY-HINT "1x:"
+    STATUS current
+    DESCRIPTION
+	"The LocalPPA textual convention defines a Local PPA (Physical 
+	 Point of Attachment).  The syntax is a 2 octet string.  The 
+	 interpretation of the bits within the octets is device 
+	 specific."
+    SYNTAX OCTET STRING (SIZE(2))
 
 LinkDriver ::= TEXTUAL-CONVENTION
-	STATUS		current
-	DESCRIPTION
-		"The LinkDriver textual convention defines a STREAMS 
-		 driver that will be used to provide the signalling 
-		 link."
-	SYNTAX		OCTET STRING
+    STATUS current
+    DESCRIPTION
+	"The LinkDriver textual convention defines a STREAMS driver that 
+	 will be used to provide the signalling link."
+    SYNTAX OCTET STRING
 
 
 -- ====================================================================
 
-SlMuxNameEntry ::=
-	SEQUENCE {
-		slMuxNameName
-			SnmpAdminString,
-		slMuxNamePPA
-			GlobalPPA
-	}
+SlMuxNameEntry ::= SEQUENCE {
+    slMuxNameName				SnmpAdminString,
+    slMuxNamePPA				GlobalPPA
+}
 
-SlMuxLinkEntry ::=
-	SEQUENCE {
-		slMuxLinkPPA
-			GlobalPPA,
-		slMuxLinkName
-			SnmpAdminString,
-
-		slMuxLinkOperationalState
-			OperationalState,
-		slMuxLinkUsageState
-			UsageState,
-		slMuxLinkAdministrativeState
-			AdministrativeState,
-
-		slMuxLinkAlarmStatus
-			AlarmStatus,
-		slMuxLinkProceduralStatus
-			ProceduralStatus,
-		slMuxLinkAvailabilityStatus
-			AvailabilityStatus,
-		slMuxLinkControlStatus
-			ControlStatus,
-		slMuxLinkUnknownStatus
-			UnknownStatus,
-
-		slMuxLinkDriver
-			OBJECT IDENTIFIER,
-		slMuxLinkLocalPPA
-			LocalPPA,
-
-		slMuxLinkStatus
-			RowStatus
-	}
-
+SlMuxLinkEntry ::= SEQUENCE {
+    slMuxLinkPPA				GlobalPPA,
+    slMuxLinkName				SnmpAdminString,
+    slMuxLinkOperationalState			OperationalState,
+    slMuxLinkUsageState				UsageState,
+    slMuxLinkAdministrativeState		AdministrativeState,
+    slMuxLinkAlarmStatus			AlarmStatus,
+    slMuxLinkProceduralStatus			ProceduralStatus,
+    slMuxLinkAvailabilityStatus			AvailabilityStatus,
+    slMuxLinkControlStatus			ControlStatus,
+    slMuxLinkUnknownStatus			UnknownStatus,
+    slMuxLinkDriver				OBJECT IDENTIFIER,
+    slMuxLinkLocalPPA				LocalPPA,
+    slMuxLinkStatus				RowStatus
+}
 
 END
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
