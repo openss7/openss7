@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M2UA-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:34:38 $
+-- @(#) $RCSfile: OPENSS7-M2UA-MIB.mib,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-27 10:01:50 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-10-11 04:34:38 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 10:01:50 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M2UA-MIB.mib,v $
+-- Revision 0.9.2.6  2008-12-27 10:01:50  brian
+-- - updated mibs and stubs
+--
 -- Revision 0.9.2.5  2008-10-11 04:34:38  brian
 -- - cleanup MIBs
 --
@@ -90,7 +93,7 @@ IMPORTS
     InterfaceIdentifier, InterfaceIdentifierText
         FROM OPENSS7-SIGTRAN-TC;
 
-m2ua-MIB MODULE-IDENTITY
+m2uaMIB MODULE-IDENTITY
     LAST-UPDATED
         "200709230000Z"
     ORGANIZATION
@@ -117,9 +120,9 @@ m2ua-MIB MODULE-IDENTITY
 
 -- Top-level structure of the MIB
 
-m2uaNotifications   OBJECT IDENTIFIER ::= { m2ua-MIB    0 }
-m2uaObjects         OBJECT IDENTIFIER ::= { m2ua-MIB    1 }
-m2uaConformance     OBJECT IDENTIFIER ::= { m2ua-MIB    2 }
+m2uaNotifications   OBJECT IDENTIFIER ::= { m2uaMIB     0 }
+m2uaObjects         OBJECT IDENTIFIER ::= { m2uaMIB     1 }
+m2uaConformance     OBJECT IDENTIFIER ::= { m2uaMIB     2 }
 
 m2uaScalars         OBJECT IDENTIFIER ::= { m2uaObjects 1 }
 m2uaTables          OBJECT IDENTIFIER ::= { m2uaObjects 2 }
@@ -509,7 +512,7 @@ m2uaIfAdministrativeState OBJECT-TYPE
          is placed in the Out Of Service state."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : administrativeState"
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m2uaIfEntry 6 }
 
 m2uaIfOperationalState OBJECT-TYPE
@@ -524,7 +527,7 @@ m2uaIfOperationalState OBJECT-TYPE
          of signalling links."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : operationalState"
-    DEFVAL  { disabled(0) }
+    DEFVAL  { 0 } -- disabled(0)
     ::= { m2uaIfEntry 7 }
 m2uaIfProceduralStatus OBJECT-TYPE
     SYNTAX      ProceduralStatus
@@ -537,7 +540,7 @@ m2uaIfProceduralStatus OBJECT-TYPE
          mib for a description of the procedural states of 
          signalling links.  In general, procedural states of 
          signalling links correspond to Q.703 states."
-    DEFVAL  { notInitialized(1) }
+    DEFVAL  { 1 } -- notInitialized(1)
     ::= { m2uaIfEntry 8 }
 
 m2uaIfUsageState OBJECT-TYPE
@@ -556,7 +559,7 @@ m2uaIfUsageState OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. X.721 (1992) : usageState,
          ITU-T Rec. Q.751.1 (1996) : signLinkTp::usageStage"
-    DEFVAL  { idle(0) }
+    DEFVAL  { 0 } -- idle(0)
     ::= { m2uaIfEntry 9 }
 
 --
@@ -624,7 +627,7 @@ m2uaIfTransmissionRate OBJECT-TYPE
          from a signalling link equipment pointer."
     REFERENCE
         "ITU-T Q.751.1 (1996) : signDataLinkTp:transmissionRate"
-    DEFVAL  { ds0(3) }
+    DEFVAL  { 3 } -- ds0(3)
     ::= { m2uaIfEntry 12 }
 
 m2uaIfCic OBJECT-TYPE
@@ -785,7 +788,7 @@ m2uaAspAdministrativeState OBJECT-TYPE
          unlocked(1) administrative state."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : administrativeState"
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m2uaAspEntry 4 }
 
 m2uaAspOperationalState OBJECT-TYPE
@@ -797,7 +800,7 @@ m2uaAspOperationalState OBJECT-TYPE
          operational state is either disabled(0) or enabled(1)."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : operationalState"
-    DEFVAL  { disabled(0) }
+    DEFVAL  { 0 } -- disabled(0)
     ::= { m2uaAspEntry 5 }
 
 m2uaAspUsageState OBJECT-TYPE
@@ -809,7 +812,7 @@ m2uaAspUsageState OBJECT-TYPE
          either idle(0), active(1) or busy(2)."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : usageState"
-    DEFVAL  { idle(0) }
+    DEFVAL  { 0 } -- idle(0)
     ::= { m2uaAspEntry 6 }
 
 m2uaAspProceduralStatus OBJECT-TYPE
@@ -829,7 +832,7 @@ m2uaAspProceduralStatus OBJECT-TYPE
          has failed and is being repeated."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : proceduralState"
-    DEFVAL  { intializationRequired(0) }
+    DEFVAL  { 0 } -- intializationRequired(0)
     ::= { m2uaAspEntry 7 }
 
 m2uaAspState OBJECT-TYPE
@@ -980,7 +983,7 @@ m2uaAspSgAspState OBJECT-TYPE
         "This is the state of the ASP for this SG.  It uses the 
          textual convention AspState which may be down(0), 
          initializing(1), terminating(2), up(3)."
-    DEFVAL  { down(0) }
+    DEFVAL  { 0 } -- down(0)
     ::= { m2uaAspSgEntry 3 }
 
 m2uaAspSgAdministrativeState OBJECT-TYPE
@@ -1002,7 +1005,7 @@ m2uaAspSgAdministrativeState OBJECT-TYPE
          that are in the unlocked(1) state."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : administrativeState"
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m2uaAspSgEntry 4 }
 
 m2uaSgAspTable OBJECT-TYPE
@@ -1071,7 +1074,7 @@ m2uaSgAspState OBJECT-TYPE
         "This is the state of the ASP for this SG.  It uses the 
          textual convention AspState which may be down(0), 
          initializing(1), terminating(2) or up(3)."
-    DEFVAL  { down(0) }
+    DEFVAL  { 0 } -- down(0)
     ::= { m2uaSgAspEntry 3 }
 
 m2uaSgAspAdministrativeState OBJECT-TYPE
@@ -1095,7 +1098,7 @@ m2uaSgAspAdministrativeState OBJECT-TYPE
          ASP-ACTIVE requests for AS in the locked(0) state."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : administrativeState"
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m2uaSgAspEntry 4 }
 
 m2uaSgAspOperationalState OBJECT-TYPE
@@ -1111,7 +1114,7 @@ m2uaSgAspOperationalState OBJECT-TYPE
          the ASP."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : operationalState"
-    DEFVAL  { disabled(0) }
+    DEFVAL  { 0 } -- disabled(0)
     ::= { m2uaSgAspEntry 5 }
 
 
@@ -1166,7 +1169,7 @@ m2uaSgAspAsRegistrationRequired OBJECT-TYPE
          activating the AS.  When required(2), the SG will 
          require the ASP to register for IIDs belonging to this 
          AS before permitting the ASP to activate the AS."
-    DEFVAL  { forbidden(0) }
+    DEFVAL  { 0 } -- forbidden(0)
     ::= { m2uaSgAspAsEntry 1 }
 
 m2uaSgAspAsState OBJECT-TYPE
@@ -1195,7 +1198,7 @@ m2uaSgAspAsAdministrativeState OBJECT-TYPE
          Attempts to register an IID of this AS will be refused.  
          When in the unlocked(1) state, the SG will permit the 
          ASP to register for and IID of or activate this AS."
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m2uaSgAspAsEntry 3 }
 
 m2uaSgAspAsOperationalState OBJECT-TYPE
@@ -1212,7 +1215,7 @@ m2uaSgAspAsOperationalState OBJECT-TYPE
          enabled(1) state, the associated ASP is in the up(1) 
          state and has registered for an IID of the AS when 
          registration is required."
-    DEFVAL  { disabled(0) }
+    DEFVAL  { 0 } -- disabled(0)
     ::= { m2uaSgAspAsEntry 4 }
 
 

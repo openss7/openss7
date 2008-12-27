@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M2PA-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2008-10-11 04:34:38 $
+-- @(#) $RCSfile: OPENSS7-M2PA-MIB.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-27 10:01:50 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-10-11 04:34:38 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 10:01:50 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M2PA-MIB.mib,v $
+-- Revision 0.9.2.5  2008-12-27 10:01:50  brian
+-- - updated mibs and stubs
+--
 -- Revision 0.9.2.4  2008-10-11 04:34:38  brian
 -- - cleanup MIBs
 --
@@ -69,7 +72,7 @@
 OPENSS7-M2PA-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    openss7Modules
+    openss7, openss7Modules
         FROM OPENSS7-SMI
     SimpleNameType
         FROM OPENSS7-SMI-MIB
@@ -162,7 +165,7 @@ m2paDefaultSctpNoDelay OBJECT-TYPE
          the scalar value must persist across system reboots."
     REFERENCE   
         "RFC 4960"
-    DEFVAL      { true }
+    DEFVAL      { 1 } -- true(1)
     ::= { m2paScalars 1 }
 
 m2paDefaultSctpMaxseg OBJECT-TYPE
@@ -705,7 +708,7 @@ m2paProving OBJECT-TYPE
          proving althogether."
     REFERENCE   
         ""
-    DEFVAL      { true }
+    DEFVAL      { 1 } -- true(1)
     ::= { m2paProtocolProfileEntry 3 }
 
 m2paManagementProvingState OBJECT-TYPE

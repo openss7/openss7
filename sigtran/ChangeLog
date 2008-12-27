@@ -1,3 +1,30 @@
+2008-12-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/mibs/OPENSS7-M2PA-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-M2UA-ASP-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-M2UA-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-M3UA-ASP-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-M3UA-SGP-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-SIGTRAN-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-SMI-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-TMN-SMI.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-UMC-MIB.mib: updated mibs
+
+	* src/snmp/m2pMIB.h: added mib skeletons
+	* src/snmp/m2paMIB.c: added mib skeletons
+	* src/snmp/m2uaAspMIB.c: added mib skeletons
+	* src/snmp/m2uaAspMIB.h: added mib skeletons
+	* src/snmp/m2uaMIB.c: added mib skeletons
+	* src/snmp/m2uaMIB.h: added mib skeletons
+	* src/snmp/m3uaAspMIB.c: added mib skeletons
+	* src/snmp/m3uaAspMIB.h: added mib skeletons
+	* src/snmp/m3uaSgpMIB.c: added mib skeletons
+	* src/snmp/m3uaSgpMIB.h: added mib skeletons
+	* src/snmp/makestubs: added mib skeletons
+	* src/snmp/sigtranMIB.c: added mib skeletons
+	* src/snmp/sigtranMIB.h: added mib skeletons
+	
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: new stratm package
