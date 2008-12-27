@@ -1,0 +1,279 @@
+#!/usr/bin/make -f
+# =============================================================================
+# 
+# @(#) $RCSfile: makestubs,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-27 10:01:52 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2008-12-27 10:01:52 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: makestubs,v $
+# Revision 0.9.2.1  2008-12-27 10:01:52  brian
+# - updated mibs and stubs
+#
+# Revision 0.9.2.4  2008-07-31 17:40:17  brian
+# - SNMP updates
+#
+# Revision 0.9.2.3  2008-04-28 12:54:07  brian
+# - update file headers for release
+#
+# Revision 0.9.2.2  2007/12/29 23:01:51  brian
+# - working up mib2c
+#
+# Revision 0.9.2.1  2007/10/13 08:54:36  brian
+# - added MIB agent files
+#
+# =============================================================================
+
+MIBS=+OPENSS7-M2PA-MIB:OPENSS7-M2UA-ASP-MIB:OPENSS7-M2UA-MIB:OPENSS7-M3UA-ASP-MIB:OPENSS7-M3UA-SGP-MIB:OPENSS7-METRIC-MIB:OPENSS7-SIGTRAN-MIB
+MIBDIRS=./mibs:/usr/share/snmp/mibs
+MIBFILES=./mibs/OPENSS7-M2PA-MIB.mib:./mibs/OPENSS7-M2UA-ASP-MIB.mib:./mibs/OPENSS7-M2UA-MIB.mib:./mibs/OPENSS7-M3UA-ASP-MIB.mib:./mibs/OPENSS7-M3UA-SGP-MIB.mib:./mibs/OPENSS7-METRIC-MIB.mib:./mibs/OPENSS7-SIGTRAN-MIB.mib
+
+#mibs/OPENSS7-M2PA-MIB::m2paMIB
+#mibs/OPENSS7-M2UA-ASP-MIB::m2uaAspMIB
+#mibs/OPENSS7-M2UA-MIB::m2uaMIB
+#mibs/OPENSS7-M3UA-ASP-MIB::m3uaAspMIB
+#mibs/OPENSS7-M3UA-SGP-MIB::m3uaSgpMIB
+#mibs/OPENSS7-METRIC-MIB::metricMIB
+#mibs/OPENSS7-SIGTRAN-MIB::sigtranMIB
+
+export MIBS
+export MIBDIRS
+export MIBFILES
+
+all: simple storage openss7
+
+check: \
+	m2paMIB.tree \
+	m2uaAspMIB.tree \
+	m2uaMIB.tree \
+	m3uaAspMIB.tree \
+	m3uaSgpMIB.tree \
+	sigtranMIB.tree
+#	metricMIB.tree
+
+m2paMIB.tree: mibs/OPENSS7-M2PA-MIB.mib
+	snmptranslate -Tp OPENSS7-M2PA-MIB::m2paMIB 2>&1 | tee $@
+
+m2uaAspMIB.tree: mibs/OPENSS7-M2UA-ASP-MIB.mib
+	snmptranslate -Tp OPENSS7-M2UA-ASP-MIB::m2uaAspMIB 2>&1 | tee $@
+
+m2uaMIB.tree: mibs/OPENSS7-M2UA-MIB.mib
+	snmptranslate -Tp OPENSS7-M2UA-MIB::m2uaMIB 2>&1 | tee $@
+
+m3uaAspMIB.tree: mibs/OPENSS7-M3UA-ASP-MIB.mib
+	snmptranslate -Tp OPENSS7-M3UA-ASP-MIB::m3uaAspMIB 2>&1 | tee $@
+
+m3uaSgpMIB.tree: mibs/OPENSS7-M3UA-SGP-MIB.mib
+	snmptranslate -Tp OPENSS7-M3UA-SGP-MIB::m3uaSgpMIB 2>&1 | tee $@
+
+metricMIB.tree: mibs/OPENSS7-METRIC-MIB.mib
+	snmptranslate -Tp OPENSS7-METRIC-MIB::metricMIB 2>&1 | tee $@
+
+sigtranMIB.tree: mibs/OPENSS7-SIGTRAN-MIB.mib
+	snmptranslate -Tp OPENSS7-SIGTRAN-MIB::sigtranMIB 2>&1 | tee $@
+
+simple: \
+	m2paMIB_simple.c m2paMIB_simple.h \
+	m2uaAspMIB_simple.c m2uaAspMIB_simple.h \
+	m2uaMIB_simple.c m2uaMIB_simple.h \
+	m3uaAspMIB_simple.c m3uaAspMIB_simple.h \
+	m3uaSgpMIB_simple.c m3uaSgpMIB_simple.h \
+	sigtranMIB_simple.c sigtranMIB_simple.h
+#	metricMIB_simple.c metricMIB_simple.h
+
+m2paMIB_simple.c m2paMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M2PA-MIB.mib
+	./mib2c -c ./mib2c.conf -f m2paMIB_simple m2paMIB
+	indent -nhnl m2paMIB_simple.[ch]
+
+m2uaAspMIB_simple.c m2uaAspMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M2UA-ASP-MIB.mib
+	./mib2c -c ./mib2c.conf -f m2uaAspMIB_simple m2uaAspMIB
+	indent -nhnl m2uaAspMIB_simple.[ch]
+
+m2uaMIB_simple.c m2uaMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M2UA-MIB.mib
+	./mib2c -c ./mib2c.conf -f m2uaMIB_simple m2uaMIB
+	indent -nhnl m2uaMIB_simple.[ch]
+
+m3uaAspMIB_simple.c m3uaAspMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M3UA-ASP-MIB.mib
+	./mib2c -c ./mib2c.conf -f m3uaAspMIB_simple m3uaAspMIB
+	indent -nhnl m3uaAspMIB_simple.[ch]
+
+m3uaSgpMIB_simple.c m3uaSgpMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M3UA-SGP-MIB.mib
+	./mib2c -c ./mib2c.conf -f m3uaSgpMIB_simple m3uaSgpMIB
+	indent -nhnl m3uaSgpMIB_simple.[ch]
+
+sigtranMIB_simple.c sigtranMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-SIGTRAN-MIB.mib
+	./mib2c -c ./mib2c.conf -f sigtranMIB_simple sigtranMIB
+	indent -nhnl sigtranMIB_simple.[ch]
+
+metricMIB_simple.c metricMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-METRIC-MIB.mib
+	./mib2c -c ./mib2c.conf -f metricMIB_simple metricMIB
+	indent -nhnl metricMIB_simple.[ch]
+
+storage: \
+	m2paMIB_storage.c m2paMIB_storage.h \
+	m2uaAspMIB_storage.c m2uaAspMIB_storage.h \
+	m2uaMIB_storage.c m2uaMIB_storage.h \
+	m3uaAspMIB_storage.c m3uaAspMIB_storage.h \
+	m3uaSgpMIB_storage.c m3uaSgpMIB_storage.h \
+	sigtranMIB_storage.c sigtranMIB_storage.h
+#	metricMIB_storage.c metricMIB_storage.h
+
+m2paMIB_storage.c m2paMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M2PA-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f m2paMIB_storage m2paMIB
+	indent -nhnl m2paMIB_storage.[ch]
+
+m2uaAspMIB_storage.c m2uaAspMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M2UA-ASP-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f m2uaAspMIB_storage m2uaAspMIB
+	indent -nhnl m2uaAspMIB_storage.[ch]
+
+m2uaMIB_storage.c m2uaMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M2UA-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f m2uaMIB_storage m2uaMIB
+	indent -nhnl m2uaMIB_storage.[ch]
+
+m3uaAspMIB_storage.c m3uaAspMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M3UA-ASP-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f m3uaAspMIB_storage m3uaAspMIB
+	indent -nhnl m3uaAspMIB_storage.[ch]
+
+m3uaSgpMIB_storage.c m3uaSgpMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M3UA-SGP-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f m3uaSgpMIB_storage m3uaSgpMIB
+	indent -nhnl m3uaSgpMIB_storage.[ch]
+
+sigtranMIB_storage.c sigtranMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-SIGTRAN-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f sigtranMIB_storage sigtranMIB
+	indent -nhnl sigtranMIB_storage.[ch]
+
+metricMIB_storage.c metricMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-METRIC-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f metricMIB_storage metricMIB
+	indent -nhnl metricMIB_storage.[ch]
+
+openss7: \
+	m2paMIB_openss7.c m2paMIB_openss7.h \
+	m2uaAspMIB_openss7.c m2uaAspMIB_openss7.h \
+	m2uaMIB_openss7.c m2uaMIB_openss7.h \
+	m3uaAspMIB_openss7.c m3uaAspMIB_openss7.h \
+	m3uaSgpMIB_openss7.c m3uaSgpMIB_openss7.h \
+	sigtranMIB_openss7.c sigtranMIB_openss7.h
+#	metricMIB_openss7.c metricMIB_openss7.h
+
+m2paMIB_openss7.c m2paMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M2PA-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f m2paMIB_openss7 m2paMIB
+	indent -nhnl m2paMIB_openss7.[ch]
+
+m2uaAspMIB_openss7.c m2uaAspMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M2UA-ASP-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f m2uaAspMIB_openss7 m2uaAspMIB
+	indent -nhnl m2uaAspMIB_openss7.[ch]
+
+m2uaMIB_openss7.c m2uaMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M2UA-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f m2uaMIB_openss7 m2uaMIB
+	indent -nhnl m2uaMIB_openss7.[ch]
+
+m3uaAspMIB_openss7.c m3uaAspMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M3UA-ASP-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f m3uaAspMIB_openss7 m3uaAspMIB
+	indent -nhnl m3uaAspMIB_openss7.[ch]
+
+m3uaSgpMIB_openss7.c m3uaSgpMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M3UA-SGP-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f m3uaSgpMIB_openss7 m3uaSgpMIB
+	indent -nhnl m3uaSgpMIB_openss7.[ch]
+
+sigtranMIB_openss7.c sigtranMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-SIGTRAN-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f sigtranMIB_openss7 sigtranMIB
+	indent -nhnl sigtranMIB_openss7.[ch]
+
+metricMIB_openss7.c metricMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-METRIC-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f metricMIB_openss7 metricMIB
+	indent -nhnl metricMIB_openss7.[ch]
+
+clean:
+	rm -f m2paMIB.tree
+	rm -f m2uaAspMIB.tree
+	rm -f m2uaMIB.tree
+	rm -f m3uaAspMIB.tree
+	rm -f m3uaSgpMIB.tree
+	rm -f sigtranMIB.tree
+	rm -f metricMIB.tree
+	rm -f m2paMIB_simple.[ch]
+	rm -f m2uaAspMIB_simple.[ch]
+	rm -f m2uaMIB_simple.[ch]
+	rm -f m3uaAspMIB_simple.[ch]
+	rm -f m3uaSgpMIB_simple.[ch]
+	rm -f sigtranMIB_simple.[ch]
+	rm -f metricMIB_simple.[ch]
+	rm -f m2paMIB_simple.[ch]~
+	rm -f m2uaAspMIB_simple.[ch]~
+	rm -f m2uaMIB_simple.[ch]~
+	rm -f m3uaAspMIB_simple.[ch]~
+	rm -f m3uaSgpMIB_simple.[ch]~
+	rm -f sigtranMIB_simple.[ch]~
+	rm -f metricMIB_simple.[ch]~
+	rm -f m2paMIB_storage.[ch]
+	rm -f m2uaAspMIB_storage.[ch]
+	rm -f m2uaMIB_storage.[ch]
+	rm -f m3uaAspMIB_storage.[ch]
+	rm -f m3uaSgpMIB_storage.[ch]
+	rm -f sigtranMIB_storage.[ch]
+	rm -f metricMIB_storage.[ch]
+	rm -f m2paMIB_storage.[ch]~
+	rm -f m2uaAspMIB_storage.[ch]~
+	rm -f m2uaMIB_storage.[ch]~
+	rm -f m3uaAspMIB_storage.[ch]~
+	rm -f m3uaSgpMIB_storage.[ch]~
+	rm -f sigtranMIB_storage.[ch]~
+	rm -f metricMIB_storage.[ch]~
+	rm -f m2paMIB_openss7.[ch]
+	rm -f m2uaAspMIB_openss7.[ch]
+	rm -f m2uaMIB_openss7.[ch]
+	rm -f m3uaAspMIB_openss7.[ch]
+	rm -f m3uaSgpMIB_openss7.[ch]
+	rm -f sigtranMIB_openss7.[ch]
+	rm -f metricMIB_openss7.[ch]
+	rm -f m2paMIB_openss7.[ch]~
+	rm -f m2uaAspMIB_openss7.[ch]~
+	rm -f m2uaMIB_openss7.[ch]~
+	rm -f m3uaAspMIB_openss7.[ch]~
+	rm -f m3uaSgpMIB_openss7.[ch]~
+	rm -f sigtranMIB_openss7.[ch]~
+	rm -f metricMIB_openss7.[ch]~
