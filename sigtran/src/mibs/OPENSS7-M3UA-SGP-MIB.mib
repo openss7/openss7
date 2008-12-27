@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M3UA-SGP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-11 04:34:38 $
+-- @(#) $RCSfile: OPENSS7-M3UA-SGP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-12-27 10:01:50 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-10-11 04:34:38 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 10:01:50 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M3UA-SGP-MIB.mib,v $
+-- Revision 0.9.2.5  2008-12-27 10:01:50  brian
+-- - updated mibs and stubs
+--
 -- Revision 0.9.2.4  2008-10-11 04:34:38  brian
 -- - cleanup MIBs
 --
@@ -71,10 +74,13 @@ OPENSS7-M3UA-SGP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
         FROM SNMPv2-SMI
-    TimeInterval, RowStatus, Unsigned32
+    TimeInterval, RowStatus, Unsigned32, RowPointer
         FROM SNMPv2-TC
-    ProtocolVersion, SigtranOptions, RegistrationPolicy, AspIdPolicy
+    ProtocolVersion, SigtranOptions, RegistrationPolicy, AspIdPolicy, AspState
         FROM OPENSS7-SIGTRAN-TC
+    AdministrativeState, AlarmStatus, AvailabilityStatus, 
+    OperationalState, ProceduralStatus, UsageState
+        FROM OPENSS7-SMI-MIB
     CommonLanguageName
         FROM OPENSS7-TC
     openss7Modules
@@ -314,7 +320,7 @@ m3uaSgpAgProtocolVersion OBJECT-TYPE
          on an active entry is also implementation dependent."
     REFERENCE
         "OPENSS7-SIGTRAN-TC"
-    DEFVAL              { interoperableProtocolVersion }
+    DEFVAL      { interoperableProtocolVersion }
     ::= { m3uaSgpAgEntry 3 }
 
 m3uaSgpAgOptions OBJECT-TYPE
@@ -334,7 +340,6 @@ m3uaSgpAgOptions OBJECT-TYPE
          engages in the ASP Up procedure with an ASP."
     REFERENCE
         "OPENSS7-SIGTRAN-TC"
-    DEFVAL              { '000000000'B }
     ::= { m3uaSgpAgEntry 4 }
 
 m3uaSgpAgRegistrationPolicy OBJECT-TYPE
@@ -360,7 +365,7 @@ m3uaSgpAgRegistrationPolicy OBJECT-TYPE
          cycled through the ASP Down procedure."
     REFERENCE
         "OPENSS7-SIGTRAN-TC"
-    DEFVAL              { unknown(1) }
+    DEFVAL      { 1 } -- unknown(1)
     ::= { m3uaSgpAgEntry 5 }
 
 
@@ -380,7 +385,7 @@ m3uaSgpAgAspIdPolicy OBJECT-TYPE
          engages in the ASP Up procedure with an ASP."
     REFERENCE
         "OPENSS7-SIGTRAN-TC"
-    DEFVAL              { unknown(1) }
+    DEFVAL      { 1 } -- unknown(1)
     ::= { m3uaSgpAgEntry 6 }
 
 m3uaSgpAgProtocolPayloadId OBJECT-TYPE
@@ -395,7 +400,7 @@ m3uaSgpAgProtocolPayloadId OBJECT-TYPE
          
          When changed on an active entry, the PPI value set will 
          take effect on the next DATA chunk sent."
-    DEFVAL              { 3 }
+    DEFVAL      { 3 }
     ::= { m3uaSgpAgEntry 7 }
 
 m3uaSgpAgIpPort OBJECT-TYPE
@@ -419,7 +424,7 @@ m3uaSgpAgIpPort OBJECT-TYPE
          immediately.  What actions are performed with regard to 
          outstanding connection attempts at the time of the 
          change are implementation dependent."
-    DEFVAL              { 2905 }
+    DEFVAL      { 2905 }
     ::= { m3uaSgpAgEntry 8 }
 
 m3uaSgpAgMinOstreams OBJECT-TYPE
@@ -437,7 +442,7 @@ m3uaSgpAgMinOstreams OBJECT-TYPE
          SLS) data streams for the  32 or 256 possible SLS 
          values).   The default value is set to 33 to handle 
          most cases without an excessive number of streams."
-    DEFVAL              { 33 }
+    DEFVAL      { 33 }
     ::= { m3uaSgpAgEntry 9 }
 
 m3uaSgpAgMaxIstreams OBJECT-TYPE
@@ -453,7 +458,7 @@ m3uaSgpAgMaxIstreams OBJECT-TYPE
          streanms in the description in the same table as this, 
          m3uaSgpAg, table for the m3uaSgpAgMinOstreams column in 
          the same entry."
-    DEFVAL              { 33 }
+    DEFVAL      { 33 }
     ::= { m3uaSgpAgEntry 10 }
 
 m3uaSgpAgStatus OBJECT-TYPE
@@ -588,7 +593,7 @@ M3uaSgpAspEntry ::=
         m3uaSgpAspUsageState
             UsageState,         -- OPENSS7-TMN-TC
         m3uaSgpAspAdministrativeState
-            AdministativeState, -- OPENSS7-TMN-TC
+            AdministrativeState, -- OPENSS7-TMN-TC
         m3uaSgpAspAlarmStatus
             AlarmStatus,        -- OPENSS7-TMN-TC
         m3uaSgpAspProceduralStatus
@@ -638,7 +643,7 @@ m3uaSgpAspOperationalState OBJECT-TYPE
          operational state is the most operable state of all of 
          the SGP-ASP associations that are configured for this 
          managed element."
-    DEFVAL              { disabled(0) }
+    DEFVAL      { 0 } -- disabled(0)
     ::= { m3uaSgpAspEntry 3 }
 
 m3uaSgpAspUsageState OBJECT-TYPE
@@ -652,11 +657,11 @@ m3uaSgpAspUsageState OBJECT-TYPE
          utilized state of each of the AS served by each SGP-ASP 
          associaiton that is configured for this managed 
          element."
-    DEFVAL              { idle(0) }
+    DEFVAL      { 0 } -- idle(0)
     ::= { m3uaSgpAspEntry 4 }
 
 m3uaSgpAspAdministrativeState OBJECT-TYPE
-    SYNTAX      AdministativeState
+    SYNTAX      AdministrativeState
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -672,7 +677,7 @@ m3uaSgpAspAdministrativeState OBJECT-TYPE
          issued an unsolicited ASP Inactive Ack to deactivate 
          the AS.  The value represents current conditions and is 
          not guaranteed peristent across an agent reboot."
-    DEFVAL              { locked(0) }
+    DEFVAL      { 0 } -- locked(0)
     ::= { m3uaSgpAspEntry 5 }
 
 m3uaSgpAspAlarmStatus OBJECT-TYPE
@@ -684,7 +689,7 @@ m3uaSgpAspAlarmStatus OBJECT-TYPE
          managed element using the AlarmStatus textual 
          convention.  The value reflects current conditions and 
          is not guaranteed persistent across an agent reboot."
-    DEFVAL              { '00000'B }
+    DEFVAL      { }
     ::= { m3uaSgpAspEntry 6 }
 
 m3uaSgpAspProceduralStatus OBJECT-TYPE
@@ -697,7 +702,7 @@ m3uaSgpAspProceduralStatus OBJECT-TYPE
          overall procedural status is the set-union (logical OR) 
          of the procedural status of all SGP-ASP associations 
          configured for this ASP."
-    DEFVAL              { '00000'B }
+    DEFVAL      { }
     ::= { m3uaSgpAspEntry 7 }
 
 m3uaSgpAspAvailabilityStatus OBJECT-TYPE
@@ -709,8 +714,8 @@ m3uaSgpAspAvailabilityStatus OBJECT-TYPE
          using the AvailabilityStatus textual convention.  The 
          overal availablity status is the set-union (logical OR) 
          of the availability status of all SGP-ASP associations 
-         cofnigured for this ASP."
-    DEFVAL              { '000000'B }
+         configured for this ASP."
+    DEFVAL      { }
     ::= { m3uaSgpAspEntry 8 }
 
 m3uaSgpAspAspState OBJECT-TYPE
@@ -729,7 +734,7 @@ m3uaSgpAspAspState OBJECT-TYPE
          be performed to return the ASP to its previous state.  
          This value reflects current conditions and is not 
          guaranteed persistent across an agent reboot."
-    DEFVAL              { down(0) }
+    DEFVAL      { 0 } -- down(0)
     ::= { m3uaSgpAspEntry 9 }
 
 m3uaSgpAspSctpProfile OBJECT-TYPE
@@ -749,7 +754,7 @@ m3uaSgpAspSctpProfile OBJECT-TYPE
          ASP.  Management stations can force a new association 
          to be formed with this ASP using the 
          m3uaSgpAspAdministrativeState column."
-    DEFVAL              { zeroDotZero }
+    DEFVAL      { zeroDotZero }
     ::= { m3uaSgpAspEntry 10 }
 
 m3uaSgpAspMaxInitRetries OBJECT-TYPE

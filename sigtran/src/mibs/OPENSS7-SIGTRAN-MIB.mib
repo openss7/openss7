@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SIGTRAN-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-11 04:34:38 $
+-- @(#) $RCSfile: OPENSS7-SIGTRAN-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-12-27 10:01:50 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-10-11 04:34:38 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 10:01:50 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SIGTRAN-MIB.mib,v $
+-- Revision 0.9.2.5  2008-12-27 10:01:50  brian
+-- - updated mibs and stubs
+--
 -- Revision 0.9.2.4  2008-10-11 04:34:38  brian
 -- - cleanup MIBs
 --
@@ -71,7 +74,7 @@ OPENSS7-SIGTRAN-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY, OBJECT-TYPE
 		FROM SNMPv2-SMI
-	RowStatus, TimeInterval
+	RowStatus, TimeInterval, TruthValue
 		FROM SNMPv2-TC
 	SnmpAdminString
 		FROM SNMP-FRAMEWORK-MIB
@@ -245,7 +248,7 @@ sigtranSctpProfileNodelay OBJECT-TYPE
 		 events."
 	REFERENCE
 		"RFC 4960"
-	DEFVAL		{ false(2) }
+	DEFVAL		{ 2 } -- false(2)
 	::= { sigtranSctpProfileEntry 3 }
 
 sigtranSctpPayloadProtocolId OBJECT-TYPE
@@ -326,7 +329,7 @@ sigtranSctpProfileCsumType OBJECT-TYPE
 		 only be used in special circumstances."
 	REFERENCE
 		"RFC 4960"
-	DEFVAL		{ crc32c(1) }
+	DEFVAL		{ 1 } -- crc32c(1)
 	::= { sigtranSctpProfileEntry 6 }
 
 sigtranSctpProfileMacType OBJECT-TYPE
@@ -362,7 +365,7 @@ sigtranSctpProfileMacType OBJECT-TYPE
 		 circumstances or for testing."
 	REFERENCE
 		"RFC 4960"
-	DEFVAL		{ other(5) }
+	DEFVAL		{ 5 } -- other(5)
 	::= { sigtranSctpProfileEntry 7 }
 
 sigtranSctpProfileValidCookieLife OBJECT-TYPE
@@ -508,7 +511,7 @@ sigtranSctpEcn OBJECT-TYPE
 		 ECN implementation problem is suspected."
 	REFERENCE
 		"RFC 4960"
-	DEFVAL		{ true(1) }
+	DEFVAL		{ 1 } -- true(1)
 	::= { sigtranSctpProfileEntry 12 }
 
 sigtranSctpAdaptationLayerInfo OBJECT-TYPE

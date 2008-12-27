@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M3UA-ASP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:34:38 $
+-- @(#) $RCSfile: OPENSS7-M3UA-ASP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.6 $) $Date: 2008-12-27 10:01:50 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-10-11 04:34:38 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 10:01:50 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M3UA-ASP-MIB.mib,v $
+-- Revision 0.9.2.6  2008-12-27 10:01:50  brian
+-- - updated mibs and stubs
+--
 -- Revision 0.9.2.5  2008-10-11 04:34:38  brian
 -- - cleanup MIBs
 --
@@ -929,7 +932,7 @@ m3uaAspSgAdministrativeState OBJECT-TYPE
          administrative state will form associations to SGP in 
          the unlocked administrative state and bring themsleves 
          to the ASP Up state."
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m3uaAspSgEntry 3 }
 
 m3uaAspSgOperationalState OBJECT-TYPE
@@ -941,7 +944,7 @@ m3uaAspSgOperationalState OBJECT-TYPE
          following the OperationalState textual convention.  The 
          operational state is the most active operational state 
          of the SGP belonging to the SG."
-    DEFVAL  { disabled(0) }
+    DEFVAL  { 0 } -- disabled(0)
     ::= { m3uaAspSgEntry 4 }
 
 m3uaAspSgProcedurealStatus OBJECT-TYPE
@@ -954,7 +957,7 @@ m3uaAspSgProcedurealStatus OBJECT-TYPE
          overall procedural state is the set-union (logical OR) 
          of the procedural states of the invividual SGP 
          belonging to the SG."
-    DEFVAL  { '000000'B }
+    DEFVAL  { } -- '000000'B
     ::= { m3uaAspSgEntry 5 }
 
 m3uaAspSgUsgageState OBJECT-TYPE
@@ -966,7 +969,7 @@ m3uaAspSgUsgageState OBJECT-TYPE
          the UsageState textual convention.  The overall usage 
          state of the SG is the most active usage state of the 
          SGP belonging to the SG."
-    DEFVAL  { idle(0) }
+    DEFVAL  { 0 } -- idle(0)
     ::= { m3uaAspSgEntry 6 }
 
 m3uaAspSgAspState OBJECT-TYPE
@@ -1652,7 +1655,7 @@ m3uaAspSgpAdministrativeState OBJECT-TYPE
          administrative state to form an SCTP association with 
          the SGP and execute the ASP Up procedures for this 
          SGP."
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m3uaAspSgpEntry 3 }
 
 m3uaAspSgpProceduralStatus OBJECT-TYPE
@@ -1665,7 +1668,7 @@ m3uaAspSgpProceduralStatus OBJECT-TYPE
          overall procedural status is the set-union (logical OR) 
          of the procedural statuses of the ASP-SGP associations 
          for which this SGP is configured."
-    DEFVAL  { '000000'B }
+    DEFVAL  { } -- '000000'B
     ::= { m3uaAspSgpEntry 4 }
 
 m3uaAspSgpOperationalState OBJECT-TYPE
@@ -1678,7 +1681,7 @@ m3uaAspSgpOperationalState OBJECT-TYPE
          overall operational state is the most active 
          operational state of all of the ASP-SGP associations 
          configured for this SGP."
-    DEFVAL  { disabled(0) }
+    DEFVAL  { 0 } -- disabled(0)
     ::= { m3uaAspSgpEntry 5 }
 
 m3uaAspSgpUsageState OBJECT-TYPE
@@ -1690,7 +1693,7 @@ m3uaAspSgpUsageState OBJECT-TYPE
          the UsageState textual convention.  The overall usage 
          state of the SGP is most active state of any of the 
          ASP-SGP associations configured for this SGP."
-    DEFVAL  { idle(0) }
+    DEFVAL  { 0 } -- idle(0)
     ::= { m3uaAspSgpEntry 6 }
 
 m3uaAspSgpAspState OBJECT-TYPE
@@ -2121,7 +2124,7 @@ m3uaAspMtAdministrativeState OBJECT-TYPE
          serving SGP and activated."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : administrativeState"
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m3uaAspMtEntry 3 }
 
 m3uaAspMtOperationalState OBJECT-TYPE
@@ -2137,7 +2140,7 @@ m3uaAspMtOperationalState OBJECT-TYPE
          associated with it and is able to accept traffic."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : operationalState"
-    DEFVAL  { disabled(0) }
+    DEFVAL  { 0 } -- disabled(0)
     ::= { m3uaAspMtEntry 4 }
 
 m3uaAspMtProceduralStatus OBJECT-TYPE
@@ -2160,7 +2163,7 @@ m3uaAspMtProceduralStatus OBJECT-TYPE
          procedurally idle."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : proceduralStatus"
-    DEFVAL  { '000000'B }
+    DEFVAL  { } -- '000000'B
     ::= { m3uaAspMtEntry 5 }
 
 m3uaAspMtUsageState OBJECT-TYPE
@@ -2178,7 +2181,7 @@ m3uaAspMtUsageState OBJECT-TYPE
          is busy with user traffic."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : usageSate"
-    DEFVAL  { idle(0) }
+    DEFVAL  { 0 } -- idle(0)
     ::= { m3uaAspMtEntry 6 }
 
 m3uaAspMtAsState OBJECT-TYPE
@@ -2207,7 +2210,7 @@ m3uaAspMtAsState OBJECT-TYPE
          move the AS back to a previous state.  Use the 
          AdministrativeState textual convention for a persistent 
          result."
-    DEFVAL  { down(0) }
+    DEFVAL  { 0 } -- down(0)
     ::= { m3uaAspMtEntry 7 }
 
 
@@ -2762,7 +2765,7 @@ m3uaAspRlAdministrativeState OBJECT-TYPE
          a route list of higher cost in the route set."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : administrativeState"
-    DEFVAL  { locked(0) }
+    DEFVAL  { 0 } -- locked(0)
     ::= { m3uaAspRlEntry 1 }
 
 m3uaAspRlOperationalState OBJECT-TYPE
@@ -2778,7 +2781,7 @@ m3uaAspRlOperationalState OBJECT-TYPE
          its availability status)."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : operationalState"
-    DEFVAL  { enabled(1) }
+    DEFVAL  { 1 } -- enabled(1)
     ::= { m3uaAspRlEntry 1 }
 
 m3uaAspRlProceduralStatus OBJECT-TYPE
@@ -2793,7 +2796,7 @@ m3uaAspRlProceduralStatus OBJECT-TYPE
          status of the contained routes."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : proceduralStatus"
-    DEFVAL  { '000000'B }
+    DEFVAL  { } -- '000000'B
     ::= { m3uaAspRlEntry 1 }
 
 m3uaAspRlUsageState OBJECT-TYPE
