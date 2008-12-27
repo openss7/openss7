@@ -7,6 +7,22 @@
 	* src/snmp/mibs/OPENSS7-MTP-MIB2.mib: removed redundant mibs
 	* src/snmp/mibs/OPENSS7-MTP-MIB3.mib:  removed redundant mibs
 
+	* Makefile.am: split MTP and MTP OM mibs
+	* src/snmp/makestubs: split MTP and MTP OM mibs
+	* src/snmp/mtpMIB.c: split MTP and MTP OM mibs
+	* src/snmp/mtpMIB.h: split MTP and MTP OM mibs
+	* src/snmp/mtpOmMIB.c: split MTP and MTP OM mibs
+	* src/snmp/mtpOmMIB.h: split MTP and MTP OM mibs
+	* src/snmp/sccpMIB.c: split MTP and MTP OM mibs
+	* src/snmp/sccpOmMIB.c: split MTP and MTP OM mibs
+	* src/snmp/ss7MIB.c: split MTP and MTP OM mibs
+	* src/snmp/x400pMIB.c: split MTP and MTP OM mibs
+	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: split MTP and MTP OM mibs
+	* src/snmp/mibs/OPENSS7-MTP-OM-MIB.mib: split MTP and MTP OM mibs
+	* src/snmp/mibs/OPENSS7-SCCP-OM-MIB.mib: split MTP and MTP OM mibs
+
+	* src/snmp/mibs/OPENSS7-MTP-OM-MIB2.mib: added new MTP OM mib
+
 2008-12-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: building ss7confd

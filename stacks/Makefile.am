@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-12-24 13:08:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-12-27 15:29:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-24 13:08:22 $ by $Author: brian $
+# Last Modified $Date: 2008-12-27 15:29:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -171,6 +171,8 @@ ss7confd_SOURCES		= src/snmp/ss7MIB.c \
 				  src/snmp/x400pMIB.h \
 				  src/snmp/mtpMIB.c \
 				  src/snmp/mtpMIB.h \
+				  src/snmp/mtpOmMIB.c \
+				  src/snmp/mtpOmMIB.h \
 				  src/snmp/sccpMIB.c \
 				  src/snmp/sccpMIB.h \
 				  src/snmp/sccpOmMIB.c \
@@ -1054,6 +1056,8 @@ ss7MIB_la_SOURCES		= \
 				  src/snmp/x400pMIB.h \
 				  src/snmp/mtpMIB.c \
 				  src/snmp/mtpMIB.h \
+				  src/snmp/mtpOmMIB.c \
+				  src/snmp/mtpOmMIB.h \
 				  src/snmp/sccpMIB.c \
 				  src/snmp/sccpMIB.h \
 				  src/snmp/sccpOmMIB.c \
@@ -1549,6 +1553,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.110  2008-12-27 15:29:45  brian
+## - split MTP and MTP OM mib
+##
 ## Revision 0.9.2.109  2008-12-24 13:08:22  brian
 ## - building ss7confd
 ##

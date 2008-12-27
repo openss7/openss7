@@ -1,0 +1,5776 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-MTP-OM-MIB2.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-27 15:29:50 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2008-12-27 15:29:50 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-MTP-OM-MIB2.mib,v $
+-- Revision 0.9.2.1  2008-12-27 15:29:50  brian
+-- - split MTP and MTP OM mib
+--
+-- =============================================================================
+
+OPENSS7-MTP-OM-MIB2 DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32
+	FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, InstancePointer, TimeStamp, TimeInterval, 
+    RowStatus
+	FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+	FROM SNMPv2-CONF
+    PerfCurrentCount, PerfIntervalCount
+	FROM PerfHist-TC-MIB
+    HCPerfIntervalThreshold, HCPerfValidIntervals
+	FROM HC-PerfHist-TC-MIB
+    mtpLsId, mtpRsId, mtpSlSlCode, mtpSpId, 
+    mtpLsEntry, mtpSlEntry, mtpSdtEntry, mtpSdlEntry
+	FROM OPENSS7-MTP-MIB
+    openss7, openss7Q, openss7Q752
+	FROM OPENSS7-SMI;
+
+mtpOmMIB MODULE-IDENTITY
+    LAST-UPDATED
+	"200812092229Z"
+    ORGANIZATION
+	"The OpenSS7 Project"
+    CONTACT-INFO
+	"Brian Bidulock
+	 OpenSS7 Corporation
+	 1469 Jefferys Crescent
+	 Edmonton, Alberta  T6L 6T1
+	 CANADA
+	 Tel: +1 780 490 1141
+	 Fax: +1 780 490 1241
+	 Mob: +1 780 953 0557
+	 mailto:bidulock@openss7.org"
+    DESCRIPTION
+	"The purpose of this MIB is to provide SNMP support for the MTP 
+	 operational measurements provided in ITU-T Q.752 and ANSI 
+	 T1.116.  There exists a draft GDMO specification for ANSI 
+	 T1.116.1 from which this MIB is based.  Strangely enough, no 
+	 GDMO is standardized for SS7 operational measurements.
+
+	 The objective of this MIB is to support both the reporting of 
+	 statistics obtained from Operational Measurements as well as 
+	 providing a mechanism to activate and report the results of OM 
+	 studies."
+    REVISION
+	"200812092229Z"
+    DESCRIPTION
+	"This is the initial revision of this MIB."
+    ::= { openss7Q752 1 }
+
+ -- top level organization of the MIB
+
+mtpOmNotifications	OBJECT IDENTIFIER ::= { mtpOmMIB	 0 }
+mtpOmObjects		OBJECT IDENTIFIER ::= { mtpOmMIB	 1 }
+mtpOmConformance	OBJECT IDENTIFIER ::= { mtpOmMIB	 2 }
+
+mtpOmTables		OBJECT IDENTIFIER ::= { mtpOmObjects	 1 }
+mtpOmScalars		OBJECT IDENTIFIER ::= { mtpOmObjects	 2 }
+mtpOmNotifs		OBJECT IDENTIFIER ::= { mtpOmObjects	 3 }
+mtpOmOids		OBJECT IDENTIFIER ::= { mtpOmObjects	 4 }
+
+mtpOmCompliance		OBJECT IDENTIFIER ::= { mtpOmConformance 1 }
+mtpOmGroups		OBJECT IDENTIFIER ::= { mtpOmConformance 2 }
+mtpOmCapabilities	OBJECT IDENTIFIER ::= { mtpOmConformance 3 }
+
+mtpOmSpStats		OBJECT IDENTIFIER ::= { mtpOmTables	 1 }
+mtpOmRsStats		OBJECT IDENTIFIER ::= { mtpOmTables	 2 }
+mtpOmLsStats		OBJECT IDENTIFIER ::= { mtpOmTables	 3 }
+mtpOmSlStats		OBJECT IDENTIFIER ::= { mtpOmTables	 4 }
+mtpOmSdtStats		OBJECT IDENTIFIER ::= { mtpOmTables	 5 }
+mtpOmSdlStats		OBJECT IDENTIFIER ::= { mtpOmTables	 6 }
+
+
+-- (1.3.6.1.4.1.29591.17.752.1) openss7Q.752.1 (mtpOmMIB)
+-- |__(0) mtpOmNotifications
+-- |  |__( 1) mtpOm5minSpReport
+-- |  |__( 2) mtpOm15minSpReport
+-- |  |__( 3) mtpOm5minRsReport
+-- |  |__( 4) mtpOm15minRsReport
+-- |  |__( 5) mtpOm5minLsReport
+-- |  |__( 6) mtpOm15minLsReport
+-- |  |__( 7) mtpOm5minSlReport
+-- |  |__( 8) mtpOm15minSlReport
+-- |  |__( 9) mtpOm5minSdtReport
+-- |  |__(10) mtpOm15minSdtReport
+-- |  |__(11) mtpOm5minSdlReport
+-- |  |__(12) mtpOm15minSdlReport
+-- |
+-- |__(1) mtpOmObjects
+-- |  |__( 1) mtpOmTables
+-- |  |  |__( 1) mtpOmSpStats
+-- |  |  |  |__( 1) mtpSpCurrentTable
+-- |  |  |  |  |__( 1) mtpSpCurrentEntry
+-- |  |  |  |     |__( 1) mtpSpCurrentValidIntervals
+-- |  |  |  |     |__( 2) mtpSpCurrentTimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpSpCurrentDiscardedMSUs
+-- |  |  |  |     |__( 4) mtpSpCurrentReceivedTFCstatus0
+-- |  |  |  |     |__( 5) mtpSpCurrentReceivedTFCstatus1
+-- |  |  |  |     |__( 6) mtpSpCurrentReceivedTFCstatus2
+-- |  |  |  |     |__( 7) mtpSpCurrentOctetsXferred
+-- |  |  |  |
+-- |  |  |  |__( 2) mtpSpInt5minTable
+-- |  |  |  |  |__( 1) mtpSpInt5minEntry
+-- |  |  |  |     |__( 1) mtpSpInt5minInterval
+-- |  |  |  |     |__( 2) mtpSpInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpSpInt5minDiscardedMSUs
+-- |  |  |  |     |__( 4) mtpSpInt5minReceivedTFCstatus0
+-- |  |  |  |     |__( 5) mtpSpInt5minReceivedTFCstatus1
+-- |  |  |  |     |__( 6) mtpSpInt5minReceivedTFCstatus2
+-- |  |  |  |     |__( 7) mtpSpInt5minOctetsXferred
+-- |  |  |  |
+-- |  |  |  |__( 3) mtpSpInt15minTable
+-- |  |  |  |  |__( 1) mtpSpInt15minEntry
+-- |  |  |  |     |__( 1) mtpSpInt15minInterval
+-- |  |  |  |     |__( 2) mtpSpInt15minTimeStamp
+-- |  |  |  |     |__( 3) mtpSpInt15minDiscardedMSUs
+-- |  |  |  |     |__( 4) mtpSpInt15minReceivedTFCstatus0
+-- |  |  |  |     |__( 5) mtpSpInt15minReceivedTFCstatus1
+-- |  |  |  |     |__( 6) mtpSpInt15minReceivedTFCstatus2
+-- |  |  |  |     |__( 7) mtpSpInt15minOctetsXferred
+-- |  |  |  |
+-- |  |  |  |__( 4) mtpSpSiTable
+-- |  |  |  |  |__( 1) mtpSpSiEntry
+-- |  |  |  |     |__( 1) mtpSpSiCode
+-- |  |  |  |     |__( 2) mtpSpSiValidIntervals
+-- |  |  |  |     |__( 3) mtpSpSiTimeDiscontinuity
+-- |  |  |  |     |__( 4) mtpSpSiTransmittedUPUnavailable
+-- |  |  |  |     |__( 5) mtpSpSiReceivedUPUnavailable
+-- |  |  |  |     |__( 6) mtpSpSiHandledOctetsSIO
+-- |  |  |  |     |__( 7) mtpSpSiStatus
+-- |  |  |  |
+-- |  |  |  |__( 5) mtpSpSiInt5minTable
+-- |  |  |  |  |__( 1) mtpSpSiInt5minEntry
+-- |  |  |  |     |__( 1) mtpSpSiInt5minInterval
+-- |  |  |  |     |__( 2) mtpSpSiInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpSpSiInt5minTransmittedUPUnavailable
+-- |  |  |  |     |__( 4) mtpSpSiInt5minReceivedUPUnavailable
+-- |  |  |  |     |__( 5) mtpSpSiInt5minHandledOctetsSIO
+-- |  |  |  |
+-- |  |  |  |__( 6) mtpSpSiInt15minTable
+-- |  |  |  |  |__( 1) mtpSpSiInt15minEntry
+-- |  |  |  |     |__( 1) mtpSpSiInt15minInterval
+-- |  |  |  |     |__( 2) mtpSpSiInt15minTimeStamp
+-- |  |  |  |     |__( 3) mtpSpSiInt15minTransmittedUPUnavailable
+-- |  |  |  |     |__( 4) mtpSpSiInt15minReceivedUPUnavailable
+-- |  |  |  |     |__( 5) mtpSpSiInt15minHandledOctetsSIO
+-- |  |  |  |
+-- |  |  |  |__( 7) mtpSpStudyTable
+-- |  |  |  |  |__( 1) mtpSpStudyEntry
+-- |  |  |  |     |__( 1) mtpSpStudyId
+-- |  |  |  |     |__( 2) mtpSpStudyValidIntervals
+-- |  |  |  |     |__( 3) mtpSpStudyTimeDiscontinuity
+-- |  |  |  |     |__( 4) mtpSpStudyHandledOctetsOpcDpcSio
+-- |  |  |  |     |__( 5) mtpSpStudyHandledMSUsOpcDpcSio
+-- |  |  |  |     |__( 6) mtpSpStudyStatus
+-- |  |  |  |
+-- |  |  |  |__( 8) mtpSpStudyInt5minTable
+-- |  |  |  |  |__( 1) mtpSpStudyInt5minEntry
+-- |  |  |  |     |__( 1) mtpSpStudyInt5minInterval
+-- |  |  |  |     |__( 2) mtpSpStudyInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpSpStudyInt5minHandledOctetsOpcDpcSio
+-- |  |  |  |     |__( 4) mtpSpStudyInt5minHandledMSUsOpcDpcSio
+-- |  |  |  |
+-- |  |  |  |__( 9) mtpSpStudyInt15minTable
+-- |  |  |  |  |__( 1) mtpSpStudyInt15minEntry
+-- |  |  |  |     |__( 1) mtpSpStudyInt15minInterval
+-- |  |  |  |     |__( 2) mtpSpStudyInt15minTimeStamp
+-- |  |  |  |     |__( 3) mtpSpStudyInt15minHandledOctetsOpcDpcSio
+-- |  |  |  |     |__( 4) mtpSpStudyInt15minHandledMSUsOpcDpcSio
+-- |  |  |  |
+-- |  |  |  |__(10) mtpSpStudyMapTable
+-- |  |  |     |__( 1) mtpSpStudyMapEntry
+-- |  |  |        |__( 1) mtpOpcRsId
+-- |  |  |        |__( 2) mtpDpcRsId
+-- |  |  |        |__( 3) mtpSpStudyMapStatus
+-- |  |  |
+-- |  |  |__( 2) mtpOmRsStats
+-- |  |  |  |__( 1) mtpRsCurrentTable
+-- |  |  |  |  |__( 1) mtpRsCurrentEntry
+-- |  |  |  |     |__( 1) mtpRsCurrentValidIntervals
+-- |  |  |  |     |__( 2) mtpRsCurrentTimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpRsCurrentReceivedOctetsOPC
+-- |  |  |  |     |__( 4) mtpRsCurrentTransmittedOctetsDPC
+-- |  |  |  |     |__( 5) mtpRsCurrentReceivedMSUsOpc
+-- |  |  |  |     |__( 6) mtpRsCurrentTransmittedMSUsDpc
+-- |  |  |  |     |__( 7) mtpRsCurrentRouteSetUnavailable
+-- |  |  |  |     |__( 8) mtpRsCurrentRouteSetUnavailableDuration
+-- |  |  |  |
+-- |  |  |  |__( 2) mtpRsInt5minTable
+-- |  |  |  |  |__( 1) mtpRsInt5minEntry
+-- |  |  |  |     |__( 1) mtpRsInt5minInterval
+-- |  |  |  |     |__( 2) mtpRsInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpRsInt5minReceivedOctetsOPC
+-- |  |  |  |     |__( 4) mtpRsInt5minTransmittedOctetsDPC
+-- |  |  |  |     |__( 5) mtpRsInt5minReceivedMSUsOpc
+-- |  |  |  |     |__( 6) mtpRsInt5minTransmittedMSUsDpc
+-- |  |  |  |     |__( 7) mtpRsInt5minRouteSetUnavailable
+-- |  |  |  |     |__( 8) mtpRsInt5minRouteSetUnavailableDuration
+-- |  |  |  |
+-- |  |  |  |__( 3) mtpRsInt15minTable
+-- |  |  |  |  |__( 1) mtpRsInt15minEntry
+-- |  |  |  |     |__( 1) mtpRsInt15minInterval
+-- |  |  |  |     |__( 2) mtpRsInt15minTimeStamp
+-- |  |  |  |     |__( 3) mtpRsInt15minReceivedOctetsOPC
+-- |  |  |  |     |__( 4) mtpRsInt15minTransmittedOctetsDPC
+-- |  |  |  |     |__( 5) mtpRsInt15minReceivedMSUsOpc
+-- |  |  |  |     |__( 6) mtpRsInt15minTransmittedMSUsDpc
+-- |  |  |  |     |__( 7) mtpRsInt15minRouteSetUnavailable
+-- |  |  |  |     |__( 8) mtpRsInt15minRouteSetUnavailableDuration
+-- |  |  |  |
+-- |  |  |  |__( 4) mtpRsSiTable
+-- |  |  |  |  |__( 1) mtpRsSiEntry
+-- |  |  |  |     |__( 1) mtpRsSiCode
+-- |  |  |  |     |__( 2) mtpRsSiValidIntervals
+-- |  |  |  |     |__( 3) mtpRsSiTimeDiscontinuity
+-- |  |  |  |     |__( 4) mtpRsSiReceivedOctetsOpcSio
+-- |  |  |  |     |__( 5) mtpRsSiTransmittedOctetsDpcSio
+-- |  |  |  |     |__( 6) mtpRsSiReceivedMSUsOpcSio
+-- |  |  |  |     |__( 7) mtpRsSiTransmittedMSUsDpcSio
+-- |  |  |  |     |__( 8) mtpRsSiStatus
+-- |  |  |  |
+-- |  |  |  |__( 5) mtpRsSiInt5minTable
+-- |  |  |  |  |__( 1) mtpRsSiInt5minEntry
+-- |  |  |  |     |__( 1) mtpRsSiInt5minInterval
+-- |  |  |  |     |__( 2) mtpRsSiInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpRsSiInt5minReceivedOctetsOpcSio
+-- |  |  |  |     |__( 4) mtpRsSiInt5minTransmittedOctetsDpcSio
+-- |  |  |  |     |__( 5) mtpRsSiInt5minReceivedMSUsOpcSio
+-- |  |  |  |     |__( 6) mtpRsSiInt5minTransmittedMSUsDpcSio
+-- |  |  |  |
+-- |  |  |  |__( 6) mtpRsSiInt15minTable
+-- |  |  |     |__( 1) mtpRsSiInt15minEntry
+-- |  |  |        |__( 1) mtpRsSiInt15minInterval
+-- |  |  |        |__( 2) mtpRsSiInt15minTimeStamp
+-- |  |  |        |__( 3) mtpRsSiInt15minReceivedOctetsOpcSio
+-- |  |  |        |__( 4) mtpRsSiInt15minTransmittedOctetsDpcSio
+-- |  |  |        |__( 5) mtpRsSiInt15minReceivedMSUsOpcSio
+-- |  |  |        |__( 6) mtpRsSiInt15minTransmittedMSUsDpcSio
+-- |  |  |
+-- |  |  |__( 3) mtpOmLsStats
+-- |  |  |  |__( 1) mtpLsCurrentTable
+-- |  |  |  |  |__( 1) mtpLsCurrentEntry
+-- |  |  |  |     |__( 1) mtpLsCurrentValidIntervals
+-- |  |  |  |     |__( 2) mtpLsCurrentTimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpLsCurrentAdjacentInaccessibleEvents
+-- |  |  |  |     |__( 4) mtpLsCurrentAdjacentInaccessibleDuration
+-- |  |  |  |     |__( 5) mtpLsCurrentSlsUnavailable
+-- |  |  |  |
+-- |  |  |  |__( 2) mtpLsInt5minTable
+-- |  |  |  |  |__( 1) mtpLsInt5minEntry
+-- |  |  |  |     |__( 1) mtpLsInt5minInterval
+-- |  |  |  |     |__( 2) mtpLsInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpLsInt5minAdjacentInaccessibleEvents
+-- |  |  |  |     |__( 4) mtpLsInt5minAdjacentInaccessibleDuration
+-- |  |  |  |     |__( 5) mtpLsInt5minSlsUnavailable
+-- |  |  |  |
+-- |  |  |  |__( 3) mtpLsInt15minTable
+-- |  |  |     |__( 1) mtpLsInt15minEntry
+-- |  |  |        |__( 1) mtpLsInt15minInterval
+-- |  |  |        |__( 2) mtpLsInt15minTimeStamp
+-- |  |  |        |__( 3) mtpLsInt15minAdjacentInaccessibleEvents
+-- |  |  |        |__( 4) mtpLsInt15minAdjacentInaccessibleDuration
+-- |  |  |        |__( 5) mtpLsInt15minSlsUnavailable
+-- |  |  |
+-- |  |  |__( 4) mtpOmSlStats
+-- |  |  |  |__( 1) mtpSlStatsTable
+-- |  |  |  |  |__( 1) mtpSlStatsEntry
+-- |  |  |  |     |__( 1) mtpSlStatsDurInService
+-- |  |  |  |     |__( 2) mtpSlStatsFailAlignOrProving
+-- |  |  |  |     |__( 3) mtpSlStatsNacksReceived
+-- |  |  |  |     |__( 4) mtpSlStatsDurUnavail
+-- |  |  |  |     |__( 5) mtpSlStatsDurUnavailFailed
+-- |  |  |  |     |__( 6) mtpSlStatsDurUnavailRpo
+-- |  |  |  |     |__( 7) mtpSlStatsSibsSent
+-- |  |  |  |     |__( 8) mtpSlStatsTranSioSifOctets
+-- |  |  |  |     |__( 9) mtpSlStatsRetransOctets
+-- |  |  |  |     |__(10) mtpSlStatsTranMsus
+-- |  |  |  |     |__(11) mtpSlStatsRecvSioSifOctets
+-- |  |  |  |     |__(12) mtpSlStatsRecvMsus
+-- |  |  |  |     |__(13) mtpSlStatsCongOnsetInd0
+-- |  |  |  |     |__(14) mtpSlStatsCongOnsetInd1
+-- |  |  |  |     |__(15) mtpSlStatsCongOnsetInd2
+-- |  |  |  |     |__(16) mtpSlStatsCongOnsetInd3
+-- |  |  |  |     |__(17) mtpSlStatsDurCongStatus0
+-- |  |  |  |     |__(18) mtpSlStatsDurCongStatus1
+-- |  |  |  |     |__(19) mtpSlStatsDurCongStatus2
+-- |  |  |  |     |__(20) mtpSlStatsDurCongStatus3
+-- |  |  |  |     |__(21) mtpSlStatsCongDiscdInd0
+-- |  |  |  |     |__(22) mtpSlStatsCongDiscdInd1
+-- |  |  |  |     |__(23) mtpSlStatsCongDiscdInd2
+-- |  |  |  |     |__(24) mtpSlStatsCongDiscdInd3
+-- |  |  |  |
+-- |  |  |  |__( 2) mtpSlL3CurrentTable
+-- |  |  |  |  |__( 1) mtpSlL3CurrentEntry
+-- |  |  |  |     |__( 1) mtpSlL3CurrentValidIntervals
+-- |  |  |  |     |__( 2) mtpSlL3CurrentTimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpSlL3CurrentSlUnavailabilityDuration
+-- |  |  |  |     |__( 4) mtpSlL3CurrentSlLocalInhibition
+-- |  |  |  |     |__( 5) mtpSlL3CurrentSlRemoteInhibition
+-- |  |  |  |     |__( 6) mtpSlL3CurrentSlFailed
+-- |  |  |  |     |__( 7) mtpSlL3CurrentSlRemoteProcOutage
+-- |  |  |  |     |__( 8) mtpSlL3CurrentLocalMgmtInhibit
+-- |  |  |  |     |__( 9) mtpSlL3CurrentLocalMgmtUninhibit
+-- |  |  |  |     |__(10) mtpSlL3CurrentLocalBusy
+-- |  |  |  |     |__(11) mtpSlL3CurrentSlCongestedStarts
+-- |  |  |  |     |__(12) mtpSlL3CurrentSlCongestedDuration
+-- |  |  |  |     |__(13) mtpSlL3CurrentSlCongestionStops
+-- |  |  |  |     |__(14) mtpSlL3CurrentDiscardedMSUs
+-- |  |  |  |     |__(15) mtpSlL3CurrentCongestionEventsMSULoss
+-- |  |  |  |     |__(16) mtpSlL3CurrentChangeovers
+-- |  |  |  |     |__(17) mtpSlL3CurrentChangebacks
+-- |  |  |  |     |__(18) mtpSlL3CurrentRestorations
+-- |  |  |  |
+-- |  |  |  |__( 3) mtpSlL3Int5minTable
+-- |  |  |  |  |__( 1) mtpSlL3Int5minEntry
+-- |  |  |  |     |__( 1) mtpSlL3Int5minInterval
+-- |  |  |  |     |__( 2) mtpSlL3Int5minTimeStamp
+-- |  |  |  |     |__( 3) mtpSlL3Int5minSlUnavailabilityDuration
+-- |  |  |  |     |__( 4) mtpSlL3Int5minSlLocalInhibition
+-- |  |  |  |     |__( 5) mtpSlL3Int5minSlRemoteInhibition
+-- |  |  |  |     |__( 6) mtpSlL3Int5minSlFailed
+-- |  |  |  |     |__( 7) mtpSlL3Int5minSlRemoteProcOutage
+-- |  |  |  |     |__( 8) mtpSlL3Int5minLocalMgmtInhibit
+-- |  |  |  |     |__( 9) mtpSlL3Int5minLocalMgmtUninhibit
+-- |  |  |  |     |__(10) mtpSlL3Int5minLocalBusy
+-- |  |  |  |     |__(11) mtpSlL3Int5minSlCongestedStarts
+-- |  |  |  |     |__(12) mtpSlL3Int5minSlCongestedDuration
+-- |  |  |  |     |__(13) mtpSlL3Int5minSlCongestionStops
+-- |  |  |  |     |__(14) mtpSlL3Int5minDiscardedMSUs
+-- |  |  |  |     |__(15) mtpSlL3Int5minCongestionEventsMSULoss
+-- |  |  |  |     |__(16) mtpSlL3Int5minChangeovers
+-- |  |  |  |     |__(17) mtpSlL3Int5minChangebacks
+-- |  |  |  |     |__(18) mtpSlL3Int5minRestorations
+-- |  |  |  |
+-- |  |  |  |__( 4) mtpSlL3Int15minTable
+-- |  |  |  |  |__( 1) mtpSlL3Int15minEntry
+-- |  |  |  |     |__( 1) mtpSlL3Int15minInterval
+-- |  |  |  |     |__( 2) mtpSlL3Int15minTimeStamp
+-- |  |  |  |     |__( 3) mtpSlL3Int15minSlUnavailabilityDuration
+-- |  |  |  |     |__( 4) mtpSlL3Int15minSlLocalInhibition
+-- |  |  |  |     |__( 5) mtpSlL3Int15minSlRemoteInhibition
+-- |  |  |  |     |__( 6) mtpSlL3Int15minSlFailed
+-- |  |  |  |     |__( 7) mtpSlL3Int15minSlRemoteProcOutage
+-- |  |  |  |     |__( 8) mtpSlL3Int15minLocalMgmtInhibit
+-- |  |  |  |     |__( 9) mtpSlL3Int15minLocalMgmtUninhibit
+-- |  |  |  |     |__(10) mtpSlL3Int15minLocalBusy
+-- |  |  |  |     |__(11) mtpSlL3Int15minSlCongestedStarts
+-- |  |  |  |     |__(12) mtpSlL3Int15minSlCongestedDuration
+-- |  |  |  |     |__(13) mtpSlL3Int15minSlCongestionStops
+-- |  |  |  |     |__(14) mtpSlL3Int15minDiscardedMSUs
+-- |  |  |  |     |__(15) mtpSlL3Int15minCongestionEventsMSULoss
+-- |  |  |  |     |__(16) mtpSlL3Int15minChangeovers
+-- |  |  |  |     |__(17) mtpSlL3Int15minChangebacks
+-- |  |  |  |     |__(18) mtpSlL3Int15minRestorations
+-- |  |  |  |
+-- |  |  |  |__( 5) mtpSlL2CurrentTable
+-- |  |  |  |  |__( 1) mtpSlL2CurrentEntry
+-- |  |  |  |     |__( 1) mtpSlL2CurrentValidIntervals
+-- |  |  |  |     |__( 2) mtpSlL2CurrentTimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpSlL2CurrentSlInServiceDuration
+-- |  |  |  |     |__( 4) mtpSlL2CurrentSlAlignment
+-- |  |  |  |     |__( 5) mtpSlL2CurrentSignUnitsReceived
+-- |  |  |  |     |__( 6) mtpSlL2CurrentNegAckReceived
+-- |  |  |  |     |__( 7) mtpSlL2CurrentTransmittedOctetsSIFSIO
+-- |  |  |  |     |__( 8) mtpSlL2CurrentRetransmittedOctets
+-- |  |  |  |     |__( 9) mtpSlL2CurrentTransmittedMSUs
+-- |  |  |  |     |__(10) mtpSlL2CurrentReceivedOctetsSIFSIO
+-- |  |  |  |     |__(11) mtpSlL2CurrentReceivedMSUs
+-- |  |  |  |
+-- |  |  |  |__( 6) mtpSlL2Int5minTable
+-- |  |  |  |  |__( 1) mtpSlL2Int5minEntry
+-- |  |  |  |     |__( 1) mtpSlL2Int5minInterval
+-- |  |  |  |     |__( 2) mtpSlL2Int5minTimestamp
+-- |  |  |  |     |__( 3) mtpSlL2Int5minSlInServiceDuration
+-- |  |  |  |     |__( 4) mtpSlL2Int5minSlAlignment
+-- |  |  |  |     |__( 5) mtpSlL2Int5minSignUnitsReceived
+-- |  |  |  |     |__( 6) mtpSlL2Int5minNegAckReceived
+-- |  |  |  |     |__( 7) mtpSlL2Int5minTransmittedOctetsSIFSIO
+-- |  |  |  |     |__( 8) mtpSlL2Int5minRetransmittedOctets
+-- |  |  |  |     |__( 9) mtpSlL2Int5minTransmittedMSUs
+-- |  |  |  |     |__(10) mtpSlL2Int5minReceivedOctetsSIFSIO
+-- |  |  |  |     |__(11) mtpSlL2Int5minReceivedMSUs
+-- |  |  |  |
+-- |  |  |  |__( 7) mtpSlL2Int15minTable
+-- |  |  |     |__( 1) mtpSlL2Int15minEntry
+-- |  |  |        |__( 1) mtpSlL2Int15minInterval
+-- |  |  |        |__( 2) mtpSlL2Int15minTimestamp
+-- |  |  |        |__( 3) mtpSlL2Int15minSlInServiceDuration
+-- |  |  |        |__( 4) mtpSlL2Int15minSlAlignment
+-- |  |  |        |__( 5) mtpSlL2Int15minSignUnitsReceived
+-- |  |  |        |__( 6) mtpSlL2Int15minNegAckReceived
+-- |  |  |        |__( 7) mtpSlL2Int15minTransmittedOctetsSIFSIO
+-- |  |  |        |__( 8) mtpSlL2Int15minRetransmittedOctets
+-- |  |  |        |__( 9) mtpSlL2Int15minTransmittedMSUs
+-- |  |  |        |__(10) mtpSlL2Int15minReceivedOctetsSIFSIO
+-- |  |  |        |__(11) mtpSlL2Int15minReceivedMSUs
+-- |  |  |
+-- |  |  |__( 5) mtpOmSdtStats
+-- |  |  |  |__( 1) mtpSdtStatsTable
+-- |  |  |     |__( 1) mtpSdtStatsEntry
+-- |  |  |        |__( 1) mtpSdtStatsTxBytes
+-- |  |  |        |__( 2) mtpSdtStatsTxSus
+-- |  |  |        |__( 3) mtpSdtStatsTxSusRepeated
+-- |  |  |        |__( 4) mtpSdtStatsTxUnderruns
+-- |  |  |        |__( 5) mtpSdtStatsTxAborts
+-- |  |  |        |__( 6) mtpSdtStatsTxBufferOverflows
+-- |  |  |        |__( 7) mtpSdtStatsTxSusInError
+-- |  |  |        |__( 8) mtpSdtStatsRxBytes
+-- |  |  |        |__( 9) mtpSdtStatsRxSusCompressed
+-- |  |  |        |__(10) mtpSdtStatsRxOverruns
+-- |  |  |        |__(11) mtpSdtStatsRxAborts
+-- |  |  |        |__(12) mtpSdtStatsRxBufferOverflows
+-- |  |  |        |__(13) mtpSdtStatsRxSusInError
+-- |  |  |        |__(14) mtpSdtStatsRxSyncTransitions
+-- |  |  |        |__(15) mtpSdtStatsRxBitsOctetCounted
+-- |  |  |        |__(16) mtpSdtStatsRxCrcErrors
+-- |  |  |        |__(17) mtpSdtStatsRxFrameErrors
+-- |  |  |        |__(18) mtpSdtStatsRxFrameOverflows
+-- |  |  |        |__(19) mtpSdtStatsRxFrameTooLong
+-- |  |  |        |__(20) mtpSdtStatsRxFrameTooShort
+-- |  |  |        |__(21) mtpSdtStatsRxResidueErrors
+-- |  |  |        |__(22) mtpSdtStatsCarrierCtsLost
+-- |  |  |        |__(23) mtpSdtStatsCarrierDcdLost
+-- |  |  |        |__(24) mtpSdtStatsCarrierLost
+-- |  |  |
+-- |  |  |__( 6) mtpOmSdlStats
+-- |  |     |__( 1) mtpSdlStatsTable
+-- |  |        |__( 1) mtpSdlStatsEntry
+-- |  |           |__( 1) mtpSdlStatsRxOctets
+-- |  |           |__( 2) mtpSdlStatsTxOctets
+-- |  |           |__( 3) mtpSdlStatsRXOverruns
+-- |  |           |__( 4) mtpSdlStatsTxUnderruns
+-- |  |           |__( 5) mtpSdlStatsRxBufferOverflows
+-- |  |           |__( 6) mtpSdlStatsTxBufferOverflows
+-- |  |           |__( 7) mtpSdlStatsLeadCtsLost
+-- |  |           |__( 8) mtpSdlStatsLeadDcdLost
+-- |  |           |__( 9) mtpSdlStatsCarrierLost
+-- |  |           |__(10) mtpSdlStatsBipolarViolations
+-- |  |
+-- |  |__( 2) mtpOmScalars
+-- |  |  |__( 1) mtpOm1stAndIntervalActivate
+-- |  |  |__( 2) mtpOm1stAndIntervalDeactivate
+-- |  |  |__( 3) mtpOm5MinActivate
+-- |  |  |__( 4) mtpOm5MinDeaActivate
+-- |  |  |__( 5) mtpOm15MinActivate
+-- |  |  |__( 6) mtpOm15MinDeaActivate
+-- |  |  |__( 7) mtpOmInterval
+-- |  |  |__( 8) mtpOmDiscontinuityTime
+-- |  |  |__( 9) mtpOmTimeStamp
+-- |  |  |__(10) mtpOm5MinMaxIntervals
+-- |  |  |__(11) mtpOm15MinMaxIntervals
+-- |  |
+-- |  |__( 3) mtpOmNotifs
+-- |  |
+-- |  |__( 4) mtpOmOids
+-- |
+-- |__(2) mtpOmConformance
+--    |__( 1) mtpOmCompliance
+--    |
+--    |__( 2) mtpOmGroups
+--    |
+--    |__( 3) mtpOmCapabilities
+
+-- ====================================================================
+-- TABLES
+-- ====================================================================
+
+mtpSpCurrentTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpCurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a table of signalling point current operational 
+	 measurements."
+    ::= { mtpOmSpStats 1 }
+
+mtpSpCurrentEntry OBJECT-TYPE
+    SYNTAX	MtpSpCurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Each entry in this table corresponds to the current operational 
+	 measurements for on signalling point provided by the managed 
+	 element."
+    INDEX	{
+	mtpSpId -- shared index
+    }
+    ::= { mtpSpCurrentTable 1 }
+
+MtpSpCurrentEntry ::= SEQUENCE {
+    mtpSpCurrentValidIntervals			HCPerfValidIntervals,
+    mtpSpCurrentTimeDiscontinuity		TimeStamp,
+    mtpSpCurrentDiscardedMSUs			PerfCurrentCount, -- Q.752, 5.5
+    mtpSpCurrentReceivedTFCstatus0		PerfCurrentCount, -- Q.752, 5.8
+    mtpSpCurrentReceivedTFCstatus1		PerfCurrentCount, -- Q.752, 5.8
+    mtpSpCurrentReceivedTFCstatus2		PerfCurrentCount, -- Q.752, 5.8
+    mtpSpCurrentOctetsXferred			PerfCurrentCount
+}
+
+mtpSpCurrentValidIntervals OBJECT-TYPE
+    SYNTAX	HCPerfValidIntervals
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpCurrentEntry 1 }
+
+mtpSpCurrentTimeDiscontinuity OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpCurrentEntry 2 }
+
+mtpSpCurrentDiscardedMSUs OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (10/95) : discardedMSUs.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.5."
+    ::= { mtpSpCurrentEntry 3 }
+
+mtpSpCurrentReceivedTFCstatus0 OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpCurrentEntry 4 }
+
+mtpSpCurrentReceivedTFCstatus1 OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpCurrentEntry 5 }
+
+mtpSpCurrentReceivedTFCstatus2 OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpCurrentEntry 6 }
+
+mtpSpCurrentOctetsXferred OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpCurrentEntry 7 }
+
+
+-- ====================================================================
+
+mtpSpInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a table of signalling point 5-minute inteval 
+	 historical operational measurements."
+    ::= { mtpOmSpStats 2 }
+
+mtpSpInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpSpInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpSpInt5minInterval
+    }
+    ::= { mtpSpInt5minTable 1 }
+
+MtpSpInt5minEntry ::= SEQUENCE {
+    mtpSpInt5minInterval			Unsigned32,
+    mtpSpInt5minTimeStamp			TimeStamp,
+    mtpSpInt5minDiscardedMSUs			PerfIntervalCount, -- Q.752, 5.5
+    mtpSpInt5minReceivedTFCstatus0		PerfIntervalCount, -- Q.752, 5.8
+    mtpSpInt5minReceivedTFCstatus1		PerfIntervalCount, -- Q.752, 5.8
+    mtpSpInt5minReceivedTFCstatus2		PerfIntervalCount, -- Q.752, 5.8
+    mtpSpInt5minOctetsXferred			PerfIntervalCount
+}
+
+mtpSpInt5minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpInt5minEntry 1 }
+
+mtpSpInt5minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpInt5minEntry 2 }
+
+mtpSpInt5minDiscardedMSUs OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (10/95) : discardedMSUs.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.5."
+    ::= { mtpSpInt5minEntry 3 }
+
+mtpSpInt5minReceivedTFCstatus0 OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpInt5minEntry 4 }
+
+mtpSpInt5minReceivedTFCstatus1 OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpInt5minEntry 5 }
+
+mtpSpInt5minReceivedTFCstatus2 OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpInt5minEntry 6 }
+
+mtpSpInt5minOctetsXferred OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpInt5minEntry 7 }
+
+
+-- ====================================================================
+
+mtpSpInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a table of signalling point 15-minute inteval 
+	 historical operational measurements."
+    ::= { mtpOmSpStats 3 }
+
+mtpSpInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpSpInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpSpInt15minInterval
+    }
+    ::= { mtpSpInt15minTable 1 }
+
+MtpSpInt15minEntry ::= SEQUENCE {
+    mtpSpInt15minInterval			Unsigned32,
+    mtpSpInt15minTimeStamp			TimeStamp,
+    mtpSpInt15minDiscardedMSUs			PerfIntervalCount, -- Q.752, 5.5
+    mtpSpInt15minReceivedTFCstatus0		PerfIntervalCount, -- Q.752, 5.8
+    mtpSpInt15minReceivedTFCstatus1		PerfIntervalCount, -- Q.752, 5.8
+    mtpSpInt15minReceivedTFCstatus2		PerfIntervalCount, -- Q.752, 5.8
+    mtpSpInt15minOctetsXferred			PerfIntervalCount
+}
+
+mtpSpInt15minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpInt15minEntry 1 }
+
+mtpSpInt15minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpInt15minEntry 2 }
+
+mtpSpInt15minDiscardedMSUs OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (10/95) : discardedMSUs.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.5."
+    ::= { mtpSpInt15minEntry 3 }
+
+mtpSpInt15minReceivedTFCstatus0 OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpInt15minEntry 4 }
+
+mtpSpInt15minReceivedTFCstatus1 OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpInt15minEntry 5 }
+
+mtpSpInt15minReceivedTFCstatus2 OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"TFCs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.8.
+
+	 The number of Transfer Controlled (TFC) messages received per 
+	 congestion level and signalling point collected on a first and 
+	 interval basis.  This is a non-obligatory measurement that is 
+	 permanently activated when available.  The measurement is used 
+	 for fault detection, near real-time monitoring, and performance 
+	 analysis."
+    REFERENCE
+	"ANSI T1.116.1D receivedTFC.
+	 ANSI T1.116.1/2000 Table 5 (5.8).
+	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
+    ::= { mtpSpInt15minEntry 6 }
+
+mtpSpInt15minOctetsXferred OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpInt15minEntry 7 }
+
+
+-- ====================================================================
+
+mtpSpSiTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpSiEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a table of optional current signalling point 
+	 operational measurements broken out be SI code."
+    ::= { mtpOmSpStats 4 }
+
+mtpSpSiEntry OBJECT-TYPE
+    SYNTAX	MtpSpSiEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpSpSiCode
+    }
+    ::= { mtpSpSiTable 1 }
+
+MtpSpSiEntry ::= SEQUENCE {
+    mtpSpSiCode					Unsigned32,
+    mtpSpSiValidIntervals			HCPerfValidIntervals,
+    mtpSpSiTimeDiscontinuity			TimeStamp,
+    mtpSpSiTransmittedUPUnavailable		PerfCurrentCount, -- Q.752, 5.6
+    mtpSpSiReceivedUPUnavailable		PerfCurrentCount, -- Q.752, 5.7
+    mtpSpSiHandledOctetsSIO			PerfCurrentCount, -- Q.752, 6.3
+    mtpSpSiStatus				RowStatus
+}
+
+mtpSpSiCode OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpSiEntry 1 }
+
+mtpSpSiValidIntervals OBJECT-TYPE
+    SYNTAX	HCPerfValidIntervals
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpSiEntry 2 }
+
+mtpSpSiTimeDiscontinuity OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpSiEntry 3 }
+
+mtpSpSiTransmittedUPUnavailable OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"UPUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.6.
+	 See also Chapter T1.111.4 11.7.2.
+	 
+	 User Part Unavailable (UPU) MSU transmitted correlated as 
+	 events per user part for each signalling point, collected on a 
+	 first and interval basis.  This is a non-obligatory measurement 
+	 that is permanently activated when available.  The measurement 
+	 is used for fault detection, near real-time monitoring, 
+	 configuration management and performance management.
+
+	 When this measurement exceeds an implementation-dependent 
+	 threshold, the management process is informed with a Quality of 
+	 Service alarm indication."
+    REFERENCE
+	"ANSI T1.116.1D transmittedUPUnavailable.
+	 ANSI T1.116.2/2000 Table 5 (5.6).
+	 ANSI T1.111.4/2000 11.7.2.
+	 ITU-T Rec. Q.751.1 (10/95) : transmitedUPUnavailable.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.6."
+    ::= { mtpSpSiEntry 4 }
+
+mtpSpSiReceivedUPUnavailable OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"UPUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.7.
+	 See also Chapter T1.111.4 11.7.2.
+	 
+	 User Part Unavailable (UPU) MSU received correlated as events 
+	 per user part for each signalling point, collected on a first 
+	 and interval basis.  This is a non-obligatory measurement that 
+	 is permanently activated when available.  The measurement is 
+	 used for fault-detection, near real-time monitoring, 
+	 configuration management and performance management.
+	 
+	 When this measurement exceeds an implementation-dependent 
+	 threshold, the management process is informed with a Quality of 
+	 Service alarm indication.  Note that for a UPU for an 
+	 unequipped MTP user results in the management process being 
+	 informed immediately."
+    REFERENCE
+	"ANSI T1.116.1D receivedUPUnavailable.
+	 ANSI T1.116.2/2000 Table 5 (5.7).
+	 ANSI T1.111.4/2000 11.7.2.
+	 ITU-T Rec. Q.751.1 (10/95) : receivedUPUnavailable.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.7."
+    ::= { mtpSpSiEntry 5 }
+
+mtpSpSiHandledOctetsSIO OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.3."
+    REFERENCE
+	"ANSI T1.116.1D handledOctetsSIO
+	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsSIO.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.3."
+    ::= { mtpSpSiEntry 6 }
+
+mtpSpSiStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { mtpSpSiEntry 7 }
+
+
+-- ====================================================================
+
+mtpSpSiInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpSiInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a table of optional 5-minute interval historical 
+	 signalling point operational measurements broken out be SI 
+	 code."
+    ::= { mtpOmSpStats 5 }
+
+mtpSpSiInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpSpSiInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpSpSiCode,
+	mtpSpSiInt5minInterval 
+    }
+    ::= { mtpSpSiInt5minTable 1 }
+
+MtpSpSiInt5minEntry ::= SEQUENCE {
+    mtpSpSiInt5minInterval			Unsigned32,
+    mtpSpSiInt5minTimeStamp			TimeStamp,
+    mtpSpSiInt5minTransmittedUPUnavailable	PerfIntervalCount, -- Q.752, 5.6
+    mtpSpSiInt5minReceivedUPUnavailable		PerfIntervalCount, -- Q.752, 5.7
+    mtpSpSiInt5minHandledOctetsSIO		PerfIntervalCount  -- Q.752, 6.3
+}
+
+mtpSpSiInt5minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpSiInt5minEntry 1 }
+
+mtpSpSiInt5minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpSiInt5minEntry 2 }
+
+mtpSpSiInt5minTransmittedUPUnavailable OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"UPUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.6.
+	 See also Chapter T1.111.4 11.7.2.
+	 
+	 User Part Unavailable (UPU) MSU transmitted correlated as 
+	 events per user part for each signalling point, collected on a 
+	 first and interval basis.  This is a non-obligatory measurement 
+	 that is permanently activated when available.  The measurement 
+	 is used for fault detection, near real-time monitoring, 
+	 configuration management and performance management.
+
+	 When this measurement exceeds an implementation-dependent 
+	 threshold, the management process is informed with a Quality of 
+	 Service alarm indication."
+    REFERENCE
+	"ANSI T1.116.1D transmittedUPUnavailable.
+	 ANSI T1.116.2/2000 Table 5 (5.6).
+	 ANSI T1.111.4/2000 11.7.2.
+	 ITU-T Rec. Q.751.1 (10/95) : transmitedUPUnavailable.
+	 ITU-T Rec. Q.752 : Table 5/Q.752, 5.6."
+    ::= { mtpSpSiInt5minEntry 3 }
+
+mtpSpSiInt5minReceivedUPUnavailable OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"UPUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.7.
+	 See also Chapter T1.111.4 11.7.2.
+	 
+	 User Part Unavailable (UPU) MSU received correlated as events 
+	 per user part for each signalling point, collected on a first 
+	 and interval basis.  This is a non-obligatory measurement that 
+	 is permanently activated when available.  The measurement is 
+	 used for fault-detection, near real-time monitoring, 
+	 configuration management and performance management.
+	 
+	 When this measurement exceeds an implementation-dependent 
+	 threshold, the management process is informed with a Quality of 
+	 Service alarm indication.  Note that for a UPU for an 
+	 unequipped MTP user results in the management process being 
+	 informed immediately."
+    REFERENCE
+	"ANSI T1.116.1D receivedUPUnavailable.
+	 ANSI T1.116.2/2000 Table 5 (5.7).
+	 ANSI T1.111.4/2000 11.7.2.
+	 ITU-T Rec. Q.751.1 (10/95) : receivedUPUnavailable.
+	 ITU-T Rec. Q.752 : Table 5/Q.752, 5.7."
+    ::= { mtpSpSiInt5minEntry 4 }
+
+mtpSpSiInt5minHandledOctetsSIO OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.3."
+    REFERENCE
+	"ANSI T1.116.1D handledOctetsSIO
+	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsSIO.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.3."
+    ::= { mtpSpSiInt5minEntry 5 }
+
+
+-- ====================================================================
+
+mtpSpSiInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpSiInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a table of optional 15-minute interval historical 
+	 signalling point operational measurements broken out be SI 
+	 code."
+    ::= { mtpOmSpStats 6 }
+
+mtpSpSiInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpSpSiInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpSpSiCode,
+	mtpSpSiInt15minInterval
+    }
+    ::= { mtpSpSiInt15minTable 1 }
+
+MtpSpSiInt15minEntry ::= SEQUENCE {
+    mtpSpSiInt15minInterval			Unsigned32,
+    mtpSpSiInt15minTimeStamp			TimeStamp,
+    mtpSpSiInt15minTransmittedUPUnavailable	PerfIntervalCount, -- Q.752, 5.6
+    mtpSpSiInt15minReceivedUPUnavailable	PerfIntervalCount, -- Q.752, 5.7
+    mtpSpSiInt15minHandledOctetsSIO		PerfIntervalCount  -- Q.752, 6.3
+}
+
+mtpSpSiInt15minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpSiInt15minEntry 1 }
+
+mtpSpSiInt15minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpSiInt15minEntry 2 }
+
+mtpSpSiInt15minTransmittedUPUnavailable OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"UPUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.6.
+	 See also Chapter T1.111.4 11.7.2.
+	 
+	 User Part Unavailable (UPU) MSU transmitted correlated as 
+	 events per user part for each signalling point, collected on a 
+	 first and interval basis.  This is a non-obligatory measurement 
+	 that is permanently activated when available.  The measurement 
+	 is used for fault detection, near real-time monitoring, 
+	 configuration management and performance management.
+
+	 When this measurement exceeds an implementation-dependent 
+	 threshold, the management process is informed with a Quality of 
+	 Service alarm indication."
+    REFERENCE
+	"ANSI T1.116.1D transmittedUPUnavailable.
+	 ANSI T1.116.2/2000 Table 5 (5.6).
+	 ANSI T1.111.4/2000 11.7.2.
+	 ITU-T Rec. Q.751.1 (10/95) : transmitedUPUnavailable.
+	 ITU-T Rec. Q.752 : Table 5/Q.752, 5.6."
+    ::= { mtpSpSiInt15minEntry 3 }
+
+mtpSpSiInt15minReceivedUPUnavailable OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"UPUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.7.
+	 See also Chapter T1.111.4 11.7.2.
+	 
+	 User Part Unavailable (UPU) MSU received correlated as events 
+	 per user part for each signalling point, collected on a first 
+	 and interval basis.  This is a non-obligatory measurement that 
+	 is permanently activated when available.  The measurement is 
+	 used for fault-detection, near real-time monitoring, 
+	 configuration management and performance management.
+	 
+	 When this measurement exceeds an implementation-dependent 
+	 threshold, the management process is informed with a Quality of 
+	 Service alarm indication.  Note that for a UPU for an 
+	 unequipped MTP user results in the management process being 
+	 informed immediately."
+    REFERENCE
+	"ANSI T1.116.1D receivedUPUnavailable.
+	 ANSI T1.116.2/2000 Table 5 (5.7).
+	 ANSI T1.111.4/2000 11.7.2.
+	 ITU-T Rec. Q.751.1 (10/95) : receivedUPUnavailable.
+	 ITU-T Rec. Q.752 : Table 5/Q.752, 5.7."
+    ::= { mtpSpSiInt15minEntry 4 }
+
+mtpSpSiInt15minHandledOctetsSIO OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.3."
+    REFERENCE
+	"ANSI T1.116.1D handledOctetsSIO
+	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsSIO.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.3."
+    ::= { mtpSpSiInt15minEntry 5 }
+
+
+-- ====================================================================
+
+mtpSpStudyTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpStudyEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmSpStats 7 }
+
+mtpSpStudyEntry OBJECT-TYPE
+    SYNTAX	MtpSpStudyEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpStudyId
+    }
+    ::= { mtpSpStudyTable 1 }
+
+MtpSpStudyEntry ::= SEQUENCE {
+    mtpSpStudyId				Unsigned32,
+    mtpSpStudyValidIntervals			HCPerfValidIntervals,
+    mtpSpStudyTimeDiscontinuity			TimeStamp,
+    mtpSpStudyHandledOctetsOpcDpcSio		PerfCurrentCount, -- Q.752, 6.6
+    mtpSpStudyHandledMSUsOpcDpcSio		PerfCurrentCount, -- Q.752, 6.7
+    mtpSpStudyStatus				RowStatus
+}
+
+mtpSpStudyId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a non-zero index into the signalling point study 
+	 table."
+    ::= { mtpSpStudyEntry 1 }
+
+mtpSpStudyValidIntervals OBJECT-TYPE
+    SYNTAX	HCPerfValidIntervals
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpStudyEntry 2 }
+
+mtpSpStudyTimeDiscontinuity OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpStudyEntry 3 }
+
+mtpSpStudyHandledOctetsOpcDpcSio OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.6.
+	 
+	 Number of SIF and SIO octets handled with given OPC, DPC and 
+	 SIO in units of number of MSUs per OPC, DPC and SIO combination 
+	 collected over a 5- or 30-minute interval.  This operational 
+	 measurement is non-obligatory.  This measurement may be used 
+	 for performance managment, accounting management, and network 
+	 administration and planning."
+    REFERENCE
+	"ANSI T1.116.1D handledOctetsOpcDpcSio.
+	 ANSI T1.116.2/2000 Table 6 (6.6).
+	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsOpcDpcSio.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.6."
+    ::= { mtpSpStudyEntry 4 }
+
+mtpSpStudyHandledMSUsOpcDpcSio OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.7.
+
+	 This measurement measures the number of handled MSU for a given 
+	 Signalling Point where the count is broken out on the basis of 
+	 the DPC, OPC and SIO fields of the MTP header contained in the 
+	 MSU."
+    REFERENCE
+	"ANSI T1.116.2/2000 Clause 6.7.
+	 ANSI T1.116.1D handledMSUsOpcDpcSio.
+	 ITU-T Rec. Q.751.1 (10/95) : handledMSUsOpcDpcSio.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.7."
+    ::= { mtpSpStudyEntry 5 }
+
+mtpSpStudyStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { mtpSpStudyEntry 6 }
+
+
+-- ====================================================================
+
+mtpSpStudyInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpStudyInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmSpStats 8 }
+
+mtpSpStudyInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpSpStudyInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpStudyId,
+	mtpSpStudyInt5minInterval
+    }
+    ::= { mtpSpStudyInt5minTable 1 }
+
+MtpSpStudyInt5minEntry ::= SEQUENCE {
+    mtpSpStudyInt5minInterval			Unsigned32,
+    mtpSpStudyInt5minTimeStamp			TimeStamp,
+    mtpSpStudyInt5minHandledOctetsOpcDpcSio	PerfIntervalCount, -- Q.752, 6.6
+    mtpSpStudyInt5minHandledMSUsOpcDpcSio	PerfIntervalCount  -- Q.752, 6.7
+}
+
+mtpSpStudyInt5minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpStudyInt5minEntry 1 }
+
+mtpSpStudyInt5minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpStudyInt5minEntry 2 }
+
+mtpSpStudyInt5minHandledOctetsOpcDpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.6.
+	 
+	 Number of SIF and SIO octets handled with given OPC, DPC and 
+	 SIO in units of number of MSUs per OPC, DPC and SIO combination 
+	 collected over a 5- or 30-minute interval.  This operational 
+	 measurement is non-obligatory.  This measurement may be used 
+	 for performance managment, accounting management, and network 
+	 administration and planning."
+    REFERENCE
+	"ANSI T1.116.1D handledOctetsOpcDpcSio.
+	 ANSI T1.116.2/2000 Table 6 (6.6).
+	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsOpcDpcSio.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.6."
+    ::= { mtpSpStudyInt5minEntry 3 }
+
+mtpSpStudyInt5minHandledMSUsOpcDpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.7.
+
+	 This measurement measures the number of handled MSU for a given 
+	 Signalling Point where the count is broken out on the basis of 
+	 the DPC, OPC and SIO fields of the MTP header contained in the 
+	 MSU."
+    REFERENCE
+	"ANSI T1.116.2/2000 Clause 6.7.
+	 ANSI T1.116.1D handledMSUsOpcDpcSio.
+	 ITU-T Rec. Q.751.1 (10/95) : handledMSUsOpcDpcSio.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.7."
+    ::= { mtpSpStudyInt5minEntry 4 }
+
+
+-- ====================================================================
+
+mtpSpStudyInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpStudyInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmSpStats 9 }
+
+mtpSpStudyInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpSpStudyInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpStudyId,
+	mtpSpStudyInt15minInterval
+    }
+    ::= { mtpSpStudyInt15minTable 1 }
+
+MtpSpStudyInt15minEntry ::= SEQUENCE {
+    mtpSpStudyInt15minInterval			Unsigned32,
+    mtpSpStudyInt15minTimeStamp			TimeStamp,
+    mtpSpStudyInt15minHandledOctetsOpcDpcSio	PerfIntervalCount, -- Q.752, 6.6
+    mtpSpStudyInt15minHandledMSUsOpcDpcSio	PerfIntervalCount  -- Q.752, 6.7
+}
+
+mtpSpStudyInt15minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpStudyInt15minEntry 1 }
+
+mtpSpStudyInt15minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSpStudyInt15minEntry 2 }
+
+mtpSpStudyInt15minHandledOctetsOpcDpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.6.
+	 
+	 Number of SIF and SIO octets handled with given OPC, DPC and 
+	 SIO in units of number of MSUs per OPC, DPC and SIO combination 
+	 collected over a 5- or 30-minute interval.  This operational 
+	 measurement is non-obligatory.  This measurement may be used 
+	 for performance managment, accounting management, and network 
+	 administration and planning."
+    REFERENCE
+	"ANSI T1.116.1D handledOctetsOpcDpcSio.
+	 ANSI T1.116.2/2000 Table 6 (6.6).
+	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsOpcDpcSio.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.6."
+    ::= { mtpSpStudyInt15minEntry 3 }
+
+mtpSpStudyInt15minHandledMSUsOpcDpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.7.
+
+	 This measurement measures the number of handled MSU for a given 
+	 Signalling Point where the count is broken out on the basis of 
+	 the DPC, OPC and SIO fields of the MTP header contained in the 
+	 MSU."
+    REFERENCE
+	"ANSI T1.116.2/2000 Clause 6.7.
+	 ANSI T1.116.1D handledMSUsOpcDpcSio.
+	 ITU-T Rec. Q.751.1 (10/95) : handledMSUsOpcDpcSio.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.7."
+    ::= { mtpSpStudyInt15minEntry 4 }
+
+
+-- ====================================================================
+
+mtpSpStudyMapTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSpStudyMapEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmSpStats 10 }
+
+mtpSpStudyMapEntry OBJECT-TYPE
+    SYNTAX	MtpSpStudyMapEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpOpcRsId,	-- OPC value
+	mtpDpcRsId,	-- DPC value
+	mtpSpSiCode,	-- SI code
+	mtpSpStudyId
+    }
+    ::= { mtpSpStudyMapTable 1 }
+
+MtpSpStudyMapEntry ::= SEQUENCE {
+    mtpOpcRsId					Unsigned32,
+    mtpDpcRsId					Unsigned32,
+    mtpSpStudyMapStatus				RowStatus
+}
+
+mtpOpcRsId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides an OPC index into the table.  The is the index of the 
+	 originating signalling point in the route set table 
+	 mtpRsTable.  The entry must exist or the creation of a row will 
+	 be refused."
+    ::= { mtpSpStudyMapEntry 1 }
+
+mtpDpcRsId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides an DPC index into the table.  The is the index of the 
+	 destination signalling point in the route set table 
+	 mtpRsTable.  The entry must exist or the creation of a row will 
+	 be refused."
+    ::= { mtpSpStudyMapEntry 2 }
+
+mtpSpStudyMapStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { mtpSpStudyMapEntry 3 }
+
+
+-- ====================================================================
+
+mtpRsCurrentTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpRsCurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmRsStats 1 }
+
+mtpRsCurrentEntry OBJECT-TYPE
+    SYNTAX	MtpRsCurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpRsId
+    }
+    ::= { mtpRsCurrentTable 1 }
+
+MtpRsCurrentEntry ::= SEQUENCE {
+    mtpRsCurrentValidIntervals			HCPerfValidIntervals,
+    mtpRsCurrentTimeDiscontinuity		TimeStamp,
+    mtpRsCurrentReceivedOctetsOPC		PerfCurrentCount, -- Q.752, 6.1
+    mtpRsCurrentTransmittedOctetsDPC		PerfCurrentCount, -- Q.752, 6.2
+    mtpRsCurrentReceivedMSUsOpc			PerfCurrentCount,
+    mtpRsCurrentTransmittedMSUsDpc		PerfCurrentCount,
+    mtpRsCurrentRouteSetUnavailable		PerfCurrentCount, -- Q.752, 4.9
+    mtpRsCurrentRouteSetUnavailableDuration	PerfCurrentCount  -- Q.752, 4.10
+}
+
+mtpRsCurrentValidIntervals OBJECT-TYPE
+    SYNTAX	HCPerfValidIntervals
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsCurrentEntry 1 }
+
+mtpRsCurrentTimeDiscontinuity OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsCurrentEntry 2 }
+
+mtpRsCurrentReceivedOctetsOPC OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.1.
+	 
+	 The number of SIF and SIO octets received with given OPC (or 
+	 OPC set) collected over an interval of 15 or 30 minutes.  This 
+	 is a non-obligatory measurement that may be derived (from 6.6).  
+	 This measurement may be used for performance analysis, 
+	 accounting management, or network administration and planning."
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsOPC
+	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsOPC.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.1."
+    ::= { mtpRsCurrentEntry 3 }
+
+mtpRsCurrentTransmittedOctetsDPC OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.2."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsDPC
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsDPC.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.2."
+    ::= { mtpRsCurrentEntry 4 }
+
+mtpRsCurrentReceivedMSUsOpc OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsCurrentEntry 5 }
+
+mtpRsCurrentTransmittedMSUsDpc OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsCurrentEntry 6 }
+
+mtpRsCurrentRouteSetUnavailable OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/4.9.
+	 See also Chapter T1.111.4 11.2.2.
+	 
+	 These are not basic measurements and can be derived (from 4.11 
+	 and 4.12).  This measurement is obligatory in international 
+	 networks."
+    REFERENCE
+	"ANSI T1.116.1D routeSetUnavailable
+	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailable.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.9"
+    ::= { mtpRsCurrentEntry 7 }
+
+mtpRsCurrentRouteSetUnavailableDuration OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/4.10.
+	 See also Chapter T1.111.4 11.2.1.
+	 
+	 These are not basic measurements and can be derived (from 4.11 
+	 and 4.12).  This measurement is obligatory in international 
+	 networks."
+    REFERENCE
+	"ANSI T1.116.1D routeSetUnavailableDuration
+	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailableDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.10"
+    ::= { mtpRsCurrentEntry 8 }
+
+
+-- ====================================================================
+
+mtpRsInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpRsInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmRsStats 2 }
+
+mtpRsInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpRsInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpRsId,
+	mtpRsInt5minInterval
+    }
+    ::= { mtpRsInt5minTable 1 }
+
+MtpRsInt5minEntry ::= SEQUENCE {
+    mtpRsInt5minInterval			Unsigned32,
+    mtpRsInt5minTimeStamp			TimeStamp,
+    mtpRsInt5minReceivedOctetsOPC		PerfIntervalCount, -- Q.752, 6.1
+    mtpRsInt5minTransmittedOctetsDPC		PerfIntervalCount, -- Q.752, 6.2
+    mtpRsInt5minReceivedMSUsOpc			PerfIntervalCount,
+    mtpRsInt5minTransmittedMSUsDpc		PerfIntervalCount,
+    mtpRsInt5minRouteSetUnavailable		PerfIntervalCount, -- Q.752, 4.9
+    mtpRsInt5minRouteSetUnavailableDuration	PerfIntervalCount  -- Q.752, 4.10
+}
+
+mtpRsInt5minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsInt5minEntry 1 }
+
+mtpRsInt5minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsInt5minEntry 2 }
+
+mtpRsInt5minReceivedOctetsOPC OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.1.
+	 
+	 The number of SIF and SIO octets received with given OPC (or 
+	 OPC set) collected over an interval of 15 or 30 minutes.  This 
+	 is a non-obligatory measurement that may be derived (from 6.6).  
+	 This measurement may be used for performance analysis, 
+	 accounting management, or network administration and planning."
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsOPC
+	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsOPC.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.1."
+    ::= { mtpRsInt5minEntry 3 }
+
+mtpRsInt5minTransmittedOctetsDPC OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.2."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsDPC
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsDPC.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.2."
+    ::= { mtpRsInt5minEntry 4 }
+
+mtpRsInt5minReceivedMSUsOpc OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsInt5minEntry 5 }
+
+mtpRsInt5minTransmittedMSUsDpc OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsInt5minEntry 6 }
+
+mtpRsInt5minRouteSetUnavailable OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/4.9.
+	 See also Chapter T1.111.4 11.2.2.
+	 
+	 These are not basic measurements and can be derived (from 4.11 
+	 and 4.12).  This measurement is obligatory in international 
+	 networks."
+    REFERENCE
+	"ANSI T1.116.1D routeSetUnavailable
+	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailable.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.9"
+    ::= { mtpRsInt5minEntry 7 }
+
+mtpRsInt5minRouteSetUnavailableDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/4.10.
+	 See also Chapter T1.111.4 11.2.1.
+	 
+	 These are not basic measurements and can be derived (from 4.11 
+	 and 4.12).  This measurement is obligatory in international 
+	 networks."
+    REFERENCE
+	"ANSI T1.116.1D routeSetUnavailableDuration
+	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailableDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.10"
+    ::= { mtpRsInt5minEntry 8 }
+
+
+-- ====================================================================
+
+mtpRsInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpRsInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmRsStats 3 }
+
+mtpRsInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpRsInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpRsId,
+	mtpRsInt15minInterval
+    }
+    ::= { mtpRsInt15minTable 1 }
+
+MtpRsInt15minEntry ::= SEQUENCE {
+    mtpRsInt15minInterval			Unsigned32,
+    mtpRsInt15minTimeStamp			TimeStamp,
+    mtpRsInt15minReceivedOctetsOPC		PerfIntervalCount, -- Q.752, 6.1
+    mtpRsInt15minTransmittedOctetsDPC		PerfIntervalCount, -- Q.752, 6.2
+    mtpRsInt15minReceivedMSUsOpc		PerfIntervalCount,
+    mtpRsInt15minTransmittedMSUsDpc		PerfIntervalCount,
+    mtpRsInt15minRouteSetUnavailable		PerfIntervalCount, -- Q.752, 4.9
+    mtpRsInt15minRouteSetUnavailableDuration	PerfIntervalCount  -- Q.752, 4.10
+}
+
+mtpRsInt15minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsInt15minEntry 1 }
+
+mtpRsInt15minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsInt15minEntry 2 }
+
+mtpRsInt15minReceivedOctetsOPC OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.1.
+	 
+	 The number of SIF and SIO octets received with given OPC (or 
+	 OPC set) collected over an interval of 15 or 30 minutes.  This 
+	 is a non-obligatory measurement that may be derived (from 6.6).  
+	 This measurement may be used for performance analysis, 
+	 accounting management, or network administration and planning."
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsOPC
+	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsOPC.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.1."
+    ::= { mtpRsInt15minEntry 3 }
+
+mtpRsInt15minTransmittedOctetsDPC OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.2."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsDPC
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsDPC.
+	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.2."
+    ::= { mtpRsInt15minEntry 4 }
+
+mtpRsInt15minReceivedMSUsOpc OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsInt15minEntry 5 }
+
+mtpRsInt15minTransmittedMSUsDpc OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsInt15minEntry 6 }
+
+mtpRsInt15minRouteSetUnavailable OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/4.9.
+	 See also Chapter T1.111.4 11.2.2.
+	 
+	 These are not basic measurements and can be derived (from 4.11 
+	 and 4.12).  This measurement is obligatory in international 
+	 networks."
+    REFERENCE
+	"ANSI T1.116.1D routeSetUnavailable
+	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailable.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.9"
+    ::= { mtpRsInt15minEntry 7 }
+
+mtpRsInt15minRouteSetUnavailableDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/4.10.
+	 See also Chapter T1.111.4 11.2.1.
+	 
+	 These are not basic measurements and can be derived (from 4.11 
+	 and 4.12).  This measurement is obligatory in international 
+	 networks."
+    REFERENCE
+	"ANSI T1.116.1D routeSetUnavailableDuration
+	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailableDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.10"
+    ::= { mtpRsInt15minEntry 8 }
+
+
+-- ====================================================================
+
+mtpRsSiTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpRsSiEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmRsStats 4 }
+
+mtpRsSiEntry OBJECT-TYPE
+    SYNTAX	MtpRsSiEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpRsSiCode
+    }
+    ::= { mtpRsSiTable 1 }
+
+MtpRsSiEntry ::= SEQUENCE {
+    mtpRsSiCode					Unsigned32,
+    mtpRsSiValidIntervals			HCPerfValidIntervals,
+    mtpRsSiTimeDiscontinuity			TimeStamp,
+    mtpRsSiReceivedOctetsOpcSio			PerfCurrentCount, -- Q.752, 6.4
+    mtpRsSiTransmittedOctetsDpcSio		PerfCurrentCount, -- Q.752, 6.5
+    mtpRsSiReceivedMSUsOpcSio			PerfCurrentCount,
+    mtpRsSiTransmittedMSUsDpcSio		PerfCurrentCount,
+    mtpRsSiStatus				RowStatus
+}
+
+mtpRsSiCode OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiEntry 1 }
+
+mtpRsSiValidIntervals OBJECT-TYPE
+    SYNTAX	HCPerfValidIntervals
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiEntry 2 }
+
+mtpRsSiTimeDiscontinuity OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiEntry 3 }
+
+mtpRsSiReceivedOctetsOpcSio OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.4.
+	 
+	 The number of SIF and SIO octets received with given OPC and 
+	 SIO collected over an interval of 15 or 30 minutes.  This a 
+	 non-obligatory measurement that may be used for performance 
+	 analysis, accounting management, and network administration and 
+	 planning."
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsOpcSio
+	 ITU-T Rec. Q.751.1, (10/95) : receivedOctetsOpcSio.
+	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.4"
+    ::= { mtpRsSiEntry 4 }
+
+mtpRsSiTransmittedOctetsDpcSio OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.5."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsDpcSio
+	 ITU-T Rec. Q.751.1, (10/95) : transmittedOctetsDpcSio.
+	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.5"
+    ::= { mtpRsSiEntry 5 }
+
+mtpRsSiReceivedMSUsOpcSio OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiEntry 6 }
+
+mtpRsSiTransmittedMSUsDpcSio OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiEntry 7 }
+
+mtpRsSiStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { mtpRsSiEntry 8 }
+
+
+-- ====================================================================
+
+mtpRsSiInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpRsSiInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmRsStats 5 }
+
+mtpRsSiInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpRsSiInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpRsSiCode,
+	mtpRsSiInt5minInterval
+    }
+    ::= { mtpRsSiInt5minTable 1 }
+
+MtpRsSiInt5minEntry ::= SEQUENCE {
+    mtpRsSiInt5minInterval			Unsigned32,
+    mtpRsSiInt5minTimeStamp			TimeStamp,
+    mtpRsSiInt5minReceivedOctetsOpcSio		PerfIntervalCount, -- Q.752, 6.4
+    mtpRsSiInt5minTransmittedOctetsDpcSio	PerfIntervalCount, -- Q.752, 6.5
+    mtpRsSiInt5minReceivedMSUsOpcSio		PerfIntervalCount,
+    mtpRsSiInt5minTransmittedMSUsDpcSio		PerfIntervalCount
+}
+
+mtpRsSiInt5minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiInt5minEntry 1 }
+
+mtpRsSiInt5minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiInt5minEntry 2 }
+
+mtpRsSiInt5minReceivedOctetsOpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.4.
+	 
+	 The number of SIF and SIO octets received with given OPC and 
+	 SIO collected over an interval of 15 or 30 minutes.  This a 
+	 non-obligatory measurement that may be used for performance 
+	 analysis, accounting management, and network administration and 
+	 planning."
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsOpcSio
+	 ITU-T Rec. Q.751.1, (10/95) : receivedOctetsOpcSio.
+	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.4"
+    ::= { mtpRsSiInt5minEntry 3 }
+
+mtpRsSiInt5minTransmittedOctetsDpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.5."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsDpcSio
+	 ITU-T Rec. Q.751.1, (10/95) : transmittedOctetsDpcSio.
+	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.5"
+    ::= { mtpRsSiInt5minEntry 4 }
+
+mtpRsSiInt5minReceivedMSUsOpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiInt5minEntry 5 }
+
+mtpRsSiInt5minTransmittedMSUsDpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiInt5minEntry 6 }
+
+
+-- ====================================================================
+
+mtpRsSiInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpRsSiInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmRsStats 6 }
+
+mtpRsSiInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpRsSiInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpRsSiCode,
+	mtpRsSiInt15minInterval
+    }
+    ::= { mtpRsSiInt15minTable 1 }
+
+MtpRsSiInt15minEntry ::= SEQUENCE {
+    mtpRsSiInt15minInterval			Unsigned32,
+    mtpRsSiInt15minTimeStamp			TimeStamp,
+    mtpRsSiInt15minReceivedOctetsOpcSio		PerfIntervalCount, -- Q.752, 6.4
+    mtpRsSiInt15minTransmittedOctetsDpcSio	PerfIntervalCount, -- Q.752, 6.5
+    mtpRsSiInt15minReceivedMSUsOpcSio		PerfIntervalCount,
+    mtpRsSiInt15minTransmittedMSUsDpcSio	PerfIntervalCount
+}
+
+mtpRsSiInt15minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiInt15minEntry 1 }
+
+mtpRsSiInt15minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiInt15minEntry 2 }
+
+mtpRsSiInt15minReceivedOctetsOpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.4.
+	 
+	 The number of SIF and SIO octets received with given OPC and 
+	 SIO collected over an interval of 15 or 30 minutes.  This a 
+	 non-obligatory measurement that may be used for performance 
+	 analysis, accounting management, and network administration and 
+	 planning."
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsOpcSio
+	 ITU-T Rec. Q.751.1, (10/95) : receivedOctetsOpcSio.
+	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.4"
+    ::= { mtpRsSiInt15minEntry 3 }
+
+mtpRsSiInt15minTransmittedOctetsDpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/6.5."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsDpcSio
+	 ITU-T Rec. Q.751.1, (10/95) : transmittedOctetsDpcSio.
+	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.5"
+    ::= { mtpRsSiInt15minEntry 4 }
+
+mtpRsSiInt15minReceivedMSUsOpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiInt15minEntry 5 }
+
+mtpRsSiInt15minTransmittedMSUsDpcSio OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpRsSiInt15minEntry 6 }
+
+
+-- ====================================================================
+
+mtpLsCurrentTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpLsCurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmLsStats 1 }
+
+mtpLsCurrentEntry OBJECT-TYPE
+    SYNTAX	MtpLsCurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpLsId	-- shared index
+    }
+    ::= { mtpLsCurrentTable 1 }
+
+MtpLsCurrentEntry ::= SEQUENCE {
+    mtpLsCurrentValidIntervals			HCPerfValidIntervals,
+    mtpLsCurrentTimeDiscontinuity		TimeStamp,
+    mtpLsCurrentAdjacentInaccessibleEvents	PerfCurrentCount, -- Q.752, 5.1
+    mtpLsCurrentAdjacentInaccessibleDuration	PerfCurrentCount, -- Q.752, 5.2
+    mtpLsCurrentSlsUnavailable			PerfCurrentCount  -- Q.752, 4.2
+}
+
+mtpLsCurrentValidIntervals OBJECT-TYPE
+    SYNTAX	HCPerfValidIntervals
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpLsCurrentEntry 1 }
+
+mtpLsCurrentTimeDiscontinuity OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpLsCurrentEntry 2 }
+
+mtpLsCurrentAdjacentInaccessibleEvents OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.1
+
+	 Adjacent SP inaccessible.  Events per SP. On occurence reports 
+	 are obligatory and permanent and are handled by alarm events.  
+	 Accumuated counts on 5 and 30 minute intervals are optional.  
+	 This operational measurement can be derived from events 
+	 indicating the start and stop of ajacent SP inaccessible (items 
+	 5.1 and 5.4).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D adjacentInaccessibleEvents
+	 ITU-T Rec. Q.751.1 (10/95) : adjacentInaccessibleEvents.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.1."
+    ::= { mtpLsCurrentEntry 3 }
+
+mtpLsCurrentAdjacentInaccessibleDuration OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.2 Duration of 
+	 adjacent SP inaccessible.  Seconds per SP.  Accumuated counts 
+	 on 5 and 30 minute intervals are obligatory.  This operational 
+	 measurement can be derived from events indicating the start and 
+	 stop of ajacent SP inaccessible (items 5.1 and 5.4).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D adjacentInaccessibleDuration.
+	 ANSI T1.116.2/2000 Table 5 (5.2).
+	 ITU-T Rec. Q.751.1 (10/95) : adjacentInacessibleDuration.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.2."
+    ::= { mtpLsCurrentEntry 4 }
+
+mtpLsCurrentSlsUnavailable OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents Measurement T1.116.2/4.2.
+
+	 This is not a basic measurement.  It can be derived (from 4.3 
+	 and 4.4)."
+    REFERENCE
+	"ANSI T1.116.1D slsUnavailable
+	 ITU-T Rec. Q.751.1, (10/95) : slsUnavailable.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.2"
+    ::= { mtpLsCurrentEntry 5 }
+
+
+-- ====================================================================
+
+mtpLsInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpLsInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmLsStats 2 }
+
+mtpLsInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpLsInt5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpLsId,	-- shared index
+	mtpLsInt5minInterval
+    }
+    ::= { mtpLsInt5minTable 1 }
+
+MtpLsInt5minEntry ::= SEQUENCE {
+    mtpLsInt5minInterval			Unsigned32,
+    mtpLsInt5minTimeStamp			TimeStamp,
+    mtpLsInt5minAdjacentInaccessibleEvents	PerfIntervalCount, -- Q.752, 5.1
+    mtpLsInt5minAdjacentInaccessibleDuration	PerfIntervalCount, -- Q.752, 5.2
+    mtpLsInt5minSlsUnavailable			PerfIntervalCount  -- Q.752, 4.2
+}
+
+mtpLsInt5minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpLsInt5minEntry 1 }
+
+mtpLsInt5minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpLsInt5minEntry 2 }
+
+mtpLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.1
+
+	 Adjacent SP inaccessible.  Events per SP. On occurence reports 
+	 are obligatory and permanent and are handled by alarm events.  
+	 Accumuated counts on 5 and 30 minute intervals are optional.  
+	 This operational measurement can be derived from events 
+	 indicating the start and stop of ajacent SP inaccessible (items 
+	 5.1 and 5.4).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D adjacentInaccessibleEvents
+	 ITU-T Rec. Q.751.1 (10/95) : adjacentInaccessibleEvents.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.1."
+    ::= { mtpLsInt5minEntry 3 }
+
+mtpLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.2 Duration of 
+	 adjacent SP inaccessible.  Seconds per SP.  Accumuated counts 
+	 on 5 and 30 minute intervals are obligatory.  This operational 
+	 measurement can be derived from events indicating the start and 
+	 stop of ajacent SP inaccessible (items 5.1 and 5.4).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D adjacentInaccessibleDuration.
+	 ANSI T1.116.2/2000 Table 5 (5.2).
+	 ITU-T Rec. Q.751.1 (10/95) : adjacentInacessibleDuration.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.2."
+    ::= { mtpLsInt5minEntry 4 }
+
+mtpLsInt5minSlsUnavailable OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents Measurement T1.116.2/4.2.
+
+	 This is not a basic measurement.  It can be derived (from 4.3 
+	 and 4.4)."
+    REFERENCE
+	"ANSI T1.116.1D slsUnavailable
+	 ITU-T Rec. Q.751.1, (10/95) : slsUnavailable.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.2"
+    ::= { mtpLsInt5minEntry 5 }
+
+
+-- ====================================================================
+
+mtpLsInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpLsInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmLsStats 3 }
+
+mtpLsInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpLsInt15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpLsId,	-- shared index
+	mtpLsInt15minInterval
+    }
+    ::= { mtpLsInt15minTable 1 }
+
+MtpLsInt15minEntry ::= SEQUENCE {
+    mtpLsInt15minInterval			Unsigned32,
+    mtpLsInt15minTimeStamp			TimeStamp,
+    mtpLsInt15minAdjacentInaccessibleEvents	PerfIntervalCount, -- Q.752, 5.1
+    mtpLsInt15minAdjacentInaccessibleDuration	PerfIntervalCount, -- Q.752, 5.2
+    mtpLsInt15minSlsUnavailable			PerfIntervalCount  -- Q.752, 4.2
+}
+
+mtpLsInt15minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpLsInt15minEntry 1 }
+
+mtpLsInt15minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpLsInt15minEntry 2 }
+
+mtpLsInt15minAdjacentInaccessibleEvents OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.1
+
+	 Adjacent SP inaccessible.  Events per SP. On occurence reports 
+	 are obligatory and permanent and are handled by alarm events.  
+	 Accumuated counts on 5 and 30 minute intervals are optional.  
+	 This operational measurement can be derived from events 
+	 indicating the start and stop of ajacent SP inaccessible (items 
+	 5.1 and 5.4).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D adjacentInaccessibleEvents
+	 ITU-T Rec. Q.751.1 (10/95) : adjacentInaccessibleEvents.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.1."
+    ::= { mtpLsInt15minEntry 3 }
+
+mtpLsInt15minAdjacentInaccessibleDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/5.2 Duration of 
+	 adjacent SP inaccessible.  Seconds per SP.  Accumuated counts 
+	 on 5 and 30 minute intervals are obligatory.  This operational 
+	 measurement can be derived from events indicating the start and 
+	 stop of ajacent SP inaccessible (items 5.1 and 5.4).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D adjacentInaccessibleDuration.
+	 ANSI T1.116.2/2000 Table 5 (5.2).
+	 ITU-T Rec. Q.751.1 (10/95) : adjacentInacessibleDuration.
+	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.2."
+    ::= { mtpLsInt15minEntry 4 }
+
+mtpLsInt15minSlsUnavailable OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents Measurement T1.116.2/4.2.
+
+	 This is not a basic measurement.  It can be derived (from 4.3 
+	 and 4.4)."
+    REFERENCE
+	"ANSI T1.116.1D slsUnavailable
+	 ITU-T Rec. Q.751.1, (10/95) : slsUnavailable.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.2"
+    ::= { mtpLsInt15minEntry 5 }
+
+
+-- ====================================================================
+
+mtpSlStatsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSlStatsEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This table provides SL statistics."
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpOmSlStats 1 }
+
+mtpSlStatsEntry OBJECT-TYPE
+    SYNTAX	MtpSlStatsEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This provides the table entry for SL statistics."
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    AUGMENTS	{
+	mtpSlEntry
+    }
+    ::= { mtpSlStatsTable 1 }
+
+MtpSlStatsEntry ::= SEQUENCE {
+    mtpSlStatsDurInService			Counter32,
+    mtpSlStatsFailAlignOrProving		Counter32,
+    mtpSlStatsNacksReceived			Counter32,
+    mtpSlStatsDurUnavail			Counter32,
+    mtpSlStatsDurUnavailFailed			Counter32,
+    mtpSlStatsDurUnavailRpo			Counter32,
+    mtpSlStatsSibsSent				Counter32,
+    mtpSlStatsTranSioSifOctets			Counter32,
+    mtpSlStatsRetransOctets			Counter32,
+    mtpSlStatsTranMsus				Counter32,
+    mtpSlStatsRecvSioSifOctets			Counter32,
+    mtpSlStatsRecvMsus				Counter32,
+    mtpSlStatsCongOnsetInd0			Counter32,
+    mtpSlStatsCongOnsetInd1			Counter32,
+    mtpSlStatsCongOnsetInd2			Counter32,
+    mtpSlStatsCongOnsetInd3			Counter32,
+    mtpSlStatsDurCongStatus0			Counter32,
+    mtpSlStatsDurCongStatus1			Counter32,
+    mtpSlStatsDurCongStatus2			Counter32,
+    mtpSlStatsDurCongStatus3			Counter32,
+    mtpSlStatsCongDiscdInd0			Counter32,
+    mtpSlStatsCongDiscdInd1			Counter32,
+    mtpSlStatsCongDiscdInd2			Counter32,
+    mtpSlStatsCongDiscdInd3			Counter32
+}
+
+mtpSlStatsDurInService OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is a count of the duration in service for the signalling 
+	 link."
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 1 }
+
+mtpSlStatsFailAlignOrProving OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 2 }
+
+mtpSlStatsNacksReceived OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 3 }
+
+mtpSlStatsDurUnavail OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 4 }
+
+mtpSlStatsDurUnavailFailed OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 5 }
+
+mtpSlStatsDurUnavailRpo OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 6 }
+
+mtpSlStatsSibsSent OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 7 }
+
+mtpSlStatsTranSioSifOctets OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 8 }
+
+mtpSlStatsRetransOctets OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 9 }
+
+mtpSlStatsTranMsus OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 10 }
+
+mtpSlStatsRecvSioSifOctets OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 11 }
+
+mtpSlStatsRecvMsus OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 12 }
+
+mtpSlStatsCongOnsetInd0 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 13 }
+
+mtpSlStatsCongOnsetInd1 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 14 }
+
+mtpSlStatsCongOnsetInd2 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 15 }
+
+mtpSlStatsCongOnsetInd3 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 16 }
+
+mtpSlStatsDurCongStatus0 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 17 }
+
+mtpSlStatsDurCongStatus1 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 18 }
+
+mtpSlStatsDurCongStatus2 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 19 }
+
+mtpSlStatsDurCongStatus3 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 20 }
+
+mtpSlStatsCongDiscdInd0 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 21 }
+
+mtpSlStatsCongDiscdInd1 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 22 }
+
+mtpSlStatsCongDiscdInd2 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 23 }
+
+mtpSlStatsCongDiscdInd3 OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.752, ANSI T1.116.2"
+    ::= { mtpSlStatsEntry 24 }
+
+
+-- ====================================================================
+
+mtpSlL3CurrentTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSlL3CurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmSlStats 2 }
+
+mtpSlL3CurrentEntry OBJECT-TYPE
+    SYNTAX	MtpSlL3CurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpLsId, -- shared index
+	mtpSlSlCode -- shared index
+    }
+    ::= { mtpSlL3CurrentTable 1 }
+
+MtpSlL3CurrentEntry ::= SEQUENCE {
+    mtpSlL3CurrentValidIntervals		HCPerfValidIntervals,
+    mtpSlL3CurrentTimeDiscontinuity		TimeStamp,
+    mtpSlL3CurrentSlUnavailabilityDuration	PerfCurrentCount, -- Q.752, 2.1
+    mtpSlL3CurrentSlLocalInhibition		PerfCurrentCount, -- Q.752, 2.5
+    mtpSlL3CurrentSlRemoteInhibition		PerfCurrentCount, -- Q.752, 2.6
+    mtpSlL3CurrentSlFailed			PerfCurrentCount, -- Q.752, 2.7
+    mtpSlL3CurrentSlRemoteProcOutage		PerfCurrentCount, -- Q.752, 2.9
+    mtpSlL3CurrentLocalMgmtInhibit		PerfCurrentCount, -- Q.752, 2.13
+    mtpSlL3CurrentLocalMgmtUninhibit		PerfCurrentCount, -- Q.752, 2.14
+    mtpSlL3CurrentLocalBusy			PerfCurrentCount, -- Q.752, 2.15
+    mtpSlL3CurrentSlCongestedStarts		PerfCurrentCount, -- Q.752, 3.6
+    mtpSlL3CurrentSlCongestedDuration		PerfCurrentCount, -- Q.752, 3.7
+    mtpSlL3CurrentSlCongestionStops		PerfCurrentCount, -- Q.752, 3.9
+    mtpSlL3CurrentDiscardedMSUs			PerfCurrentCount, -- Q.752, 3.10
+    mtpSlL3CurrentCongestionEventsMSULoss	PerfCurrentCount, -- Q.752, 3.11
+    mtpSlL3CurrentChangeovers			PerfCurrentCount, -- Q.752, 1.10
+    mtpSlL3CurrentChangebacks			PerfCurrentCount, -- Q.752, 1.11
+    mtpSlL3CurrentRestorations			PerfCurrentCount  -- Q.752, 1.12
+}
+
+mtpSlL3CurrentValidIntervals OBJECT-TYPE
+    SYNTAX	HCPerfValidIntervals
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL3CurrentEntry 1 }
+
+mtpSlL3CurrentTimeDiscontinuity OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL3CurrentEntry 2 }
+
+mtpSlL3CurrentSlUnavailabilityDuration OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.1
+
+	 Duration of signalling link unavailability (for any reason) in 
+	 units of seconds per signalling link.  This is an obligatory 
+	 operational measurement to be collected on a 30 minute basis.  
+	 This operational measurement is permanently activated.  This 
+	 operational measurement may be derived (from 1.2, 1.12, 2.5 and 
+	 2.6).
+
+	 This measurement can be used in calculations for the detection 
+	 of increases in signalling link signalling unit error rates 
+	 (ANSI T1.116.2/2000 6.2.1.4.1).  It may also be used in the 
+	 calculation of signalling link utilization (ANSI T1.116.2/2000 
+	 6.2.2.1).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slUnavailabilityDuration
+	 ITU-T Rec. Q.751.1, (10/95) : slUnavailabilityDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.1"
+    ::= { mtpSlL3CurrentEntry 3 }
+
+mtpSlL3CurrentSlLocalInhibition OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.5.
+	 See also 3.2.8/T1.111.4.
+	 
+	 Duration of signalling link inhibition due to local management 
+	 actions in units of seconds per signalling link collected on a 
+	 30 minute interval.  This is a non-obligatory operational 
+	 measurement that may be derived (from 2.16 and 2.17 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slLocalInhibition.
+	 ANSI T1.116.1/2000 Table 2 (2.5).
+	 ANSI T1.111.4/2000 3.2.8.
+	 ITU-T Rec. Q.751.1, (10/95) : slLocalInhibition
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.5"
+    ::= { mtpSlL3CurrentEntry 4 }
+
+mtpSlL3CurrentSlRemoteInhibition OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.6.
+	 See also 3.2.2/T1.111.4.
+
+	 Duration of signalling link inhibition due to remote management 
+	 actions in units of seconds per signalling link collected on a 
+	 30 minute interval.  This is a non-obligatory operational 
+	 measurement that may be derived (from 2.18 and 2.19 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slRemoteInhibition.
+	 ANSI T1.116.1/2000 Table 2 (2.6).
+	 ANSI T1.111.4/2000 3.2.2.
+	 ITU-T Rec. Q.751.1, (10/95) : slRemoteInhibition.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.6"
+    ::= { mtpSlL3CurrentEntry 5 }
+
+mtpSlL3CurrentSlFailed OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.7.
+	 See also 3.2.2/T1.111.4.
+
+	 Duration of signalling link unavailability due to link failure 
+	 in units of seconds per signalling link collected on a 30 
+	 minute interval.  This is non-obligatory operational 
+	 measurement that may be derived (from 1.2 and 1.12 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slFailed.
+	 ANSI T1.116.1/2000 Table 2 (2.7).
+	 ANSI T1.111.4/2000 3.2.2.
+	 ITU-T Rec. Q.751.1, (10/95) : slFailed.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.7"
+    ::= { mtpSlL3CurrentEntry 6 }
+
+mtpSlL3CurrentSlRemoteProcOutage OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurementT1.116.2/2.9.
+	 See also 3.2.6/T1.111.4.
+
+	 Duraing of signalling link unavailability due to remote 
+	 processor outage in units of seconds per siganlling link 
+	 collected on a 30 minute interval.  This is a non-obligatory 
+	 operational measurement that may be derived (from 2.10 and 2.11 
+	 which are alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slRemoteProcOutage.
+	 ANSI T1.111.4/3.2.6.
+	 ITU-T Rec. Q.751.1, (10/95) : slRemoteProcOutage.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.9"
+    ::= { mtpSlL3CurrentEntry 7 }
+
+mtpSlL3CurrentLocalMgmtInhibit OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.13.
+	 See also 10.2/T1.111.4.
+	 
+	 Local management inhibit in number of events per signalling 
+	 link collected on a 5 or 30 minute interval.  This is a 
+	 non-obligatory measurement that may be derived (from 2.16 which 
+	 is a alarm indication event)."
+    REFERENCE
+	"ANSI T1.116.1D localMgntInhibit.
+	 ANSI T1.116.2/2000 Table 2 (2.13).
+	 ANSI T1.111.4/2000 10.2.
+	 ITU-T Rec. Q.751.1, (10/95) : localMgmtInhibit.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.13"
+    ::= { mtpSlL3CurrentEntry 8 }
+
+mtpSlL3CurrentLocalMgmtUninhibit OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.14.
+	 See also 10.3/T1.111.4.
+
+	 Local management unininhibit in number of events per signalling 
+	 link collected on a 5 or 30 minute interval.  This is a 
+	 non-obligatory measurement that may be derived (from 2.17 and 
+	 2.19 which are alarm clearing events)."
+    REFERENCE
+	"ANSI T1.116.1D localMgntUninhibit.
+	 ANSI T1.116.2/2000 Table 2 (2.14).
+	 ANSI T1.111.4/2000 10.3.
+	 ITU-T Rec. Q.751.1, (10/95) : localMgmtUninhibit.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.14"
+    ::= { mtpSlL3CurrentEntry 9 }
+
+mtpSlL3CurrentLocalBusy OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"SIBs sent"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.15.
+	 See also 9.3/T1.111.4.
+	 
+	 Duration of local busy in SIBs per signalling link collected 
+	 over a 5 or 30 minute interval.  This is a non-obligatory 
+	 measurement.  The measurement is used for near-real-time fault 
+	 detection, general fault detection, and  MTP performance 
+	 studies."
+    REFERENCE
+	"ANSI T1.116.1D localBusy.
+	 ANSI T1.116.2/2000 Table 2 (2.15).
+	 ANSI T1.111.4/2000 9.3.
+	 ITU-T Rec. Q.751.1, (10/95) : localBusy.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.15"
+    ::= { mtpSlL3CurrentEntry 10 }
+
+mtpSlL3CurrentSlCongestedStarts OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.6.
+	 See also 3.8/T1.111.4.
+	 
+	 Signalling link congestion indications per signalling link 
+	 collected on a first and interval basis, or over a 5 or 30 
+	 minute interval.  This measurement is non-obligatory and may be 
+	 used for fault detection, near real-time monitoring, 
+	 performance analysis and network administration and planning.
+	 
+	 The signalling link congestion refers to link status 
+	 'congested' at Level 3.  A link is marked at Level 3 as 
+	 congested when a congestion threshold is reached at the 
+	 transmit side.  Measurements should be kept for thresholds 1, 2 
+	 and 3 separately if that national option is selected.
+	 
+	 The reporting of this item on occurence should be considered 
+	 carefully, since there might be many events in a short 
+	 interval.  This might occur for example if the congestion onset 
+	 and abatement thresholds were close together, or if the 
+	 transmission/retransmission buffer size were significantly 
+	 greater than the reception buffer at the other end of the link, 
+	 and congestion occurred."
+    REFERENCE
+	"ANSI T1.116.1D slCongestedStarts.
+	 ANSI T1.116.2/2000 Table 3 (3.6).
+	 ANSI T1.114.1/2000 3.8.
+	 ITU-T Q.752 (1997) Table 3 (3.6).
+	 ITU-T Q.752 (1997) 2.4.6.
+	 ITU-T Q.704 (1993) 3.6 and 11.
+	 ITU-T Rec. Q.751.1, (10/95) : slCongestedStarts.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.6"
+    ::= { mtpSlL3CurrentEntry 11 }
+
+mtpSlL3CurrentSlCongestedDuration OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.751.1, (10/95) : slCongestedDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.7"
+    ::= { mtpSlL3CurrentEntry 12 }
+
+mtpSlL3CurrentSlCongestionStops OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.9.
+	 See also 3.8/T1.111.4.
+	 
+	 Stop of signalling link congestion events per signalling link 
+	 collected on a first and interval basis.  This measurement is 
+	 non-obligatory and may be used for fault detection and 
+	 performance analysis.
+
+	 Stop of signalling link congestion occurs for a link at Level 3 
+	 when the buffer occupancy has dropped below the congestion 
+	 abatement threshold.  If a number of thresholds is used, the 
+	 event is marked separately for each threshold.
+	 
+	 The reporting of this item on occurence should be considered 
+	 carefully, since there might be many events in a short 
+	 interval.  This might occur for example if the congestion onset 
+	 and abatement thresholds were close together, or if the 
+	 transmission/retransmission buffer size were significantly 
+	 greater than the reception buffer at the other end of the link, 
+	 and congestion occurred."
+    REFERENCE
+	"ANSI T1.116.1D slCongestionStops
+	 ITU-T Rec. Q.751.1, (10/95) : slCongestionStops.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.9"
+    ::= { mtpSlL3CurrentEntry 13 }
+
+mtpSlL3CurrentDiscardedMSUs OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.10
+
+	 The number of MSUs discarded due to signalling link congestion.  
+	 The significance and method of measuring this item depends upon 
+	 the method of congestion handling employed in the newtork.  The 
+	 three congestion handling methods are:
+
+	 a) single congestion level without priority; or
+	 b) national option of multiple levels without message 
+	    priorities; or
+	 c) the national option of multiple congestion levels with 
+	    message priorities.
+
+	 For cases a) and b), messages are discarded by the MTP only 
+	 under extreme overload.  Thus the count indicates, if greater 
+	 than zero, an extreme congestion.  It indicates the 
+	 effectiveness of flow control procedures.  For case c), 
+	 messages with priority less thatn the discard level are 
+	 discarded in the MTP.  For this case, the MSUs discarded due to 
+	 SL congestion (thresholds 1, 2 and 3 separately) are counted 
+	 based on the greatest congestion discard threshold in effect on 
+	 the link.  For example, if the congestion on a link has 
+	 exceeded congestion discard threshold 2, and therefore MSUs 
+	 with priority 0 and 1 are being discarded, a MSU discarded with 
+	 priority 0 is counted in the threshould 2 count.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D discardedMSUs
+	 ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.10"
+    ::= { mtpSlL3CurrentEntry 14 }
+
+mtpSlL3CurrentCongestionEventsMSULoss OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.11
+	 
+	 The number of congestion events resulting in loss of MSUs per 
+	 signalling link collected on a first and interval basis, or 
+	 over a 5 or 30 minute interval.  This measurement is 
+	 non-obligatory and may be used for fault detection, near 
+	 real-time monitoring, performance analysis and network 
+	 administration and planning.
+
+	 This measurement is per congestion level.  For the national 
+	 option of multiple congestion levels with message priorities, a 
+	 congestion event that may result in the loss of MSUs for 
+	 threshold 'n' begins when congestion discard threshold 'n' is 
+	 exceeded.  A new congestion event that may result in the loss 
+	 of MSUs for threshold 'n' cannot begin until the congestion 
+	 level falls below congestion abatement threshold 'n'.  Only one 
+	 congestion event which may result in the loss of MSUs can be in 
+	 effect at one time, this being the greatest numbered threshold.  
+	 Therefore, the congestion even that may result in the loss of 
+	 MSUs for threshold 'n' is suspended (not stopped) when 
+	 congestion discard threshod 'n+1' is exceeded, and resumed (not 
+	 a new one started) when the congestion level falls below 
+	 congestion abatement threshold 'n+1'."
+    REFERENCE
+	"ANSI T1.116.1D congestionEventsMSULoss.
+	 ANSI T1.116.2/2000 Table 3 (3.11).
+	 ITU-T Q.752 (1997) Table 3 (3.11).
+	 ITU-T Q.752 (1997) 2.4.10.
+	 ITU-T Rec. Q.751.1, (10/95) : congestionEventsMSULoss.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.11"
+    ::= { mtpSlL3CurrentEntry 15 }
+
+mtpSlL3CurrentChangeovers OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.10"
+    ::= { mtpSlL3CurrentEntry 16 }
+
+mtpSlL3CurrentChangebacks OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.11"
+    ::= { mtpSlL3CurrentEntry 17 }
+
+mtpSlL3CurrentRestorations OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.12"
+    ::= { mtpSlL3CurrentEntry 18 }
+
+
+-- ====================================================================
+
+mtpSlL3Int5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSlL3Int5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmSlStats 3 }
+
+mtpSlL3Int5minEntry OBJECT-TYPE
+    SYNTAX	MtpSlL3Int5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpLsId, -- shared index
+	mtpSlSlCode, -- shared index
+	mtpSlL3Int5minInterval
+    }
+    ::= { mtpSlL3Int5minTable 1 }
+
+MtpSlL3Int5minEntry ::= SEQUENCE {
+    mtpSlL3Int5minInterval			Unsigned32,
+    mtpSlL3Int5minTimeStamp			TimeStamp,
+    mtpSlL3Int5minSlUnavailabilityDuration	PerfIntervalCount, -- Q.752, 2.1
+    mtpSlL3Int5minSlLocalInhibition		PerfIntervalCount, -- Q.752, 2.5
+    mtpSlL3Int5minSlRemoteInhibition		PerfIntervalCount, -- Q.752, 2.6
+    mtpSlL3Int5minSlFailed			PerfIntervalCount, -- Q.752, 2.7
+    mtpSlL3Int5minSlRemoteProcOutage		PerfIntervalCount, -- Q.752, 2.9
+    mtpSlL3Int5minLocalMgmtInhibit		PerfIntervalCount, -- Q.752, 2.13
+    mtpSlL3Int5minLocalMgmtUninhibit		PerfIntervalCount, -- Q.752, 2.14
+    mtpSlL3Int5minLocalBusy			PerfIntervalCount, -- Q.752, 2.15
+    mtpSlL3Int5minSlCongestedStarts		PerfIntervalCount, -- Q.752, 3.6
+    mtpSlL3Int5minSlCongestedDuration		PerfIntervalCount, -- Q.752, 3.7
+    mtpSlL3Int5minSlCongestionStops		PerfIntervalCount, -- Q.752, 3.9
+    mtpSlL3Int5minDiscardedMSUs			PerfIntervalCount, -- Q.752, 3.10
+    mtpSlL3Int5minCongestionEventsMSULoss	PerfIntervalCount, -- Q.752, 3.11
+    mtpSlL3Int5minChangeovers			PerfIntervalCount, -- Q.752, 1.10
+    mtpSlL3Int5minChangebacks			PerfIntervalCount, -- Q.752, 1.11
+    mtpSlL3Int5minRestorations			PerfIntervalCount  -- Q.752, 1.12
+}
+
+mtpSlL3Int5minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL3Int5minEntry 1 }
+
+mtpSlL3Int5minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL3Int5minEntry 2 }
+
+mtpSlL3Int5minSlUnavailabilityDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.1
+
+	 Duration of signalling link unavailability (for any reason) in 
+	 units of seconds per signalling link.  This is an obligatory 
+	 operational measurement to be collected on a 30 minute basis.  
+	 This operational measurement is permanently activated.  This 
+	 operational measurement may be derived (from 1.2, 1.12, 2.5 and 
+	 2.6).
+
+	 This measurement can be used in calculations for the detection 
+	 of increases in signalling link signalling unit error rates 
+	 (ANSI T1.116.2/2000 6.2.1.4.1).  It may also be used in the 
+	 calculation of signalling link utilization (ANSI T1.116.2/2000 
+	 6.2.2.1).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slUnavailabilityDuration
+	 ITU-T Rec. Q.751.1, (10/95) : slUnavailabilityDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.1"
+    ::= { mtpSlL3Int5minEntry 3 }
+
+mtpSlL3Int5minSlLocalInhibition OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.5.
+	 See also 3.2.8/T1.111.4.
+	 
+	 Duration of signalling link inhibition due to local management 
+	 actions in units of seconds per signalling link collected on a 
+	 30 minute interval.  This is a non-obligatory operational 
+	 measurement that may be derived (from 2.16 and 2.17 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slLocalInhibition.
+	 ANSI T1.116.1/2000 Table 2 (2.5).
+	 ANSI T1.111.4/2000 3.2.8.
+	 ITU-T Rec. Q.751.1, (10/95) : slLocalInhibition
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.5"
+    ::= { mtpSlL3Int5minEntry 4 }
+
+mtpSlL3Int5minSlRemoteInhibition OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.6.
+	 See also 3.2.2/T1.111.4.
+
+	 Duration of signalling link inhibition due to remote management 
+	 actions in units of seconds per signalling link collected on a 
+	 30 minute interval.  This is a non-obligatory operational 
+	 measurement that may be derived (from 2.18 and 2.19 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slRemoteInhibition.
+	 ANSI T1.116.1/2000 Table 2 (2.6).
+	 ANSI T1.111.4/2000 3.2.2.
+	 ITU-T Rec. Q.751.1, (10/95) : slRemoteInhibition.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.6"
+    ::= { mtpSlL3Int5minEntry 5 }
+
+mtpSlL3Int5minSlFailed OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.7.
+	 See also 3.2.2/T1.111.4.
+
+	 Duration of signalling link unavailability due to link failure 
+	 in units of seconds per signalling link collected on a 30 
+	 minute interval.  This is non-obligatory operational 
+	 measurement that may be derived (from 1.2 and 1.12 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slFailed.
+	 ANSI T1.116.1/2000 Table 2 (2.7).
+	 ANSI T1.111.4/2000 3.2.2.
+	 ITU-T Rec. Q.751.1, (10/95) : slFailed.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.7"
+    ::= { mtpSlL3Int5minEntry 6 }
+
+mtpSlL3Int5minSlRemoteProcOutage OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurementT1.116.2/2.9.
+	 See also 3.2.6/T1.111.4.
+
+	 Duraing of signalling link unavailability due to remote 
+	 processor outage in units of seconds per siganlling link 
+	 collected on a 30 minute interval.  This is a non-obligatory 
+	 operational measurement that may be derived (from 2.10 and 2.11 
+	 which are alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slRemoteProcOutage.
+	 ANSI T1.111.4/3.2.6.
+	 ITU-T Rec. Q.751.1, (10/95) : slRemoteProcOutage.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.9"
+    ::= { mtpSlL3Int5minEntry 7 }
+
+mtpSlL3Int5minLocalMgmtInhibit OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.13.
+	 See also 10.2/T1.111.4.
+	 
+	 Local management inhibit in number of events per signalling 
+	 link collected on a 5 or 30 minute interval.  This is a 
+	 non-obligatory measurement that may be derived (from 2.16 which 
+	 is a alarm indication event)."
+    REFERENCE
+	"ANSI T1.116.1D localMgntInhibit.
+	 ANSI T1.116.2/2000 Table 2 (2.13).
+	 ANSI T1.111.4/2000 10.2.
+	 ITU-T Rec. Q.751.1, (10/95) : localMgmtInhibit.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.13"
+    ::= { mtpSlL3Int5minEntry 8 }
+
+mtpSlL3Int5minLocalMgmtUninhibit OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.14.
+	 See also 10.3/T1.111.4.
+
+	 Local management unininhibit in number of events per signalling 
+	 link collected on a 5 or 30 minute interval.  This is a 
+	 non-obligatory measurement that may be derived (from 2.17 and 
+	 2.19 which are alarm clearing events)."
+    REFERENCE
+	"ANSI T1.116.1D localMgntUninhibit.
+	 ANSI T1.116.2/2000 Table 2 (2.14).
+	 ANSI T1.111.4/2000 10.3.
+	 ITU-T Rec. Q.751.1, (10/95) : localMgmtUninhibit.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.14"
+    ::= { mtpSlL3Int5minEntry 9 }
+
+mtpSlL3Int5minLocalBusy OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"SIBs sent"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.15.
+	 See also 9.3/T1.111.4.
+	 
+	 Duration of local busy in SIBs per signalling link collected 
+	 over a 5 or 30 minute interval.  This is a non-obligatory 
+	 measurement.  The measurement is used for near-real-time fault 
+	 detection, general fault detection, and  MTP performance 
+	 studies."
+    REFERENCE
+	"ANSI T1.116.1D localBusy.
+	 ANSI T1.116.2/2000 Table 2 (2.15).
+	 ANSI T1.111.4/2000 9.3.
+	 ITU-T Rec. Q.751.1, (10/95) : localBusy.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.15"
+    ::= { mtpSlL3Int5minEntry 10 }
+
+mtpSlL3Int5minSlCongestedStarts OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.6.
+	 See also 3.8/T1.111.4.
+	 
+	 Signalling link congestion indications per signalling link 
+	 collected on a first and interval basis, or over a 5 or 30 
+	 minute interval.  This measurement is non-obligatory and may be 
+	 used for fault detection, near real-time monitoring, 
+	 performance analysis and network administration and planning.
+	 
+	 The signalling link congestion refers to link status 
+	 'congested' at Level 3.  A link is marked at Level 3 as 
+	 congested when a congestion threshold is reached at the 
+	 transmit side.  Measurements should be kept for thresholds 1, 2 
+	 and 3 separately if that national option is selected.
+	 
+	 The reporting of this item on occurence should be considered 
+	 carefully, since there might be many events in a short 
+	 interval.  This might occur for example if the congestion onset 
+	 and abatement thresholds were close together, or if the 
+	 transmission/retransmission buffer size were significantly 
+	 greater than the reception buffer at the other end of the link, 
+	 and congestion occurred."
+    REFERENCE
+	"ANSI T1.116.1D slCongestedStarts.
+	 ANSI T1.116.2/2000 Table 3 (3.6).
+	 ANSI T1.114.1/2000 3.8.
+	 ITU-T Q.752 (1997) Table 3 (3.6).
+	 ITU-T Q.752 (1997) 2.4.6.
+	 ITU-T Q.704 (1993) 3.6 and 11.
+	 ITU-T Rec. Q.751.1, (10/95) : slCongestedStarts.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.6"
+    ::= { mtpSlL3Int5minEntry 11 }
+
+mtpSlL3Int5minSlCongestedDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.751.1, (10/95) : slCongestedDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.7"
+    ::= { mtpSlL3Int5minEntry 12 }
+
+mtpSlL3Int5minSlCongestionStops OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.9.
+	 See also 3.8/T1.111.4.
+	 
+	 Stop of signalling link congestion events per signalling link 
+	 collected on a first and interval basis.  This measurement is 
+	 non-obligatory and may be used for fault detection and 
+	 performance analysis.
+
+	 Stop of signalling link congestion occurs for a link at Level 3 
+	 when the buffer occupancy has dropped below the congestion 
+	 abatement threshold.  If a number of thresholds is used, the 
+	 event is marked separately for each threshold.
+	 
+	 The reporting of this item on occurence should be considered 
+	 carefully, since there might be many events in a short 
+	 interval.  This might occur for example if the congestion onset 
+	 and abatement thresholds were close together, or if the 
+	 transmission/retransmission buffer size were significantly 
+	 greater than the reception buffer at the other end of the link, 
+	 and congestion occurred."
+    REFERENCE
+	"ANSI T1.116.1D slCongestionStops
+	 ITU-T Rec. Q.751.1, (10/95) : slCongestionStops.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.9"
+    ::= { mtpSlL3Int5minEntry 13 }
+
+mtpSlL3Int5minDiscardedMSUs OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.10
+
+	 The number of MSUs discarded due to signalling link congestion.  
+	 The significance and method of measuring this item depends upon 
+	 the method of congestion handling employed in the newtork.  The 
+	 three congestion handling methods are:
+
+	 a) single congestion level without priority; or
+	 b) national option of multiple levels without message 
+	    priorities; or
+	 c) the national option of multiple congestion levels with 
+	    message priorities.
+
+	 For cases a) and b), messages are discarded by the MTP only 
+	 under extreme overload.  Thus the count indicates, if greater 
+	 than zero, an extreme congestion.  It indicates the 
+	 effectiveness of flow control procedures.  For case c), 
+	 messages with priority less thatn the discard level are 
+	 discarded in the MTP.  For this case, the MSUs discarded due to 
+	 SL congestion (thresholds 1, 2 and 3 separately) are counted 
+	 based on the greatest congestion discard threshold in effect on 
+	 the link.  For example, if the congestion on a link has 
+	 exceeded congestion discard threshold 2, and therefore MSUs 
+	 with priority 0 and 1 are being discarded, a MSU discarded with 
+	 priority 0 is counted in the threshould 2 count.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D discardedMSUs
+	 ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.10"
+    ::= { mtpSlL3Int5minEntry 14 }
+
+mtpSlL3Int5minCongestionEventsMSULoss OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.11
+	 
+	 The number of congestion events resulting in loss of MSUs per 
+	 signalling link collected on a first and interval basis, or 
+	 over a 5 or 30 minute interval.  This measurement is 
+	 non-obligatory and may be used for fault detection, near 
+	 real-time monitoring, performance analysis and network 
+	 administration and planning.
+
+	 This measurement is per congestion level.  For the national 
+	 option of multiple congestion levels with message priorities, a 
+	 congestion event that may result in the loss of MSUs for 
+	 threshold 'n' begins when congestion discard threshold 'n' is 
+	 exceeded.  A new congestion event that may result in the loss 
+	 of MSUs for threshold 'n' cannot begin until the congestion 
+	 level falls below congestion abatement threshold 'n'.  Only one 
+	 congestion event which may result in the loss of MSUs can be in 
+	 effect at one time, this being the greatest numbered threshold.  
+	 Therefore, the congestion even that may result in the loss of 
+	 MSUs for threshold 'n' is suspended (not stopped) when 
+	 congestion discard threshod 'n+1' is exceeded, and resumed (not 
+	 a new one started) when the congestion level falls below 
+	 congestion abatement threshold 'n+1'."
+    REFERENCE
+	"ANSI T1.116.1D congestionEventsMSULoss.
+	 ANSI T1.116.2/2000 Table 3 (3.11).
+	 ITU-T Q.752 (1997) Table 3 (3.11).
+	 ITU-T Q.752 (1997) 2.4.10.
+	 ITU-T Rec. Q.751.1, (10/95) : congestionEventsMSULoss.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.11"
+    ::= { mtpSlL3Int5minEntry 15 }
+
+mtpSlL3Int5minChangeovers OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.10"
+    ::= { mtpSlL3Int5minEntry 16 }
+
+mtpSlL3Int5minChangebacks OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.11"
+    ::= { mtpSlL3Int5minEntry 17 }
+
+mtpSlL3Int5minRestorations OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.12"
+    ::= { mtpSlL3Int5minEntry 18 }
+
+
+-- ====================================================================
+
+mtpSlL3Int15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSlL3Int15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmSlStats 4 }
+
+mtpSlL3Int15minEntry OBJECT-TYPE
+    SYNTAX	MtpSlL3Int15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpLsId, -- shared index
+	mtpSlSlCode, -- shared index
+	mtpSlL3Int15minInterval
+    }
+    ::= { mtpSlL3Int15minTable 1 }
+
+MtpSlL3Int15minEntry ::= SEQUENCE {
+    mtpSlL3Int15minInterval			Unsigned32,
+    mtpSlL3Int15minTimeStamp			TimeStamp,
+    mtpSlL3Int15minSlUnavailabilityDuration	PerfIntervalCount, -- Q.752, 2.1
+    mtpSlL3Int15minSlLocalInhibition		PerfIntervalCount, -- Q.752, 2.5
+    mtpSlL3Int15minSlRemoteInhibition		PerfIntervalCount, -- Q.752, 2.6
+    mtpSlL3Int15minSlFailed			PerfIntervalCount, -- Q.752, 2.7
+    mtpSlL3Int15minSlRemoteProcOutage		PerfIntervalCount, -- Q.752, 2.9
+    mtpSlL3Int15minLocalMgmtInhibit		PerfIntervalCount, -- Q.752, 2.13
+    mtpSlL3Int15minLocalMgmtUninhibit		PerfIntervalCount, -- Q.752, 2.14
+    mtpSlL3Int15minLocalBusy			PerfIntervalCount, -- Q.752, 2.15
+    mtpSlL3Int15minSlCongestedStarts		PerfIntervalCount, -- Q.752, 3.6
+    mtpSlL3Int15minSlCongestedDuration		PerfIntervalCount, -- Q.752, 3.7
+    mtpSlL3Int15minSlCongestionStops		PerfIntervalCount, -- Q.752, 3.9
+    mtpSlL3Int15minDiscardedMSUs		PerfIntervalCount, -- Q.752, 3.10
+    mtpSlL3Int15minCongestionEventsMSULoss	PerfIntervalCount, -- Q.752, 3.11
+    mtpSlL3Int15minChangeovers			PerfIntervalCount, -- Q.752, 1.10
+    mtpSlL3Int15minChangebacks			PerfIntervalCount, -- Q.752, 1.11
+    mtpSlL3Int15minRestorations			PerfIntervalCount  -- Q.752, 1.12
+}
+
+mtpSlL3Int15minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL3Int15minEntry 1 }
+
+mtpSlL3Int15minTimeStamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL3Int15minEntry 2 }
+
+mtpSlL3Int15minSlUnavailabilityDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.1
+
+	 Duration of signalling link unavailability (for any reason) in 
+	 units of seconds per signalling link.  This is an obligatory 
+	 operational measurement to be collected on a 30 minute basis.  
+	 This operational measurement is permanently activated.  This 
+	 operational measurement may be derived (from 1.2, 1.12, 2.5 and 
+	 2.6).
+
+	 This measurement can be used in calculations for the detection 
+	 of increases in signalling link signalling unit error rates 
+	 (ANSI T1.116.2/2000 6.2.1.4.1).  It may also be used in the 
+	 calculation of signalling link utilization (ANSI T1.116.2/2000 
+	 6.2.2.1).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slUnavailabilityDuration
+	 ITU-T Rec. Q.751.1, (10/95) : slUnavailabilityDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.1"
+    ::= { mtpSlL3Int15minEntry 3 }
+
+mtpSlL3Int15minSlLocalInhibition OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.5.
+	 See also 3.2.8/T1.111.4.
+	 
+	 Duration of signalling link inhibition due to local management 
+	 actions in units of seconds per signalling link collected on a 
+	 30 minute interval.  This is a non-obligatory operational 
+	 measurement that may be derived (from 2.16 and 2.17 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slLocalInhibition.
+	 ANSI T1.116.1/2000 Table 2 (2.5).
+	 ANSI T1.111.4/2000 3.2.8.
+	 ITU-T Rec. Q.751.1, (10/95) : slLocalInhibition
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.5"
+    ::= { mtpSlL3Int15minEntry 4 }
+
+mtpSlL3Int15minSlRemoteInhibition OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.6.
+	 See also 3.2.2/T1.111.4.
+
+	 Duration of signalling link inhibition due to remote management 
+	 actions in units of seconds per signalling link collected on a 
+	 30 minute interval.  This is a non-obligatory operational 
+	 measurement that may be derived (from 2.18 and 2.19 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slRemoteInhibition.
+	 ANSI T1.116.1/2000 Table 2 (2.6).
+	 ANSI T1.111.4/2000 3.2.2.
+	 ITU-T Rec. Q.751.1, (10/95) : slRemoteInhibition.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.6"
+    ::= { mtpSlL3Int15minEntry 5 }
+
+mtpSlL3Int15minSlFailed OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.7.
+	 See also 3.2.2/T1.111.4.
+
+	 Duration of signalling link unavailability due to link failure 
+	 in units of seconds per signalling link collected on a 30 
+	 minute interval.  This is non-obligatory operational 
+	 measurement that may be derived (from 1.2 and 1.12 which are 
+	 alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slFailed.
+	 ANSI T1.116.1/2000 Table 2 (2.7).
+	 ANSI T1.111.4/2000 3.2.2.
+	 ITU-T Rec. Q.751.1, (10/95) : slFailed.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.7"
+    ::= { mtpSlL3Int15minEntry 6 }
+
+mtpSlL3Int15minSlRemoteProcOutage OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurementT1.116.2/2.9.
+	 See also 3.2.6/T1.111.4.
+
+	 Duraing of signalling link unavailability due to remote 
+	 processor outage in units of seconds per siganlling link 
+	 collected on a 30 minute interval.  This is a non-obligatory 
+	 operational measurement that may be derived (from 2.10 and 2.11 
+	 which are alarm indication and clearing events).
+
+	 This operational measurement is used in MTP performance 
+	 studies.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slRemoteProcOutage.
+	 ANSI T1.111.4/3.2.6.
+	 ITU-T Rec. Q.751.1, (10/95) : slRemoteProcOutage.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.9"
+    ::= { mtpSlL3Int15minEntry 7 }
+
+mtpSlL3Int15minLocalMgmtInhibit OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.13.
+	 See also 10.2/T1.111.4.
+	 
+	 Local management inhibit in number of events per signalling 
+	 link collected on a 5 or 30 minute interval.  This is a 
+	 non-obligatory measurement that may be derived (from 2.16 which 
+	 is a alarm indication event)."
+    REFERENCE
+	"ANSI T1.116.1D localMgntInhibit.
+	 ANSI T1.116.2/2000 Table 2 (2.13).
+	 ANSI T1.111.4/2000 10.2.
+	 ITU-T Rec. Q.751.1, (10/95) : localMgmtInhibit.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.13"
+    ::= { mtpSlL3Int15minEntry 8 }
+
+mtpSlL3Int15minLocalMgmtUninhibit OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.14.
+	 See also 10.3/T1.111.4.
+
+	 Local management unininhibit in number of events per signalling 
+	 link collected on a 5 or 30 minute interval.  This is a 
+	 non-obligatory measurement that may be derived (from 2.17 and 
+	 2.19 which are alarm clearing events)."
+    REFERENCE
+	"ANSI T1.116.1D localMgntUninhibit.
+	 ANSI T1.116.2/2000 Table 2 (2.14).
+	 ANSI T1.111.4/2000 10.3.
+	 ITU-T Rec. Q.751.1, (10/95) : localMgmtUninhibit.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.14"
+    ::= { mtpSlL3Int15minEntry 9 }
+
+mtpSlL3Int15minLocalBusy OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"SIBs sent"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/2.15.
+	 See also 9.3/T1.111.4.
+	 
+	 Duration of local busy in SIBs per signalling link collected 
+	 over a 5 or 30 minute interval.  This is a non-obligatory 
+	 measurement.  The measurement is used for near-real-time fault 
+	 detection, general fault detection, and  MTP performance 
+	 studies."
+    REFERENCE
+	"ANSI T1.116.1D localBusy.
+	 ANSI T1.116.2/2000 Table 2 (2.15).
+	 ANSI T1.111.4/2000 9.3.
+	 ITU-T Rec. Q.751.1, (10/95) : localBusy.
+	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.15"
+    ::= { mtpSlL3Int15minEntry 10 }
+
+mtpSlL3Int15minSlCongestedStarts OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.6.
+	 See also 3.8/T1.111.4.
+	 
+	 Signalling link congestion indications per signalling link 
+	 collected on a first and interval basis, or over a 5 or 30 
+	 minute interval.  This measurement is non-obligatory and may be 
+	 used for fault detection, near real-time monitoring, 
+	 performance analysis and network administration and planning.
+	 
+	 The signalling link congestion refers to link status 
+	 'congested' at Level 3.  A link is marked at Level 3 as 
+	 congested when a congestion threshold is reached at the 
+	 transmit side.  Measurements should be kept for thresholds 1, 2 
+	 and 3 separately if that national option is selected.
+	 
+	 The reporting of this item on occurence should be considered 
+	 carefully, since there might be many events in a short 
+	 interval.  This might occur for example if the congestion onset 
+	 and abatement thresholds were close together, or if the 
+	 transmission/retransmission buffer size were significantly 
+	 greater than the reception buffer at the other end of the link, 
+	 and congestion occurred."
+    REFERENCE
+	"ANSI T1.116.1D slCongestedStarts.
+	 ANSI T1.116.2/2000 Table 3 (3.6).
+	 ANSI T1.114.1/2000 3.8.
+	 ITU-T Q.752 (1997) Table 3 (3.6).
+	 ITU-T Q.752 (1997) 2.4.6.
+	 ITU-T Q.704 (1993) 3.6 and 11.
+	 ITU-T Rec. Q.751.1, (10/95) : slCongestedStarts.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.6"
+    ::= { mtpSlL3Int15minEntry 11 }
+
+mtpSlL3Int15minSlCongestedDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.751.1, (10/95) : slCongestedDuration.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.7"
+    ::= { mtpSlL3Int15minEntry 12 }
+
+mtpSlL3Int15minSlCongestionStops OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.9.
+	 See also 3.8/T1.111.4.
+	 
+	 Stop of signalling link congestion events per signalling link 
+	 collected on a first and interval basis.  This measurement is 
+	 non-obligatory and may be used for fault detection and 
+	 performance analysis.
+
+	 Stop of signalling link congestion occurs for a link at Level 3 
+	 when the buffer occupancy has dropped below the congestion 
+	 abatement threshold.  If a number of thresholds is used, the 
+	 event is marked separately for each threshold.
+	 
+	 The reporting of this item on occurence should be considered 
+	 carefully, since there might be many events in a short 
+	 interval.  This might occur for example if the congestion onset 
+	 and abatement thresholds were close together, or if the 
+	 transmission/retransmission buffer size were significantly 
+	 greater than the reception buffer at the other end of the link, 
+	 and congestion occurred."
+    REFERENCE
+	"ANSI T1.116.1D slCongestionStops
+	 ITU-T Rec. Q.751.1, (10/95) : slCongestionStops.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.9"
+    ::= { mtpSlL3Int15minEntry 13 }
+
+mtpSlL3Int15minDiscardedMSUs OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"MSUs"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.10
+
+	 The number of MSUs discarded due to signalling link congestion.  
+	 The significance and method of measuring this item depends upon 
+	 the method of congestion handling employed in the newtork.  The 
+	 three congestion handling methods are:
+
+	 a) single congestion level without priority; or
+	 b) national option of multiple levels without message 
+	    priorities; or
+	 c) the national option of multiple congestion levels with 
+	    message priorities.
+
+	 For cases a) and b), messages are discarded by the MTP only 
+	 under extreme overload.  Thus the count indicates, if greater 
+	 than zero, an extreme congestion.  It indicates the 
+	 effectiveness of flow control procedures.  For case c), 
+	 messages with priority less thatn the discard level are 
+	 discarded in the MTP.  For this case, the MSUs discarded due to 
+	 SL congestion (thresholds 1, 2 and 3 separately) are counted 
+	 based on the greatest congestion discard threshold in effect on 
+	 the link.  For example, if the congestion on a link has 
+	 exceeded congestion discard threshold 2, and therefore MSUs 
+	 with priority 0 and 1 are being discarded, a MSU discarded with 
+	 priority 0 is counted in the threshould 2 count.
+	 "
+    REFERENCE
+	"ANSI T1.116.1D discardedMSUs
+	 ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.10"
+    ::= { mtpSlL3Int15minEntry 14 }
+
+mtpSlL3Int15minCongestionEventsMSULoss OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    UNITS	"events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.11
+	 
+	 The number of congestion events resulting in loss of MSUs per 
+	 signalling link collected on a first and interval basis, or 
+	 over a 5 or 30 minute interval.  This measurement is 
+	 non-obligatory and may be used for fault detection, near 
+	 real-time monitoring, performance analysis and network 
+	 administration and planning.
+
+	 This measurement is per congestion level.  For the national 
+	 option of multiple congestion levels with message priorities, a 
+	 congestion event that may result in the loss of MSUs for 
+	 threshold 'n' begins when congestion discard threshold 'n' is 
+	 exceeded.  A new congestion event that may result in the loss 
+	 of MSUs for threshold 'n' cannot begin until the congestion 
+	 level falls below congestion abatement threshold 'n'.  Only one 
+	 congestion event which may result in the loss of MSUs can be in 
+	 effect at one time, this being the greatest numbered threshold.  
+	 Therefore, the congestion even that may result in the loss of 
+	 MSUs for threshold 'n' is suspended (not stopped) when 
+	 congestion discard threshod 'n+1' is exceeded, and resumed (not 
+	 a new one started) when the congestion level falls below 
+	 congestion abatement threshold 'n+1'."
+    REFERENCE
+	"ANSI T1.116.1D congestionEventsMSULoss.
+	 ANSI T1.116.2/2000 Table 3 (3.11).
+	 ITU-T Q.752 (1997) Table 3 (3.11).
+	 ITU-T Q.752 (1997) 2.4.10.
+	 ITU-T Rec. Q.751.1, (10/95) : congestionEventsMSULoss.
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.11"
+    ::= { mtpSlL3Int15minEntry 15 }
+
+mtpSlL3Int15minChangeovers OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.10"
+    ::= { mtpSlL3Int15minEntry 16 }
+
+mtpSlL3Int15minChangebacks OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.11"
+    ::= { mtpSlL3Int15minEntry 17 }
+
+mtpSlL3Int15minRestorations OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Q.752, 1.12"
+    ::= { mtpSlL3Int15minEntry 18 }
+
+
+-- ====================================================================
+
+mtpSlL2CurrentTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSlL2CurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpOmSlStats 5 }
+
+mtpSlL2CurrentEntry OBJECT-TYPE
+    SYNTAX	MtpSlL2CurrentEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpLsId, -- shared index
+	mtpSlSlCode -- shared index
+    }
+    ::= { mtpSlL2CurrentTable 1 }
+
+MtpSlL2CurrentEntry ::= SEQUENCE {
+    mtpSlL2CurrentValidIntervals		HCPerfValidIntervals,
+    mtpSlL2CurrentTimeDiscontinuity		TimeStamp,
+    mtpSlL2CurrentSlInServiceDuration		PerfCurrentCount, -- Q.752, 1.1
+    mtpSlL2CurrentSlAlignment			PerfCurrentCount, -- Q.752, 1.7
+    mtpSlL2CurrentSignUnitsReceived		PerfCurrentCount, -- Q.752, 1.8
+    mtpSlL2CurrentNegAckReceived		PerfCurrentCount, -- Q.752, 1.9
+    mtpSlL2CurrentTransmittedOctetsSIFSIO	PerfCurrentCount, -- Q.752, 3.1
+    mtpSlL2CurrentRetransmittedOctets		PerfCurrentCount, -- Q.752, 3.2
+    mtpSlL2CurrentTransmittedMSUs		PerfCurrentCount, -- Q.752, 3.3
+    mtpSlL2CurrentReceivedOctetsSIFSIO		PerfCurrentCount, -- Q.752, 3.4
+    mtpSlL2CurrentReceivedMSUs			PerfCurrentCount  -- Q.752, 3.5
+}
+
+mtpSlL2CurrentValidIntervals OBJECT-TYPE
+    SYNTAX	HCPerfValidIntervals
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL2CurrentEntry 1 }
+
+mtpSlL2CurrentTimeDiscontinuity OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL2CurrentEntry 2 }
+
+mtpSlL2CurrentSlInServiceDuration OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.1
+
+	 Duration of link in the in-service state in units of seconds 
+	 per signalling link.  This is an obligatory operational 
+	 measurement to be collected on a 30 minute basis.  This 
+	 operational measurement is permanently activated.  This 
+	 operational measurement may be derived (from 1.2 and 1.12, 
+	 which are alarm and alarm clearing events).
+
+	 This measurement can be used in calculations for the detection 
+	 of increases in signalling link signalling unit error rates 
+	 (ANSI T1.116.2/2000 6.2.1.4.1).  It may also be used in the 
+	 calculation of signalling link utilization (ANSI T1.116.2/2000 
+	 6.2.2.1).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slInServiceDuration.
+	 ANSI T1.116.1/2000 Table 1 (1.1).
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.1
+	 ITU-T Rec. Q.751.1, (10/95) : slInServiceDuration."
+    ::= { mtpSlL2CurrentEntry 3 }
+
+mtpSlL2CurrentSlAlignment OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents Measurement T1.116.2/1.7.
+	 
+	 Indicates a signalling data link fault that prevents the 
+	 signalling data link from moving into service."
+    REFERENCE
+	"ANSI T1.116.1D slAlignment
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.7
+	 ITU-T Rec. Q.751.1 (10/95) : slAlignment."
+    ::= { mtpSlL2CurrentEntry 4 }
+
+mtpSlL2CurrentSignUnitsReceived OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.8.
+	 See also 4/T1.111.4.
+	 
+	 Indicates the incoming message error rate."
+    REFERENCE
+	"ANSI T1.116.1D signUnitsReceived
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.8
+	 ITU-T Rec. Q.751.1 (10/95) : signUnitsReceived."
+    ::= { mtpSlL2CurrentEntry 5 }
+
+mtpSlL2CurrentNegAckReceived OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.9
+	 
+	 Indicates the outgoing message error rate."
+    REFERENCE
+	"ANSI T1.116.1D negAckReceived
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.9
+	 ITU-T Rec. Q.751.1 (10/95) : negAckReceived."
+    ::= { mtpSlL2CurrentEntry 6 }
+
+mtpSlL2CurrentTransmittedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.1.
+	 See also 2.3.8/T1.111.4.
+	 
+	 The number of SIF and SIO octets transmitted does not include 
+	 SIF and SIO octets that are retransmitted."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsSIFSIO
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.1
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsSIFSIO."
+    ::= { mtpSlL2CurrentEntry 7 }
+
+mtpSlL2CurrentRetransmittedOctets OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.2.
+	 See also 5/T1.111.4.
+	 
+	 The opening flag and the check bits are included in the count."
+    REFERENCE
+	"ANSI T1.116.1D retransmittedOctets
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.2
+	 ITU-T Rec. Q.751.1 (10/95) : retransmittedOctets."
+    ::= { mtpSlL2CurrentEntry 8 }
+
+mtpSlL2CurrentTransmittedMSUs OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.3
+	 
+	 The number of message signal units transmitted does not include 
+	 message signal units that are retransmitted."
+    REFERENCE
+	"ANSI T1.116.1D transmittedMSUs
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.3
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedMSUs."
+    ::= { mtpSlL2CurrentEntry 9 }
+
+mtpSlL2CurrentReceivedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.4"
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsSIFSIO
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.4
+	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsSIFSIO."
+    ::= { mtpSlL2CurrentEntry 10 }
+
+mtpSlL2CurrentReceivedMSUs OBJECT-TYPE
+    SYNTAX	PerfCurrentCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.5,
+
+	 The number of message signal units received consists of all 
+	 message signal units that are passed to Level 3 for processing."
+    REFERENCE
+	"ANSI T1.116.1D receivedMSUs
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.5
+	 ITU-T Rec. Q.751.1 (10/95) : receivedMSUs."
+    ::= { mtpSlL2CurrentEntry 11 }
+
+
+-- ====================================================================
+
+mtpSlL2Int5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSlL2Int5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a 5 minute interval table for MTP Level 2 statistics."
+    ::= { mtpOmSlStats 6 }
+
+mtpSlL2Int5minEntry OBJECT-TYPE
+    SYNTAX	MtpSlL2Int5minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Each entry in the table represents statistics collected for one 
+	 5 minute interval.  The first interval in the table is the most 
+	 recent 5 minute interval, beginning with 1."
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpLsId, -- shared index
+	mtpSlSlCode, -- shared index
+	mtpSlL2Int5minInterval
+    }
+    ::= { mtpSlL2Int5minTable 1 }
+
+MtpSlL2Int5minEntry ::= SEQUENCE {
+    mtpSlL2Int5minInterval			Unsigned32,
+    mtpSlL2Int5minTimestamp			TimeStamp,
+    mtpSlL2Int5minSlInServiceDuration		PerfIntervalCount, -- Q.752, 1.1
+    mtpSlL2Int5minSlAlignment			PerfIntervalCount, -- Q.752, 1.7
+    mtpSlL2Int5minSignUnitsReceived		PerfIntervalCount, -- Q.752, 1.8
+    mtpSlL2Int5minNegAckReceived		PerfIntervalCount, -- Q.752, 1.9
+    mtpSlL2Int5minTransmittedOctetsSIFSIO	PerfIntervalCount, -- Q.752, 3.1
+    mtpSlL2Int5minRetransmittedOctets		PerfIntervalCount, -- Q.752, 3.2
+    mtpSlL2Int5minTransmittedMSUs		PerfIntervalCount, -- Q.752, 3.3
+    mtpSlL2Int5minReceivedOctetsSIFSIO		PerfIntervalCount, -- Q.752, 3.4
+    mtpSlL2Int5minReceivedMSUs			PerfIntervalCount  -- Q.752, 3.5
+}
+
+mtpSlL2Int5minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL2Int5minEntry 1 }
+
+mtpSlL2Int5minTimestamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL2Int5minEntry 2 }
+
+mtpSlL2Int5minSlInServiceDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.1
+
+	 Duration of link in the in-service state in units of seconds 
+	 per signalling link.  This is an obligatory operational 
+	 measurement to be collected on a 30 minute basis.  This 
+	 operational measurement is permanently activated.  This 
+	 operational measurement may be derived (from 1.2 and 1.12, 
+	 which are alarm and alarm clearing events).
+
+	 This measurement can be used in calculations for the detection 
+	 of increases in signalling link signalling unit error rates 
+	 (ANSI T1.116.2/2000 6.2.1.4.1).  It may also be used in the 
+	 calculation of signalling link utilization (ANSI T1.116.2/2000 
+	 6.2.2.1).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slInServiceDuration.
+	 ANSI T1.116.1/2000 Table 1 (1.1).
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.1
+	 ITU-T Rec. Q.751.1, (10/95) : slInServiceDuration."
+    ::= { mtpSlL2Int5minEntry 3 }
+
+mtpSlL2Int5minSlAlignment OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents Measurement T1.116.2/1.7.
+	 
+	 Indicates a signalling data link fault that prevents the 
+	 signalling data link from moving into service."
+    REFERENCE
+	"ANSI T1.116.1D slAlignment
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.7
+	 ITU-T Rec. Q.751.1 (10/95) : slAlignment."
+    ::= { mtpSlL2Int5minEntry 4 }
+
+mtpSlL2Int5minSignUnitsReceived OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.8.
+	 See also 4/T1.111.4.
+	 
+	 Indicates the incoming message error rate."
+    REFERENCE
+	"ANSI T1.116.1D signUnitsReceived
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.8
+	 ITU-T Rec. Q.751.1 (10/95) : signUnitsReceived."
+    ::= { mtpSlL2Int5minEntry 5 }
+
+mtpSlL2Int5minNegAckReceived OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.9
+	 
+	 Indicates the outgoing message error rate."
+    REFERENCE
+	"ANSI T1.116.1D negAckReceived
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.9
+	 ITU-T Rec. Q.751.1 (10/95) : negAckReceived."
+    ::= { mtpSlL2Int5minEntry 6 }
+
+mtpSlL2Int5minTransmittedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.1.
+	 See also 2.3.8/T1.111.4.
+	 
+	 The number of SIF and SIO octets transmitted does not include 
+	 SIF and SIO octets that are retransmitted."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsSIFSIO
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.1
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsSIFSIO."
+    ::= { mtpSlL2Int5minEntry 7 }
+
+mtpSlL2Int5minRetransmittedOctets OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.2.
+	 See also 5/T1.111.4.
+	 
+	 The opening flag and the check bits are included in the count."
+    REFERENCE
+	"ANSI T1.116.1D retransmittedOctets
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.2
+	 ITU-T Rec. Q.751.1 (10/95) : retransmittedOctets."
+    ::= { mtpSlL2Int5minEntry 8 }
+
+mtpSlL2Int5minTransmittedMSUs OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.3
+	 
+	 The number of message signal units transmitted does not include 
+	 message signal units that are retransmitted."
+    REFERENCE
+	"ANSI T1.116.1D transmittedMSUs
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.3
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedMSUs."
+    ::= { mtpSlL2Int5minEntry 9 }
+
+mtpSlL2Int5minReceivedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.4"
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsSIFSIO
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.4
+	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsSIFSIO."
+    ::= { mtpSlL2Int5minEntry 10 }
+
+mtpSlL2Int5minReceivedMSUs OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.5,
+
+	 The number of message signal units received consists of all 
+	 message signal units that are passed to Level 3 for processing."
+    REFERENCE
+	"ANSI T1.116.1D receivedMSUs
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.5
+	 ITU-T Rec. Q.751.1 (10/95) : receivedMSUs."
+    ::= { mtpSlL2Int5minEntry 11 }
+
+
+-- ====================================================================
+
+mtpSlL2Int15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSlL2Int15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Provides a 15 minute interval table for MTP Level 2 
+	 statistics."
+    ::= { mtpOmSlStats 7 }
+
+mtpSlL2Int15minEntry OBJECT-TYPE
+    SYNTAX	MtpSlL2Int15minEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Each entry in the table represents statistics collected for one 
+	 15 minute interval.  The first interval in the table is the 
+	 most recent 15 minute interval, beginning with 1."
+    INDEX	{
+	mtpSpId, -- shared index
+	mtpLsId, -- shared index
+	mtpSlSlCode, -- shared index
+	mtpSlL2Int15minInterval
+    }
+    ::= { mtpSlL2Int15minTable 1 }
+
+MtpSlL2Int15minEntry ::= SEQUENCE {
+    mtpSlL2Int15minInterval			Unsigned32,
+    mtpSlL2Int15minTimestamp			TimeStamp,
+    mtpSlL2Int15minSlInServiceDuration		PerfIntervalCount, -- Q.752, 1.1
+    mtpSlL2Int15minSlAlignment			PerfIntervalCount, -- Q.752, 1.7
+    mtpSlL2Int15minSignUnitsReceived		PerfIntervalCount, -- Q.752, 1.8
+    mtpSlL2Int15minNegAckReceived		PerfIntervalCount, -- Q.752, 1.9
+    mtpSlL2Int15minTransmittedOctetsSIFSIO	PerfIntervalCount, -- Q.752, 3.1
+    mtpSlL2Int15minRetransmittedOctets		PerfIntervalCount, -- Q.752, 3.2
+    mtpSlL2Int15minTransmittedMSUs		PerfIntervalCount, -- Q.752, 3.3
+    mtpSlL2Int15minReceivedOctetsSIFSIO		PerfIntervalCount, -- Q.752, 3.4
+    mtpSlL2Int15minReceivedMSUs			PerfIntervalCount  -- Q.752, 3.5
+}
+
+mtpSlL2Int15minInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL2Int15minEntry 1 }
+
+mtpSlL2Int15minTimestamp OBJECT-TYPE
+    SYNTAX	TimeStamp
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSlL2Int15minEntry 2 }
+
+mtpSlL2Int15minSlInServiceDuration OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.1
+
+	 Duration of link in the in-service state in units of seconds 
+	 per signalling link.  This is an obligatory operational 
+	 measurement to be collected on a 30 minute basis.  This 
+	 operational measurement is permanently activated.  This 
+	 operational measurement may be derived (from 1.2 and 1.12, 
+	 which are alarm and alarm clearing events).
+
+	 This measurement can be used in calculations for the detection 
+	 of increases in signalling link signalling unit error rates 
+	 (ANSI T1.116.2/2000 6.2.1.4.1).  It may also be used in the 
+	 calculation of signalling link utilization (ANSI T1.116.2/2000 
+	 6.2.2.1).
+	 "
+    REFERENCE
+	"ANSI T1.116.1D slInServiceDuration.
+	 ANSI T1.116.1/2000 Table 1 (1.1).
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.1
+	 ITU-T Rec. Q.751.1, (10/95) : slInServiceDuration."
+    ::= { mtpSlL2Int15minEntry 3 }
+
+mtpSlL2Int15minSlAlignment OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents Measurement T1.116.2/1.7.
+	 
+	 Indicates a signalling data link fault that prevents the 
+	 signalling data link from moving into service."
+    REFERENCE
+	"ANSI T1.116.1D slAlignment
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.7
+	 ITU-T Rec. Q.751.1 (10/95) : slAlignment."
+    ::= { mtpSlL2Int15minEntry 4 }
+
+mtpSlL2Int15minSignUnitsReceived OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.8.
+	 See also 4/T1.111.4.
+	 
+	 Indicates the incoming message error rate."
+    REFERENCE
+	"ANSI T1.116.1D signUnitsReceived
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.8
+	 ITU-T Rec. Q.751.1 (10/95) : signUnitsReceived."
+    ::= { mtpSlL2Int15minEntry 5 }
+
+mtpSlL2Int15minNegAckReceived OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/1.9
+	 
+	 Indicates the outgoing message error rate."
+    REFERENCE
+	"ANSI T1.116.1D negAckReceived
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.9
+	 ITU-T Rec. Q.751.1 (10/95) : negAckReceived."
+    ::= { mtpSlL2Int15minEntry 6 }
+
+mtpSlL2Int15minTransmittedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.1.
+	 See also 2.3.8/T1.111.4.
+	 
+	 The number of SIF and SIO octets transmitted does not include 
+	 SIF and SIO octets that are retransmitted."
+    REFERENCE
+	"ANSI T1.116.1D transmittedOctetsSIFSIO
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.1
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsSIFSIO."
+    ::= { mtpSlL2Int15minEntry 7 }
+
+mtpSlL2Int15minRetransmittedOctets OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.2.
+	 See also 5/T1.111.4.
+	 
+	 The opening flag and the check bits are included in the count."
+    REFERENCE
+	"ANSI T1.116.1D retransmittedOctets
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.2
+	 ITU-T Rec. Q.751.1 (10/95) : retransmittedOctets."
+    ::= { mtpSlL2Int15minEntry 8 }
+
+mtpSlL2Int15minTransmittedMSUs OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.2/3.3
+	 
+	 The number of message signal units transmitted does not include 
+	 message signal units that are retransmitted."
+    REFERENCE
+	"ANSI T1.116.1D transmittedMSUs
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.3
+	 ITU-T Rec. Q.751.1 (10/95) : transmittedMSUs."
+    ::= { mtpSlL2Int15minEntry 9 }
+
+mtpSlL2Int15minReceivedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.4"
+    REFERENCE
+	"ANSI T1.116.1D receivedOctetsSIFSIO
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.4
+	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsSIFSIO."
+    ::= { mtpSlL2Int15minEntry 10 }
+
+mtpSlL2Int15minReceivedMSUs OBJECT-TYPE
+    SYNTAX	PerfIntervalCount
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This attribute represents measurement T1.116.1/3.5,
+
+	 The number of message signal units received consists of all 
+	 message signal units that are passed to Level 3 for processing."
+    REFERENCE
+	"ANSI T1.116.1D receivedMSUs
+	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.5
+	 ITU-T Rec. Q.751.1 (10/95) : receivedMSUs."
+    ::= { mtpSlL2Int15minEntry 11 }
+
+
+-- ====================================================================
+
+mtpSdtStatsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSdtStatsEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This is the SDT statistics table.  It provides statistics 
+	 associated with signalling terminals."
+    ::= { mtpOmSdtStats 1 }
+
+mtpSdtStatsEntry OBJECT-TYPE
+    SYNTAX	MtpSdtStatsEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This is an entry in the SDT statistics table.  Each entry 
+	 contains statistics associated with a single signalling 
+	 terminal.  The entries are indexed using the same index as is 
+	 used for the signalling terminal configuration and state table, 
+	 and the statistics are corelated with the signalling terminal 
+	 using that index.  Whenever a row exists in the signalling 
+	 terminal table, a corresponding row with the same index exists 
+	 in this table.
+	 
+	 A management station may continually walk this table, repeating 
+	 every second or so, to collect near real-time statistics on the 
+	 OpenSS7 implementations.  Note, however, that for general SS7 
+	 implementations, statistics should be collected not more 
+	 rapidly than on five minute intervals.  Notifications are 
+	 provided for significant events to preclude the need for 
+	 polling these tables.."
+    AUGMENTS	{
+	mtpSdtEntry
+    }
+    ::= { mtpSdtStatsTable 1 }
+
+MtpSdtStatsEntry ::= SEQUENCE {
+    mtpSdtStatsTxBytes				Counter32,
+    mtpSdtStatsTxSus				Counter32,
+    mtpSdtStatsTxSusRepeated			Counter32,
+    mtpSdtStatsTxUnderruns			Counter32,
+    mtpSdtStatsTxAborts				Counter32,
+    mtpSdtStatsTxBufferOverflows		Counter32,
+    mtpSdtStatsTxSusInError			Counter32,
+    mtpSdtStatsRxBytes				Counter32,
+    mtpSdtStatsRxSusCompressed			Counter32,
+    mtpSdtStatsRxOverruns			Counter32,
+    mtpSdtStatsRxAborts				Counter32,
+    mtpSdtStatsRxBufferOverflows		Counter32,
+    mtpSdtStatsRxSusInError			Counter32,
+    mtpSdtStatsRxSyncTransitions		Counter32,
+    mtpSdtStatsRxBitsOctetCounted		Counter32,
+    mtpSdtStatsRxCrcErrors			Counter32,
+    mtpSdtStatsRxFrameErrors			Counter32,
+    mtpSdtStatsRxFrameOverflows			Counter32,
+    mtpSdtStatsRxFrameTooLong			Counter32,
+    mtpSdtStatsRxFrameTooShort			Counter32,
+    mtpSdtStatsRxResidueErrors			Counter32,
+    mtpSdtStatsCarrierCtsLost			Counter32,
+    mtpSdtStatsCarrierDcdLost			Counter32,
+    mtpSdtStatsCarrierLost			Counter32
+}
+
+mtpSdtStatsTxBytes OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of octets transmitted by the 
+	 signalling terminal.  This count should increase rapidly during 
+	 normal operation.  When this count does not increase, it means 
+	 that the transmitters are not transmitting data."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 1 }
+
+mtpSdtStatsTxSus OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Signal Units"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the number of signal units transmitted by the 
+	 signalling terminal, it includes repeated SUs.  This count 
+	 should increase rapidly during normal operation.  When this 
+	 count does not increase, it means that the signalling terminal 
+	 is not transmitting SUs."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 2 }
+
+mtpSdtStatsTxSusRepeated OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Signal Units"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of signal units repeated.  A 
+	 signal unit is repeated when there is no additional signal unit 
+	 waiting to be transmitted so the signalling terminal generates 
+	 another copy of an LSSU or FISU, or if the last frame 
+	 transmitted was an MSUs, a FISU is generated from the MSU 
+	 previously sent.  This count should increase rapidly while idle 
+	 (e.g. idling FISUs) during normal operation.  It is also normal 
+	 for this count to not increase when the line is busy (activiely 
+	 carrying a significant traffic load of MSUs."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 3 }
+
+mtpSdtStatsTxUnderruns OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of transmitter underrun events.  
+	 A transmitter underrun event occurs when an unsufficient number 
+	 of bits where provided to the signalling data link when the 
+	 time came to transmit bits on the wire.  This count should not 
+	 increase past possibly a small number when the link  is 
+	 initialized for the first time.  Large counts here represent a 
+	 significant problem."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 4 }
+
+mtpSdtStatsTxAborts OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of aborts transmitted.  The 
+	 drivers do not normally transmit aborts (unless specifically 
+	 requested to for test purposes).  This count should be low or 
+	 zero.  A significant number here represents a heavy testing or 
+	 a significant problem."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 5 }
+
+mtpSdtStatsTxBufferOverflows OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of transmit buffer overflow 
+	 events.  A transmit  overflow event occurs when the signalling 
+	 terminal goes to acquire a buffer to transmit data bits to the 
+	 signalling data link and cannot immediately acquire a buffer, 
+	 resulting in data loss.  The drivers recycle recieve buffers 
+	 into transmit buffers from and to the signalling data link.  
+	 There should be no counts in this item.  A significant number 
+	 here would represent a significant problem."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 6 }
+
+mtpSdtStatsTxSusInError OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Signal Units"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of signal units transmitted in error.  The 
+	 drivers do not normally transmit signal units in error, unless 
+	 requested to do so for testing purposes.  This count should be 
+	 low or zero.  A significant number here reflects heavy testing 
+	 or a significant error."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 7 }
+
+mtpSdtStatsRxBytes OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This count is the number of octets received by the signalling 
+	 terminal from the signalling data link.  This number should 
+	 increase rapidly under normal operation."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 8 }
+
+mtpSdtStatsRxSusCompressed OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Signal Units"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This count is the number of signal units that were compressed 
+	 on input.  Each signal unit that would otherwise have been 
+	 delivered but was suppressed due to the SU compression 
+	 algorithm is counted in this count.  This number should 
+	 increase rapidly during normal operation when the line is idle 
+	 (e.g. it is idling FISUs)."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 9 }
+
+mtpSdtStatsRxOverruns OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This count is the number of receive buffer overruns that have 
+	 occurred.  A receive buffer overrun occurs when the signalling 
+	 terminal goes to allocate a buffer to deliver an SU to the 
+	 signalling link and a buffer is not immediately available.  The 
+	 drivers recycle singalling data link receive buffers into 
+	 signalling data link transmit buffers and the signalling data 
+	 link does the opposite (recycles transmit buffers to receive 
+	 buffers).  This number should be low or zero and should not 
+	 increase after the first initialization of the siganalling 
+	 link.  A significant number here would represent a significant 
+	 problem."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 10 }
+
+mtpSdtStatsRxAborts OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This count is the number of aborts that were received in the 
+	 incoming bit stream from the signalling data link.  Signalling 
+	 data terminals do not normally send aborts.  A significant 
+	 number here indicates that either the signalling data link is 
+	 experiencing a fault or the remote signalling terminal is 
+	 experiencing difficulties.  When a T1 or E1 span is losing 
+	 synchronization, it is not uncommon to see this count rise.  If 
+	 there are no group synchronization problems with the signalling 
+	 link an increasing count here represends a problem with the 
+	 facility or a problem with the remote signalling terminal."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 11 }
+
+mtpSdtStatsRxBufferOverflows OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This count is the number of receive buffer overflow conditions.  
+	 A receive buffer overflow condition occurs when, on the receive 
+	 side, the siganlling terminal attempts to allocate a buffer to 
+	 transmit data to a signalling link and a buffer is not 
+	 immediately available.  Signalling link drivers typically 
+	 recycle their buffers from receive to transmit and the 
+	 signalling terminal recycles its buffers from transmit to 
+	 receive.  Therefore, it is unlikely that a buffer overflow will 
+	 occur.  An increasing number here represents a serious 
+	 problem."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 12 }
+
+mtpSdtStatsRxSusInError OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Signal Units"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This count is the count of the number of signal units received 
+	 in error.  If this number is increasing it is either because 
+	 the signalling link is noisy (due to, for example, loss of 
+	 synchronization on the group carrier), or the remote signalling 
+	 terminal is experiencing difficulties sending correct SUs.  A 
+	 significant number here represents a significant problem with 
+	 the signalling data link or with the remote signalling 
+	 terminal."
+    REFERENCE
+	"Q.751.1, ANSI T1.116.1, Table 1/1.8"
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 13 }
+
+mtpSdtStatsRxSyncTransitions OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This count is the count of the number of synchronization 
+	 transitions on the receive bitstream.  Syncrhonization 
+	 transitions occur when the signalling terminal begins hunting 
+	 for flags because a flag does not exist where expected and when 
+	 the signalling terminal locks on flags and begins to frame 
+	 proper HDLC frames.  Both the transition from flag and frame 
+	 lock to flag hunting and the transition from flag hunting to 
+	 flag and frame lock are counted.  A significant or increasing 
+	 number of transitions here normally indicates that the group 
+	 carrier providing the signalling link is experiencing 
+	 syncrhonization problems (i.e. it is slipping).  For a clean 
+	 facility, an increasing number here would indicate a difficulty 
+	 with the remote signalling terminal."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 14 }
+
+mtpSdtStatsRxBitsOctetCounted OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Bits"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This count is the number of bits (not bytes) octet counted.  
+	 While the signalling terminal is hunting for flags, it counts 
+	 the bits that it receives which do not contain a valid flag.  
+	 These bits are used to count octets and every 16 octets are 
+	 considered to be an SU in error for error monitoring purposes.  
+	 An increasing number here indicates that the signalling 
+	 terminal is hunting for flags and not finding them.  This can 
+	 either be caused by a failed facility or by a serious problem 
+	 with the remote signalling terminal."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 15 }
+
+mtpSdtStatsRxCrcErrors OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of CRC errors detected in the 
+	 received bit stream.  This number should be small.  An 
+	 excessive number of CRC errors either indicates that the 
+	 signalling data link facility is noisy and is experiencing bit 
+	 errors.  This would not normally result from a syncrhonization 
+	 problem (framing would likely be lost and octet counting 
+	 entered).  CRC errors result from random bit errors that are 
+	 unlikely to affect flags.  A increasing or significant number 
+	 here indicates a noisy signalling data link."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 16 }
+
+mtpSdtStatsRxFrameErrors OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of frame errors in the received 
+	 bit stream."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 17 }
+
+mtpSdtStatsRxFrameOverflows OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 18 }
+
+mtpSdtStatsRxFrameTooLong OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Frames"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of frames that were too long 
+	 (they had a number of octets between flags and CRC of greater 
+	 than the maximum SIF length) in the receive bitstream.  This 
+	 number should be zero or very small.  A significant count in 
+	 this field indicates a loss of syncrhonization on the carrier 
+	 hosting the signalling data link, a noisy signalilng data link, 
+	 or a serious problem with the remote signalling terminal."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 19 }
+
+mtpSdtStatsRxFrameTooShort OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Frames"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of frames that were too short 
+	 (they were shorter than a FISU) in the receive bitstream.  This 
+	 number should be zero or very small.  A significant number in 
+	 this field indicates a loss of syncrhonization on the carrier 
+	 hosting the signalling data link, a noisy signalling data link 
+	 or a serious problem with the remote signalling terminal."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 20 }
+
+mtpSdtStatsRxResidueErrors OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Frames"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of frames with residue errors (a non-octet 
+	 aligned number of bits) in the receive bitstream.  This number 
+	 should be zero or small.  A significant or increasing number in 
+	 this column indicates a loss of syncrhonization of the group 
+	 carrier containing the signalling data link, a noisy signalling 
+	 data link, or a serious problem with the remote signalling 
+	 terminal."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 21 }
+
+mtpSdtStatsCarrierCtsLost OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of times that the CTS (Clear To 
+	 Send) lead was lost (deasserted) on a V.35 interface.  A 
+	 significant number in this column indicates a problem with the 
+	 modem or channel bank providing access to the signalling data 
+	 link over the V.35 interface."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 22 }
+
+mtpSdtStatsCarrierDcdLost OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of times that the DCD (Data 
+	 Carrier Detect) lead was lost (deasserted) on a V.35 interface.  
+	 A significant number in this column indicates a problemw tih 
+	 the modem or channel bank providing access to the signalling 
+	 data link over the V.35 interface."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 23 }
+
+mtpSdtStatsCarrierLost OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Events"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of times that the carrier was 
+	 lost on a DS0/DS1 interface.  A significant number in this 
+	 field indicates that there is a problem with syncrhonization of 
+	 the group carrier containing the signalling data link."
+    DEFVAL { 0 }
+    ::= { mtpSdtStatsEntry 24 }
+
+
+-- ====================================================================
+
+mtpSdlStatsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpSdlStatsEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This is the SDL ststistics table.  It provides statistics 
+	 associated with signalling data links."
+    ::= { mtpOmSdlStats 1 }
+
+mtpSdlStatsEntry OBJECT-TYPE
+    SYNTAX	MtpSdlStatsEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This is an entry in the SDL statistics table.  Each entry 
+	 contains statistics associated with a single signalling data 
+	 link.  The entries are indexed using the same index as is used 
+	 for the signalling data link configuration and state table, and 
+	 the statistics are corelated with the signalling data link 
+	 using that index.  Whenever a row exists in the signalling data 
+	 link table, a corresponding row with the same index exists in 
+	 this table.
+	 
+	 A management station may continually walk this table, repeating 
+	 every second or so, to collect near real-time statistics on the 
+	 OpenSS7 implementations.  Note, however, that for general SS7 
+	 implementations, statistics should not be collected more 
+	 frequently than on five minute intervals.  Notifications are 
+	 provided for significant events to preclude the need for 
+	 polling these tables."
+    AUGMENTS	{
+	mtpSdlEntry
+    }
+    ::= { mtpSdlStatsTable 1 }
+
+MtpSdlStatsEntry ::= SEQUENCE {
+    mtpSdlStatsRxOctets				Counter32,
+    mtpSdlStatsTxOctets				Counter32,
+    mtpSdlStatsRXOverruns			Counter32,
+    mtpSdlStatsTxUnderruns			Counter32,
+    mtpSdlStatsRxBufferOverflows		Counter32,
+    mtpSdlStatsTxBufferOverflows		Counter32,
+    mtpSdlStatsLeadCtsLost			Counter32,
+    mtpSdlStatsLeadDcdLost			Counter32,
+    mtpSdlStatsCarrierLost			Counter32,
+    mtpSdlStatsBipolarViolations		Counter32
+}
+
+mtpSdlStatsRxOctets OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of octets received by the 
+	 signalling data link from the line.  This count should increase 
+	 rapidly during normal operation.  When this count does not 
+	 increase, it means that the receivers are not receiving data.  
+	 Monitoring this column over a short period of time is a way of 
+	 verifying the bit rate of the signalling data link.  During 
+	 normal operation, this column should increase at a fixe rate 
+	 equal to the bit rate of the signalling data link."
+    ::= { mtpSdlStatsEntry 1 }
+
+mtpSdlStatsTxOctets OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of octets transmitted by the 
+	 signalling data link to the line.  This count should increase 
+	 rapidly during normal operation.  When this count does not 
+	 increase, it means that the transmittters are not transmitting 
+	 data.  Monitoring this column over a short period of time is a 
+	 way of verifying the transmission rate of the signalling data 
+	 link.  During normal operation, this column should increase at 
+	 a fixed rate equal to the bit rate of the signalling data 
+	 link."
+    ::= { mtpSdlStatsEntry 2 }
+
+mtpSdlStatsRXOverruns OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Occurences"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Receive overruns are counted on the receiver between the line 
+	 and the signalling data link terminating device.  This occurs 
+	 whenever bits were able to be retrieved from the line, but the 
+	 driver was too slow in accepting the previously received bit 
+	 from the line, and the signalling data link receivers were 
+	 forced to drop bits.  This should not occur in normal operation 
+	 and this number should be low or zero and not increase after 
+	 the first initialization of the signalling data link.  If this 
+	 number is increasing, it indicates that there are significant 
+	 latencies in some device driver which is performing too many 
+	 functions with interrupts suppressed.  (Or the CPU is just too 
+	 slow.)"
+    ::= { mtpSdlStatsEntry 3 }
+
+mtpSdlStatsTxUnderruns OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Occurences"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Transmit underruns are counted on the transmitter between the 
+	 signalling data link and the line.  This occrus whenever bits 
+	 were required to be transmitted on the wire and the signalling 
+	 data link driver did not supply a sufficient number of bits to 
+	 satisfy the requirement.  This should not occur in normal 
+	 operation and this number should be low or zero and not 
+	 increase after the first initialization of the signalling data 
+	 link.  If this number is increasing, it indicates that there 
+	 are significant latencies in some device driver which is 
+	 performing too many functions with interrupts suppressed.  (Or 
+	 the CPU is just too slow.)"
+    ::= { mtpSdlStatsEntry 4 }
+
+mtpSdlStatsRxBufferOverflows OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Occurences"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Receive buffer overflows occur between the signalling data link 
+	 and the signalling terminal.  When the signalling data link 
+	 driver goes to deliver data to the signalling terminal and a 
+	 buffer to contain the data is not immediately available, a 
+	 receive buffer overflow condition ensues.  Becuase of buffer 
+	 recycling, this number should be low or zero and should not 
+	 increase after the first initialization of the signalling data 
+	 link.  If this number is increasing, it indicates that there 
+	 are significant buffer or memory pressure issued or that there 
+	 are significant latencies in some device driver which is 
+	 performing too many functions with interrupts diabled.  (Or the 
+	 CPU is just too slow.)"
+    ::= { mtpSdlStatsEntry 5 }
+
+mtpSdlStatsTxBufferOverflows OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Occurences"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { mtpSdlStatsEntry 6 }
+
+mtpSdlStatsLeadCtsLost OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Occurences"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of times that the CTS (Clear To 
+	 Send) lead was lost (deasserted) on a V.35 interface.  A 
+	 significant number in this column indicates a problem with the 
+	 modem or channel bank providing access to the signalling data 
+	 link over the V.35 interface."
+    ::= { mtpSdlStatsEntry 7 }
+
+mtpSdlStatsLeadDcdLost OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Occurences"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of times that the DCD (Data 
+	 Carrier Detect) lead was lost (deasserted) on a V.35 interface.  
+	 A significant number in this column indicates a problemw tih 
+	 the modem or channel bank providing access to the signalling 
+	 data link over the V.35 interface."
+    ::= { mtpSdlStatsEntry 8 }
+
+mtpSdlStatsCarrierLost OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Occurences"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of times that the carrier was 
+	 lost on a DS0/DS1 interface.  A significant number in this 
+	 field indicates that there is a problem with syncrhonization of 
+	 the group carrier containing the signalling data link."
+    ::= { mtpSdlStatsEntry 9 }
+
+mtpSdlStatsBipolarViolations OBJECT-TYPE
+    SYNTAX	Counter32
+    UNITS	"Occurences"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This is the count of the number of bipolar violations received 
+	 on a T1, J1 or E1 carrier."
+    ::= { mtpSdlStatsEntry 10 }
+
+-- ==========================================================================
+-- SCALARS
+-- ==========================================================================
+
+mtpOm1stAndIntervalActivate OBJECT-TYPE
+    SYNTAX InstancePointer
+    MAX-ACCESS write-only
+    STATUS current
+    DESCRIPTION
+	"Some measurements in this MIB that are to be collected on a 
+	 first-and-interval basis are marked as obligatory but requiring 
+	 activation.  Writing the instance pointer of the columnar 
+	 object corresponding to the PerfCurrentCount for the 
+	 measurement will activate the first-and-interval measurement if 
+	 not already activated.  When the object cannot be activated, an 
+	 SNMP error will be returned.
+	 
+	 The activation state of a measurement can be determined by 
+	 attempting to read its PerfCurrentValue.  This is because these 
+	 texutal conventions will return an error ('wrong value') if the 
+	 particular columnar object is not activated (the data collected 
+	 is invalid or missing).
+	 
+	 Activating first-and-interval for a given measurement causes 
+	 ss7OnOccurEvent notifications to be issued for the first event 
+	 within the interval that occurs for the corresponding measure.  
+	 However, it has no effect on the communicationsAlarm or 
+	 qualityOfServiceAalarm notifications that are generated for 
+	 maintenance purposes."
+    REFERENCE
+	""
+    ::= { mtpOmScalars 1 }
+
+mtpOm1stAndIntervalDeactivate OBJECT-TYPE
+    SYNTAX InstancePointer
+    MAX-ACCESS write-only
+    STATUS current
+    DESCRIPTION
+	"Some measurements in this MIB that are to be collected on a 
+	 first-and-interval basis are marked as obligatory but requiring 
+	 activation.  Writing the instance pointer of the columnar 
+	 object corresponding to the PerfCurrentCount for the 
+	 measurement will deactivate the first-and-interval measurement 
+	 if not already activated.  When the object cannot be 
+	 deactivated, an SNMP error will be returned.
+	 
+	 The activation state of a measurement can be determined by 
+	 attempting to read its PerfCurrentValue.  This is because these 
+	 texutal conventions will return an error if they particular 
+	 columnar object is not activated (the data collected is invalid 
+	 or missing).
+	 
+	 Activating first-and-interval for a given measurement causes 
+	 ss7OnOccurEvent notifications to be issued for the first event 
+	 within the interval that occurs for the corresponding measure.  
+	 However, it has no effect on the communicationsAlarm or 
+	 qualityOfServiceAalarm notifications that are generated for 
+	 maintenance purposes."
+    REFERENCE
+	""
+    ::= { mtpOmScalars 2 }
+
+mtpOm5MinActivate OBJECT-TYPE
+    SYNTAX InstancePointer
+    MAX-ACCESS write-only
+    STATUS current
+    DESCRIPTION
+	"Some measurements in this MIB that are to be collected on a 
+	 5-minute basis are marked as obligatory by requiring 
+	 activation.  Writing the instance pointer of the columnar 
+	 object coresponding to the PerfCurrentCount for the measurement 
+	 will activate the 5-minute measurement if not already 
+	 activated.  When the object cannot be activated, an SNMP error 
+	 will be returned.
+	 
+	 The activation state of a measurement can be determined by 
+	 attempting to read its PerfCurrentValue.  This is because these 
+	 texutal conventions will return an error if they particular 
+	 columnar object is not activated (the data collected is invalid 
+	 or missing)."
+    REFERENCE
+	""
+    ::= { mtpOmScalars 3 }
+
+mtpOm5MinDeaActivate OBJECT-TYPE
+    SYNTAX InstancePointer
+    MAX-ACCESS write-only
+    STATUS current
+    DESCRIPTION
+	"Some measurements in this MIB that are to be collected on a 
+	 5-minute basis are marked as obligatory by requiring 
+	 activation.  Writing the instance pointer of the columnar 
+	 object coresponding to the PerfCurrentCount for the measurement 
+	 will deactivate the 5-minute measurement if not already 
+	 deactivated.  When the object cannot be deactivated, an SNMP 
+	 error will be returned.
+
+	 The activation state of a measurement can be determined by 
+	 attempting to read its PerfCurrentValue.  This is because these 
+	 texutal conventions will return an error if they particular 
+	 columnar object is not activated (the data collected is invalid 
+	 or missing)."
+    REFERENCE
+	""
+    ::= { mtpOmScalars 4 }
+
+mtpOm15MinActivate OBJECT-TYPE
+    SYNTAX InstancePointer
+    MAX-ACCESS write-only
+    STATUS current
+    DESCRIPTION
+	"Some measurements in this MIB that are to be collected on a 
+	 15-minute basis are marked as obligatory by requiring 
+	 activation.  Writing the instance pointer of the columnar 
+	 object coresponding to the PerfCurrentCount for the measurement 
+	 will activate the 15-minute measurement if not already 
+	 activated.  When the object cannot be activated, an SNMP error 
+	 will be returned.
+	 
+	 The activation state of a measurement can be determined by 
+	 attempting to read its PerfCurrentValue.  This is because these 
+	 texutal conventions will return an error if they particular 
+	 columnar object is not activated (the data collected is invalid 
+	 or missing)."
+    REFERENCE
+	""
+    ::= { mtpOmScalars 5 }
+
+mtpOm15MinDeaActivate OBJECT-TYPE
+    SYNTAX InstancePointer
+    MAX-ACCESS write-only
+    STATUS current
+    DESCRIPTION
+	"Some measurements in this MIB that are to be collected on a 
+	 15-minute basis are marked as obligatory by requiring 
+	 activation.  Writing the instance pointer of the columnar 
+	 object coresponding to the PerfCurrentCount for the measurement 
+	 will deactivate the 15-minute measurement if not already 
+	 deactivated.  When the object cannot be deactivated, an SNMP 
+	 error will be returned.
+	 
+	 The activation state of a measurement can be determined by 
+	 attempting to read its PerfCurrentValue.  This is because these 
+	 texutal conventions will return an error if they particular 
+	 columnar object is not activated (the data collected is invalid 
+	 or missing)."
+    REFERENCE
+	""
+    ::= { mtpOmScalars 6 }
+
+mtpOmInterval OBJECT-TYPE
+    SYNTAX Integer32 (1..672)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"A historical data collection interval for use as an index.  
+	 Specifies the historical data collection interval as a 
+	 time-sequence with the lowest ordinal value '1' representing 
+	 the newest data collected and the highest ordinal value 
+	 (typically '96') being the oldest data collected."
+    ::= { mtpOmScalars 7 }
+
+mtpOmDiscontinuityTime OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The time of the last discontinuity."
+    ::= { mtpOmScalars 8 }
+
+mtpOmTimeStamp OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The time stamp of the beggining of the last completed 15-minute 
+	 time interval when read, the beginning of an interval report 
+	 for notifications."
+    ::= { mtpOmScalars 9 }
+
+mtpOm5MinMaxIntervals OBJECT-TYPE
+    SYNTAX Unsigned32 (0..288)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"Indicates the maximum number of historical 5-minute intervals 
+	 that will be collected.  This is in the range from zero (0), no 
+	 historical data collected, to 288, 1 day of historical 5-minute 
+	 data collected.  Some implementations may support longer 
+	 periods of time, or some, a more restricted range.  The default 
+	 value that should be supported by all managed systems by 
+	 element configuration is 96, or 8 hours of historical 5-minute 
+	 data.
+	 
+	 Increasing or decreasing this value may increase or descrease 
+	 respectively the local storage demands of the agent.  
+	 Decreasing this value may or may not cause historical interval 
+	 data beyond the maximum to be discarded.  Increasing this value 
+	 might not restore valid intervals beyond the point to which 
+	 this maximum was previously decreased.
+	 
+	 Therefore, the setting of this value must be retained in 
+	 permanent storage and should be altered only infrequently, if 
+	 at all, by management stations."
+    DEFVAL { 96 }
+    ::= { mtpOmScalars 10 }
+
+mtpOm15MinMaxIntervals OBJECT-TYPE
+    SYNTAX Unsigned32 (0..672)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"Indicates and specifies the maximum number of historical 
+	 15-minute intervals that will be collected.  This is in the 
+	 range from zero (0), no historical data collected, to 672, 7 
+	 days of historical 15-minute data collected.  Some 
+	 implementations may support longer periods of time, or a some, 
+	 a more restricted range.  The default value that should be 
+	 supported by all managed systems by element configuration is 
+	 96, or 24 hours of historical 15-minute data.
+	 
+	 Increasing or decreasing this value may increase or descrease 
+	 respectively the local storage demands of the agent.  
+	 Decreasing this value may or may not cause historical interval 
+	 data beyond the maximum to be discarded.  Increasing this value 
+	 might not restore valid intervals beyond the point to which 
+	 this maximum was previously decreased.
+	 
+	 Therefore, the setting of this value must be retained in 
+	 permanent storage and should be altered only infrequently, if 
+	 at all, by management stations."
+    DEFVAL { 96 }
+    ::= { mtpOmScalars 11 }
+
+END -- OPENSS7-MTP-OM-MIB2 module
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

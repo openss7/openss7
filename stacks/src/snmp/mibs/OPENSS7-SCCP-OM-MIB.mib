@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SCCP-OM-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-24 13:08:29 $
+-- @(#) $RCSfile: OPENSS7-SCCP-OM-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-12-27 15:29:49 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-24 13:08:29 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 15:29:49 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SCCP-OM-MIB.mib,v $
+-- Revision 0.9.2.4  2008-12-27 15:29:49  brian
+-- - split MTP and MTP OM mib
+--
 -- Revision 0.9.2.3  2008-12-24 13:08:29  brian
 -- - building ss7confd
 --
@@ -78,7 +81,7 @@ IMPORTS
 	FROM HC-PerfHist-TC-MIB
     sccpNetworkEntityId
 	FROM OPENSS7-SCCP-MIB
-    openss7
+    openss7, openss7Q, openss7Q752
 	FROM OPENSS7-SMI;
 
 sccpOmMIB MODULE-IDENTITY
@@ -111,7 +114,7 @@ sccpOmMIB MODULE-IDENTITY
 	"200812092229Z"
     DESCRIPTION
 	"This is the initial revision of this MIB."
-    ::= { openss7 17 752 2 }
+    ::= { openss7Q752 2 }
 
  -- top level organization of the MIB
 
