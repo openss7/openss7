@@ -2584,6 +2584,7 @@ stacks/src/snmp/mibs/.index
 stacks/src/snmp/mibs/mibs.tar.gz
 stacks/src/snmp/*_openss7.c
 stacks/src/snmp/*_openss7.h
+stacks/src/snmp/sccpOmMIB.tree
 stacks/src/snmp/*_simple.c
 stacks/src/snmp/*_simple.h
 stacks/src/snmp/*_storage.c
@@ -3523,6 +3524,8 @@ striso/src/include/Makefile.in
 striso/src/Makefile.in
 striso/src/perl/EN300292.hh
 striso/src/perl/EN300292.new.gdmo
+striso/src/perl/EN300304.new.gdmo
+striso/src/perl/EN300371.new.gdmo
 striso/src/perl/ES200653.hh
 striso/src/perl/ES200653.new.gdmo
 striso/src/perl/ES201097-1.hh
@@ -3543,6 +3546,7 @@ striso/src/perl/G.855.1.hh
 striso/src/perl/G.855.1.new.gdmo
 striso/src/perl/ISO10589.hh
 striso/src/perl/ISO10589.new.gdmo
+striso/src/perl/ISO10733.new.gdmo
 striso/src/perl/M.3100.hh
 striso/src/perl/M.3100.new.gdmo
 striso/src/perl/Q.751.1.hh
@@ -3553,6 +3557,8 @@ striso/src/perl/Q.821.hh
 striso/src/perl/Q.821.new.gdmo
 striso/src/perl/Q.822.hh
 striso/src/perl/Q.822.new.gdmo
+striso/src/perl/Q.824.1.new.gdmo
+striso/src/perl/Q.825.new.gdmo
 striso/src/perl/Q.826.hh
 striso/src/perl/Q.826.new.gdmo
 striso/src/perl/T1.116.1D.hh
@@ -3568,8 +3574,14 @@ striso/src/perl/tmp3.gdmo
 striso/src/perl/tmp.cpp
 striso/src/perl/tmp.gdmo
 striso/src/perl/tmp.hh
+striso/src/perl/TS102004-1.new.gdmo
+striso/src/perl/TS132106-4.new.gdmo
+striso/src/perl/TS132106-7.new.gdmo
+striso/src/perl/TS132111-4.new.gdmo
+striso/src/perl/TS300819.new.gdmo
 striso/src/perl/X.283.hh
 striso/src/perl/X.283.new.gdmo
+striso/src/perl/X.462.new.gdmo
 striso/src/perl/X.521.hh
 striso/src/perl/X.521.new.gdmo
 striso/src/perl/X.721.hh
