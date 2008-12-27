@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-12-20 12:55:40 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-27 15:29:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-20 12:55:40 $ by $Author: brian $
+# Last Modified $Date: 2008-12-27 15:29:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.6  2008-12-27 15:29:45  brian
+# - split MTP and MTP OM mib
+#
+# Revision 0.9.2.5  2008-12-27 10:42:41  brian
+# - remove redundant mibs
+#
 # Revision 0.9.2.4  2008-12-20 12:55:40  brian
 # - add new mibs and agents
 #
@@ -90,7 +96,6 @@ check: \
 	ss7MIB.tree \
 	ss7OmMIB.tree \
 	mtpMIB.tree \
-	mtpMIB2.tree \
 	mtpOmMIB.tree \
 	sccpMIB.tree \
 	sccpOmMIB.tree \
@@ -113,16 +118,12 @@ ss7OmMIB.tree: mibs/OPENSS7-SS7-OM-MIB.mib
 	snmptranslate -Tp OPENSS7-SS7-OM-MIB::ss7OmMIB >ss7OmMIB.tree
 
 mtpMIB.tree: MIBS+=OPENSS7-MTP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB.tree: mibs/OPENSS7-MTP-MIB3.mib
+mtpMIB.tree: mibs/OPENSS7-MTP-MIB.mib
 	snmptranslate -Tp OPENSS7-MTP-MIB::mtpMIB >mtpMIB.tree
 
-mtpMIB2.tree: MIBS+=OPENSS7-MTP-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB2.tree: mibs/OPENSS7-MTP-MIB2.mib
-	snmptranslate -Tp OPENSS7-MTP-MIB2::mtpMIB2 >mtpMIB2.tree
-
-mtpOmMIB.tree: MIBS+=OPENSS7-MTP-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpOmMIB.tree: mibs/OPENSS7-MTP-OM-MIB.mib
-	snmptranslate -Tp OPENSS7-MTP-OM-MIB::mtpOmMIB >mtpOmMIB.tree
+mtpOmMIB.tree: MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpOmMIB.tree: mibs/OPENSS7-MTP-OM-MIB2.mib
+	snmptranslate -Tp OPENSS7-MTP-OM-MIB2::mtpOmMIB >mtpOmMIB.tree
 
 sccpMIB.tree: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-TC
 sccpMIB.tree: mibs/OPENSS7-SCCP-MIB.mib
@@ -142,7 +143,6 @@ basic: \
 	ss7MIB_simple.c ss7MIB_simple.h \
 	ss7OmMIB_simple.c ss7OmMIB_simple.h \
 	mtpMIB_simple.c mtpMIB_simple.h \
-	mtpMIB2_simple.c mtpMIB2_simple.h \
 	mtpOmMIB_simple.c mtpOmMIB_simple.h \
 	sccpMIB_simple.c sccpMIB_simple.h \
 	sccpOmMIB_simple.c sccpOmMIB_simple.h \
@@ -169,17 +169,12 @@ ss7OmMIB_simple.c ss7OmMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-SS7-OM-MIB.mi
 	indent -nhnl ss7OmMIB_simple.[ch]
 
 mtpMIB_simple.c mtpMIB_simple.h: MIBS+=OPENSS7-MTP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB_simple.c mtpMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MTP-MIB3.mib
+mtpMIB_simple.c mtpMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MTP-MIB.mib
 	./mib2c -c ./mib2c.conf -f mtpMIB_simple mtpMIB
 	indent -nhnl mtpMIB_simple.[ch]
 
-mtpMIB2_simple.c mtpMIB2_simple.h: MIBS+=OPENSS7-MTP-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB2_simple.c mtpMIB2_simple.h: mib2c mib2c.conf mibs/OPENSS7-MTP-MIB2.mib
-	./mib2c -c ./mib2c.conf -f mtpMIB2_simple mtpMIB2
-	indent -nhnl mtpMIB2_simple.[ch]
-
-mtpOmMIB_simple.c mtpOmMIB_simple.h: MIBS+=OPENSS7-MTP-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpOmMIB_simple.c mtpOmMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MTP-OM-MIB.mib
+mtpOmMIB_simple.c mtpOmMIB_simple.h: MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpOmMIB_simple.c mtpOmMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MTP-OM-MIB2.mib
 	./mib2c -c ./mib2c.conf -f mtpOmMIB_simple mtpOmMIB
 	indent -nhnl mtpOmMIB_simple.[ch]
 
@@ -204,7 +199,6 @@ storage: \
 	ss7MIB_storage.c ss7MIB_storage.h \
 	ss7OmMIB_storage.c ss7OmMIB_storage.h \
 	mtpMIB_storage.c mtpMIB_storage.h \
-	mtpMIB2_storage.c mtpMIB2_storage.h \
 	mtpOmMIB_storage.c mtpOmMIB_storage.h \
 	sccpMIB_storage.c sccpMIB_storage.h \
 	sccpOmMIB_storage.c sccpOmMIB_storage.h \
@@ -231,17 +225,12 @@ ss7OmMIB_storage.c ss7OmMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-SS7-
 	indent -nhnl ss7OmMIB_storage.[ch]
 
 mtpMIB_storage.c mtpMIB_storage.h:MIBS+=OPENSS7-MTP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB_storage.c mtpMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-MTP-MIB3.mib
+mtpMIB_storage.c mtpMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-MTP-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f mtpMIB_storage mtpMIB
 	indent -nhnl mtpMIB_storage.[ch]
 
-mtpMIB2_storage.c mtpMIB2_storage.h:MIBS+=OPENSS7-MTP-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB2_storage.c mtpMIB2_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-MTP-MIB2.mib
-	./mib2c -c ./mib2c.storage.conf -f mtpMIB2_storage mtpMIB2
-	indent -nhnl mtpMIB2_storage.[ch]
-
-mtpOmMIB_storage.c mtpOmMIB_storage.h:MIBS+=OPENSS7-MTP-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpOmMIB_storage.c mtpOmMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-MTP-OM-MIB.mib
+mtpOmMIB_storage.c mtpOmMIB_storage.h:MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpOmMIB_storage.c mtpOmMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-MTP-OM-MIB2.mib
 	./mib2c -c ./mib2c.storage.conf -f mtpOmMIB_storage mtpOmMIB
 	indent -nhnl mtpOmMIB_storage.[ch]
 
@@ -266,7 +255,6 @@ openss7: \
 	ss7MIB_openss7.c ss7MIB_openss7.h \
 	ss7OmMIB_openss7.c ss7OmMIB_openss7.h \
 	mtpMIB_openss7.c mtpMIB_openss7.h \
-	mtpMIB2_openss7.c mtpMIB2_openss7.h \
 	mtpOmMIB_openss7.c mtpOmMIB_openss7.h \
 	sccpMIB_openss7.c sccpMIB_openss7.h \
 	sccpOmMIB_openss7.c sccpOmMIB_openss7.h \
@@ -293,17 +281,12 @@ ss7OmMIB_openss7.c ss7OmMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-SS7-
 	indent -nhnl ss7OmMIB_openss7.[ch]
 
 mtpMIB_openss7.c mtpMIB_openss7.h:MIBS+=OPENSS7-MTP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB_openss7.c mtpMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-MTP-MIB3.mib
+mtpMIB_openss7.c mtpMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-MTP-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f mtpMIB_openss7 mtpMIB
 	indent -nhnl mtpMIB_openss7.[ch]
 
-mtpMIB2_openss7.c mtpMIB2_openss7.h:MIBS+=OPENSS7-MTP-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB2_openss7.c mtpMIB2_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-MTP-MIB2.mib
-	./mib2c -c ./mib2c.openss7.conf -f mtpMIB2_openss7 mtpMIB2
-	indent -nhnl mtpMIB2_openss7.[ch]
-
-mtpOmMIB_openss7.c mtpOmMIB_openss7.h:MIBS+=OPENSS7-MTP-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpOmMIB_openss7.c mtpOmMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-MTP-OM-MIB.mib
+mtpOmMIB_openss7.c mtpOmMIB_openss7.h:MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpOmMIB_openss7.c mtpOmMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-MTP-OM-MIB2.mib
 	./mib2c -c ./mib2c.openss7.conf -f mtpOmMIB_openss7 mtpOmMIB
 	indent -nhnl mtpOmMIB_openss7.[ch]
 
@@ -370,13 +353,6 @@ clean:
 	rm -f mtpMIB_storage.[ch]~
 	rm -f mtpMIB_openss7.[ch]
 	rm -f mtpMIB_openss7.[ch]~
-	rm -f mtpMIB2.tree
-	rm -f mtpMIB2_simple.[ch]
-	rm -f mtpMIB2_simple.[ch]~
-	rm -f mtpMIB2_storage.[ch]
-	rm -f mtpMIB2_storage.[ch]~
-	rm -f mtpMIB2_openss7.[ch]
-	rm -f mtpMIB2_openss7.[ch]~
 	rm -f mtpOmMIB.tree
 	rm -f mtpOmMIB_simple.[ch]
 	rm -f mtpOmMIB_simple.[ch]~
