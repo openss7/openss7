@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-12-24 13:08:26 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-12-27 10:38:03 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-24 13:08:26 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 10:38:03 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB.mib,v $
+-- Revision 0.9.2.12  2008-12-27 10:38:03  brian
+-- - rationalized version of MTP mibs
+--
 -- Revision 0.9.2.11  2008-12-24 13:08:26  brian
 -- - building ss7confd
 --
@@ -84,7 +87,7 @@
 --
 -- =============================================================================
 
-OPENSS7-MTP-MIB1 DEFINITIONS ::= BEGIN
+OPENSS7-MTP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
@@ -826,8 +829,6 @@ mtpSdl			OBJECT IDENTIFIER ::= { mtpTables	12 }
 -- |  |  |  |     |__(17) mtpLsAsaProfilePointer
 -- |  |  |  |     |__(18) mtpLsAlarmStatus
 -- |  |  |  |     |__(19) mtpLsRowStatus
--- |  |  |  |     |__(20) mtpLsSlsMask
--- |  |  |  |     |__(21) mtpLsLsSlot
 -- |  |  |  |
 -- |  |  |  |__( 3) mtpLsStatsTable
 -- |  |  |  |  |__( 1) mtpLsStatsEntry
@@ -956,7 +957,6 @@ mtpSdl			OBJECT IDENTIFIER ::= { mtpTables	12 }
 -- |  |  |  |     |__(24) mtpSlL3ProfilePointer
 -- |  |  |  |     |__(25) mtpSlAlarmStatus
 -- |  |  |  |     |__(26) mtpSlRowStatus
--- |  |  |  |     |__(27) mtpSlMuxId
 -- |  |  |  |
 -- |  |  |  |__( 4) mtpSlSdlListTable
 -- |  |  |  |  |__( 1) mtpSlSdlListEntry
@@ -1189,20 +1189,6 @@ mtpSdl			OBJECT IDENTIFIER ::= { mtpTables	12 }
 -- |  |  |  |     |__( 8) mtpSdtName
 -- |  |  |  |     |__( 9) mtpSdtProfilePointer
 -- |  |  |  |     |__(10) mtpSdtRowStatus
--- |  |  |  |     |__(11) mtpSdtAermState
--- |  |  |  |     |__(12) mtpSdtAermCa
--- |  |  |  |     |__(13) mtpSdtAermTi
--- |  |  |  |     |__(14) mtpSdtAermAbortedProving
--- |  |  |  |     |__(15) mtpSdtSuermState
--- |  |  |  |     |__(16) mtpSdtSuermCs
--- |  |  |  |     |__(17) mtpSdtSuermNs
--- |  |  |  |     |__(18) mtpSdtEimState
--- |  |  |  |     |__(19) mtpSdtEimCe
--- |  |  |  |     |__(20) mtpSdtEimSuReceived
--- |  |  |  |     |__(21) mtpSdtEimIntervalError
--- |  |  |  |     |__(22) mtpSdtDaedrState
--- |  |  |  |     |__(23) mtpSdtOctetCountingMode
--- |  |  |  |     |__(24) mtpSdtDaedtState
 -- |  |  |  |
 -- |  |  |  |__( 5) mtpSdtStatsTable
 -- |  |  |     |__( 1) mtpSdtStatsEntry
@@ -1245,26 +1231,6 @@ mtpSdl			OBJECT IDENTIFIER ::= { mtpTables	12 }
 -- |  |     |     |__( 9) mtpSdlStmChannel
 -- |  |     |     |__(10) mtpSdlVcTTpPointer
 -- |  |     |     |__(11) mtpSdlRowStatus
--- |  |     |     |__(12) mtpSdlAutoAlloc
--- |  |     |     |__(13) mtpSdlIfType
--- |  |     |     |__(14) mtpSdlIfRate
--- |  |     |     |__(15) mtpSdlIfGroupType
--- |  |     |     |__(16) mtpSdlIfGroupRate
--- |  |     |     |__(17) mtpSdlIfMode
--- |  |     |     |__(18) mtpSdlIfGroupMode
--- |  |     |     |__(19) mtpSdlIfGroupCrc
--- |  |     |     |__(20) mtpSdlIfClock
--- |  |     |     |__(21) mtpSdlIfCoding
--- |  |     |     |__(22) mtpSdlIfFraming
--- |  |     |     |__(23) mtpSdlIfBlkSize
--- |  |     |     |__(24) mtpSdlIfLeads
--- |  |     |     |__(25) mtpSdlIfAlarms
--- |  |     |     |__(26) mtpSdlIfTxLevel
--- |  |     |     |__(27) mtpSdlIfRxLevel
--- |  |     |     |__(28) mtpSdlIfSyncSrc
--- |  |     |     |__(29) mtpSdlIfState
--- |  |     |     |__(30) mtpSdlIfTxState
--- |  |     |     |__(31) mtpSdlIfRxState
 -- |  |     |
 -- |  |     |__( 2) mtpSdlStatsTable
 -- |  |        |__( 1) mtpSdlStatsEntry
@@ -7866,7 +7832,7 @@ mtpSpStudyInt15minInterval OBJECT-TYPE
 	""
     ::= { mtpSpStudyInt15minEntry 1 }
 
-mtpSpStudyInt15minInterval OBJECT-TYPE
+mtpSpStudyInt15minTimeStamp OBJECT-TYPE
     SYNTAX TimeStamp
     MAX-ACCESS read-only
     STATUS current
@@ -7917,8 +7883,8 @@ mtpSpStudyMapEntry OBJECT-TYPE
 	""
     INDEX {
 	mtpSpId, -- shared index
-	mtpRsId,	-- OPC value
-	mtpRsId,	-- DPC value
+	mtpOpcRsId,	-- OPC value
+	mtpDpcRsId,	-- DPC value
 	mtpSpSiCode,	-- SI code
 	mtpSpStudyId
     }
@@ -7926,8 +7892,32 @@ mtpSpStudyMapEntry OBJECT-TYPE
 
 
 MtpSpStudyMapEntry ::= SEQUENCE {
+    mtpOpcRsId					Unsigned32,
+    mtpDpcRsId					Unsigned32,
     mtpSpStudyMapStatus				RowStatus
 }
+
+mtpOpcRsId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Provides an OPC index into the table.  The is the index of the 
+	 originating signalling point in the route set table 
+	 mtpRsTable.  The entry must exist or the creation of a row will 
+	 be refused."
+    ::= { mtpSpStudyMapEntry 1 }
+
+mtpDpcRsId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Provides an DPC index into the table.  The is the index of the 
+	 destination signalling point in the route set table 
+	 mtpRsTable.  The entry must exist or the creation of a row will 
+	 be refused."
+    ::= { mtpSpStudyMapEntry 2 }
 
 mtpSpStudyMapStatus OBJECT-TYPE
     SYNTAX RowStatus
@@ -7937,7 +7927,7 @@ mtpSpStudyMapStatus OBJECT-TYPE
 	""
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus."
-    ::= { mtpSpStudyMapEntry 1 }
+    ::= { mtpSpStudyMapEntry 3 }
 
 -- ====================================================================
 
@@ -9284,7 +9274,7 @@ mtpRsSiInt5minTimeStamp OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt5minEntry 3 }
+    ::= { mtpRsSiInt5minEntry 2 }
 
 mtpRsSiInt5minReceivedOctetsOpcSio OBJECT-TYPE
     SYNTAX PerfIntervalCount
@@ -9627,7 +9617,7 @@ mtpRtEntry OBJECT-TYPE
     INDEX {
 	mtpSpId,
 	mtpRsId,
-	mtpLsId
+	mtpRtId	    -- could be mtpLsId
     }
     ::= { mtpRtTable 1 }
 
@@ -10928,9 +10918,7 @@ MtpLsEntry ::= SEQUENCE {
     mtpLsName					CommonLanguageName,
     mtpLsAsaProfilePointer			RowPointer,
     mtpLsAlarmStatus				AlarmStatus,
-    mtpLsRowStatus				RowStatus,
-    mtpLsSlsMask				Unsigned32,
-    mtpLsLsSlot					Unsigned32
+    mtpLsRowStatus				RowStatus
 }
 
 mtpLsId OBJECT-TYPE
@@ -11213,17 +11201,17 @@ mtpLsPeriodicLinkTestFail OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"This object specifies whether periodic link test failure will 
-	 fail the signalling link.  When TRUE, the failure of a periodic 
-	 signalling link set procedure will fail the signalling link; 
-	 FALSE, a notification will be generated but the signalling link 
-	 will not fail.
+	 fail the signalling link.  When true(1), the failure of a 
+	 periodic signalling link set procedure will fail the signalling 
+	 link; false(2), a notification will be generated but the 
+	 signalling link will not fail.
 	 
 	 When this value is not specified on a management station SET 
 	 operation that creates an entry, this value should be inherited 
 	 from the containing combined link set."
     REFERENCE
 	"ANSI T1.111.7/2000 2.2"
-    DEFVAL { true }
+    DEFVAL { 1 } -- true(1)
     ::= { mtpLsEntry 11 }
 
 mtpLsAdministrativeState OBJECT-TYPE
@@ -11426,49 +11414,6 @@ mtpLsRowStatus OBJECT-TYPE
 	     BINDING."
     ::= { mtpLsEntry 19 }
 
-mtpLsSlsMask OBJECT-TYPE
-    SYNTAX Unsigned32 (0..255)
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	"This object specifies a bit mask indicating which bits within 
-	 the signalling link selection code will be used to select the 
-	 link within the link set for normal routing.  The SLS values 
-	 which are assigned to a given link set under normal conditions 
-	 can be determined by masking the SLS value with this mask, 
-	 packing together into least significant bits only the masked 
-	 bits, comparing the modulo of the masked bits with the number 
-	 of link sets in the combined link set, and then matching 
-	 against the index numbers of the link sets.  So, for example, 
-	 if there are 4 SLS bits (ITU-T case) and there are two links 
-	 sets in the combined link set at index positions 0 and 1, and 
-	 the mask is '0100'B, then SLS values '0000'B, '0001'B, '0010'B, 
-	 '0011'B, '1000'B, '1001'B, '1010'B and '1011'B will be sent 
-	 normally to the link set in index 0, the remaining SLS will 
-	 normally be sent to the link set at index 1."
-    DEFVAL { 1 }
-    ::= { mtpLsEntry 20 }
-
-mtpLsLsSlot OBJECT-TYPE
-    SYNTAX Unsigned32 (0..4)
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	"This object specifies the index of the link set amoung the link 
-	 sets belonging to the same combined link set.  The special 
-	 value zero (0) used on a management station SET operation that 
-	 creates an entry in this table, will assign the next available 
-	 index within the link set.  When a management state GET 
-	 operation retrieves the value of this object, it will be in the 
-	 range (1..4).  Normally only two link sets are associated with 
-	 a combined link set (each going to one of the two STPs in an 
-	 associated pair).  At one time NTT permitted 4 (Fujitsu's STP 
-	 quads) and that is why the upper constraint is 4.  A management 
-	 station SET operation that creates an entry which does not have 
-	 a unique value of the index within the combined signalling link 
-	 must fail."
-    ::= { mtpLsEntry 21 }
-
 
 -- ====================================================================
 
@@ -11632,7 +11577,7 @@ mtpLsInt5minTimeStamp OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	""
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpLsInt5minEntry 2 }
 
 mtpLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
     SYNTAX PerfIntervalCount
@@ -11644,7 +11589,7 @@ mtpLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (10/95) : adjacentInaccessibleEvents.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.1."
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpLsInt5minEntry 3 }
 
 mtpLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
     SYNTAX PerfIntervalCount
@@ -11656,7 +11601,7 @@ mtpLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (10/95) : adjacentInacessibleDuration.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.2."
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpLsInt5minEntry 4 }
 
 mtpLsInt5minSlsUnavailable OBJECT-TYPE
     SYNTAX PerfIntervalCount
@@ -11667,7 +11612,7 @@ mtpLsInt5minSlsUnavailable OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1, (10/95) : slsUnavailable.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.2"
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpLsInt5minEntry 5 }
 
 -- ====================================================================
 
@@ -13756,8 +13701,7 @@ MtpSlEntry ::= SEQUENCE {
     mtpSlSlsCodeNormalList			SlsList,
     mtpSlL3ProfilePointer			SimpleNameType,
     mtpSlAlarmStatus				AlarmStatus,
-    mtpSlRowStatus				RowStatus,
-    mtpSlMuxId					Unsigned32
+    mtpSlRowStatus				RowStatus
 }
 
 mtpSlSlCode OBJECT-TYPE
@@ -14350,16 +14294,6 @@ mtpSlRowStatus OBJECT-TYPE
 	 ITU-T Rec. Q.751.1 (1997) : signLinkSetTp-signLinkTp NAME 
 	 BINDING."
     ::= { mtpSlEntry 26 }
-
-mtpSlMuxId OBJECT-TYPE
-    SYNTAX Unsigned32
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	"This object specifies and indicate the multiplexer identifier 
-	 of the signalling link beneath the MTP multiplexing driver.  
-	 Once created, this object is read-only until destroyed."
-    ::= { mtpSlEntry 27 }
 
 -- ====================================================================
 
@@ -16801,7 +16735,7 @@ mtpM2paProving OBJECT-TYPE
 	 false(2), forego proving althogether."
     REFERENCE
 	""
-    DEFVAL { true }
+    DEFVAL { 1 } -- true(1)
     ::= { mtpM2paEntry 2 }
 
 mtpM2paManagementProvingState OBJECT-TYPE
@@ -17304,21 +17238,7 @@ MtpSdtEntry ::= SEQUENCE {
     mtpSdtEquipmentPointer			RowPointer,
     mtpSdtName					CommonLanguageName,
     mtpSdtProfilePointer			RowPointer,
-    mtpSdtRowStatus				RowStatus,
-    mtpSdtAermState				INTEGER,
-    mtpSdtAermCa				Gauge32,
-    mtpSdtAermTi				Gauge32,
-    mtpSdtAermAbortedProving			TruthValue,
-    mtpSdtSuermState				INTEGER,
-    mtpSdtSuermCs				Gauge32,
-    mtpSdtSuermNs				Gauge32,
-    mtpSdtEimState				INTEGER,
-    mtpSdtEimCe					Gauge32,
-    mtpSdtEimSuReceived				TruthValue,
-    mtpSdtEimIntervalError			TruthValue,
-    mtpSdtDaedrState				INTEGER,
-    mtpSdtOctetCountingMode			TruthValue,
-    mtpSdtDaedtState				INTEGER
+    mtpSdtRowStatus				RowStatus
 }
 
 mtpSdtId OBJECT-TYPE
@@ -17496,217 +17416,6 @@ mtpSdtRowStatus OBJECT-TYPE
 	 ITU-T Rec. Q.751.1 (1997) : managedSwitchingElement-signTerm 
 	     NAME BINDING."
     ::= { mtpSdtEntry 10 }
-
-mtpSdtAermState OBJECT-TYPE
-    SYNTAX INTEGER {
-		idle(0), monitoring(1) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This is the state of the Alignment Error Rate Monitor (AERM).  
-	 The AERM is in the monitoring state when a signalling links is 
-	 going through its proving period.
-	 
-	 - idle(0),
-	 - monitoring(1),"
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { idle }
-    ::= { mtpSdtEntry 11 }
-
-mtpSdtAermCa OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This is the current count of errored signal units and 
-	 implements the leaky bucket in the AERM."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { 0 }
-    ::= { mtpSdtEntry 12 }
-
-mtpSdtAermTi OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This is the current aborted proving threshold for the AERM and 
-	 is either Tin when in normal proving or Tie when in emergency 
-	 proving."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { 1 }
-    ::= { mtpSdtEntry 13 }
-
-mtpSdtAermAbortedProving OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This flag is true when a proving period has been aborted."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { false }
-    ::= { mtpSdtEntry 14 }
-
-mtpSdtSuermState OBJECT-TYPE
-    SYNTAX INTEGER {
-		idle(0), monitoring(1) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This is the state of the Signal Unit Error Rate Monitor or 
-	 SUERM.  The SUERM is in the monitoring(1) state once a low 
-	 speed link has passed alignment, and idle(0) otherwise.
-	 
-	 - idle(0),
-	 - monitoring(1), "
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { idle }
-    ::= { mtpSdtEntry 15 }
-
-mtpSdtSuermCs OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This count is the count of signal units received in error, 
-	 including those considered as received due to octet counting 
-	 mode.  Receipt of an errored signal unit increments this count.  
-	 If the count reaches T, then the link fails and the SUERM 
-	 returns to the idle(0) state."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { 0 }
-    ::= { mtpSdtEntry 16 }
-
-mtpSdtSuermNs OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This is the count of correctly received signal units.  Receipt 
-	 of D correct signal units results in the Cs count being 
-	 decremented (the leak in the bucket) if it is greater than 
-	 zero."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { 0 }
-    ::= { mtpSdtEntry 17 }
-
-mtpSdtEimState OBJECT-TYPE
-    SYNTAX INTEGER {
-		idle(0), monitoring(1) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"For high speed links, the SUERM is inefficient and this Errored 
-	 Interval Monitor (EIM) is used instead.  The EIM is in the 
-	 monitoring(1) state once the high speed link has passed 
-	 alignment, and idle(0) otherwise.
-	 
-	 - idle(0),
-	 - monitoring(1), "
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { idle }
-    ::= { mtpSdtEntry 18 }
-
-mtpSdtEimCe OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This is the count of weighted errored intervals.  Receipt an 
-	 errored signal unit within the interval of the T8 timer will 
-	 result in this count being increased by the weighting factor.  
-	 If this count exceeds the threshould Te, then the signalling 
-	 link fails and the EIM returns to the idle(0) state."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { 0 }
-    ::= { mtpSdtEntry 19 }
-
-mtpSdtEimSuReceived OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"If a signal unit is received correctly during the interval T8, 
-	 this flag is set.  If there is no error duing the interval, the 
-	 count Ce is decremented by the weighting factor De, or to 
-	 zero."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { false }
-    ::= { mtpSdtEntry 20 }
-
-mtpSdtEimIntervalError OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"If a signal unit is received in error during the interval T8, 
-	 this flag is set.  At the end of the interval, the count Ce is 
-	 incremented by the weighting factor Ue, or to the threshold 
-	 Te."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { false }
-    ::= { mtpSdtEntry 21 }
-
-mtpSdtDaedrState OBJECT-TYPE
-    SYNTAX INTEGER {
-		idle(0), inservice(1), congested(2) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This is the state of the receiver.  The receiver is in the 
-	 inservice(1) state once the singalling terminal has been 
-	 powered up and idle(0) otherwise.
-	 
-	 - idle(0),
-	 - inservice(1),
-	 - congested(2), "
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { idle }
-    ::= { mtpSdtEntry 22 }
-
-mtpSdtOctetCountingMode OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"When frame alignment is lost (hunting for flags), or an abort 
-	 is received, the receives enter octet counting mode and this 
-	 value is set to true.  The DAEDR will consider that an 
-	 erroneous SU has been received for each N octets received on 
-	 the line."
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { false }
-    ::= { mtpSdtEntry 23 }
-
-mtpSdtDaedtState OBJECT-TYPE
-    SYNTAX INTEGER {
-		idle(0), inservice(1), congested(2) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This is the state of the transmitter.  The transmitter is in 
-	 the inservice(1) state once the signalling terminal has been 
-	 powered up and idle(0) otherwise.
-	 
-	 - idle(0),
-	 - inservice(1),
-	 - congested(2), "
-    REFERENCE
-	"Q.704 SDLs"
-    DEFVAL { idle }
-    ::= { mtpSdtEntry 24 }
 
 
 -- ====================================================================
@@ -18201,27 +17910,7 @@ MtpSdlEntry ::= SEQUENCE {
     mtpSdlName					CommonLanguageName,
     mtpSdlStmChannel				CircuitCode,
     mtpSdlVcTTpPointer				RowPointer,
-    mtpSdlRowStatus				RowStatus,
-    mtpSdlAutoAlloc				TruthValue,
-    mtpSdlIfType				INTEGER,
-    mtpSdlIfRate				Unsigned32,
-    mtpSdlIfGroupType				INTEGER,
-    mtpSdlIfGroupRate				Unsigned32,
-    mtpSdlIfMode				INTEGER,
-    mtpSdlIfGroupMode				INTEGER,
-    mtpSdlIfGroupCrc				INTEGER,
-    mtpSdlIfClock				INTEGER,
-    mtpSdlIfCoding				INTEGER,
-    mtpSdlIfFraming				INTEGER,
-    mtpSdlIfBlkSize				Unsigned32,
-    mtpSdlIfLeads				BITS,
-    mtpSdlIfAlarms				BITS,
-    mtpSdlIfTxLevel				INTEGER,
-    mtpSdlIfRxLevel				Integer32,
-    mtpSdlIfSyncSrc				OCTET STRING,
-    mtpSdlIfState				INTEGER,
-    mtpSdlIfTxState				INTEGER,
-    mtpSdlIfRxState				INTEGER
+    mtpSdlRowStatus				RowStatus
 }
 
 mtpSdlId OBJECT-TYPE
@@ -18406,393 +18095,6 @@ mtpSdlRowStatus OBJECT-TYPE
 	 ITU-T Rec. Q.751.1 (1997) : mtpSignPoint-signDataLinkTp NAME 
 	     BINDING."
     ::= { mtpSdlEntry 11 }
-
-mtpSdlAutoAlloc OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	"The mtpSdlAutoAlloc entry is a boolean option entry that 
-	 specifies whether automatic allocation of signalling data links 
-	 is to be performed in accordance with Q.704/Clause 11.  Note 
-	 that ANSI T1.111.4 does not support automatic allocation of 
-	 signalling data links."
-    DEFVAL { false }
-    ::= { mtpSdlEntry 12 }
-
-mtpSdlIfType OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), v35(1), ds0(2), ds0a(3), e1(4), t1(5), j1(6), 
-		atm(7), packet(8) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This colunmar object is an entry of the SdlTable that indicates 
-	 the interface type.  This option must always be a virtual 
-	 tributary or complete representation of the associated 
-	 SdlIfGroupType.
-	 
-	 - none(0), unknown/unspecified;
-	 - v35(1), V.35;
-	 - ds0(2), DS0 channel;
-	 - ds0a(3), DS0A channel;
-	 - e1(4), full E1;
-	 - t1(5), full T1;
-	 - j1(6), full J1;
-	 - atm(7), ATM SAAL;
-	 - packet(8), other packet interface."
-    DEFVAL { ds0 }
-    ::= { mtpSdlEntry 13 }
-
-mtpSdlIfRate OBJECT-TYPE
-    SYNTAX Unsigned32 (0 | 56000 | 64000 | 1544000 | 2048000 | 
-		    6312000 | 8488000 | 44736000)
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the interface (channel) rate.  For traditional narrowband SS7 
-	 links this value affects both capacity proportionate loading of 
-	 the link as well as timer ranges.
-	 
-	 - 0, no rate/variable rate/E3 rate;
-	 - 56000, DS0A rate;
-	 - 64000, DS0 rate;
-	 - 1544000, T1 or J1 rate;
-	 - 2048000, E1 rate;
-	 - 6312000, T2 rate;
-	 - 8488000, E2 rate;
-	 - 44736000, T3 rate."
-    DEFVAL { 64000 }
-    ::= { mtpSdlEntry 14 }
-
-mtpSdlIfGroupType OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), t1(1), e1(2), j1(3), atm(4), eth(5), ip(6), 
-		udp(7), tcp(8), rtp(9), sctp(10), t2(11), e2(12), 
-		e3(13), t3(14), oc3(15), oc12(16), oc48(17), oc192(18) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the interface (channel) group type.  The SdlIfType must 
-	 indicate a tributary or the same type as this group type.  The 
-	 group type does not affect the Signalling Link protocol state 
-	 machine but may be useful in fault determination.
-	 
-	 - none(0), unknown/unspecified;
-	 - t1(1), T1 group;
-	 - e1(2), E1 group;
-	 - j1(3), J1 group;
-	 - atm(4), ATM SAAL;
-	 - eth(5), Ethernet;
-	 - ip(6), Internet Protocol;
-	 - udp(7), User Datagram Protocol;
-	 - tcp(8), Transmission Control Protocol;
-	 - rtp(9), Real-Time Transport Protocol;
-	 - sctp(10), Stream Control Transmission Protocol;
-	 - t2(11), T2 group;
-	 - e2(12), E2 group;
-	 - e3(13), E3 group;
-	 - t3(14), T3 group;
-	 - oc3(15), OC3/STS-1 group;
-	 - oc12(16), OC12/STS-4 group;
-	 - oc48(17), OC48/STS-16 group;
-	 - oc192(18), OC192/STS-64 group."
-    ::= { mtpSdlEntry 15 }
-
-mtpSdlIfGroupRate OBJECT-TYPE
-    SYNTAX Unsigned32 (0 | 1544000 | 2048000 | 6312000 | 8488000 | 
-    44736000)
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the interface (channel) group rate.  This value must be greater 
-	 than or equal to the interface (channel) rate.  This value does 
-	 not affect the Signalling Data Link protocol state machine, but 
-	 may be useful for fault determination.
-	 
-	 - 0, unknown/unspecified/E3/OCx rate;
-	 - 1544000, T1 or J1 group rate;
-	 - 2048000, E1 group rate;
-	 - 6312000, T2 group rate;
-	 - 8488000, E2 group rate;
-	 - 44736000, T3 group rate."
-    ::= { mtpSdlEntry 16 }
-
-mtpSdlIfMode OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), dsu(1), csu(2), dte(3), dce(4), client(5), 
-		server(6), peer(7), echo(8), remLb(9), locLb(10), 
-		lbEcho(11), test(12) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the interface (channel) mode.  This mode does not affect the 
-	 Signalling Data Link state machine, but is useful in fault 
-	 determination (particularly if it happens to be set to a local 
-	 or remote loopback mode, echo or a test mode.
-	 
-	 - none(0), unknown/unspecified mode;
-	 - dsu(1), DSU mode;
-	 - csu(2), CSU mode;
-	 - dte(3), DTE mode;
-	 - dce(4), DCE mode;
-	 - client(5), client mode;
-	 - server(6), server mode;
-	 - peer(7), peer mode;
-	 - echo(8), echo mode;
-	 - remLb(9), remote loopback mode;
-	 - locLb(10), local loopback mode;
-	 - lbEcho(11), loopback and echo mode;
-	 - test(12), test mode."
-    DEFVAL { none }
-    ::= { mtpSdlEntry 17 }
-
-mtpSdlIfGroupMode OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), locLb(1), remLb(2) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the interface (channel) group mode.  This mode does not affect 
-	 the Signalling Data Link state machine, but is useful in fault 
-	 determination (particularly if it happens to be set to a local 
-	 or remote loopback mode, echo or a test mode.
-	 
-	 - none(0), normal;
-	 - locLb(1), group local loopback;
-	 - remLb(2), group remote loopback."
-    DEFVAL { none }
-    ::= { mtpSdlEntry 28 }
-
-mtpSdlIfGroupCrc OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), crc4(1), crc5(2), crc6(3), crc6j(4) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the CRC calculation method associated with the group containing 
-	 the siganlling channel(s).  While this value does not affect 
-	 the function of the Signalling Data Terminal protocol state 
-	 machin, it is useful for notifications for loss of frame or 
-	 blue alarms as it indicates one possible cause of the loss of 
-	 syncrhonization.
-	 
-	 - none(0),
-	 - crc4(1),
-	 - crc5(2),
-	 - crc6(3),
-	 - crc6j(4),"
-    ::= { mtpSdlEntry 19 }
-
-mtpSdlIfClock OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), int(1), ext(2), loop(3), master(4), slave(5), 
-		dpll(6), abr(7), shaper(8), tick(9) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object in an entry of the SdlTable that indicates 
-	 the clocking associated with the group containing the 
-	 signalling channel(s).  While this value does not affect the 
-	 function of the Signalling Data Link protocol state machine, it 
-	 is useful for notifications for loss of synchronization or 
-	 yellow or red alarms as it indicates one possible cause of the 
-	 loss of syncrhonization.
-	 
-	 - none(0), no clocking/free wheeling;
-	 - int(1), internal clocking;
-	 - ext(2), external clocking;
-	 - loop(3), loop clock;
-	 - master(4), master clock;
-	 - slave(5), slave clock;
-	 - dpll(6), Digital Phase Locked Loop;
-	 - abr(7), Average Bit Rate;
-	 - shaper(8), Traffic Shaper;
-	 - tick(9), System tick clock."
-    ::= { mtpSdlEntry 20 }
-
-mtpSdlIfCoding OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), nrz(1), nrzi(2), ami(3), b6zs(4), b8zs(5), 
-		hdb3(6), aal1(7), aal2(8), aal5(9) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the coding associated with the group containing the signalling 
-	 channel(s).  While this values does not affect the function of 
-	 the Signalling Data Link protocol state machine, it is useful 
-	 for notifications for bibolar violations.
-	 
-	 - none(0), no coding;
-	 - nrz(1), Manchester non-return to zero;
-	 - nrzi(2), Manchester non-return to zero inverted;
-	 - ami(3), AMI coding (T1 only);
-	 - b6zs(4), B6ZS coding (E1 only);
-	 - b8zs(5), B8ZS coding (T1 only);
-	 - hdb3(6), HDB3 coding (E1 only);
-	 - aal1(7), AAL1 coding;
-	 - aal2(8), AAL2 coding;
-	 - aal5(9), AAL5 coding."
-    ::= { mtpSdlEntry 21 }
-
-mtpSdlIfFraming OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), ccs(1), cas(2), sf(3), esf(4) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the framing associated with the group containing the signalling 
-	 channel(s).  While this value does not affect the function of 
-	 the Signalling Data Link protocol state machine, it is useful 
-	 for notifications for loss of frame.
-	 
-	 - none(0), no framing;
-	 - ccs(1), common channel signalling (E1 only);
-	 - cas(2), circuit associated signalling (E1 only);
-	 - sf(3), SF/D4 framing (T1 only);
-	 - esf(4), ESF framing (T1 only)."
-    ::= { mtpSdlEntry 22 }
-
-mtpSdlIfBlkSize OBJECT-TYPE
-    SYNTAX Unsigned32 (8..64)
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    DEFVAL { 8 }
-    ::= { mtpSdlEntry 23 }
-
-mtpSdlIfLeads OBJECT-TYPE
-    SYNTAX BITS {
-		dtr(0), rts(1), dcd(2), cts(3), dsr(4) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the V.35 leads associated with the signalling channel(s).  This 
-	 value is only applicable to V.35 or related interfaces and is 
-	 zero (all bits clear) when not applicable.  While this value 
-	 does not affect the function of the Signalling Data Link 
-	 protocols state machine (SS7 signalling link interface 
-	 definition does not include a definition of leads), it is use 
-	 for fault determination on notification of signalling link 
-	 failures.
-	 
-	 - dtr(0), V.35 DTR;
-	 - rts(1), V.35 RTS;
-	 - dcd(2), V.35 DCD;
-	 - cts(3), V.35 CTS;
-	 - dsr(4), V.35 DSR."
-    DEFVAL { '00011111'B }
-    ::= { mtpSdlEntry 24 }
-
-mtpSdlIfAlarms OBJECT-TYPE
-    SYNTAX BITS {
-		red(0), blue(1), yellow(2), recovery(3) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the E1/T1/J1 alarm state associated with the interface 
-	 (channel) group.  This value is only applicable to PDH 
-	 interfaces and is zero (all bits clear) when not applicable.  
-	 While this value does not affect the function of the Signalling 
-	 Data Link protocol state machine, it is useful in fault 
-	 determination on notifications of lost of synchronization, loss 
-	 of frame or bipolar violations.
-	 
-	 - red(0),
-	 - blue(1),
-	 - yellow(2),
-	 - recovery(3)."
-    ::= { mtpSdlEntry 25 }
-
-mtpSdlIfTxLevel OBJECT-TYPE
-    SYNTAX INTEGER {
-		none(0), dsx133ftImp75ohmNmCsu0dB(1), 
-		dsx266ftImp120ohmNm(2), dsx399ftImp75ohmPr(3), 
-		dsx533ftImp120ohmPr(4), dsx666ftImp75ohmHrl(5), 
-		csu8dBImp120ohmHrl(6), csu15dB(7), csu23dB(8), 
-		monitor0dB(9), monitor12dB(10), monitor2030dB(11), 
-		monitor32dB(12) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"This columnar object is an entry of the SdlTable that indicates 
-	 the transmit level of the interface (channel) group.  This 
-	 value is only applicable to true PDH interfaces and is zero (0) 
-	 when not applicable.  While this does not affect the Signalling 
-	 Data Link protocols state machine, it is useful in fault 
-	 determination under notification of loss of synchronization, 
-	 loss of frame, or bipolar violations.
-	 
-	 - none(0),
-	 - dsx133ftImp75ohmNmCsu0dB(1),
-	 - dsx266ftImp120ohmNm(2),
-	 - dsx399ftImp75ohmPr(3),
-	 - dsx533ftImp120ohmPr(4),
-	 - dsx666ftImp75ohmHrl(5), Impeadance 75 Ohms, High Return Loss
-	 - csu8dBImp120ohmHrl(6), Impeadance 120 Ohms, High Return Loss
-	 - csu15dB(7),
-	 - csu23dB(8),
-	 - monitor0dB(9),
-	 - monitor12dB(10),
-	 - monitor2030dB(11),
-	 - monitor32dB(12)."
-    ::= { mtpSdlEntry 26 }
-
-mtpSdlIfRxLevel OBJECT-TYPE
-    SYNTAX Integer32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    ::= { mtpSdlEntry 27 }
-
-mtpSdlIfSyncSrc OBJECT-TYPE
-    SYNTAX OCTET STRING (SIZE(0..32))
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    ::= { mtpSdlEntry 28 }
-
-mtpSdlIfState OBJECT-TYPE
-    SYNTAX INTEGER {
-		idle(0), inservice(1) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"
-	 - idle(0),
-	 - inservice(1),"
-    ::= { mtpSdlEntry 29 }
-
-mtpSdlIfTxState OBJECT-TYPE
-    SYNTAX INTEGER {
-		idle(0), inservice(1) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    ::= { mtpSdlEntry 30 }
-
-mtpSdlIfRxState OBJECT-TYPE
-    SYNTAX INTEGER {
-		idle(0), inservice(1) }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    ::= { mtpSdlEntry 31 }
 
 
 -- ====================================================================
@@ -19025,7 +18327,7 @@ mtpM2paDefaultSctpNoDelay OBJECT-TYPE
 	 persist across system reboots."
     REFERENCE
 	"RFC 4960"
-    DEFVAL { true }
+    DEFVAL { 1 } -- true(1)
     ::= { mtpDefaults 1 }
 
 mtpM2paDefaultSctpMaxseg OBJECT-TYPE
