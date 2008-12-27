@@ -1,3 +1,8 @@
+*_simple.c
+*_simple.h
+*_storage.c
+*_storage.h
 *_openss7.c
 *_openss7.h
 *.tree
+*~
