@@ -1,3 +1,9 @@
+2008-12-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: rationalize mib versions
+	* src/snmp/mibs/OPENSS7-MTP-MIB2.mib: rationalize mib versions
+	* src/snmp/mibs/OPENSS7-MTP-MIB3.mib: rationalize mib versions
+
 2008-12-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: building ss7confd

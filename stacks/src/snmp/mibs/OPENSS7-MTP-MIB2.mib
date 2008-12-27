@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-12-24 13:08:27 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-27 10:38:04 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-24 13:08:27 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 10:38:04 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB2.mib,v $
+-- Revision 0.9.2.10  2008-12-27 10:38:04  brian
+-- - rationalized version of MTP mibs
+--
 -- Revision 0.9.2.9  2008-12-24 13:08:27  brian
 -- - building ss7confd
 --
@@ -78,7 +81,7 @@
 --
 -- =============================================================================
 
-OPENSS7-MTP-MIB2 DEFINITIONS ::= BEGIN
+OPENSS7-MTP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
@@ -118,7 +121,7 @@ IMPORTS
     openss7, openss7Q, openss7Q751
 	FROM OPENSS7-SMI;
 
-mtpMIB2 MODULE-IDENTITY
+mtpMIB MODULE-IDENTITY
     LAST-UPDATED "200812201153Z"
     ORGANIZATION "The OpenSS7 Project"
     CONTACT-INFO
@@ -310,9 +313,9 @@ mtpMIB2 MODULE-IDENTITY
 
  -- top level organization of the MIB
 
-mtpNotifications	OBJECT IDENTIFIER ::= { mtpMIB2		 0 }
-mtpObjects		OBJECT IDENTIFIER ::= { mtpMIB2		 1 }
-mtpConformance		OBJECT IDENTIFIER ::= { mtpMIB2		 2 }
+mtpNotifications	OBJECT IDENTIFIER ::= { mtpMIB		 0 }
+mtpObjects		OBJECT IDENTIFIER ::= { mtpMIB		 1 }
+mtpConformance		OBJECT IDENTIFIER ::= { mtpMIB		 2 }
 
 mtpTables		OBJECT IDENTIFIER ::= { mtpObjects	 1 }
 mtpScalars		OBJECT IDENTIFIER ::= { mtpObjects	 2 }
@@ -344,7 +347,7 @@ mtpSdl			OBJECT IDENTIFIER ::= { mtpTables	12 }
 
 -- ====================================================================
 
--- (1.3.6.1.4.1.29591.17.751.1) mtpMIB2
+-- (1.3.6.1.4.1.29591.17.751.1) mtpMIB
 -- |__(0) mtpNotifications
 -- |  |__( 1) mtpRestarting
 -- |  |__( 2) ss7OnOccEvent
@@ -2966,7 +2969,7 @@ transferControlledReceived OBJECT-IDENTITY
 
 -- ITU-T Rec. Q.751.1 mtpSpecificExtensions
 -- mtpSpecificExtensions OBJECT IDENTIFIER
---     ::= { mtpMIB2 3 }
+--     ::= { mtpMIB 3 }
 --    ::= { ccitt(0) recommendation(0) q(17) omap(751) mtp(1) 
 --    informationModel(0) specificExtensions(0) }
 
@@ -7823,7 +7826,7 @@ mtpSpStudyInt15minInterval OBJECT-TYPE
 	""
     ::= { mtpSpStudyInt15minEntry 1 }
 
-mtpSpStudyInt15minInterval OBJECT-TYPE
+mtpSpStudyInt15minTimeStamp OBJECT-TYPE
     SYNTAX TimeStamp
     MAX-ACCESS read-only
     STATUS current
@@ -7874,8 +7877,8 @@ mtpSpStudyMapEntry OBJECT-TYPE
 	""
     INDEX {
 	mtpSpId, -- shared index
-	mtpRsId,	-- OPC value
-	mtpRsId,	-- DPC value
+	mtpOpcRsId,	-- OPC value
+	mtpDpcRsId,	-- DPC value
 	mtpSpSiCode,	-- SI code
 	mtpSpStudyId
     }
@@ -7883,8 +7886,32 @@ mtpSpStudyMapEntry OBJECT-TYPE
 
 
 MtpSpStudyMapEntry ::= SEQUENCE {
+    mtpOpcRsId					Unsigned32,
+    mtpDpcRsId					Unsigned32,
     mtpSpStudyMapStatus				RowStatus
 }
+
+mtpOpcRsId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Provides an OPC index into the table.  The is the index of the 
+	 originating signalling point in the route set table 
+	 mtpRsTable.  The entry must exist or the creation of a row will 
+	 be refused."
+    ::= { mtpSpStudyMapEntry 1 }
+
+mtpDpcRsId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Provides an DPC index into the table.  The is the index of the 
+	 destination signalling point in the route set table 
+	 mtpRsTable.  The entry must exist or the creation of a row will 
+	 be refused."
+    ::= { mtpSpStudyMapEntry 2 }
 
 mtpSpStudyMapStatus OBJECT-TYPE
     SYNTAX RowStatus
@@ -7894,7 +7921,7 @@ mtpSpStudyMapStatus OBJECT-TYPE
 	""
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus."
-    ::= { mtpSpStudyMapEntry 1 }
+    ::= { mtpSpStudyMapEntry 3 }
 
 -- ====================================================================
 
@@ -9241,7 +9268,7 @@ mtpRsSiInt5minTimeStamp OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt5minEntry 3 }
+    ::= { mtpRsSiInt5minEntry 2 }
 
 mtpRsSiInt5minReceivedOctetsOpcSio OBJECT-TYPE
     SYNTAX PerfIntervalCount
@@ -9584,7 +9611,7 @@ mtpRtEntry OBJECT-TYPE
     INDEX {
 	mtpSpId,
 	mtpRsId,
-	mtpRtId
+	mtpRtId	    -- could be mtpLsId
     }
     ::= { mtpRtTable 1 }
 
@@ -11168,17 +11195,17 @@ mtpLsPeriodicLinkTestFail OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"This object specifies whether periodic link test failure will 
-	 fail the signalling link.  When TRUE, the failure of a periodic 
-	 signalling link set procedure will fail the signalling link; 
-	 FALSE, a notification will be generated but the signalling link 
-	 will not fail.
+	 fail the signalling link.  When true(1), the failure of a 
+	 periodic signalling link set procedure will fail the signalling 
+	 link; false(2), a notification will be generated but the 
+	 signalling link will not fail.
 	 
 	 When this value is not specified on a management station SET 
 	 operation that creates an entry, this value should be inherited 
 	 from the containing combined link set."
     REFERENCE
 	"ANSI T1.111.7/2000 2.2"
-    DEFVAL { true }
+    DEFVAL { 1 } -- true(1)
     ::= { mtpLsEntry 11 }
 
 mtpLsAdministrativeState OBJECT-TYPE
@@ -11544,7 +11571,7 @@ mtpLsInt5minTimeStamp OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	""
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpLsInt5minEntry 2 }
 
 mtpLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
     SYNTAX PerfIntervalCount
@@ -11556,7 +11583,7 @@ mtpLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (10/95) : adjacentInaccessibleEvents.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.1."
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpLsInt5minEntry 3 }
 
 mtpLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
     SYNTAX PerfIntervalCount
@@ -11568,7 +11595,7 @@ mtpLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (10/95) : adjacentInacessibleDuration.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.2."
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpLsInt5minEntry 4 }
 
 mtpLsInt5minSlsUnavailable OBJECT-TYPE
     SYNTAX PerfIntervalCount
@@ -11579,7 +11606,7 @@ mtpLsInt5minSlsUnavailable OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1, (10/95) : slsUnavailable.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.2"
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpLsInt5minEntry 5 }
 
 -- ====================================================================
 
@@ -13034,7 +13061,7 @@ mtpSlL2ProfileCongestionReportingBaseObject OBJECT-TYPE
 
 mtpSlL2ProfileLoopDelay OBJECT-TYPE
     SYNTAX Unsigned32
-    UNITS "milliseconds"
+    UNITS "seconds"
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -16702,7 +16729,7 @@ mtpM2paProving OBJECT-TYPE
 	 false(2), forego proving althogether."
     REFERENCE
 	""
-    DEFVAL { true }
+    DEFVAL { 1 } -- true(1)
     ::= { mtpM2paEntry 2 }
 
 mtpM2paManagementProvingState OBJECT-TYPE
@@ -18294,7 +18321,7 @@ mtpM2paDefaultSctpNoDelay OBJECT-TYPE
 	 persist across system reboots."
     REFERENCE
 	"RFC 4960"
-    DEFVAL { true }
+    DEFVAL { 1 } -- true(1)
     ::= { mtpDefaults 1 }
 
 mtpM2paDefaultSctpMaxseg OBJECT-TYPE
