@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SCCP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.8 $) $Date: 2008-12-20 12:55:44 $
+-- @(#) $RCSfile: OPENSS7-SCCP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.9 $) $Date: 2008-12-24 13:08:28 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-20 12:55:44 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-24 13:08:28 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SCCP-MIB.mib,v $
+-- Revision 0.9.2.9  2008-12-24 13:08:28  brian
+-- - building ss7confd
+--
 -- Revision 0.9.2.8  2008-12-20 12:55:44  brian
 -- - add new mibs and agents
 --
@@ -640,8 +643,7 @@ ImportanceLevel ::= TEXTUAL-CONVENTION
 	 The first octet in the two-octet string is the default 
 	 importance level, the second octet in the two-octet string is 
 	 the maximum importance level.  Importance levels are only 
-	 allowed to range from 0 to 
-	 255."
+	 allowed to range from 0 to 255."
     REFERENCE
 	"ITU-T Rec. Q.751.2 ASN.1 ImportanceLevel, 2.6.2/Q.714."
     SYNTAX OCTET STRING(SIZE(2))
@@ -1372,9 +1374,9 @@ sccpNetworkEntityEntry OBJECT-TYPE
 
 SccpNetworkEntityEntry ::=
     SEQUENCE {
-	sccpNetworkEntityId			UInteger32, -- index
+	sccpNetworkEntityId			Unsigned32, -- index
 	sccpNetworkEntityAlarmStatus		AlarmStatus,
-	sccpCommunicationsEntityId		UInteger32,
+	sccpCommunicationsEntityId		Unsigned32,
 	sccpLocalSapNames			OCTET STRING, -- needs to be a sidetable
 	sccpNetworkEntityTitles			SccpNAddresses,
 	sccpSystemTypes				NEntitySystemTypes,
@@ -1388,7 +1390,7 @@ SccpNetworkEntityEntry ::=
     }
 
 sccpNetworkEntityId OBJECT-TYPE
-    SYNTAX UInteger32
+    SYNTAX Unsigned32
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -1426,7 +1428,7 @@ sccpNetworkEntityAlarmStatus OBJECT-TYPE
 
 
 sccpCommunicationsEntityId OBJECT-TYPE
-    SYNTAX UInteger32
+    SYNTAX Unsigned32
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -1658,7 +1660,7 @@ sccpAccessPointEntry OBJECT-TYPE
 SccpAccessPointEntry ::=
     SEQUENCE {
 	-- sap2 attributes:
-	sccpSapId				UInteger32,
+	sccpSapId				Unsigned32,
 	sccpAccessPointAlarmStatus		AlarmStatus,
 	sccpSap2Address				SubSystemNumber,
 	sccpUserEntityNames			OCTET STRING,
@@ -1666,8 +1668,8 @@ SccpAccessPointEntry ::=
 	-- nSAP attributes: (none)
 	-- sccpAccessPoint attributes:
 	sccpAvailabilityStatus			AvailabilityStatus,
-	sccpConcernedAreaPointer		UInteger32,
-	sccpLinkagePointer			UInteger32,
+	sccpConcernedAreaPointer		Unsigned32,
+	sccpLinkagePointer			Unsigned32,
 	-- ssAvailableAfterSpRestartPackage
 	sccpSsAvailableAfterSpRestart		TruthValue,
 	sccpAccessPointName			CommonLanguageName,
@@ -1675,7 +1677,7 @@ SccpAccessPointEntry ::=
     }
 
 sccpSapId OBJECT-TYPE
-    SYNTAX UInteger32
+    SYNTAX Unsigned32
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -1799,7 +1801,7 @@ sccpAvailabilityStatus OBJECT-TYPE
 -- sccpConcernedAreaTable, using the index is sufficient.
 --
 sccpConcernedAreaPointer OBJECT-TYPE
-    SYNTAX UInteger32  -- was RowPointer
+    SYNTAX Unsigned32  -- was RowPointer
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -1822,7 +1824,7 @@ sccpConcernedAreaPointer OBJECT-TYPE
 	 within the concerned area)."
     REFERENCE
 	"ITU-T Rec. Q.751.2 (1992) concernedAreaPointer."
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpAccessPointEntry 7 }
 
 --
@@ -1831,7 +1833,7 @@ sccpConcernedAreaPointer OBJECT-TYPE
 -- using the index is sufficient.
 --
 sccpLinkagePointer OBJECT-TYPE
-    SYNTAX UInteger32  -- was RowPointer
+    SYNTAX Unsigned32  -- was RowPointer
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -1871,7 +1873,7 @@ sccpSsAvailableAfterSpRestart OBJECT-TYPE
 	 SCCP-SAPs are always assumed available and the value for a 
 	 local SCCP-SAP is pinned at true(2).
 	 "
-    DEFVAL      { 2 }
+    DEFVAL { 2 }
     ::= { sccpAccessPointEntry 9 }
 
 sccpAccessPointName OBJECT-TYPE
@@ -1943,7 +1945,7 @@ sccpLinkageEntry OBJECT-TYPE
 
 SccpLinkageEntry ::=
     SEQUENCE {
-	sccpLinkageId				UInteger32,
+	sccpLinkageId				Unsigned32,
 	sccpOperationalProtocols		OperationalProtocols,
 	sccpSnSAP				RowPointer,
 	-- congestion package
@@ -1977,7 +1979,7 @@ SccpLinkageEntry ::=
 	sccpRLM					INTEGER,
 	sccpRSLM				INTEGER,
 	-- localSccpLinkagePackage
-	sccpLinkageConcernedAreaPointer		UInteger32,
+	sccpLinkageConcernedAreaPointer		Unsigned32,
 	sccpLowerLimitForSegmentation		INTEGER,
 	sccpUpperLimitForSegmentation		INTEGER,
 	sccpLinkageName				CommonLanguageName,
@@ -1986,7 +1988,7 @@ SccpLinkageEntry ::=
 
 
 sccpLinkageId OBJECT-TYPE
-    SYNTAX UInteger32
+    SYNTAX Unsigned32
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -2078,7 +2080,7 @@ sccpNrOfRestrictionLevels OBJECT-TYPE
 	 is supported."
     REFERENCE
 	"ITU-T Rec. Q.751.2 nrOfRestrictionLevels, 5.2.7/Q.714 N."
-    DEFVAL      { 8 }
+    DEFVAL { 8 }
     ::= { sccpLinkageEntry 6 }
 
 sccpNrOfSubLevels OBJECT-TYPE
@@ -2091,7 +2093,7 @@ sccpNrOfSubLevels OBJECT-TYPE
 	 is supported."
     REFERENCE
 	"ITU-T Rec. Q.751.2 nrOfSubLevels, 5.2.7/Q.714 M."
-    DEFVAL      { 4 }
+    DEFVAL { 4 }
     ::= { sccpLinkageEntry 7 }
 
 sccpCLS OBJECT-TYPE
@@ -2104,7 +2106,7 @@ sccpCLS OBJECT-TYPE
 	 is supported."
     REFERENCE
 	"ITU-T Rec. Q.751.2 cLS, 5.2.7/Q.714 CLS."
-    DEFVAL      { 8 }
+    DEFVAL { 8 }
     ::= { sccpLinkageEntry 8 }
 
 sccpCongestionTimerValue OBJECT-TYPE
@@ -2130,7 +2132,7 @@ sccpp OBJECT-TYPE
 	 is supported."
     REFERENCE
 	"ITU-T Rec. Q.751.2 p, 5.2.7/Q.714 P."
-    DEFVAL      { 8 }
+    DEFVAL { 8 }
     ::= { sccpLinkageEntry 10 }
 
 sccpImportanceLevelCR OBJECT-TYPE
@@ -2145,7 +2147,7 @@ sccpImportanceLevelCR OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-CR, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0204'X }
+    DEFVAL { '0204'X }
     ::= { sccpLinkageEntry 11 }
 
 sccpImportanceLevelCC OBJECT-TYPE
@@ -2160,7 +2162,7 @@ sccpImportanceLevelCC OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-CC, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0304'X }
+    DEFVAL { '0304'X }
     ::= { sccpLinkageEntry 12 }
 
 sccpImportanceLevelCREF OBJECT-TYPE
@@ -2176,7 +2178,7 @@ sccpImportanceLevelCREF OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-CREF, Table 
 	 2/2.6.2/Q.714."
-    DEFVAL      { '0204'X }
+    DEFVAL { '0204'X }
     ::= { sccpLinkageEntry 13 }
 
 sccpImportanceLevelDT1 OBJECT-TYPE
@@ -2191,7 +2193,7 @@ sccpImportanceLevelDT1 OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-DT1, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0406'X }
+    DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 14 }
 
 sccpImportanceLevelDT2 OBJECT-TYPE
@@ -2206,7 +2208,7 @@ sccpImportanceLevelDT2 OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-DT2, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0406'X }
+    DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 15 }
 
 sccpImportanceLevelAK OBJECT-TYPE
@@ -2221,7 +2223,7 @@ sccpImportanceLevelAK OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-AK, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0600'X }
+    DEFVAL { '0600'X }
     ::= { sccpLinkageEntry 16 }
 
 sccpImportanceLevelIT OBJECT-TYPE
@@ -2236,7 +2238,7 @@ sccpImportanceLevelIT OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-IT, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0600'X }
+    DEFVAL { '0600'X }
     ::= { sccpLinkageEntry 17 }
 
 sccpImportanceLevelED OBJECT-TYPE
@@ -2251,7 +2253,7 @@ sccpImportanceLevelED OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-ED, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0700'X }
+    DEFVAL { '0700'X }
     ::= { sccpLinkageEntry 18 }
 
 sccpImportanceLevelEA OBJECT-TYPE
@@ -2266,7 +2268,7 @@ sccpImportanceLevelEA OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-EA, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0700'X }
+    DEFVAL { '0700'X }
     ::= { sccpLinkageEntry 19 }
 
 sccpImportanceLevelRSR OBJECT-TYPE
@@ -2281,7 +2283,7 @@ sccpImportanceLevelRSR OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-RSR, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0600'X }
+    DEFVAL { '0600'X }
     ::= { sccpLinkageEntry 20 }
 
 sccpImportanceLevelRSC OBJECT-TYPE
@@ -2296,7 +2298,7 @@ sccpImportanceLevelRSC OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-RSC, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0600'X }
+    DEFVAL { '0600'X }
     ::= { sccpLinkageEntry 21 }
 
 sccpImportanceLevelERR OBJECT-TYPE
@@ -2311,7 +2313,7 @@ sccpImportanceLevelERR OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-ERR, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0700'X }
+    DEFVAL { '0700'X }
     ::= { sccpLinkageEntry 22 }
 
 sccpImportanceLevelRLC OBJECT-TYPE
@@ -2326,7 +2328,7 @@ sccpImportanceLevelRLC OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-RLC, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0400'X }
+    DEFVAL { '0400'X }
     ::= { sccpLinkageEntry 23 }
 
 sccpImportanceLevelRLSD OBJECT-TYPE
@@ -2341,7 +2343,7 @@ sccpImportanceLevelRLSD OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-RLSD, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0606'X }
+    DEFVAL { '0606'X }
     ::= { sccpLinkageEntry 24 }
 
 sccpImportanceLevelUDT OBJECT-TYPE
@@ -2356,7 +2358,7 @@ sccpImportanceLevelUDT OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-UDT, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0406'X }
+    DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 25 }
 
 sccpImportanceLevelUDTS OBJECT-TYPE
@@ -2371,7 +2373,7 @@ sccpImportanceLevelUDTS OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-UDTS, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0300'X }
+    DEFVAL { '0300'X }
     ::= { sccpLinkageEntry 26 }
 
 sccpImportanceLevelXUDT OBJECT-TYPE
@@ -2386,7 +2388,7 @@ sccpImportanceLevelXUDT OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-XUDT, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0406'X }
+    DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 27 }
 
 sccpImportanceLevelXUDTS OBJECT-TYPE
@@ -2401,7 +2403,7 @@ sccpImportanceLevelXUDTS OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-XUDTS, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0300'X }
+    DEFVAL { '0300'X }
     ::= { sccpLinkageEntry 28 }
 
 sccpImportanceLevelLUDT OBJECT-TYPE
@@ -2416,7 +2418,7 @@ sccpImportanceLevelLUDT OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-LUDT, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0406'X }
+    DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 29 }
 
 sccpImportanceLevelLUDTS OBJECT-TYPE
@@ -2431,7 +2433,7 @@ sccpImportanceLevelLUDTS OBJECT-TYPE
 	 within and in between different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-LUDTS, Table 2/2.6.2/Q.714."
-    DEFVAL      { '0300'X }
+    DEFVAL { '0300'X }
     ::= { sccpLinkageEntry 30 }
 
 sccpRLM OBJECT-TYPE
@@ -2943,7 +2945,7 @@ sccpScocName OBJECT-TYPE
 	 value is set to and defaults to a null string."
     REFERENCE
 	"ITU-T Rec. Q.751.2 scocName."
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpScocEntry 6 }
 
 sccpScocRowStatus OBJECT-TYPE
@@ -3013,7 +3015,7 @@ sccpScrcId OBJECT-TYPE
 	 attribute is not an index."
     REFERENCE
 	"ITU-T Rec. Q.751.2 scrcId."
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpScrcEntry 1 }
 
 sccpScrcAlarmStatus OBJECT-TYPE
@@ -3071,7 +3073,7 @@ sccpScrcAlarmStatus OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.731 (1993) : 8.1.2.1, ITU-T Rec. X.721 
 	 (1882) : alarmStatus"
-    DEFVAL      { } -- '0000'B
+    DEFVAL { } -- '0000'B
     ::= { sccpScrcEntry 2 }
 
 sccpScrcName OBJECT-TYPE
@@ -3084,7 +3086,7 @@ sccpScrcName OBJECT-TYPE
 	 convention.  When unused, this attribute is a null string."
     REFERENCE
 	"ITU-T Rec. Q.751.2 scrcName."
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpScrcEntry 3 }
 
 sccpScrcRowStatus OBJECT-TYPE
@@ -3153,7 +3155,7 @@ SccpEntitySetEntry ::=
 
 sccpEntitySetId OBJECT-TYPE
     SYNTAX SimpleNameType
-    MAX-ACCESS read-create
+    MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
 	"Provides an identifier for use in naming the conceptual row of 
@@ -3225,7 +3227,7 @@ sccpEntitySetName OBJECT-TYPE
 	 should be set to a null string."
     REFERENCE
 	"ITU-T Rec. Q.751.2 entitySetName."
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpEntitySetEntry 4 }
 
 sccpEntitySetType OBJECT-TYPE
@@ -3633,7 +3635,7 @@ sccpGtNewEncodingScheme OBJECT-TYPE
 	 Global Titles to which this rule applies."
     REFERENCE
 	"ITU-T Q.751.2 newEncodingScheme."
-    DEFVAL      { notUsedOrNoOverwite(256) }
+    DEFVAL { 256 } -- notUsedOrNoOverwite
     ::= { sccpGtConversionRuleEntry 2 }
 
 sccpGtNewNatureOfAddress OBJECT-TYPE
@@ -3646,7 +3648,7 @@ sccpGtNewNatureOfAddress OBJECT-TYPE
 	 Global Titles to which this rule applies."
     REFERENCE
 	"ITU-T Q.751.2 newNatureOfAddress."
-    DEFVAL      { notUsedOrNoOverwite(256) }
+    DEFVAL { 256 } -- notUsedOrNoOverwite
     ::= { sccpGtConversionRuleEntry 3 }
 
 sccpGtNewNumberingPlan OBJECT-TYPE
@@ -3659,7 +3661,7 @@ sccpGtNewNumberingPlan OBJECT-TYPE
 	 Global Titles to which this rule applies."
     REFERENCE
 	"ITU-T Q.751.2 newNumberingPlan."
-    DEFVAL      { notUsedOrNoOverwite(256) }
+    DEFVAL { 256 } -- notUsedOrNoOverwite
     ::= { sccpGtConversionRuleEntry 4 }
 
 sccpGtNewTranslationType OBJECT-TYPE
@@ -3672,7 +3674,7 @@ sccpGtNewTranslationType OBJECT-TYPE
 	 Global Titles to which this rule applies."
     REFERENCE
 	"ITU-T Q.751.2 newTranslationType."
-    DEFVAL      { notUsedOrNoOverwite(256) }
+    DEFVAL { 256 } -- notUsedOrNoOverwite
     ::= { sccpGtConversionRuleEntry 5 }
 
 sccpGtConversionRuleName OBJECT-TYPE
@@ -3683,7 +3685,7 @@ sccpGtConversionRuleName OBJECT-TYPE
 	""
     REFERENCE
 	""
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpGtConversionRuleEntry 6 }
 
 sccpGtConversionRuleRowStatus OBJECT-TYPE
@@ -3977,7 +3979,7 @@ sccpGtTranslatorName OBJECT-TYPE
 	""
     REFERENCE
 	""
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpGtTranslatorEntry 7 }
 
 sccpGtTranslatorRowStatus OBJECT-TYPE
@@ -4134,7 +4136,7 @@ sccpGtRuleName OBJECT-TYPE
 	""
     REFERENCE
 	""
-    DEFVAL      { }
+    DEFVAL { }
     ::=  { sccpGtRuleEntry 7 }
 
 sccpGtRuleRowStatus OBJECT-TYPE
@@ -4241,7 +4243,7 @@ sccpSrvtName OBJECT-TYPE
 	 (the defautl) is set to the null string."
     REFERENCE
 	"ITU-T Rec. Q.752.1 srvtName ATTRIBUTE."
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpSrvtEntry 4 }
 
 sccpAdministrativeState OBJECT-TYPE
@@ -4276,7 +4278,7 @@ sccpAdministrativeState OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.753 startSRVT ConfirmedAction,
 	 ITU-T Rec. Q.751.2 startSccpRouteTest ACTION."
-    DEFVAL      { locked(0) }
+    DEFVAL { 0 } -- locked
     ::= { sccpSrvtEntry 5 }
 
 sccpOperationalState OBJECT-TYPE
@@ -4384,7 +4386,7 @@ sccpMtpBackwardRoutingRequested OBJECT-TYPE
     REFERENCE
 	"ITU-T Recommendation Q.753 (1997) ASN.1 startSVRT 
 	 mtpBackwardRoutingRequested."
-    DEFVAL      { false(1) }
+    DEFVAL { 2 } -- false
     ::= { sccpSrvtEntry 10 }
 
 sccpOriginalGT OBJECT-TYPE
@@ -4400,7 +4402,7 @@ sccpOriginalGT OBJECT-TYPE
 	 string)."
     REFERENCE
 	"ITU-T Recommendation Q.753 (1997) ASN.1 startSVRT originalGT."
-    DEFVAL      { }
+    DEFVAL { }
     ::= { sccpSrvtEntry 11 }
 
 sccpInfoRequest OBJECT-TYPE
@@ -4423,7 +4425,7 @@ sccpInfoRequest OBJECT-TYPE
 	 initiator node, but it can be copied into regenerated MRVTs."
     REFERENCE
 	"ITU-T Recommendation Q.753 (1997) ASN.1 startSVRT infoRequest."
-    DEFVAL      { } -- '000'B
+    DEFVAL { } -- '000'B
     ::= { sccpSrvtEntry 12 }
 
 sccpReturnUnknownParams OBJECT-TYPE
@@ -4448,7 +4450,7 @@ sccpReturnUnknownParams OBJECT-TYPE
     REFERENCE
 	"ITU-T Recommendation Q.753 (1997) ASN.1 startSVRT 
 	 returnUnknownParams."
-    DEFVAL      { } -- '00'B
+    DEFVAL { } -- '00'B
     ::= { sccpSrvtEntry 13 }
 
 sccpRouteTestRowStatus OBJECT-TYPE
