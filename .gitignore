@@ -49,6 +49,7 @@ iperf/scripts/depcomp
 iperf/scripts/install-sh
 iperf/scripts/ltmain.sh
 iperf/scripts/missing
+iperf/scripts/speccommon.in
 iperf/scripts/texinfo.tex
 iperf/src/Makefile.in
 iperf/TODO
@@ -1713,6 +1714,7 @@ LiS/scripts/depcomp
 LiS/scripts/install-sh
 LiS/scripts/ltmain.sh
 LiS/scripts/missing
+LiS/scripts/speccommon.in
 LiS/scripts/texinfo.tex
 LiS/tags
 LiS/tests/Makefile.in
@@ -1730,6 +1732,7 @@ m4/ltversion.m4
 m4/Makefile.in
 Makefile.in
 MANUAL
+mibs/.index
 netperf/aclocal.m4
 netperf/AUTHORS
 netperf/autom4te.cache
@@ -1767,6 +1770,7 @@ netperf/scripts/depcomp
 netperf/scripts/install-sh
 netperf/scripts/ltmain.sh
 netperf/scripts/missing
+netperf/scripts/speccommon.in
 netperf/scripts/texinfo.tex
 netperf/tags
 netperf/TODO
@@ -1843,6 +1847,7 @@ osr61/scripts/depcomp
 osr61/scripts/install-sh
 osr61/scripts/ltmain.sh
 osr61/scripts/missing
+osr61/scripts/speccommon.in
 osr61/scripts/texinfo.tex
 PROBLEMS
 README
@@ -1895,6 +1900,7 @@ sctp/scripts/depcomp
 sctp/scripts/install-sh
 sctp/scripts/ltmain.sh
 sctp/scripts/missing
+sctp/scripts/speccommon.in
 sctp/scripts/texinfo.tex
 sctp/src/sctp.c.old
 sctp/tests/Makefile.in
@@ -2187,8 +2193,10 @@ sigtran/scripts/depcomp
 sigtran/scripts/install-sh
 sigtran/scripts/ltmain.sh
 sigtran/scripts/missing
+sigtran/scripts/speccommon.in
 sigtran/scripts/texinfo.tex
 sigtran/scripts/ylwrap
+sigtran/src/snmp/mibs/.index
 stacks/ABOUT-NLS
 stacks/aclocal.m4
 stacks/AUTHORS
@@ -2564,6 +2572,7 @@ stacks/scripts/install-sh
 stacks/scripts/ltmain.sh
 stacks/scripts/missing
 stacks/scripts/mkinstalldirs
+stacks/scripts/speccommon.in
 stacks/scripts/texinfo.tex
 stacks/scripts/ylwrap
 stacks/src/include/Makefile.in
@@ -2660,8 +2669,10 @@ stratm/scripts/install-sh
 stratm/scripts/ltmain.sh
 stratm/scripts/missing
 stratm/scripts/mkinstalldirs
+stratm/scripts/speccommon.in
 stratm/scripts/texinfo.tex
 stratm/scripts/ylwrap
+stratm/src/snmp/mibs/.index
 stratm/TODO
 strbcm/aclocal.m4
 strbcm/AUTHORS
@@ -2701,6 +2712,7 @@ strbcm/scripts/depcomp
 strbcm/scripts/install-sh
 strbcm/scripts/ltmain.sh
 strbcm/scripts/missing
+strbcm/scripts/speccommon.in
 strbcm/scripts/texinfo.tex
 strbcm/src/include/Makefile.in
 strbcm/src/Makefile.in
@@ -2729,7 +2741,9 @@ strchan/scripts/depcomp
 strchan/scripts/install-sh
 strchan/scripts/ltmain.sh
 strchan/scripts/missing
+strchan/scripts/speccommon.in
 strchan/scripts/texinfo.tex
+strchan/src/mibs/.index
 strchan/src/snmp/ds1EXT_openss7.c
 strchan/src/snmp/ds1EXT_openss7.h
 strchan/src/snmp/ds1EXT_simple.c
@@ -2799,6 +2813,7 @@ strcompat/scripts/depcomp
 strcompat/scripts/install-sh
 strcompat/scripts/ltmain.sh
 strcompat/scripts/missing
+strcompat/scripts/speccommon.in
 strcompat/scripts/texinfo.tex
 strcompat/src/include/Makefile.in
 strcompat/src/include/sys/uw7/stream.h.orig
@@ -3073,6 +3088,7 @@ streams/scripts/depcomp
 streams/scripts/install-sh
 streams/scripts/ltmain.sh
 streams/scripts/missing
+streams/scripts/speccommon.in
 streams/scripts/texinfo.tex
 streams/src/kernel/tags
 streams/src/mibs/.cvsignore
@@ -3115,6 +3131,7 @@ streams/src/modules/sth.c.old
 streams/src/modules/sth.now.c
 streams/src/modules/sth.old.c
 streams/src/modules/sth.rel.c
+streams/src/snmp/mibs/.index
 streams/src/snmp/strMIB_openss7.c
 streams/src/snmp/strMIB_openss7.h
 streams/src/snmp/strMIB_simple.c
@@ -3372,6 +3389,7 @@ strinet/scripts/depcomp
 strinet/scripts/install-sh
 strinet/scripts/ltmain.sh
 strinet/scripts/missing
+strinet/scripts/speccommon.in
 strinet/scripts/texinfo.tex
 strinet/src/include/Makefile.in
 strinet/src/Makefile.in
@@ -3393,6 +3411,7 @@ strisdn/scripts/depcomp
 strisdn/scripts/install-sh
 strisdn/scripts/ltmain.sh
 strisdn/scripts/missing
+strisdn/scripts/speccommon.in
 strisdn/scripts/texinfo.tex
 striso/10030.txt
 striso/ABOUT-NLS
@@ -3497,6 +3516,7 @@ striso/scripts/install-sh
 striso/scripts/ltmain.sh
 striso/scripts/missing
 striso/scripts/mkinstalldirs
+striso/scripts/speccommon.in
 striso/scripts/texinfo.tex
 striso/scripts/ylwrap
 striso/src/include/Makefile.in
@@ -3578,6 +3598,7 @@ striso/src/perl/X.746.hh
 striso/src/perl/X.746.new.gdmo
 striso/src/perl/X.748.hh
 striso/src/perl/X.748.new.gdmo
+striso/src/snmp/mibs/.index
 striso/tests/Makefile.in
 striso/TODO
 strnsl/ABOUT-NLS
@@ -3655,6 +3676,7 @@ strnsl/scripts/install-sh
 strnsl/scripts/ltmain.sh
 strnsl/scripts/missing
 strnsl/scripts/mkinstalldirs
+strnsl/scripts/speccommon.in
 strnsl/scripts/texinfo.tex
 strnsl/TODO
 strsctp/aclocal.m4
@@ -3862,6 +3884,7 @@ strsctp/scripts/depcomp
 strsctp/scripts/install-sh
 strsctp/scripts/ltmain.sh
 strsctp/scripts/missing
+strsctp/scripts/speccommon.in
 strsctp/scripts/texinfo.tex
 strsctp/src/drivers/.cvsignore
 strsctp/src/drivers/sctp2.c.old
@@ -3869,6 +3892,7 @@ strsctp/src/drivers/sctp2.old.c
 strsctp/src/include/Makefile.in
 strsctp/src/Makefile.in
 strsctp/src/snmp/
+strsctp/src/snmp/mibs/.index
 strsctp/tags
 strsctp/tests/Makefile.in
 strsctp/TODO
@@ -3993,6 +4017,7 @@ strsock/scripts/install-sh
 strsock/scripts/ltmain.sh
 strsock/scripts/missing
 strsock/scripts/mkinstalldirs
+strsock/scripts/speccommon.in
 strsock/scripts/texinfo.tex
 strsock/src/include/Makefile.in
 strsock/src/Makefile.in
@@ -4036,6 +4061,7 @@ strtty/scripts/depcomp
 strtty/scripts/install-sh
 strtty/scripts/ltmain.sh
 strtty/scripts/missing
+strtty/scripts/speccommon.in
 strtty/scripts/texinfo.tex
 strtty/src/include/Makefile.in
 strtty/src/Makefile.in
@@ -4079,6 +4105,7 @@ strutil/scripts/depcomp
 strutil/scripts/install-sh
 strutil/scripts/ltmain.sh
 strutil/scripts/missing
+strutil/scripts/speccommon.in
 strutil/scripts/texinfo.tex
 strutil/src/include/Makefile.in
 strutil/src/Makefile.in
@@ -4100,6 +4127,7 @@ strvoip/scripts/depcomp
 strvoip/scripts/install-sh
 strvoip/scripts/ltmain.sh
 strvoip/scripts/missing
+strvoip/scripts/speccommon.in
 strvoip/scripts/texinfo.tex
 strx25/ABOUT-NLS
 strx25/doc/manual/strx25.info
@@ -4163,6 +4191,7 @@ strx25/po/Rules-quot
 strx25/po/strx25.pot
 strx25/scripts/config.rpath
 strx25/scripts/ltmain.sh
+strx25/scripts/speccommon.in
 strx25/src/mibs/.index
 strx25/src/snmp/makestubs
 strx25/src/snmp/mibs/.index
@@ -4268,6 +4297,7 @@ strxnet/scripts/install-sh
 strxnet/scripts/ltmain.sh
 strxnet/scripts/missing
 strxnet/scripts/mkinstalldirs
+strxnet/scripts/speccommon.in
 strxnet/scripts/texinfo.tex
 strxnet/src/include/Makefile.in
 strxnet/src/Makefile.in
@@ -4373,6 +4403,7 @@ strxns/scripts/depcomp
 strxns/scripts/install-sh
 strxns/scripts/ltmain.sh
 strxns/scripts/missing
+strxns/scripts/speccommon.in
 strxns/scripts/texinfo.tex
 strxns/src/include/Makefile.in
 strxns/src/lib/libdlpi/.cvsignore

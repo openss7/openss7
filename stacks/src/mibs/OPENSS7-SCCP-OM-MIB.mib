@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SCCP-OM-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.2 $) $Date: 2008-12-14 12:55:57 $
+-- @(#) $RCSfile: OPENSS7-SCCP-OM-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2008-12-24 13:08:29 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-14 12:55:57 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-24 13:08:29 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SCCP-OM-MIB.mib,v $
+-- Revision 0.9.2.3  2008-12-24 13:08:29  brian
+-- - building ss7confd
+--
 -- Revision 0.9.2.2  2008-12-14 12:55:57  brian
 -- - working up mibs
 --
@@ -65,8 +68,10 @@ OPENSS7-SCCP-OM-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32
 	FROM SNMPv2-SMI
-    MODULE-COMPLIANCE, InstancePointer, TimeStamp, TimeInterval
+    TEXTUAL-CONVENTION, InstancePointer, TimeStamp, TimeInterval
 	FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+	FROM SNMPv2-CONF
     PerfCurrentCount, PerfIntervalCount
 	FROM PerfHist-TC-MIB
     HCPerfIntervalThreshold, HCPerfValidIntervals
@@ -361,10 +366,15 @@ sccpOmCapabilities	OBJECT IDENTIFIER ::= { sccpOmConformance 3 }
 -- |  |  |__( 9) sccpOmTimeStamp
 -- |  |  |__(10) sccpOm5MinMaxIntervals
 -- |  |  |__(11) sccpOm15MinMaxIntervals
+-- |  |  |
+-- |  |  |__(12) sccpOmpDefault
+-- |  |  |__(13) sccpOmNrOfSubLevelsDefault
+-- |  |  |__(13) sccpOmNrOfRestrictionLevelsDefault
 -- |  |
 -- |  |__(3) sccpOmNotifs
 -- |  |  |__( 1) sccpOmDuration
 -- |  |  |__( 2) sccpOmSsn
+-- |  |  |__( 3) sccpOmSyntaxErrorType
 -- |  |
 -- |  |__(4) sccpOmOids
 -- |
@@ -389,6 +399,234 @@ sccpOmCapabilities	OBJECT IDENTIFIER ::= { sccpOmConformance 3 }
 --    |  |__(14) sccpOmSccpUnavailableGroup
 --    |
 --    |__(3) sccpOmCapabilities
+
+-- =====================================================================
+-- TEXTUAL CONVENTIONS
+-- =====================================================================
+
+SccpSyntaxErrorList ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2 the type of syntax error encountered."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.SccpSyntaxErrorList."
+    SYNTAX INTEGER {
+	unknownMessageType(0),
+	invalidValueOfProtocolClass(1),
+	invalidValueOfGTI(2),
+	invalidValueForEncodingScheme(3),
+	invalidParameterLength(4),
+	invalidPointerToOptionalParameter(5),
+	optionalParameterToLong(6),
+	pointerInconsistentWithLengths(7),
+	incompatibleAddressLength(8),
+	expectedSSNnotFound(9) }
+
+SccpCongestionLevel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2 the level of congestion."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.CongestionLevel."
+    SYNTAX INTEGER
+
+SccpUpperLimitForSegmentation ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the upper limit for segmentation."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.UpperLimitForSegmentation."
+    SYNTAX INTEGER
+
+SccpSSN ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the subsystem number."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.SSN."
+    SYNTAX INTEGER (0..255)
+
+SccpSharingMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the sharing mode for replicated subsystems."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.SharingMode."
+    SYNTAX INTEGER {
+	solitary(0),
+	dupliDominant(1),
+	dupliReplacement(2),
+	dupliLoadShared(3) }
+
+SccpVersion ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the SCCP version.  This is a PrintableString from 
+	 ASN.1."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.SccpVersion."
+    SYNTAX OCTET STRING
+
+SccpRSLM ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the restriction sub-level parameter RLSm.  Objects 
+	 with this textual convention in thier SYNTAX clause model the 
+	 restriction sub-level parameter RSLm as defined in 5.2.4/Q.714."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.RSLM.
+	 ITU-T Q.714 (05/2001) Clause 5.2.4."
+    SYNTAX INTEGER
+
+SccpRLM ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the restriction level parameter RLm.  Objects with 
+	 this textual convention in their SYNTAX clause model the 
+	 restriction level parameter RLm as defined in 5.2.4/Q.714."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.RLM.
+	 ITU-T Q.714 (05/2001) Clause 5.2.4."
+    SYNTAX INTEGER
+
+SccpP ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the congestion control parameter P.  Objects with this 
+	 textual convention in their SYNTAX clause model the congestion 
+	 control parameter P, as described in 5.2.7/Q.714.
+	 
+	 Objects with this textual convention in their SYNTAX clause 
+	 have a default value equal to the sccpOmpDefault value, which 
+	 defaults to 8."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.P.
+	 ITU-T Q.714 (05/2001) Clause 5.2.7."
+    SYNTAX INTEGER
+
+SccpNSRVT ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the NSRVT parameter.  Objects with this textual 
+	 convention in their SYNTAX clause modle the NSRVT parameter 
+	 described in 3.2.2.5/Q.753."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.NSRVT.
+	 ITU-T Q.753 Clause 3.2.2.5."
+    SYNTAX INTEGER
+
+SccpNrOfSubLevels ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the congestion control parameter M.  Objects with this 
+	 textual convention in their SYNTAX clause model the congestion 
+	 control parameter M as described in 5.2.7/Q.714.
+	 
+	 Objects with this textual convention in their SYNTAX clause 
+	 have a default value equal to the sccpOmNrOfSubLevelsDefault 
+	 value, which defaults to 4."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.NrOfSubLevels.
+	 ITU-T Q.714 (05/2001) Clause 5.2.7."
+    SYNTAX INTEGER
+
+SccpNrOfRestrictionLevels ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the congestion control parameter N.  Objects with this 
+	 textual convention in their SYNTAX clause model the congestion 
+	 control parameter N as described in 5.2.7/Q.714.
+
+	 Objects with this textual convention in their SYNTAX clause 
+	 have a default value equal to the 
+	 sccpOmNrOfRestrictionLevelsDefault value, which default to 8."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.NrOfRestrictionLevels.
+	 ITU-T Q.714 (05/2001) Clause 5.2.7."
+    SYNTAX INTEGER
+
+SccpGtTranslationType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the global title translation type.  Objects with this 
+	 textual convention in their SYNTAX clause model the global 
+	 title translation type as an octet string of zero or one octet.  
+	 When the size is one octet, the value of the octet is as 
+	 follows: unknown(0), iTCC(1), genericNumberingPlan(14), 
+	 iEESS(17).  When the size is zero octets, the translation type 
+	 is not use or no overwrite is specified."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.GtTranslationType."
+    SYNTAX OCTET STRING (SIZE(0..1))
+
+SccpGtNumberingPlan ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the global title numbering plan.  Objects with this 
+	 textual convention in their SYNTAX clause model the global 
+	 title number plan as an octet string of zero or one octet.  
+	 When the size is one octet, the value of the octet is as 
+	 follows: unknown(0), iSDNTNP(1), genericNumberingPlan(2), 
+	 dNP(3), tNP(4), mMNP(5), lMNP(6), iSDNMNP(7), 
+	 privateNumberingPlan(14).  When the size is zero octets, the 
+	 number plan is not used or no overwrite is specified."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) 
+	    SCCPDefinedTypesModule.GtNumberingPlan."
+    SYNTAX OCTET STRING (SIZE(0..1))
+
+SccpGtNatureOfAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the global title nature of addresss.  Objects with 
+	 this textual convention in their SYNTAX clause model the global 
+	 title nature of address as a octet string of zero or one octet.  
+	 When the size is one octet, the value of the octet is as 
+	 follows: unknown(0), subscriber(1), national(3), 
+	 international(4).  When the size is zero octets, the nature of 
+	 address is not used or no overwrite is specified."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) 
+	    SCCPDefinedTypesModule.GtNatureOfAddress."
+    SYNTAX OCTET STRING (SIZE(0..1))
+
+SccpGtEncodingScheme ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T 
+	 Q.751.2, the global title encoding scheme.  Objects with 
+	 this textual convention in their SYNTAX clause model the global 
+	 title encoding scheme as a octet string of zero or one octet.  
+	 When the size is one octet, the value of the octet is as 
+	 follows: unknown(0), bCDODD(1), bCDEVEN(2), 
+	 nationalSpecific(3).  When the size is zero octets, the 
+	 encoding scheme is not used or no overwrite is specified."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) 
+	    SCCPDefinedTypesModule.GtNatureOfAddress."
+    SYNTAX OCTET STRING (SIZE(0..1))
+
+
+
 
 -- =====================================================================
 --
@@ -606,6 +844,9 @@ sccpOm15minSsnReport NOTIFICATION-TYPE
 -- 8.12 Subsystem allowed message received
 -- subsystemProhibited qualityOfServiceAlarm Cleared
 
+
+-- =====================================================================
+
 sccpOmErrorsTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpOmErrorsEntry
     MAX-ACCESS not-accessible
@@ -670,33 +911,38 @@ sccpOmErrorsEntry OBJECT-TYPE
 	    }
     ::= { sccpOmErrorsTable 1 }
 
+-- NOTES: Q.751.2 says that most of these are per sclc (which shares 
+-- sccpNetworkEntityId in our model); however, it shows 
+-- segmentationImpossibleData and subsystemProhibitedData MOCs as 
+-- contained by sccpAccessPoint MOC.
+
 SccpOmErrorsEntry ::=
     SEQUENCE {
 	-- Obligatory 1st & Int. and 15 min
-	sccpOmNoTranslatorForAddress		PerfCurrentCount,
-	sccpOmNoRuleForAddress			PerfCurrentCount,
-	sccpOmPointCodeNotAvailable		PerfCurrentCount,
-	sccpOmPointCodeCongested		PerfCurrentCount,
-	sccpOmSubsystemUnavailable		PerfCurrentCount,
-	sccpOmSubsystemCongested		PerfCurrentCount,
-	sccpOmUnequippedSubsystem		PerfCurrentCount,
-	sccpOmSyntaxErrorDetected		PerfCurrentCount,
-	sccpOmRoutingFailure			PerfCurrentCount,
-	sccpOmReassemblyTimeOut			PerfCurrentCount,
-	sccpOmSegmentOutOfOrder			PerfCurrentCount,
-	sccpOmNoReassemblySpace			PerfCurrentCount,
-	sccpOmHopCounterViolation		PerfCurrentCount,
-	sccpOmTooLargeForSegmentation		PerfCurrentCount,
-	sccpOmReleaseFailure			PerfCurrentCount,
-	sccpOmInactivityTimerExpiry		PerfCurrentCount,
-	sccpOmProviderInitiatedReset		PerfCurrentCount,
-	sccpOmProviderInitiatedRelease		PerfCurrentCount,
+	sccpOmNoTranslatorForAddress		PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmNoRuleForAddress			PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmPointCodeNotAvailable		PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmPointCodeCongested		PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmSubsystemUnavailable		PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmSubsystemCongested		PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmUnequippedSubsystem		PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmSyntaxErrorDetected		PerfCurrentCount, -- (scrc)
+	sccpOmRoutingFailure			PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmReassemblyTimeOut			PerfCurrentCount, -- reassemblyErrorData (sclc)
+	sccpOmSegmentOutOfOrder			PerfCurrentCount, -- reassemblyErrorData (sclc)
+	sccpOmNoReassemblySpace			PerfCurrentCount, -- reassemblyErrorData (sclc)
+	sccpOmHopCounterViolation		PerfCurrentCount, -- routingFailureData (scrc)
+	sccpOmTooLargeForSegmentation		PerfCurrentCount, -- (sccpAccessPoint)
+	sccpOmReleaseFailure			PerfCurrentCount, -- (sclc ^Q.751.2)
+	sccpOmInactivityTimerExpiry		PerfCurrentCount, -- (sclc ^Q.751.2)
+	sccpOmProviderInitiatedReset		PerfCurrentCount, -- (sclc ^Q.751.2)
+	sccpOmProviderInitiatedRelease		PerfCurrentCount, -- (sclc ^Q.751.2)
 	-- Non-Obligatory 1st & Int. and 15 min
-	sccpOmNoSegmentationSupport		PerfCurrentCount,
+	sccpOmNoSegmentationSupport		PerfCurrentCount, -- segmentationErrorData (sclc)
 	-- Obligatory 1st & Int. and 15 min
-	sccpOmSegmentationFailure		PerfCurrentCount,
+	sccpOmSegmentationFailure		PerfCurrentCount, -- segmentationErrorData (sclc)
 	-- Non-Obligatory 1st & Int. and 15 min
-	sccpOmReassemblyFailure			PerfCurrentCount,
+	sccpOmReassemblyFailure			PerfCurrentCount, -- reassemblyErrorData (sclc)
 	sccpOmErrors5MinValidIntervals		HCPerfValidIntervals,
 	sccpOmErrors15MinValidIntervals		HCPerfValidIntervals
    }
@@ -716,11 +962,28 @@ sccpOmNoTranslatorForAddress OBJECT-TYPE
 	 address is unknown to the translation function.  The first 
 	 event within an interval can generate a qualityOfServiceAlarm 
 	 with probable cause noTranslatorForAddress and a severity of 
-	 Major, Minor or Warning."
+	 Major, Minor or Warning.
+	 
+	 This attribute represents measurement Q.752/7.1. It counts the 
+	 failed Global Title translations that result from the fact that 
+	 the type of address is unknown to the translation function. 
+	 This measurement is only required at SCCP nodes with global 
+	 title translation capabilities. See also 2.4/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.1).
-	 ITU-T Q.752 (1997) Table 7 (7.1).
-	 ITU-T Q.752.2 (06/1997) noTranslatorForAddress."
+	 ITU-T Q.752 (06/97) Table 7 (7.1).
+	 ITU-T Q.751.2 (06/97) noTranslatorForAddress ProbableCause.
+	 ITU-T Q.751.2 (06/97) noTranslForNatureAddress A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.4."
     ::= { sccpOmErrorsEntry 1 }
 
 sccpOmNoRuleForAddress OBJECT-TYPE
@@ -736,11 +999,29 @@ sccpOmNoRuleForAddress OBJECT-TYPE
 	 although the type is known to the translation function.  The 
 	 first event within an interval can generate a 
 	 qualityOfServiceAlarm with probable cause noRuleForAddress and 
-	 a severity of Major, Minor or Warning."
+	 a severity of Major, Minor or Warning.
+	 
+	 This attribute represents measurement Q.752/7.2. It counts the 
+	 failed Global Title translations that result from the fact that 
+	 although the type of address is known to the translation 
+	 function, this specific address is not. This measurement is 
+	 only required at SCCP nodes with global title translation 
+	 capabilities. See also 2.4/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.2).
-	 ITU-T Q.752 (1997) Table 7 (7.2).
-	 ITU-T Q.751.2 (06/1997) noRuleForAddress."
+	 ITU-T Q.752 (06/97) Table 7 (7.2).
+	 ITU-T Q.751.2 (06/97) noRuleForAddress ProbableCause.
+	 ITU-T Q.751.2 (06/97) noTranslForSpecificAddress A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.4."
     ::= { sccpOmErrorsEntry 2 }
 
 sccpOmPointCodeNotAvailable OBJECT-TYPE
@@ -757,11 +1038,25 @@ sccpOmPointCodeNotAvailable OBJECT-TYPE
 	 MTP and/or SCCP.  The first event within an interval can 
 	 generate a qualityOfServiceAlarm with probable cause 
 	 pointCodeNotAvailable and a severity of Major, Minor or 
-	 Warning."
+	 Warning.
+	 
+	 This attribute represents measurement Q.752/7.3. See also 
+	 2.4/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.3).
-	 ITU-T Q.752 (1997) Table 7 (7.3).
-	 ITU-T Q.751.2 (06/1997) pointCodeNotAvailable."
+	 ITU-T Q.752 (06/97) Table 7 (7.3).
+	 ITU-T Q.751.2 (06/97) pointCodeNotAvailable ProbableCause.
+	 ITU-T Q.751.2 (06/97) noPointCodeAvailable A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.4."
     ::= { sccpOmErrorsEntry 3 }
 
 sccpOmPointCodeCongested OBJECT-TYPE
@@ -777,11 +1072,25 @@ sccpOmPointCodeCongested OBJECT-TYPE
 	 concerned destination address, due to congestion in MTP and/or 
 	 SCCP.  The first event within an interval can generate a 
 	 qualityOfServiceAlarm with probable cause pointCodeCongested a 
-	 severity of Major, Minor or Warning."
+	 severity of Major, Minor or Warning.
+	 
+	 This attribute represents measurement Q.752/7.4. See also 
+	 2.4/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.4).
-	 ITU-T Q.752 (1997) Table 7 (7.4).
-	 ITU-T Q.751.2 (06/1997) pointCodeCongested."
+	 ITU-T Q.752 (06/97) Table 7 (7.4).
+	 ITU-T Q.751.2 (06/97) pointCodeCongested ProbableCause.
+	 ITU-T Q.751.2 (06/97) networkCongestion A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.4."
     ::= { sccpOmErrorsEntry 4 }
 
 sccpOmSubsystemUnavailable OBJECT-TYPE
@@ -798,11 +1107,25 @@ sccpOmSubsystemUnavailable OBJECT-TYPE
 	 the SCCP subsystem.  The first event within an interval can 
 	 generate a qualityOfServiceAlarm with probable cause 
 	 subsystemUnavailable and a severity of Major, Minor or 
-	 Warning."
+	 Warning.
+	 
+	 This attribute represents measurement Q.752/7.5. See also 
+	 2.4/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.5).
-	 ITU-T Q.752 (1997) Table 7 (7.5).
-	 ITU-T Q.751.2 (06/1997) subsystemUnavailable."
+	 ITU-T Q.752 (06/97) Table 7 (7.5).
+	 ITU-T Q.751.2 (06/97) subsystemUnavailable ProbableCause.
+	 ITU-T Q.751.2 (06/97) subSystemFailure A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.4."
     ::= { sccpOmErrorsEntry 5 }
 
 sccpOmSubsystemCongested OBJECT-TYPE
@@ -818,11 +1141,25 @@ sccpOmSubsystemCongested OBJECT-TYPE
 	 concerned destination address, due to congestion in the SCCP 
 	 subsystem.  The first event within an interval can generate a 
 	 qualityOfServiceAlarm with probable cause subsystemCongested 
-	 and a severity of Major, Minor or Warning."
+	 and a severity of Major, Minor or Warning.
+	 
+	 This attribute represents measurement Q.752/7.6 (this 
+	 measurement is for further study). See also 2.4/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.6).
-	 ITU-T Q.752 (1997) Table 7 (7.6).
-	 ITU-T Q.751.2 (06/1997) subsystemCongested."
+	 ITU-T Q.752 (06/97) Table 7 (7.6).
+	 ITU-T Q.751.2 (06/97) subsystemCongested ProbableCause.
+	 ITU-T Q.751.2 (06/97) subSystemCongestion A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.4."
     ::= { sccpOmErrorsEntry 6 }
 
 sccpOmUnequippedSubsystem OBJECT-TYPE
@@ -837,11 +1174,25 @@ sccpOmUnequippedSubsystem OBJECT-TYPE
 	 unequipped in the local node.  The first event within an 
 	 interval can generate a qualityOfServiceAlarm with probable 
 	 cause unequippedSubsystem and a severity of Major, Minor or 
-	 Warning."
+	 Warning.
+	 
+	 This attribute represents measurement Q.752/7.7. See also 
+	 2.4/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.7).
-	 ITU-T Q.752 (1997) Table 7 (7.7).
-	 ITU-T Q.751.2 (06/1997) unequippedSubsystem."
+	 ITU-T Q.752 (06/97) Table 7 (7.7).
+	 ITU-T Q.751.2 (06/97) unequippedSubsystem ProbableCause.
+	 ITU-T Q.751.2 (06/97) userUnequipped A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.4."
     ::= { sccpOmErrorsEntry 7 }
 
 sccpOmSyntaxErrorDetected OBJECT-TYPE
@@ -855,11 +1206,24 @@ sccpOmSyntaxErrorDetected OBJECT-TYPE
 	 syntax errors are detected in the SCCP message.  The first 
 	 event in an interval can generate a qualityOfServiceAlarm with 
 	 probable cause syntaxErrorDetected and a severity of Major, 
-	 Minor or Warning."
+	 Minor or Warning.
+	 
+	 This attribute represents measurement Q.752/7.8: the syntax 
+	 errors as identified in section 3.10/Q.714. See also 
+	 4.3/Q.714.
+	 
+	 This managed object class contains the obligated syntax error 
+	 data. The preferred granularityPeriod is 30 minutes. The 
+	 attribute is read-only."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.8).
-	 ITU-T Q.752 (1997) Table 7 (7.8).
-	 ITU-T Q.751.2 (06/1997) syntaxErrorDetected."
+	 ITU-T Q.752 (06/97) Table 7 (7.8).
+	 ITU-T Q.751.2 (06/97) syntaxErrorDetected ProbableCause.
+	 ITU-T Q.751.2 (06/97) sccpSyntaxErrorList A.
+	 ITU-T Q.751.2 (06/97) sccpSyntaxErrorData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-sccpSyntaxErrorData NB.
+	 ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.SccpSyntaxErrorList.
+	 ITU-T Q.714 (05/2001) Clause 3.10 and 4.3."
     ::= { sccpOmErrorsEntry 8 }
 
 sccpOmRoutingFailure OBJECT-TYPE
@@ -874,11 +1238,25 @@ sccpOmRoutingFailure OBJECT-TYPE
 	 fails for no reason or an unqualified reason.  The first event 
 	 within an interval can generate a qualityOfServiceAlarm with 
 	 probable cause routineFailureNoReasonOrUnqualified and a 
-	 severity of Major, Minor or Warning."
+	 severity of Major, Minor or Warning.
+	 
+	 This attribute represents measurement Q.752/7.9. See also 
+	 2.4/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.9).
-	 ITU-T Q.752 (1997) Table 7 (7.9).
-	 ITU-T Q.751.2 (06/1997) routingFailureNoReasonOrUnqualified."
+	 ITU-T Q.752 (06/97) Table 7 (7.9).
+	 ITU-T Q.751.2 (06/97) routingFailureNoReasonOrUnqualified ProbableCause.
+	 ITU-T Q.751.2 (06/97) unknownOrUnqualifiedRoutingFailure A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.4."
     ::= { sccpOmErrorsEntry 9 }
 
 sccpOmReassemblyTimeOut OBJECT-TYPE
@@ -893,11 +1271,26 @@ sccpOmReassemblyTimeOut OBJECT-TYPE
 	 expires.  These events occur only at SCCP nodes where SCCP 
 	 segmentation and reassembly is supported.  The first event 
 	 within an interval can generate a qualityOfServiceAlarm with 
-	 probable cause reassemblyTimeOut."
+	 probable cause reassemblyTimeOut.
+	 
+	 This attribute represents measurement Q.752/7.10. It counts the 
+	 failed reassembly processes caused by the expiration of the 
+	 reassembly timer. See also 4.1.1.2.3.2/Q.714.
+	 
+	 This managed object class contains the reassembly error data. 
+	 The preferred granularityPeriod is 30 minutes. The attributes 
+	 are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the sclc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.10).
-	 ITU-T Q.752 (1997) Table 7 (7.10).
-	 ITU-T Q.751.2 (06/1997) reassemblyTimeOut."
+	 ITU-T Q.752 (06/97) Table 7 (7.10).
+	 ITU-T Q.751.2 (06/97) reassemblyTimeOut ProbableCause.
+	 ITU-T Q.751.2 (06/97) reassemblyTimerExpired A.
+	 ITU-T Q.751.2 (06/97) reassemblyErrorData MOC.
+	 ITU-T Q.751.2 (06/97) sclc-reassemblyErrorData NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1.1.2.3.2."
     ::= { sccpOmErrorsEntry 10 }
 
 sccpOmSegmentOutOfOrder OBJECT-TYPE
@@ -913,11 +1306,26 @@ sccpOmSegmentOutOfOrder OBJECT-TYPE
 	 events is occur only at SCCP nodes where SCCP segmentation and 
 	 reassebly is supported.  The first event within an interval can 
 	 generate a qualityOfServiceAlarm with probable cause 
-	 segmentOutOfOrder."
+	 segmentOutOfOrder.
+	 
+	 This attribute represents measurement Q.752/7.11. It counts the 
+	 data segments that are not received in sequence. See also 
+	 4.1.1.2.3.2/Q.714.
+	 
+	 This managed object class contains the reassembly error data. 
+	 The preferred granularityPeriod is 30 minutes. The attributes 
+	 are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the sclc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.11).
-	 ITU-T Q.752 (1997) Table 7 (7.11).
-	 ITU-T Q.751.2 (06/1997) segmentOutOfOrder."
+	 ITU-T Q.752 (06/97) Table 7 (7.11).
+	 ITU-T Q.751.2 (06/97) segmentOutOfOrder ProbableCause.
+	 ITU-T Q.751.2 (06/97) segmentReceivedOutOfSequence A.
+	 ITU-T Q.751.2 (06/97) reassemblyErrorData MOC.
+	 ITU-T Q.751.2 (06/97) sclc-reassemblyErrorData NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1.1.2.3.2."
     ::= { sccpOmErrorsEntry 11 }
 
 sccpOmNoReassemblySpace OBJECT-TYPE
@@ -933,11 +1341,26 @@ sccpOmNoReassemblySpace OBJECT-TYPE
 	 These events occur only at SCCP nodes where SCCP segmentation 
 	 and reassembly is supported.  The first event within an 
 	 interval can generate a qualityOfServiceAlarm with a probable 
-	 cause of noReassemblySpace."
+	 cause of noReassemblySpace.
+	 
+	 This attribute represents measurement Q.752/7.12. It counts the 
+	 failed reassembly processes that result from a lack of 
+	 resources. See also 4.1.1.2.3.4/Q.714.
+	 
+	 This managed object class contains the reassembly error data. 
+	 The preferred granularityPeriod is 30 minutes. The attributes 
+	 are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the sclc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.12).
-	 ITU-T Q.752 (1997) Table 7 (7.12).
-	 ITU-T Q.751.2 (06/1997) noReassemblySpace."
+	 ITU-T Q.752 (06/97) Table 7 (7.12).
+	 ITU-T Q.751.2 (06/97) noReassemblySpace ProbableCause.
+	 ITU-T Q.751.2 (06/97) noReassemblyResources A.
+	 ITU-T Q.751.2 (06/97) reassemblyErrorData MOC.
+	 ITU-T Q.751.2 (06/97) sclc-reassemblyErrorData NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1.1.2.3.4."
     ::= { sccpOmErrorsEntry 12 }
 
 sccpOmHopCounterViolation OBJECT-TYPE
@@ -954,11 +1377,26 @@ sccpOmHopCounterViolation OBJECT-TYPE
 	 only part of specific SCCP messages: XUDT, XUDTS, CR, LUDT and 
 	 LDUTS.  The first event within an interval can generate a 
 	 communicationsAlarm with a probable cause of 
-	 hopCounterViolation and a severity of Major, Minor or Warning."
+	 hopCounterViolation and a severity of Major, Minor or Warning.  
+	 
+	 This attribute represents measurement Q.752/7.13. It counts the 
+	 routing failures caused by the expiration of the Hop Counter. 
+	 See also 2.3.1.3/Q.714.
+	 
+	 This managed object class contains the obligated routing 
+	 failure data. The preferred granularityPeriod is 30 minutes. 
+	 The attributes are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the scrc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 7 (7.13).
-	 ITU-T Q.752 (1997) Table 7 (7.13).
-	 ITU-T Q.751.2 (06/1997) hopCounterViolation."
+	 ITU-T Q.752 (06/97) Table 7 (7.13).
+	 ITU-T Q.751.2 (06/97) hopCounterViolation ProbableCause.
+	 ITU-T Q.751.2 (06/97) violationOfHopCounter A.
+	 ITU-T Q.751.2 (06/97) routingFailureData MOC.
+	 ITU-T Q.751.2 (06/97) scrc-routingFailureData NB.
+	 ITU-T Q.714 (05/2001) Clause 2.3.1.3."
     ::= { sccpOmErrorsEntry 13 }
 
 sccpOmTooLargeForSegmentation OBJECT-TYPE
@@ -975,10 +1413,25 @@ sccpOmTooLargeForSegmentation OBJECT-TYPE
 	 first event within an interval can generate a 
 	 qualityOfServiceAlarm with a probable cause of 
 	 tooLargeForSegmentation.  This operational measurement is not 
-	 specified by ANSI T1.116.2."
+	 specified by ANSI T1.116.2.
+	 
+	 This attribute represents measurement Q.752/7.14. It counts the 
+	 segmentation errors caused by user data that is too large to be 
+	 segmented. See also 4.1.1.1.1/Q.714.
+	 
+	 This managed object class contains segmentation error data. The 
+	 preferred granularityPeriod is 30 minutes. The attributes are 
+	 read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the sccpAccessPoint managed object 
+	 class. An attribute is incremented if a qualityofServiceAlarm 
+	 happens with the corresponding value for the probableCause."
     REFERENCE
-	"ITU-T Q.752 (1997) Table 7 (7.14).
-	 ITU-T Q.751.2 (06/1997) tooLargeForSegmentation."
+	"ITU-T Q.752 (06/97) Table 7 (7.14).
+	 ITU-T Q.751.2 (06/97) tooLargeForSegmentation ProbableCause.
+	 ITU-T Q.751.2 (06/97) messageTooLarge A.
+	 ITU-T Q.751.2 (06/97) segmentationImpossibleData MOC.
+	 ITU-T Q.751.2 (06/97) sccpAccessPoint-segmentationImpossibleData NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1.1.1.1."
     ::= { sccpOmErrorsEntry 14 }
 
 sccpOmReleaseFailure OBJECT-TYPE
@@ -994,8 +1447,8 @@ sccpOmReleaseFailure OBJECT-TYPE
 	 oriented protocol classes.  This operational measurement is not 
 	 specified by ANSI T1.116.2."
     REFERENCE
-	"ITU-T Q.752 (1997) Table 7 (7.15).
-	 ITU-T Q.751.2 (06/1997) ss7OnOccurEvent."
+	"ITU-T Q.752 (06/97) Table 7 (7.15).
+	 ITU-T Q.751.2 (06/97) ss7OnOccurEvent."
     ::= { sccpOmErrorsEntry 15 }
 
 sccpOmInactivityTimerExpiry OBJECT-TYPE
@@ -1010,8 +1463,8 @@ sccpOmInactivityTimerExpiry OBJECT-TYPE
 	 SCCP nodes that suport connection oriented protocol classes.  
 	 This operational measurement is not specified by ANSI T1.116.2."
     REFERENCE
-	"ITU-T Q.752 (1997) Table 7 (7.16).
-	 ITU-T Q.751.2 (06/1997) ss7OnOccurEvent."
+	"ITU-T Q.752 (06/97) Table 7 (7.16).
+	 ITU-T Q.751.2 (06/97) ss7OnOccurEvent."
     ::= { sccpOmErrorsEntry 16 }
 
 sccpOmProviderInitiatedReset OBJECT-TYPE
@@ -1027,8 +1480,8 @@ sccpOmProviderInitiatedReset OBJECT-TYPE
 	 oriented protocol class 3.  This operational measurement is not 
 	 specified in ANSI T1.116.2."
     REFERENCE
-	"ITU-T Q.752 (1997) Table 7 (7.17).
-	 ITU-T Q.751.2 (06/1997) ss7OnOccurEvent."
+	"ITU-T Q.752 (06/97) Table 7 (7.17).
+	 ITU-T Q.751.2 (06/97) ss7OnOccurEvent."
     ::= { sccpOmErrorsEntry 17 }
 
 sccpOmProviderInitiatedRelease OBJECT-TYPE
@@ -1044,8 +1497,8 @@ sccpOmProviderInitiatedRelease OBJECT-TYPE
 	 oriented protocol classes.  This operational measurement is not 
 	 specified in ANSI T1.116.2."
     REFERENCE
-	"ITU-T Q.752 (1997) Table 7 (7.18).
-	 ITU-T Q.751.2 (06/1997) ss7OnOccurEvent."
+	"ITU-T Q.752 (06/97) Table 7 (7.18).
+	 ITU-T Q.751.2 (06/97) ss7OnOccurEvent."
     ::= { sccpOmErrorsEntry 18 }
 
 -- Non-Obligatory 1st & Int. and 15 min
@@ -1066,9 +1519,23 @@ sccpOmNoSegmentationSupport OBJECT-TYPE
 	 during an interval may generate a qualityOfServiceAlarm with 
 	 probable cause noSegmentationSupport.
 
-	 ANSI T1.116.2/2000 Table 7 does not include this measurement."
+	 ANSI T1.116.2/2000 Table 7 does not include this measurement.
+	 
+	 This attribute represents measurement Q.752/7.19. See also 
+	 4.1.1.1/Q.714.
+	 
+	 This managed object class contains segmentation error data. The 
+	 preferred granularityPeriod is 30 minutes. The attributes are 
+	 read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the sclc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
-	"ITU-T Q.752 (1997) Table 7 (7.19)."
+	"ITU-T Q.752 (06/97) Table 7 (7.19).
+	 ITU-T Q.751.2 (06/97) segmentationNotSupported A.
+	 ITU-T Q.751.2 (06/97) segmentationErrorData MOC.
+	 ITU-T Q.751.2 (06/97) sclc-segmentationErrorData NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1.1.1."
     ::= { sccpOmErrorsEntry 19 }
 
 -- Obligatory 1st & Int. and 15 min
@@ -1087,10 +1554,24 @@ sccpOmSegmentationFailure OBJECT-TYPE
 	 reassembly.  The first event within an interval can generate a 
 	 qualityOfServiceAlarm with probable cause segmentationFailure.  
 	 This operational measurement, and the corresponding quality of 
-	 service alarm, are not specified in ANSI T1.116.2."
+	 service alarm, are not specified in ANSI T1.116.2.
+	 
+	 This attribute represents measurement Q.752/7.20. See also 
+	 4.1.1.1/Q.714.
+	 
+	 This managed object class contains segmentation error data. The 
+	 preferred granularityPeriod is 30 minutes. The attributes are 
+	 read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the sclc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
-	"ITU-T Q.752 (1997) Table 7 (7.20).
-	 ITU-T Q.751.2 (06/1997) segmentationFailure."
+	"ITU-T Q.752 (06/97) Table 7 (7.20).
+	 ITU-T Q.751.2 (06/97) segmentationFailure ProbableCause.
+	 ITU-T Q.751.2 (06/97) segmentationFailed A.
+	 ITU-T Q.751.2 (06/97) segmentationErrorData MOC.
+	 ITU-T Q.751.2 (06/97) sclc-segmentationErrorData NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1.1.1."
     ::= { sccpOmErrorsEntry 20 }
 
 -- Non-Obligatory 1st & Int. and 15 min
@@ -1109,9 +1590,23 @@ sccpOmReassemblyFailure OBJECT-TYPE
 	 event during an interval may generate a qualityOfServiceAlarm 
 	 with probable cause reassemblyFailure.
 
-	 ANSI T1.116.2/2000 Table 7 does not include this measurement."
+	 ANSI T1.116.2/2000 Table 7 does not include this measurement.
+	 
+	 This attribute represents measurement Q.752/7.21. See also 
+	 4.1.1.1/Q.714.
+	 
+	 This managed object class contains the reassembly error data. 
+	 The preferred granularityPeriod is 30 minutes. The attributes 
+	 are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the sclc managed object class. An 
+	 attribute is incremented if a qualityofServiceAlarm happens 
+	 with the corresponding value for the probableCause."
     REFERENCE
-	"ITU-T Q.752 (1997) Table 7 (7.21)."
+	"ITU-T Q.752 (06/97) Table 7 (7.21).
+	 ITU-T Q.751.2 (06/97) reassemblyFailed A.
+	 ITU-T Q.751.2 (06/97) reassemblyErrorData MOC.
+	 ITU-T Q.751.2 (06/97) sclc-reassemblyErrorData NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1.1.1."
     ::= { sccpOmErrorsEntry 21 }
 
 sccpOmErrors5MinValidIntervals OBJECT-TYPE
@@ -1134,6 +1629,7 @@ sccpOmErrors15MinValidIntervals OBJECT-TYPE
     ::= { sccpOmErrorsEntry 23 }
 
 
+-- =====================================================================
 
 sccpOmMessageTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpOmMessageEntry
@@ -1190,7 +1686,7 @@ sccpOmMessageTable OBJECT-TYPE
 	 segmenting node to request the return optoin in the first 
 	 segment or in all.
 
-	 (ITU-T) THe quantity of CREF messages can give only an 
+	 (ITU-T) The quantity of CREF messages can give only an 
 	 indication of SCCP QoS, since the SCCP user is the most likely 
 	 generator of the CREF, rather than the SCCP.  Timeout of 
 	 establishment timers, reception of ERR or RLSD messages also 
@@ -1217,29 +1713,29 @@ sccpOmMessageEntry OBJECT-TYPE
 
 SccpOmMessageEntry ::=
     SEQUENCE {
-	sccpOmTotalMessagesHandled		PerfCurrentCount,
-	sccpOmTotalMessagesLocal		PerfCurrentCount,
-	sccpOmTotalMessagesGTT			PerfCurrentCount,
-	sccpOmUDTMessagesSent			PerfCurrentCount,
-	sccpOmUDTSMessagesSent			PerfCurrentCount,
-	sccpOmUDTMessagesReceived		PerfCurrentCount,
-	sccpOmUDTSMessagesReceived		PerfCurrentCount,
-	sccpOmCRMessagesSent			PerfCurrentCount,
-	sccpOmCREFMessagesSent			PerfCurrentCount,
-	sccpOmCRMessagesReceived		PerfCurrentCount,
-	sccpOmCREFMessagesReceived		PerfCurrentCount,
-	sccpOmRSRMessagesSent			PerfCurrentCount,
-	sccpOmRSRMessagesReceived		PerfCurrentCount,
-	sccpOmERRMessagesSent			PerfCurrentCount,
-	sccpOmERRMessagesReceived		PerfCurrentCount,
-	sccpOmXUDTMessagesSent			PerfCurrentCount,
-	sccpOmXUDTSMessagesSent			PerfCurrentCount,
-	sccpOmXUDTMessagesReceived		PerfCurrentCount,
-	sccpOmXUDTSMessagesReceived		PerfCurrentCount,
-	sccpOmLUDTMessagesSent			PerfCurrentCount,
-	sccpOmLUDTSMessagesSent			PerfCurrentCount,
-	sccpOmLUDTMessagesReceived		PerfCurrentCount,
-	sccpOmLUDTSMessagesReceived		PerfCurrentCount,
+	sccpOmTotalMessagesHandled		PerfCurrentCount, -- sccpMessagesCounts (scrc)
+	sccpOmTotalMessagesLocal		PerfCurrentCount, -- sccpMessagesCounts (scrc)
+	sccpOmTotalMessagesGTT			PerfCurrentCount, -- sccpMessagesCounts (scrc)
+	sccpOmUDTMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmUDTSMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmUDTMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmUDTSMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmCRMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmCREFMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmCRMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmCREFMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmRSRMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmRSRMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmERRMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmERRMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmXUDTMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmXUDTSMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmXUDTMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmXUDTSMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmLUDTMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmLUDTSMessagesSent			PerfCurrentCount, -- (scrc)
+	sccpOmLUDTMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmLUDTSMessagesReceived		PerfCurrentCount, -- (scrc)
 	sccpOmMessage5MinValidIntervals		HCPerfValidIntervals,
 	sccpOmMessage15MinValidIntervals	HCPerfValidIntervals
     }
@@ -1252,10 +1748,24 @@ sccpOmTotalMessagesHandled OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The total number of messages handled (from local or remote 
-	 subsystems), collected per SCCP on a 5- or 15-minute basis."
+	 subsystems), collected per SCCP on a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9.3: the total 
+	 number of messages handled from local or remote systems. It is 
+	 assumed that a message transiting an SCCP relay point is 
+	 counted only once. See also 2.3/Q.714.
+	 
+	 This measurement counts sccp messages as received by scrc. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes. The 
+	 total number of messages is independent from the fact whether 
+	 the message could be delivered or not."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 (Item 9.3).
-	 ITU-T Q.752 (1997) Table 9 (Item 9.3)."
+	 ITU-T Q.752 (06/97) Table 9 (Item 9.3).
+	 ITU-T Q.751.2 (06/97) messagesHandled A.
+	 ITU-T Q.751.2 (06/97) sccpMessagesCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-sccpMessagesCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 2.3."
     ::= { sccpOmMessageEntry 1 }
 
 sccpOmTotalMessagesLocal OBJECT-TYPE
@@ -1264,10 +1774,23 @@ sccpOmTotalMessagesLocal OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The total number of messages intended for local subsystems, 
-	 collected per SCCP on a 5- or 15-minute basis."
+	 collected per SCCP on a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9.4: the total 
+	 number of messages intended for local subsystems. See also 
+	 2.3/Q.714.
+	 
+	 This measurement counts sccp messages as received by scrc. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes. The 
+	 total number of messages is independent from the fact whether 
+	 the message could be delivered or not."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 (Item 9.4).
-	 ITU-T Q.752 (1997) Table 9 (Item 9.4)."
+	 ITU-T Q.752 (06/97) Table 9 (Item 9.4).
+	 ITU-T Q.751.2 (06/97) messagesForLocalSubsystems A.
+	 ITU-T Q.751.2 (06/97) sccpMessagesCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-sccpMessagesCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 2.3."
     ::= { sccpOmMessageEntry 2 }
 
 sccpOmTotalMessagesGTT OBJECT-TYPE
@@ -1276,10 +1799,26 @@ sccpOmTotalMessagesGTT OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The total number of messages requiring global title 
-	 translations, collected per SCCP on a 5- or 15-minute basis."
+	 translations, collected per SCCP on a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9.5: the total 
+	 number of messages that require global title translation. The 
+	 total number of messages is independent from the fact whether 
+	 the global title in the message could be translated or not. 
+	 This measurement is only required at SCCP nodes with global 
+	 title translation capabilities. See also 2.3/Q.714.
+	 
+	 This measurement counts sccp messages as received by scrc. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes. The 
+	 total number of messages is independent from the fact whether 
+	 the message could be delivered or not."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 (Item 9.5).
-	 ITU-T Q.752 (1997) Table 9 (Item 9.5)."
+	 ITU-T Q.752 (06/97) Table 9 (Item 9.5).
+	 ITU-T Q.751.2 (06/97) messagesRequiringGTTranslation A.
+	 ITU-T Q.751.2 (06/97) sccpMessagesCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-sccpMessagesCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 2.3."
     ::= { sccpOmMessageEntry 3 }
 
 sccpOmUDTMessagesSent OBJECT-TYPE
@@ -1289,10 +1828,20 @@ sccpOmUDTMessagesSent OBJECT-TYPE
     DESCRIPTION
 	"The number of UDT messages sent, collected per SCCP on a 5- or 
 	 15-minute basis.  ANSI T1.116.2/2000 specifies that this 
-	 measurement can be derived (from 9.6 and 9 bis.2)."
+	 measurement can be derived (from 9.6 and 9 bis.2).
+	 
+	 This attribute represents measurement Q.752/9bis.1: the total 
+	 number of UDT messages sent. See also 4.1/Q.714.
+	 
+	 This measurement counts the UDT messages sent. The preferred 
+	 granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.1).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.1)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.1).
+	 ITU-T Q.751.2 (06/97) udtMessagesSent A.
+	 ITU-T Q.751.2 (06/97) udtMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-udtMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1."
     ::= { sccpOmMessageEntry 4 }
 
 sccpOmUDTSMessagesSent OBJECT-TYPE
@@ -1301,10 +1850,20 @@ sccpOmUDTSMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of UDTS messages sent, collected per SCCP on a 5- or 
-	 15-minute basis."
+	 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.4: the total 
+	 number of UDTS messages sent. See also 4.2/Q.714.
+	 
+	 This measurement counts the UDTS messages sent. The preferred 
+	 granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.2).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.2)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.2).
+	 ITU-T Q.751.2 (06/97) udtsMessagesSent A.
+	 ITU-T Q.751.2 (06/97) udtsMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-udtsMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.2."
     ::= { sccpOmMessageEntry 5 }
 
 sccpOmUDTMessagesReceived OBJECT-TYPE
@@ -1314,10 +1873,20 @@ sccpOmUDTMessagesReceived OBJECT-TYPE
     DESCRIPTION
 	"The number of UDT messages received, collected per SCCP on a 5- 
 	 or 15-minute basis.  ANSI T.116.2/2000 specifies that this 
-	 measurement can be derived (from 9.7 and 9 bis.4)."
+	 measurement can be derived (from 9.7 and 9 bis.4).
+	 
+	 This attribute represents measurement Q.752/9bis.3: the total 
+	 number of UDT messages received. See also 4.1/Q.714.
+	 
+	 This measurement counts the UDT messages received. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.3).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.3)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.3).
+	 ITU-T Q.751.2 (06/97) udtMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) udtMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-udtMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1."
     ::= { sccpOmMessageEntry 6 }
 
 sccpOmUDTSMessagesReceived OBJECT-TYPE
@@ -1326,10 +1895,20 @@ sccpOmUDTSMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of UDTS messages received, collected per SCCP on a 
-	 5- or 15-minute basis."
+	 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.4: the total 
+	 number of UDTS messages sent. See also 4.2/Q.714.
+	 
+	 This measurement counts the UDTS messages received. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.4).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.4)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.4).
+	 ITU-T Q.751.2 (06/97) udtsMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) udtsMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-udtsMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.2."
     ::= { sccpOmMessageEntry 7 }
 
 sccpOmCRMessagesSent OBJECT-TYPE
@@ -1338,10 +1917,21 @@ sccpOmCRMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of CR messages sent to MTP plus ISDN-UP embedded 
-	 CRs, collected per SCCP on a 5- or 15-minute basis."
+	 CRs, collected per SCCP on a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.5: the total 
+	 number of CR messages sent. See also 3.1/Q.714.
+	 
+	 This measurement counts the CR messages sent to MTP plus 
+	 ISDN-UP embedded CRs.  The preferred granularityPeriods are 5 
+	 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.5).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.5)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.5).
+	 ITU-T Q.751.2 (06/97) crMessagesSent A.
+	 ITU-T Q.751.2 (06/97) crMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-crMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.1."
     ::= { sccpOmMessageEntry 8 }
 
 sccpOmCREFMessagesSent OBJECT-TYPE
@@ -1350,10 +1940,20 @@ sccpOmCREFMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of CREF messages sent to MTP, collected per SCCP on 
-	 a 5- or 15-minute basis."
+	 a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.6: the total 
+	 number of CREF messages sent. See also 3.2/Q.714.
+	 
+	 This measurement counts the CREF messages sent to MTP. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.6).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.6)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.6).
+	 ITU-T Q.751.2 (06/97) crefMessagesSent A.
+	 ITU-T Q.751.2 (06/97) crefMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-crefMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.2."
     ::= { sccpOmMessageEntry 9 }
 
 sccpOmCRMessagesReceived OBJECT-TYPE
@@ -1362,10 +1962,21 @@ sccpOmCRMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of CR messages received from MTP plus ISDN-UP 
-	 embedded CRs, collected per SCCP on a 5- or 15-minute basis."
+	 embedded CRs, collected per SCCP on a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.7: the total 
+	 number of CR messages received. See also 3.1/Q.714.
+	 
+	 This measurement counts the CR messages received from MTP plus 
+	 ISDN-UP embedded CRs. The preferred granularityPeriods are 5 
+	 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.7).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.7)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.7).
+	 ITU-T Q.751.2 (06/97) crMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) crMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-crMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.1."
     ::= { sccpOmMessageEntry 10 }
 
 sccpOmCREFMessagesReceived OBJECT-TYPE
@@ -1374,10 +1985,21 @@ sccpOmCREFMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of CREF messages received from MTP, collected per 
-	 SCCP on a 5- or 15-minute basis."
+	 SCCP on a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.8: the total 
+	 number of CREF messages received. See also 3.2/Q.714.
+	 
+	 This measurement counts the CREF messages received from MTP. 
+	 The preferred granularityPeriods are 5 minutes and 30 
+	 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.8).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.8)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.8).
+	 ITU-T Q.751.2 (06/97) crefMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) crefMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-crefMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.2."
     ::= { sccpOmMessageEntry 11 }
 
 sccpOmRSRMessagesSent OBJECT-TYPE
@@ -1386,10 +2008,20 @@ sccpOmRSRMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of RSR messages sent to MTP, collected per SCCP on a 
-	 5- or 15-minute basis."
+	 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.9: the total 
+	 number of RSR messages sent. See also 3.7/Q.714.
+	 
+	 This measurement counts the RSR messages sent to MTP. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.9).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.9)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.9).
+	 ITU-T Q.751.2 (06/97) rsrMessagesSent A.
+	 ITU-T Q.751.2 (06/97) rsrMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-rsrMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.7."
     ::= { sccpOmMessageEntry 12 }
 
 sccpOmRSRMessagesReceived OBJECT-TYPE
@@ -1398,10 +2030,20 @@ sccpOmRSRMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of RSR messages received from MTP, collected per 
-	 SCCP on a 5- or 15-minute basis."
+	 SCCP on a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.10: the total 
+	 number of RSR messages received. See also 3.7/Q.714.
+	 
+	 This measurement counts the RSR messages received from MTP. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.10).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.10)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.10).
+	 ITU-T Q.751.2 (06/97) rsrMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) rsrMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-rsrMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.7."
     ::= { sccpOmMessageEntry 13 }
 
 sccpOmERRMessagesSent OBJECT-TYPE
@@ -1410,10 +2052,20 @@ sccpOmERRMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of ERR messages sent to MTP, collected per SCCP on a 
-	 5- or 15-minute basis."
+	 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.11: the total 
+	 number of ERR messages sent. See also 3.10/Q.714.
+	 
+	 This measurement counts the ERR messages sent to MTP. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.11).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.11)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.11).
+	 ITU-T Q.751.2 (06/97) errMessagesSent A.
+	 ITU-T Q.751.2 (06/97) errMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-errMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.10."
     ::= { sccpOmMessageEntry 14 }
 
 sccpOmERRMessagesReceived OBJECT-TYPE
@@ -1422,10 +2074,20 @@ sccpOmERRMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of ERR messages received from MTP, collected per 
-	 SCCP on a 5- or 15-minute basis."
+	 SCCP on a 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.12: the total 
+	 number of ERR messages received. See also 3.10/Q.714.
+	 
+	 This measurement counts the ERR messages received from MTP. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.12).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.12)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.12).
+	 ITU-T Q.751.2 (06/97) errMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) errMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-errMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.10."
     ::= { sccpOmMessageEntry 15 }
 
 sccpOmXUDTMessagesSent OBJECT-TYPE
@@ -1434,10 +2096,20 @@ sccpOmXUDTMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of XUDT messages sent, collected per SCCP on a 5- or 
-	 15-minute basis."
+	 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.13: the total 
+	 number of XUDT messages sent. See also 4.1/Q.714.
+	 
+	 This measurement counts the XUDT messages sent. The preferred 
+	 granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.13).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.13)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.13).
+	 ITU-T Q.751.2 (06/97) xudtMessagesSent A.
+	 ITU-T Q.751.2 (06/97) xudtMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-xudtMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1."
     ::= { sccpOmMessageEntry 16 }
 
 sccpOmXUDTSMessagesSent OBJECT-TYPE
@@ -1446,10 +2118,20 @@ sccpOmXUDTSMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of XUDTS messages sent, collected per SCCP on a 5- 
-	 or 15-minute basis."
+	 or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.14: the total 
+	 number of XUDTS messages sent. See also 4.2/Q.714.
+	 
+	 This measurement counts the XUDTS messages sent. The preferred 
+	 granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.14).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.14)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.14).
+	 ITU-T Q.751.2 (06/97) xudtsMessagesSent A.
+	 ITU-T Q.751.2 (06/97) xudtsMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-xudtsMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.2."
     ::= { sccpOmMessageEntry 17 }
 
 sccpOmXUDTMessagesReceived OBJECT-TYPE
@@ -1458,10 +2140,20 @@ sccpOmXUDTMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of XUDT messages received, collected per SCCP on a 
-	 5- or 15-minute basis."
+	 5- or 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.15: the total 
+	 number of XUDT messages received. See also 4.1/Q.714.
+	 
+	 This measurement counts the XUDT messages Received. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.15).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.15)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.15).
+	 ITU-T Q.751.2 (06/97) xudtMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) xudtMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-xudtMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1."
     ::= { sccpOmMessageEntry 18 }
 
 sccpOmXUDTSMessagesReceived OBJECT-TYPE
@@ -1470,10 +2162,20 @@ sccpOmXUDTSMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of XUDTS messages received, collected per SCCP on a 
-	 5- or 15-minute basis."
+	 5- or 15-minute basis.
+
+	 This attribute represents measurement Q.752/9bis.16: the total 
+	 number of XUDTS messages received. See also 4.2/Q.714.
+	 
+	 This measurement counts the XUDTS messages Received. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.16).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.16)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.16).
+	 ITU-T Q.751.2 (06/97) xudtsMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) xudtsMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-xudtsMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.2."
     ::= { sccpOmMessageEntry 19 }
 
 sccpOmLUDTMessagesSent OBJECT-TYPE
@@ -1482,10 +2184,20 @@ sccpOmLUDTMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of LUDT messages sent, collected per SCCP on a 5- 
-	 and 15-minute basis."
+	 and 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.17: the total 
+	 number of LUDT messages sent. See also 4.1/Q.714.
+	 
+	 This measurement counts the LUDT messages sent. The preferred 
+	 granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.17).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.17)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.17).
+	 ITU-T Q.751.2 (06/97) ludtMessagesSent A.
+	 ITU-T Q.751.2 (06/97) ludtMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-ludtMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1."
     ::= { sccpOmMessageEntry 20 }
 
 sccpOmLUDTSMessagesSent OBJECT-TYPE
@@ -1494,10 +2206,20 @@ sccpOmLUDTSMessagesSent OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of LUDTS message sent, collected per SCCP on a 5- 
-	 and 15-minute basis."
+	 and 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.17: the total 
+	 number of LUDT messages sent. See also 4.1/Q.714.
+	 
+	 This measurement counts the LUDTS messages sent. The preferred 
+	 granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.18).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.18)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.18).
+	 ITU-T Q.751.2 (06/97) ludtsMessagesSent A.
+	 ITU-T Q.751.2 (06/97) ludtsMessagesSentCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-ludtsMessagesSentCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1."
     ::= { sccpOmMessageEntry 21 }
 
 sccpOmLUDTMessagesReceived OBJECT-TYPE
@@ -1506,10 +2228,20 @@ sccpOmLUDTMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of LUDT messages received, collected per SCCP on a 
-	 5- and 15-minute basis."
+	 5- and 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.19: the total 
+	 number of LUDT messages received. See also 4.1/Q.714.
+	 
+	 This measurement counts the LUDT messages Received. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.19).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.19)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.19).
+	 ITU-T Q.751.2 (06/97) ludtMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) ludtMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-ludtMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.1."
     ::= { sccpOmMessageEntry 22 }
 
 sccpOmLUDTSMessagesReceived OBJECT-TYPE
@@ -1518,10 +2250,20 @@ sccpOmLUDTSMessagesReceived OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The number of LUDTS messages received, collected per SCCP on a 
-	 5- and 15-minute basis."
+	 5- and 15-minute basis.
+	 
+	 This attribute represents measurement Q.752/9bis.20: the total 
+	 number of LUDTS messages sent. See also 4.2/Q.714.
+	 
+	 This measurement counts the LUDTS messages received. The 
+	 preferred granularityPeriods are 5 minutes and 30 minutes."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 bis (Item 9 bis.20).
-	 ITU-T Q.752 (1997) Table 9 bis (Item 9 bis.20)."
+	 ITU-T Q.752 (06/97) Table 9 bis (Item 9 bis.20).
+	 ITU-T Q.751.2 (06/97) ludtsMessagesReceived A.
+	 ITU-T Q.751.2 (06/97) ludtsMessagesReceivedCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-ludtsMessagesReceivedCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 4.2."
     ::= { sccpOmMessageEntry 23 }
 
 sccpOmMessage5MinValidIntervals OBJECT-TYPE
@@ -1543,6 +2285,8 @@ sccpOmMessage15MinValidIntervals OBJECT-TYPE
     ::= { sccpOmMessageEntry 25 }
 
 
+
+-- =====================================================================
 
 sccpOmAccessibilityTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpOmAccessibilityEntry
@@ -1577,9 +2321,9 @@ sccpOmAccessibilityEntry OBJECT-TYPE
 SccpOmAccessibilityEntry ::=
     SEQUENCE {
 	sccpOmSSCMessageReceived		PerfCurrentCount,
-	sccpOmSSPMessageReceived		PerfCurrentCount,
+	sccpOmSSPMessageReceived		PerfCurrentCount, -- (sccpAccessPoint)
 	-- Non-Obligatory 15 min Duration
-	sccpOmSccpUnavailableDuration		HCPerfIntervalThreshold,
+	sccpOmSccpUnavailableDuration		HCPerfIntervalThreshold, -- (sccp)
 	-- 8.5 Duration of local SCCP unavailable - all reasons
 	-- ANSI only
 	sccpOmAccessibility5MinValidIntervals	HCPerfValidIntervals,
@@ -1600,8 +2344,8 @@ sccpOmSSCMessageReceived OBJECT-TYPE
 	 support SCCP management messages."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 8 (8.8).
-	 ITU-T Q.752 (1997) Table 8 (8.8).
-	 ITU-T Q.751.2 (06/1997) sccpCongested."
+	 ITU-T Q.752 (06/97) Table 8 (8.8).
+	 ITU-T Q.751.2 (06/97) sccpCongested."
     ::= { sccpOmAccessibilityEntry 1 }
 
 sccpOmSSPMessageReceived OBJECT-TYPE
@@ -1614,11 +2358,23 @@ sccpOmSSPMessageReceived OBJECT-TYPE
 	 within an interval can generate a qualityOfServiceAlarm with 
 	 probable cause subsystemProhibited and a severity of Major, 
 	 Minor or Warning.  Note that JTTC JQ.711 does not support SCCP 
-	 maangement messages."
+	 management messages.
+	 
+	 This attribute represents measurement Q.752/8.11.
+	 
+	 This managed object class contains the subsystem error data. 
+	 The preferred granularityPeriod is 30 minutes. The attributes 
+	 are read-only. The attributes are related to the 
+	 qualityofServiceAlarm in the sccpAccessPoint managed object 
+	 class. An attribute is incremented if a qualityofServiceAlarm 
+	 happens with the corresponding value for the probableCause."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 8 (8.11).
-	 ITU-T Q.752 (1997) Table 8 (8.11).
-	 ITU-T Q.751.2 (06/1997) subsystemProhibited."
+	 ITU-T Q.752 (06/97) Table 8 (8.11).
+	 ITU-T Q.751.2 (06/97) subsystemProhibited ProbableCause.
+	 ITU-T Q.751.2 (06/97) subsystemProhibited A.
+	 ITU-T Q.751.2 (06/97) subsystemProhibitedData MOC.
+	 ITU-T Q.751.2 (06/97) sccpAccessPoint-subsystemProhibitedData NB."
     ::= { sccpOmAccessibilityEntry 2 }
 
 -- Non-Obligatory 15 min Duration
@@ -1628,9 +2384,22 @@ sccpOmSccpUnavailableDuration OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"Duration of local SCCP unavailable: all reasons.
+	 
+	 This attribute represents measurement Q.752/8.5
+	 
+	 This managed object class provides information on the 
+	 availability of the local SCCP. The preferred granularityPeriod 
+	 of this permanent measurement is 30 minutes. The attribute 
+	 localSCCPUnavailabilityDuration provides the duration of the 
+	 local SCCP unavailability situation (all reasons). Start of an 
+	 unavailability situation is notified by the 
+	 localSCCPUnavailability notification, which is contained in the 
+	 sccp managed object class."
     REFERENCE
-	""
+	"ITU-T Q.751.2 (06/97) localSCCPUnavailabilityDuration A.
+	 ITU-T Q.751.2 (06/97) localSCCPAvailability MOC.
+	 ITU-T Q.751.2 (06/97) sccp-localSCCPAvailability NB."
 -- 8.5 Duration of local SCCP unavailable - all reasons
 -- ANSI only
     ::= { sccpOmAccessibilityEntry 3 }
@@ -1654,6 +2423,8 @@ sccpOmAccessibility15MinValidIntervals OBJECT-TYPE
     ::= { sccpOmAccessibilityEntry 5 }
 
 
+-- =====================================================================
+
 sccpOmUtilizationTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpOmUtilizationEntry
     MAX-ACCESS not-accessible
@@ -1674,7 +2445,7 @@ sccpOmUtilizationTable OBJECT-TYPE
 	 for 15 minute collection."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9.
-	 ITU-T Q.752 (1997) Table 9."
+	 ITU-T Q.752 (06/97) Table 9."
     ::= { sccpOmTables 4 }
 
 sccpOmUtilizationEntry OBJECT-TYPE
@@ -1715,7 +2486,7 @@ sccpOmUtilizationEntry OBJECT-TYPE
 	 measurements be enabled permanently."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9.
-	 ITU-T Q.752 (1997) Table 9."
+	 ITU-T Q.752 (06/97) Table 9."
     INDEX   {
 		sccpNetworkEntityId,	-- shared index
 		sccpOmSsn		-- shared index
@@ -1725,11 +2496,11 @@ sccpOmUtilizationEntry OBJECT-TYPE
 SccpOmUtilizationEntry ::=
     SEQUENCE {
 	-- Non-Obligatory 5 min, Obligatory 15 min, per class per SSN
-	sccpOmLXUDTMessagesOrigClass0		PerfCurrentCount,
-	sccpOmLXUDTMessagesOrigClass1		PerfCurrentCount,
-	sccpOmLXUDTMessagesTermClass0		PerfCurrentCount,
-	sccpOmLXUDTMessagesTermClass1		PerfCurrentCount,
-	sccpOmMessagesSentToBackup		PerfCurrentCount
+	sccpOmLXUDTMessagesOrigClass0		PerfCurrentCount, -- (sclc)
+	sccpOmLXUDTMessagesOrigClass1		PerfCurrentCount, -- (sclc)
+	sccpOmLXUDTMessagesTermClass0		PerfCurrentCount, -- (sclc)
+	sccpOmLXUDTMessagesTermClass1		PerfCurrentCount, -- (sclc)
+	sccpOmMessagesSentToBackup		PerfCurrentCount, -- (scrc)
 	-- Non-Obligatory 5 and 15 min, Events per SSN
 	sccpOmDT1MessagesReceived		PerfCurrentCount,
 	sccpOmDT1MessagesSent			PerfCurrentCount,
@@ -1743,6 +2514,8 @@ SccpOmUtilizationEntry ::=
 
 -- Non-Obligatory 5 min, Obligatory 15 min, per class per SSN
 
+-- NOTE: Q.751.2 shows this as having both a pointCode attribute and an 
+-- ssn attribute.
 sccpOmLXUDTMessagesOrigClass0 OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
@@ -1763,12 +2536,29 @@ sccpOmLXUDTMessagesOrigClass0 OBJECT-TYPE
 	 delivered to the MTP Service Access Point.
 	 
 	 Note that SCCP management messages are included in these totals 
-	 for SSN 1 and protocol class 0."
+	 for SSN 1 and protocol class 0.
+	 
+	 This attribute represents measurement Q.752/9.6. See also 
+	 1.1.2/Q.714.
+	 
+	 This obligated, permanent measurement counts the total number 
+	 of messages for a given protocol class (spc attribute, values 0 
+	 and 1 only) originating from a given subsystem (ssn attribute). 
+	 Instances of this class are created for every spc-ssn value 
+	 combinations. The preferred granularityPeriods are 5 minutes 
+	 and 30 minutes. The total number of messages is independent 
+	 from the fact whether the message could be handled or not."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 (Item 9.6).
-	 ITU-T Q.752 (1997) Table 9 (Item 9.6)."
+	 ITU-T Q.752 (06/97) Table 9 (Item 9.6).
+	 ITU-T Q.751.2 (06/97) messagesOriginatedPerSSN-SPC A.
+	 ITU-T Q.751.2 (06/97) originatedMessagesPerSSNMeasurement MOC.
+	 ITU-T Q.751.2 (06/97) sclc-originatedMessagesPerSSNMeasurement NB.
+	 ITU-T Q.714 (05/2001) Clause 1.1.2."
     ::= { sccpOmUtilizationEntry 1 }
 
+-- NOTE: Q.751.2 shows this as having both a pointCode attribute and an 
+-- ssn attribute.
 sccpOmLXUDTMessagesOrigClass1 OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
@@ -1786,12 +2576,29 @@ sccpOmLXUDTMessagesOrigClass1 OBJECT-TYPE
 	 protocol class parameter of the (L)(X)UDT messages) and per 
 	 SSN.  The measurement is counted at the origin per source SSN 
 	 and refers to messages, successfully received by SCCP and 
-	 delivered to the MTP Service Access Point."
+	 delivered to the MTP Service Access Point.
+	 
+	 This attribute represents measurement Q.752/9.6. See also 
+	 1.1.2/Q.714.
+	 
+	 This obligated, permanent measurement counts the total number 
+	 of messages for a given protocol class (spc attribute, values 0 
+	 and 1 only) originating from a given subsystem (ssn attribute). 
+	 Instances of this class are created for every spc-ssn value 
+	 combinations. The preferred granularityPeriods are 5 minutes 
+	 and 30 minutes. The total number of messages is independent 
+	 from the fact whether the message could be handled or not."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 (Item 9.6).
-	 ITU-T Q.752 (1997) Table 9 (Item 9.6)."
+	 ITU-T Q.752 (06/97) Table 9 (Item 9.6).
+	 ITU-T Q.751.2 (06/97) messagesOriginatedPerSSN-SPC A.
+	 ITU-T Q.751.2 (06/97) originatedMessagesPerSSNMeasurement MOC.
+	 ITU-T Q.751.2 (06/97) sclc-originatedMessagesPerSSNMeasurement NB.
+	 ITU-T Q.714 (05/2001) Clause 1.1.2."
     ::= { sccpOmUtilizationEntry 2 }
 
+-- NOTE: Q.751.2 shows this as having both a pointCode attribute and an 
+-- ssn attribute.
 sccpOmLXUDTMessagesTermClass0 OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
@@ -1812,12 +2619,30 @@ sccpOmLXUDTMessagesTermClass0 OBJECT-TYPE
 	 received from an MTP Service Access Point.
 	 
 	 Note that SCCP management messages are included in these totals 
-	 for SSN 1 and protocol class 0."
+	 for SSN 1 and protocol class 0.
+	 
+	 This attribute represents measurement Q.752/9.7. See also 
+	 1.1.2/Q.714.
+	 
+	 This obligated, permanent measurement counts the total number 
+	 of messages for a given protocol class (spc attribute, values 0 
+	 and 1 only) to be delivered to a given subsystem (ssn 
+	 attribute). Instances of this class are created for every 
+	 spc-ssn value combinations. The preferred granularityPeriods 
+	 are 5 minutes and 30 minutes. The total number of messages is 
+	 independent from the fact whether the message could be handled 
+	 or not."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 (Item 9.7).
-	 ITU-T Q.752 (1997) Table 9 (Item 9.7)."
+	 ITU-T Q.752 (06/97) Table 9 (Item 9.7).
+	 ITU-T Q.751.2 (06/97) messagesReceivedOrTerminatedPerSSN-SPC A.
+	 ITU-T Q.751.2 (06/97) receivedMessagesPerSSNMeasurement MOC.
+	 ITU-T Q.751.2 (06/97) sclc-receivedMessagesPerSSNMeasurement NB.
+	 ITU-T Q.714 (05/2001) Clause 1.1.2."
     ::= { sccpOmUtilizationEntry 3 }
 
+-- NOTE: Q.751.2 shows this as having both a pointCode attribute and an 
+-- ssn attribute.
 sccpOmLXUDTMessagesTermClass1 OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
@@ -1835,10 +2660,26 @@ sccpOmLXUDTMessagesTermClass1 OBJECT-TYPE
 	 protocol class parameter of the (L)(X)UDT messages) and per 
 	 SSN.  The measurement is counted at the destination per sink SSN 
 	 and refers to messages, successfully sent out of the SCCP and 
-	 received from an MTP Service Access Point."
+	 received from an MTP Service Access Point.
+	 
+	 This attribute represents measurement Q.752/9.7. See also 
+	 1.1.2/Q.714.
+	 
+	 This obligated, permanent measurement counts the total number 
+	 of messages for a given protocol class (spc attribute, values 0 
+	 and 1 only) to be delivered to a given subsystem (ssn 
+	 attribute). Instances of this class are created for every 
+	 spc-ssn value combinations. The preferred granularityPeriods 
+	 are 5 minutes and 30 minutes. The total number of messages is 
+	 independent from the fact whether the message could be handled 
+	 or not."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 (Item 9.7).
-	 ITU-T Q.752 (1997) Table 9 (Item 9.7)."
+	 ITU-T Q.752 (06/97) Table 9 (Item 9.7).
+	 ITU-T Q.751.2 (06/97) messagesReceivedOrTerminatedPerSSN-SPC A.
+	 ITU-T Q.751.2 (06/97) receivedMessagesPerSSNMeasurement MOC.
+	 ITU-T Q.751.2 (06/97) sclc-receivedMessagesPerSSNMeasurement NB.
+	 ITU-T Q.714 (05/2001) Clause 1.1.2."
     ::= { sccpOmUtilizationEntry 4 }
 
 sccpOmMessagesSentToBackup OBJECT-TYPE
@@ -1855,78 +2696,167 @@ sccpOmMessagesSentToBackup OBJECT-TYPE
 	 change in the translation process (e.g. due to a routing 
 	 failure toward a subsystem) are directed to a backup subsystem.  
 	 The measurement is applicable only at replicated nodes with 
-	 translation capabilities."
+	 translation capabilities.
+	 
+	 This attribute represents measurement Q.752/9.8: the total 
+	 number of messages that have been sent to a back-up subsystem. 
+	 See also 5.3.2/Q.714.
+	 
+	 This measurement counts the messages sent to a back-up 
+	 subsystem (attribute SSN). The preferred granularityPeriods are 
+	 5 minutes and 30 minutes. Instances of this class are created 
+	 for every ssn. This measurement refers only to those messages 
+	 which would normally have been routed to a sub-system but 
+	 because of a change in the translation process (e.g. due to a 
+	 routing failure towards that sub-system), are directed to a 
+	 back-up sub-system. The measurement is only applicable at 
+	 replicated nodes with translation capabilities."
     REFERENCE
 	"ANSI T1.116.2/2000 Table 9 (Item 9.8).
-	 ITU-T Q.752 (1997) Table 9 (Item 9.8)."
+	 ITU-T Q.752 (06/97) Table 9 (Item 9.8).
+	 ITU-T Q.751.2 (06/97) messagesToBackupSSN A.
+	 ITU-T Q.751.2 (06/97) messagesToBackupCounts MOC.
+	 ITU-T Q.751.2 (06/97) scrc-messagesToBackupCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 5.3.2."
     ::= { sccpOmUtilizationEntry 5 }
 
 -- Non-Obligatory 5 and 15 min, Events per SSN
 
+-- 9.9 DT1 messages received from MTP per sink SSN
 sccpOmDT1MessagesReceived OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"DT1 essages receive from MTP per sink SSN.
+	 
+	 This attribute represents measurement Q.752/9.9: the total 
+	 number of DT1 received from MTP per sink SSN. See also 
+	 3.5/Q.714.
+	 
+	 This measurement counts the DT1 messages received from MTP per 
+	 sink SSN. The preferred granularityPeriods are 5 minutes and 30 
+	 minutes."
     REFERENCE
-	""
--- 9.9 DT1 messages received from MTP per sink SSN
+	"ITU-T Q.752 (06/97) Table 9 (Item 9.9).
+	 ITU-T Q.751.2 (06/97) dt1MessagesToSinkSSN A.
+	 ITU-T Q.751.2 (06/97) dt1ToSinkSSNCounts MOC.
+	 ITU-T Q.751.2 (06/97) scoc-dt1ToSinkSSNCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.5."
     ::= { sccpOmUtilizationEntry 6 }
 
+-- 9.10 DT1 messages sent to MTP per source SSN
 sccpOmDT1MessagesSent OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"DT1 Messages sent to MTP per source SSN.
+	 
+	 This attribute represents measurement Q.752/9.10: the total 
+	 number of DT1 messages sent to per source SSN. See also 
+	 3.5/Q.714.
+	 
+	 This measurement counts the DT1 messages sent to MTP per source 
+	 SSN. The preferred granularityPeriods are 5 minutes and 30 
+	 minutes."
     REFERENCE
-	""
--- 9.10 DT1 messages sent to MTP per source SSN
+	"ITU-T Q.752 (06/97) Table 9 (Item 9.10).
+	 ITU-T Q.751.2 (06/97) dt1MessagesFromSourceSSN A.
+	 ITU-T Q.751.2 (06/97) dt1FromSourceSSNCounts MOC.
+	 ITU-T Q.751.2 (06/97) scoc-dt1FromSourceSSNCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.5."
     ::= { sccpOmUtilizationEntry 7 }
 
+-- 9.11 DT2 messages received from MTP per sink SSN
 sccpOmDT2MessagesReceived OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"DT2 messages received from MTP per sink SSN.
+	 
+	 This attribute represents measurement Q.752/9.11: the total 
+	 number DT2 messages received from MTP per sink SSN. See also 
+	 3.5/Q.714.
+	 
+	 This measurement counts the DT1 messages received from MTP per 
+	 sink SSN. The preferred granularityPeriods are 5 minutes and 30 
+	 minutes."
     REFERENCE
-	""
--- 9.11 DT2 messages received from MTP per sink SSN
+	"ITU-T Q.752 (06/97) Table 9 (Item 9.11).
+	 ITU-T Q.751.2 (06/97) dt2MessagesToSinkSSN A.
+	 ITU-T Q.751.2 (06/97) dt2ToSinkSSNCounts MOC.
+	 ITU-T Q.751.2 (06/97) scoc-dt2ToSinkSSNCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.5."
     ::= { sccpOmUtilizationEntry 8 }
 
+-- 9.12 DT2 messages sent to MTP per source SSN
 sccpOmDT2MessagesSent OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"DT2 messages sent to MTP per source SSN.
+	 
+	 This attribute represents measurement Q.752/9.12: the total 
+	 number DT2 sent to per source SSN. See also 3.5/Q.714.
+	 
+	 This measurement counts the DT1 messages sent to MTP per source 
+	 SSN. The preferred granularityPeriods are 5 minutes and 30 
+	 minutes."
     REFERENCE
-	""
--- 9.12 DT2 messages sent to MTP per source SSN
+	"ITU-T Q.752 (06/97) Table 9 (Item 9.12).
+	 ITU-T Q.751.2 (06/97) dt2MessagesFromSourceSSN A.
+	 ITU-T Q.751.2 (06/97) dt2FromSourceSSNCounts MOC.
+	 ITU-T Q.751.2 (06/97) scoc-dt2FromSourceSSNCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.5."
     ::= { sccpOmUtilizationEntry 9 }
 
+-- 9.13 ED messages sent to MTP per source SSN
 sccpOmEDMessagesSent OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"ED messages sent to MTP per source SSN.
+	 
+	 This attribute represents measurement Q.752/9.13: the total 
+	 number of ED messages sent to per source SSN. See also 
+	 3.6/Q.714.
+	 
+	 This measurement counts the ED messages sent to MTP per source 
+	 SSN. The preferred granularityPeriods are 5 minutes and 30 
+	 minutes."
     REFERENCE
-	""
--- 9.13 ED messages sent to MTP per source SSN
+	"ITU-T Q.752 (06/97) Table 9 (Item 9.13).
+	 ITU-T Q.751.2 (06/97) edMessagesFromSourceSSN A.
+	 ITU-T Q.751.2 (06/97) edFromSourceSSNCounts MOC.
+	 ITU-T Q.751.2 (06/97) scoc-edFromSourceSSNCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.6."
     ::= { sccpOmUtilizationEntry 10 }
 
+-- 9.14 ED messages received from MTP per sink SSN
 sccpOmEDMessagesReceived OBJECT-TYPE
     SYNTAX PerfCurrentCount
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"ED messages received from MTP per sink SSN.
+	 
+	 This attribute represents measurement Q.752/9.14: the total 
+	 number of ED messages received from MTP per sink SSN. See also 
+	 3.6/Q.714.
+	 
+	 This measurement counts the ED messages received from MTP per 
+	 sink SSN. The preferred granularityPeriods are 5 minutes and 30 
+	 minutes."
     REFERENCE
-	""
--- 9.14 ED messages received from MTP per sink SSN
+	"ITU-T Q.752 (06/97) Table 9 (Item 9.14).
+	 ITU-T Q.751.2 (06/97) edMessagesToSinkSSN A.
+	 ITU-T Q.751.2 (06/97) edToSinkSSNCounts MOC.
+	 ITU-T Q.751.2 (06/97) scoc-edToSinkSSNCounts NB.
+	 ITU-T Q.714 (05/2001) Clause 3.6."
     ::= { sccpOmUtilizationEntry 11 }
 
 sccpOmUtilization5MinValidIntervals OBJECT-TYPE
@@ -1952,6 +2882,7 @@ sccpOmUtilization15MinValidIntervals OBJECT-TYPE
     ::= { sccpOmUtilizationEntry 13 }
 
 
+-- =====================================================================
 
 sccpOm5MinHistoryTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpOm5MinHistoryEntry
@@ -2533,6 +3464,8 @@ sccpOm5MinSSPMessageReceived OBJECT-TYPE
 
 
 
+-- =====================================================================
+
 sccpOm15MinHistoryTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpOm15MinHistoryEntry
     MAX-ACCESS not-accessible
@@ -2567,7 +3500,7 @@ SccpOm15MinHistoryEntry ::=
 	sccpOm15MinSubsystemCongested			PerfIntervalCount,
 	sccpOm15MinUnequippedSubsystem			PerfIntervalCount,
 	sccpOm15MinSyntaxErrorDetected			PerfIntervalCount,
-	sccpOm15MinRoutingFailure	PerfIntervalCount,
+	sccpOm15MinRoutingFailure			PerfIntervalCount,
 	sccpOm15MinReassemblyTimeOut			PerfIntervalCount,
 	sccpOm15MinSegmentOutOfOrder			PerfIntervalCount,
 	sccpOm15MinNoReassemblySpace			PerfIntervalCount,
@@ -3096,6 +4029,8 @@ sccpOm15MinSccpUnavailableDuration OBJECT-TYPE
     ::= { sccpOm15MinHistoryEntry 45 }
 
 
+-- =====================================================================
+
 -- SCCP OM 5-minute SSN indexed History Table
 
 sccpOm5MinSsnHistoryTable OBJECT-TYPE
@@ -3260,6 +4195,8 @@ sccpOm5MinEDMessagesReceived OBJECT-TYPE
     ::= { sccpOm5MinSsnHistoryEntry 11 }
 
 
+
+-- =====================================================================
 
 -- SCCP OM 15-minute SSN indexed History Table
 
@@ -3608,7 +4545,7 @@ sccpOmTimeStamp OBJECT-TYPE
     ::= { sccpOmScalars 9 }
 
 sccpOm5MinMaxIntervals OBJECT-TYPE
-    SYNTAX UInteger32 (0..288)
+    SYNTAX Unsigned32 (0..288)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -3635,7 +4572,7 @@ sccpOm5MinMaxIntervals OBJECT-TYPE
     ::= { sccpOmScalars 10 }
 
 sccpOm15MinMaxIntervals OBJECT-TYPE
-    SYNTAX UInteger32 (0..672)
+    SYNTAX Unsigned32 (0..672)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -3661,6 +4598,45 @@ sccpOm15MinMaxIntervals OBJECT-TYPE
     DEFVAL { 96 }
     ::= { sccpOmScalars 11 }
 
+sccpOmpDefault OBJECT-TYPE
+    SYNTAX SccpP
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"Provides the default value of the congestion control parameter 
+	 P as described in 5.2.7/Q.714."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.pDefault.
+	 ITU-T Q.714 (05/2001) Clause 5.2.7."
+    DEFVAL { 8 }
+    ::= { sccpOmScalars 12 }
+
+sccpOmNrOfSubLevelsDefault OBJECT-TYPE
+    SYNTAX SccpNrOfSubLevels
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"Provides the default value of the congestion control paramter 
+	 M as described in 5.2.7/Q.714."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.nrOfSubLevelsDefault.
+	 ITU-T Q.714 (05/2001) Clause 5.2.7."
+    DEFVAL { 4 }
+    ::= { sccpOmScalars 13 }
+
+sccpOmNrOfRestrictionLevelsDefault OBJECT-TYPE
+    SYNTAX SccpNrOfRestrictionLevels
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"Provides the default value of the congestion control parameter 
+	 N as described in 5.2.7/Q.714."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.nrOfRestrictionLevelsDefault.
+	 ITU-T Q.714 (05/2001) Clause 5.2.7."
+    DEFVAL { 8 }
+    ::= { sccpOmScalars 14 }
+
 sccpOmDuration OBJECT-TYPE
     SYNTAX TimeInterval
     MAX-ACCESS accessible-for-notify
@@ -3678,6 +4654,263 @@ sccpOmSsn OBJECT-TYPE
 	"A subsystem number for use as an index and in notifications."
     ::= { sccpOmNotifs 2 }
 
+sccpOmSyntaxErrorType OBJECT-TYPE
+    SYNTAX SccpSyntaxErrorList
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+	"An SCCP syntax error type for use as an index and in 
+	 notifications."
+    REFERENCE
+	"ITU-T Q.751.2 (06/97) SCCPDefinedTypesModule.SccpSyntaxErrorList"
+    ::= { sccpOmNotifs 3 }
+
+
+-- concernedArea MANAGED OBJECT CLASS
+-- endNodeEntitySetWithoutSSN MANAGED OBJECT CLASS
+-- endNodeEntitySetWithSSN MANAGED OBJECT CLASS
+-- gtConversionRule MANAGED OBJECT CLASS
+-- gtRule MANAGED OBJECT CLASS
+-- gtTranslator MANAGED OBJECT CLASS
+-- relayNodeEntitySet MANAGED OBJECT CLASS
+-- sccp MANAGED OBJECT CLASS
+-- sccpAccessPoint MANAGED OBJECT CLASS
+-- sccpEntitySet MANAGED OBJECT CLASS
+-- sccpLinkage MANAGED OBJECT CLASS
+-- sclc MANAGED OBJECT CLASS
+-- scoc MANAGED OBJECT CLASS
+-- scrc MANAGED OBJECT CLASS
+-- srvt MANAGED OBJECT CLASS
+
+-- crefMessagesReceivedCounts MANAGED OBJECT CLASS
+-- crefMessagesSentCounts MANAGED OBJECT CLASS
+-- crMessagesReceivedCounts MANAGED OBJECT CLASS
+-- crMessagesSentCounts MANAGED OBJECT CLASS
+-- dt1FromSourceSSNCounts MANAGED OBJECT CLASS
+-- dt1ToSinkSSNCounts MANAGED OBJECT CLASS
+-- dt2FromSourceSSNCounts MANAGED OBJECT CLASS
+-- dt2ToSinkSSNCounts MANAGED OBJECT CLASS
+-- edFromSourceSSNCounts MANAGED OBJECT CLASS
+-- edToSinkSSNCounts MANAGED OBJECT CLASS
+-- errMessagesReceivedCounts MANAGED OBJECT CLASS
+-- errMessagesSentCounts MANAGED OBJECT CLASS
+-- localSCCPAvailability MANAGED OBJECT CLASS
+-- ludtMessagesReceivedCounts MANAGED OBJECT CLASS
+-- ludtMessagesSentCounts MANAGED OBJECT CLASS
+-- ludtsMessagesReceivedCounts MANAGED OBJECT CLASS
+-- ludtsMessagesSentCounts MANAGED OBJECT CLASS
+-- messagesToBackupCounts MANAGED OBJECT CLASS
+-- originatedMessagesPerSSNMeasurement MANAGED OBJECT CLASS
+-- reassemblyErrorData MANAGED OBJECT CLASS
+-- receivedMessagesPerSSNMeasurement MANAGED OBJECT CLASS
+-- routingFailureData MANAGED OBJECT CLASS
+-- rsrMessagesReceivedCounts MANAGED OBJECT CLASS
+-- rsrMessagesSentCounts MANAGED OBJECT CLASS
+-- sccpMessagesCounts MANAGED OBJECT CLASS
+-- sccpSyntaxErrorData MANAGED OBJECT CLASS
+-- segmentationErrorData MANAGED OBJECT CLASS
+-- segmentationImpossibleData MANAGED OBJECT CLASS
+-- subsystemProhibitedData MANAGED OBJECT CLASS
+-- udtMessagesReceivedCounts MANAGED OBJECT CLASS
+-- udtMessagesSentCounts MANAGED OBJECT CLASS
+-- udtsMessagesReceivedCounts MANAGED OBJECT CLASS
+-- udtsMessagesSentCounts MANAGED OBJECT CLASS
+-- xudtMessagesReceivedCounts MANAGED OBJECT CLASS
+-- xudtMessagesSentCounts MANAGED OBJECT CLASS
+-- xudtsMessagesReceivedCounts MANAGED OBJECT CLASS
+-- xudtsMessagesSentCounts MANAGED OBJECT CLASS
+
+-- addressInfoConversionRule ATTRIBUTE
+-- attackTimerValue ATTRIBUTE
+-- cLS ATTRIBUTE
+-- concernedAreaId ATTRIBUTE
+-- concernedAreaName ATTRIBUTE
+-- concernedAreaPointer ATTRIBUTE
+-- congestionTimerValue ATTRIBUTE
+-- coordChangeTimer ATTRIBUTE
+-- decayTimerValue ATTRIBUTE
+-- dSRVT ATTRIBUTE
+-- entitySetName ATTRIBUTE
+-- entitySetSapPointer ATTRIBUTE
+-- gtAddressInformation ATTRIBUTE
+-- gtConversionRuleId ATTRIBUTE
+-- gtConversionRuleName ATTRIBUTE
+-- gtConvRulePointer ATTRIBUTE
+-- gtEncodingScheme ATTRIBUTE
+-- gtIndicator ATTRIBUTE
+-- gtNatureOfAddress ATTRIBUTE
+-- gtNumberingPlan ATTRIBUTE
+-- gtRuleId ATTRIBUTE
+-- gtRuleName ATTRIBUTE
+-- gtTranslationType ATTRIBUTE
+-- gtTranslatorId ATTRIBUTE
+-- gtTranslatorName ATTRIBUTE
+-- importanceLevel-AK ATTRIBUTE
+-- importanceLevel-CC ATTRIBUTE
+-- importanceLevel-CR ATTRIBUTE
+-- importanceLevel-CREF ATTRIBUTE
+-- importanceLevel-DT1 ATTRIBUTE
+-- importanceLevel-DT2 ATTRIBUTE
+-- importanceLevel-EA ATTRIBUTE
+-- importanceLevel-ED ATTRIBUTE
+-- importanceLevel-ERR ATTRIBUTE
+-- importanceLevel-IT ATTRIBUTE
+-- importanceLevel-LUDT ATTRIBUTE
+-- importanceLevel-LUDTS ATTRIBUTE
+-- importanceLevel-RLC ATTRIBUTE
+-- importanceLevel-RLSD ATTRIBUTE
+-- importanceLevel-RSC ATTRIBUTE
+-- importanceLevel-RSR ATTRIBUTE
+-- importanceLevel-UDT ATTRIBUTE
+-- importanceLevel-UDTS ATTRIBUTE
+-- importanceLevel-XUDT ATTRIBUTE
+-- importanceLevel-XUDTS ATTRIBUTE
+-- ingnoreSSTTimer ATTRIBUTE
+-- initialValueReassTimer ATTRIBUTE
+-- loadSharingAlgPointer ATTRIBUTE
+-- lowerLimitForSegmentation ATTRIBUTE
+-- lUDTandLUDTSSupported ATTRIBUTE
+-- maxStatInfoTimer ATTRIBUTE
+-- newEncodingScheme ATTRIBUTE
+-- newNatureOfAddress ATTRIBUTE
+-- newNumberingPlan ATTRIBUTE
+-- newTranslationType ATTRIBUTE
+-- nrOfRestrictionLevels ATTRIBUTE
+-- nrOfSubLevels ATTRIBUTE
+-- nSRVT ATTRIBUTE
+-- p ATTRIBUTE
+-- remoteSCCPList ATTRIBUTE
+-- rLM ATTRIBUTE
+-- rSLM ATTRIBUTE
+-- sccpAccessPointName ATTRIBUTE
+-- sccpEntitySetId ATTRIBUTE
+-- sccpEntitySetPointer ATTRIBUTE
+-- sccpLinkageId ATTRIBUTE
+-- sccpLinkageName ATTRIBUTE
+-- sccpLinkagePointer ATTRIBUTE
+-- sccpName ATTRIBUTE
+-- sccpRouteTestId ATTRIBUTE
+-- sccpVersion ATTRIBUTE
+-- sclcName ATTRIBUTE
+-- scocName ATTRIBUTE
+-- scrcId ATTRIBUTE
+-- scrcName ATTRIBUTE
+-- sharingMode ATTRIBUTE
+-- srvtName ATTRIBUTE
+-- ssAvailableAfterSpRestart ATTRIBUTE
+-- ssn ATTRIBUTE
+-- upperLimitForSegmentation ATTRIBUTE
+
+-- crefMessagesReceived ATTRIBUTE
+-- crefMessagesSent ATTRIBUTE
+-- crMessagesReceived ATTRIBUTE
+-- crMessagesSent ATTRIBUTE
+-- dt1MessagesFromSourceSSN ATTRIBUTE
+-- dt1MessagesToSinkSSN ATTRIBUTE
+-- dt2MessagesFromSourceSSN ATTRIBUTE
+-- dt2MessagesToSinkSSN ATTRIBUTE
+-- edMessagesFromSourceSSN ATTRIBUTE
+-- edMessagesToSinkSSN ATTRIBUTE
+-- errMessagesReceived ATTRIBUTE
+-- errMessagesSent ATTRIBUTE
+-- localSCCPUnavailabilityDuration ATTRIBUTE
+-- ludtMessagesReceived ATTRIBUTE
+-- ludtMessagesSent ATTRIBUTE
+-- ludtsMessagesReceived ATTRIBUTE
+-- ludtsMessagesSent ATTRIBUTE
+-- messagesForLocalSubsystems ATTRIBUTE
+-- messagesHandled ATTRIBUTE
+-- messagesOriginatedPerSSN-SPC ATTRIBUTE
+-- messagesReceivedOrTerminatedPerSSN-SPC ATTRIBUTE
+-- messagesRequiringGTTranslation ATTRIBUTE
+-- messagesToBackupSSN ATTRIBUTE
+-- messageTooLarge ATTRIBUTE
+-- networkCongestion ATTRIBUTE
+-- noPointCodeAvailable ATTRIBUTE
+-- noReassemblyResources ATTRIBUTE
+-- noTranslForNatureAddress ATTRIBUTE
+-- noTranslForSpecificAddress ATTRIBUTE
+-- reassemblyFailed ATTRIBUTE
+-- reassemblyTimerExpired ATTRIBUTE
+-- rsrMessagesReceived ATTRIBUTE
+-- rsrMessagesSent ATTRIBUTE
+-- sccpSyntaxErrorList ATTRIBUTE
+-- segmentationFailed ATTRIBUTE
+-- segmentationNotSupported ATTRIBUTE
+-- segmentReceivedOutOfSequence ATTRIBUTE
+-- subSystemCongestion ATTRIBUTE
+-- subSystemFailure ATTRIBUTE
+-- subsystemProhibited ATTRIBUTE
+-- udtMessagesReceived ATTRIBUTE
+-- udtMessagesSent ATTRIBUTE
+-- udtsMessagesReceived ATTRIBUTE
+-- udtsMessagesSent ATTRIBUTE
+-- unknownOrUnqualifiedRoutingFailure ATTRIBUTE
+-- userUnequipped ATTRIBUTE
+-- violationOfHopCounter ATTRIBUTE
+-- xudtMessagesReceived ATTRIBUTE
+-- xudtMessagesSent ATTRIBUTE
+-- xudtsMessagesReceived ATTRIBUTE
+-- xudtsMessagesSent ATTRIBUTE
+
+-- sccpRouteTestResult NOTIFICATION
+
+-- gtTranslator-gtRule NAME BINDING
+-- managedElement-managedSwitchingElement NAME BINDING
+-- managedSwitchingElement-sccp NAME BINDING
+-- sccp-sclc NAME BINDING
+-- sccp-scoc NAME BINDING
+-- sccp-scrc NAME BINDING
+-- sccp-srvt NAME BINDING
+-- scrc-concernedArea NAME BINDING
+-- scrc-gtConversionRule NAME BINDING
+-- scrc-gtTranslator NAME BINDING
+-- scrc-sccpAccessPoint NAME BINDING
+-- scrc-sccpEntitySet NAME BINDING
+-- scrc-sccpLinkage NAME BINDING
+
+-- sccp-localSCCPAvailability NAME BINDING
+
+-- sccpAccessPoint-segmentationImpossibleData NAME BINDING
+-- sccpAccessPoint-subsystemProhibitedData NAME BINDING
+
+-- sclc-originatedMessagesPerSSNMeasurement NAME BINDING
+-- sclc-reassemblyErrorData NAME BINDING
+-- sclc-receivedMessagesPerSSNMeasurement NAME BINDING
+-- sclc-segmentationErrorData NAME BINDING
+
+-- scoc-dt1FromSourceSSNCounts NAME BINDING
+-- scoc-dt1ToSinkSSNCounts NAME BINDING
+-- scoc-dt2FromSourceSSNCounts NAME BINDING
+-- scoc-dt2ToSinkSSNCounts NAME BINDING
+-- scoc-edFromSourceSSNCounts NAME BINDING
+-- scoc-edToSinkSSNCounts NAME BINDING
+
+-- scrc-crefMessagesReceivedCounts NAME BINDING
+-- scrc-crefMessagesSentCounts NAME BINDING
+-- scrc-crMessagesReceivedCounts NAME BINDING
+-- scrc-crMessagesSentCounts NAME BINDING
+-- scrc-errMessagesReceivedCounts NAME BINDING
+-- scrc-errMessagesSentCounts NAME BINDING
+-- scrc-ludtMessagesReceivedCounts NAME BINDING
+-- scrc-ludtMessagesSentCounts NAME BINDING
+-- scrc-ludtsMessagesReceivedCounts NAME BINDING
+-- scrc-ludtsMessagesSentCounts NAME BINDING
+-- scrc-messagesToBackupCounts NAME BINDING
+-- scrc-routingFailureData NAME BINDING
+-- scrc-rsrMessagesReceivedCounts NAME BINDING
+-- scrc-rsrMessagesSentCounts NAME BINDING
+-- scrc-sccpMessagesCounts NAME BINDING
+-- scrc-sccpSyntaxErrorData NAME BINDING
+-- scrc-udtMessagesReceivedCounts NAME BINDING
+-- scrc-udtMessagesSentCounts NAME BINDING
+-- scrc-udtsMessagesReceivedCounts NAME BINDING
+-- scrc-udtsMessagesSentCounts NAME BINDING
+-- scrc-xudtMessagesReceivedCounts NAME BINDING
+-- scrc-xudtMessagesSentCounts NAME BINDING
+-- scrc-xudtsMessagesReceivedCounts NAME BINDING
+-- scrc-xudtsMessagesSentCounts NAME BINDING
+
 
 
 -- ==========================================================================
@@ -3688,10 +4921,10 @@ sccpOmSsn OBJECT-TYPE
 
 sccpOmObligatoryGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmLXUDTMessagesOrigClass0,
-	sccpOmLXUDTMessagesOrigClass1,
-	sccpOmLXUDTMessagesTermClass0,
-	sccpOmLXUDTMessagesTermClass1
+	sccpOmLXUDTMessagesOrigClass0, -- (sclc)
+	sccpOmLXUDTMessagesOrigClass1, -- (sclc)
+	sccpOmLXUDTMessagesTermClass0, -- (sclc)
+	sccpOmLXUDTMessagesTermClass1 -- (sclc)
     }
     STATUS current
     DESCRIPTION
@@ -3700,15 +4933,15 @@ sccpOmObligatoryGroup OBJECT-GROUP
 
 sccpOmRoutingGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmNoTranslatorForAddress,
-	sccpOmNoRuleForAddress,
-	sccpOmPointCodeNotAvailable,
-	sccpOmPointCodeCongested,
-	sccpOmSubsystemUnavailable,
-	sccpOmSubsystemCongested,
-	sccpOmUnequippedSubsystem,
-	sccpOmRoutingFailure,
-	sccpOmSyntaxErrorDetected
+	sccpOmNoTranslatorForAddress, -- routingFailureData (scrc)
+	sccpOmNoRuleForAddress, -- routingFailureData (scrc)
+	sccpOmPointCodeNotAvailable, -- routingFailureData (scrc)
+	sccpOmPointCodeCongested, -- routingFailureData (scrc)
+	sccpOmSubsystemUnavailable, -- routingFailureData (scrc)
+	sccpOmSubsystemCongested, -- routingFailureData (scrc)
+	sccpOmUnequippedSubsystem, -- routingFailureData (scrc)
+	sccpOmRoutingFailure, -- routingFailureData (scrc)
+	sccpOmSyntaxErrorDetected -- (scrc)
     }
     STATUS current
     DESCRIPTION
@@ -3718,11 +4951,11 @@ sccpOmRoutingGroup OBJECT-GROUP
 
 sccpOmOblReassemblyGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmReassemblyTimeOut,
-	sccpOmSegmentOutOfOrder,
-	sccpOmNoReassemblySpace,
-	sccpOmTooLargeForSegmentation, -- not ANSI
-	sccpOmSegmentationFailure -- not ANSI
+	sccpOmReassemblyTimeOut, -- reassemblyErrorData (sclc)
+	sccpOmSegmentOutOfOrder, -- reassemblyErrorData (sclc)
+	sccpOmNoReassemblySpace, -- reassemblyErrorData (sclc)
+	sccpOmTooLargeForSegmentation, -- not ANSI (sccpAccessPoint)
+	sccpOmSegmentationFailure -- not ANSI segmentationErrorData (sclc)
     }
     STATUS current
     DESCRIPTION
@@ -3732,8 +4965,8 @@ sccpOmOblReassemblyGroup OBJECT-GROUP
 
 sccpOmAllReassemblyGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmNoSegmentationSupport, -- not ANSI
-	sccpOmReassemblyFailure -- not ANSI
+	sccpOmNoSegmentationSupport, -- not ANSI segmentationErrorData (sclc)
+	sccpOmReassemblyFailure -- not ANSI reassemblyErrorData (sclc)
     }
     STATUS current
     DESCRIPTION
@@ -3744,7 +4977,7 @@ sccpOmAllReassemblyGroup OBJECT-GROUP
 
 sccpOmHopCounterGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmHopCounterViolation
+	sccpOmHopCounterViolation -- routingFailureData
     }
     STATUS current
     DESCRIPTION
@@ -3754,7 +4987,7 @@ sccpOmHopCounterGroup OBJECT-GROUP
 
 sccpOmReplicatedGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmMessagesSentToBackup
+	sccpOmMessagesSentToBackup -- (scrc)
     }
     STATUS current
     DESCRIPTION
@@ -3764,9 +4997,9 @@ sccpOmReplicatedGroup OBJECT-GROUP
 
 sccpOmOblConnectionOrientedGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmReleaseFailure, -- not ANSI
-	sccpOmInactivityTimerExpiry, -- not ANSI
-	sccpOmProviderInitiatedRelease -- not ANSI
+	sccpOmReleaseFailure, -- not ANSI (sclc ^Q.751.2)
+	sccpOmInactivityTimerExpiry, -- not ANSI (sclc ^Q.751.2)
+	sccpOmProviderInitiatedRelease -- not ANSI (sclc ^Q.751.2)
     }
     STATUS current
     DESCRIPTION
@@ -3778,16 +5011,16 @@ sccpOmOblConnectionOrientedGroup OBJECT-GROUP
 
 sccpOmAllConnectionOrientedGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmCRMessagesSent,
-	sccpOmCREFMessagesSent,
-	sccpOmCRMessagesReceived,
-	sccpOmCREFMessagesReceived,
-	sccpOmRSRMessagesSent,
-	sccpOmRSRMessagesReceived,
-	sccpOmERRMessagesSent,
-	sccpOmERRMessagesReceived,
-	sccpOmDT1MessagesReceived,
-	sccpOmDT1MessagesSent
+	sccpOmCRMessagesSent, -- (scrc)
+	sccpOmCREFMessagesSent, -- (scrc)
+	sccpOmCRMessagesReceived, -- (scrc)
+	sccpOmCREFMessagesReceived, -- (scrc)
+	sccpOmRSRMessagesSent, -- (scrc)
+	sccpOmRSRMessagesReceived, -- (scrc)
+	sccpOmERRMessagesSent, -- (scrc)
+	sccpOmERRMessagesReceived, -- (scrc)
+	sccpOmDT1MessagesReceived, -- (scoc)
+	sccpOmDT1MessagesSent -- (scoc)
     }
     STATUS current
     DESCRIPTION
@@ -3797,7 +5030,7 @@ sccpOmAllConnectionOrientedGroup OBJECT-GROUP
 
 sccpOmOblProtocolClass3Group OBJECT-GROUP
     OBJECTS {
-	sccpOmProviderInitiatedReset -- not ANSI
+	sccpOmProviderInitiatedReset -- not ANSI (sclc ^Q.751.2)
     }
     STATUS current
     DESCRIPTION
@@ -3808,10 +5041,10 @@ sccpOmOblProtocolClass3Group OBJECT-GROUP
 
 sccpOmAllProtocolClass3Group OBJECT-GROUP
     OBJECTS {
-	sccpOmDT2MessagesReceived,
-	sccpOmDT2MessagesSent,
-	sccpOmEDMessagesSent,
-	sccpOmEDMessagesReceived
+	sccpOmDT2MessagesReceived, -- (scoc)
+	sccpOmDT2MessagesSent, -- (scoc)
+	sccpOmEDMessagesSent, -- (scoc)
+	sccpOmEDMessagesReceived -- (scoc)
     }
     STATUS current
     DESCRIPTION
@@ -3822,7 +5055,7 @@ sccpOmAllProtocolClass3Group OBJECT-GROUP
 sccpOmSccpManagementGroup OBJECT-GROUP
     OBJECTS {
 	sccpOmSSCMessageReceived,
-	sccpOmSSPMessageReceived
+	sccpOmSSPMessageReceived -- (sccpAccessPoint)
     }
     STATUS current
     DESCRIPTION
@@ -3832,7 +5065,7 @@ sccpOmSccpManagementGroup OBJECT-GROUP
 
 sccpOmGTTGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmTotalMessagesGTT
+	sccpOmTotalMessagesGTT -- sccpMessagesCounts (scrc)
     }
     STATUS current
     DESCRIPTION
@@ -3842,20 +5075,20 @@ sccpOmGTTGroup OBJECT-GROUP
 
 sccpOmNonObligatoryGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmTotalMessagesHandled,
-	sccpOmTotalMessagesLocal,
-	sccpOmUDTMessagesSent,
-	sccpOmUDTSMessagesSent,
-	sccpOmUDTMessagesReceived,
-	sccpOmUDTSMessagesReceived,
-	sccpOmXUDTMessagesSent,
-	sccpOmXUDTSMessagesSent,
-	sccpOmXUDTMessagesReceived,
-	sccpOmXUDTSMessagesReceived,
-	sccpOmLUDTMessagesSent,
-	sccpOmLUDTSMessagesSent,
-	sccpOmLUDTMessagesReceived,
-	sccpOmLUDTSMessagesReceived
+	sccpOmTotalMessagesHandled, -- sccpMessagesCounts (scrc)
+	sccpOmTotalMessagesLocal, -- sccpMessagesCounts (scrc)
+	sccpOmUDTMessagesSent, -- (scrc)
+	sccpOmUDTSMessagesSent, -- (scrc)
+	sccpOmUDTMessagesReceived, -- (scrc)
+	sccpOmUDTSMessagesReceived, -- (scrc)
+	sccpOmXUDTMessagesSent, -- (scrc)
+	sccpOmXUDTSMessagesSent, -- (scrc)
+	sccpOmXUDTMessagesReceived, -- (scrc)
+	sccpOmXUDTSMessagesReceived, -- (scrc)
+	sccpOmLUDTMessagesSent, -- (scrc)
+	sccpOmLUDTSMessagesSent, -- (scrc)
+	sccpOmLUDTMessagesReceived, -- (scrc)
+	sccpOmLUDTSMessagesReceived -- (scrc)
     }
     STATUS current
     DESCRIPTION
@@ -3865,7 +5098,7 @@ sccpOmNonObligatoryGroup OBJECT-GROUP
 
 sccpOmSccpUnavailableGroup OBJECT-GROUP
     OBJECTS {
-	sccpOmSccpUnavailableDuration
+	sccpOmSccpUnavailableDuration -- (sccp)
     }
     STATUS current
     DESCRIPTION

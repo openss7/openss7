@@ -9,7 +9,7 @@ END-INFO-DIR-ENTRY
 This file documents the OpenSS7 Signalling Connection Control Part Interface
 (SCCPI).
 
-This is Edition 0.9a, last updated 2008-12-17, for OpenSS7 SS7 Stack version
+This is Edition 0.9a, last updated 2008-12-06, for OpenSS7 SS7 Stack version
 0.9a release 8.20081103 published by OpenSS7 Corporation
 (http://www.openss7.com/).
 
@@ -176,6 +176,9 @@ Only the texinfo or roff source is controlled.  A printed (or postscript)
 version of this document is an *UNCONTROLLED VERSION*.
 
 $Log: sccpi.texi,v $
+Revision 0.9.2.3  2008-12-20 12:55:39  brian
+- add new mibs and agents
+
 Revision 0.9.2.2  2008-11-26 12:01:34  brian
 - updated to FDL 1.3
 
@@ -5546,126 +5549,126 @@ File: sccpi.info,  Node: Index,  Prev: References,  Up: Top
 Tag Table:
 Node: Top2499
 Node: Preface3181
-Node: Introduction8427
-Node: The SCCP Layer11010
-Node: Model of the SCCPI11439
-Ref: Figure 112451
-Node: SCCPI Services12849
-Ref: SCCPI Services-Footnote-115721
-Ref: SCCPI Services-Footnote-215746
-Node: SCCP Service Primitives16273
-Ref: Table 117645
-Ref: Table 218467
-Ref: Table 319839
-Ref: Table 421069
-Node: SCCPI Services Definition21137
-Ref: SCCPI Services Definition-Footnote-121694
-Node: Local Management Services21778
-Ref: Figure 222978
-Ref: Figure 424120
-Ref: Figure 524529
-Ref: Figure 624955
-Ref: Figure 725502
-Ref: Figure 825958
-Node: Connectionless Services26037
-Ref: Figure 927424
-Node: Connection Oriented Services27495
-Ref: Table 530721
-Ref: Figure 1132656
-Ref: Figure 1233501
-Ref: Figure 1334204
-Ref: Figure 1435022
-Node: SCCP Provider Management Services35098
-Node: SCCPI Primitives36391
-Node: Local Management Primitives37547
-Node: SCCP Information Request38058
-Ref: N_INFO_REQ38274
-Node: N_INFO_ACK39432
-Ref: N_INFO_ACK-Footnote-148398
-Node: N_BIND_REQ48565
-Node: N_BIND_ACK55347
-Node: N_UNBIND_REQ60460
-Node: SCCP Options Management Request61825
-Ref: N_OPTMGMT_REQ62097
-Node: N_ERROR_ACK65488
-Node: N_OK_ACK69090
-Node: Connection Mode Primitives71227
-Node: Connection Establishment Phase71894
-Node: N_CONN_REQ72337
-Node: N_CONN_IND77593
-Node: N_CONN_RES82518
-Node: N_CONN_CON89806
-Node: Normal Data Transfer Phase93548
-Node: N_DATA_REQ94111
-Node: N_DATA_IND99105
-Node: Receipt Confirmation Service Primitives101251
-Node: N_DATACK_REQ102746
-Node: N_DATACK_IND104573
-Node: Expedited Data Transfer Service105485
-Node: N_EXDATA_REQ106918
-Node: N_EXDATA_IND109188
-Node: Reset Service110225
-Node: N_RESET_REQ111206
-Node: N_RESET_IND113089
-Node: N_RESET_RES114127
-Node: N_RESET_CON115823
-Node: Inform Service116728
-Ref: N_INFORM_REQ116996
-Ref: N_INFORM_IND118345
-Node: Network Connection Release Phase119561
-Node: N_DISCON_REQ120542
-Node: N_DISCON_IND124930
-Node: Connectionless Mode Primitives128528
-Node: Unit Data Transfer129046
-Node: N_UNITDATA_REQ129205
-Node: N_UNITDATA_IND132283
-Node: Unit Data Error134305
-Node: N_UDERROR_IND134458
-Node: Notice Indication135967
-Ref: N_NOTICE_IND136095
-Node: SCCP Provider Management Primitives139541
-Node: SCCP Status Service139839
-Ref: N_STATE_REQ140085
-Ref: N_STATE_IND141198
-Node: SCCP PC Status Service142320
-Ref: N_PCSTATE_IND142622
-Node: SCCP Coordination Service143774
-Ref: N_COORD_REQ144052
-Ref: N_COORD_IND144694
-Ref: N_COORD_RES145615
-Ref: N_COORD_CON146598
-Node: Diagnostics Requirements147435
-Node: SCCPI Input-Output Controls149648
-Node: SCCPI Management Information Base149850
-Node: Addendum for SCCP Conformance150069
-Node: Addendum for ITU-T Q.711 Conformance150414
-Node: Addendum for ANSI T1.112 Conformance151572
-Node: Addendum for ETSI EN 300 009-1 Conformance151846
-Node: Mapping SCCPI Primitives152087
-Node: Mapping SCCPI Primitives to Q.711152430
-Node: Mapping SCCPI Primitives to ANSI T1.112153194
-Node: Mapping SCCPI Primitives to ETSI EN 300 009-1153901
-Node: State/Event Tables154590
-Node: Precedence Tables154767
-Node: SCCPI Header Files154936
-Node: SCCPI Library155104
-Node: SCCPI Drivers and Modules155268
-Node: SCCPI Utilities155453
-Node: SCCPI File Formats155623
-Node: SCCPI Compatibility and Porting155805
-Node: License156005
-Node: GNU Affero General Public License156210
-Node: GNU Free Documentation License192977
-Node: Glossary217961
-Node: Acronyms219105
-Node: References222949
-Ref: Q.700223058
-Ref: Q.701223310
-Ref: Q.702223607
-Ref: Q.703223859
-Ref: Q.704224106
-Ref: CDIAPI224377
-Ref: Q.771224531
-Node: Index224816
+Node: Introduction8499
+Node: The SCCP Layer11082
+Node: Model of the SCCPI11511
+Ref: Figure 112523
+Node: SCCPI Services12921
+Ref: SCCPI Services-Footnote-115793
+Ref: SCCPI Services-Footnote-215818
+Node: SCCP Service Primitives16345
+Ref: Table 117717
+Ref: Table 218539
+Ref: Table 319911
+Ref: Table 421141
+Node: SCCPI Services Definition21209
+Ref: SCCPI Services Definition-Footnote-121766
+Node: Local Management Services21850
+Ref: Figure 223050
+Ref: Figure 424192
+Ref: Figure 524601
+Ref: Figure 625027
+Ref: Figure 725574
+Ref: Figure 826030
+Node: Connectionless Services26109
+Ref: Figure 927496
+Node: Connection Oriented Services27567
+Ref: Table 530793
+Ref: Figure 1132728
+Ref: Figure 1233573
+Ref: Figure 1334276
+Ref: Figure 1435094
+Node: SCCP Provider Management Services35170
+Node: SCCPI Primitives36463
+Node: Local Management Primitives37619
+Node: SCCP Information Request38130
+Ref: N_INFO_REQ38346
+Node: N_INFO_ACK39504
+Ref: N_INFO_ACK-Footnote-148470
+Node: N_BIND_REQ48637
+Node: N_BIND_ACK55419
+Node: N_UNBIND_REQ60532
+Node: SCCP Options Management Request61897
+Ref: N_OPTMGMT_REQ62169
+Node: N_ERROR_ACK65560
+Node: N_OK_ACK69162
+Node: Connection Mode Primitives71299
+Node: Connection Establishment Phase71966
+Node: N_CONN_REQ72409
+Node: N_CONN_IND77665
+Node: N_CONN_RES82590
+Node: N_CONN_CON89878
+Node: Normal Data Transfer Phase93620
+Node: N_DATA_REQ94183
+Node: N_DATA_IND99177
+Node: Receipt Confirmation Service Primitives101323
+Node: N_DATACK_REQ102818
+Node: N_DATACK_IND104645
+Node: Expedited Data Transfer Service105557
+Node: N_EXDATA_REQ106990
+Node: N_EXDATA_IND109260
+Node: Reset Service110297
+Node: N_RESET_REQ111278
+Node: N_RESET_IND113161
+Node: N_RESET_RES114199
+Node: N_RESET_CON115895
+Node: Inform Service116800
+Ref: N_INFORM_REQ117068
+Ref: N_INFORM_IND118417
+Node: Network Connection Release Phase119633
+Node: N_DISCON_REQ120614
+Node: N_DISCON_IND125002
+Node: Connectionless Mode Primitives128600
+Node: Unit Data Transfer129118
+Node: N_UNITDATA_REQ129277
+Node: N_UNITDATA_IND132355
+Node: Unit Data Error134377
+Node: N_UDERROR_IND134530
+Node: Notice Indication136039
+Ref: N_NOTICE_IND136167
+Node: SCCP Provider Management Primitives139613
+Node: SCCP Status Service139911
+Ref: N_STATE_REQ140157
+Ref: N_STATE_IND141270
+Node: SCCP PC Status Service142392
+Ref: N_PCSTATE_IND142694
+Node: SCCP Coordination Service143846
+Ref: N_COORD_REQ144124
+Ref: N_COORD_IND144766
+Ref: N_COORD_RES145687
+Ref: N_COORD_CON146670
+Node: Diagnostics Requirements147507
+Node: SCCPI Input-Output Controls149720
+Node: SCCPI Management Information Base149922
+Node: Addendum for SCCP Conformance150141
+Node: Addendum for ITU-T Q.711 Conformance150486
+Node: Addendum for ANSI T1.112 Conformance151644
+Node: Addendum for ETSI EN 300 009-1 Conformance151918
+Node: Mapping SCCPI Primitives152159
+Node: Mapping SCCPI Primitives to Q.711152502
+Node: Mapping SCCPI Primitives to ANSI T1.112153266
+Node: Mapping SCCPI Primitives to ETSI EN 300 009-1153973
+Node: State/Event Tables154662
+Node: Precedence Tables154839
+Node: SCCPI Header Files155008
+Node: SCCPI Library155176
+Node: SCCPI Drivers and Modules155340
+Node: SCCPI Utilities155525
+Node: SCCPI File Formats155695
+Node: SCCPI Compatibility and Porting155877
+Node: License156077
+Node: GNU Affero General Public License156282
+Node: GNU Free Documentation License193049
+Node: Glossary218033
+Node: Acronyms219177
+Node: References223021
+Ref: Q.700223130
+Ref: Q.701223382
+Ref: Q.702223679
+Ref: Q.703223931
+Ref: Q.704224178
+Ref: CDIAPI224449
+Ref: Q.771224603
+Node: Index224888
 
 End Tag Table

@@ -83,7 +83,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 m2paMIB MODULE-IDENTITY
-    LAST-UPDATED "200711281554Z"
+    LAST-UPDATED "200812231227Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -101,6 +101,14 @@ m2paMIB MODULE-IDENTITY
          for an M2PA subsystem, where the M2PA is in accordance 
          with RFC 4165.  This MIB is intended on being used with 
          the OPENSS7-MTP3-MIB."
+    REVISION    "200812231227Z"
+    DESCRIPTION
+        "Working up this module.  This module needs to provide a table 
+         of M2PA signalling terminals that the OPENSS7-MTP-MIB can use 
+         to assign signalling links.  The table must contain sufficient 
+         information to establish the signalling data link (SCTP 
+         connection) and then be linked under either the MTP or under 
+         the SL-MUX driver."
     REVISION    "200711281554Z"
     DESCRIPTION 
         "First release of this module."
