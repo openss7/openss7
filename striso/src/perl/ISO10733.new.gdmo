@@ -1,10 +1,10 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.3 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Nov 21 19:13:44 MST 2007
+--@@ Date: Tue Dec 23 23:31:20 MST 2008
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
@@ -16,7 +16,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: ISO10733.new.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:38 $
+--  @(#) $RCSfile: ISO10733.gdmo,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/12/29 23:30:03 $
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -61,7 +61,7 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/12/15 20:16:38 $ by $Author: brian $
+--  Last Modified $Date: 2007/12/29 23:30:03 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -1617,8 +1617,9 @@ x25PLEPImportedNotifications-B BEHAVIOUR
 		additionalInformation field of the communicationsAlarm, using the 
 		notificationData PARAMETER
 
-		The significance sub-parameter of each item of additionalInformation shall be 
-		set to the value `False' (i.e. not significant) so that a managing system 
+		The significance sub-parameter of each item of additionalInformation shall be et 
+		to the value `False' (i.e. not significant) so that a managing system s8
+
 		receiving the event report will be less likely to reject it. The value 
 		NLM.remotelyInitiatedRestart shall be reported in the specificProblems 
 		parameter. The probableCause shall be set to NLM.communicationsProtocolError.
@@ -2824,10 +2825,13 @@ END
 --< GDMO.ChangeLog
 --  =============================================================================
 --  
---  $Log: ISO10733.new.gdmo,v $
---  Revision 0.9.2.1  2007/12/15 20:16:38  brian
---  - added new mib files
---
+--  $Log: ISO10733.gdmo,v $
+--  Revision 0.9.2.5  2007/12/29 23:30:03  brian
+--  - corrections
+--  
+--  Revision 0.9.2.4  2007/12/15 20:20:35  brian
+--  - updates
+--  
 --  Revision 0.9.2.3  2007/09/29 14:28:05  brian
 --  - update gdmos and asns
 --  

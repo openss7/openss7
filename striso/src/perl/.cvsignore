@@ -107,4 +107,4 @@ test.cpp
 test.gdmo
 test2
 test2.cpp
-
+*.new.gdmo
