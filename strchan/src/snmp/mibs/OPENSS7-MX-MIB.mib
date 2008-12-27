@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-12-20 12:48:40 $
+-- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-27 15:35:03 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-20 12:48:40 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-27 15:35:03 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MX-MIB.mib,v $
+-- Revision 0.9.2.6  2008-12-27 15:35:03  brian
+-- - correct default values
+--
 -- Revision 0.9.2.5  2008-12-20 12:48:40  brian
 -- - added manpages and mibs
 --
@@ -558,7 +561,7 @@ mxSpanLineLength OBJECT-TYPE
          
          The value is only significant when mxSpanLineMode is set to 
          dsu(1) for T1 spans."
-    DEFVAL      { dsx133ft }
+    DEFVAL      { 1 } -- dsx133ft
     ::= { mxSpanEntry 15 }
 
 mxSpanLineAttenuation OBJECT-TYPE
@@ -628,7 +631,7 @@ mxSpanTxLevel OBJECT-TYPE
         "Specifies and indicates whether the transmitter is on(1) or 
          off(0).  Note that if the mxSpanLineMode is set to monitor(3), 
          the tranmitter may be fixed at off(0)."
-    DEFVAL      { on }
+    DEFVAL      { 1 } -- on
     ::= { mxSpanEntry 19 }
 
 mxSpanRxLevel OBJECT-TYPE
@@ -638,7 +641,7 @@ mxSpanRxLevel OBJECT-TYPE
     DESCRIPTION 
         "Specifies and indicates whether the receiver is on(1) or 
          off(0)."
-    DEFVAL      { on }
+    DEFVAL      { 1 } -- on
     ::= { mxSpanEntry 20 }
 
 mxSpanAlarmSettleTime OBJECT-TYPE
@@ -685,7 +688,6 @@ mxSpanPrimary OBJECT-TYPE
          The state of the backup span is indicated by the standby status 
          of the span.  Only the primary span index can be referenced 
          directly by a service access point."
-    DEFVAL      { "" }
     ::= { mxSpanEntry 23 }
 
 mxSpanDataLink OBJECT-TYPE
@@ -734,7 +736,7 @@ mxSpanLineCode OBJECT-TYPE
          The linkCode(2), payloadCode(3) and resetCode(4) settings will 
          only persist for 5 seconds.  Other settings will persist until 
          reset."
-    DEFVAL      { noCode }
+    DEFVAL      { 1 } -- noCode
     ::= { mxSpanEntry 25 }
 
 mxSpanAlarmSeverityMappingProfile OBJECT-TYPE
@@ -746,7 +748,6 @@ mxSpanAlarmSeverityMappingProfile OBJECT-TYPE
          used when generating alarm notifications.  When this is the 
          null string, or when a mapping does not exist, the default 
          values will be used."
-    DEFVAL      { "" }
     ::= { mxSpanEntry 26 }
 
 mxSpanAdministrativeState OBJECT-TYPE
@@ -769,7 +770,7 @@ mxSpanAdministrativeState OBJECT-TYPE
     REFERENCE   
         "OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
          administrativeState."
-    DEFVAL      { locked }
+    DEFVAL      { 0 } -- locked
     ::= { mxSpanEntry 27 }
 
 mxSpanOperationalState OBJECT-TYPE
@@ -857,7 +858,6 @@ mxSpanAlarmStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
          alarmStatus."
-    DEFVAL      { {} }
     ::= { mxSpanEntry 30 }
 
 mxSpanProceduralStatus OBJECT-TYPE
@@ -999,7 +999,6 @@ mxSpanControlStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
          controlStatus."
-    DEFVAL      { {} }
     ::= { mxSpanEntry 33 }
 
 mxSpanStandbyStatus OBJECT-TYPE
@@ -1039,7 +1038,7 @@ mxSpanStandbyStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
          standbyStatus."
-    DEFVAL      { providingService }
+    DEFVAL      { 2 } -- providingService
     ::= { mxSpanEntry 34 }
 
 mxSpanUnknownStatus OBJECT-TYPE
@@ -1337,7 +1336,7 @@ mxChanType OBJECT-TYPE
          channel; otherwise, 64kbps DS0 operation within the channel is 
          indicated.  The default is ccs(1).  For E1 CAS operation, 
          channel 17 (timeslot 16) is unavailable for use."
-    DEFVAL      { ccs }
+    DEFVAL      { 2 } -- ccs
     ::= { mxChanEntry 2 }
 
 mxChanRate OBJECT-TYPE
@@ -1403,7 +1402,7 @@ mxChanAdministrativeState OBJECT-TYPE
     REFERENCE   
         "OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
          administrativeState."
-    DEFVAL      { locked }
+    DEFVAL      { 0 } -- locked
     ::= { mxChanEntry 5 }
 
 mxChanUsageState OBJECT-TYPE
@@ -1517,7 +1516,6 @@ mxChanControlStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
          controlStatus."
-    DEFVAL      { {} }
     ::= { mxChanEntry 8 }
 
 mxChanSap OBJECT-TYPE
@@ -1612,7 +1610,7 @@ mxXconType OBJECT-TYPE
          (but the agent may support management station deletion of 
          switch connections).  Management stations may create and delete 
          semi-permanent and permanent connections."
-    DEFVAL      { permanent }
+    DEFVAL      { 3 } -- permanent
     ::= { mxXconEntry 3 }
 
 mxXconStorageType OBJECT-TYPE
@@ -1628,7 +1626,7 @@ mxXconStorageType OBJECT-TYPE
           
          - nonVolatile(3), the row is not lost upon reboot, applicable 
            to semi-permanent and permanent connections."
-    DEFVAL      { nonVolatile }
+    DEFVAL      { 3 } -- nonVolatile
     ::= { mxXconEntry 4 }
 
 mxXconRowStatus OBJECT-TYPE
@@ -1645,7 +1643,6 @@ mxXconRowStatus OBJECT-TYPE
          which is already engaged in another connection, the other 
          connection must first be deleted.  Rows may not be taken out of 
          service."
-    DEFVAL      { active }
     ::= { mxXconEntry 5 }
 
 mxBert OBJECT IDENTIFIER
@@ -1709,7 +1706,7 @@ mxBertMode OBJECT-TYPE
          
          Not all values are supported by all spans, and not all values 
          are supported by all span equipment."
-    DEFVAL      { none }
+    DEFVAL      { 0 } -- none
     ::= { mxBertEntry 1 }
 
 mxBertSelect OBJECT-TYPE
@@ -1745,7 +1742,7 @@ mxBertSelect OBJECT-TYPE
          
          Not all values are supported by all span types and not all 
          values are supported by all span equipment."
-    DEFVAL      { none }
+    DEFVAL      { 0 } -- none
     ::= { mxBertEntry 2 }
 
 mxBertPattern OBJECT-TYPE

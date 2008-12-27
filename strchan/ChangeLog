@@ -1,3 +1,8 @@
+2008-12-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/mxMIB.c: correct default values
+	* src/snmp/mibs/OPENSS7-MX-MIB.mib: correct default values
+
 2008-12-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/ds1.c: updated mib
