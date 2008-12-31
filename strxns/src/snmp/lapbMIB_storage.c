@@ -98,10 +98,9 @@ volatile int sLPConnectionTable_refresh = 1;
 volatile int sLPConnectionIVMOTable_refresh = 1;
 
 /*
- * lapbMIB_variables_oid:
- *   this is the top level oid that we want to register under.  This
- *   is essentially a prefix, with the suffix appearing in the
- *   variable below.
+ * lapbMIB_variables_oid: object identifier for lapbMIB
+ * This is the top level oid that we want to register under.  This is essentially a prefix, with the
+ * suffix appearing in the variable below.
  */
 oid lapbMIB_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 22 };
 oid lAPBDLETable_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 22, 1, 1, 1, 1, 1 };
@@ -111,19 +110,17 @@ oid sLPConnectionTable_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 22, 1, 1,
 oid sLPConnectionIVMOTable_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 22, 1, 1, 5, 1, 1 };
 
 /*
- * variable7 lapbMIB_variables:
- *   this variable defines function callbacks and type return information
- *   for the lapbMIB mib section
+ * variable7 lapbMIB_variables: tree for lapbMIB
+ * This variable defines function callbacks and type return information for the lapbMIB mib section
  */
 struct variable7 lapbMIB_variables[] = {
-/*  magic number        , variable type , ro/rw , callback fn  , L, oidsuffix */
+	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
 #define   LAPBDLELOCALSAPNAMES  (4 % 256)
 	{LAPBDLELOCALSAPNAMES, ASN_OBJECT_ID, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 2}},
 #define   LAPBDLEOPERATIONALSTATE  (5 % 256)
 	{LAPBDLEOPERATIONALSTATE, ASN_INTEGER, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 3}},
 #define   LAPBDLEPROVIDERENTITYNAMES  (6 % 256)
-	{LAPBDLEPROVIDERENTITYNAMES, ASN_OBJECT_ID, RWRITE, var_lAPBDLETable, 6,
-	 {1, 1, 1, 1, 1, 4}},
+	{LAPBDLEPROVIDERENTITYNAMES, ASN_OBJECT_ID, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 4}},
 #define   LAPBDLEMT1TIMER       (7 % 256)
 	{LAPBDLEMT1TIMER, ASN_INTEGER, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 5}},
 #define   LAPBDLEMT3TIMER       (8 % 256)
@@ -147,11 +144,9 @@ struct variable7 lapbMIB_variables[] = {
 #define   LAPBDLEMLPFRAMESSENT  (17 % 256)
 	{LAPBDLEMLPFRAMESSENT, ASN_COUNTER, RONLY, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 15}},
 #define   LAPBDLEMLPFRAMESOUTSIDEWINDOWGUARD  (18 % 256)
-	{LAPBDLEMLPFRAMESOUTSIDEWINDOWGUARD, ASN_COUNTER, RONLY, var_lAPBDLETable, 6,
-	 {1, 1, 1, 1, 1, 16}},
+	{LAPBDLEMLPFRAMESOUTSIDEWINDOWGUARD, ASN_COUNTER, RONLY, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 16}},
 #define   LAPBDLERECEIVEDMLPFRAMESINGUARDREGION  (19 % 256)
-	{LAPBDLERECEIVEDMLPFRAMESINGUARDREGION, ASN_COUNTER, RONLY, var_lAPBDLETable, 6,
-	 {1, 1, 1, 1, 1, 17}},
+	{LAPBDLERECEIVEDMLPFRAMESINGUARDREGION, ASN_COUNTER, RONLY, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 17}},
 #define   LAPBDLEROWSTATUS      (20 % 256)
 	{LAPBDLEROWSTATUS, ASN_INTEGER, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 18}},
 #define   DLSAPSAP1ADDRESS      (25 % 256)
@@ -167,14 +162,11 @@ struct variable7 lapbMIB_variables[] = {
 #define   SLPPMROWSTATUS        (34 % 256)
 	{SLPPMROWSTATUS, ASN_INTEGER, RWRITE, var_sLPPMTable, 6, {1, 1, 3, 1, 1, 4}},
 #define   SLPCONNECTIONUNDERLYINGCONNECTIONNAMES  (38 % 256)
-	{SLPCONNECTIONUNDERLYINGCONNECTIONNAMES, ASN_OBJECT_ID, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 2}},
+	{SLPCONNECTIONUNDERLYINGCONNECTIONNAMES, ASN_OBJECT_ID, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 2}},
 #define   SLPCONNECTIONSUPPORTEDCONNECTIONNAMES  (39 % 256)
-	{SLPCONNECTIONSUPPORTEDCONNECTIONNAMES, ASN_OBJECT_ID, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 3}},
+	{SLPCONNECTIONSUPPORTEDCONNECTIONNAMES, ASN_OBJECT_ID, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 3}},
 #define   SLPCONNECTIONINTERFACETYPE  (40 % 256)
-	{SLPCONNECTIONINTERFACETYPE, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 4}},
+	{SLPCONNECTIONINTERFACETYPE, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 4}},
 #define   SLPCONNECTIONK        (41 % 256)
 	{SLPCONNECTIONK, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 5}},
 #define   SLPCONNECTIONN1       (42 % 256)
@@ -182,134 +174,95 @@ struct variable7 lapbMIB_variables[] = {
 #define   SLPCONNECTIONN2       (43 % 256)
 	{SLPCONNECTIONN2, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 7}},
 #define   SLPCONNECTIONSEQUENCEMODULUS  (44 % 256)
-	{SLPCONNECTIONSEQUENCEMODULUS, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 8}},
+	{SLPCONNECTIONSEQUENCEMODULUS, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 8}},
 #define   SLPCONNECTIONT1TIMER  (45 % 256)
 	{SLPCONNECTIONT1TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 9}},
 #define   SLPCONNECTIONT2TIMER  (46 % 256)
 	{SLPCONNECTIONT2TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 10}},
 #define   SLPCONNECTIONFCSERRORSRECEIVED  (47 % 256)
-	{SLPCONNECTIONFCSERRORSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 11}},
+	{SLPCONNECTIONFCSERRORSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 11}},
 #define   SLPCONNECTIONFRMRSRECEIVED  (48 % 256)
-	{SLPCONNECTIONFRMRSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 12}},
+	{SLPCONNECTIONFRMRSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 12}},
 #define   SLPCONNECTIONFRMRSSENT  (49 % 256)
-	{SLPCONNECTIONFRMRSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 13}},
+	{SLPCONNECTIONFRMRSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 13}},
 #define   SLPCONNECTIONIFRAMEDATAOCTETSRECEIVED  (50 % 256)
-	{SLPCONNECTIONIFRAMEDATAOCTETSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 14}},
+	{SLPCONNECTIONIFRAMEDATAOCTETSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 14}},
 #define   SLPCONNECTIONIFRAMEDATAOCTETSSENT  (51 % 256)
-	{SLPCONNECTIONIFRAMEDATAOCTETSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 15}},
+	{SLPCONNECTIONIFRAMEDATAOCTETSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 15}},
 #define   SLPCONNECTIONIFRAMESRECEIVED  (52 % 256)
-	{SLPCONNECTIONIFRAMESRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 16}},
+	{SLPCONNECTIONIFRAMESRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 16}},
 #define   SLPCONNECTIONIFRAMESSENT  (53 % 256)
-	{SLPCONNECTIONIFRAMESSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 17}},
+	{SLPCONNECTIONIFRAMESSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 17}},
 #define   SLPCONNECTIONPOLLSRECEIVED  (54 % 256)
-	{SLPCONNECTIONPOLLSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 18}},
+	{SLPCONNECTIONPOLLSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 18}},
 #define   SLPCONNECTIONREJSRECEIVED  (55 % 256)
-	{SLPCONNECTIONREJSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 19}},
+	{SLPCONNECTIONREJSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 19}},
 #define   SLPCONNECTIONREJSSENT  (56 % 256)
 	{SLPCONNECTIONREJSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 20}},
 #define   SLPCONNECTIONRNRSRECEIVED  (57 % 256)
-	{SLPCONNECTIONRNRSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 21}},
+	{SLPCONNECTIONRNRSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 21}},
 #define   SLPCONNECTIONRNRSSENT  (58 % 256)
 	{SLPCONNECTIONRNRSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 22}},
 #define   SLPCONNECTIONSABMSRECEIVED  (59 % 256)
-	{SLPCONNECTIONSABMSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 23}},
+	{SLPCONNECTIONSABMSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 23}},
 #define   SLPCONNECTIONSABMSSENT  (60 % 256)
-	{SLPCONNECTIONSABMSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 24}},
+	{SLPCONNECTIONSABMSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 24}},
 #define   SLPCONNECTIONPROTOCOLSTATE  (61 % 256)
-	{SLPCONNECTIONPROTOCOLSTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 25}},
+	{SLPCONNECTIONPROTOCOLSTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 25}},
 #define   SLPCONNECTIONTIMEST1EXPIRED  (62 % 256)
-	{SLPCONNECTIONTIMEST1EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 26}},
+	{SLPCONNECTIONTIMEST1EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 26}},
 #define   SLPCONNECTIONT3TIMER  (63 % 256)
 	{SLPCONNECTIONT3TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 27}},
 #define   SLPCONNECTIONTIMEST3EXPIRED  (64 % 256)
-	{SLPCONNECTIONTIMEST3EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 28}},
+	{SLPCONNECTIONTIMEST3EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 28}},
 #define   SLPCONNECTIONT4TIMER  (65 % 256)
 	{SLPCONNECTIONT4TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 29}},
 #define   SLPCONNECTIONTIMEST4EXPIRED  (66 % 256)
-	{SLPCONNECTIONTIMEST4EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 30}},
+	{SLPCONNECTIONTIMEST4EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 30}},
 #define   SLPCONNECTIONABNORMALLINKDISCONNECTSRECEIVED  (67 % 256)
-	{SLPCONNECTIONABNORMALLINKDISCONNECTSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable,
-	 6, {1, 1, 4, 1, 1, 31}},
+	{SLPCONNECTIONABNORMALLINKDISCONNECTSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 31}},
 #define   SLPCONNECTIONABNORMALLINKDISCONNECTSSENT  (68 % 256)
-	{SLPCONNECTIONABNORMALLINKDISCONNECTSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 32}},
+	{SLPCONNECTIONABNORMALLINKDISCONNECTSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 32}},
 #define   SLPCONNECTIONLINKRESETSRECEIVED  (69 % 256)
-	{SLPCONNECTIONLINKRESETSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 33}},
+	{SLPCONNECTIONLINKRESETSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 33}},
 #define   SLPCONNECTIONLINKRESETSSENT  (70 % 256)
-	{SLPCONNECTIONLINKRESETSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 34}},
+	{SLPCONNECTIONLINKRESETSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 34}},
 #define   SLPCONNECTIONTIMESN2REACHED  (71 % 256)
-	{SLPCONNECTIONTIMESN2REACHED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 35}},
+	{SLPCONNECTIONTIMESN2REACHED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 35}},
 #define   SLPCONNECTIONADMINISTRATIVESTATE  (72 % 256)
-	{SLPCONNECTIONADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 36}},
+	{SLPCONNECTIONADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 36}},
 #define   SLPCONNECTIONOPERATIONALSTATE  (73 % 256)
-	{SLPCONNECTIONOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 37}},
+	{SLPCONNECTIONOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 37}},
 #define   SLPCONNECTIONUSAGESTATE  (74 % 256)
-	{SLPCONNECTIONUSAGESTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 38}},
+	{SLPCONNECTIONUSAGESTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 38}},
 #define   SLPCONNECTIONPROCEDURALSTATUS  (75 % 256)
-	{SLPCONNECTIONPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 39}},
+	{SLPCONNECTIONPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 39}},
 #define   SLPCONNECTIONALARMSTATUS  (76 % 256)
-	{SLPCONNECTIONALARMSTATUS, ASN_BIT_STR, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 40}},
+	{SLPCONNECTIONALARMSTATUS, ASN_BIT_STR, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 40}},
 #define   SLPCONNECTIONROWSTATUS  (77 % 256)
-	{SLPCONNECTIONROWSTATUS, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 41}},
+	{SLPCONNECTIONROWSTATUS, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 41}},
 #define   SLPCONNECTIONIVMOID   (81 % 256)
-	{SLPCONNECTIONIVMOID, ASN_OCTET_STR, RONLY, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 1}},
+	{SLPCONNECTIONIVMOID, ASN_OCTET_STR, RONLY, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 1}},
 #define   SLPCONNECTIONIVMOINTERFACETYPE  (82 % 256)
-	{SLPCONNECTIONIVMOINTERFACETYPE, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 2}},
+	{SLPCONNECTIONIVMOINTERFACETYPE, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 2}},
 #define   SLPCONNECTIONIVMOK    (83 % 256)
-	{SLPCONNECTIONIVMOK, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 3}},
+	{SLPCONNECTIONIVMOK, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 3}},
 #define   SLPCONNECTIONIVMON1   (84 % 256)
-	{SLPCONNECTIONIVMON1, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 4}},
+	{SLPCONNECTIONIVMON1, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 4}},
 #define   SLPCONNECTIONIVMON2   (85 % 256)
-	{SLPCONNECTIONIVMON2, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 5}},
+	{SLPCONNECTIONIVMON2, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 5}},
 #define   SLPCONNECTIONIVMOSEQUENCEMODULUS  (86 % 256)
-	{SLPCONNECTIONIVMOSEQUENCEMODULUS, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 6}},
+	{SLPCONNECTIONIVMOSEQUENCEMODULUS, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 6}},
 #define   SLPCONNECTIONIVMOT1TIMER  (87 % 256)
-	{SLPCONNECTIONIVMOT1TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 7}},
+	{SLPCONNECTIONIVMOT1TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 7}},
 #define   SLPCONNECTIONIVMOT2TIMER  (88 % 256)
-	{SLPCONNECTIONIVMOT2TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 8}},
+	{SLPCONNECTIONIVMOT2TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 8}},
 #define   SLPCONNECTIONIVMOT3TIMER  (89 % 256)
-	{SLPCONNECTIONIVMOT3TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 9}},
+	{SLPCONNECTIONIVMOT3TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 9}},
 #define   SLPCONNECTIONIVMOT4TIMER  (90 % 256)
-	{SLPCONNECTIONIVMOT4TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 10}},
+	{SLPCONNECTIONIVMOT4TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 10}},
 #define   SLPCONNECTIONIVMOROWSTATUS  (91 % 256)
-	{SLPCONNECTIONIVMOROWSTATUS, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 11}},
+	{SLPCONNECTIONIVMOROWSTATUS, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 11}},
 #define   LAPBDISCONTINUITYTIME  (92 % 256)
 	{LAPBDISCONTINUITYTIME, ASN_TIMETICKS, RONLY, var_lapbMIB, 4, {1, 2, 1, 1}},
 #define   SLPCONNECTIONDEFAULTINTERFACETYPE  (93 % 256)
@@ -330,10 +283,9 @@ struct variable7 lapbMIB_variables[] = {
 	{SLPCONNECTIONDEFAULTT3TIMER, ASN_INTEGER, RWRITE, var_lapbMIB, 5, {1, 2, 2, 1, 8}},
 #define   SLPCONNECTIONDEFAULTT4TIMER  (101 % 256)
 	{SLPCONNECTIONDEFAULTT4TIMER, ASN_INTEGER, RWRITE, var_lapbMIB, 5, {1, 2, 2, 1, 9}},
-
 };
 
-/*    (L = length of the oidsuffix) */
+/* (L = length of the oidsuffix) */
 struct lapbMIB_data *lapbMIBStorage = NULL;
 
 /* global storage of our data, saved in and configured by header_complex() */
@@ -344,9 +296,9 @@ struct header_complex_index *sLPConnectionTableStorage = NULL;
 struct header_complex_index *sLPConnectionIVMOTableStorage = NULL;
 
 /*
- * init_lapbMIB():
- *   Initialization routine.  This is called when the agent starts up.
- *   At a minimum, registration of your variables should take place here.
+ * init_lapbMIB(): Initialization routine.
+ * This is called when the agent starts up.  At a minimum, registration of your variables should
+ * take place here.
  */
 void
 init_lapbMIB(void)
@@ -360,33 +312,25 @@ init_lapbMIB(void)
 	snmpd_register_config_handler("lAPBDLETable", parse_lAPBDLETable, NULL, "HELP STRING");
 	snmpd_register_config_handler("dLSAPTable", parse_dLSAPTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("sLPPMTable", parse_sLPPMTable, NULL, "HELP STRING");
-	snmpd_register_config_handler("sLPConnectionTable", parse_sLPConnectionTable, NULL,
-				      "HELP STRING");
-	snmpd_register_config_handler("sLPConnectionIVMOTable", parse_sLPConnectionIVMOTable, NULL,
-				      "HELP STRING");
+	snmpd_register_config_handler("sLPConnectionTable", parse_sLPConnectionTable, NULL, "HELP STRING");
+	snmpd_register_config_handler("sLPConnectionIVMOTable", parse_sLPConnectionIVMOTable, NULL, "HELP STRING");
 
 	/* we need to be called back later to store our data */
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_lapbMIB,
-			       NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_lAPBDLETable,
-			       NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_dLSAPTable,
-			       NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sLPPMTable,
-			       NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA,
-			       store_sLPConnectionTable, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA,
-			       store_sLPConnectionIVMOTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_lapbMIB, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_lAPBDLETable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_dLSAPTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sLPPMTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sLPConnectionTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sLPConnectionIVMOTable, NULL);
 
 	/* place any other initialization junk you need here */
 	DEBUGMSGTL(("lapbMIB", "done.\n"));
 }
 
 /*
- * deinit_lapbMIB():
- *   Deinitialization routine.  This is called before the agent is unloaded.
- *   At a minimum, deregistration of your variables should take place here.
+ * deinit_lapbMIB(): Deinitialization routine.
+ * This is called before the agent is unloaded.  At a minimum, deregistration of your variables
+ * should take place here.
  */
 void
 deinit_lapbMIB(void)
@@ -424,8 +368,7 @@ lapbMIB_add(struct lapbMIB_data *thedata)
 }
 
 /*
- * parse_lapbMIB():
- *   parses .conf file entries needed to configure the mib.
+ * parse_lapbMIB(): parses .conf file entries needed to configure the mib.
  */
 void
 parse_lapbMIB(const char *token, char *line)
@@ -438,42 +381,23 @@ parse_lapbMIB(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line =
-	    read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->lapbDiscontinuityTime,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultInterfaceType,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultK, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultN1, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultN2, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line,
-				  &StorageTmp->sLPConnectionDefaultSequenceModulus, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultT1Timer,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultT2Timer,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultT3Timer,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultT4Timer,
-				  &tmpsize);
-
+	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->lapbDiscontinuityTime, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultInterfaceType, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultK, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultN1, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultN2, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultSequenceModulus, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultT1Timer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultT2Timer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultT3Timer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionDefaultT4Timer, &tmpsize);
 	lapbMIB_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("lapbMIB", "done.\n"));
 }
 
 /*
- * store_lapbMIB():
- *   stores .conf file entries needed to configure the mib.
+ * store_lapbMIB(): stores .conf file entries needed to configure the mib.
  */
 int
 store_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg)
@@ -490,42 +414,23 @@ store_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		return SNMPERR_GENERR;
 	}
 	(void) tmpsize;
-	/* XXX: if (StorageTmp->lapbMIBStorageType == ST_NONVOLATILE) { */
-	memset(line, 0, sizeof(line));
-	strcat(line, "lapbMIB ");
-	cptr = line + strlen(line);
-	cptr =
-	    read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->lapbDiscontinuityTime,
-				   &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr,
-				   &StorageTmp->sLPConnectionDefaultInterfaceType, &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultK, &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultN1,
-				   &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultN2,
-				   &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr,
-				   &StorageTmp->sLPConnectionDefaultSequenceModulus, &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultT1Timer,
-				   &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultT2Timer,
-				   &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultT3Timer,
-				   &tmpsize);
-	cptr =
-	    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultT4Timer,
-				   &tmpsize);
-
-	snmpd_store_config(line);
-	/* } */
+	/* XXX: if (StorageTmp->lapbMIBStorageType == ST_NONVOLATILE) */
+	{
+		memset(line, 0, sizeof(line));
+		strcat(line, "lapbMIB ");
+		cptr = line + strlen(line);
+		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->lapbDiscontinuityTime, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultInterfaceType, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultK, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultN1, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultN2, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultSequenceModulus, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultT1Timer, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultT2Timer, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultT3Timer, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultT4Timer, &tmpsize);
+		snmpd_store_config(line);
+	}
 	DEBUGMSGTL(("lapbMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
@@ -533,13 +438,11 @@ store_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * refresh_lapbMIB: refresh lapbMIB scalars
  *
- * Normally, the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread scalars and tables from the STREAMS susbystem.  This function
- * is used when the agent starts for the first time, or after a SIGPOLL
- * has been received (and a scalar has been requested).
+ * Normally, the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread scalars and
+ * tables from the STREAMS susbystem.  This function is used when the agent starts for the first
+ * time, or after a SIGPOLL has been received (and a scalar has been requested).
  */
 void
 refresh_lapbMIB(void)
@@ -551,7 +454,6 @@ refresh_lapbMIB(void)
 			return;
 		/* Update scalar defaults as required here... */
 		StorageNew->sLPConnectionDefaultInterfaceType = dTE(0);
-
 		lapbMIBStorage = StorageNew;
 		lapbMIB_refresh = 1;
 	}
@@ -562,25 +464,21 @@ refresh_lapbMIB(void)
 }
 
 /*
- * var_lapbMIB():
- *   This function is called every time the agent gets a request for
- *   a scalar variable that might be found within your mib section
- *   registered above.  It is up to you to do the right thing and
- *   return the correct value.
- *     You should also correct the value of "var_len" if necessary.
+ * var_lapbMIB(): locate variables in lapbMIB
  *
- *   Please see the documentation for more information about writing
- *   module extensions, and check out the examples in the examples
- *   and mibII directories.
+ * This function is called every time the agent gets a request for a scalar variable that might be
+ * found within your mib section registered above.  It is up to you to do the right thing and return
+ * the correct value.  You should also correct the value of "var_len" if necessary.
+ *
+ * Please see the documentation for more information about writing module extensions, and check out
+ * the examples in the examples and mibII directories.
  */
-uint8_t *
-var_lapbMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-	    WriteMethod ** write_method)
+u_char *
+var_lapbMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct lapbMIB_data *StorageTmp;
 
-	if (header_generic(vp, name, length, exact, var_len, write_method)
-	    == MATCH_FAILED)
+	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
 	/* Refresh the MIB values if required. */
 	refresh_lapbMIB();
@@ -588,48 +486,46 @@ var_lapbMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *
 		return NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-
 	case LAPBDISCONTINUITYTIME:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->lapbDiscontinuityTime);
-		return (uint8_t *) &StorageTmp->lapbDiscontinuityTime;
+		return (u_char *) &StorageTmp->lapbDiscontinuityTime;
 	case SLPCONNECTIONDEFAULTINTERFACETYPE:
 		*write_method = write_sLPConnectionDefaultInterfaceType;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultInterfaceType);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultInterfaceType;
+		return (u_char *) &StorageTmp->sLPConnectionDefaultInterfaceType;
 	case SLPCONNECTIONDEFAULTK:
 		*write_method = write_sLPConnectionDefaultK;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultK);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultK;
+		return (u_char *) &StorageTmp->sLPConnectionDefaultK;
 	case SLPCONNECTIONDEFAULTN1:
 		*write_method = write_sLPConnectionDefaultN1;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultN1);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultN1;
+		return (u_char *) &StorageTmp->sLPConnectionDefaultN1;
 	case SLPCONNECTIONDEFAULTN2:
 		*write_method = write_sLPConnectionDefaultN2;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultN2);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultN2;
+		return (u_char *) &StorageTmp->sLPConnectionDefaultN2;
 	case SLPCONNECTIONDEFAULTSEQUENCEMODULUS:
 		*write_method = write_sLPConnectionDefaultSequenceModulus;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultSequenceModulus);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultSequenceModulus;
+		return (u_char *) &StorageTmp->sLPConnectionDefaultSequenceModulus;
 	case SLPCONNECTIONDEFAULTT1TIMER:
 		*write_method = write_sLPConnectionDefaultT1Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultT1Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultT1Timer;
+		return (u_char *) &StorageTmp->sLPConnectionDefaultT1Timer;
 	case SLPCONNECTIONDEFAULTT2TIMER:
 		*write_method = write_sLPConnectionDefaultT2Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultT2Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultT2Timer;
+		return (u_char *) &StorageTmp->sLPConnectionDefaultT2Timer;
 	case SLPCONNECTIONDEFAULTT3TIMER:
 		*write_method = write_sLPConnectionDefaultT3Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultT3Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultT3Timer;
+		return (u_char *) &StorageTmp->sLPConnectionDefaultT3Timer;
 	case SLPCONNECTIONDEFAULTT4TIMER:
 		*write_method = write_sLPConnectionDefaultT4Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionDefaultT4Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionDefaultT4Timer;
-
+		return (u_char *) &StorageTmp->sLPConnectionDefaultT4Timer;
 	default:
 		ERROR_MSG("");
 	}
@@ -648,10 +544,7 @@ lAPBDLETable_add(struct lAPBDLETable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* lAPBDLEcommunicationsEntityId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR,
-				  (uint8_t *) thedata->lAPBDLEcommunicationsEntityId,
-				  thedata->lAPBDLEcommunicationsEntityIdLen);
-
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lAPBDLEcommunicationsEntityId, thedata->lAPBDLEcommunicationsEntityIdLen);
 	header_complex_add_data(&lAPBDLETableStorage, vars, thedata);
 	DEBUGMSGTL(("lAPBDLETable", "registered an entry\n"));
 	DEBUGMSGTL(("lAPBDLETable", "done.\n"));
@@ -659,8 +552,31 @@ lAPBDLETable_add(struct lAPBDLETable_data *thedata)
 }
 
 /*
- * parse_lAPBDLETable():
- *   parses .conf file entries needed to configure the mib.
+ * lAPBDLETable_del(): delete a structure
+ */
+int
+lAPBDLETable_del(struct lAPBDLETable_data **thedata)
+{
+	struct lAPBDLETable_data *StorageDel;
+
+	DEBUGMSGTL(("lAPBDLETable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->lAPBDLEcommunicationsEntityId);
+		StorageDel->lAPBDLEcommunicationsEntityIdLen = 0;
+		SNMP_FREE(StorageDel->lAPBDLElocalSapNames);
+		StorageDel->lAPBDLElocalSapNamesLen = 0;
+		SNMP_FREE(StorageDel->lAPBDLEproviderEntityNames);
+		StorageDel->lAPBDLEproviderEntityNamesLen = 0;
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("lAPBDLETable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_lAPBDLETable(): parse configuration file for lAPBDLETable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_lAPBDLETable(const char *token, char *line)
@@ -673,70 +589,47 @@ parse_lAPBDLETable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line =
-	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId,
-				  &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
 	StorageTmp->lAPBDLEcommunicationsEntityIdLen = tmpsize;
 	if (StorageTmp->lAPBDLEcommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lAPBDLEcommunicationsEntityId");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->lAPBDLElocalSapNames, &tmpsize);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->lAPBDLElocalSapNames, &tmpsize);
 	StorageTmp->lAPBDLElocalSapNamesLen = tmpsize;
 	if (StorageTmp->lAPBDLElocalSapNames == NULL) {
 		config_perror("invalid specification for lAPBDLElocalSapNames");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEoperationalState,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->lAPBDLEproviderEntityNames,
-				  &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEoperationalState, &tmpsize);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->lAPBDLEproviderEntityNames, &tmpsize);
 	StorageTmp->lAPBDLEproviderEntityNamesLen = tmpsize;
 	if (StorageTmp->lAPBDLEproviderEntityNames == NULL) {
 		config_perror("invalid specification for lAPBDLEproviderEntityNames");
 		return;
 	}
-
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEmT1Timer, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEmT3Timer, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEmW, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEmXSend, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEmXReceive, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEmT2Timer, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEreceivedMlpResets,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEtimesMT1Expired, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEIframesReassignments,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEmlpFramesReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEmlpFramesSent, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line,
-				  &StorageTmp->lAPBDLEmlpFramesOutsideWindowGuard, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line,
-				  &StorageTmp->lAPBDLEreceivedMlpFramesInGuardRegion, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEreceivedMlpResets, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEtimesMT1Expired, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEIframesReassignments, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEmlpFramesReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEmlpFramesSent, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEmlpFramesOutsideWindowGuard, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lAPBDLEreceivedMlpFramesInGuardRegion, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLERowStatus, &tmpsize);
-
 	lAPBDLETable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("lAPBDLETable", "done.\n"));
 }
 
 /*
- * store_lAPBDLETable():
- *   stores .conf file entries needed to configure the mib.
+ * store_lAPBDLETable(): store configuraiton file for lAPBDLETable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_lAPBDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
@@ -752,69 +645,34 @@ store_lAPBDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	(void) tmpsize;
 	for (hcindex = lAPBDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lAPBDLETable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->lAPBDLETableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "lAPBDLETable ");
-		cptr = line + strlen(line);
-		tmpsize = StorageTmp->lAPBDLEcommunicationsEntityIdLen;
-		cptr =
-		    read_config_store_data(ASN_OCTET_STR, cptr,
-					   &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
-		tmpsize = StorageTmp->lAPBDLElocalSapNamesLen;
-		cptr =
-		    read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->lAPBDLElocalSapNames,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEoperationalState,
-					   &tmpsize);
-		tmpsize = StorageTmp->lAPBDLEproviderEntityNamesLen;
-		cptr =
-		    read_config_store_data(ASN_OBJECT_ID, cptr,
-					   &StorageTmp->lAPBDLEproviderEntityNames, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmT1Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmT3Timer,
-					   &tmpsize);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmW, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmXSend, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmXReceive,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmT2Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEreceivedMlpResets,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEtimesMT1Expired,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->lAPBDLEIframesReassignments, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEmlpFramesReceived,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEmlpFramesSent,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->lAPBDLEmlpFramesOutsideWindowGuard,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->lAPBDLEreceivedMlpFramesInGuardRegion,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLERowStatus,
-					   &tmpsize);
-
-		snmpd_store_config(line);
-/*   } */
+		/* XXX: if (StorageTmp->lAPBDLETableStorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "lAPBDLETable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->lAPBDLEcommunicationsEntityIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
+			tmpsize = StorageTmp->lAPBDLElocalSapNamesLen;
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->lAPBDLElocalSapNames, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEoperationalState, &tmpsize);
+			tmpsize = StorageTmp->lAPBDLEproviderEntityNamesLen;
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->lAPBDLEproviderEntityNames, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmT1Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmT3Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmW, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmXSend, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmXReceive, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmT2Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEreceivedMlpResets, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEtimesMT1Expired, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEIframesReassignments, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEmlpFramesReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEmlpFramesSent, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEmlpFramesOutsideWindowGuard, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lAPBDLEreceivedMlpFramesInGuardRegion, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLERowStatus, &tmpsize);
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("lAPBDLETable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -832,13 +690,9 @@ dLSAPTable_add(struct dLSAPTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* lAPBDLEcommunicationsEntityId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR,
-				  (uint8_t *) thedata->lAPBDLEcommunicationsEntityId,
-				  thedata->lAPBDLEcommunicationsEntityIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lAPBDLEcommunicationsEntityId, thedata->lAPBDLEcommunicationsEntityIdLen);
 	/* dLSAPsapId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->dLSAPsapId,
-				  thedata->dLSAPsapIdLen);
-
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->dLSAPsapId, thedata->dLSAPsapIdLen);
 	header_complex_add_data(&dLSAPTableStorage, vars, thedata);
 	DEBUGMSGTL(("dLSAPTable", "registered an entry\n"));
 	DEBUGMSGTL(("dLSAPTable", "done.\n"));
@@ -846,8 +700,31 @@ dLSAPTable_add(struct dLSAPTable_data *thedata)
 }
 
 /*
- * parse_dLSAPTable():
- *   parses .conf file entries needed to configure the mib.
+ * dLSAPTable_del(): delete a structure
+ */
+int
+dLSAPTable_del(struct dLSAPTable_data **thedata)
+{
+	struct dLSAPTable_data *StorageDel;
+
+	DEBUGMSGTL(("dLSAPTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->lAPBDLEcommunicationsEntityId);
+		StorageDel->lAPBDLEcommunicationsEntityIdLen = 0;
+		SNMP_FREE(StorageDel->dLSAPsapId);
+		StorageDel->dLSAPsapIdLen = 0;
+		SNMP_FREE(StorageDel->dLSAPuserEntityNames);
+		StorageDel->dLSAPuserEntityNamesLen = 0;
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_dLSAPTable(): parse configuration file for dLSAPTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_dLSAPTable(const char *token, char *line)
@@ -860,41 +737,34 @@ parse_dLSAPTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line =
-	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId,
-				  &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
 	StorageTmp->lAPBDLEcommunicationsEntityIdLen = tmpsize;
 	if (StorageTmp->lAPBDLEcommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lAPBDLEcommunicationsEntityId");
 		return;
 	}
-
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dLSAPsapId, &tmpsize);
 	StorageTmp->dLSAPsapIdLen = tmpsize;
 	if (StorageTmp->dLSAPsapId == NULL) {
 		config_perror("invalid specification for dLSAPsapId");
 		return;
 	}
-
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->dLSAPsap1Address, &tmpsize);
-	line =
-	    read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->dLSAPuserEntityNames, &tmpsize);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->dLSAPuserEntityNames, &tmpsize);
 	StorageTmp->dLSAPuserEntityNamesLen = tmpsize;
 	if (StorageTmp->dLSAPuserEntityNames == NULL) {
 		config_perror("invalid specification for dLSAPuserEntityNames");
 		return;
 	}
-
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dLSAPRowStatus, &tmpsize);
-
 	dLSAPTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("dLSAPTable", "done.\n"));
 }
 
 /*
- * store_dLSAPTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_dLSAPTable(): store configuraiton file for dLSAPTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
@@ -910,30 +780,21 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	(void) tmpsize;
 	for (hcindex = dLSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dLSAPTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->dLSAPTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "dLSAPTable ");
-		cptr = line + strlen(line);
-		tmpsize = StorageTmp->lAPBDLEcommunicationsEntityIdLen;
-		cptr =
-		    read_config_store_data(ASN_OCTET_STR, cptr,
-					   &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
-		tmpsize = StorageTmp->dLSAPsapIdLen;
-		cptr =
-		    read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dLSAPsapId, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->dLSAPsap1Address,
-					   &tmpsize);
-		tmpsize = StorageTmp->dLSAPuserEntityNamesLen;
-		cptr =
-		    read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->dLSAPuserEntityNames,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dLSAPRowStatus,
-					   &tmpsize);
-
-		snmpd_store_config(line);
-/*   } */
+		/* XXX: if (StorageTmp->dLSAPTableStorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "dLSAPTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->lAPBDLEcommunicationsEntityIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
+			tmpsize = StorageTmp->dLSAPsapIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dLSAPsapId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->dLSAPsap1Address, &tmpsize);
+			tmpsize = StorageTmp->dLSAPuserEntityNamesLen;
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->dLSAPuserEntityNames, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dLSAPRowStatus, &tmpsize);
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("dLSAPTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -951,14 +812,9 @@ sLPPMTable_add(struct sLPPMTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* lAPBDLEcommunicationsEntityId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR,
-				  (uint8_t *) thedata->lAPBDLEcommunicationsEntityId,
-				  thedata->lAPBDLEcommunicationsEntityIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lAPBDLEcommunicationsEntityId, thedata->lAPBDLEcommunicationsEntityIdLen);
 	/* sLPPMcoProtocolMachineId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR,
-				  (uint8_t *) thedata->sLPPMcoProtocolMachineId,
-				  thedata->sLPPMcoProtocolMachineIdLen);
-
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sLPPMcoProtocolMachineId, thedata->sLPPMcoProtocolMachineIdLen);
 	header_complex_add_data(&sLPPMTableStorage, vars, thedata);
 	DEBUGMSGTL(("sLPPMTable", "registered an entry\n"));
 	DEBUGMSGTL(("sLPPMTable", "done.\n"));
@@ -966,8 +822,29 @@ sLPPMTable_add(struct sLPPMTable_data *thedata)
 }
 
 /*
- * parse_sLPPMTable():
- *   parses .conf file entries needed to configure the mib.
+ * sLPPMTable_del(): delete a structure
+ */
+int
+sLPPMTable_del(struct sLPPMTable_data **thedata)
+{
+	struct sLPPMTable_data *StorageDel;
+
+	DEBUGMSGTL(("sLPPMTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->lAPBDLEcommunicationsEntityId);
+		StorageDel->lAPBDLEcommunicationsEntityIdLen = 0;
+		SNMP_FREE(StorageDel->sLPPMcoProtocolMachineId);
+		StorageDel->sLPPMcoProtocolMachineIdLen = 0;
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("sLPPMTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_sLPPMTable(): parse configuration file for sLPPMTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_sLPPMTable(const char *token, char *line)
@@ -980,39 +857,29 @@ parse_sLPPMTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line =
-	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId,
-				  &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
 	StorageTmp->lAPBDLEcommunicationsEntityIdLen = tmpsize;
 	if (StorageTmp->lAPBDLEcommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lAPBDLEcommunicationsEntityId");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPPMcoProtocolMachineId,
-				  &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPPMcoProtocolMachineId, &tmpsize);
 	StorageTmp->sLPPMcoProtocolMachineIdLen = tmpsize;
 	if (StorageTmp->sLPPMcoProtocolMachineId == NULL) {
 		config_perror("invalid specification for sLPPMcoProtocolMachineId");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPPMoperationalState, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPPMadministrativeState,
-				  &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPPMoperationalState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPPMadministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPPMRowStatus, &tmpsize);
-
 	sLPPMTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("sLPPMTable", "done.\n"));
 }
 
 /*
- * store_sLPPMTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_sLPPMTable(): store configuraiton file for sLPPMTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_sLPPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
@@ -1028,30 +895,20 @@ store_sLPPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	(void) tmpsize;
 	for (hcindex = sLPPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPPMTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->sLPPMTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "sLPPMTable ");
-		cptr = line + strlen(line);
-		tmpsize = StorageTmp->lAPBDLEcommunicationsEntityIdLen;
-		cptr =
-		    read_config_store_data(ASN_OCTET_STR, cptr,
-					   &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
-		tmpsize = StorageTmp->sLPPMcoProtocolMachineIdLen;
-		cptr =
-		    read_config_store_data(ASN_OCTET_STR, cptr,
-					   &StorageTmp->sLPPMcoProtocolMachineId, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPPMoperationalState,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPPMadministrativeState,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPPMRowStatus,
-					   &tmpsize);
-
-		snmpd_store_config(line);
-/*   } */
+		/* XXX: if (StorageTmp->sLPPMTableStorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "sLPPMTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->lAPBDLEcommunicationsEntityIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lAPBDLEcommunicationsEntityId, &tmpsize);
+			tmpsize = StorageTmp->sLPPMcoProtocolMachineIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sLPPMcoProtocolMachineId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPPMoperationalState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPPMadministrativeState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPPMRowStatus, &tmpsize);
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("sLPPMTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1069,10 +926,7 @@ sLPConnectionTable_add(struct sLPConnectionTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* sLPConnectionConnectionId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR,
-				  (uint8_t *) thedata->sLPConnectionConnectionId,
-				  thedata->sLPConnectionConnectionIdLen);
-
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sLPConnectionConnectionId, thedata->sLPConnectionConnectionIdLen);
 	header_complex_add_data(&sLPConnectionTableStorage, vars, thedata);
 	DEBUGMSGTL(("sLPConnectionTable", "registered an entry\n"));
 	DEBUGMSGTL(("sLPConnectionTable", "done.\n"));
@@ -1080,8 +934,35 @@ sLPConnectionTable_add(struct sLPConnectionTable_data *thedata)
 }
 
 /*
- * parse_sLPConnectionTable():
- *   parses .conf file entries needed to configure the mib.
+ * sLPConnectionTable_del(): delete a structure
+ */
+int
+sLPConnectionTable_del(struct sLPConnectionTable_data **thedata)
+{
+	struct sLPConnectionTable_data *StorageDel;
+
+	DEBUGMSGTL(("sLPConnectionTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sLPConnectionConnectionId);
+		StorageDel->sLPConnectionConnectionIdLen = 0;
+		SNMP_FREE(StorageDel->sLPConnectionUnderlyingConnectionNames);
+		StorageDel->sLPConnectionUnderlyingConnectionNamesLen = 0;
+		SNMP_FREE(StorageDel->sLPConnectionSupportedConnectionNames);
+		StorageDel->sLPConnectionSupportedConnectionNamesLen = 0;
+		SNMP_FREE(StorageDel->sLPConnectionProceduralStatus);
+		StorageDel->sLPConnectionProceduralStatusLen = 0;
+		SNMP_FREE(StorageDel->sLPConnectionAlarmStatus);
+		StorageDel->sLPConnectionAlarmStatusLen = 0;
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("sLPConnectionTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_sLPConnectionTable(): parse configuration file for sLPConnectionTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_sLPConnectionTable(const char *token, char *line)
@@ -1094,154 +975,80 @@ parse_sLPConnectionTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line =
-	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionConnectionId,
-				  &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionConnectionId, &tmpsize);
 	StorageTmp->sLPConnectionConnectionIdLen = tmpsize;
 	if (StorageTmp->sLPConnectionConnectionId == NULL) {
 		config_perror("invalid specification for sLPConnectionConnectionId");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_OBJECT_ID, line,
-				  &StorageTmp->sLPConnectionUnderlyingConnectionNames, &tmpsize);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sLPConnectionUnderlyingConnectionNames, &tmpsize);
 	StorageTmp->sLPConnectionUnderlyingConnectionNamesLen = tmpsize;
 	if (StorageTmp->sLPConnectionUnderlyingConnectionNames == NULL) {
 		config_perror("invalid specification for sLPConnectionUnderlyingConnectionNames");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_OBJECT_ID, line,
-				  &StorageTmp->sLPConnectionSupportedConnectionNames, &tmpsize);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sLPConnectionSupportedConnectionNames, &tmpsize);
 	StorageTmp->sLPConnectionSupportedConnectionNamesLen = tmpsize;
 	if (StorageTmp->sLPConnectionSupportedConnectionNames == NULL) {
 		config_perror("invalid specification for sLPConnectionSupportedConnectionNames");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionInterfaceType,
-				  &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionInterfaceType, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionK, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionN1, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionN2, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionSequenceModulus,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionT1Timer, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionT2Timer, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionFCSErrorsReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionFRMRsReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionFRMRsSent, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line,
-				  &StorageTmp->sLPConnectionIFrameDataOctetsReceived, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionIFrameDataOctetsSent,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionIFramesReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionIFramesSent,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionPollsReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionREJsReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionREJsSent, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionRNRsReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionRNRsSent, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionSABMsReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionSABMsSent, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionProtocolState,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionTimesT1Expired,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionT3Timer, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionTimesT3Expired,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionT4Timer, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionTimesT4Expired,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line,
-				  &StorageTmp->sLPConnectionAbnormalLinkDisconnectsReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line,
-				  &StorageTmp->sLPConnectionAbnormalLinkDisconnectsSent, &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionLinkResetsReceived,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionLinkResetsSent,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionTimesN2Reached,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionAdministrativeState,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionOperationalState,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionUsageState,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sLPConnectionProceduralStatus,
-				  &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionSequenceModulus, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionT1Timer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionT2Timer, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionFCSErrorsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionFRMRsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionFRMRsSent, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionIFrameDataOctetsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionIFrameDataOctetsSent, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionIFramesReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionIFramesSent, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionPollsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionREJsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionREJsSent, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionRNRsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionRNRsSent, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionSABMsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionSABMsSent, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionProtocolState, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionTimesT1Expired, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionT3Timer, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionTimesT3Expired, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionT4Timer, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionTimesT4Expired, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionAbnormalLinkDisconnectsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionAbnormalLinkDisconnectsSent, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionLinkResetsReceived, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionLinkResetsSent, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->sLPConnectionTimesN2Reached, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionAdministrativeState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionOperationalState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionUsageState, &tmpsize);
+	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sLPConnectionProceduralStatus, &tmpsize);
 	StorageTmp->sLPConnectionProceduralStatusLen = tmpsize;
 	if (StorageTmp->sLPConnectionProceduralStatus == NULL) {
 		config_perror("invalid specification for sLPConnectionProceduralStatus");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sLPConnectionAlarmStatus,
-				  &tmpsize);
+	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sLPConnectionAlarmStatus, &tmpsize);
 	StorageTmp->sLPConnectionAlarmStatusLen = tmpsize;
 	if (StorageTmp->sLPConnectionAlarmStatus == NULL) {
 		config_perror("invalid specification for sLPConnectionAlarmStatus");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionRowStatus, &tmpsize);
-
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionRowStatus, &tmpsize);
 	sLPConnectionTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("sLPConnectionTable", "done.\n"));
 }
 
 /*
- * store_sLPConnectionTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_sLPConnectionTable(): store configuraiton file for sLPConnectionTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_sLPConnectionTable(int majorID, int minorID, void *serverarg, void *clientarg)
@@ -1257,147 +1064,59 @@ store_sLPConnectionTable(int majorID, int minorID, void *serverarg, void *client
 	(void) tmpsize;
 	for (hcindex = sLPConnectionTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPConnectionTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->sLPConnectionTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "sLPConnectionTable ");
-		cptr = line + strlen(line);
-		tmpsize = StorageTmp->sLPConnectionConnectionIdLen;
-		cptr =
-		    read_config_store_data(ASN_OCTET_STR, cptr,
-					   &StorageTmp->sLPConnectionConnectionId, &tmpsize);
-		tmpsize = StorageTmp->sLPConnectionUnderlyingConnectionNamesLen;
-		cptr =
-		    read_config_store_data(ASN_OBJECT_ID, cptr,
-					   &StorageTmp->sLPConnectionUnderlyingConnectionNames,
-					   &tmpsize);
-		tmpsize = StorageTmp->sLPConnectionSupportedConnectionNamesLen;
-		cptr =
-		    read_config_store_data(ASN_OBJECT_ID, cptr,
-					   &StorageTmp->sLPConnectionSupportedConnectionNames,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr,
-					   &StorageTmp->sLPConnectionInterfaceType, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionK,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionN1,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionN2,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr,
-					   &StorageTmp->sLPConnectionSequenceModulus, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionT1Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionT2Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionFCSErrorsReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionFRMRsReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionFRMRsSent,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionIFrameDataOctetsReceived,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionIFrameDataOctetsSent,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionIFramesReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionIFramesSent,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionPollsReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionREJsReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionREJsSent,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionRNRsReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionRNRsSent,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionSABMsReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionSABMsSent,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr,
-					   &StorageTmp->sLPConnectionProtocolState, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionTimesT1Expired, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionT3Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionTimesT3Expired, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionT4Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionTimesT4Expired, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->
-					   sLPConnectionAbnormalLinkDisconnectsReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionAbnormalLinkDisconnectsSent,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionLinkResetsReceived, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionLinkResetsSent, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_COUNTER, cptr,
-					   &StorageTmp->sLPConnectionTimesN2Reached, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr,
-					   &StorageTmp->sLPConnectionAdministrativeState, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr,
-					   &StorageTmp->sLPConnectionOperationalState, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionUsageState,
-					   &tmpsize);
-		tmpsize = StorageTmp->sLPConnectionProceduralStatusLen;
-		cptr =
-		    read_config_store_data(ASN_BIT_STR, cptr,
-					   &StorageTmp->sLPConnectionProceduralStatus, &tmpsize);
-		tmpsize = StorageTmp->sLPConnectionAlarmStatusLen;
-		cptr =
-		    read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sLPConnectionAlarmStatus,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionRowStatus,
-					   &tmpsize);
-
-		snmpd_store_config(line);
-/*   } */
+		/* XXX: if (StorageTmp->sLPConnectionTableStorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "sLPConnectionTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->sLPConnectionConnectionIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sLPConnectionConnectionId, &tmpsize);
+			tmpsize = StorageTmp->sLPConnectionUnderlyingConnectionNamesLen;
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sLPConnectionUnderlyingConnectionNames, &tmpsize);
+			tmpsize = StorageTmp->sLPConnectionSupportedConnectionNamesLen;
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sLPConnectionSupportedConnectionNames, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionInterfaceType, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionK, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionN1, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionN2, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionSequenceModulus, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionT1Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionT2Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionFCSErrorsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionFRMRsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionFRMRsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionIFrameDataOctetsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionIFrameDataOctetsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionIFramesReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionIFramesSent, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionPollsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionREJsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionREJsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionRNRsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionRNRsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionSABMsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionSABMsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionProtocolState, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionTimesT1Expired, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionT3Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionTimesT3Expired, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionT4Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionTimesT4Expired, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionAbnormalLinkDisconnectsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionAbnormalLinkDisconnectsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionLinkResetsReceived, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionLinkResetsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sLPConnectionTimesN2Reached, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionAdministrativeState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionOperationalState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionUsageState, &tmpsize);
+			tmpsize = StorageTmp->sLPConnectionProceduralStatusLen;
+			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sLPConnectionProceduralStatus, &tmpsize);
+			tmpsize = StorageTmp->sLPConnectionAlarmStatusLen;
+			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sLPConnectionAlarmStatus, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionRowStatus, &tmpsize);
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("sLPConnectionTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1415,10 +1134,7 @@ sLPConnectionIVMOTable_add(struct sLPConnectionIVMOTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* sLPConnectionConnectionId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR,
-				  (uint8_t *) thedata->sLPConnectionConnectionId,
-				  thedata->sLPConnectionConnectionIdLen);
-
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sLPConnectionConnectionId, thedata->sLPConnectionConnectionIdLen);
 	header_complex_add_data(&sLPConnectionIVMOTableStorage, vars, thedata);
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "registered an entry\n"));
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "done.\n"));
@@ -1426,70 +1142,71 @@ sLPConnectionIVMOTable_add(struct sLPConnectionIVMOTable_data *thedata)
 }
 
 /*
- * parse_sLPConnectionIVMOTable():
- *   parses .conf file entries needed to configure the mib.
+ * sLPConnectionIVMOTable_del(): delete a structure
+ */
+int
+sLPConnectionIVMOTable_del(struct sLPConnectionIVMOTable_data **thedata)
+{
+	struct sLPConnectionIVMOTable_data *StorageDel;
+
+	DEBUGMSGTL(("sLPConnectionIVMOTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sLPConnectionConnectionId);
+		StorageDel->sLPConnectionConnectionIdLen = 0;
+		SNMP_FREE(StorageDel->sLPConnectionIVMOid);
+		StorageDel->sLPConnectionIVMOidLen = 0;
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("sLPConnectionIVMOTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_sLPConnectionIVMOTable(): parse configuration file for sLPConnectionIVMOTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_sLPConnectionIVMOTable(const char *token, char *line)
 {
 	size_t tmpsize;
-	struct sLPConnectionIVMOTable_data *StorageTmp =
-	    SNMP_MALLOC_STRUCT(sLPConnectionIVMOTable_data);
+	struct sLPConnectionIVMOTable_data *StorageTmp = SNMP_MALLOC_STRUCT(sLPConnectionIVMOTable_data);
+
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
-	line =
-	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionConnectionId,
-				  &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionConnectionId, &tmpsize);
 	StorageTmp->sLPConnectionConnectionIdLen = tmpsize;
 	if (StorageTmp->sLPConnectionConnectionId == NULL) {
 		config_perror("invalid specification for sLPConnectionConnectionId");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionIVMOid, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionIVMOid, &tmpsize);
 	StorageTmp->sLPConnectionIVMOidLen = tmpsize;
 	if (StorageTmp->sLPConnectionIVMOid == NULL) {
 		config_perror("invalid specification for sLPConnectionIVMOid");
 		return;
 	}
-
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOinterfaceType,
-				  &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOinterfaceType, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOk, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOn1, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOn2, &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOsequenceModulus,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOt1Timer,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOt2Timer,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOt3Timer,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOt4Timer,
-				  &tmpsize);
-	line =
-	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMORowStatus,
-				  &tmpsize);
-
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOsequenceModulus, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOt1Timer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOt2Timer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOt3Timer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMOt4Timer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionIVMORowStatus, &tmpsize);
 	sLPConnectionIVMOTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "done.\n"));
 }
 
 /*
- * store_sLPConnectionIVMOTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_sLPConnectionIVMOTable(): store configuraiton file for sLPConnectionIVMOTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *clientarg)
@@ -1505,51 +1222,27 @@ store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *cl
 	(void) tmpsize;
 	for (hcindex = sLPConnectionIVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPConnectionIVMOTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->sLPConnectionIVMOTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "sLPConnectionIVMOTable ");
-		cptr = line + strlen(line);
-		tmpsize = StorageTmp->sLPConnectionConnectionIdLen;
-		cptr =
-		    read_config_store_data(ASN_OCTET_STR, cptr,
-					   &StorageTmp->sLPConnectionConnectionId, &tmpsize);
-		tmpsize = StorageTmp->sLPConnectionIVMOidLen;
-		cptr =
-		    read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sLPConnectionIVMOid,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr,
-					   &StorageTmp->sLPConnectionIVMOinterfaceType, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOk,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOn1,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOn2,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr,
-					   &StorageTmp->sLPConnectionIVMOsequenceModulus, &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOt1Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOt2Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOt3Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOt4Timer,
-					   &tmpsize);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr,
-					   &StorageTmp->sLPConnectionIVMORowStatus, &tmpsize);
-
-		snmpd_store_config(line);
-/*   } */
+		/* XXX: if (StorageTmp->sLPConnectionIVMOTableStorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "sLPConnectionIVMOTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->sLPConnectionConnectionIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sLPConnectionConnectionId, &tmpsize);
+			tmpsize = StorageTmp->sLPConnectionIVMOidLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sLPConnectionIVMOid, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOinterfaceType, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOk, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOn1, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOn2, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOsequenceModulus, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOt1Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOt2Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOt3Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMOt4Timer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionIVMORowStatus, &tmpsize);
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1558,13 +1251,11 @@ store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *cl
 /**
  * refresh_lAPBDLETable(): refresh lAPBDLETable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_lAPBDLETable(void)
@@ -1578,11 +1269,9 @@ refresh_lAPBDLETable(void)
 /**
  * refresh_lAPBDLETable_row(): refresh lAPBDLETable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp)
@@ -1593,13 +1282,12 @@ refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp)
 }
 
 /*
- * var_lAPBDLETable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_lapbMIB above.
+ * var_lAPBDLETable(): locate variables in lAPBDLETable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_lapbMIB above.
  */
-uint8_t *
-var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-		 WriteMethod ** write_method)
+u_char *
+var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct lAPBDLETable_data *StorageTmp = NULL;
 
@@ -1609,83 +1297,79 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	refresh_lAPBDLETable();
 	/* This assumes you have registered all your data properly with header_complex_add()
 	   somewhere before this. */
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lAPBDLETable_row(StorageTmp);
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-
 	case LAPBDLELOCALSAPNAMES:
 		*write_method = write_lAPBDLElocalSapNames;
 		*var_len = StorageTmp->lAPBDLElocalSapNamesLen;
-		return (uint8_t *) StorageTmp->lAPBDLElocalSapNames;
+		return (u_char *) StorageTmp->lAPBDLElocalSapNames;
 	case LAPBDLEOPERATIONALSTATE:
 		*write_method = write_lAPBDLEoperationalState;
 		*var_len = sizeof(StorageTmp->lAPBDLEoperationalState);
-		return (uint8_t *) &StorageTmp->lAPBDLEoperationalState;
+		return (u_char *) &StorageTmp->lAPBDLEoperationalState;
 	case LAPBDLEPROVIDERENTITYNAMES:
 		*write_method = write_lAPBDLEproviderEntityNames;
 		*var_len = StorageTmp->lAPBDLEproviderEntityNamesLen;
-		return (uint8_t *) StorageTmp->lAPBDLEproviderEntityNames;
+		return (u_char *) StorageTmp->lAPBDLEproviderEntityNames;
 	case LAPBDLEMT1TIMER:
 		*write_method = write_lAPBDLEmT1Timer;
 		*var_len = sizeof(StorageTmp->lAPBDLEmT1Timer);
-		return (uint8_t *) &StorageTmp->lAPBDLEmT1Timer;
+		return (u_char *) &StorageTmp->lAPBDLEmT1Timer;
 	case LAPBDLEMT3TIMER:
 		*write_method = write_lAPBDLEmT3Timer;
 		*var_len = sizeof(StorageTmp->lAPBDLEmT3Timer);
-		return (uint8_t *) &StorageTmp->lAPBDLEmT3Timer;
+		return (u_char *) &StorageTmp->lAPBDLEmT3Timer;
 	case LAPBDLEMW:
 		*write_method = write_lAPBDLEmW;
 		*var_len = sizeof(StorageTmp->lAPBDLEmW);
-		return (uint8_t *) &StorageTmp->lAPBDLEmW;
+		return (u_char *) &StorageTmp->lAPBDLEmW;
 	case LAPBDLEMXSEND:
 		*write_method = write_lAPBDLEmXSend;
 		*var_len = sizeof(StorageTmp->lAPBDLEmXSend);
-		return (uint8_t *) &StorageTmp->lAPBDLEmXSend;
+		return (u_char *) &StorageTmp->lAPBDLEmXSend;
 	case LAPBDLEMXRECEIVE:
 		*write_method = write_lAPBDLEmXReceive;
 		*var_len = sizeof(StorageTmp->lAPBDLEmXReceive);
-		return (uint8_t *) &StorageTmp->lAPBDLEmXReceive;
+		return (u_char *) &StorageTmp->lAPBDLEmXReceive;
 	case LAPBDLEMT2TIMER:
 		*write_method = write_lAPBDLEmT2Timer;
 		*var_len = sizeof(StorageTmp->lAPBDLEmT2Timer);
-		return (uint8_t *) &StorageTmp->lAPBDLEmT2Timer;
+		return (u_char *) &StorageTmp->lAPBDLEmT2Timer;
 	case LAPBDLERECEIVEDMLPRESETS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->lAPBDLEreceivedMlpResets);
-		return (uint8_t *) &StorageTmp->lAPBDLEreceivedMlpResets;
+		return (u_char *) &StorageTmp->lAPBDLEreceivedMlpResets;
 	case LAPBDLETIMESMT1EXPIRED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->lAPBDLEtimesMT1Expired);
-		return (uint8_t *) &StorageTmp->lAPBDLEtimesMT1Expired;
+		return (u_char *) &StorageTmp->lAPBDLEtimesMT1Expired;
 	case LAPBDLEIFRAMESREASSIGNMENTS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->lAPBDLEIframesReassignments);
-		return (uint8_t *) &StorageTmp->lAPBDLEIframesReassignments;
+		return (u_char *) &StorageTmp->lAPBDLEIframesReassignments;
 	case LAPBDLEMLPFRAMESRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->lAPBDLEmlpFramesReceived);
-		return (uint8_t *) &StorageTmp->lAPBDLEmlpFramesReceived;
+		return (u_char *) &StorageTmp->lAPBDLEmlpFramesReceived;
 	case LAPBDLEMLPFRAMESSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->lAPBDLEmlpFramesSent);
-		return (uint8_t *) &StorageTmp->lAPBDLEmlpFramesSent;
+		return (u_char *) &StorageTmp->lAPBDLEmlpFramesSent;
 	case LAPBDLEMLPFRAMESOUTSIDEWINDOWGUARD:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->lAPBDLEmlpFramesOutsideWindowGuard);
-		return (uint8_t *) &StorageTmp->lAPBDLEmlpFramesOutsideWindowGuard;
+		return (u_char *) &StorageTmp->lAPBDLEmlpFramesOutsideWindowGuard;
 	case LAPBDLERECEIVEDMLPFRAMESINGUARDREGION:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->lAPBDLEreceivedMlpFramesInGuardRegion);
-		return (uint8_t *) &StorageTmp->lAPBDLEreceivedMlpFramesInGuardRegion;
+		return (u_char *) &StorageTmp->lAPBDLEreceivedMlpFramesInGuardRegion;
 	case LAPBDLEROWSTATUS:
 		*write_method = write_lAPBDLERowStatus;
 		*var_len = sizeof(StorageTmp->lAPBDLERowStatus);
-		return (uint8_t *) &StorageTmp->lAPBDLERowStatus;
-
+		return (u_char *) &StorageTmp->lAPBDLERowStatus;
 	default:
 		ERROR_MSG("");
 	}
@@ -1695,13 +1379,11 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 /**
  * refresh_dLSAPTable(): refresh dLSAPTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_dLSAPTable(void)
@@ -1715,11 +1397,9 @@ refresh_dLSAPTable(void)
 /**
  * refresh_dLSAPTable_row(): refresh dLSAPTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
@@ -1730,13 +1410,12 @@ refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
 }
 
 /*
- * var_dLSAPTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_lapbMIB above.
+ * var_dLSAPTable(): locate variables in dLSAPTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_lapbMIB above.
  */
-uint8_t *
-var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-	       WriteMethod ** write_method)
+u_char *
+var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct dLSAPTable_data *StorageTmp = NULL;
 
@@ -1746,27 +1425,23 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 	refresh_dLSAPTable();
 	/* This assumes you have registered all your data properly with header_complex_add()
 	   somewhere before this. */
-	if ((StorageTmp =
-	     header_complex(dLSAPTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(dLSAPTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_dLSAPTable_row(StorageTmp);
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-
 	case DLSAPSAP1ADDRESS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->dLSAPsap1Address);
-		return (uint8_t *) &StorageTmp->dLSAPsap1Address;
+		return (u_char *) &StorageTmp->dLSAPsap1Address;
 	case DLSAPUSERENTITYNAMES:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->dLSAPuserEntityNamesLen;
-		return (uint8_t *) StorageTmp->dLSAPuserEntityNames;
+		return (u_char *) StorageTmp->dLSAPuserEntityNames;
 	case DLSAPROWSTATUS:
 		*write_method = write_dLSAPRowStatus;
 		*var_len = sizeof(StorageTmp->dLSAPRowStatus);
-		return (uint8_t *) &StorageTmp->dLSAPRowStatus;
-
+		return (u_char *) &StorageTmp->dLSAPRowStatus;
 	default:
 		ERROR_MSG("");
 	}
@@ -1776,13 +1451,11 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 /**
  * refresh_sLPPMTable(): refresh sLPPMTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_sLPPMTable(void)
@@ -1796,11 +1469,9 @@ refresh_sLPPMTable(void)
 /**
  * refresh_sLPPMTable_row(): refresh sLPPMTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp)
@@ -1811,13 +1482,12 @@ refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp)
 }
 
 /*
- * var_sLPPMTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_lapbMIB above.
+ * var_sLPPMTable(): locate variables in sLPPMTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_lapbMIB above.
  */
-uint8_t *
-var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-	       WriteMethod ** write_method)
+u_char *
+var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct sLPPMTable_data *StorageTmp = NULL;
 
@@ -1827,27 +1497,23 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 	refresh_sLPPMTable();
 	/* This assumes you have registered all your data properly with header_complex_add()
 	   somewhere before this. */
-	if ((StorageTmp =
-	     header_complex(sLPPMTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(sLPPMTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sLPPMTable_row(StorageTmp);
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-
 	case SLPPMOPERATIONALSTATE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPPMoperationalState);
-		return (uint8_t *) &StorageTmp->sLPPMoperationalState;
+		return (u_char *) &StorageTmp->sLPPMoperationalState;
 	case SLPPMADMINISTRATIVESTATE:
 		*write_method = write_sLPPMadministrativeState;
 		*var_len = sizeof(StorageTmp->sLPPMadministrativeState);
-		return (uint8_t *) &StorageTmp->sLPPMadministrativeState;
+		return (u_char *) &StorageTmp->sLPPMadministrativeState;
 	case SLPPMROWSTATUS:
 		*write_method = write_sLPPMRowStatus;
 		*var_len = sizeof(StorageTmp->sLPPMRowStatus);
-		return (uint8_t *) &StorageTmp->sLPPMRowStatus;
-
+		return (u_char *) &StorageTmp->sLPPMRowStatus;
 	default:
 		ERROR_MSG("");
 	}
@@ -1857,13 +1523,11 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 /**
  * refresh_sLPConnectionTable(): refresh sLPConnectionTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_sLPConnectionTable(void)
@@ -1877,11 +1541,9 @@ refresh_sLPConnectionTable(void)
 /**
  * refresh_sLPConnectionTable_row(): refresh sLPConnectionTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp)
@@ -1892,13 +1554,12 @@ refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp)
 }
 
 /*
- * var_sLPConnectionTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_lapbMIB above.
+ * var_sLPConnectionTable(): locate variables in sLPConnectionTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_lapbMIB above.
  */
-uint8_t *
-var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-		       WriteMethod ** write_method)
+u_char *
+var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct sLPConnectionTable_data *StorageTmp = NULL;
 
@@ -1908,175 +1569,171 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 	refresh_sLPConnectionTable();
 	/* This assumes you have registered all your data properly with header_complex_add()
 	   somewhere before this. */
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sLPConnectionTable_row(StorageTmp);
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-
 	case SLPCONNECTIONUNDERLYINGCONNECTIONNAMES:
 		*write_method = write_sLPConnectionUnderlyingConnectionNames;
 		*var_len = StorageTmp->sLPConnectionUnderlyingConnectionNamesLen;
-		return (uint8_t *) StorageTmp->sLPConnectionUnderlyingConnectionNames;
+		return (u_char *) StorageTmp->sLPConnectionUnderlyingConnectionNames;
 	case SLPCONNECTIONSUPPORTEDCONNECTIONNAMES:
 		*write_method = write_sLPConnectionSupportedConnectionNames;
 		*var_len = StorageTmp->sLPConnectionSupportedConnectionNamesLen;
-		return (uint8_t *) StorageTmp->sLPConnectionSupportedConnectionNames;
+		return (u_char *) StorageTmp->sLPConnectionSupportedConnectionNames;
 	case SLPCONNECTIONINTERFACETYPE:
 		*write_method = write_sLPConnectionInterfaceType;
 		*var_len = sizeof(StorageTmp->sLPConnectionInterfaceType);
-		return (uint8_t *) &StorageTmp->sLPConnectionInterfaceType;
+		return (u_char *) &StorageTmp->sLPConnectionInterfaceType;
 	case SLPCONNECTIONK:
 		*write_method = write_sLPConnectionK;
 		*var_len = sizeof(StorageTmp->sLPConnectionK);
-		return (uint8_t *) &StorageTmp->sLPConnectionK;
+		return (u_char *) &StorageTmp->sLPConnectionK;
 	case SLPCONNECTIONN1:
 		*write_method = write_sLPConnectionN1;
 		*var_len = sizeof(StorageTmp->sLPConnectionN1);
-		return (uint8_t *) &StorageTmp->sLPConnectionN1;
+		return (u_char *) &StorageTmp->sLPConnectionN1;
 	case SLPCONNECTIONN2:
 		*write_method = write_sLPConnectionN2;
 		*var_len = sizeof(StorageTmp->sLPConnectionN2);
-		return (uint8_t *) &StorageTmp->sLPConnectionN2;
+		return (u_char *) &StorageTmp->sLPConnectionN2;
 	case SLPCONNECTIONSEQUENCEMODULUS:
 		*write_method = write_sLPConnectionSequenceModulus;
 		*var_len = sizeof(StorageTmp->sLPConnectionSequenceModulus);
-		return (uint8_t *) &StorageTmp->sLPConnectionSequenceModulus;
+		return (u_char *) &StorageTmp->sLPConnectionSequenceModulus;
 	case SLPCONNECTIONT1TIMER:
 		*write_method = write_sLPConnectionT1Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionT1Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionT1Timer;
+		return (u_char *) &StorageTmp->sLPConnectionT1Timer;
 	case SLPCONNECTIONT2TIMER:
 		*write_method = write_sLPConnectionT2Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionT2Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionT2Timer;
+		return (u_char *) &StorageTmp->sLPConnectionT2Timer;
 	case SLPCONNECTIONFCSERRORSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionFCSErrorsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionFCSErrorsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionFCSErrorsReceived;
 	case SLPCONNECTIONFRMRSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionFRMRsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionFRMRsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionFRMRsReceived;
 	case SLPCONNECTIONFRMRSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionFRMRsSent);
-		return (uint8_t *) &StorageTmp->sLPConnectionFRMRsSent;
+		return (u_char *) &StorageTmp->sLPConnectionFRMRsSent;
 	case SLPCONNECTIONIFRAMEDATAOCTETSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionIFrameDataOctetsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionIFrameDataOctetsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionIFrameDataOctetsReceived;
 	case SLPCONNECTIONIFRAMEDATAOCTETSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionIFrameDataOctetsSent);
-		return (uint8_t *) &StorageTmp->sLPConnectionIFrameDataOctetsSent;
+		return (u_char *) &StorageTmp->sLPConnectionIFrameDataOctetsSent;
 	case SLPCONNECTIONIFRAMESRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionIFramesReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionIFramesReceived;
+		return (u_char *) &StorageTmp->sLPConnectionIFramesReceived;
 	case SLPCONNECTIONIFRAMESSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionIFramesSent);
-		return (uint8_t *) &StorageTmp->sLPConnectionIFramesSent;
+		return (u_char *) &StorageTmp->sLPConnectionIFramesSent;
 	case SLPCONNECTIONPOLLSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionPollsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionPollsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionPollsReceived;
 	case SLPCONNECTIONREJSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionREJsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionREJsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionREJsReceived;
 	case SLPCONNECTIONREJSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionREJsSent);
-		return (uint8_t *) &StorageTmp->sLPConnectionREJsSent;
+		return (u_char *) &StorageTmp->sLPConnectionREJsSent;
 	case SLPCONNECTIONRNRSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionRNRsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionRNRsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionRNRsReceived;
 	case SLPCONNECTIONRNRSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionRNRsSent);
-		return (uint8_t *) &StorageTmp->sLPConnectionRNRsSent;
+		return (u_char *) &StorageTmp->sLPConnectionRNRsSent;
 	case SLPCONNECTIONSABMSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionSABMsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionSABMsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionSABMsReceived;
 	case SLPCONNECTIONSABMSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionSABMsSent);
-		return (uint8_t *) &StorageTmp->sLPConnectionSABMsSent;
+		return (u_char *) &StorageTmp->sLPConnectionSABMsSent;
 	case SLPCONNECTIONPROTOCOLSTATE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionProtocolState);
-		return (uint8_t *) &StorageTmp->sLPConnectionProtocolState;
+		return (u_char *) &StorageTmp->sLPConnectionProtocolState;
 	case SLPCONNECTIONTIMEST1EXPIRED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionTimesT1Expired);
-		return (uint8_t *) &StorageTmp->sLPConnectionTimesT1Expired;
+		return (u_char *) &StorageTmp->sLPConnectionTimesT1Expired;
 	case SLPCONNECTIONT3TIMER:
 		*write_method = write_sLPConnectionT3Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionT3Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionT3Timer;
+		return (u_char *) &StorageTmp->sLPConnectionT3Timer;
 	case SLPCONNECTIONTIMEST3EXPIRED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionTimesT3Expired);
-		return (uint8_t *) &StorageTmp->sLPConnectionTimesT3Expired;
+		return (u_char *) &StorageTmp->sLPConnectionTimesT3Expired;
 	case SLPCONNECTIONT4TIMER:
 		*write_method = write_sLPConnectionT4Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionT4Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionT4Timer;
+		return (u_char *) &StorageTmp->sLPConnectionT4Timer;
 	case SLPCONNECTIONTIMEST4EXPIRED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionTimesT4Expired);
-		return (uint8_t *) &StorageTmp->sLPConnectionTimesT4Expired;
+		return (u_char *) &StorageTmp->sLPConnectionTimesT4Expired;
 	case SLPCONNECTIONABNORMALLINKDISCONNECTSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionAbnormalLinkDisconnectsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionAbnormalLinkDisconnectsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionAbnormalLinkDisconnectsReceived;
 	case SLPCONNECTIONABNORMALLINKDISCONNECTSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionAbnormalLinkDisconnectsSent);
-		return (uint8_t *) &StorageTmp->sLPConnectionAbnormalLinkDisconnectsSent;
+		return (u_char *) &StorageTmp->sLPConnectionAbnormalLinkDisconnectsSent;
 	case SLPCONNECTIONLINKRESETSRECEIVED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionLinkResetsReceived);
-		return (uint8_t *) &StorageTmp->sLPConnectionLinkResetsReceived;
+		return (u_char *) &StorageTmp->sLPConnectionLinkResetsReceived;
 	case SLPCONNECTIONLINKRESETSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionLinkResetsSent);
-		return (uint8_t *) &StorageTmp->sLPConnectionLinkResetsSent;
+		return (u_char *) &StorageTmp->sLPConnectionLinkResetsSent;
 	case SLPCONNECTIONTIMESN2REACHED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionTimesN2Reached);
-		return (uint8_t *) &StorageTmp->sLPConnectionTimesN2Reached;
+		return (u_char *) &StorageTmp->sLPConnectionTimesN2Reached;
 	case SLPCONNECTIONADMINISTRATIVESTATE:
 		*write_method = write_sLPConnectionAdministrativeState;
 		*var_len = sizeof(StorageTmp->sLPConnectionAdministrativeState);
-		return (uint8_t *) &StorageTmp->sLPConnectionAdministrativeState;
+		return (u_char *) &StorageTmp->sLPConnectionAdministrativeState;
 	case SLPCONNECTIONOPERATIONALSTATE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionOperationalState);
-		return (uint8_t *) &StorageTmp->sLPConnectionOperationalState;
+		return (u_char *) &StorageTmp->sLPConnectionOperationalState;
 	case SLPCONNECTIONUSAGESTATE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sLPConnectionUsageState);
-		return (uint8_t *) &StorageTmp->sLPConnectionUsageState;
+		return (u_char *) &StorageTmp->sLPConnectionUsageState;
 	case SLPCONNECTIONPROCEDURALSTATUS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->sLPConnectionProceduralStatusLen;
-		return (uint8_t *) StorageTmp->sLPConnectionProceduralStatus;
+		return (u_char *) StorageTmp->sLPConnectionProceduralStatus;
 	case SLPCONNECTIONALARMSTATUS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->sLPConnectionAlarmStatusLen;
-		return (uint8_t *) StorageTmp->sLPConnectionAlarmStatus;
+		return (u_char *) StorageTmp->sLPConnectionAlarmStatus;
 	case SLPCONNECTIONROWSTATUS:
 		*write_method = write_sLPConnectionRowStatus;
 		*var_len = sizeof(StorageTmp->sLPConnectionRowStatus);
-		return (uint8_t *) &StorageTmp->sLPConnectionRowStatus;
-
+		return (u_char *) &StorageTmp->sLPConnectionRowStatus;
 	default:
 		ERROR_MSG("");
 	}
@@ -2086,13 +1743,11 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 /**
  * refresh_sLPConnectionIVMOTable(): refresh sLPConnectionIVMOTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_sLPConnectionIVMOTable(void)
@@ -2106,11 +1761,9 @@ refresh_sLPConnectionIVMOTable(void)
 /**
  * refresh_sLPConnectionIVMOTable_row(): refresh sLPConnectionIVMOTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp)
@@ -2121,13 +1774,12 @@ refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTm
 }
 
 /*
- * var_sLPConnectionIVMOTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_lapbMIB above.
+ * var_sLPConnectionIVMOTable(): locate variables in sLPConnectionIVMOTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_lapbMIB above.
  */
-uint8_t *
-var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int exact,
-			   size_t *var_len, WriteMethod ** write_method)
+u_char *
+var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
 
@@ -2137,59 +1789,55 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 	refresh_sLPConnectionIVMOTable();
 	/* This assumes you have registered all your data properly with header_complex_add()
 	   somewhere before this. */
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sLPConnectionIVMOTable_row(StorageTmp);
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-
 	case SLPCONNECTIONIVMOID:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->sLPConnectionIVMOidLen;
-		return (uint8_t *) StorageTmp->sLPConnectionIVMOid;
+		return (u_char *) StorageTmp->sLPConnectionIVMOid;
 	case SLPCONNECTIONIVMOINTERFACETYPE:
 		*write_method = write_sLPConnectionIVMOinterfaceType;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOinterfaceType);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOinterfaceType;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOinterfaceType;
 	case SLPCONNECTIONIVMOK:
 		*write_method = write_sLPConnectionIVMOk;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOk);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOk;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOk;
 	case SLPCONNECTIONIVMON1:
 		*write_method = write_sLPConnectionIVMOn1;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOn1);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOn1;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOn1;
 	case SLPCONNECTIONIVMON2:
 		*write_method = write_sLPConnectionIVMOn2;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOn2);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOn2;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOn2;
 	case SLPCONNECTIONIVMOSEQUENCEMODULUS:
 		*write_method = write_sLPConnectionIVMOsequenceModulus;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOsequenceModulus);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOsequenceModulus;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOsequenceModulus;
 	case SLPCONNECTIONIVMOT1TIMER:
 		*write_method = write_sLPConnectionIVMOt1Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOt1Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOt1Timer;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOt1Timer;
 	case SLPCONNECTIONIVMOT2TIMER:
 		*write_method = write_sLPConnectionIVMOt2Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOt2Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOt2Timer;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOt2Timer;
 	case SLPCONNECTIONIVMOT3TIMER:
 		*write_method = write_sLPConnectionIVMOt3Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOt3Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOt3Timer;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOt3Timer;
 	case SLPCONNECTIONIVMOT4TIMER:
 		*write_method = write_sLPConnectionIVMOt4Timer;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMOt4Timer);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMOt4Timer;
+		return (u_char *) &StorageTmp->sLPConnectionIVMOt4Timer;
 	case SLPCONNECTIONIVMOROWSTATUS:
 		*write_method = write_sLPConnectionIVMORowStatus;
 		*var_len = sizeof(StorageTmp->sLPConnectionIVMORowStatus);
-		return (uint8_t *) &StorageTmp->sLPConnectionIVMORowStatus;
-
+		return (u_char *) &StorageTmp->sLPConnectionIVMORowStatus;
 	default:
 		ERROR_MSG("");
 	}
@@ -2197,254 +1845,263 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 int
-write_lAPBDLElocalSapNames(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			   uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLElocalSapNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *tmpvar;
+	static oid *old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t old_length = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLElocalSapNames entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_OBJECT_ID) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to lAPBDLElocalSapNames not ASN_OBJECT_ID\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLElocalSapNames not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLElocalSapNames: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLElocalSapNames;
-		tmplen = StorageTmp->lAPBDLElocalSapNamesLen;
-		memdup((void *) &StorageTmp->lAPBDLElocalSapNames, var_val, var_val_len);
+		old_value = StorageTmp->lAPBDLElocalSapNames;
+		old_length = StorageTmp->lAPBDLElocalSapNamesLen;
+		StorageTmp->lAPBDLElocalSapNames = objid;
 		StorageTmp->lAPBDLElocalSapNamesLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->lAPBDLElocalSapNames);
-		StorageTmp->lAPBDLElocalSapNames = tmpvar;
-		StorageTmp->lAPBDLElocalSapNamesLen = tmplen;
+		StorageTmp->lAPBDLElocalSapNames = old_value;
+		StorageTmp->lAPBDLElocalSapNamesLen = old_length;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(tmpvar);
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLEoperationalState(int action, uint8_t *var_val, uint8_t var_val_type,
-			      size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLEoperationalState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEoperationalState entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to lAPBDLEoperationalState not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEoperationalState not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEoperationalState: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case LAPBDLEOPERATIONALSTATE_DISABLED:
+		case LAPBDLEOPERATIONALSTATE_ENABLED:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEoperationalState: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLEoperationalState;
-		StorageTmp->lAPBDLEoperationalState = *((long *) var_val);
+		old_value = StorageTmp->lAPBDLEoperationalState;
+		StorageTmp->lAPBDLEoperationalState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lAPBDLEoperationalState = tmpvar;
+		StorageTmp->lAPBDLEoperationalState = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLEproviderEntityNames(int action, uint8_t *var_val, uint8_t var_val_type,
-				 size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLEproviderEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *tmpvar;
+	static oid *old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t old_length = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEproviderEntityNames entering action=%d...  \n",
-		    action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEproviderEntityNames entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_OBJECT_ID) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to lAPBDLEproviderEntityNames not ASN_OBJECT_ID\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEproviderEntityNames not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEproviderEntityNames: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLEproviderEntityNames;
-		tmplen = StorageTmp->lAPBDLEproviderEntityNamesLen;
-		memdup((void *) &StorageTmp->lAPBDLEproviderEntityNames, var_val, var_val_len);
+		old_value = StorageTmp->lAPBDLEproviderEntityNames;
+		old_length = StorageTmp->lAPBDLEproviderEntityNamesLen;
+		StorageTmp->lAPBDLEproviderEntityNames = objid;
 		StorageTmp->lAPBDLEproviderEntityNamesLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->lAPBDLEproviderEntityNames);
-		StorageTmp->lAPBDLEproviderEntityNames = tmpvar;
-		StorageTmp->lAPBDLEproviderEntityNamesLen = tmplen;
+		StorageTmp->lAPBDLEproviderEntityNames = old_value;
+		StorageTmp->lAPBDLEproviderEntityNamesLen = old_length;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(tmpvar);
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLEmT1Timer(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		      uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLEmT1Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmT1Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to lAPBDLEmT1Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT1Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT1Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT1Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLEmT1Timer;
-		StorageTmp->lAPBDLEmT1Timer = *((long *) var_val);
+		old_value = StorageTmp->lAPBDLEmT1Timer;
+		StorageTmp->lAPBDLEmT1Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lAPBDLEmT1Timer = tmpvar;
+		StorageTmp->lAPBDLEmT1Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLEmT3Timer(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		      uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLEmT3Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmT3Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to lAPBDLEmT3Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT3Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT3Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT3Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLEmT3Timer;
-		StorageTmp->lAPBDLEmT3Timer = *((long *) var_val);
+		old_value = StorageTmp->lAPBDLEmT3Timer;
+		StorageTmp->lAPBDLEmT3Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lAPBDLEmT3Timer = tmpvar;
+		StorageTmp->lAPBDLEmT3Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLEmW(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLEmW(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmW entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
@@ -2452,1620 +2109,1597 @@ write_lAPBDLEmW(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmW not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmW: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLEmW;
-		StorageTmp->lAPBDLEmW = *((long *) var_val);
+		old_value = StorageTmp->lAPBDLEmW;
+		StorageTmp->lAPBDLEmW = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lAPBDLEmW = tmpvar;
+		StorageTmp->lAPBDLEmW = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLEmXSend(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		    uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLEmXSend(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmXSend entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to lAPBDLEmXSend not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmXSend not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmXSend: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLEmXSend;
-		StorageTmp->lAPBDLEmXSend = *((long *) var_val);
+		old_value = StorageTmp->lAPBDLEmXSend;
+		StorageTmp->lAPBDLEmXSend = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lAPBDLEmXSend = tmpvar;
+		StorageTmp->lAPBDLEmXSend = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLEmXReceive(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		       uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLEmXReceive(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmXReceive entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to lAPBDLEmXReceive not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmXReceive not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmXReceive: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLEmXReceive;
-		StorageTmp->lAPBDLEmXReceive = *((long *) var_val);
+		old_value = StorageTmp->lAPBDLEmXReceive;
+		StorageTmp->lAPBDLEmXReceive = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lAPBDLEmXReceive = tmpvar;
+		StorageTmp->lAPBDLEmXReceive = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLEmT2Timer(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		      uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLEmT2Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lAPBDLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmT2Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(lAPBDLETableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to lAPBDLEmT2Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT2Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT2Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLEmT2Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->lAPBDLEmT2Timer;
-		StorageTmp->lAPBDLEmT2Timer = *((long *) var_val);
+		old_value = StorageTmp->lAPBDLEmT2Timer;
+		StorageTmp->lAPBDLEmT2Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lAPBDLEmT2Timer = tmpvar;
+		StorageTmp->lAPBDLEmT2Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPPMadministrativeState(int action, uint8_t *var_val, uint8_t var_val_type,
-			       size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPPMadministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPPMTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPPMadministrativeState entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPPMTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPPMTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPPMadministrativeState not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPPMadministrativeState not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPPMadministrativeState: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case SLPPMADMINISTRATIVESTATE_LOCKED:
+		case SLPPMADMINISTRATIVESTATE_UNLOCKED:
+		case SLPPMADMINISTRATIVESTATE_SHUTTINGDOWN:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPPMadministrativeState: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPPMadministrativeState;
-		StorageTmp->sLPPMadministrativeState = *((long *) var_val);
+		old_value = StorageTmp->sLPPMadministrativeState;
+		StorageTmp->sLPPMadministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPPMadministrativeState = tmpvar;
+		StorageTmp->sLPPMadministrativeState = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionUnderlyingConnectionNames(int action, uint8_t *var_val, uint8_t var_val_type,
-					     size_t var_val_len, uint8_t *statP, oid * name,
-					     size_t name_len)
+write_sLPConnectionUnderlyingConnectionNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *tmpvar;
+	static oid *old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t old_length = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB",
-		    "write_sLPConnectionUnderlyingConnectionNames entering action=%d...  \n",
-		    action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionUnderlyingConnectionNames entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_OBJECT_ID) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionUnderlyingConnectionNames not ASN_OBJECT_ID\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionUnderlyingConnectionNames not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionUnderlyingConnectionNames: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionUnderlyingConnectionNames;
-		tmplen = StorageTmp->sLPConnectionUnderlyingConnectionNamesLen;
-		memdup((void *) &StorageTmp->sLPConnectionUnderlyingConnectionNames, var_val,
-		       var_val_len);
+		old_value = StorageTmp->sLPConnectionUnderlyingConnectionNames;
+		old_length = StorageTmp->sLPConnectionUnderlyingConnectionNamesLen;
+		StorageTmp->sLPConnectionUnderlyingConnectionNames = objid;
 		StorageTmp->sLPConnectionUnderlyingConnectionNamesLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->sLPConnectionUnderlyingConnectionNames);
-		StorageTmp->sLPConnectionUnderlyingConnectionNames = tmpvar;
-		StorageTmp->sLPConnectionUnderlyingConnectionNamesLen = tmplen;
+		StorageTmp->sLPConnectionUnderlyingConnectionNames = old_value;
+		StorageTmp->sLPConnectionUnderlyingConnectionNamesLen = old_length;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(tmpvar);
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionSupportedConnectionNames(int action, uint8_t *var_val, uint8_t var_val_type,
-					    size_t var_val_len, uint8_t *statP, oid * name,
-					    size_t name_len)
+write_sLPConnectionSupportedConnectionNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *tmpvar;
+	static oid *old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t old_length = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB",
-		    "write_sLPConnectionSupportedConnectionNames entering action=%d...  \n",
-		    action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionSupportedConnectionNames entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_OBJECT_ID) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionSupportedConnectionNames not ASN_OBJECT_ID\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionSupportedConnectionNames not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionSupportedConnectionNames: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionSupportedConnectionNames;
-		tmplen = StorageTmp->sLPConnectionSupportedConnectionNamesLen;
-		memdup((void *) &StorageTmp->sLPConnectionSupportedConnectionNames, var_val,
-		       var_val_len);
+		old_value = StorageTmp->sLPConnectionSupportedConnectionNames;
+		old_length = StorageTmp->sLPConnectionSupportedConnectionNamesLen;
+		StorageTmp->sLPConnectionSupportedConnectionNames = objid;
 		StorageTmp->sLPConnectionSupportedConnectionNamesLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->sLPConnectionSupportedConnectionNames);
-		StorageTmp->sLPConnectionSupportedConnectionNames = tmpvar;
-		StorageTmp->sLPConnectionSupportedConnectionNamesLen = tmplen;
+		StorageTmp->sLPConnectionSupportedConnectionNames = old_value;
+		StorageTmp->sLPConnectionSupportedConnectionNamesLen = old_length;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(tmpvar);
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionInterfaceType(int action, uint8_t *var_val, uint8_t var_val_type,
-				 size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionInterfaceType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionInterfaceType entering action=%d...  \n",
-		    action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionInterfaceType entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionInterfaceType not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionInterfaceType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionInterfaceType: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case SLPCONNECTIONINTERFACETYPE_DTE:
+		case SLPCONNECTIONINTERFACETYPE_DCE:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionInterfaceType: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionInterfaceType;
-		StorageTmp->sLPConnectionInterfaceType = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionInterfaceType;
+		StorageTmp->sLPConnectionInterfaceType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionInterfaceType = tmpvar;
+		StorageTmp->sLPConnectionInterfaceType = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionK(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		     uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionK(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionK entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionK not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionK not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionK: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionK;
-		StorageTmp->sLPConnectionK = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionK;
+		StorageTmp->sLPConnectionK = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionK = tmpvar;
+		StorageTmp->sLPConnectionK = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionN1(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		      uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionN1 entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionN1 not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionN1 not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionN1: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionN1;
-		StorageTmp->sLPConnectionN1 = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionN1;
+		StorageTmp->sLPConnectionN1 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionN1 = tmpvar;
+		StorageTmp->sLPConnectionN1 = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionN2(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		      uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionN2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionN2 entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionN2 not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionN2 not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionN2: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionN2;
-		StorageTmp->sLPConnectionN2 = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionN2;
+		StorageTmp->sLPConnectionN2 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionN2 = tmpvar;
+		StorageTmp->sLPConnectionN2 = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionSequenceModulus(int action, uint8_t *var_val, uint8_t var_val_type,
-				   size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionSequenceModulus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionSequenceModulus entering action=%d...  \n",
-		    action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionSequenceModulus entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionSequenceModulus not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionSequenceModulus not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionSequenceModulus: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 8..8 128..128 */
+		if (set_value != 8 && set_value != 128) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionSequenceModulus: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionSequenceModulus;
-		StorageTmp->sLPConnectionSequenceModulus = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionSequenceModulus;
+		StorageTmp->sLPConnectionSequenceModulus = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionSequenceModulus = tmpvar;
+		StorageTmp->sLPConnectionSequenceModulus = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionT1Timer(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			   uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionT1Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionT1Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionT1Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT1Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT1Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT1Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionT1Timer;
-		StorageTmp->sLPConnectionT1Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionT1Timer;
+		StorageTmp->sLPConnectionT1Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionT1Timer = tmpvar;
+		StorageTmp->sLPConnectionT1Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionT2Timer(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			   uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionT2Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionT2Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionT2Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT2Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT2Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT2Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionT2Timer;
-		StorageTmp->sLPConnectionT2Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionT2Timer;
+		StorageTmp->sLPConnectionT2Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionT2Timer = tmpvar;
+		StorageTmp->sLPConnectionT2Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionT3Timer(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			   uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionT3Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionT3Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionT3Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT3Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT3Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT3Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionT3Timer;
-		StorageTmp->sLPConnectionT3Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionT3Timer;
+		StorageTmp->sLPConnectionT3Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionT3Timer = tmpvar;
+		StorageTmp->sLPConnectionT3Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionT4Timer(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			   uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionT4Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionT4Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionT4Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT4Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT4Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionT4Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionT4Timer;
-		StorageTmp->sLPConnectionT4Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionT4Timer;
+		StorageTmp->sLPConnectionT4Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionT4Timer = tmpvar;
+		StorageTmp->sLPConnectionT4Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionAdministrativeState(int action, uint8_t *var_val, uint8_t var_val_type,
-				       size_t var_val_len, uint8_t *statP, oid * name,
-				       size_t name_len)
+write_sLPConnectionAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionAdministrativeState entering action=%d...  \n",
-		    action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionAdministrativeState entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionAdministrativeState not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionAdministrativeState not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionAdministrativeState: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case SLPCONNECTIONADMINISTRATIVESTATE_LOCKED:
+		case SLPCONNECTIONADMINISTRATIVESTATE_UNLOCKED:
+		case SLPCONNECTIONADMINISTRATIVESTATE_SHUTTINGDOWN:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionAdministrativeState: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionAdministrativeState;
-		StorageTmp->sLPConnectionAdministrativeState = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionAdministrativeState;
+		StorageTmp->sLPConnectionAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionAdministrativeState = tmpvar;
+		StorageTmp->sLPConnectionAdministrativeState = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOinterfaceType(int action, uint8_t *var_val, uint8_t var_val_type,
-				     size_t var_val_len, uint8_t *statP, oid * name,
-				     size_t name_len)
+write_sLPConnectionIVMOinterfaceType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOinterfaceType entering action=%d...  \n",
-		    action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOinterfaceType entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOinterfaceType not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOinterfaceType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOinterfaceType: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case SLPCONNECTIONIVMOINTERFACETYPE_DTE:
+		case SLPCONNECTIONIVMOINTERFACETYPE_DCE:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOinterfaceType: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOinterfaceType;
-		StorageTmp->sLPConnectionIVMOinterfaceType = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOinterfaceType;
+		StorageTmp->sLPConnectionIVMOinterfaceType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOinterfaceType = tmpvar;
+		StorageTmp->sLPConnectionIVMOinterfaceType = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOk(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			 uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOk(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOk entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOk not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOk not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOk: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOk;
-		StorageTmp->sLPConnectionIVMOk = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOk;
+		StorageTmp->sLPConnectionIVMOk = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOk = tmpvar;
+		StorageTmp->sLPConnectionIVMOk = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOn1(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			  uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOn1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOn1 entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOn1 not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOn1 not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOn1: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOn1;
-		StorageTmp->sLPConnectionIVMOn1 = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOn1;
+		StorageTmp->sLPConnectionIVMOn1 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOn1 = tmpvar;
+		StorageTmp->sLPConnectionIVMOn1 = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOn2(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			  uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOn2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOn2 entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOn2 not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOn2 not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOn2: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOn2;
-		StorageTmp->sLPConnectionIVMOn2 = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOn2;
+		StorageTmp->sLPConnectionIVMOn2 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOn2 = tmpvar;
+		StorageTmp->sLPConnectionIVMOn2 = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOsequenceModulus(int action, uint8_t *var_val, uint8_t var_val_type,
-				       size_t var_val_len, uint8_t *statP, oid * name,
-				       size_t name_len)
+write_sLPConnectionIVMOsequenceModulus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOsequenceModulus entering action=%d...  \n",
-		    action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOsequenceModulus entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOsequenceModulus not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOsequenceModulus not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOsequenceModulus: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 8..8 128..128 */
+		if (set_value != 8 && set_value != 128) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOsequenceModulus: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOsequenceModulus;
-		StorageTmp->sLPConnectionIVMOsequenceModulus = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOsequenceModulus;
+		StorageTmp->sLPConnectionIVMOsequenceModulus = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOsequenceModulus = tmpvar;
+		StorageTmp->sLPConnectionIVMOsequenceModulus = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOt1Timer(int action, uint8_t *var_val, uint8_t var_val_type,
-			       size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOt1Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOt1Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOt1Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt1Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt1Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt1Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOt1Timer;
-		StorageTmp->sLPConnectionIVMOt1Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOt1Timer;
+		StorageTmp->sLPConnectionIVMOt1Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOt1Timer = tmpvar;
+		StorageTmp->sLPConnectionIVMOt1Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOt2Timer(int action, uint8_t *var_val, uint8_t var_val_type,
-			       size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOt2Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOt2Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOt2Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt2Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt2Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt2Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOt2Timer;
-		StorageTmp->sLPConnectionIVMOt2Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOt2Timer;
+		StorageTmp->sLPConnectionIVMOt2Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOt2Timer = tmpvar;
+		StorageTmp->sLPConnectionIVMOt2Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOt3Timer(int action, uint8_t *var_val, uint8_t var_val_type,
-			       size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOt3Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOt3Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOt3Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt3Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt3Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt3Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOt3Timer;
-		StorageTmp->sLPConnectionIVMOt3Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOt3Timer;
+		StorageTmp->sLPConnectionIVMOt3Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOt3Timer = tmpvar;
+		StorageTmp->sLPConnectionIVMOt3Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionIVMOt4Timer(int action, uint8_t *var_val, uint8_t var_val_type,
-			       size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOt4Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOt4Timer entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(sLPConnectionIVMOTableStorage, NULL,
-			    &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(lapbMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionIVMOt4Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt4Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt4Timer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMOt4Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionIVMOt4Timer;
-		StorageTmp->sLPConnectionIVMOt4Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionIVMOt4Timer;
+		StorageTmp->sLPConnectionIVMOt4Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionIVMOt4Timer = tmpvar;
+		StorageTmp->sLPConnectionIVMOt4Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultInterfaceType(int action, uint8_t *var_val, uint8_t var_val_type,
-					size_t var_val_len, uint8_t *statP, oid * name,
-					size_t name_len)
+write_sLPConnectionDefaultInterfaceType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultInterfaceType entering action=%d...  \n",
-		    action));
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultInterfaceType entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultInterfaceType not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultInterfaceType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultInterfaceType: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultInterfaceType: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value dTE ( 0 ) */
-		/* Note: ranges (none) */
+		switch (set_value) {
+		case SLPCONNECTIONDEFAULTINTERFACETYPE_DTE:
+		case SLPCONNECTIONDEFAULTINTERFACETYPE_DCE:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultInterfaceType: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultInterfaceType;
-		StorageTmp->sLPConnectionDefaultInterfaceType = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultInterfaceType;
+		StorageTmp->sLPConnectionDefaultInterfaceType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultInterfaceType = tmpvar;
+		StorageTmp->sLPConnectionDefaultInterfaceType = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultK(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			    uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultK(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultK entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultK not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultK not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultK: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultK: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: no default */
-		/* Note: ranges (none) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultK;
-		StorageTmp->sLPConnectionDefaultK = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultK;
+		StorageTmp->sLPConnectionDefaultK = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultK = tmpvar;
+		StorageTmp->sLPConnectionDefaultK = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultN1(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			     uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultN1 entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultN1 not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultN1 not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultN1: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultN1: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: no default */
-		/* Note: ranges (none) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultN1;
-		StorageTmp->sLPConnectionDefaultN1 = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultN1;
+		StorageTmp->sLPConnectionDefaultN1 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultN1 = tmpvar;
+		StorageTmp->sLPConnectionDefaultN1 = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultN2(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			     uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultN2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultN2 entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultN2 not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultN2 not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultN2: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultN2: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: no default */
-		/* Note: ranges (none) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultN2;
-		StorageTmp->sLPConnectionDefaultN2 = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultN2;
+		StorageTmp->sLPConnectionDefaultN2 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultN2 = tmpvar;
+		StorageTmp->sLPConnectionDefaultN2 = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultSequenceModulus(int action, uint8_t *var_val, uint8_t var_val_type,
-					  size_t var_val_len, uint8_t *statP, oid * name,
-					  size_t name_len)
+write_sLPConnectionDefaultSequenceModulus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB",
-		    "write_sLPConnectionDefaultSequenceModulus entering action=%d...  \n", action));
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultSequenceModulus entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultSequenceModulus not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultSequenceModulus not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultSequenceModulus: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultSequenceModulus: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: no default */
 		/* Note: ranges 8..8 128..128 */
+		if (set_value != 8 && set_value != 128) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultSequenceModulus: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultSequenceModulus;
-		StorageTmp->sLPConnectionDefaultSequenceModulus = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultSequenceModulus;
+		StorageTmp->sLPConnectionDefaultSequenceModulus = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultSequenceModulus = tmpvar;
+		StorageTmp->sLPConnectionDefaultSequenceModulus = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultT1Timer(int action, uint8_t *var_val, uint8_t var_val_type,
-				  size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultT1Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultT1Timer entering action=%d...  \n",
-		    action));
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultT1Timer entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultT1Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT1Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultT1Timer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT1Timer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: no default */
 		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT1Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultT1Timer;
-		StorageTmp->sLPConnectionDefaultT1Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultT1Timer;
+		StorageTmp->sLPConnectionDefaultT1Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultT1Timer = tmpvar;
+		StorageTmp->sLPConnectionDefaultT1Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultT2Timer(int action, uint8_t *var_val, uint8_t var_val_type,
-				  size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultT2Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultT2Timer entering action=%d...  \n",
-		    action));
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultT2Timer entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultT2Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT2Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultT2Timer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT2Timer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: no default */
 		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT2Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultT2Timer;
-		StorageTmp->sLPConnectionDefaultT2Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultT2Timer;
+		StorageTmp->sLPConnectionDefaultT2Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultT2Timer = tmpvar;
+		StorageTmp->sLPConnectionDefaultT2Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultT3Timer(int action, uint8_t *var_val, uint8_t var_val_type,
-				  size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultT3Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultT3Timer entering action=%d...  \n",
-		    action));
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultT3Timer entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultT3Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT3Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultT3Timer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT3Timer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: no default */
 		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT3Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultT3Timer;
-		StorageTmp->sLPConnectionDefaultT3Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultT3Timer;
+		StorageTmp->sLPConnectionDefaultT3Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultT3Timer = tmpvar;
+		StorageTmp->sLPConnectionDefaultT3Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_sLPConnectionDefaultT4Timer(int action, uint8_t *var_val, uint8_t var_val_type,
-				  size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultT4Timer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static int32_t tmpvar;
+	static int32_t old_value;
 	struct lapbMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
-	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultT4Timer entering action=%d...  \n",
-		    action));
+	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionDefaultT4Timer entering action=%d...  \n", action));
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultT4Timer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT4Timer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to sLPConnectionDefaultT4Timer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT4Timer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: no default */
 		/* Note: ranges 0..2147483647 */
+		if ((0 > set_value || set_value > 2147483647)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionDefaultT4Timer: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you 
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->sLPConnectionDefaultT4Timer;
-		StorageTmp->sLPConnectionDefaultT4Timer = *((long *) var_val);
+		old_value = StorageTmp->sLPConnectionDefaultT4Timer;
+		StorageTmp->sLPConnectionDefaultT4Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sLPConnectionDefaultT4Timer = tmpvar;
+		StorageTmp->sLPConnectionDefaultT4Timer = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_lAPBDLERowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		       uint8_t *statP, oid * name, size_t name_len)
+write_lAPBDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct lAPBDLETable_data *StorageTmp = NULL;
 	static struct lAPBDLETable_data *StorageNew, *StorageDel;
@@ -4075,119 +3709,162 @@ write_lAPBDLERowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_
 	static struct variable_list *vars, *vp;
 	struct header_complex_index *hciptr;
 
-	StorageTmp =
-	    header_complex(lAPBDLETableStorage, NULL,
-			   &name[sizeof(lAPBDLETable_variables_oid) / sizeof(oid) + 3 - 1], &newlen,
-			   1, NULL, NULL);
+	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[sizeof(lAPBDLETable_variables_oid) / sizeof(oid) + 3 - 1], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to lAPBDLERowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
 	}
-	set_value = *((int *) var_val);
+	set_value = *((long *) var_val);
 	/* check legal range, and notReady is reserved for us, not a user */
 	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY)
 		return SNMP_ERR_INCONSISTENTVALUE;
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->lAPBDLERowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->lAPBDLETable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->lAPBDLETable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* lAPBDLEcommunicationsEntityId 
-												 */
-
-			if (header_complex_parse_oid
-			    (&(name[sizeof(lAPBDLETable_variables_oid) / sizeof(oid) + 2]), newlen,
-			     vars) != SNMPERR_SUCCESS) {
+			/* lAPBDLEcommunicationsEntityId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);
+			if (header_complex_parse_oid(&(name[sizeof(lAPBDLETable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(lAPBDLETable_data);
-			memdup((void *) &StorageNew->lAPBDLEcommunicationsEntityId, vp->val.string,
-			       vp->val_len);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(lAPBDLETable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			memdup((void *) &StorageNew->lAPBDLEcommunicationsEntityId, vp->val.string, vp->val_len);
 			StorageNew->lAPBDLEcommunicationsEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
-
 			/* XXX: fill in default row values here into StorageNew */
-
-			StorageNew->lAPBDLERowStatus = set_value;
+			StorageNew->lAPBDLERowStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			lAPBDLETable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				lAPBDLETable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			lAPBDLETable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->lAPBDLERowStatus;
-			StorageTmp->lAPBDLERowStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(lAPBDLETableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&lAPBDLETableStorage, hciptr);
+			StorageTmp->lAPBDLERowStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(lAPBDLETableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&lAPBDLETableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(lAPBDLETableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&lAPBDLETableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(lAPBDLETableStorage, StorageNew);
+			header_complex_extract_entry(&lAPBDLETableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->lAPBDLERowStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			lAPBDLETable_add(StorageDel);
-		} else {
-			StorageTmp->lAPBDLERowStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->lAPBDLERowStatus == RS_CREATEANDGO) {
-				StorageTmp->lAPBDLERowStatus = RS_ACTIVE;
-			} else if (StorageTmp && StorageTmp->lAPBDLERowStatus == RS_CREATEANDWAIT) {
-				StorageTmp->lAPBDLERowStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->lAPBDLERowStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->lAPBDLERowStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			lAPBDLETable_del(&StorageDel);
+			/* lAPBDLETable_del() can handle NULL pointers. */
+			break;
 		}
 		break;
 	}
@@ -4195,8 +3872,7 @@ write_lAPBDLERowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_
 }
 
 int
-write_dLSAPRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		     uint8_t *statP, oid * name, size_t name_len)
+write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct dLSAPTable_data *StorageTmp = NULL;
 	static struct dLSAPTable_data *StorageNew, *StorageDel;
@@ -4206,124 +3882,167 @@ write_dLSAPRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t 
 	static struct variable_list *vars, *vp;
 	struct header_complex_index *hciptr;
 
-	StorageTmp =
-	    header_complex(dLSAPTableStorage, NULL,
-			   &name[sizeof(dLSAPTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen,
-			   1, NULL, NULL);
+	StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[sizeof(dLSAPTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to dLSAPRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
 	}
-	set_value = *((int *) var_val);
+	set_value = *((long *) var_val);
 	/* check legal range, and notReady is reserved for us, not a user */
 	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY)
 		return SNMP_ERR_INCONSISTENTVALUE;
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->dLSAPRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->dLSAPTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->dLSAPTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* lAPBDLEcommunicationsEntityId 
-												 */
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* dLSAPsapId 
-												 */
-
-			if (header_complex_parse_oid
-			    (&(name[sizeof(dLSAPTable_variables_oid) / sizeof(oid) + 2]), newlen,
-			     vars) != SNMPERR_SUCCESS) {
+			/* lAPBDLEcommunicationsEntityId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);
+			/* dLSAPsapId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);
+			if (header_complex_parse_oid(&(name[sizeof(dLSAPTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(dLSAPTable_data);
-			memdup((void *) &StorageNew->lAPBDLEcommunicationsEntityId, vp->val.string,
-			       vp->val_len);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(dLSAPTable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			memdup((void *) &StorageNew->lAPBDLEcommunicationsEntityId, vp->val.string, vp->val_len);
 			StorageNew->lAPBDLEcommunicationsEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->dLSAPsapId, vp->val.string, vp->val_len);
 			StorageNew->dLSAPsapIdLen = vp->val_len;
 			vp = vp->next_variable;
-
 			/* XXX: fill in default row values here into StorageNew */
-
-			StorageNew->dLSAPRowStatus = set_value;
+			StorageNew->dLSAPRowStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			dLSAPTable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				dLSAPTable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			dLSAPTable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->dLSAPRowStatus;
-			StorageTmp->dLSAPRowStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(dLSAPTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&dLSAPTableStorage, hciptr);
+			StorageTmp->dLSAPRowStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(dLSAPTableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&dLSAPTableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(dLSAPTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&dLSAPTableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(dLSAPTableStorage, StorageNew);
+			header_complex_extract_entry(&dLSAPTableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->dLSAPRowStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			dLSAPTable_add(StorageDel);
-		} else {
-			StorageTmp->dLSAPRowStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->dLSAPRowStatus == RS_CREATEANDGO) {
-				StorageTmp->dLSAPRowStatus = RS_ACTIVE;
-			} else if (StorageTmp && StorageTmp->dLSAPRowStatus == RS_CREATEANDWAIT) {
-				StorageTmp->dLSAPRowStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->dLSAPRowStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->dLSAPRowStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			dLSAPTable_del(&StorageDel);
+			/* dLSAPTable_del() can handle NULL pointers. */
+			break;
 		}
 		break;
 	}
@@ -4331,8 +4050,7 @@ write_dLSAPRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t 
 }
 
 int
-write_sLPPMRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-		     uint8_t *statP, oid * name, size_t name_len)
+write_sLPPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct sLPPMTable_data *StorageTmp = NULL;
 	static struct sLPPMTable_data *StorageNew, *StorageDel;
@@ -4342,125 +4060,167 @@ write_sLPPMRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t 
 	static struct variable_list *vars, *vp;
 	struct header_complex_index *hciptr;
 
-	StorageTmp =
-	    header_complex(sLPPMTableStorage, NULL,
-			   &name[sizeof(sLPPMTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen,
-			   1, NULL, NULL);
+	StorageTmp = header_complex(sLPPMTableStorage, NULL, &name[sizeof(sLPPMTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPPMRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
 	}
-	set_value = *((int *) var_val);
+	set_value = *((long *) var_val);
 	/* check legal range, and notReady is reserved for us, not a user */
 	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY)
 		return SNMP_ERR_INCONSISTENTVALUE;
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->sLPPMRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sLPPMTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sLPPMTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* lAPBDLEcommunicationsEntityId 
-												 */
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* sLPPMcoProtocolMachineId 
-												 */
-
-			if (header_complex_parse_oid
-			    (&(name[sizeof(sLPPMTable_variables_oid) / sizeof(oid) + 2]), newlen,
-			     vars) != SNMPERR_SUCCESS) {
+			/* lAPBDLEcommunicationsEntityId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);
+			/* sLPPMcoProtocolMachineId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);
+			if (header_complex_parse_oid(&(name[sizeof(sLPPMTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(sLPPMTable_data);
-			memdup((void *) &StorageNew->lAPBDLEcommunicationsEntityId, vp->val.string,
-			       vp->val_len);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(sLPPMTable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			memdup((void *) &StorageNew->lAPBDLEcommunicationsEntityId, vp->val.string, vp->val_len);
 			StorageNew->lAPBDLEcommunicationsEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
-			memdup((void *) &StorageNew->sLPPMcoProtocolMachineId, vp->val.string,
-			       vp->val_len);
+			memdup((void *) &StorageNew->sLPPMcoProtocolMachineId, vp->val.string, vp->val_len);
 			StorageNew->sLPPMcoProtocolMachineIdLen = vp->val_len;
 			vp = vp->next_variable;
-
 			/* XXX: fill in default row values here into StorageNew */
-
-			StorageNew->sLPPMRowStatus = set_value;
+			StorageNew->sLPPMRowStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			sLPPMTable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				sLPPMTable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			sLPPMTable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->sLPPMRowStatus;
-			StorageTmp->sLPPMRowStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(sLPPMTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&sLPPMTableStorage, hciptr);
+			StorageTmp->sLPPMRowStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(sLPPMTableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&sLPPMTableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(sLPPMTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&sLPPMTableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(sLPPMTableStorage, StorageNew);
+			header_complex_extract_entry(&sLPPMTableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->sLPPMRowStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			sLPPMTable_add(StorageDel);
-		} else {
-			StorageTmp->sLPPMRowStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->sLPPMRowStatus == RS_CREATEANDGO) {
-				StorageTmp->sLPPMRowStatus = RS_ACTIVE;
-			} else if (StorageTmp && StorageTmp->sLPPMRowStatus == RS_CREATEANDWAIT) {
-				StorageTmp->sLPPMRowStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->sLPPMRowStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->sLPPMRowStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			sLPPMTable_del(&StorageDel);
+			/* sLPPMTable_del() can handle NULL pointers. */
+			break;
 		}
 		break;
 	}
@@ -4468,8 +4228,7 @@ write_sLPPMRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t 
 }
 
 int
-write_sLPConnectionRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len,
-			     uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct sLPConnectionTable_data *StorageTmp = NULL;
 	static struct sLPConnectionTable_data *StorageNew, *StorageDel;
@@ -4479,125 +4238,164 @@ write_sLPConnectionRowStatus(int action, uint8_t *var_val, uint8_t var_val_type,
 	static struct variable_list *vars, *vp;
 	struct header_complex_index *hciptr;
 
-	StorageTmp =
-	    header_complex(sLPConnectionTableStorage, NULL,
-			   &name[sizeof(sLPConnectionTable_variables_oid) / sizeof(oid) + 3 - 1],
-			   &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[sizeof(sLPConnectionTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
-		snmp_log(MY_FACILITY(LOG_NOTICE),
-			 "write to sLPConnectionRowStatus not ASN_INTEGER\n");
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
 	}
-	set_value = *((int *) var_val);
+	set_value = *((long *) var_val);
 	/* check legal range, and notReady is reserved for us, not a user */
 	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY)
 		return SNMP_ERR_INCONSISTENTVALUE;
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->sLPConnectionRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sLPConnectionTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sLPConnectionTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* sLPConnectionConnectionId 
-												 */
-
-			if (header_complex_parse_oid
-			    (&(name[sizeof(sLPConnectionTable_variables_oid) / sizeof(oid) + 2]),
-			     newlen, vars) != SNMPERR_SUCCESS) {
+			/* sLPConnectionConnectionId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);
+			if (header_complex_parse_oid(&(name[sizeof(sLPConnectionTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(sLPConnectionTable_data);
-			memdup((void *) &StorageNew->sLPConnectionConnectionId, vp->val.string,
-			       vp->val_len);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(sLPConnectionTable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			memdup((void *) &StorageNew->sLPConnectionConnectionId, vp->val.string, vp->val_len);
 			StorageNew->sLPConnectionConnectionIdLen = vp->val_len;
 			vp = vp->next_variable;
-
 			/* XXX: fill in default row values here into StorageNew */
 			/* StorageNew->sLPConnectionUnderlyingConnectionNames = zeroDotZero; */
 			/* StorageNew->sLPConnectionSupportedConnectionNames = zeroDotZero; */
-
-			StorageNew->sLPConnectionRowStatus = set_value;
+			StorageNew->sLPConnectionRowStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			sLPConnectionTable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				sLPConnectionTable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			sLPConnectionTable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->sLPConnectionRowStatus;
-			StorageTmp->sLPConnectionRowStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(sLPConnectionTableStorage, StorageTmp);
-			StorageDel =
-			    header_complex_extract_entry(&sLPConnectionTableStorage, hciptr);
+			StorageTmp->sLPConnectionRowStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(sLPConnectionTableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&sLPConnectionTableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(sLPConnectionTableStorage, StorageTmp);
-			StorageDel =
-			    header_complex_extract_entry(&sLPConnectionTableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(sLPConnectionTableStorage, StorageNew);
+			header_complex_extract_entry(&sLPConnectionTableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->sLPConnectionRowStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			sLPConnectionTable_add(StorageDel);
-		} else {
-			StorageTmp->sLPConnectionRowStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->sLPConnectionRowStatus == RS_CREATEANDGO) {
-				StorageTmp->sLPConnectionRowStatus = RS_ACTIVE;
-			} else if (StorageTmp
-				   && StorageTmp->sLPConnectionRowStatus == RS_CREATEANDWAIT) {
-				StorageTmp->sLPConnectionRowStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->sLPConnectionRowStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->sLPConnectionRowStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			sLPConnectionTable_del(&StorageDel);
+			/* sLPConnectionTable_del() can handle NULL pointers. */
+			break;
 		}
 		break;
 	}
@@ -4605,138 +4403,172 @@ write_sLPConnectionRowStatus(int action, uint8_t *var_val, uint8_t var_val_type,
 }
 
 int
-write_sLPConnectionIVMORowStatus(int action, uint8_t *var_val, uint8_t var_val_type,
-				 size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMORowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
 	static struct sLPConnectionIVMOTable_data *StorageNew, *StorageDel;
-	size_t newlen =
-	    name_len - (sizeof(sLPConnectionIVMOTable_variables_oid) / sizeof(oid) + 3 - 1);
+	size_t newlen = name_len - (sizeof(sLPConnectionIVMOTable_variables_oid) / sizeof(oid) + 3 - 1);
 	static int old_value;
 	int set_value;
 	static struct variable_list *vars, *vp;
 	struct header_complex_index *hciptr;
 
-	StorageTmp =
-	    header_complex(sLPConnectionIVMOTableStorage, NULL,
-			   &name[sizeof(sLPConnectionIVMOTable_variables_oid) / sizeof(oid) + 3 -
-				 1], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[sizeof(sLPConnectionIVMOTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
-		snmp_log(MY_FACILITY(LOG_NOTICE),
-			 "write to sLPConnectionIVMORowStatus not ASN_INTEGER\n");
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sLPConnectionIVMORowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
 	}
-	set_value = *((int *) var_val);
+	set_value = *((long *) var_val);
 	/* check legal range, and notReady is reserved for us, not a user */
 	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY)
 		return SNMP_ERR_INCONSISTENTVALUE;
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->sLPConnectionIVMORowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sLPConnectionIVMOTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sLPConnectionIVMOTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* sLPConnectionConnectionId 
-												 */
-
-			if (header_complex_parse_oid
-			    (&
-			     (name[sizeof(sLPConnectionIVMOTable_variables_oid) / sizeof(oid) + 2]),
-			     newlen, vars) != SNMPERR_SUCCESS) {
+			/* sLPConnectionConnectionId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);
+			if (header_complex_parse_oid(&(name[sizeof(sLPConnectionIVMOTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(sLPConnectionIVMOTable_data);
-			memdup((void *) &StorageNew->sLPConnectionConnectionId, vp->val.string,
-			       vp->val_len);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(sLPConnectionIVMOTable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			memdup((void *) &StorageNew->sLPConnectionConnectionId, vp->val.string, vp->val_len);
 			StorageNew->sLPConnectionConnectionIdLen = vp->val_len;
 			vp = vp->next_variable;
-
 			/* XXX: fill in default row values here into StorageNew */
-
-			StorageNew->sLPConnectionIVMORowStatus = set_value;
+			StorageNew->sLPConnectionIVMORowStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			sLPConnectionIVMOTable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				sLPConnectionIVMOTable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			sLPConnectionIVMOTable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->sLPConnectionIVMORowStatus;
-			StorageTmp->sLPConnectionIVMORowStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr =
-			    header_complex_find_entry(sLPConnectionIVMOTableStorage, StorageTmp);
-			StorageDel =
-			    header_complex_extract_entry(&sLPConnectionIVMOTableStorage, hciptr);
+			StorageTmp->sLPConnectionIVMORowStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(sLPConnectionIVMOTableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&sLPConnectionIVMOTableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr =
-			    header_complex_find_entry(sLPConnectionIVMOTableStorage, StorageTmp);
-			StorageDel =
-			    header_complex_extract_entry(&sLPConnectionIVMOTableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(sLPConnectionIVMOTableStorage, StorageNew);
+			header_complex_extract_entry(&sLPConnectionIVMOTableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->sLPConnectionIVMORowStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			sLPConnectionIVMOTable_add(StorageDel);
-		} else {
-			StorageTmp->sLPConnectionIVMORowStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->sLPConnectionIVMORowStatus == RS_CREATEANDGO) {
-				StorageTmp->sLPConnectionIVMORowStatus = RS_ACTIVE;
-			} else if (StorageTmp
-				   && StorageTmp->sLPConnectionIVMORowStatus == RS_CREATEANDWAIT) {
-				StorageTmp->sLPConnectionIVMORowStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->sLPConnectionIVMORowStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->sLPConnectionIVMORowStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			sLPConnectionIVMOTable_del(&StorageDel);
+			/* sLPConnectionIVMOTable_del() can handle NULL pointers. */
+			break;
 		}
 		break;
 	}

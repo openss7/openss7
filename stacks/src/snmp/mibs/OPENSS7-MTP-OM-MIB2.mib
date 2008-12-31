@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-OM-MIB2.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-27 15:29:50 $
+-- @(#) $RCSfile: OPENSS7-MTP-OM-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-31 16:04:49 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-27 15:29:50 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-31 16:04:49 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-OM-MIB2.mib,v $
+-- Revision 0.9.2.2  2008-12-31 16:04:49  brian
+-- - updated mibs
+--
 -- Revision 0.9.2.1  2008-12-27 15:29:50  brian
 -- - split MTP and MTP OM mib
 --
@@ -60,7 +63,8 @@
 OPENSS7-MTP-OM-MIB2 DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32, Unsigned32, 
+    Counter32
 	FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, InstancePointer, TimeStamp, TimeInterval, 
     RowStatus
@@ -71,8 +75,8 @@ IMPORTS
 	FROM PerfHist-TC-MIB
     HCPerfIntervalThreshold, HCPerfValidIntervals
 	FROM HC-PerfHist-TC-MIB
-    mtpLsId, mtpRsId, mtpSlSlCode, mtpSpId, 
-    mtpLsEntry, mtpSlEntry, mtpSdtEntry, mtpSdlEntry
+    mtpLsId, mtpRsId, mtpSlSlCode, mtpSpId, mtpSlEntry, mtpSdtEntry, 
+    mtpSdlEntry
 	FROM OPENSS7-MTP-MIB
     openss7, openss7Q, openss7Q752
 	FROM OPENSS7-SMI;
@@ -150,353 +154,353 @@ mtpOmSdlStats		OBJECT IDENTIFIER ::= { mtpOmTables	 6 }
 -- |__(1) mtpOmObjects
 -- |  |__( 1) mtpOmTables
 -- |  |  |__( 1) mtpOmSpStats
--- |  |  |  |__( 1) mtpSpCurrentTable
--- |  |  |  |  |__( 1) mtpSpCurrentEntry
--- |  |  |  |     |__( 1) mtpSpCurrentValidIntervals
--- |  |  |  |     |__( 2) mtpSpCurrentTimeDiscontinuity
--- |  |  |  |     |__( 3) mtpSpCurrentDiscardedMSUs
--- |  |  |  |     |__( 4) mtpSpCurrentReceivedTFCstatus0
--- |  |  |  |     |__( 5) mtpSpCurrentReceivedTFCstatus1
--- |  |  |  |     |__( 6) mtpSpCurrentReceivedTFCstatus2
--- |  |  |  |     |__( 7) mtpSpCurrentOctetsXferred
+-- |  |  |  |__( 1) mtpOmSpTable
+-- |  |  |  |  |__( 1) mtpOmSpEntry
+-- |  |  |  |     |__( 1) mtpOmSpValidIntervals
+-- |  |  |  |     |__( 2) mtpOmSpTimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpOmSpDiscardedMSUs
+-- |  |  |  |     |__( 4) mtpOmSpReceivedTFCstatus0
+-- |  |  |  |     |__( 5) mtpOmSpReceivedTFCstatus1
+-- |  |  |  |     |__( 6) mtpOmSpReceivedTFCstatus2
+-- |  |  |  |     |__( 7) mtpOmSpOctetsXferred
 -- |  |  |  |
--- |  |  |  |__( 2) mtpSpInt5minTable
--- |  |  |  |  |__( 1) mtpSpInt5minEntry
--- |  |  |  |     |__( 1) mtpSpInt5minInterval
--- |  |  |  |     |__( 2) mtpSpInt5minTimeStamp
--- |  |  |  |     |__( 3) mtpSpInt5minDiscardedMSUs
--- |  |  |  |     |__( 4) mtpSpInt5minReceivedTFCstatus0
--- |  |  |  |     |__( 5) mtpSpInt5minReceivedTFCstatus1
--- |  |  |  |     |__( 6) mtpSpInt5minReceivedTFCstatus2
--- |  |  |  |     |__( 7) mtpSpInt5minOctetsXferred
+-- |  |  |  |__( 2) mtpOmSpInt5minTable
+-- |  |  |  |  |__( 1) mtpOmSpInt5minEntry
+-- |  |  |  |     |__( 1) mtpOmSpInt5minInterval
+-- |  |  |  |     |__( 2) mtpOmSpInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmSpInt5minDiscardedMSUs
+-- |  |  |  |     |__( 4) mtpOmSpInt5minReceivedTFCstatus0
+-- |  |  |  |     |__( 5) mtpOmSpInt5minReceivedTFCstatus1
+-- |  |  |  |     |__( 6) mtpOmSpInt5minReceivedTFCstatus2
+-- |  |  |  |     |__( 7) mtpOmSpInt5minOctetsXferred
 -- |  |  |  |
--- |  |  |  |__( 3) mtpSpInt15minTable
--- |  |  |  |  |__( 1) mtpSpInt15minEntry
--- |  |  |  |     |__( 1) mtpSpInt15minInterval
--- |  |  |  |     |__( 2) mtpSpInt15minTimeStamp
--- |  |  |  |     |__( 3) mtpSpInt15minDiscardedMSUs
--- |  |  |  |     |__( 4) mtpSpInt15minReceivedTFCstatus0
--- |  |  |  |     |__( 5) mtpSpInt15minReceivedTFCstatus1
--- |  |  |  |     |__( 6) mtpSpInt15minReceivedTFCstatus2
--- |  |  |  |     |__( 7) mtpSpInt15minOctetsXferred
+-- |  |  |  |__( 3) mtpOmSpInt15minTable
+-- |  |  |  |  |__( 1) mtpOmSpInt15minEntry
+-- |  |  |  |     |__( 1) mtpOmSpInt15minInterval
+-- |  |  |  |     |__( 2) mtpOmSpInt15minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmSpInt15minDiscardedMSUs
+-- |  |  |  |     |__( 4) mtpOmSpInt15minReceivedTFCstatus0
+-- |  |  |  |     |__( 5) mtpOmSpInt15minReceivedTFCstatus1
+-- |  |  |  |     |__( 6) mtpOmSpInt15minReceivedTFCstatus2
+-- |  |  |  |     |__( 7) mtpOmSpInt15minOctetsXferred
 -- |  |  |  |
--- |  |  |  |__( 4) mtpSpSiTable
--- |  |  |  |  |__( 1) mtpSpSiEntry
--- |  |  |  |     |__( 1) mtpSpSiCode
--- |  |  |  |     |__( 2) mtpSpSiValidIntervals
--- |  |  |  |     |__( 3) mtpSpSiTimeDiscontinuity
--- |  |  |  |     |__( 4) mtpSpSiTransmittedUPUnavailable
--- |  |  |  |     |__( 5) mtpSpSiReceivedUPUnavailable
--- |  |  |  |     |__( 6) mtpSpSiHandledOctetsSIO
--- |  |  |  |     |__( 7) mtpSpSiStatus
+-- |  |  |  |__( 4) mtpOmSpSiTable
+-- |  |  |  |  |__( 1) mtpOmSpSiEntry
+-- |  |  |  |     |__( 1) mtpOmSpSiCode
+-- |  |  |  |     |__( 2) mtpOmSpSiValidIntervals
+-- |  |  |  |     |__( 3) mtpOmSpSiTimeDiscontinuity
+-- |  |  |  |     |__( 4) mtpOmSpSiTransmittedUPUnavailable
+-- |  |  |  |     |__( 5) mtpOmSpSiReceivedUPUnavailable
+-- |  |  |  |     |__( 6) mtpOmSpSiHandledOctetsSIO
+-- |  |  |  |     |__( 7) mtpOmSpSiStatus
 -- |  |  |  |
--- |  |  |  |__( 5) mtpSpSiInt5minTable
--- |  |  |  |  |__( 1) mtpSpSiInt5minEntry
--- |  |  |  |     |__( 1) mtpSpSiInt5minInterval
--- |  |  |  |     |__( 2) mtpSpSiInt5minTimeStamp
--- |  |  |  |     |__( 3) mtpSpSiInt5minTransmittedUPUnavailable
--- |  |  |  |     |__( 4) mtpSpSiInt5minReceivedUPUnavailable
--- |  |  |  |     |__( 5) mtpSpSiInt5minHandledOctetsSIO
+-- |  |  |  |__( 5) mtpOmSpSiInt5minTable
+-- |  |  |  |  |__( 1) mtpOmSpSiInt5minEntry
+-- |  |  |  |     |__( 1) mtpOmSpSiInt5minInterval
+-- |  |  |  |     |__( 2) mtpOmSpSiInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmSpSiInt5minTransmittedUPUnavailable
+-- |  |  |  |     |__( 4) mtpOmSpSiInt5minReceivedUPUnavailable
+-- |  |  |  |     |__( 5) mtpOmSpSiInt5minHandledOctetsSIO
 -- |  |  |  |
--- |  |  |  |__( 6) mtpSpSiInt15minTable
--- |  |  |  |  |__( 1) mtpSpSiInt15minEntry
--- |  |  |  |     |__( 1) mtpSpSiInt15minInterval
--- |  |  |  |     |__( 2) mtpSpSiInt15minTimeStamp
--- |  |  |  |     |__( 3) mtpSpSiInt15minTransmittedUPUnavailable
--- |  |  |  |     |__( 4) mtpSpSiInt15minReceivedUPUnavailable
--- |  |  |  |     |__( 5) mtpSpSiInt15minHandledOctetsSIO
+-- |  |  |  |__( 6) mtpOmSpSiInt15minTable
+-- |  |  |  |  |__( 1) mtpOmSpSiInt15minEntry
+-- |  |  |  |     |__( 1) mtpOmSpSiInt15minInterval
+-- |  |  |  |     |__( 2) mtpOmSpSiInt15minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmSpSiInt15minTransmittedUPUnavailable
+-- |  |  |  |     |__( 4) mtpOmSpSiInt15minReceivedUPUnavailable
+-- |  |  |  |     |__( 5) mtpOmSpSiInt15minHandledOctetsSIO
 -- |  |  |  |
--- |  |  |  |__( 7) mtpSpStudyTable
--- |  |  |  |  |__( 1) mtpSpStudyEntry
--- |  |  |  |     |__( 1) mtpSpStudyId
--- |  |  |  |     |__( 2) mtpSpStudyValidIntervals
--- |  |  |  |     |__( 3) mtpSpStudyTimeDiscontinuity
--- |  |  |  |     |__( 4) mtpSpStudyHandledOctetsOpcDpcSio
--- |  |  |  |     |__( 5) mtpSpStudyHandledMSUsOpcDpcSio
--- |  |  |  |     |__( 6) mtpSpStudyStatus
+-- |  |  |  |__( 7) mtpOmSpStudyTable
+-- |  |  |  |  |__( 1) mtpOmSpStudyEntry
+-- |  |  |  |     |__( 1) mtpOmSpStudyId
+-- |  |  |  |     |__( 2) mtpOmSpStudyValidIntervals
+-- |  |  |  |     |__( 3) mtpOmSpStudyTimeDiscontinuity
+-- |  |  |  |     |__( 4) mtpOmSpStudyHandledOctetsOpcDpcSio
+-- |  |  |  |     |__( 5) mtpOmSpStudyHandledMSUsOpcDpcSio
+-- |  |  |  |     |__( 6) mtpOmSpStudyStatus
 -- |  |  |  |
--- |  |  |  |__( 8) mtpSpStudyInt5minTable
--- |  |  |  |  |__( 1) mtpSpStudyInt5minEntry
--- |  |  |  |     |__( 1) mtpSpStudyInt5minInterval
--- |  |  |  |     |__( 2) mtpSpStudyInt5minTimeStamp
--- |  |  |  |     |__( 3) mtpSpStudyInt5minHandledOctetsOpcDpcSio
--- |  |  |  |     |__( 4) mtpSpStudyInt5minHandledMSUsOpcDpcSio
+-- |  |  |  |__( 8) mtpOmSpStudyInt5minTable
+-- |  |  |  |  |__( 1) mtpOmSpStudyInt5minEntry
+-- |  |  |  |     |__( 1) mtpOmSpStudyInt5minInterval
+-- |  |  |  |     |__( 2) mtpOmSpStudyInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmSpStudyInt5minHandledOctetsOpcDpcSio
+-- |  |  |  |     |__( 4) mtpOmSpStudyInt5minHandledMSUsOpcDpcSio
 -- |  |  |  |
--- |  |  |  |__( 9) mtpSpStudyInt15minTable
--- |  |  |  |  |__( 1) mtpSpStudyInt15minEntry
--- |  |  |  |     |__( 1) mtpSpStudyInt15minInterval
--- |  |  |  |     |__( 2) mtpSpStudyInt15minTimeStamp
--- |  |  |  |     |__( 3) mtpSpStudyInt15minHandledOctetsOpcDpcSio
--- |  |  |  |     |__( 4) mtpSpStudyInt15minHandledMSUsOpcDpcSio
+-- |  |  |  |__( 9) mtpOmSpStudyInt15minTable
+-- |  |  |  |  |__( 1) mtpOmSpStudyInt15minEntry
+-- |  |  |  |     |__( 1) mtpOmSpStudyInt15minInterval
+-- |  |  |  |     |__( 2) mtpOmSpStudyInt15minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmSpStudyInt15minHandledOctetsOpcDpcSio
+-- |  |  |  |     |__( 4) mtpOmSpStudyInt15minHandledMSUsOpcDpcSio
 -- |  |  |  |
--- |  |  |  |__(10) mtpSpStudyMapTable
--- |  |  |     |__( 1) mtpSpStudyMapEntry
--- |  |  |        |__( 1) mtpOpcRsId
--- |  |  |        |__( 2) mtpDpcRsId
--- |  |  |        |__( 3) mtpSpStudyMapStatus
+-- |  |  |  |__(10) mtpOmSpStudyMapTable
+-- |  |  |     |__( 1) mtpOmSpStudyMapEntry
+-- |  |  |        |__( 1) mtpOmOpcRsId
+-- |  |  |        |__( 2) mtpOmDpcRsId
+-- |  |  |        |__( 3) mtpOmSpStudyMapStatus
 -- |  |  |
 -- |  |  |__( 2) mtpOmRsStats
--- |  |  |  |__( 1) mtpRsCurrentTable
--- |  |  |  |  |__( 1) mtpRsCurrentEntry
--- |  |  |  |     |__( 1) mtpRsCurrentValidIntervals
--- |  |  |  |     |__( 2) mtpRsCurrentTimeDiscontinuity
--- |  |  |  |     |__( 3) mtpRsCurrentReceivedOctetsOPC
--- |  |  |  |     |__( 4) mtpRsCurrentTransmittedOctetsDPC
--- |  |  |  |     |__( 5) mtpRsCurrentReceivedMSUsOpc
--- |  |  |  |     |__( 6) mtpRsCurrentTransmittedMSUsDpc
--- |  |  |  |     |__( 7) mtpRsCurrentRouteSetUnavailable
--- |  |  |  |     |__( 8) mtpRsCurrentRouteSetUnavailableDuration
+-- |  |  |  |__( 1) mtpOmRsTable
+-- |  |  |  |  |__( 1) mtpOmRsEntry
+-- |  |  |  |     |__( 1) mtpOmRsValidIntervals
+-- |  |  |  |     |__( 2) mtpOmRsTimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpOmRsReceivedOctetsOPC
+-- |  |  |  |     |__( 4) mtpOmRsTransmittedOctetsDPC
+-- |  |  |  |     |__( 5) mtpOmRsReceivedMSUsOpc
+-- |  |  |  |     |__( 6) mtpOmRsTransmittedMSUsDpc
+-- |  |  |  |     |__( 7) mtpOmRsRouteSetUnavailable
+-- |  |  |  |     |__( 8) mtpOmRsRouteSetUnavailableDuration
 -- |  |  |  |
--- |  |  |  |__( 2) mtpRsInt5minTable
--- |  |  |  |  |__( 1) mtpRsInt5minEntry
--- |  |  |  |     |__( 1) mtpRsInt5minInterval
--- |  |  |  |     |__( 2) mtpRsInt5minTimeStamp
--- |  |  |  |     |__( 3) mtpRsInt5minReceivedOctetsOPC
--- |  |  |  |     |__( 4) mtpRsInt5minTransmittedOctetsDPC
--- |  |  |  |     |__( 5) mtpRsInt5minReceivedMSUsOpc
--- |  |  |  |     |__( 6) mtpRsInt5minTransmittedMSUsDpc
--- |  |  |  |     |__( 7) mtpRsInt5minRouteSetUnavailable
--- |  |  |  |     |__( 8) mtpRsInt5minRouteSetUnavailableDuration
+-- |  |  |  |__( 2) mtpOmRsInt5minTable
+-- |  |  |  |  |__( 1) mtpOmRsInt5minEntry
+-- |  |  |  |     |__( 1) mtpOmRsInt5minInterval
+-- |  |  |  |     |__( 2) mtpOmRsInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmRsInt5minReceivedOctetsOPC
+-- |  |  |  |     |__( 4) mtpOmRsInt5minTransmittedOctetsDPC
+-- |  |  |  |     |__( 5) mtpOmRsInt5minReceivedMSUsOpc
+-- |  |  |  |     |__( 6) mtpOmRsInt5minTransmittedMSUsDpc
+-- |  |  |  |     |__( 7) mtpOmRsInt5minRouteSetUnavailable
+-- |  |  |  |     |__( 8) mtpOmRsInt5minRouteSetUnavailableDuration
 -- |  |  |  |
--- |  |  |  |__( 3) mtpRsInt15minTable
--- |  |  |  |  |__( 1) mtpRsInt15minEntry
--- |  |  |  |     |__( 1) mtpRsInt15minInterval
--- |  |  |  |     |__( 2) mtpRsInt15minTimeStamp
--- |  |  |  |     |__( 3) mtpRsInt15minReceivedOctetsOPC
--- |  |  |  |     |__( 4) mtpRsInt15minTransmittedOctetsDPC
--- |  |  |  |     |__( 5) mtpRsInt15minReceivedMSUsOpc
--- |  |  |  |     |__( 6) mtpRsInt15minTransmittedMSUsDpc
--- |  |  |  |     |__( 7) mtpRsInt15minRouteSetUnavailable
--- |  |  |  |     |__( 8) mtpRsInt15minRouteSetUnavailableDuration
+-- |  |  |  |__( 3) mtpOmRsInt15minTable
+-- |  |  |  |  |__( 1) mtpOmRsInt15minEntry
+-- |  |  |  |     |__( 1) mtpOmRsInt15minInterval
+-- |  |  |  |     |__( 2) mtpOmRsInt15minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmRsInt15minReceivedOctetsOPC
+-- |  |  |  |     |__( 4) mtpOmRsInt15minTransmittedOctetsDPC
+-- |  |  |  |     |__( 5) mtpOmRsInt15minReceivedMSUsOpc
+-- |  |  |  |     |__( 6) mtpOmRsInt15minTransmittedMSUsDpc
+-- |  |  |  |     |__( 7) mtpOmRsInt15minRouteSetUnavailable
+-- |  |  |  |     |__( 8) mtpOmRsInt15minRouteSetUnavailableDuration
 -- |  |  |  |
--- |  |  |  |__( 4) mtpRsSiTable
--- |  |  |  |  |__( 1) mtpRsSiEntry
--- |  |  |  |     |__( 1) mtpRsSiCode
--- |  |  |  |     |__( 2) mtpRsSiValidIntervals
--- |  |  |  |     |__( 3) mtpRsSiTimeDiscontinuity
--- |  |  |  |     |__( 4) mtpRsSiReceivedOctetsOpcSio
--- |  |  |  |     |__( 5) mtpRsSiTransmittedOctetsDpcSio
--- |  |  |  |     |__( 6) mtpRsSiReceivedMSUsOpcSio
--- |  |  |  |     |__( 7) mtpRsSiTransmittedMSUsDpcSio
--- |  |  |  |     |__( 8) mtpRsSiStatus
+-- |  |  |  |__( 4) mtpOmRsSiTable
+-- |  |  |  |  |__( 1) mtpOmRsSiEntry
+-- |  |  |  |     |__( 1) mtpOmRsSiCode
+-- |  |  |  |     |__( 2) mtpOmRsSiValidIntervals
+-- |  |  |  |     |__( 3) mtpOmRsSiTimeDiscontinuity
+-- |  |  |  |     |__( 4) mtpOmRsSiReceivedOctetsOpcSio
+-- |  |  |  |     |__( 5) mtpOmRsSiTransmittedOctetsDpcSio
+-- |  |  |  |     |__( 6) mtpOmRsSiReceivedMSUsOpcSio
+-- |  |  |  |     |__( 7) mtpOmRsSiTransmittedMSUsDpcSio
+-- |  |  |  |     |__( 8) mtpOmRsSiStatus
 -- |  |  |  |
--- |  |  |  |__( 5) mtpRsSiInt5minTable
--- |  |  |  |  |__( 1) mtpRsSiInt5minEntry
--- |  |  |  |     |__( 1) mtpRsSiInt5minInterval
--- |  |  |  |     |__( 2) mtpRsSiInt5minTimeStamp
--- |  |  |  |     |__( 3) mtpRsSiInt5minReceivedOctetsOpcSio
--- |  |  |  |     |__( 4) mtpRsSiInt5minTransmittedOctetsDpcSio
--- |  |  |  |     |__( 5) mtpRsSiInt5minReceivedMSUsOpcSio
--- |  |  |  |     |__( 6) mtpRsSiInt5minTransmittedMSUsDpcSio
+-- |  |  |  |__( 5) mtpOmRsSiInt5minTable
+-- |  |  |  |  |__( 1) mtpOmRsSiInt5minEntry
+-- |  |  |  |     |__( 1) mtpOmRsSiInt5minInterval
+-- |  |  |  |     |__( 2) mtpOmRsSiInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmRsSiInt5minReceivedOctetsOpcSio
+-- |  |  |  |     |__( 4) mtpOmRsSiInt5minTransmittedOctetsDpcSio
+-- |  |  |  |     |__( 5) mtpOmRsSiInt5minReceivedMSUsOpcSio
+-- |  |  |  |     |__( 6) mtpOmRsSiInt5minTransmittedMSUsDpcSio
 -- |  |  |  |
--- |  |  |  |__( 6) mtpRsSiInt15minTable
--- |  |  |     |__( 1) mtpRsSiInt15minEntry
--- |  |  |        |__( 1) mtpRsSiInt15minInterval
--- |  |  |        |__( 2) mtpRsSiInt15minTimeStamp
--- |  |  |        |__( 3) mtpRsSiInt15minReceivedOctetsOpcSio
--- |  |  |        |__( 4) mtpRsSiInt15minTransmittedOctetsDpcSio
--- |  |  |        |__( 5) mtpRsSiInt15minReceivedMSUsOpcSio
--- |  |  |        |__( 6) mtpRsSiInt15minTransmittedMSUsDpcSio
+-- |  |  |  |__( 6) mtpOmRsSiInt15minTable
+-- |  |  |     |__( 1) mtpOmRsSiInt15minEntry
+-- |  |  |        |__( 1) mtpOmRsSiInt15minInterval
+-- |  |  |        |__( 2) mtpOmRsSiInt15minTimeStamp
+-- |  |  |        |__( 3) mtpOmRsSiInt15minReceivedOctetsOpcSio
+-- |  |  |        |__( 4) mtpOmRsSiInt15minTransmittedOctetsDpcSio
+-- |  |  |        |__( 5) mtpOmRsSiInt15minReceivedMSUsOpcSio
+-- |  |  |        |__( 6) mtpOmRsSiInt15minTransmittedMSUsDpcSio
 -- |  |  |
 -- |  |  |__( 3) mtpOmLsStats
--- |  |  |  |__( 1) mtpLsCurrentTable
--- |  |  |  |  |__( 1) mtpLsCurrentEntry
--- |  |  |  |     |__( 1) mtpLsCurrentValidIntervals
--- |  |  |  |     |__( 2) mtpLsCurrentTimeDiscontinuity
--- |  |  |  |     |__( 3) mtpLsCurrentAdjacentInaccessibleEvents
--- |  |  |  |     |__( 4) mtpLsCurrentAdjacentInaccessibleDuration
--- |  |  |  |     |__( 5) mtpLsCurrentSlsUnavailable
+-- |  |  |  |__( 1) mtpOmLsTable
+-- |  |  |  |  |__( 1) mtpOmLsEntry
+-- |  |  |  |     |__( 1) mtpOmLsValidIntervals
+-- |  |  |  |     |__( 2) mtpOmLsTimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpOmLsAdjacentInaccessibleEvents
+-- |  |  |  |     |__( 4) mtpOmLsAdjacentInaccessibleDuration
+-- |  |  |  |     |__( 5) mtpOmLsSlsUnavailable
 -- |  |  |  |
--- |  |  |  |__( 2) mtpLsInt5minTable
--- |  |  |  |  |__( 1) mtpLsInt5minEntry
--- |  |  |  |     |__( 1) mtpLsInt5minInterval
--- |  |  |  |     |__( 2) mtpLsInt5minTimeStamp
--- |  |  |  |     |__( 3) mtpLsInt5minAdjacentInaccessibleEvents
--- |  |  |  |     |__( 4) mtpLsInt5minAdjacentInaccessibleDuration
--- |  |  |  |     |__( 5) mtpLsInt5minSlsUnavailable
+-- |  |  |  |__( 2) mtpOmLsInt5minTable
+-- |  |  |  |  |__( 1) mtpOmLsInt5minEntry
+-- |  |  |  |     |__( 1) mtpOmLsInt5minInterval
+-- |  |  |  |     |__( 2) mtpOmLsInt5minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmLsInt5minAdjacentInaccessibleEvents
+-- |  |  |  |     |__( 4) mtpOmLsInt5minAdjacentInaccessibleDuration
+-- |  |  |  |     |__( 5) mtpOmLsInt5minSlsUnavailable
 -- |  |  |  |
--- |  |  |  |__( 3) mtpLsInt15minTable
--- |  |  |     |__( 1) mtpLsInt15minEntry
--- |  |  |        |__( 1) mtpLsInt15minInterval
--- |  |  |        |__( 2) mtpLsInt15minTimeStamp
--- |  |  |        |__( 3) mtpLsInt15minAdjacentInaccessibleEvents
--- |  |  |        |__( 4) mtpLsInt15minAdjacentInaccessibleDuration
--- |  |  |        |__( 5) mtpLsInt15minSlsUnavailable
+-- |  |  |  |__( 3) mtpOmLsInt15minTable
+-- |  |  |     |__( 1) mtpOmLsInt15minEntry
+-- |  |  |        |__( 1) mtpOmLsInt15minInterval
+-- |  |  |        |__( 2) mtpOmLsInt15minTimeStamp
+-- |  |  |        |__( 3) mtpOmLsInt15minAdjacentInaccessibleEvents
+-- |  |  |        |__( 4) mtpOmLsInt15minAdjacentInaccessibleDuration
+-- |  |  |        |__( 5) mtpOmLsInt15minSlsUnavailable
 -- |  |  |
 -- |  |  |__( 4) mtpOmSlStats
--- |  |  |  |__( 1) mtpSlStatsTable
--- |  |  |  |  |__( 1) mtpSlStatsEntry
--- |  |  |  |     |__( 1) mtpSlStatsDurInService
--- |  |  |  |     |__( 2) mtpSlStatsFailAlignOrProving
--- |  |  |  |     |__( 3) mtpSlStatsNacksReceived
--- |  |  |  |     |__( 4) mtpSlStatsDurUnavail
--- |  |  |  |     |__( 5) mtpSlStatsDurUnavailFailed
--- |  |  |  |     |__( 6) mtpSlStatsDurUnavailRpo
--- |  |  |  |     |__( 7) mtpSlStatsSibsSent
--- |  |  |  |     |__( 8) mtpSlStatsTranSioSifOctets
--- |  |  |  |     |__( 9) mtpSlStatsRetransOctets
--- |  |  |  |     |__(10) mtpSlStatsTranMsus
--- |  |  |  |     |__(11) mtpSlStatsRecvSioSifOctets
--- |  |  |  |     |__(12) mtpSlStatsRecvMsus
--- |  |  |  |     |__(13) mtpSlStatsCongOnsetInd0
--- |  |  |  |     |__(14) mtpSlStatsCongOnsetInd1
--- |  |  |  |     |__(15) mtpSlStatsCongOnsetInd2
--- |  |  |  |     |__(16) mtpSlStatsCongOnsetInd3
--- |  |  |  |     |__(17) mtpSlStatsDurCongStatus0
--- |  |  |  |     |__(18) mtpSlStatsDurCongStatus1
--- |  |  |  |     |__(19) mtpSlStatsDurCongStatus2
--- |  |  |  |     |__(20) mtpSlStatsDurCongStatus3
--- |  |  |  |     |__(21) mtpSlStatsCongDiscdInd0
--- |  |  |  |     |__(22) mtpSlStatsCongDiscdInd1
--- |  |  |  |     |__(23) mtpSlStatsCongDiscdInd2
--- |  |  |  |     |__(24) mtpSlStatsCongDiscdInd3
+-- |  |  |  |__( 1) mtpOmSlStatsTable
+-- |  |  |  |  |__( 1) mtpOmSlStatsEntry
+-- |  |  |  |     |__( 1) mtpOmSlStatsDurInService
+-- |  |  |  |     |__( 2) mtpOmSlStatsFailAlignOrProving
+-- |  |  |  |     |__( 3) mtpOmSlStatsNacksReceived
+-- |  |  |  |     |__( 4) mtpOmSlStatsDurUnavail
+-- |  |  |  |     |__( 5) mtpOmSlStatsDurUnavailFailed
+-- |  |  |  |     |__( 6) mtpOmSlStatsDurUnavailRpo
+-- |  |  |  |     |__( 7) mtpOmSlStatsSibsSent
+-- |  |  |  |     |__( 8) mtpOmSlStatsTranSioSifOctets
+-- |  |  |  |     |__( 9) mtpOmSlStatsRetransOctets
+-- |  |  |  |     |__(10) mtpOmSlStatsTranMsus
+-- |  |  |  |     |__(11) mtpOmSlStatsRecvSioSifOctets
+-- |  |  |  |     |__(12) mtpOmSlStatsRecvMsus
+-- |  |  |  |     |__(13) mtpOmSlStatsCongOnsetInd0
+-- |  |  |  |     |__(14) mtpOmSlStatsCongOnsetInd1
+-- |  |  |  |     |__(15) mtpOmSlStatsCongOnsetInd2
+-- |  |  |  |     |__(16) mtpOmSlStatsCongOnsetInd3
+-- |  |  |  |     |__(17) mtpOmSlStatsDurCongStatus0
+-- |  |  |  |     |__(18) mtpOmSlStatsDurCongStatus1
+-- |  |  |  |     |__(19) mtpOmSlStatsDurCongStatus2
+-- |  |  |  |     |__(20) mtpOmSlStatsDurCongStatus3
+-- |  |  |  |     |__(21) mtpOmSlStatsCongDiscdInd0
+-- |  |  |  |     |__(22) mtpOmSlStatsCongDiscdInd1
+-- |  |  |  |     |__(23) mtpOmSlStatsCongDiscdInd2
+-- |  |  |  |     |__(24) mtpOmSlStatsCongDiscdInd3
 -- |  |  |  |
--- |  |  |  |__( 2) mtpSlL3CurrentTable
--- |  |  |  |  |__( 1) mtpSlL3CurrentEntry
--- |  |  |  |     |__( 1) mtpSlL3CurrentValidIntervals
--- |  |  |  |     |__( 2) mtpSlL3CurrentTimeDiscontinuity
--- |  |  |  |     |__( 3) mtpSlL3CurrentSlUnavailabilityDuration
--- |  |  |  |     |__( 4) mtpSlL3CurrentSlLocalInhibition
--- |  |  |  |     |__( 5) mtpSlL3CurrentSlRemoteInhibition
--- |  |  |  |     |__( 6) mtpSlL3CurrentSlFailed
--- |  |  |  |     |__( 7) mtpSlL3CurrentSlRemoteProcOutage
--- |  |  |  |     |__( 8) mtpSlL3CurrentLocalMgmtInhibit
--- |  |  |  |     |__( 9) mtpSlL3CurrentLocalMgmtUninhibit
--- |  |  |  |     |__(10) mtpSlL3CurrentLocalBusy
--- |  |  |  |     |__(11) mtpSlL3CurrentSlCongestedStarts
--- |  |  |  |     |__(12) mtpSlL3CurrentSlCongestedDuration
--- |  |  |  |     |__(13) mtpSlL3CurrentSlCongestionStops
--- |  |  |  |     |__(14) mtpSlL3CurrentDiscardedMSUs
--- |  |  |  |     |__(15) mtpSlL3CurrentCongestionEventsMSULoss
--- |  |  |  |     |__(16) mtpSlL3CurrentChangeovers
--- |  |  |  |     |__(17) mtpSlL3CurrentChangebacks
--- |  |  |  |     |__(18) mtpSlL3CurrentRestorations
+-- |  |  |  |__( 2) mtpOmSlL3Table
+-- |  |  |  |  |__( 1) mtpOmSlL3Entry
+-- |  |  |  |     |__( 1) mtpOmSlL3ValidIntervals
+-- |  |  |  |     |__( 2) mtpOmSlL3TimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpOmSlL3SlUnavailabilityDuration
+-- |  |  |  |     |__( 4) mtpOmSlL3SlLocalInhibition
+-- |  |  |  |     |__( 5) mtpOmSlL3SlRemoteInhibition
+-- |  |  |  |     |__( 6) mtpOmSlL3SlFailed
+-- |  |  |  |     |__( 7) mtpOmSlL3SlRemoteProcOutage
+-- |  |  |  |     |__( 8) mtpOmSlL3LocalMgmtInhibit
+-- |  |  |  |     |__( 9) mtpOmSlL3LocalMgmtUninhibit
+-- |  |  |  |     |__(10) mtpOmSlL3LocalBusy
+-- |  |  |  |     |__(11) mtpOmSlL3SlCongestedStarts
+-- |  |  |  |     |__(12) mtpOmSlL3SlCongestedDuration
+-- |  |  |  |     |__(13) mtpOmSlL3SlCongestionStops
+-- |  |  |  |     |__(14) mtpOmSlL3DiscardedMSUs
+-- |  |  |  |     |__(15) mtpOmSlL3CongestionEventsMSULoss
+-- |  |  |  |     |__(16) mtpOmSlL3Changeovers
+-- |  |  |  |     |__(17) mtpOmSlL3Changebacks
+-- |  |  |  |     |__(18) mtpOmSlL3Restorations
 -- |  |  |  |
--- |  |  |  |__( 3) mtpSlL3Int5minTable
--- |  |  |  |  |__( 1) mtpSlL3Int5minEntry
--- |  |  |  |     |__( 1) mtpSlL3Int5minInterval
--- |  |  |  |     |__( 2) mtpSlL3Int5minTimeStamp
--- |  |  |  |     |__( 3) mtpSlL3Int5minSlUnavailabilityDuration
--- |  |  |  |     |__( 4) mtpSlL3Int5minSlLocalInhibition
--- |  |  |  |     |__( 5) mtpSlL3Int5minSlRemoteInhibition
--- |  |  |  |     |__( 6) mtpSlL3Int5minSlFailed
--- |  |  |  |     |__( 7) mtpSlL3Int5minSlRemoteProcOutage
--- |  |  |  |     |__( 8) mtpSlL3Int5minLocalMgmtInhibit
--- |  |  |  |     |__( 9) mtpSlL3Int5minLocalMgmtUninhibit
--- |  |  |  |     |__(10) mtpSlL3Int5minLocalBusy
--- |  |  |  |     |__(11) mtpSlL3Int5minSlCongestedStarts
--- |  |  |  |     |__(12) mtpSlL3Int5minSlCongestedDuration
--- |  |  |  |     |__(13) mtpSlL3Int5minSlCongestionStops
--- |  |  |  |     |__(14) mtpSlL3Int5minDiscardedMSUs
--- |  |  |  |     |__(15) mtpSlL3Int5minCongestionEventsMSULoss
--- |  |  |  |     |__(16) mtpSlL3Int5minChangeovers
--- |  |  |  |     |__(17) mtpSlL3Int5minChangebacks
--- |  |  |  |     |__(18) mtpSlL3Int5minRestorations
+-- |  |  |  |__( 3) mtpOmSlL3Int5minTable
+-- |  |  |  |  |__( 1) mtpOmSlL3Int5minEntry
+-- |  |  |  |     |__( 1) mtpOmSlL3Int5minInterval
+-- |  |  |  |     |__( 2) mtpOmSlL3Int5minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmSlL3Int5minSlUnavailabilityDuration
+-- |  |  |  |     |__( 4) mtpOmSlL3Int5minSlLocalInhibition
+-- |  |  |  |     |__( 5) mtpOmSlL3Int5minSlRemoteInhibition
+-- |  |  |  |     |__( 6) mtpOmSlL3Int5minSlFailed
+-- |  |  |  |     |__( 7) mtpOmSlL3Int5minSlRemoteProcOutage
+-- |  |  |  |     |__( 8) mtpOmSlL3Int5minLocalMgmtInhibit
+-- |  |  |  |     |__( 9) mtpOmSlL3Int5minLocalMgmtUninhibit
+-- |  |  |  |     |__(10) mtpOmSlL3Int5minLocalBusy
+-- |  |  |  |     |__(11) mtpOmSlL3Int5minSlCongestedStarts
+-- |  |  |  |     |__(12) mtpOmSlL3Int5minSlCongestedDuration
+-- |  |  |  |     |__(13) mtpOmSlL3Int5minSlCongestionStops
+-- |  |  |  |     |__(14) mtpOmSlL3Int5minDiscardedMSUs
+-- |  |  |  |     |__(15) mtpOmSlL3Int5minCongestionEventsMSULoss
+-- |  |  |  |     |__(16) mtpOmSlL3Int5minChangeovers
+-- |  |  |  |     |__(17) mtpOmSlL3Int5minChangebacks
+-- |  |  |  |     |__(18) mtpOmSlL3Int5minRestorations
 -- |  |  |  |
--- |  |  |  |__( 4) mtpSlL3Int15minTable
--- |  |  |  |  |__( 1) mtpSlL3Int15minEntry
--- |  |  |  |     |__( 1) mtpSlL3Int15minInterval
--- |  |  |  |     |__( 2) mtpSlL3Int15minTimeStamp
--- |  |  |  |     |__( 3) mtpSlL3Int15minSlUnavailabilityDuration
--- |  |  |  |     |__( 4) mtpSlL3Int15minSlLocalInhibition
--- |  |  |  |     |__( 5) mtpSlL3Int15minSlRemoteInhibition
--- |  |  |  |     |__( 6) mtpSlL3Int15minSlFailed
--- |  |  |  |     |__( 7) mtpSlL3Int15minSlRemoteProcOutage
--- |  |  |  |     |__( 8) mtpSlL3Int15minLocalMgmtInhibit
--- |  |  |  |     |__( 9) mtpSlL3Int15minLocalMgmtUninhibit
--- |  |  |  |     |__(10) mtpSlL3Int15minLocalBusy
--- |  |  |  |     |__(11) mtpSlL3Int15minSlCongestedStarts
--- |  |  |  |     |__(12) mtpSlL3Int15minSlCongestedDuration
--- |  |  |  |     |__(13) mtpSlL3Int15minSlCongestionStops
--- |  |  |  |     |__(14) mtpSlL3Int15minDiscardedMSUs
--- |  |  |  |     |__(15) mtpSlL3Int15minCongestionEventsMSULoss
--- |  |  |  |     |__(16) mtpSlL3Int15minChangeovers
--- |  |  |  |     |__(17) mtpSlL3Int15minChangebacks
--- |  |  |  |     |__(18) mtpSlL3Int15minRestorations
+-- |  |  |  |__( 4) mtpOmSlL3Int15minTable
+-- |  |  |  |  |__( 1) mtpOmSlL3Int15minEntry
+-- |  |  |  |     |__( 1) mtpOmSlL3Int15minInterval
+-- |  |  |  |     |__( 2) mtpOmSlL3Int15minTimeStamp
+-- |  |  |  |     |__( 3) mtpOmSlL3Int15minSlUnavailabilityDuration
+-- |  |  |  |     |__( 4) mtpOmSlL3Int15minSlLocalInhibition
+-- |  |  |  |     |__( 5) mtpOmSlL3Int15minSlRemoteInhibition
+-- |  |  |  |     |__( 6) mtpOmSlL3Int15minSlFailed
+-- |  |  |  |     |__( 7) mtpOmSlL3Int15minSlRemoteProcOutage
+-- |  |  |  |     |__( 8) mtpOmSlL3Int15minLocalMgmtInhibit
+-- |  |  |  |     |__( 9) mtpOmSlL3Int15minLocalMgmtUninhibit
+-- |  |  |  |     |__(10) mtpOmSlL3Int15minLocalBusy
+-- |  |  |  |     |__(11) mtpOmSlL3Int15minSlCongestedStarts
+-- |  |  |  |     |__(12) mtpOmSlL3Int15minSlCongestedDuration
+-- |  |  |  |     |__(13) mtpOmSlL3Int15minSlCongestionStops
+-- |  |  |  |     |__(14) mtpOmSlL3Int15minDiscardedMSUs
+-- |  |  |  |     |__(15) mtpOmSlL3Int15minCongestionEventsMSULoss
+-- |  |  |  |     |__(16) mtpOmSlL3Int15minChangeovers
+-- |  |  |  |     |__(17) mtpOmSlL3Int15minChangebacks
+-- |  |  |  |     |__(18) mtpOmSlL3Int15minRestorations
 -- |  |  |  |
--- |  |  |  |__( 5) mtpSlL2CurrentTable
--- |  |  |  |  |__( 1) mtpSlL2CurrentEntry
--- |  |  |  |     |__( 1) mtpSlL2CurrentValidIntervals
--- |  |  |  |     |__( 2) mtpSlL2CurrentTimeDiscontinuity
--- |  |  |  |     |__( 3) mtpSlL2CurrentSlInServiceDuration
--- |  |  |  |     |__( 4) mtpSlL2CurrentSlAlignment
--- |  |  |  |     |__( 5) mtpSlL2CurrentSignUnitsReceived
--- |  |  |  |     |__( 6) mtpSlL2CurrentNegAckReceived
--- |  |  |  |     |__( 7) mtpSlL2CurrentTransmittedOctetsSIFSIO
--- |  |  |  |     |__( 8) mtpSlL2CurrentRetransmittedOctets
--- |  |  |  |     |__( 9) mtpSlL2CurrentTransmittedMSUs
--- |  |  |  |     |__(10) mtpSlL2CurrentReceivedOctetsSIFSIO
--- |  |  |  |     |__(11) mtpSlL2CurrentReceivedMSUs
+-- |  |  |  |__( 5) mtpOmSlL2Table
+-- |  |  |  |  |__( 1) mtpOmSlL2Entry
+-- |  |  |  |     |__( 1) mtpOmSlL2ValidIntervals
+-- |  |  |  |     |__( 2) mtpOmSlL2TimeDiscontinuity
+-- |  |  |  |     |__( 3) mtpOmSlL2SlInServiceDuration
+-- |  |  |  |     |__( 4) mtpOmSlL2SlAlignment
+-- |  |  |  |     |__( 5) mtpOmSlL2SignUnitsReceived
+-- |  |  |  |     |__( 6) mtpOmSlL2NegAckReceived
+-- |  |  |  |     |__( 7) mtpOmSlL2TransmittedOctetsSIFSIO
+-- |  |  |  |     |__( 8) mtpOmSlL2RetransmittedOctets
+-- |  |  |  |     |__( 9) mtpOmSlL2TransmittedMSUs
+-- |  |  |  |     |__(10) mtpOmSlL2ReceivedOctetsSIFSIO
+-- |  |  |  |     |__(11) mtpOmSlL2ReceivedMSUs
 -- |  |  |  |
--- |  |  |  |__( 6) mtpSlL2Int5minTable
--- |  |  |  |  |__( 1) mtpSlL2Int5minEntry
--- |  |  |  |     |__( 1) mtpSlL2Int5minInterval
--- |  |  |  |     |__( 2) mtpSlL2Int5minTimestamp
--- |  |  |  |     |__( 3) mtpSlL2Int5minSlInServiceDuration
--- |  |  |  |     |__( 4) mtpSlL2Int5minSlAlignment
--- |  |  |  |     |__( 5) mtpSlL2Int5minSignUnitsReceived
--- |  |  |  |     |__( 6) mtpSlL2Int5minNegAckReceived
--- |  |  |  |     |__( 7) mtpSlL2Int5minTransmittedOctetsSIFSIO
--- |  |  |  |     |__( 8) mtpSlL2Int5minRetransmittedOctets
--- |  |  |  |     |__( 9) mtpSlL2Int5minTransmittedMSUs
--- |  |  |  |     |__(10) mtpSlL2Int5minReceivedOctetsSIFSIO
--- |  |  |  |     |__(11) mtpSlL2Int5minReceivedMSUs
+-- |  |  |  |__( 6) mtpOmSlL2Int5minTable
+-- |  |  |  |  |__( 1) mtpOmSlL2Int5minEntry
+-- |  |  |  |     |__( 1) mtpOmSlL2Int5minInterval
+-- |  |  |  |     |__( 2) mtpOmSlL2Int5minTimestamp
+-- |  |  |  |     |__( 3) mtpOmSlL2Int5minSlInServiceDuration
+-- |  |  |  |     |__( 4) mtpOmSlL2Int5minSlAlignment
+-- |  |  |  |     |__( 5) mtpOmSlL2Int5minSignUnitsReceived
+-- |  |  |  |     |__( 6) mtpOmSlL2Int5minNegAckReceived
+-- |  |  |  |     |__( 7) mtpOmSlL2Int5minTransmittedOctetsSIFSIO
+-- |  |  |  |     |__( 8) mtpOmSlL2Int5minRetransmittedOctets
+-- |  |  |  |     |__( 9) mtpOmSlL2Int5minTransmittedMSUs
+-- |  |  |  |     |__(10) mtpOmSlL2Int5minReceivedOctetsSIFSIO
+-- |  |  |  |     |__(11) mtpOmSlL2Int5minReceivedMSUs
 -- |  |  |  |
--- |  |  |  |__( 7) mtpSlL2Int15minTable
--- |  |  |     |__( 1) mtpSlL2Int15minEntry
--- |  |  |        |__( 1) mtpSlL2Int15minInterval
--- |  |  |        |__( 2) mtpSlL2Int15minTimestamp
--- |  |  |        |__( 3) mtpSlL2Int15minSlInServiceDuration
--- |  |  |        |__( 4) mtpSlL2Int15minSlAlignment
--- |  |  |        |__( 5) mtpSlL2Int15minSignUnitsReceived
--- |  |  |        |__( 6) mtpSlL2Int15minNegAckReceived
--- |  |  |        |__( 7) mtpSlL2Int15minTransmittedOctetsSIFSIO
--- |  |  |        |__( 8) mtpSlL2Int15minRetransmittedOctets
--- |  |  |        |__( 9) mtpSlL2Int15minTransmittedMSUs
--- |  |  |        |__(10) mtpSlL2Int15minReceivedOctetsSIFSIO
--- |  |  |        |__(11) mtpSlL2Int15minReceivedMSUs
+-- |  |  |  |__( 7) mtpOmSlL2Int15minTable
+-- |  |  |     |__( 1) mtpOmSlL2Int15minEntry
+-- |  |  |        |__( 1) mtpOmSlL2Int15minInterval
+-- |  |  |        |__( 2) mtpOmSlL2Int15minTimestamp
+-- |  |  |        |__( 3) mtpOmSlL2Int15minSlInServiceDuration
+-- |  |  |        |__( 4) mtpOmSlL2Int15minSlAlignment
+-- |  |  |        |__( 5) mtpOmSlL2Int15minSignUnitsReceived
+-- |  |  |        |__( 6) mtpOmSlL2Int15minNegAckReceived
+-- |  |  |        |__( 7) mtpOmSlL2Int15minTransmittedOctetsSIFSIO
+-- |  |  |        |__( 8) mtpOmSlL2Int15minRetransmittedOctets
+-- |  |  |        |__( 9) mtpOmSlL2Int15minTransmittedMSUs
+-- |  |  |        |__(10) mtpOmSlL2Int15minReceivedOctetsSIFSIO
+-- |  |  |        |__(11) mtpOmSlL2Int15minReceivedMSUs
 -- |  |  |
--- |  |  |__( 5) mtpOmSdtStats
--- |  |  |  |__( 1) mtpSdtStatsTable
--- |  |  |     |__( 1) mtpSdtStatsEntry
--- |  |  |        |__( 1) mtpSdtStatsTxBytes
--- |  |  |        |__( 2) mtpSdtStatsTxSus
--- |  |  |        |__( 3) mtpSdtStatsTxSusRepeated
--- |  |  |        |__( 4) mtpSdtStatsTxUnderruns
--- |  |  |        |__( 5) mtpSdtStatsTxAborts
--- |  |  |        |__( 6) mtpSdtStatsTxBufferOverflows
--- |  |  |        |__( 7) mtpSdtStatsTxSusInError
--- |  |  |        |__( 8) mtpSdtStatsRxBytes
--- |  |  |        |__( 9) mtpSdtStatsRxSusCompressed
--- |  |  |        |__(10) mtpSdtStatsRxOverruns
--- |  |  |        |__(11) mtpSdtStatsRxAborts
--- |  |  |        |__(12) mtpSdtStatsRxBufferOverflows
--- |  |  |        |__(13) mtpSdtStatsRxSusInError
--- |  |  |        |__(14) mtpSdtStatsRxSyncTransitions
--- |  |  |        |__(15) mtpSdtStatsRxBitsOctetCounted
--- |  |  |        |__(16) mtpSdtStatsRxCrcErrors
--- |  |  |        |__(17) mtpSdtStatsRxFrameErrors
--- |  |  |        |__(18) mtpSdtStatsRxFrameOverflows
--- |  |  |        |__(19) mtpSdtStatsRxFrameTooLong
--- |  |  |        |__(20) mtpSdtStatsRxFrameTooShort
--- |  |  |        |__(21) mtpSdtStatsRxResidueErrors
--- |  |  |        |__(22) mtpSdtStatsCarrierCtsLost
--- |  |  |        |__(23) mtpSdtStatsCarrierDcdLost
--- |  |  |        |__(24) mtpSdtStatsCarrierLost
+-- |  |  |__( 5) mtpOmOmSdtStats
+-- |  |  |  |__( 1) mtpOmSdtStatsTable
+-- |  |  |     |__( 1) mtpOmSdtStatsEntry
+-- |  |  |        |__( 1) mtpOmSdtStatsTxBytes
+-- |  |  |        |__( 2) mtpOmSdtStatsTxSus
+-- |  |  |        |__( 3) mtpOmSdtStatsTxSusRepeated
+-- |  |  |        |__( 4) mtpOmSdtStatsTxUnderruns
+-- |  |  |        |__( 5) mtpOmSdtStatsTxAborts
+-- |  |  |        |__( 6) mtpOmSdtStatsTxBufferOverflows
+-- |  |  |        |__( 7) mtpOmSdtStatsTxSusInError
+-- |  |  |        |__( 8) mtpOmSdtStatsRxBytes
+-- |  |  |        |__( 9) mtpOmSdtStatsRxSusCompressed
+-- |  |  |        |__(10) mtpOmSdtStatsRxOverruns
+-- |  |  |        |__(11) mtpOmSdtStatsRxAborts
+-- |  |  |        |__(12) mtpOmSdtStatsRxBufferOverflows
+-- |  |  |        |__(13) mtpOmSdtStatsRxSusInError
+-- |  |  |        |__(14) mtpOmSdtStatsRxSyncTransitions
+-- |  |  |        |__(15) mtpOmSdtStatsRxBitsOctetCounted
+-- |  |  |        |__(16) mtpOmSdtStatsRxCrcErrors
+-- |  |  |        |__(17) mtpOmSdtStatsRxFrameErrors
+-- |  |  |        |__(18) mtpOmSdtStatsRxFrameOverflows
+-- |  |  |        |__(19) mtpOmSdtStatsRxFrameTooLong
+-- |  |  |        |__(20) mtpOmSdtStatsRxFrameTooShort
+-- |  |  |        |__(21) mtpOmSdtStatsRxResidueErrors
+-- |  |  |        |__(22) mtpOmSdtStatsCarrierCtsLost
+-- |  |  |        |__(23) mtpOmSdtStatsCarrierDcdLost
+-- |  |  |        |__(24) mtpOmSdtStatsCarrierLost
 -- |  |  |
--- |  |  |__( 6) mtpOmSdlStats
--- |  |     |__( 1) mtpSdlStatsTable
--- |  |        |__( 1) mtpSdlStatsEntry
--- |  |           |__( 1) mtpSdlStatsRxOctets
--- |  |           |__( 2) mtpSdlStatsTxOctets
--- |  |           |__( 3) mtpSdlStatsRXOverruns
--- |  |           |__( 4) mtpSdlStatsTxUnderruns
--- |  |           |__( 5) mtpSdlStatsRxBufferOverflows
--- |  |           |__( 6) mtpSdlStatsTxBufferOverflows
--- |  |           |__( 7) mtpSdlStatsLeadCtsLost
--- |  |           |__( 8) mtpSdlStatsLeadDcdLost
--- |  |           |__( 9) mtpSdlStatsCarrierLost
--- |  |           |__(10) mtpSdlStatsBipolarViolations
+-- |  |  |__( 6) mtpOmOmSdlStats
+-- |  |     |__( 1) mtpOmSdlStatsTable
+-- |  |        |__( 1) mtpOmSdlStatsEntry
+-- |  |           |__( 1) mtpOmSdlStatsRxOctets
+-- |  |           |__( 2) mtpOmSdlStatsTxOctets
+-- |  |           |__( 3) mtpOmSdlStatsRXOverruns
+-- |  |           |__( 4) mtpOmSdlStatsTxUnderruns
+-- |  |           |__( 5) mtpOmSdlStatsRxBufferOverflows
+-- |  |           |__( 6) mtpOmSdlStatsTxBufferOverflows
+-- |  |           |__( 7) mtpOmSdlStatsLeadCtsLost
+-- |  |           |__( 8) mtpOmSdlStatsLeadDcdLost
+-- |  |           |__( 9) mtpOmSdlStatsCarrierLost
+-- |  |           |__(10) mtpOmSdlStatsBipolarViolations
 -- |  |
 -- |  |__( 2) mtpOmScalars
 -- |  |  |__( 1) mtpOm1stAndIntervalActivate
@@ -526,8 +530,8 @@ mtpOmSdlStats		OBJECT IDENTIFIER ::= { mtpOmTables	 6 }
 -- TABLES
 -- ====================================================================
 
-mtpSpCurrentTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpCurrentEntry
+mtpOmSpTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -535,8 +539,8 @@ mtpSpCurrentTable OBJECT-TYPE
 	 measurements."
     ::= { mtpOmSpStats 1 }
 
-mtpSpCurrentEntry OBJECT-TYPE
-    SYNTAX	MtpSpCurrentEntry
+mtpOmSpEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -546,36 +550,36 @@ mtpSpCurrentEntry OBJECT-TYPE
     INDEX	{
 	mtpSpId -- shared index
     }
-    ::= { mtpSpCurrentTable 1 }
+    ::= { mtpOmSpTable 1 }
 
-MtpSpCurrentEntry ::= SEQUENCE {
-    mtpSpCurrentValidIntervals			HCPerfValidIntervals,
-    mtpSpCurrentTimeDiscontinuity		TimeStamp,
-    mtpSpCurrentDiscardedMSUs			PerfCurrentCount, -- Q.752, 5.5
-    mtpSpCurrentReceivedTFCstatus0		PerfCurrentCount, -- Q.752, 5.8
-    mtpSpCurrentReceivedTFCstatus1		PerfCurrentCount, -- Q.752, 5.8
-    mtpSpCurrentReceivedTFCstatus2		PerfCurrentCount, -- Q.752, 5.8
-    mtpSpCurrentOctetsXferred			PerfCurrentCount
+MtpOmSpEntry ::= SEQUENCE {
+    mtpOmSpValidIntervals			HCPerfValidIntervals,
+    mtpOmSpTimeDiscontinuity			TimeStamp,
+    mtpOmSpDiscardedMSUs			Counter32, -- Q.752, 5.5
+    mtpOmSpReceivedTFCstatus0			Counter32, -- Q.752, 5.8
+    mtpOmSpReceivedTFCstatus1			Counter32, -- Q.752, 5.8
+    mtpOmSpReceivedTFCstatus2			Counter32, -- Q.752, 5.8
+    mtpOmSpOctetsXferred			Counter32
 }
 
-mtpSpCurrentValidIntervals OBJECT-TYPE
+mtpOmSpValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpCurrentEntry 1 }
+    ::= { mtpOmSpEntry 1 }
 
-mtpSpCurrentTimeDiscontinuity OBJECT-TYPE
+mtpOmSpTimeDiscontinuity OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpCurrentEntry 2 }
+    ::= { mtpOmSpEntry 2 }
 
-mtpSpCurrentDiscardedMSUs OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpDiscardedMSUs OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
@@ -584,10 +588,10 @@ mtpSpCurrentDiscardedMSUs OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (10/95) : discardedMSUs.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.5."
-    ::= { mtpSpCurrentEntry 3 }
+    ::= { mtpOmSpEntry 3 }
 
-mtpSpCurrentReceivedTFCstatus0 OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpReceivedTFCstatus0 OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"TFCs"
     MAX-ACCESS	read-only
     STATUS	current
@@ -605,10 +609,10 @@ mtpSpCurrentReceivedTFCstatus0 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpCurrentEntry 4 }
+    ::= { mtpOmSpEntry 4 }
 
-mtpSpCurrentReceivedTFCstatus1 OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpReceivedTFCstatus1 OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"TFCs"
     MAX-ACCESS	read-only
     STATUS	current
@@ -626,10 +630,10 @@ mtpSpCurrentReceivedTFCstatus1 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpCurrentEntry 5 }
+    ::= { mtpOmSpEntry 5 }
 
-mtpSpCurrentReceivedTFCstatus2 OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpReceivedTFCstatus2 OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"TFCs"
     MAX-ACCESS	read-only
     STATUS	current
@@ -647,22 +651,22 @@ mtpSpCurrentReceivedTFCstatus2 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpCurrentEntry 6 }
+    ::= { mtpOmSpEntry 6 }
 
-mtpSpCurrentOctetsXferred OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpOctetsXferred OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpCurrentEntry 7 }
+    ::= { mtpOmSpEntry 7 }
 
 
 -- ====================================================================
 
-mtpSpInt5minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpInt5minEntry
+mtpOmSpInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -670,45 +674,45 @@ mtpSpInt5minTable OBJECT-TYPE
 	 historical operational measurements."
     ::= { mtpOmSpStats 2 }
 
-mtpSpInt5minEntry OBJECT-TYPE
-    SYNTAX	MtpSpInt5minEntry
+mtpOmSpInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpSpId, -- shared index
-	mtpSpInt5minInterval
+	mtpOmSpInt5minInterval
     }
-    ::= { mtpSpInt5minTable 1 }
+    ::= { mtpOmSpInt5minTable 1 }
 
-MtpSpInt5minEntry ::= SEQUENCE {
-    mtpSpInt5minInterval			Unsigned32,
-    mtpSpInt5minTimeStamp			TimeStamp,
-    mtpSpInt5minDiscardedMSUs			PerfIntervalCount, -- Q.752, 5.5
-    mtpSpInt5minReceivedTFCstatus0		PerfIntervalCount, -- Q.752, 5.8
-    mtpSpInt5minReceivedTFCstatus1		PerfIntervalCount, -- Q.752, 5.8
-    mtpSpInt5minReceivedTFCstatus2		PerfIntervalCount, -- Q.752, 5.8
-    mtpSpInt5minOctetsXferred			PerfIntervalCount
+MtpOmSpInt5minEntry ::= SEQUENCE {
+    mtpOmSpInt5minInterval			Unsigned32,
+    mtpOmSpInt5minTimeStamp			TimeStamp,
+    mtpOmSpInt5minDiscardedMSUs			PerfIntervalCount, -- Q.752, 5.5
+    mtpOmSpInt5minReceivedTFCstatus0		PerfIntervalCount, -- Q.752, 5.8
+    mtpOmSpInt5minReceivedTFCstatus1		PerfIntervalCount, -- Q.752, 5.8
+    mtpOmSpInt5minReceivedTFCstatus2		PerfIntervalCount, -- Q.752, 5.8
+    mtpOmSpInt5minOctetsXferred			PerfIntervalCount
 }
 
-mtpSpInt5minInterval OBJECT-TYPE
+mtpOmSpInt5minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpInt5minEntry 1 }
+    ::= { mtpOmSpInt5minEntry 1 }
 
-mtpSpInt5minTimeStamp OBJECT-TYPE
+mtpOmSpInt5minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpInt5minEntry 2 }
+    ::= { mtpOmSpInt5minEntry 2 }
 
-mtpSpInt5minDiscardedMSUs OBJECT-TYPE
+mtpOmSpInt5minDiscardedMSUs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
@@ -718,9 +722,9 @@ mtpSpInt5minDiscardedMSUs OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (10/95) : discardedMSUs.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.5."
-    ::= { mtpSpInt5minEntry 3 }
+    ::= { mtpOmSpInt5minEntry 3 }
 
-mtpSpInt5minReceivedTFCstatus0 OBJECT-TYPE
+mtpOmSpInt5minReceivedTFCstatus0 OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"TFCs"
     MAX-ACCESS	read-only
@@ -739,9 +743,9 @@ mtpSpInt5minReceivedTFCstatus0 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpInt5minEntry 4 }
+    ::= { mtpOmSpInt5minEntry 4 }
 
-mtpSpInt5minReceivedTFCstatus1 OBJECT-TYPE
+mtpOmSpInt5minReceivedTFCstatus1 OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"TFCs"
     MAX-ACCESS	read-only
@@ -760,9 +764,9 @@ mtpSpInt5minReceivedTFCstatus1 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpInt5minEntry 5 }
+    ::= { mtpOmSpInt5minEntry 5 }
 
-mtpSpInt5minReceivedTFCstatus2 OBJECT-TYPE
+mtpOmSpInt5minReceivedTFCstatus2 OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"TFCs"
     MAX-ACCESS	read-only
@@ -781,22 +785,22 @@ mtpSpInt5minReceivedTFCstatus2 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpInt5minEntry 6 }
+    ::= { mtpOmSpInt5minEntry 6 }
 
-mtpSpInt5minOctetsXferred OBJECT-TYPE
+mtpOmSpInt5minOctetsXferred OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpInt5minEntry 7 }
+    ::= { mtpOmSpInt5minEntry 7 }
 
 
 -- ====================================================================
 
-mtpSpInt15minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpInt15minEntry
+mtpOmSpInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -804,45 +808,45 @@ mtpSpInt15minTable OBJECT-TYPE
 	 historical operational measurements."
     ::= { mtpOmSpStats 3 }
 
-mtpSpInt15minEntry OBJECT-TYPE
-    SYNTAX	MtpSpInt15minEntry
+mtpOmSpInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpSpId, -- shared index
-	mtpSpInt15minInterval
+	mtpOmSpInt15minInterval
     }
-    ::= { mtpSpInt15minTable 1 }
+    ::= { mtpOmSpInt15minTable 1 }
 
-MtpSpInt15minEntry ::= SEQUENCE {
-    mtpSpInt15minInterval			Unsigned32,
-    mtpSpInt15minTimeStamp			TimeStamp,
-    mtpSpInt15minDiscardedMSUs			PerfIntervalCount, -- Q.752, 5.5
-    mtpSpInt15minReceivedTFCstatus0		PerfIntervalCount, -- Q.752, 5.8
-    mtpSpInt15minReceivedTFCstatus1		PerfIntervalCount, -- Q.752, 5.8
-    mtpSpInt15minReceivedTFCstatus2		PerfIntervalCount, -- Q.752, 5.8
-    mtpSpInt15minOctetsXferred			PerfIntervalCount
+MtpOmSpInt15minEntry ::= SEQUENCE {
+    mtpOmSpInt15minInterval			Unsigned32,
+    mtpOmSpInt15minTimeStamp			TimeStamp,
+    mtpOmSpInt15minDiscardedMSUs		PerfIntervalCount, -- Q.752, 5.5
+    mtpOmSpInt15minReceivedTFCstatus0		PerfIntervalCount, -- Q.752, 5.8
+    mtpOmSpInt15minReceivedTFCstatus1		PerfIntervalCount, -- Q.752, 5.8
+    mtpOmSpInt15minReceivedTFCstatus2		PerfIntervalCount, -- Q.752, 5.8
+    mtpOmSpInt15minOctetsXferred		PerfIntervalCount
 }
 
-mtpSpInt15minInterval OBJECT-TYPE
+mtpOmSpInt15minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpInt15minEntry 1 }
+    ::= { mtpOmSpInt15minEntry 1 }
 
-mtpSpInt15minTimeStamp OBJECT-TYPE
+mtpOmSpInt15minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpInt15minEntry 2 }
+    ::= { mtpOmSpInt15minEntry 2 }
 
-mtpSpInt15minDiscardedMSUs OBJECT-TYPE
+mtpOmSpInt15minDiscardedMSUs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
@@ -852,9 +856,9 @@ mtpSpInt15minDiscardedMSUs OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (10/95) : discardedMSUs.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.5."
-    ::= { mtpSpInt15minEntry 3 }
+    ::= { mtpOmSpInt15minEntry 3 }
 
-mtpSpInt15minReceivedTFCstatus0 OBJECT-TYPE
+mtpOmSpInt15minReceivedTFCstatus0 OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"TFCs"
     MAX-ACCESS	read-only
@@ -873,9 +877,9 @@ mtpSpInt15minReceivedTFCstatus0 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpInt15minEntry 4 }
+    ::= { mtpOmSpInt15minEntry 4 }
 
-mtpSpInt15minReceivedTFCstatus1 OBJECT-TYPE
+mtpOmSpInt15minReceivedTFCstatus1 OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"TFCs"
     MAX-ACCESS	read-only
@@ -894,9 +898,9 @@ mtpSpInt15minReceivedTFCstatus1 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpInt15minEntry 5 }
+    ::= { mtpOmSpInt15minEntry 5 }
 
-mtpSpInt15minReceivedTFCstatus2 OBJECT-TYPE
+mtpOmSpInt15minReceivedTFCstatus2 OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"TFCs"
     MAX-ACCESS	read-only
@@ -915,22 +919,22 @@ mtpSpInt15minReceivedTFCstatus2 OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 5 (5.8).
 	 ITU-T Rec. Q.751.1 (10/95) : receivedTFC.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.8."
-    ::= { mtpSpInt15minEntry 6 }
+    ::= { mtpOmSpInt15minEntry 6 }
 
-mtpSpInt15minOctetsXferred OBJECT-TYPE
+mtpOmSpInt15minOctetsXferred OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpInt15minEntry 7 }
+    ::= { mtpOmSpInt15minEntry 7 }
 
 
 -- ====================================================================
 
-mtpSpSiTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpSiEntry
+mtpOmSpSiTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpSiEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -938,54 +942,54 @@ mtpSpSiTable OBJECT-TYPE
 	 operational measurements broken out be SI code."
     ::= { mtpOmSpStats 4 }
 
-mtpSpSiEntry OBJECT-TYPE
-    SYNTAX	MtpSpSiEntry
+mtpOmSpSiEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpSiEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpSpId, -- shared index
-	mtpSpSiCode
+	mtpOmSpSiCode
     }
-    ::= { mtpSpSiTable 1 }
+    ::= { mtpOmSpSiTable 1 }
 
-MtpSpSiEntry ::= SEQUENCE {
-    mtpSpSiCode					Unsigned32,
-    mtpSpSiValidIntervals			HCPerfValidIntervals,
-    mtpSpSiTimeDiscontinuity			TimeStamp,
-    mtpSpSiTransmittedUPUnavailable		PerfCurrentCount, -- Q.752, 5.6
-    mtpSpSiReceivedUPUnavailable		PerfCurrentCount, -- Q.752, 5.7
-    mtpSpSiHandledOctetsSIO			PerfCurrentCount, -- Q.752, 6.3
-    mtpSpSiStatus				RowStatus
+MtpOmSpSiEntry ::= SEQUENCE {
+    mtpOmSpSiCode				Unsigned32,
+    mtpOmSpSiValidIntervals			HCPerfValidIntervals,
+    mtpOmSpSiTimeDiscontinuity			TimeStamp,
+    mtpOmSpSiTransmittedUPUnavailable		Counter32, -- Q.752, 5.6
+    mtpOmSpSiReceivedUPUnavailable		Counter32, -- Q.752, 5.7
+    mtpOmSpSiHandledOctetsSIO			Counter32, -- Q.752, 6.3
+    mtpOmSpSiStatus				RowStatus
 }
 
-mtpSpSiCode OBJECT-TYPE
+mtpOmSpSiCode OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpSiEntry 1 }
+    ::= { mtpOmSpSiEntry 1 }
 
-mtpSpSiValidIntervals OBJECT-TYPE
+mtpOmSpSiValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpSiEntry 2 }
+    ::= { mtpOmSpSiEntry 2 }
 
-mtpSpSiTimeDiscontinuity OBJECT-TYPE
+mtpOmSpSiTimeDiscontinuity OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpSiEntry 3 }
+    ::= { mtpOmSpSiEntry 3 }
 
-mtpSpSiTransmittedUPUnavailable OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpSiTransmittedUPUnavailable OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"UPUs"
     MAX-ACCESS	read-only
     STATUS	current
@@ -1009,10 +1013,10 @@ mtpSpSiTransmittedUPUnavailable OBJECT-TYPE
 	 ANSI T1.111.4/2000 11.7.2.
 	 ITU-T Rec. Q.751.1 (10/95) : transmitedUPUnavailable.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.6."
-    ::= { mtpSpSiEntry 4 }
+    ::= { mtpOmSpSiEntry 4 }
 
-mtpSpSiReceivedUPUnavailable OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpSiReceivedUPUnavailable OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"UPUs"
     MAX-ACCESS	read-only
     STATUS	current
@@ -1038,10 +1042,10 @@ mtpSpSiReceivedUPUnavailable OBJECT-TYPE
 	 ANSI T1.111.4/2000 11.7.2.
 	 ITU-T Rec. Q.751.1 (10/95) : receivedUPUnavailable.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.7."
-    ::= { mtpSpSiEntry 5 }
+    ::= { mtpOmSpSiEntry 5 }
 
-mtpSpSiHandledOctetsSIO OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpSiHandledOctetsSIO OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
@@ -1051,9 +1055,9 @@ mtpSpSiHandledOctetsSIO OBJECT-TYPE
 	"ANSI T1.116.1D handledOctetsSIO
 	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsSIO.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.3."
-    ::= { mtpSpSiEntry 6 }
+    ::= { mtpOmSpSiEntry 6 }
 
-mtpSpSiStatus OBJECT-TYPE
+mtpOmSpSiStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -1061,13 +1065,13 @@ mtpSpSiStatus OBJECT-TYPE
 	""
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus."
-    ::= { mtpSpSiEntry 7 }
+    ::= { mtpOmSpSiEntry 7 }
 
 
 -- ====================================================================
 
-mtpSpSiInt5minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpSiInt5minEntry
+mtpOmSpSiInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpSiInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -1076,44 +1080,44 @@ mtpSpSiInt5minTable OBJECT-TYPE
 	 code."
     ::= { mtpOmSpStats 5 }
 
-mtpSpSiInt5minEntry OBJECT-TYPE
-    SYNTAX	MtpSpSiInt5minEntry
+mtpOmSpSiInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpSiInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpSpId, -- shared index
-	mtpSpSiCode,
-	mtpSpSiInt5minInterval 
+	mtpOmSpSiCode,
+	mtpOmSpSiInt5minInterval 
     }
-    ::= { mtpSpSiInt5minTable 1 }
+    ::= { mtpOmSpSiInt5minTable 1 }
 
-MtpSpSiInt5minEntry ::= SEQUENCE {
-    mtpSpSiInt5minInterval			Unsigned32,
-    mtpSpSiInt5minTimeStamp			TimeStamp,
-    mtpSpSiInt5minTransmittedUPUnavailable	PerfIntervalCount, -- Q.752, 5.6
-    mtpSpSiInt5minReceivedUPUnavailable		PerfIntervalCount, -- Q.752, 5.7
-    mtpSpSiInt5minHandledOctetsSIO		PerfIntervalCount  -- Q.752, 6.3
+MtpOmSpSiInt5minEntry ::= SEQUENCE {
+    mtpOmSpSiInt5minInterval			Unsigned32,
+    mtpOmSpSiInt5minTimeStamp			TimeStamp,
+    mtpOmSpSiInt5minTransmittedUPUnavailable	PerfIntervalCount, -- Q.752, 5.6
+    mtpOmSpSiInt5minReceivedUPUnavailable	PerfIntervalCount, -- Q.752, 5.7
+    mtpOmSpSiInt5minHandledOctetsSIO		PerfIntervalCount  -- Q.752, 6.3
 }
 
-mtpSpSiInt5minInterval OBJECT-TYPE
+mtpOmSpSiInt5minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpSiInt5minEntry 1 }
+    ::= { mtpOmSpSiInt5minEntry 1 }
 
-mtpSpSiInt5minTimeStamp OBJECT-TYPE
+mtpOmSpSiInt5minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpSiInt5minEntry 2 }
+    ::= { mtpOmSpSiInt5minEntry 2 }
 
-mtpSpSiInt5minTransmittedUPUnavailable OBJECT-TYPE
+mtpOmSpSiInt5minTransmittedUPUnavailable OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"UPUs"
     MAX-ACCESS	read-only
@@ -1138,9 +1142,9 @@ mtpSpSiInt5minTransmittedUPUnavailable OBJECT-TYPE
 	 ANSI T1.111.4/2000 11.7.2.
 	 ITU-T Rec. Q.751.1 (10/95) : transmitedUPUnavailable.
 	 ITU-T Rec. Q.752 : Table 5/Q.752, 5.6."
-    ::= { mtpSpSiInt5minEntry 3 }
+    ::= { mtpOmSpSiInt5minEntry 3 }
 
-mtpSpSiInt5minReceivedUPUnavailable OBJECT-TYPE
+mtpOmSpSiInt5minReceivedUPUnavailable OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"UPUs"
     MAX-ACCESS	read-only
@@ -1167,9 +1171,9 @@ mtpSpSiInt5minReceivedUPUnavailable OBJECT-TYPE
 	 ANSI T1.111.4/2000 11.7.2.
 	 ITU-T Rec. Q.751.1 (10/95) : receivedUPUnavailable.
 	 ITU-T Rec. Q.752 : Table 5/Q.752, 5.7."
-    ::= { mtpSpSiInt5minEntry 4 }
+    ::= { mtpOmSpSiInt5minEntry 4 }
 
-mtpSpSiInt5minHandledOctetsSIO OBJECT-TYPE
+mtpOmSpSiInt5minHandledOctetsSIO OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -1180,13 +1184,13 @@ mtpSpSiInt5minHandledOctetsSIO OBJECT-TYPE
 	"ANSI T1.116.1D handledOctetsSIO
 	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsSIO.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.3."
-    ::= { mtpSpSiInt5minEntry 5 }
+    ::= { mtpOmSpSiInt5minEntry 5 }
 
 
 -- ====================================================================
 
-mtpSpSiInt15minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpSiInt15minEntry
+mtpOmSpSiInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpSiInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -1195,44 +1199,44 @@ mtpSpSiInt15minTable OBJECT-TYPE
 	 code."
     ::= { mtpOmSpStats 6 }
 
-mtpSpSiInt15minEntry OBJECT-TYPE
-    SYNTAX	MtpSpSiInt15minEntry
+mtpOmSpSiInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpSiInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpSpId, -- shared index
-	mtpSpSiCode,
-	mtpSpSiInt15minInterval
+	mtpOmSpSiCode,
+	mtpOmSpSiInt15minInterval
     }
-    ::= { mtpSpSiInt15minTable 1 }
+    ::= { mtpOmSpSiInt15minTable 1 }
 
-MtpSpSiInt15minEntry ::= SEQUENCE {
-    mtpSpSiInt15minInterval			Unsigned32,
-    mtpSpSiInt15minTimeStamp			TimeStamp,
-    mtpSpSiInt15minTransmittedUPUnavailable	PerfIntervalCount, -- Q.752, 5.6
-    mtpSpSiInt15minReceivedUPUnavailable	PerfIntervalCount, -- Q.752, 5.7
-    mtpSpSiInt15minHandledOctetsSIO		PerfIntervalCount  -- Q.752, 6.3
+MtpOmSpSiInt15minEntry ::= SEQUENCE {
+    mtpOmSpSiInt15minInterval			Unsigned32,
+    mtpOmSpSiInt15minTimeStamp			TimeStamp,
+    mtpOmSpSiInt15minTransmittedUPUnavailable	PerfIntervalCount, -- Q.752, 5.6
+    mtpOmSpSiInt15minReceivedUPUnavailable	PerfIntervalCount, -- Q.752, 5.7
+    mtpOmSpSiInt15minHandledOctetsSIO		PerfIntervalCount  -- Q.752, 6.3
 }
 
-mtpSpSiInt15minInterval OBJECT-TYPE
+mtpOmSpSiInt15minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpSiInt15minEntry 1 }
+    ::= { mtpOmSpSiInt15minEntry 1 }
 
-mtpSpSiInt15minTimeStamp OBJECT-TYPE
+mtpOmSpSiInt15minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpSiInt15minEntry 2 }
+    ::= { mtpOmSpSiInt15minEntry 2 }
 
-mtpSpSiInt15minTransmittedUPUnavailable OBJECT-TYPE
+mtpOmSpSiInt15minTransmittedUPUnavailable OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"UPUs"
     MAX-ACCESS	read-only
@@ -1257,9 +1261,9 @@ mtpSpSiInt15minTransmittedUPUnavailable OBJECT-TYPE
 	 ANSI T1.111.4/2000 11.7.2.
 	 ITU-T Rec. Q.751.1 (10/95) : transmitedUPUnavailable.
 	 ITU-T Rec. Q.752 : Table 5/Q.752, 5.6."
-    ::= { mtpSpSiInt15minEntry 3 }
+    ::= { mtpOmSpSiInt15minEntry 3 }
 
-mtpSpSiInt15minReceivedUPUnavailable OBJECT-TYPE
+mtpOmSpSiInt15minReceivedUPUnavailable OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"UPUs"
     MAX-ACCESS	read-only
@@ -1286,9 +1290,9 @@ mtpSpSiInt15minReceivedUPUnavailable OBJECT-TYPE
 	 ANSI T1.111.4/2000 11.7.2.
 	 ITU-T Rec. Q.751.1 (10/95) : receivedUPUnavailable.
 	 ITU-T Rec. Q.752 : Table 5/Q.752, 5.7."
-    ::= { mtpSpSiInt15minEntry 4 }
+    ::= { mtpOmSpSiInt15minEntry 4 }
 
-mtpSpSiInt15minHandledOctetsSIO OBJECT-TYPE
+mtpOmSpSiInt15minHandledOctetsSIO OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -1299,66 +1303,66 @@ mtpSpSiInt15minHandledOctetsSIO OBJECT-TYPE
 	"ANSI T1.116.1D handledOctetsSIO
 	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsSIO.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.3."
-    ::= { mtpSpSiInt15minEntry 5 }
+    ::= { mtpOmSpSiInt15minEntry 5 }
 
 
 -- ====================================================================
 
-mtpSpStudyTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpStudyEntry
+mtpOmSpStudyTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpStudyEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmSpStats 7 }
 
-mtpSpStudyEntry OBJECT-TYPE
-    SYNTAX	MtpSpStudyEntry
+mtpOmSpStudyEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpStudyEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
-	mtpSpStudyId
+	mtpOmSpStudyId
     }
-    ::= { mtpSpStudyTable 1 }
+    ::= { mtpOmSpStudyTable 1 }
 
-MtpSpStudyEntry ::= SEQUENCE {
-    mtpSpStudyId				Unsigned32,
-    mtpSpStudyValidIntervals			HCPerfValidIntervals,
-    mtpSpStudyTimeDiscontinuity			TimeStamp,
-    mtpSpStudyHandledOctetsOpcDpcSio		PerfCurrentCount, -- Q.752, 6.6
-    mtpSpStudyHandledMSUsOpcDpcSio		PerfCurrentCount, -- Q.752, 6.7
-    mtpSpStudyStatus				RowStatus
+MtpOmSpStudyEntry ::= SEQUENCE {
+    mtpOmSpStudyId				Unsigned32,
+    mtpOmSpStudyValidIntervals			HCPerfValidIntervals,
+    mtpOmSpStudyTimeDiscontinuity		TimeStamp,
+    mtpOmSpStudyHandledOctetsOpcDpcSio		Counter32, -- Q.752, 6.6
+    mtpOmSpStudyHandledMSUsOpcDpcSio		Counter32, -- Q.752, 6.7
+    mtpOmSpStudyStatus				RowStatus
 }
 
-mtpSpStudyId OBJECT-TYPE
+mtpOmSpStudyId OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	"Provides a non-zero index into the signalling point study 
 	 table."
-    ::= { mtpSpStudyEntry 1 }
+    ::= { mtpOmSpStudyEntry 1 }
 
-mtpSpStudyValidIntervals OBJECT-TYPE
+mtpOmSpStudyValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpStudyEntry 2 }
+    ::= { mtpOmSpStudyEntry 2 }
 
-mtpSpStudyTimeDiscontinuity OBJECT-TYPE
+mtpOmSpStudyTimeDiscontinuity OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpStudyEntry 3 }
+    ::= { mtpOmSpStudyEntry 3 }
 
-mtpSpStudyHandledOctetsOpcDpcSio OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpStudyHandledOctetsOpcDpcSio OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
@@ -1376,10 +1380,10 @@ mtpSpStudyHandledOctetsOpcDpcSio OBJECT-TYPE
 	 ANSI T1.116.2/2000 Table 6 (6.6).
 	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsOpcDpcSio.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.6."
-    ::= { mtpSpStudyEntry 4 }
+    ::= { mtpOmSpStudyEntry 4 }
 
-mtpSpStudyHandledMSUsOpcDpcSio OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSpStudyHandledMSUsOpcDpcSio OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
@@ -1395,9 +1399,9 @@ mtpSpStudyHandledMSUsOpcDpcSio OBJECT-TYPE
 	 ANSI T1.116.1D handledMSUsOpcDpcSio.
 	 ITU-T Rec. Q.751.1 (10/95) : handledMSUsOpcDpcSio.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.7."
-    ::= { mtpSpStudyEntry 5 }
+    ::= { mtpOmSpStudyEntry 5 }
 
-mtpSpStudyStatus OBJECT-TYPE
+mtpOmSpStudyStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -1405,55 +1409,55 @@ mtpSpStudyStatus OBJECT-TYPE
 	""
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus."
-    ::= { mtpSpStudyEntry 6 }
+    ::= { mtpOmSpStudyEntry 6 }
 
 
 -- ====================================================================
 
-mtpSpStudyInt5minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpStudyInt5minEntry
+mtpOmSpStudyInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpStudyInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmSpStats 8 }
 
-mtpSpStudyInt5minEntry OBJECT-TYPE
-    SYNTAX	MtpSpStudyInt5minEntry
+mtpOmSpStudyInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpStudyInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
-	mtpSpStudyId,
-	mtpSpStudyInt5minInterval
+	mtpOmSpStudyId,
+	mtpOmSpStudyInt5minInterval
     }
-    ::= { mtpSpStudyInt5minTable 1 }
+    ::= { mtpOmSpStudyInt5minTable 1 }
 
-MtpSpStudyInt5minEntry ::= SEQUENCE {
-    mtpSpStudyInt5minInterval			Unsigned32,
-    mtpSpStudyInt5minTimeStamp			TimeStamp,
-    mtpSpStudyInt5minHandledOctetsOpcDpcSio	PerfIntervalCount, -- Q.752, 6.6
-    mtpSpStudyInt5minHandledMSUsOpcDpcSio	PerfIntervalCount  -- Q.752, 6.7
+MtpOmSpStudyInt5minEntry ::= SEQUENCE {
+    mtpOmSpStudyInt5minInterval			Unsigned32,
+    mtpOmSpStudyInt5minTimeStamp		TimeStamp,
+    mtpOmSpStudyInt5minHandledOctetsOpcDpcSio	PerfIntervalCount, -- Q.752, 6.6
+    mtpOmSpStudyInt5minHandledMSUsOpcDpcSio	PerfIntervalCount  -- Q.752, 6.7
 }
 
-mtpSpStudyInt5minInterval OBJECT-TYPE
+mtpOmSpStudyInt5minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpStudyInt5minEntry 1 }
+    ::= { mtpOmSpStudyInt5minEntry 1 }
 
-mtpSpStudyInt5minTimeStamp OBJECT-TYPE
+mtpOmSpStudyInt5minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpStudyInt5minEntry 2 }
+    ::= { mtpOmSpStudyInt5minEntry 2 }
 
-mtpSpStudyInt5minHandledOctetsOpcDpcSio OBJECT-TYPE
+mtpOmSpStudyInt5minHandledOctetsOpcDpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -1472,9 +1476,9 @@ mtpSpStudyInt5minHandledOctetsOpcDpcSio OBJECT-TYPE
 	 ANSI T1.116.2/2000 Table 6 (6.6).
 	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsOpcDpcSio.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.6."
-    ::= { mtpSpStudyInt5minEntry 3 }
+    ::= { mtpOmSpStudyInt5minEntry 3 }
 
-mtpSpStudyInt5minHandledMSUsOpcDpcSio OBJECT-TYPE
+mtpOmSpStudyInt5minHandledMSUsOpcDpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
@@ -1491,55 +1495,55 @@ mtpSpStudyInt5minHandledMSUsOpcDpcSio OBJECT-TYPE
 	 ANSI T1.116.1D handledMSUsOpcDpcSio.
 	 ITU-T Rec. Q.751.1 (10/95) : handledMSUsOpcDpcSio.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.7."
-    ::= { mtpSpStudyInt5minEntry 4 }
+    ::= { mtpOmSpStudyInt5minEntry 4 }
 
 
 -- ====================================================================
 
-mtpSpStudyInt15minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpStudyInt15minEntry
+mtpOmSpStudyInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpStudyInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmSpStats 9 }
 
-mtpSpStudyInt15minEntry OBJECT-TYPE
-    SYNTAX	MtpSpStudyInt15minEntry
+mtpOmSpStudyInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpStudyInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
-	mtpSpStudyId,
-	mtpSpStudyInt15minInterval
+	mtpOmSpStudyId,
+	mtpOmSpStudyInt15minInterval
     }
-    ::= { mtpSpStudyInt15minTable 1 }
+    ::= { mtpOmSpStudyInt15minTable 1 }
 
-MtpSpStudyInt15minEntry ::= SEQUENCE {
-    mtpSpStudyInt15minInterval			Unsigned32,
-    mtpSpStudyInt15minTimeStamp			TimeStamp,
-    mtpSpStudyInt15minHandledOctetsOpcDpcSio	PerfIntervalCount, -- Q.752, 6.6
-    mtpSpStudyInt15minHandledMSUsOpcDpcSio	PerfIntervalCount  -- Q.752, 6.7
+MtpOmSpStudyInt15minEntry ::= SEQUENCE {
+    mtpOmSpStudyInt15minInterval		Unsigned32,
+    mtpOmSpStudyInt15minTimeStamp		TimeStamp,
+    mtpOmSpStudyInt15minHandledOctetsOpcDpcSio	PerfIntervalCount, -- Q.752, 6.6
+    mtpOmSpStudyInt15minHandledMSUsOpcDpcSio	PerfIntervalCount  -- Q.752, 6.7
 }
 
-mtpSpStudyInt15minInterval OBJECT-TYPE
+mtpOmSpStudyInt15minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpStudyInt15minEntry 1 }
+    ::= { mtpOmSpStudyInt15minEntry 1 }
 
-mtpSpStudyInt15minTimeStamp OBJECT-TYPE
+mtpOmSpStudyInt15minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSpStudyInt15minEntry 2 }
+    ::= { mtpOmSpStudyInt15minEntry 2 }
 
-mtpSpStudyInt15minHandledOctetsOpcDpcSio OBJECT-TYPE
+mtpOmSpStudyInt15minHandledOctetsOpcDpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -1558,9 +1562,9 @@ mtpSpStudyInt15minHandledOctetsOpcDpcSio OBJECT-TYPE
 	 ANSI T1.116.2/2000 Table 6 (6.6).
 	 ITU-T Rec. Q.751.1 (10/95) : handledOctetsOpcDpcSio.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.6."
-    ::= { mtpSpStudyInt15minEntry 3 }
+    ::= { mtpOmSpStudyInt15minEntry 3 }
 
-mtpSpStudyInt15minHandledMSUsOpcDpcSio OBJECT-TYPE
+mtpOmSpStudyInt15minHandledMSUsOpcDpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
@@ -1577,63 +1581,63 @@ mtpSpStudyInt15minHandledMSUsOpcDpcSio OBJECT-TYPE
 	 ANSI T1.116.1D handledMSUsOpcDpcSio.
 	 ITU-T Rec. Q.751.1 (10/95) : handledMSUsOpcDpcSio.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.7."
-    ::= { mtpSpStudyInt15minEntry 4 }
+    ::= { mtpOmSpStudyInt15minEntry 4 }
 
 
 -- ====================================================================
 
-mtpSpStudyMapTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSpStudyMapEntry
+mtpOmSpStudyMapTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSpStudyMapEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmSpStats 10 }
 
-mtpSpStudyMapEntry OBJECT-TYPE
-    SYNTAX	MtpSpStudyMapEntry
+mtpOmSpStudyMapEntry OBJECT-TYPE
+    SYNTAX	MtpOmSpStudyMapEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpSpId, -- shared index
-	mtpOpcRsId,	-- OPC value
-	mtpDpcRsId,	-- DPC value
-	mtpSpSiCode,	-- SI code
-	mtpSpStudyId
+	mtpOmOpcRsId,	-- OPC value
+	mtpOmDpcRsId,	-- DPC value
+	mtpOmSpSiCode,	-- SI code
+	mtpOmSpStudyId
     }
-    ::= { mtpSpStudyMapTable 1 }
+    ::= { mtpOmSpStudyMapTable 1 }
 
-MtpSpStudyMapEntry ::= SEQUENCE {
-    mtpOpcRsId					Unsigned32,
-    mtpDpcRsId					Unsigned32,
-    mtpSpStudyMapStatus				RowStatus
+MtpOmSpStudyMapEntry ::= SEQUENCE {
+    mtpOmOpcRsId				Unsigned32,
+    mtpOmDpcRsId				Unsigned32,
+    mtpOmSpStudyMapStatus			RowStatus
 }
 
-mtpOpcRsId OBJECT-TYPE
+mtpOmOpcRsId OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	"Provides an OPC index into the table.  The is the index of the 
 	 originating signalling point in the route set table 
-	 mtpRsTable.  The entry must exist or the creation of a row will 
+	 mtpOmRsTable.  The entry must exist or the creation of a row will 
 	 be refused."
-    ::= { mtpSpStudyMapEntry 1 }
+    ::= { mtpOmSpStudyMapEntry 1 }
 
-mtpDpcRsId OBJECT-TYPE
+mtpOmDpcRsId OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	"Provides an DPC index into the table.  The is the index of the 
 	 destination signalling point in the route set table 
-	 mtpRsTable.  The entry must exist or the creation of a row will 
+	 mtpOmRsTable.  The entry must exist or the creation of a row will 
 	 be refused."
-    ::= { mtpSpStudyMapEntry 2 }
+    ::= { mtpOmSpStudyMapEntry 2 }
 
-mtpSpStudyMapStatus OBJECT-TYPE
+mtpOmSpStudyMapStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -1641,21 +1645,21 @@ mtpSpStudyMapStatus OBJECT-TYPE
 	""
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus."
-    ::= { mtpSpStudyMapEntry 3 }
+    ::= { mtpOmSpStudyMapEntry 3 }
 
 
 -- ====================================================================
 
-mtpRsCurrentTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpRsCurrentEntry
+mtpOmRsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmRsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmRsStats 1 }
 
-mtpRsCurrentEntry OBJECT-TYPE
-    SYNTAX	MtpRsCurrentEntry
+mtpOmRsEntry OBJECT-TYPE
+    SYNTAX	MtpOmRsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -1663,37 +1667,37 @@ mtpRsCurrentEntry OBJECT-TYPE
     INDEX	{
 	mtpRsId
     }
-    ::= { mtpRsCurrentTable 1 }
+    ::= { mtpOmRsTable 1 }
 
-MtpRsCurrentEntry ::= SEQUENCE {
-    mtpRsCurrentValidIntervals			HCPerfValidIntervals,
-    mtpRsCurrentTimeDiscontinuity		TimeStamp,
-    mtpRsCurrentReceivedOctetsOPC		PerfCurrentCount, -- Q.752, 6.1
-    mtpRsCurrentTransmittedOctetsDPC		PerfCurrentCount, -- Q.752, 6.2
-    mtpRsCurrentReceivedMSUsOpc			PerfCurrentCount,
-    mtpRsCurrentTransmittedMSUsDpc		PerfCurrentCount,
-    mtpRsCurrentRouteSetUnavailable		PerfCurrentCount, -- Q.752, 4.9
-    mtpRsCurrentRouteSetUnavailableDuration	PerfCurrentCount  -- Q.752, 4.10
+MtpOmRsEntry ::= SEQUENCE {
+    mtpOmRsValidIntervals			HCPerfValidIntervals,
+    mtpOmRsTimeDiscontinuity			TimeStamp,
+    mtpOmRsReceivedOctetsOPC			Counter32, -- Q.752, 6.1
+    mtpOmRsTransmittedOctetsDPC			Counter32, -- Q.752, 6.2
+    mtpOmRsReceivedMSUsOpc			Counter32,
+    mtpOmRsTransmittedMSUsDpc			Counter32,
+    mtpOmRsRouteSetUnavailable			Counter32, -- Q.752, 4.9
+    mtpOmRsRouteSetUnavailableDuration		Counter32  -- Q.752, 4.10
 }
 
-mtpRsCurrentValidIntervals OBJECT-TYPE
+mtpOmRsValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsCurrentEntry 1 }
+    ::= { mtpOmRsEntry 1 }
 
-mtpRsCurrentTimeDiscontinuity OBJECT-TYPE
+mtpOmRsTimeDiscontinuity OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsCurrentEntry 2 }
+    ::= { mtpOmRsEntry 2 }
 
-mtpRsCurrentReceivedOctetsOPC OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsReceivedOctetsOPC OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
@@ -1709,10 +1713,10 @@ mtpRsCurrentReceivedOctetsOPC OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsOPC
 	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsOPC.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.1."
-    ::= { mtpRsCurrentEntry 3 }
+    ::= { mtpOmRsEntry 3 }
 
-mtpRsCurrentTransmittedOctetsDPC OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsTransmittedOctetsDPC OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
@@ -1722,28 +1726,28 @@ mtpRsCurrentTransmittedOctetsDPC OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsDPC
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsDPC.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.2."
-    ::= { mtpRsCurrentEntry 4 }
+    ::= { mtpOmRsEntry 4 }
 
-mtpRsCurrentReceivedMSUsOpc OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsReceivedMSUsOpc OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsCurrentEntry 5 }
+    ::= { mtpOmRsEntry 5 }
 
-mtpRsCurrentTransmittedMSUsDpc OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsTransmittedMSUsDpc OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsCurrentEntry 6 }
+    ::= { mtpOmRsEntry 6 }
 
-mtpRsCurrentRouteSetUnavailable OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsRouteSetUnavailable OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -1757,10 +1761,10 @@ mtpRsCurrentRouteSetUnavailable OBJECT-TYPE
 	"ANSI T1.116.1D routeSetUnavailable
 	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailable.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.9"
-    ::= { mtpRsCurrentEntry 7 }
+    ::= { mtpOmRsEntry 7 }
 
-mtpRsCurrentRouteSetUnavailableDuration OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsRouteSetUnavailableDuration OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -1775,59 +1779,59 @@ mtpRsCurrentRouteSetUnavailableDuration OBJECT-TYPE
 	"ANSI T1.116.1D routeSetUnavailableDuration
 	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailableDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.10"
-    ::= { mtpRsCurrentEntry 8 }
+    ::= { mtpOmRsEntry 8 }
 
 
 -- ====================================================================
 
-mtpRsInt5minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpRsInt5minEntry
+mtpOmRsInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmRsInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmRsStats 2 }
 
-mtpRsInt5minEntry OBJECT-TYPE
-    SYNTAX	MtpRsInt5minEntry
+mtpOmRsInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpOmRsInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpRsId,
-	mtpRsInt5minInterval
+	mtpOmRsInt5minInterval
     }
-    ::= { mtpRsInt5minTable 1 }
+    ::= { mtpOmRsInt5minTable 1 }
 
-MtpRsInt5minEntry ::= SEQUENCE {
-    mtpRsInt5minInterval			Unsigned32,
-    mtpRsInt5minTimeStamp			TimeStamp,
-    mtpRsInt5minReceivedOctetsOPC		PerfIntervalCount, -- Q.752, 6.1
-    mtpRsInt5minTransmittedOctetsDPC		PerfIntervalCount, -- Q.752, 6.2
-    mtpRsInt5minReceivedMSUsOpc			PerfIntervalCount,
-    mtpRsInt5minTransmittedMSUsDpc		PerfIntervalCount,
-    mtpRsInt5minRouteSetUnavailable		PerfIntervalCount, -- Q.752, 4.9
-    mtpRsInt5minRouteSetUnavailableDuration	PerfIntervalCount  -- Q.752, 4.10
+MtpOmRsInt5minEntry ::= SEQUENCE {
+    mtpOmRsInt5minInterval			Unsigned32,
+    mtpOmRsInt5minTimeStamp			TimeStamp,
+    mtpOmRsInt5minReceivedOctetsOPC		PerfIntervalCount, -- Q.752, 6.1
+    mtpOmRsInt5minTransmittedOctetsDPC		PerfIntervalCount, -- Q.752, 6.2
+    mtpOmRsInt5minReceivedMSUsOpc		PerfIntervalCount,
+    mtpOmRsInt5minTransmittedMSUsDpc		PerfIntervalCount,
+    mtpOmRsInt5minRouteSetUnavailable		PerfIntervalCount, -- Q.752, 4.9
+    mtpOmRsInt5minRouteSetUnavailableDuration	PerfIntervalCount  -- Q.752, 4.10
 }
 
-mtpRsInt5minInterval OBJECT-TYPE
+mtpOmRsInt5minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsInt5minEntry 1 }
+    ::= { mtpOmRsInt5minEntry 1 }
 
-mtpRsInt5minTimeStamp OBJECT-TYPE
+mtpOmRsInt5minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsInt5minEntry 2 }
+    ::= { mtpOmRsInt5minEntry 2 }
 
-mtpRsInt5minReceivedOctetsOPC OBJECT-TYPE
+mtpOmRsInt5minReceivedOctetsOPC OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -1844,9 +1848,9 @@ mtpRsInt5minReceivedOctetsOPC OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsOPC
 	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsOPC.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.1."
-    ::= { mtpRsInt5minEntry 3 }
+    ::= { mtpOmRsInt5minEntry 3 }
 
-mtpRsInt5minTransmittedOctetsDPC OBJECT-TYPE
+mtpOmRsInt5minTransmittedOctetsDPC OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -1857,27 +1861,27 @@ mtpRsInt5minTransmittedOctetsDPC OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsDPC
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsDPC.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.2."
-    ::= { mtpRsInt5minEntry 4 }
+    ::= { mtpOmRsInt5minEntry 4 }
 
-mtpRsInt5minReceivedMSUsOpc OBJECT-TYPE
+mtpOmRsInt5minReceivedMSUsOpc OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsInt5minEntry 5 }
+    ::= { mtpOmRsInt5minEntry 5 }
 
-mtpRsInt5minTransmittedMSUsDpc OBJECT-TYPE
+mtpOmRsInt5minTransmittedMSUsDpc OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsInt5minEntry 6 }
+    ::= { mtpOmRsInt5minEntry 6 }
 
-mtpRsInt5minRouteSetUnavailable OBJECT-TYPE
+mtpOmRsInt5minRouteSetUnavailable OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -1892,9 +1896,9 @@ mtpRsInt5minRouteSetUnavailable OBJECT-TYPE
 	"ANSI T1.116.1D routeSetUnavailable
 	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailable.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.9"
-    ::= { mtpRsInt5minEntry 7 }
+    ::= { mtpOmRsInt5minEntry 7 }
 
-mtpRsInt5minRouteSetUnavailableDuration OBJECT-TYPE
+mtpOmRsInt5minRouteSetUnavailableDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -1910,59 +1914,59 @@ mtpRsInt5minRouteSetUnavailableDuration OBJECT-TYPE
 	"ANSI T1.116.1D routeSetUnavailableDuration
 	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailableDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.10"
-    ::= { mtpRsInt5minEntry 8 }
+    ::= { mtpOmRsInt5minEntry 8 }
 
 
 -- ====================================================================
 
-mtpRsInt15minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpRsInt15minEntry
+mtpOmRsInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmRsInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmRsStats 3 }
 
-mtpRsInt15minEntry OBJECT-TYPE
-    SYNTAX	MtpRsInt15minEntry
+mtpOmRsInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpOmRsInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpRsId,
-	mtpRsInt15minInterval
+	mtpOmRsInt15minInterval
     }
-    ::= { mtpRsInt15minTable 1 }
+    ::= { mtpOmRsInt15minTable 1 }
 
-MtpRsInt15minEntry ::= SEQUENCE {
-    mtpRsInt15minInterval			Unsigned32,
-    mtpRsInt15minTimeStamp			TimeStamp,
-    mtpRsInt15minReceivedOctetsOPC		PerfIntervalCount, -- Q.752, 6.1
-    mtpRsInt15minTransmittedOctetsDPC		PerfIntervalCount, -- Q.752, 6.2
-    mtpRsInt15minReceivedMSUsOpc		PerfIntervalCount,
-    mtpRsInt15minTransmittedMSUsDpc		PerfIntervalCount,
-    mtpRsInt15minRouteSetUnavailable		PerfIntervalCount, -- Q.752, 4.9
-    mtpRsInt15minRouteSetUnavailableDuration	PerfIntervalCount  -- Q.752, 4.10
+MtpOmRsInt15minEntry ::= SEQUENCE {
+    mtpOmRsInt15minInterval			Unsigned32,
+    mtpOmRsInt15minTimeStamp			TimeStamp,
+    mtpOmRsInt15minReceivedOctetsOPC		PerfIntervalCount, -- Q.752, 6.1
+    mtpOmRsInt15minTransmittedOctetsDPC		PerfIntervalCount, -- Q.752, 6.2
+    mtpOmRsInt15minReceivedMSUsOpc		PerfIntervalCount,
+    mtpOmRsInt15minTransmittedMSUsDpc		PerfIntervalCount,
+    mtpOmRsInt15minRouteSetUnavailable		PerfIntervalCount, -- Q.752, 4.9
+    mtpOmRsInt15minRouteSetUnavailableDuration	PerfIntervalCount  -- Q.752, 4.10
 }
 
-mtpRsInt15minInterval OBJECT-TYPE
+mtpOmRsInt15minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsInt15minEntry 1 }
+    ::= { mtpOmRsInt15minEntry 1 }
 
-mtpRsInt15minTimeStamp OBJECT-TYPE
+mtpOmRsInt15minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsInt15minEntry 2 }
+    ::= { mtpOmRsInt15minEntry 2 }
 
-mtpRsInt15minReceivedOctetsOPC OBJECT-TYPE
+mtpOmRsInt15minReceivedOctetsOPC OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -1979,9 +1983,9 @@ mtpRsInt15minReceivedOctetsOPC OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsOPC
 	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsOPC.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.1."
-    ::= { mtpRsInt15minEntry 3 }
+    ::= { mtpOmRsInt15minEntry 3 }
 
-mtpRsInt15minTransmittedOctetsDPC OBJECT-TYPE
+mtpOmRsInt15minTransmittedOctetsDPC OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -1992,27 +1996,27 @@ mtpRsInt15minTransmittedOctetsDPC OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsDPC
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsDPC.
 	 ITU-T Rec. Q.752 (1997) : Table 6/Q.752, 6.2."
-    ::= { mtpRsInt15minEntry 4 }
+    ::= { mtpOmRsInt15minEntry 4 }
 
-mtpRsInt15minReceivedMSUsOpc OBJECT-TYPE
+mtpOmRsInt15minReceivedMSUsOpc OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsInt15minEntry 5 }
+    ::= { mtpOmRsInt15minEntry 5 }
 
-mtpRsInt15minTransmittedMSUsDpc OBJECT-TYPE
+mtpOmRsInt15minTransmittedMSUsDpc OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsInt15minEntry 6 }
+    ::= { mtpOmRsInt15minEntry 6 }
 
-mtpRsInt15minRouteSetUnavailable OBJECT-TYPE
+mtpOmRsInt15minRouteSetUnavailable OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -2027,9 +2031,9 @@ mtpRsInt15minRouteSetUnavailable OBJECT-TYPE
 	"ANSI T1.116.1D routeSetUnavailable
 	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailable.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.9"
-    ::= { mtpRsInt15minEntry 7 }
+    ::= { mtpOmRsInt15minEntry 7 }
 
-mtpRsInt15minRouteSetUnavailableDuration OBJECT-TYPE
+mtpOmRsInt15minRouteSetUnavailableDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -2045,67 +2049,67 @@ mtpRsInt15minRouteSetUnavailableDuration OBJECT-TYPE
 	"ANSI T1.116.1D routeSetUnavailableDuration
 	 ITU-T Rec. Q.751.1, (10/95) : routeSetUnavailableDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.10"
-    ::= { mtpRsInt15minEntry 8 }
+    ::= { mtpOmRsInt15minEntry 8 }
 
 
 -- ====================================================================
 
-mtpRsSiTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpRsSiEntry
+mtpOmRsSiTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmRsSiEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmRsStats 4 }
 
-mtpRsSiEntry OBJECT-TYPE
-    SYNTAX	MtpRsSiEntry
+mtpOmRsSiEntry OBJECT-TYPE
+    SYNTAX	MtpOmRsSiEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
-	mtpRsSiCode
+	mtpOmRsSiCode
     }
-    ::= { mtpRsSiTable 1 }
+    ::= { mtpOmRsSiTable 1 }
 
-MtpRsSiEntry ::= SEQUENCE {
-    mtpRsSiCode					Unsigned32,
-    mtpRsSiValidIntervals			HCPerfValidIntervals,
-    mtpRsSiTimeDiscontinuity			TimeStamp,
-    mtpRsSiReceivedOctetsOpcSio			PerfCurrentCount, -- Q.752, 6.4
-    mtpRsSiTransmittedOctetsDpcSio		PerfCurrentCount, -- Q.752, 6.5
-    mtpRsSiReceivedMSUsOpcSio			PerfCurrentCount,
-    mtpRsSiTransmittedMSUsDpcSio		PerfCurrentCount,
-    mtpRsSiStatus				RowStatus
+MtpOmRsSiEntry ::= SEQUENCE {
+    mtpOmRsSiCode				Unsigned32,
+    mtpOmRsSiValidIntervals			HCPerfValidIntervals,
+    mtpOmRsSiTimeDiscontinuity			TimeStamp,
+    mtpOmRsSiReceivedOctetsOpcSio		Counter32, -- Q.752, 6.4
+    mtpOmRsSiTransmittedOctetsDpcSio		Counter32, -- Q.752, 6.5
+    mtpOmRsSiReceivedMSUsOpcSio			Counter32,
+    mtpOmRsSiTransmittedMSUsDpcSio		Counter32,
+    mtpOmRsSiStatus				RowStatus
 }
 
-mtpRsSiCode OBJECT-TYPE
+mtpOmRsSiCode OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiEntry 1 }
+    ::= { mtpOmRsSiEntry 1 }
 
-mtpRsSiValidIntervals OBJECT-TYPE
+mtpOmRsSiValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiEntry 2 }
+    ::= { mtpOmRsSiEntry 2 }
 
-mtpRsSiTimeDiscontinuity OBJECT-TYPE
+mtpOmRsSiTimeDiscontinuity OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiEntry 3 }
+    ::= { mtpOmRsSiEntry 3 }
 
-mtpRsSiReceivedOctetsOpcSio OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsSiReceivedOctetsOpcSio OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
@@ -2121,10 +2125,10 @@ mtpRsSiReceivedOctetsOpcSio OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsOpcSio
 	 ITU-T Rec. Q.751.1, (10/95) : receivedOctetsOpcSio.
 	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.4"
-    ::= { mtpRsSiEntry 4 }
+    ::= { mtpOmRsSiEntry 4 }
 
-mtpRsSiTransmittedOctetsDpcSio OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsSiTransmittedOctetsDpcSio OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"octets"
     MAX-ACCESS	read-only
     STATUS	current
@@ -2134,27 +2138,27 @@ mtpRsSiTransmittedOctetsDpcSio OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsDpcSio
 	 ITU-T Rec. Q.751.1, (10/95) : transmittedOctetsDpcSio.
 	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.5"
-    ::= { mtpRsSiEntry 5 }
+    ::= { mtpOmRsSiEntry 5 }
 
-mtpRsSiReceivedMSUsOpcSio OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsSiReceivedMSUsOpcSio OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiEntry 6 }
+    ::= { mtpOmRsSiEntry 6 }
 
-mtpRsSiTransmittedMSUsDpcSio OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmRsSiTransmittedMSUsDpcSio OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiEntry 7 }
+    ::= { mtpOmRsSiEntry 7 }
 
-mtpRsSiStatus OBJECT-TYPE
+mtpOmRsSiStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -2162,57 +2166,57 @@ mtpRsSiStatus OBJECT-TYPE
 	""
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus."
-    ::= { mtpRsSiEntry 8 }
+    ::= { mtpOmRsSiEntry 8 }
 
 
 -- ====================================================================
 
-mtpRsSiInt5minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpRsSiInt5minEntry
+mtpOmRsSiInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmRsSiInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmRsStats 5 }
 
-mtpRsSiInt5minEntry OBJECT-TYPE
-    SYNTAX	MtpRsSiInt5minEntry
+mtpOmRsSiInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpOmRsSiInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
-	mtpRsSiCode,
-	mtpRsSiInt5minInterval
+	mtpOmRsSiCode,
+	mtpOmRsSiInt5minInterval
     }
-    ::= { mtpRsSiInt5minTable 1 }
+    ::= { mtpOmRsSiInt5minTable 1 }
 
-MtpRsSiInt5minEntry ::= SEQUENCE {
-    mtpRsSiInt5minInterval			Unsigned32,
-    mtpRsSiInt5minTimeStamp			TimeStamp,
-    mtpRsSiInt5minReceivedOctetsOpcSio		PerfIntervalCount, -- Q.752, 6.4
-    mtpRsSiInt5minTransmittedOctetsDpcSio	PerfIntervalCount, -- Q.752, 6.5
-    mtpRsSiInt5minReceivedMSUsOpcSio		PerfIntervalCount,
-    mtpRsSiInt5minTransmittedMSUsDpcSio		PerfIntervalCount
+MtpOmRsSiInt5minEntry ::= SEQUENCE {
+    mtpOmRsSiInt5minInterval			Unsigned32,
+    mtpOmRsSiInt5minTimeStamp			TimeStamp,
+    mtpOmRsSiInt5minReceivedOctetsOpcSio	PerfIntervalCount, -- Q.752, 6.4
+    mtpOmRsSiInt5minTransmittedOctetsDpcSio	PerfIntervalCount, -- Q.752, 6.5
+    mtpOmRsSiInt5minReceivedMSUsOpcSio		PerfIntervalCount,
+    mtpOmRsSiInt5minTransmittedMSUsDpcSio	PerfIntervalCount
 }
 
-mtpRsSiInt5minInterval OBJECT-TYPE
+mtpOmRsSiInt5minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt5minEntry 1 }
+    ::= { mtpOmRsSiInt5minEntry 1 }
 
-mtpRsSiInt5minTimeStamp OBJECT-TYPE
+mtpOmRsSiInt5minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt5minEntry 2 }
+    ::= { mtpOmRsSiInt5minEntry 2 }
 
-mtpRsSiInt5minReceivedOctetsOpcSio OBJECT-TYPE
+mtpOmRsSiInt5minReceivedOctetsOpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -2229,9 +2233,9 @@ mtpRsSiInt5minReceivedOctetsOpcSio OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsOpcSio
 	 ITU-T Rec. Q.751.1, (10/95) : receivedOctetsOpcSio.
 	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.4"
-    ::= { mtpRsSiInt5minEntry 3 }
+    ::= { mtpOmRsSiInt5minEntry 3 }
 
-mtpRsSiInt5minTransmittedOctetsDpcSio OBJECT-TYPE
+mtpOmRsSiInt5minTransmittedOctetsDpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -2242,75 +2246,75 @@ mtpRsSiInt5minTransmittedOctetsDpcSio OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsDpcSio
 	 ITU-T Rec. Q.751.1, (10/95) : transmittedOctetsDpcSio.
 	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.5"
-    ::= { mtpRsSiInt5minEntry 4 }
+    ::= { mtpOmRsSiInt5minEntry 4 }
 
-mtpRsSiInt5minReceivedMSUsOpcSio OBJECT-TYPE
+mtpOmRsSiInt5minReceivedMSUsOpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt5minEntry 5 }
+    ::= { mtpOmRsSiInt5minEntry 5 }
 
-mtpRsSiInt5minTransmittedMSUsDpcSio OBJECT-TYPE
+mtpOmRsSiInt5minTransmittedMSUsDpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt5minEntry 6 }
+    ::= { mtpOmRsSiInt5minEntry 6 }
 
 
 -- ====================================================================
 
-mtpRsSiInt15minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpRsSiInt15minEntry
+mtpOmRsSiInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmRsSiInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmRsStats 6 }
 
-mtpRsSiInt15minEntry OBJECT-TYPE
-    SYNTAX	MtpRsSiInt15minEntry
+mtpOmRsSiInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpOmRsSiInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
-	mtpRsSiCode,
-	mtpRsSiInt15minInterval
+	mtpOmRsSiCode,
+	mtpOmRsSiInt15minInterval
     }
-    ::= { mtpRsSiInt15minTable 1 }
+    ::= { mtpOmRsSiInt15minTable 1 }
 
-MtpRsSiInt15minEntry ::= SEQUENCE {
-    mtpRsSiInt15minInterval			Unsigned32,
-    mtpRsSiInt15minTimeStamp			TimeStamp,
-    mtpRsSiInt15minReceivedOctetsOpcSio		PerfIntervalCount, -- Q.752, 6.4
-    mtpRsSiInt15minTransmittedOctetsDpcSio	PerfIntervalCount, -- Q.752, 6.5
-    mtpRsSiInt15minReceivedMSUsOpcSio		PerfIntervalCount,
-    mtpRsSiInt15minTransmittedMSUsDpcSio	PerfIntervalCount
+MtpOmRsSiInt15minEntry ::= SEQUENCE {
+    mtpOmRsSiInt15minInterval			Unsigned32,
+    mtpOmRsSiInt15minTimeStamp			TimeStamp,
+    mtpOmRsSiInt15minReceivedOctetsOpcSio	PerfIntervalCount, -- Q.752, 6.4
+    mtpOmRsSiInt15minTransmittedOctetsDpcSio	PerfIntervalCount, -- Q.752, 6.5
+    mtpOmRsSiInt15minReceivedMSUsOpcSio		PerfIntervalCount,
+    mtpOmRsSiInt15minTransmittedMSUsDpcSio	PerfIntervalCount
 }
 
-mtpRsSiInt15minInterval OBJECT-TYPE
+mtpOmRsSiInt15minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt15minEntry 1 }
+    ::= { mtpOmRsSiInt15minEntry 1 }
 
-mtpRsSiInt15minTimeStamp OBJECT-TYPE
+mtpOmRsSiInt15minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt15minEntry 2 }
+    ::= { mtpOmRsSiInt15minEntry 2 }
 
-mtpRsSiInt15minReceivedOctetsOpcSio OBJECT-TYPE
+mtpOmRsSiInt15minReceivedOctetsOpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -2327,9 +2331,9 @@ mtpRsSiInt15minReceivedOctetsOpcSio OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsOpcSio
 	 ITU-T Rec. Q.751.1, (10/95) : receivedOctetsOpcSio.
 	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.4"
-    ::= { mtpRsSiInt15minEntry 3 }
+    ::= { mtpOmRsSiInt15minEntry 3 }
 
-mtpRsSiInt15minTransmittedOctetsDpcSio OBJECT-TYPE
+mtpOmRsSiInt15minTransmittedOctetsDpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"octets"
     MAX-ACCESS	read-only
@@ -2340,39 +2344,39 @@ mtpRsSiInt15minTransmittedOctetsDpcSio OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsDpcSio
 	 ITU-T Rec. Q.751.1, (10/95) : transmittedOctetsDpcSio.
 	 ITU-T Rec. Q.752, (1997) : Table 6/Q.752 6.5"
-    ::= { mtpRsSiInt15minEntry 4 }
+    ::= { mtpOmRsSiInt15minEntry 4 }
 
-mtpRsSiInt15minReceivedMSUsOpcSio OBJECT-TYPE
+mtpOmRsSiInt15minReceivedMSUsOpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt15minEntry 5 }
+    ::= { mtpOmRsSiInt15minEntry 5 }
 
-mtpRsSiInt15minTransmittedMSUsDpcSio OBJECT-TYPE
+mtpOmRsSiInt15minTransmittedMSUsDpcSio OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpRsSiInt15minEntry 6 }
+    ::= { mtpOmRsSiInt15minEntry 6 }
 
 
 -- ====================================================================
 
-mtpLsCurrentTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpLsCurrentEntry
+mtpOmLsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmLsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmLsStats 1 }
 
-mtpLsCurrentEntry OBJECT-TYPE
-    SYNTAX	MtpLsCurrentEntry
+mtpOmLsEntry OBJECT-TYPE
+    SYNTAX	MtpOmLsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -2380,34 +2384,34 @@ mtpLsCurrentEntry OBJECT-TYPE
     INDEX	{
 	mtpLsId	-- shared index
     }
-    ::= { mtpLsCurrentTable 1 }
+    ::= { mtpOmLsTable 1 }
 
-MtpLsCurrentEntry ::= SEQUENCE {
-    mtpLsCurrentValidIntervals			HCPerfValidIntervals,
-    mtpLsCurrentTimeDiscontinuity		TimeStamp,
-    mtpLsCurrentAdjacentInaccessibleEvents	PerfCurrentCount, -- Q.752, 5.1
-    mtpLsCurrentAdjacentInaccessibleDuration	PerfCurrentCount, -- Q.752, 5.2
-    mtpLsCurrentSlsUnavailable			PerfCurrentCount  -- Q.752, 4.2
+MtpOmLsEntry ::= SEQUENCE {
+    mtpOmLsValidIntervals			HCPerfValidIntervals,
+    mtpOmLsTimeDiscontinuity			TimeStamp,
+    mtpOmLsAdjacentInaccessibleEvents		Counter32, -- Q.752, 5.1
+    mtpOmLsAdjacentInaccessibleDuration		Counter32, -- Q.752, 5.2
+    mtpOmLsSlsUnavailable			Counter32  -- Q.752, 4.2
 }
 
-mtpLsCurrentValidIntervals OBJECT-TYPE
+mtpOmLsValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpLsCurrentEntry 1 }
+    ::= { mtpOmLsEntry 1 }
 
-mtpLsCurrentTimeDiscontinuity OBJECT-TYPE
+mtpOmLsTimeDiscontinuity OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpLsCurrentEntry 2 }
+    ::= { mtpOmLsEntry 2 }
 
-mtpLsCurrentAdjacentInaccessibleEvents OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmLsAdjacentInaccessibleEvents OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"events"
     MAX-ACCESS	read-only
     STATUS	current
@@ -2425,10 +2429,10 @@ mtpLsCurrentAdjacentInaccessibleEvents OBJECT-TYPE
 	"ANSI T1.116.1D adjacentInaccessibleEvents
 	 ITU-T Rec. Q.751.1 (10/95) : adjacentInaccessibleEvents.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.1."
-    ::= { mtpLsCurrentEntry 3 }
+    ::= { mtpOmLsEntry 3 }
 
-mtpLsCurrentAdjacentInaccessibleDuration OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmLsAdjacentInaccessibleDuration OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -2444,10 +2448,10 @@ mtpLsCurrentAdjacentInaccessibleDuration OBJECT-TYPE
 	 ANSI T1.116.2/2000 Table 5 (5.2).
 	 ITU-T Rec. Q.751.1 (10/95) : adjacentInacessibleDuration.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.2."
-    ::= { mtpLsCurrentEntry 4 }
+    ::= { mtpOmLsEntry 4 }
 
-mtpLsCurrentSlsUnavailable OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmLsSlsUnavailable OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -2459,56 +2463,56 @@ mtpLsCurrentSlsUnavailable OBJECT-TYPE
 	"ANSI T1.116.1D slsUnavailable
 	 ITU-T Rec. Q.751.1, (10/95) : slsUnavailable.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.2"
-    ::= { mtpLsCurrentEntry 5 }
+    ::= { mtpOmLsEntry 5 }
 
 
 -- ====================================================================
 
-mtpLsInt5minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpLsInt5minEntry
+mtpOmLsInt5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmLsInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmLsStats 2 }
 
-mtpLsInt5minEntry OBJECT-TYPE
-    SYNTAX	MtpLsInt5minEntry
+mtpOmLsInt5minEntry OBJECT-TYPE
+    SYNTAX	MtpOmLsInt5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpLsId,	-- shared index
-	mtpLsInt5minInterval
+	mtpOmLsInt5minInterval
     }
-    ::= { mtpLsInt5minTable 1 }
+    ::= { mtpOmLsInt5minTable 1 }
 
-MtpLsInt5minEntry ::= SEQUENCE {
-    mtpLsInt5minInterval			Unsigned32,
-    mtpLsInt5minTimeStamp			TimeStamp,
-    mtpLsInt5minAdjacentInaccessibleEvents	PerfIntervalCount, -- Q.752, 5.1
-    mtpLsInt5minAdjacentInaccessibleDuration	PerfIntervalCount, -- Q.752, 5.2
-    mtpLsInt5minSlsUnavailable			PerfIntervalCount  -- Q.752, 4.2
+MtpOmLsInt5minEntry ::= SEQUENCE {
+    mtpOmLsInt5minInterval			Unsigned32,
+    mtpOmLsInt5minTimeStamp			TimeStamp,
+    mtpOmLsInt5minAdjacentInaccessibleEvents	PerfIntervalCount, -- Q.752, 5.1
+    mtpOmLsInt5minAdjacentInaccessibleDuration	PerfIntervalCount, -- Q.752, 5.2
+    mtpOmLsInt5minSlsUnavailable		PerfIntervalCount  -- Q.752, 4.2
 }
 
-mtpLsInt5minInterval OBJECT-TYPE
+mtpOmLsInt5minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpLsInt5minEntry 1 }
+    ::= { mtpOmLsInt5minEntry 1 }
 
-mtpLsInt5minTimeStamp OBJECT-TYPE
+mtpOmLsInt5minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpLsInt5minEntry 2 }
+    ::= { mtpOmLsInt5minEntry 2 }
 
-mtpLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
+mtpOmLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"events"
     MAX-ACCESS	read-only
@@ -2527,9 +2531,9 @@ mtpLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
 	"ANSI T1.116.1D adjacentInaccessibleEvents
 	 ITU-T Rec. Q.751.1 (10/95) : adjacentInaccessibleEvents.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.1."
-    ::= { mtpLsInt5minEntry 3 }
+    ::= { mtpOmLsInt5minEntry 3 }
 
-mtpLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
+mtpOmLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -2546,9 +2550,9 @@ mtpLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
 	 ANSI T1.116.2/2000 Table 5 (5.2).
 	 ITU-T Rec. Q.751.1 (10/95) : adjacentInacessibleDuration.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.2."
-    ::= { mtpLsInt5minEntry 4 }
+    ::= { mtpOmLsInt5minEntry 4 }
 
-mtpLsInt5minSlsUnavailable OBJECT-TYPE
+mtpOmLsInt5minSlsUnavailable OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -2561,56 +2565,56 @@ mtpLsInt5minSlsUnavailable OBJECT-TYPE
 	"ANSI T1.116.1D slsUnavailable
 	 ITU-T Rec. Q.751.1, (10/95) : slsUnavailable.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.2"
-    ::= { mtpLsInt5minEntry 5 }
+    ::= { mtpOmLsInt5minEntry 5 }
 
 
 -- ====================================================================
 
-mtpLsInt15minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpLsInt15minEntry
+mtpOmLsInt15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmLsInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmLsStats 3 }
 
-mtpLsInt15minEntry OBJECT-TYPE
-    SYNTAX	MtpLsInt15minEntry
+mtpOmLsInt15minEntry OBJECT-TYPE
+    SYNTAX	MtpOmLsInt15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     INDEX	{
 	mtpLsId,	-- shared index
-	mtpLsInt15minInterval
+	mtpOmLsInt15minInterval
     }
-    ::= { mtpLsInt15minTable 1 }
+    ::= { mtpOmLsInt15minTable 1 }
 
-MtpLsInt15minEntry ::= SEQUENCE {
-    mtpLsInt15minInterval			Unsigned32,
-    mtpLsInt15minTimeStamp			TimeStamp,
-    mtpLsInt15minAdjacentInaccessibleEvents	PerfIntervalCount, -- Q.752, 5.1
-    mtpLsInt15minAdjacentInaccessibleDuration	PerfIntervalCount, -- Q.752, 5.2
-    mtpLsInt15minSlsUnavailable			PerfIntervalCount  -- Q.752, 4.2
+MtpOmLsInt15minEntry ::= SEQUENCE {
+    mtpOmLsInt15minInterval			Unsigned32,
+    mtpOmLsInt15minTimeStamp			TimeStamp,
+    mtpOmLsInt15minAdjacentInaccessibleEvents	PerfIntervalCount, -- Q.752, 5.1
+    mtpOmLsInt15minAdjacentInaccessibleDuration	PerfIntervalCount, -- Q.752, 5.2
+    mtpOmLsInt15minSlsUnavailable		PerfIntervalCount  -- Q.752, 4.2
 }
 
-mtpLsInt15minInterval OBJECT-TYPE
+mtpOmLsInt15minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpLsInt15minEntry 1 }
+    ::= { mtpOmLsInt15minEntry 1 }
 
-mtpLsInt15minTimeStamp OBJECT-TYPE
+mtpOmLsInt15minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpLsInt15minEntry 2 }
+    ::= { mtpOmLsInt15minEntry 2 }
 
-mtpLsInt15minAdjacentInaccessibleEvents OBJECT-TYPE
+mtpOmLsInt15minAdjacentInaccessibleEvents OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"events"
     MAX-ACCESS	read-only
@@ -2629,9 +2633,9 @@ mtpLsInt15minAdjacentInaccessibleEvents OBJECT-TYPE
 	"ANSI T1.116.1D adjacentInaccessibleEvents
 	 ITU-T Rec. Q.751.1 (10/95) : adjacentInaccessibleEvents.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.1."
-    ::= { mtpLsInt15minEntry 3 }
+    ::= { mtpOmLsInt15minEntry 3 }
 
-mtpLsInt15minAdjacentInaccessibleDuration OBJECT-TYPE
+mtpOmLsInt15minAdjacentInaccessibleDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -2648,9 +2652,9 @@ mtpLsInt15minAdjacentInaccessibleDuration OBJECT-TYPE
 	 ANSI T1.116.2/2000 Table 5 (5.2).
 	 ITU-T Rec. Q.751.1 (10/95) : adjacentInacessibleDuration.
 	 ITU-T Rec. Q.752 (1997) : Table 5/Q.752, 5.2."
-    ::= { mtpLsInt15minEntry 4 }
+    ::= { mtpOmLsInt15minEntry 4 }
 
-mtpLsInt15minSlsUnavailable OBJECT-TYPE
+mtpOmLsInt15minSlsUnavailable OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -2663,13 +2667,13 @@ mtpLsInt15minSlsUnavailable OBJECT-TYPE
 	"ANSI T1.116.1D slsUnavailable
 	 ITU-T Rec. Q.751.1, (10/95) : slsUnavailable.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 4.2"
-    ::= { mtpLsInt15minEntry 5 }
+    ::= { mtpOmLsInt15minEntry 5 }
 
 
 -- ====================================================================
 
-mtpSlStatsTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSlStatsEntry
+mtpOmSlStatsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSlStatsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -2678,8 +2682,8 @@ mtpSlStatsTable OBJECT-TYPE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
     ::= { mtpOmSlStats 1 }
 
-mtpSlStatsEntry OBJECT-TYPE
-    SYNTAX	MtpSlStatsEntry
+mtpOmSlStatsEntry OBJECT-TYPE
+    SYNTAX	MtpOmSlStatsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -2689,36 +2693,36 @@ mtpSlStatsEntry OBJECT-TYPE
     AUGMENTS	{
 	mtpSlEntry
     }
-    ::= { mtpSlStatsTable 1 }
+    ::= { mtpOmSlStatsTable 1 }
 
-MtpSlStatsEntry ::= SEQUENCE {
-    mtpSlStatsDurInService			Counter32,
-    mtpSlStatsFailAlignOrProving		Counter32,
-    mtpSlStatsNacksReceived			Counter32,
-    mtpSlStatsDurUnavail			Counter32,
-    mtpSlStatsDurUnavailFailed			Counter32,
-    mtpSlStatsDurUnavailRpo			Counter32,
-    mtpSlStatsSibsSent				Counter32,
-    mtpSlStatsTranSioSifOctets			Counter32,
-    mtpSlStatsRetransOctets			Counter32,
-    mtpSlStatsTranMsus				Counter32,
-    mtpSlStatsRecvSioSifOctets			Counter32,
-    mtpSlStatsRecvMsus				Counter32,
-    mtpSlStatsCongOnsetInd0			Counter32,
-    mtpSlStatsCongOnsetInd1			Counter32,
-    mtpSlStatsCongOnsetInd2			Counter32,
-    mtpSlStatsCongOnsetInd3			Counter32,
-    mtpSlStatsDurCongStatus0			Counter32,
-    mtpSlStatsDurCongStatus1			Counter32,
-    mtpSlStatsDurCongStatus2			Counter32,
-    mtpSlStatsDurCongStatus3			Counter32,
-    mtpSlStatsCongDiscdInd0			Counter32,
-    mtpSlStatsCongDiscdInd1			Counter32,
-    mtpSlStatsCongDiscdInd2			Counter32,
-    mtpSlStatsCongDiscdInd3			Counter32
+MtpOmSlStatsEntry ::= SEQUENCE {
+    mtpOmSlStatsDurInService			Counter32,
+    mtpOmSlStatsFailAlignOrProving		Counter32,
+    mtpOmSlStatsNacksReceived			Counter32,
+    mtpOmSlStatsDurUnavail			Counter32,
+    mtpOmSlStatsDurUnavailFailed		Counter32,
+    mtpOmSlStatsDurUnavailRpo			Counter32,
+    mtpOmSlStatsSibsSent			Counter32,
+    mtpOmSlStatsTranSioSifOctets		Counter32,
+    mtpOmSlStatsRetransOctets			Counter32,
+    mtpOmSlStatsTranMsus			Counter32,
+    mtpOmSlStatsRecvSioSifOctets		Counter32,
+    mtpOmSlStatsRecvMsus			Counter32,
+    mtpOmSlStatsCongOnsetInd0			Counter32,
+    mtpOmSlStatsCongOnsetInd1			Counter32,
+    mtpOmSlStatsCongOnsetInd2			Counter32,
+    mtpOmSlStatsCongOnsetInd3			Counter32,
+    mtpOmSlStatsDurCongStatus0			Counter32,
+    mtpOmSlStatsDurCongStatus1			Counter32,
+    mtpOmSlStatsDurCongStatus2			Counter32,
+    mtpOmSlStatsDurCongStatus3			Counter32,
+    mtpOmSlStatsCongDiscdInd0			Counter32,
+    mtpOmSlStatsCongDiscdInd1			Counter32,
+    mtpOmSlStatsCongDiscdInd2			Counter32,
+    mtpOmSlStatsCongDiscdInd3			Counter32
 }
 
-mtpSlStatsDurInService OBJECT-TYPE
+mtpOmSlStatsDurInService OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -2728,9 +2732,9 @@ mtpSlStatsDurInService OBJECT-TYPE
 	 link."
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 1 }
+    ::= { mtpOmSlStatsEntry 1 }
 
-mtpSlStatsFailAlignOrProving OBJECT-TYPE
+mtpOmSlStatsFailAlignOrProving OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2738,9 +2742,9 @@ mtpSlStatsFailAlignOrProving OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 2 }
+    ::= { mtpOmSlStatsEntry 2 }
 
-mtpSlStatsNacksReceived OBJECT-TYPE
+mtpOmSlStatsNacksReceived OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2748,9 +2752,9 @@ mtpSlStatsNacksReceived OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 3 }
+    ::= { mtpOmSlStatsEntry 3 }
 
-mtpSlStatsDurUnavail OBJECT-TYPE
+mtpOmSlStatsDurUnavail OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2758,9 +2762,9 @@ mtpSlStatsDurUnavail OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 4 }
+    ::= { mtpOmSlStatsEntry 4 }
 
-mtpSlStatsDurUnavailFailed OBJECT-TYPE
+mtpOmSlStatsDurUnavailFailed OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2768,9 +2772,9 @@ mtpSlStatsDurUnavailFailed OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 5 }
+    ::= { mtpOmSlStatsEntry 5 }
 
-mtpSlStatsDurUnavailRpo OBJECT-TYPE
+mtpOmSlStatsDurUnavailRpo OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2778,9 +2782,9 @@ mtpSlStatsDurUnavailRpo OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 6 }
+    ::= { mtpOmSlStatsEntry 6 }
 
-mtpSlStatsSibsSent OBJECT-TYPE
+mtpOmSlStatsSibsSent OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2788,9 +2792,9 @@ mtpSlStatsSibsSent OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 7 }
+    ::= { mtpOmSlStatsEntry 7 }
 
-mtpSlStatsTranSioSifOctets OBJECT-TYPE
+mtpOmSlStatsTranSioSifOctets OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2798,9 +2802,9 @@ mtpSlStatsTranSioSifOctets OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 8 }
+    ::= { mtpOmSlStatsEntry 8 }
 
-mtpSlStatsRetransOctets OBJECT-TYPE
+mtpOmSlStatsRetransOctets OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2808,9 +2812,9 @@ mtpSlStatsRetransOctets OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 9 }
+    ::= { mtpOmSlStatsEntry 9 }
 
-mtpSlStatsTranMsus OBJECT-TYPE
+mtpOmSlStatsTranMsus OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2818,9 +2822,9 @@ mtpSlStatsTranMsus OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 10 }
+    ::= { mtpOmSlStatsEntry 10 }
 
-mtpSlStatsRecvSioSifOctets OBJECT-TYPE
+mtpOmSlStatsRecvSioSifOctets OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2828,9 +2832,9 @@ mtpSlStatsRecvSioSifOctets OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 11 }
+    ::= { mtpOmSlStatsEntry 11 }
 
-mtpSlStatsRecvMsus OBJECT-TYPE
+mtpOmSlStatsRecvMsus OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2838,9 +2842,9 @@ mtpSlStatsRecvMsus OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 12 }
+    ::= { mtpOmSlStatsEntry 12 }
 
-mtpSlStatsCongOnsetInd0 OBJECT-TYPE
+mtpOmSlStatsCongOnsetInd0 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2848,9 +2852,9 @@ mtpSlStatsCongOnsetInd0 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 13 }
+    ::= { mtpOmSlStatsEntry 13 }
 
-mtpSlStatsCongOnsetInd1 OBJECT-TYPE
+mtpOmSlStatsCongOnsetInd1 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2858,9 +2862,9 @@ mtpSlStatsCongOnsetInd1 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 14 }
+    ::= { mtpOmSlStatsEntry 14 }
 
-mtpSlStatsCongOnsetInd2 OBJECT-TYPE
+mtpOmSlStatsCongOnsetInd2 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2868,9 +2872,9 @@ mtpSlStatsCongOnsetInd2 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 15 }
+    ::= { mtpOmSlStatsEntry 15 }
 
-mtpSlStatsCongOnsetInd3 OBJECT-TYPE
+mtpOmSlStatsCongOnsetInd3 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2878,9 +2882,9 @@ mtpSlStatsCongOnsetInd3 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 16 }
+    ::= { mtpOmSlStatsEntry 16 }
 
-mtpSlStatsDurCongStatus0 OBJECT-TYPE
+mtpOmSlStatsDurCongStatus0 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2888,9 +2892,9 @@ mtpSlStatsDurCongStatus0 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 17 }
+    ::= { mtpOmSlStatsEntry 17 }
 
-mtpSlStatsDurCongStatus1 OBJECT-TYPE
+mtpOmSlStatsDurCongStatus1 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2898,9 +2902,9 @@ mtpSlStatsDurCongStatus1 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 18 }
+    ::= { mtpOmSlStatsEntry 18 }
 
-mtpSlStatsDurCongStatus2 OBJECT-TYPE
+mtpOmSlStatsDurCongStatus2 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2908,9 +2912,9 @@ mtpSlStatsDurCongStatus2 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 19 }
+    ::= { mtpOmSlStatsEntry 19 }
 
-mtpSlStatsDurCongStatus3 OBJECT-TYPE
+mtpOmSlStatsDurCongStatus3 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2918,9 +2922,9 @@ mtpSlStatsDurCongStatus3 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 20 }
+    ::= { mtpOmSlStatsEntry 20 }
 
-mtpSlStatsCongDiscdInd0 OBJECT-TYPE
+mtpOmSlStatsCongDiscdInd0 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2928,9 +2932,9 @@ mtpSlStatsCongDiscdInd0 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 21 }
+    ::= { mtpOmSlStatsEntry 21 }
 
-mtpSlStatsCongDiscdInd1 OBJECT-TYPE
+mtpOmSlStatsCongDiscdInd1 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2938,9 +2942,9 @@ mtpSlStatsCongDiscdInd1 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 22 }
+    ::= { mtpOmSlStatsEntry 22 }
 
-mtpSlStatsCongDiscdInd2 OBJECT-TYPE
+mtpOmSlStatsCongDiscdInd2 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2948,9 +2952,9 @@ mtpSlStatsCongDiscdInd2 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 23 }
+    ::= { mtpOmSlStatsEntry 23 }
 
-mtpSlStatsCongDiscdInd3 OBJECT-TYPE
+mtpOmSlStatsCongDiscdInd3 OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2958,21 +2962,21 @@ mtpSlStatsCongDiscdInd3 OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. Q.752, ANSI T1.116.2"
-    ::= { mtpSlStatsEntry 24 }
+    ::= { mtpOmSlStatsEntry 24 }
 
 
 -- ====================================================================
 
-mtpSlL3CurrentTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSlL3CurrentEntry
+mtpOmSlL3Table OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSlL3Entry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmSlStats 2 }
 
-mtpSlL3CurrentEntry OBJECT-TYPE
-    SYNTAX	MtpSlL3CurrentEntry
+mtpOmSlL3Entry OBJECT-TYPE
+    SYNTAX	MtpOmSlL3Entry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -2982,47 +2986,47 @@ mtpSlL3CurrentEntry OBJECT-TYPE
 	mtpLsId, -- shared index
 	mtpSlSlCode -- shared index
     }
-    ::= { mtpSlL3CurrentTable 1 }
+    ::= { mtpOmSlL3Table 1 }
 
-MtpSlL3CurrentEntry ::= SEQUENCE {
-    mtpSlL3CurrentValidIntervals		HCPerfValidIntervals,
-    mtpSlL3CurrentTimeDiscontinuity		TimeStamp,
-    mtpSlL3CurrentSlUnavailabilityDuration	PerfCurrentCount, -- Q.752, 2.1
-    mtpSlL3CurrentSlLocalInhibition		PerfCurrentCount, -- Q.752, 2.5
-    mtpSlL3CurrentSlRemoteInhibition		PerfCurrentCount, -- Q.752, 2.6
-    mtpSlL3CurrentSlFailed			PerfCurrentCount, -- Q.752, 2.7
-    mtpSlL3CurrentSlRemoteProcOutage		PerfCurrentCount, -- Q.752, 2.9
-    mtpSlL3CurrentLocalMgmtInhibit		PerfCurrentCount, -- Q.752, 2.13
-    mtpSlL3CurrentLocalMgmtUninhibit		PerfCurrentCount, -- Q.752, 2.14
-    mtpSlL3CurrentLocalBusy			PerfCurrentCount, -- Q.752, 2.15
-    mtpSlL3CurrentSlCongestedStarts		PerfCurrentCount, -- Q.752, 3.6
-    mtpSlL3CurrentSlCongestedDuration		PerfCurrentCount, -- Q.752, 3.7
-    mtpSlL3CurrentSlCongestionStops		PerfCurrentCount, -- Q.752, 3.9
-    mtpSlL3CurrentDiscardedMSUs			PerfCurrentCount, -- Q.752, 3.10
-    mtpSlL3CurrentCongestionEventsMSULoss	PerfCurrentCount, -- Q.752, 3.11
-    mtpSlL3CurrentChangeovers			PerfCurrentCount, -- Q.752, 1.10
-    mtpSlL3CurrentChangebacks			PerfCurrentCount, -- Q.752, 1.11
-    mtpSlL3CurrentRestorations			PerfCurrentCount  -- Q.752, 1.12
+MtpOmSlL3Entry ::= SEQUENCE {
+    mtpOmSlL3ValidIntervals			HCPerfValidIntervals,
+    mtpOmSlL3TimeDiscontinuity			TimeStamp,
+    mtpOmSlL3SlUnavailabilityDuration		Counter32, -- Q.752, 2.1
+    mtpOmSlL3SlLocalInhibition			Counter32, -- Q.752, 2.5
+    mtpOmSlL3SlRemoteInhibition			Counter32, -- Q.752, 2.6
+    mtpOmSlL3SlFailed				Counter32, -- Q.752, 2.7
+    mtpOmSlL3SlRemoteProcOutage			Counter32, -- Q.752, 2.9
+    mtpOmSlL3LocalMgmtInhibit			Counter32, -- Q.752, 2.13
+    mtpOmSlL3LocalMgmtUninhibit			Counter32, -- Q.752, 2.14
+    mtpOmSlL3LocalBusy				Counter32, -- Q.752, 2.15
+    mtpOmSlL3SlCongestedStarts			Counter32, -- Q.752, 3.6
+    mtpOmSlL3SlCongestedDuration		Counter32, -- Q.752, 3.7
+    mtpOmSlL3SlCongestionStops			Counter32, -- Q.752, 3.9
+    mtpOmSlL3DiscardedMSUs			Counter32, -- Q.752, 3.10
+    mtpOmSlL3CongestionEventsMSULoss		Counter32, -- Q.752, 3.11
+    mtpOmSlL3Changeovers			Counter32, -- Q.752, 1.10
+    mtpOmSlL3Changebacks			Counter32, -- Q.752, 1.11
+    mtpOmSlL3Restorations			Counter32  -- Q.752, 1.12
 }
 
-mtpSlL3CurrentValidIntervals OBJECT-TYPE
+mtpOmSlL3ValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL3CurrentEntry 1 }
+    ::= { mtpOmSlL3Entry 1 }
 
-mtpSlL3CurrentTimeDiscontinuity OBJECT-TYPE
+mtpOmSlL3TimeDiscontinuity OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL3CurrentEntry 2 }
+    ::= { mtpOmSlL3Entry 2 }
 
-mtpSlL3CurrentSlUnavailabilityDuration OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3SlUnavailabilityDuration OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3046,10 +3050,10 @@ mtpSlL3CurrentSlUnavailabilityDuration OBJECT-TYPE
 	"ANSI T1.116.1D slUnavailabilityDuration
 	 ITU-T Rec. Q.751.1, (10/95) : slUnavailabilityDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.1"
-    ::= { mtpSlL3CurrentEntry 3 }
+    ::= { mtpOmSlL3Entry 3 }
 
-mtpSlL3CurrentSlLocalInhibition OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3SlLocalInhibition OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3072,10 +3076,10 @@ mtpSlL3CurrentSlLocalInhibition OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.8.
 	 ITU-T Rec. Q.751.1, (10/95) : slLocalInhibition
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.5"
-    ::= { mtpSlL3CurrentEntry 4 }
+    ::= { mtpOmSlL3Entry 4 }
 
-mtpSlL3CurrentSlRemoteInhibition OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3SlRemoteInhibition OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3098,10 +3102,10 @@ mtpSlL3CurrentSlRemoteInhibition OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.2.
 	 ITU-T Rec. Q.751.1, (10/95) : slRemoteInhibition.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.6"
-    ::= { mtpSlL3CurrentEntry 5 }
+    ::= { mtpOmSlL3Entry 5 }
 
-mtpSlL3CurrentSlFailed OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3SlFailed OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3124,10 +3128,10 @@ mtpSlL3CurrentSlFailed OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.2.
 	 ITU-T Rec. Q.751.1, (10/95) : slFailed.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.7"
-    ::= { mtpSlL3CurrentEntry 6 }
+    ::= { mtpOmSlL3Entry 6 }
 
-mtpSlL3CurrentSlRemoteProcOutage OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3SlRemoteProcOutage OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3149,10 +3153,10 @@ mtpSlL3CurrentSlRemoteProcOutage OBJECT-TYPE
 	 ANSI T1.111.4/3.2.6.
 	 ITU-T Rec. Q.751.1, (10/95) : slRemoteProcOutage.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.9"
-    ::= { mtpSlL3CurrentEntry 7 }
+    ::= { mtpOmSlL3Entry 7 }
 
-mtpSlL3CurrentLocalMgmtInhibit OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3LocalMgmtInhibit OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3170,10 +3174,10 @@ mtpSlL3CurrentLocalMgmtInhibit OBJECT-TYPE
 	 ANSI T1.111.4/2000 10.2.
 	 ITU-T Rec. Q.751.1, (10/95) : localMgmtInhibit.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.13"
-    ::= { mtpSlL3CurrentEntry 8 }
+    ::= { mtpOmSlL3Entry 8 }
 
-mtpSlL3CurrentLocalMgmtUninhibit OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3LocalMgmtUninhibit OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3191,10 +3195,10 @@ mtpSlL3CurrentLocalMgmtUninhibit OBJECT-TYPE
 	 ANSI T1.111.4/2000 10.3.
 	 ITU-T Rec. Q.751.1, (10/95) : localMgmtUninhibit.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.14"
-    ::= { mtpSlL3CurrentEntry 9 }
+    ::= { mtpOmSlL3Entry 9 }
 
-mtpSlL3CurrentLocalBusy OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3LocalBusy OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"SIBs sent"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3213,10 +3217,10 @@ mtpSlL3CurrentLocalBusy OBJECT-TYPE
 	 ANSI T1.111.4/2000 9.3.
 	 ITU-T Rec. Q.751.1, (10/95) : localBusy.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.15"
-    ::= { mtpSlL3CurrentEntry 10 }
+    ::= { mtpOmSlL3Entry 10 }
 
-mtpSlL3CurrentSlCongestedStarts OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3SlCongestedStarts OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"events"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3252,10 +3256,10 @@ mtpSlL3CurrentSlCongestedStarts OBJECT-TYPE
 	 ITU-T Q.704 (1993) 3.6 and 11.
 	 ITU-T Rec. Q.751.1, (10/95) : slCongestedStarts.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.6"
-    ::= { mtpSlL3CurrentEntry 11 }
+    ::= { mtpOmSlL3Entry 11 }
 
-mtpSlL3CurrentSlCongestedDuration OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3SlCongestedDuration OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3264,10 +3268,10 @@ mtpSlL3CurrentSlCongestedDuration OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1, (10/95) : slCongestedDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.7"
-    ::= { mtpSlL3CurrentEntry 12 }
+    ::= { mtpOmSlL3Entry 12 }
 
-mtpSlL3CurrentSlCongestionStops OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3SlCongestionStops OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"events"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3296,10 +3300,10 @@ mtpSlL3CurrentSlCongestionStops OBJECT-TYPE
 	"ANSI T1.116.1D slCongestionStops
 	 ITU-T Rec. Q.751.1, (10/95) : slCongestionStops.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.9"
-    ::= { mtpSlL3CurrentEntry 13 }
+    ::= { mtpOmSlL3Entry 13 }
 
-mtpSlL3CurrentDiscardedMSUs OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3DiscardedMSUs OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"MSUs"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3334,10 +3338,10 @@ mtpSlL3CurrentDiscardedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D discardedMSUs
 	 ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.10"
-    ::= { mtpSlL3CurrentEntry 14 }
+    ::= { mtpOmSlL3Entry 14 }
 
-mtpSlL3CurrentCongestionEventsMSULoss OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3CongestionEventsMSULoss OBJECT-TYPE
+    SYNTAX	Counter32
     UNITS	"events"
     MAX-ACCESS	read-only
     STATUS	current
@@ -3372,51 +3376,51 @@ mtpSlL3CurrentCongestionEventsMSULoss OBJECT-TYPE
 	 ITU-T Q.752 (1997) 2.4.10.
 	 ITU-T Rec. Q.751.1, (10/95) : congestionEventsMSULoss.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.11"
-    ::= { mtpSlL3CurrentEntry 15 }
+    ::= { mtpOmSlL3Entry 15 }
 
-mtpSlL3CurrentChangeovers OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3Changeovers OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
     REFERENCE
 	"Q.752, 1.10"
-    ::= { mtpSlL3CurrentEntry 16 }
+    ::= { mtpOmSlL3Entry 16 }
 
-mtpSlL3CurrentChangebacks OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3Changebacks OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
     REFERENCE
 	"Q.752, 1.11"
-    ::= { mtpSlL3CurrentEntry 17 }
+    ::= { mtpOmSlL3Entry 17 }
 
-mtpSlL3CurrentRestorations OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL3Restorations OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
     REFERENCE
 	"Q.752, 1.12"
-    ::= { mtpSlL3CurrentEntry 18 }
+    ::= { mtpOmSlL3Entry 18 }
 
 
 -- ====================================================================
 
-mtpSlL3Int5minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSlL3Int5minEntry
+mtpOmSlL3Int5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSlL3Int5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmSlStats 3 }
 
-mtpSlL3Int5minEntry OBJECT-TYPE
-    SYNTAX	MtpSlL3Int5minEntry
+mtpOmSlL3Int5minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSlL3Int5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -3425,48 +3429,48 @@ mtpSlL3Int5minEntry OBJECT-TYPE
 	mtpSpId, -- shared index
 	mtpLsId, -- shared index
 	mtpSlSlCode, -- shared index
-	mtpSlL3Int5minInterval
+	mtpOmSlL3Int5minInterval
     }
-    ::= { mtpSlL3Int5minTable 1 }
+    ::= { mtpOmSlL3Int5minTable 1 }
 
-MtpSlL3Int5minEntry ::= SEQUENCE {
-    mtpSlL3Int5minInterval			Unsigned32,
-    mtpSlL3Int5minTimeStamp			TimeStamp,
-    mtpSlL3Int5minSlUnavailabilityDuration	PerfIntervalCount, -- Q.752, 2.1
-    mtpSlL3Int5minSlLocalInhibition		PerfIntervalCount, -- Q.752, 2.5
-    mtpSlL3Int5minSlRemoteInhibition		PerfIntervalCount, -- Q.752, 2.6
-    mtpSlL3Int5minSlFailed			PerfIntervalCount, -- Q.752, 2.7
-    mtpSlL3Int5minSlRemoteProcOutage		PerfIntervalCount, -- Q.752, 2.9
-    mtpSlL3Int5minLocalMgmtInhibit		PerfIntervalCount, -- Q.752, 2.13
-    mtpSlL3Int5minLocalMgmtUninhibit		PerfIntervalCount, -- Q.752, 2.14
-    mtpSlL3Int5minLocalBusy			PerfIntervalCount, -- Q.752, 2.15
-    mtpSlL3Int5minSlCongestedStarts		PerfIntervalCount, -- Q.752, 3.6
-    mtpSlL3Int5minSlCongestedDuration		PerfIntervalCount, -- Q.752, 3.7
-    mtpSlL3Int5minSlCongestionStops		PerfIntervalCount, -- Q.752, 3.9
-    mtpSlL3Int5minDiscardedMSUs			PerfIntervalCount, -- Q.752, 3.10
-    mtpSlL3Int5minCongestionEventsMSULoss	PerfIntervalCount, -- Q.752, 3.11
-    mtpSlL3Int5minChangeovers			PerfIntervalCount, -- Q.752, 1.10
-    mtpSlL3Int5minChangebacks			PerfIntervalCount, -- Q.752, 1.11
-    mtpSlL3Int5minRestorations			PerfIntervalCount  -- Q.752, 1.12
+MtpOmSlL3Int5minEntry ::= SEQUENCE {
+    mtpOmSlL3Int5minInterval			Unsigned32,
+    mtpOmSlL3Int5minTimeStamp			TimeStamp,
+    mtpOmSlL3Int5minSlUnavailabilityDuration	PerfIntervalCount, -- Q.752, 2.1
+    mtpOmSlL3Int5minSlLocalInhibition		PerfIntervalCount, -- Q.752, 2.5
+    mtpOmSlL3Int5minSlRemoteInhibition		PerfIntervalCount, -- Q.752, 2.6
+    mtpOmSlL3Int5minSlFailed			PerfIntervalCount, -- Q.752, 2.7
+    mtpOmSlL3Int5minSlRemoteProcOutage		PerfIntervalCount, -- Q.752, 2.9
+    mtpOmSlL3Int5minLocalMgmtInhibit		PerfIntervalCount, -- Q.752, 2.13
+    mtpOmSlL3Int5minLocalMgmtUninhibit		PerfIntervalCount, -- Q.752, 2.14
+    mtpOmSlL3Int5minLocalBusy			PerfIntervalCount, -- Q.752, 2.15
+    mtpOmSlL3Int5minSlCongestedStarts		PerfIntervalCount, -- Q.752, 3.6
+    mtpOmSlL3Int5minSlCongestedDuration		PerfIntervalCount, -- Q.752, 3.7
+    mtpOmSlL3Int5minSlCongestionStops		PerfIntervalCount, -- Q.752, 3.9
+    mtpOmSlL3Int5minDiscardedMSUs		PerfIntervalCount, -- Q.752, 3.10
+    mtpOmSlL3Int5minCongestionEventsMSULoss	PerfIntervalCount, -- Q.752, 3.11
+    mtpOmSlL3Int5minChangeovers			PerfIntervalCount, -- Q.752, 1.10
+    mtpOmSlL3Int5minChangebacks			PerfIntervalCount, -- Q.752, 1.11
+    mtpOmSlL3Int5minRestorations		PerfIntervalCount  -- Q.752, 1.12
 }
 
-mtpSlL3Int5minInterval OBJECT-TYPE
+mtpOmSlL3Int5minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL3Int5minEntry 1 }
+    ::= { mtpOmSlL3Int5minEntry 1 }
 
-mtpSlL3Int5minTimeStamp OBJECT-TYPE
+mtpOmSlL3Int5minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL3Int5minEntry 2 }
+    ::= { mtpOmSlL3Int5minEntry 2 }
 
-mtpSlL3Int5minSlUnavailabilityDuration OBJECT-TYPE
+mtpOmSlL3Int5minSlUnavailabilityDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3491,9 +3495,9 @@ mtpSlL3Int5minSlUnavailabilityDuration OBJECT-TYPE
 	"ANSI T1.116.1D slUnavailabilityDuration
 	 ITU-T Rec. Q.751.1, (10/95) : slUnavailabilityDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.1"
-    ::= { mtpSlL3Int5minEntry 3 }
+    ::= { mtpOmSlL3Int5minEntry 3 }
 
-mtpSlL3Int5minSlLocalInhibition OBJECT-TYPE
+mtpOmSlL3Int5minSlLocalInhibition OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3517,9 +3521,9 @@ mtpSlL3Int5minSlLocalInhibition OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.8.
 	 ITU-T Rec. Q.751.1, (10/95) : slLocalInhibition
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.5"
-    ::= { mtpSlL3Int5minEntry 4 }
+    ::= { mtpOmSlL3Int5minEntry 4 }
 
-mtpSlL3Int5minSlRemoteInhibition OBJECT-TYPE
+mtpOmSlL3Int5minSlRemoteInhibition OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3543,9 +3547,9 @@ mtpSlL3Int5minSlRemoteInhibition OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.2.
 	 ITU-T Rec. Q.751.1, (10/95) : slRemoteInhibition.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.6"
-    ::= { mtpSlL3Int5minEntry 5 }
+    ::= { mtpOmSlL3Int5minEntry 5 }
 
-mtpSlL3Int5minSlFailed OBJECT-TYPE
+mtpOmSlL3Int5minSlFailed OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3569,9 +3573,9 @@ mtpSlL3Int5minSlFailed OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.2.
 	 ITU-T Rec. Q.751.1, (10/95) : slFailed.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.7"
-    ::= { mtpSlL3Int5minEntry 6 }
+    ::= { mtpOmSlL3Int5minEntry 6 }
 
-mtpSlL3Int5minSlRemoteProcOutage OBJECT-TYPE
+mtpOmSlL3Int5minSlRemoteProcOutage OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3594,9 +3598,9 @@ mtpSlL3Int5minSlRemoteProcOutage OBJECT-TYPE
 	 ANSI T1.111.4/3.2.6.
 	 ITU-T Rec. Q.751.1, (10/95) : slRemoteProcOutage.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.9"
-    ::= { mtpSlL3Int5minEntry 7 }
+    ::= { mtpOmSlL3Int5minEntry 7 }
 
-mtpSlL3Int5minLocalMgmtInhibit OBJECT-TYPE
+mtpOmSlL3Int5minLocalMgmtInhibit OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3615,9 +3619,9 @@ mtpSlL3Int5minLocalMgmtInhibit OBJECT-TYPE
 	 ANSI T1.111.4/2000 10.2.
 	 ITU-T Rec. Q.751.1, (10/95) : localMgmtInhibit.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.13"
-    ::= { mtpSlL3Int5minEntry 8 }
+    ::= { mtpOmSlL3Int5minEntry 8 }
 
-mtpSlL3Int5minLocalMgmtUninhibit OBJECT-TYPE
+mtpOmSlL3Int5minLocalMgmtUninhibit OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3636,9 +3640,9 @@ mtpSlL3Int5minLocalMgmtUninhibit OBJECT-TYPE
 	 ANSI T1.111.4/2000 10.3.
 	 ITU-T Rec. Q.751.1, (10/95) : localMgmtUninhibit.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.14"
-    ::= { mtpSlL3Int5minEntry 9 }
+    ::= { mtpOmSlL3Int5minEntry 9 }
 
-mtpSlL3Int5minLocalBusy OBJECT-TYPE
+mtpOmSlL3Int5minLocalBusy OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"SIBs sent"
     MAX-ACCESS	read-only
@@ -3658,9 +3662,9 @@ mtpSlL3Int5minLocalBusy OBJECT-TYPE
 	 ANSI T1.111.4/2000 9.3.
 	 ITU-T Rec. Q.751.1, (10/95) : localBusy.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.15"
-    ::= { mtpSlL3Int5minEntry 10 }
+    ::= { mtpOmSlL3Int5minEntry 10 }
 
-mtpSlL3Int5minSlCongestedStarts OBJECT-TYPE
+mtpOmSlL3Int5minSlCongestedStarts OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"events"
     MAX-ACCESS	read-only
@@ -3697,9 +3701,9 @@ mtpSlL3Int5minSlCongestedStarts OBJECT-TYPE
 	 ITU-T Q.704 (1993) 3.6 and 11.
 	 ITU-T Rec. Q.751.1, (10/95) : slCongestedStarts.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.6"
-    ::= { mtpSlL3Int5minEntry 11 }
+    ::= { mtpOmSlL3Int5minEntry 11 }
 
-mtpSlL3Int5minSlCongestedDuration OBJECT-TYPE
+mtpOmSlL3Int5minSlCongestedDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3709,9 +3713,9 @@ mtpSlL3Int5minSlCongestedDuration OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1, (10/95) : slCongestedDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.7"
-    ::= { mtpSlL3Int5minEntry 12 }
+    ::= { mtpOmSlL3Int5minEntry 12 }
 
-mtpSlL3Int5minSlCongestionStops OBJECT-TYPE
+mtpOmSlL3Int5minSlCongestionStops OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"events"
     MAX-ACCESS	read-only
@@ -3741,9 +3745,9 @@ mtpSlL3Int5minSlCongestionStops OBJECT-TYPE
 	"ANSI T1.116.1D slCongestionStops
 	 ITU-T Rec. Q.751.1, (10/95) : slCongestionStops.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.9"
-    ::= { mtpSlL3Int5minEntry 13 }
+    ::= { mtpOmSlL3Int5minEntry 13 }
 
-mtpSlL3Int5minDiscardedMSUs OBJECT-TYPE
+mtpOmSlL3Int5minDiscardedMSUs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
@@ -3779,9 +3783,9 @@ mtpSlL3Int5minDiscardedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D discardedMSUs
 	 ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.10"
-    ::= { mtpSlL3Int5minEntry 14 }
+    ::= { mtpOmSlL3Int5minEntry 14 }
 
-mtpSlL3Int5minCongestionEventsMSULoss OBJECT-TYPE
+mtpOmSlL3Int5minCongestionEventsMSULoss OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"events"
     MAX-ACCESS	read-only
@@ -3817,9 +3821,9 @@ mtpSlL3Int5minCongestionEventsMSULoss OBJECT-TYPE
 	 ITU-T Q.752 (1997) 2.4.10.
 	 ITU-T Rec. Q.751.1, (10/95) : congestionEventsMSULoss.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.11"
-    ::= { mtpSlL3Int5minEntry 15 }
+    ::= { mtpOmSlL3Int5minEntry 15 }
 
-mtpSlL3Int5minChangeovers OBJECT-TYPE
+mtpOmSlL3Int5minChangeovers OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -3827,9 +3831,9 @@ mtpSlL3Int5minChangeovers OBJECT-TYPE
 	""
     REFERENCE
 	"Q.752, 1.10"
-    ::= { mtpSlL3Int5minEntry 16 }
+    ::= { mtpOmSlL3Int5minEntry 16 }
 
-mtpSlL3Int5minChangebacks OBJECT-TYPE
+mtpOmSlL3Int5minChangebacks OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -3837,9 +3841,9 @@ mtpSlL3Int5minChangebacks OBJECT-TYPE
 	""
     REFERENCE
 	"Q.752, 1.11"
-    ::= { mtpSlL3Int5minEntry 17 }
+    ::= { mtpOmSlL3Int5minEntry 17 }
 
-mtpSlL3Int5minRestorations OBJECT-TYPE
+mtpOmSlL3Int5minRestorations OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -3847,21 +3851,21 @@ mtpSlL3Int5minRestorations OBJECT-TYPE
 	""
     REFERENCE
 	"Q.752, 1.12"
-    ::= { mtpSlL3Int5minEntry 18 }
+    ::= { mtpOmSlL3Int5minEntry 18 }
 
 
 -- ====================================================================
 
-mtpSlL3Int15minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSlL3Int15minEntry
+mtpOmSlL3Int15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSlL3Int15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmSlStats 4 }
 
-mtpSlL3Int15minEntry OBJECT-TYPE
-    SYNTAX	MtpSlL3Int15minEntry
+mtpOmSlL3Int15minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSlL3Int15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -3870,48 +3874,48 @@ mtpSlL3Int15minEntry OBJECT-TYPE
 	mtpSpId, -- shared index
 	mtpLsId, -- shared index
 	mtpSlSlCode, -- shared index
-	mtpSlL3Int15minInterval
+	mtpOmSlL3Int15minInterval
     }
-    ::= { mtpSlL3Int15minTable 1 }
+    ::= { mtpOmSlL3Int15minTable 1 }
 
-MtpSlL3Int15minEntry ::= SEQUENCE {
-    mtpSlL3Int15minInterval			Unsigned32,
-    mtpSlL3Int15minTimeStamp			TimeStamp,
-    mtpSlL3Int15minSlUnavailabilityDuration	PerfIntervalCount, -- Q.752, 2.1
-    mtpSlL3Int15minSlLocalInhibition		PerfIntervalCount, -- Q.752, 2.5
-    mtpSlL3Int15minSlRemoteInhibition		PerfIntervalCount, -- Q.752, 2.6
-    mtpSlL3Int15minSlFailed			PerfIntervalCount, -- Q.752, 2.7
-    mtpSlL3Int15minSlRemoteProcOutage		PerfIntervalCount, -- Q.752, 2.9
-    mtpSlL3Int15minLocalMgmtInhibit		PerfIntervalCount, -- Q.752, 2.13
-    mtpSlL3Int15minLocalMgmtUninhibit		PerfIntervalCount, -- Q.752, 2.14
-    mtpSlL3Int15minLocalBusy			PerfIntervalCount, -- Q.752, 2.15
-    mtpSlL3Int15minSlCongestedStarts		PerfIntervalCount, -- Q.752, 3.6
-    mtpSlL3Int15minSlCongestedDuration		PerfIntervalCount, -- Q.752, 3.7
-    mtpSlL3Int15minSlCongestionStops		PerfIntervalCount, -- Q.752, 3.9
-    mtpSlL3Int15minDiscardedMSUs		PerfIntervalCount, -- Q.752, 3.10
-    mtpSlL3Int15minCongestionEventsMSULoss	PerfIntervalCount, -- Q.752, 3.11
-    mtpSlL3Int15minChangeovers			PerfIntervalCount, -- Q.752, 1.10
-    mtpSlL3Int15minChangebacks			PerfIntervalCount, -- Q.752, 1.11
-    mtpSlL3Int15minRestorations			PerfIntervalCount  -- Q.752, 1.12
+MtpOmSlL3Int15minEntry ::= SEQUENCE {
+    mtpOmSlL3Int15minInterval			Unsigned32,
+    mtpOmSlL3Int15minTimeStamp			TimeStamp,
+    mtpOmSlL3Int15minSlUnavailabilityDuration	PerfIntervalCount, -- Q.752, 2.1
+    mtpOmSlL3Int15minSlLocalInhibition		PerfIntervalCount, -- Q.752, 2.5
+    mtpOmSlL3Int15minSlRemoteInhibition		PerfIntervalCount, -- Q.752, 2.6
+    mtpOmSlL3Int15minSlFailed			PerfIntervalCount, -- Q.752, 2.7
+    mtpOmSlL3Int15minSlRemoteProcOutage		PerfIntervalCount, -- Q.752, 2.9
+    mtpOmSlL3Int15minLocalMgmtInhibit		PerfIntervalCount, -- Q.752, 2.13
+    mtpOmSlL3Int15minLocalMgmtUninhibit		PerfIntervalCount, -- Q.752, 2.14
+    mtpOmSlL3Int15minLocalBusy			PerfIntervalCount, -- Q.752, 2.15
+    mtpOmSlL3Int15minSlCongestedStarts		PerfIntervalCount, -- Q.752, 3.6
+    mtpOmSlL3Int15minSlCongestedDuration	PerfIntervalCount, -- Q.752, 3.7
+    mtpOmSlL3Int15minSlCongestionStops		PerfIntervalCount, -- Q.752, 3.9
+    mtpOmSlL3Int15minDiscardedMSUs		PerfIntervalCount, -- Q.752, 3.10
+    mtpOmSlL3Int15minCongestionEventsMSULoss	PerfIntervalCount, -- Q.752, 3.11
+    mtpOmSlL3Int15minChangeovers		PerfIntervalCount, -- Q.752, 1.10
+    mtpOmSlL3Int15minChangebacks		PerfIntervalCount, -- Q.752, 1.11
+    mtpOmSlL3Int15minRestorations		PerfIntervalCount  -- Q.752, 1.12
 }
 
-mtpSlL3Int15minInterval OBJECT-TYPE
+mtpOmSlL3Int15minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL3Int15minEntry 1 }
+    ::= { mtpOmSlL3Int15minEntry 1 }
 
-mtpSlL3Int15minTimeStamp OBJECT-TYPE
+mtpOmSlL3Int15minTimeStamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL3Int15minEntry 2 }
+    ::= { mtpOmSlL3Int15minEntry 2 }
 
-mtpSlL3Int15minSlUnavailabilityDuration OBJECT-TYPE
+mtpOmSlL3Int15minSlUnavailabilityDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3936,9 +3940,9 @@ mtpSlL3Int15minSlUnavailabilityDuration OBJECT-TYPE
 	"ANSI T1.116.1D slUnavailabilityDuration
 	 ITU-T Rec. Q.751.1, (10/95) : slUnavailabilityDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.1"
-    ::= { mtpSlL3Int15minEntry 3 }
+    ::= { mtpOmSlL3Int15minEntry 3 }
 
-mtpSlL3Int15minSlLocalInhibition OBJECT-TYPE
+mtpOmSlL3Int15minSlLocalInhibition OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3962,9 +3966,9 @@ mtpSlL3Int15minSlLocalInhibition OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.8.
 	 ITU-T Rec. Q.751.1, (10/95) : slLocalInhibition
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.5"
-    ::= { mtpSlL3Int15minEntry 4 }
+    ::= { mtpOmSlL3Int15minEntry 4 }
 
-mtpSlL3Int15minSlRemoteInhibition OBJECT-TYPE
+mtpOmSlL3Int15minSlRemoteInhibition OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3988,9 +3992,9 @@ mtpSlL3Int15minSlRemoteInhibition OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.2.
 	 ITU-T Rec. Q.751.1, (10/95) : slRemoteInhibition.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.6"
-    ::= { mtpSlL3Int15minEntry 5 }
+    ::= { mtpOmSlL3Int15minEntry 5 }
 
-mtpSlL3Int15minSlFailed OBJECT-TYPE
+mtpOmSlL3Int15minSlFailed OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4014,9 +4018,9 @@ mtpSlL3Int15minSlFailed OBJECT-TYPE
 	 ANSI T1.111.4/2000 3.2.2.
 	 ITU-T Rec. Q.751.1, (10/95) : slFailed.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.7"
-    ::= { mtpSlL3Int15minEntry 6 }
+    ::= { mtpOmSlL3Int15minEntry 6 }
 
-mtpSlL3Int15minSlRemoteProcOutage OBJECT-TYPE
+mtpOmSlL3Int15minSlRemoteProcOutage OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4039,9 +4043,9 @@ mtpSlL3Int15minSlRemoteProcOutage OBJECT-TYPE
 	 ANSI T1.111.4/3.2.6.
 	 ITU-T Rec. Q.751.1, (10/95) : slRemoteProcOutage.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.9"
-    ::= { mtpSlL3Int15minEntry 7 }
+    ::= { mtpOmSlL3Int15minEntry 7 }
 
-mtpSlL3Int15minLocalMgmtInhibit OBJECT-TYPE
+mtpOmSlL3Int15minLocalMgmtInhibit OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4060,9 +4064,9 @@ mtpSlL3Int15minLocalMgmtInhibit OBJECT-TYPE
 	 ANSI T1.111.4/2000 10.2.
 	 ITU-T Rec. Q.751.1, (10/95) : localMgmtInhibit.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.13"
-    ::= { mtpSlL3Int15minEntry 8 }
+    ::= { mtpOmSlL3Int15minEntry 8 }
 
-mtpSlL3Int15minLocalMgmtUninhibit OBJECT-TYPE
+mtpOmSlL3Int15minLocalMgmtUninhibit OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4081,9 +4085,9 @@ mtpSlL3Int15minLocalMgmtUninhibit OBJECT-TYPE
 	 ANSI T1.111.4/2000 10.3.
 	 ITU-T Rec. Q.751.1, (10/95) : localMgmtUninhibit.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.14"
-    ::= { mtpSlL3Int15minEntry 9 }
+    ::= { mtpOmSlL3Int15minEntry 9 }
 
-mtpSlL3Int15minLocalBusy OBJECT-TYPE
+mtpOmSlL3Int15minLocalBusy OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"SIBs sent"
     MAX-ACCESS	read-only
@@ -4103,9 +4107,9 @@ mtpSlL3Int15minLocalBusy OBJECT-TYPE
 	 ANSI T1.111.4/2000 9.3.
 	 ITU-T Rec. Q.751.1, (10/95) : localBusy.
 	 ITU-T Rec. Q.752, (1997) : Table 2/Q.752 2.15"
-    ::= { mtpSlL3Int15minEntry 10 }
+    ::= { mtpOmSlL3Int15minEntry 10 }
 
-mtpSlL3Int15minSlCongestedStarts OBJECT-TYPE
+mtpOmSlL3Int15minSlCongestedStarts OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"events"
     MAX-ACCESS	read-only
@@ -4142,9 +4146,9 @@ mtpSlL3Int15minSlCongestedStarts OBJECT-TYPE
 	 ITU-T Q.704 (1993) 3.6 and 11.
 	 ITU-T Rec. Q.751.1, (10/95) : slCongestedStarts.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.6"
-    ::= { mtpSlL3Int15minEntry 11 }
+    ::= { mtpOmSlL3Int15minEntry 11 }
 
-mtpSlL3Int15minSlCongestedDuration OBJECT-TYPE
+mtpOmSlL3Int15minSlCongestedDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4154,9 +4158,9 @@ mtpSlL3Int15minSlCongestedDuration OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1, (10/95) : slCongestedDuration.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.7"
-    ::= { mtpSlL3Int15minEntry 12 }
+    ::= { mtpOmSlL3Int15minEntry 12 }
 
-mtpSlL3Int15minSlCongestionStops OBJECT-TYPE
+mtpOmSlL3Int15minSlCongestionStops OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"events"
     MAX-ACCESS	read-only
@@ -4186,9 +4190,9 @@ mtpSlL3Int15minSlCongestionStops OBJECT-TYPE
 	"ANSI T1.116.1D slCongestionStops
 	 ITU-T Rec. Q.751.1, (10/95) : slCongestionStops.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.9"
-    ::= { mtpSlL3Int15minEntry 13 }
+    ::= { mtpOmSlL3Int15minEntry 13 }
 
-mtpSlL3Int15minDiscardedMSUs OBJECT-TYPE
+mtpOmSlL3Int15minDiscardedMSUs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"MSUs"
     MAX-ACCESS	read-only
@@ -4224,9 +4228,9 @@ mtpSlL3Int15minDiscardedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D discardedMSUs
 	 ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.10"
-    ::= { mtpSlL3Int15minEntry 14 }
+    ::= { mtpOmSlL3Int15minEntry 14 }
 
-mtpSlL3Int15minCongestionEventsMSULoss OBJECT-TYPE
+mtpOmSlL3Int15minCongestionEventsMSULoss OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"events"
     MAX-ACCESS	read-only
@@ -4262,9 +4266,9 @@ mtpSlL3Int15minCongestionEventsMSULoss OBJECT-TYPE
 	 ITU-T Q.752 (1997) 2.4.10.
 	 ITU-T Rec. Q.751.1, (10/95) : congestionEventsMSULoss.
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.11"
-    ::= { mtpSlL3Int15minEntry 15 }
+    ::= { mtpOmSlL3Int15minEntry 15 }
 
-mtpSlL3Int15minChangeovers OBJECT-TYPE
+mtpOmSlL3Int15minChangeovers OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4272,9 +4276,9 @@ mtpSlL3Int15minChangeovers OBJECT-TYPE
 	""
     REFERENCE
 	"Q.752, 1.10"
-    ::= { mtpSlL3Int15minEntry 16 }
+    ::= { mtpOmSlL3Int15minEntry 16 }
 
-mtpSlL3Int15minChangebacks OBJECT-TYPE
+mtpOmSlL3Int15minChangebacks OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4282,9 +4286,9 @@ mtpSlL3Int15minChangebacks OBJECT-TYPE
 	""
     REFERENCE
 	"Q.752, 1.11"
-    ::= { mtpSlL3Int15minEntry 17 }
+    ::= { mtpOmSlL3Int15minEntry 17 }
 
-mtpSlL3Int15minRestorations OBJECT-TYPE
+mtpOmSlL3Int15minRestorations OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4292,21 +4296,21 @@ mtpSlL3Int15minRestorations OBJECT-TYPE
 	""
     REFERENCE
 	"Q.752, 1.12"
-    ::= { mtpSlL3Int15minEntry 18 }
+    ::= { mtpOmSlL3Int15minEntry 18 }
 
 
 -- ====================================================================
 
-mtpSlL2CurrentTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSlL2CurrentEntry
+mtpOmSlL2Table OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSlL2Entry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
     ::= { mtpOmSlStats 5 }
 
-mtpSlL2CurrentEntry OBJECT-TYPE
-    SYNTAX	MtpSlL2CurrentEntry
+mtpOmSlL2Entry OBJECT-TYPE
+    SYNTAX	MtpOmSlL2Entry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -4316,40 +4320,40 @@ mtpSlL2CurrentEntry OBJECT-TYPE
 	mtpLsId, -- shared index
 	mtpSlSlCode -- shared index
     }
-    ::= { mtpSlL2CurrentTable 1 }
+    ::= { mtpOmSlL2Table 1 }
 
-MtpSlL2CurrentEntry ::= SEQUENCE {
-    mtpSlL2CurrentValidIntervals		HCPerfValidIntervals,
-    mtpSlL2CurrentTimeDiscontinuity		TimeStamp,
-    mtpSlL2CurrentSlInServiceDuration		PerfCurrentCount, -- Q.752, 1.1
-    mtpSlL2CurrentSlAlignment			PerfCurrentCount, -- Q.752, 1.7
-    mtpSlL2CurrentSignUnitsReceived		PerfCurrentCount, -- Q.752, 1.8
-    mtpSlL2CurrentNegAckReceived		PerfCurrentCount, -- Q.752, 1.9
-    mtpSlL2CurrentTransmittedOctetsSIFSIO	PerfCurrentCount, -- Q.752, 3.1
-    mtpSlL2CurrentRetransmittedOctets		PerfCurrentCount, -- Q.752, 3.2
-    mtpSlL2CurrentTransmittedMSUs		PerfCurrentCount, -- Q.752, 3.3
-    mtpSlL2CurrentReceivedOctetsSIFSIO		PerfCurrentCount, -- Q.752, 3.4
-    mtpSlL2CurrentReceivedMSUs			PerfCurrentCount  -- Q.752, 3.5
+MtpOmSlL2Entry ::= SEQUENCE {
+    mtpOmSlL2ValidIntervals			HCPerfValidIntervals,
+    mtpOmSlL2TimeDiscontinuity			TimeStamp,
+    mtpOmSlL2SlInServiceDuration		Counter32, -- Q.752, 1.1
+    mtpOmSlL2SlAlignment			Counter32, -- Q.752, 1.7
+    mtpOmSlL2SignUnitsReceived			Counter32, -- Q.752, 1.8
+    mtpOmSlL2NegAckReceived			Counter32, -- Q.752, 1.9
+    mtpOmSlL2TransmittedOctetsSIFSIO		Counter32, -- Q.752, 3.1
+    mtpOmSlL2RetransmittedOctets		Counter32, -- Q.752, 3.2
+    mtpOmSlL2TransmittedMSUs			Counter32, -- Q.752, 3.3
+    mtpOmSlL2ReceivedOctetsSIFSIO		Counter32, -- Q.752, 3.4
+    mtpOmSlL2ReceivedMSUs			Counter32  -- Q.752, 3.5
 }
 
-mtpSlL2CurrentValidIntervals OBJECT-TYPE
+mtpOmSlL2ValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL2CurrentEntry 1 }
+    ::= { mtpOmSlL2Entry 1 }
 
-mtpSlL2CurrentTimeDiscontinuity OBJECT-TYPE
+mtpOmSlL2TimeDiscontinuity OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL2CurrentEntry 2 }
+    ::= { mtpOmSlL2Entry 2 }
 
-mtpSlL2CurrentSlInServiceDuration OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2SlInServiceDuration OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4373,10 +4377,10 @@ mtpSlL2CurrentSlInServiceDuration OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 1 (1.1).
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.1
 	 ITU-T Rec. Q.751.1, (10/95) : slInServiceDuration."
-    ::= { mtpSlL2CurrentEntry 3 }
+    ::= { mtpOmSlL2Entry 3 }
 
-mtpSlL2CurrentSlAlignment OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2SlAlignment OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4388,10 +4392,10 @@ mtpSlL2CurrentSlAlignment OBJECT-TYPE
 	"ANSI T1.116.1D slAlignment
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.7
 	 ITU-T Rec. Q.751.1 (10/95) : slAlignment."
-    ::= { mtpSlL2CurrentEntry 4 }
+    ::= { mtpOmSlL2Entry 4 }
 
-mtpSlL2CurrentSignUnitsReceived OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2SignUnitsReceived OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4403,10 +4407,10 @@ mtpSlL2CurrentSignUnitsReceived OBJECT-TYPE
 	"ANSI T1.116.1D signUnitsReceived
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.8
 	 ITU-T Rec. Q.751.1 (10/95) : signUnitsReceived."
-    ::= { mtpSlL2CurrentEntry 5 }
+    ::= { mtpOmSlL2Entry 5 }
 
-mtpSlL2CurrentNegAckReceived OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2NegAckReceived OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4417,10 +4421,10 @@ mtpSlL2CurrentNegAckReceived OBJECT-TYPE
 	"ANSI T1.116.1D negAckReceived
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.9
 	 ITU-T Rec. Q.751.1 (10/95) : negAckReceived."
-    ::= { mtpSlL2CurrentEntry 6 }
+    ::= { mtpOmSlL2Entry 6 }
 
-mtpSlL2CurrentTransmittedOctetsSIFSIO OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2TransmittedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4433,10 +4437,10 @@ mtpSlL2CurrentTransmittedOctetsSIFSIO OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsSIFSIO
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.1
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsSIFSIO."
-    ::= { mtpSlL2CurrentEntry 7 }
+    ::= { mtpOmSlL2Entry 7 }
 
-mtpSlL2CurrentRetransmittedOctets OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2RetransmittedOctets OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4448,10 +4452,10 @@ mtpSlL2CurrentRetransmittedOctets OBJECT-TYPE
 	"ANSI T1.116.1D retransmittedOctets
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.2
 	 ITU-T Rec. Q.751.1 (10/95) : retransmittedOctets."
-    ::= { mtpSlL2CurrentEntry 8 }
+    ::= { mtpOmSlL2Entry 8 }
 
-mtpSlL2CurrentTransmittedMSUs OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2TransmittedMSUs OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4463,10 +4467,10 @@ mtpSlL2CurrentTransmittedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D transmittedMSUs
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.3
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedMSUs."
-    ::= { mtpSlL2CurrentEntry 9 }
+    ::= { mtpOmSlL2Entry 9 }
 
-mtpSlL2CurrentReceivedOctetsSIFSIO OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2ReceivedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4475,10 +4479,10 @@ mtpSlL2CurrentReceivedOctetsSIFSIO OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsSIFSIO
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.4
 	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsSIFSIO."
-    ::= { mtpSlL2CurrentEntry 10 }
+    ::= { mtpOmSlL2Entry 10 }
 
-mtpSlL2CurrentReceivedMSUs OBJECT-TYPE
-    SYNTAX	PerfCurrentCount
+mtpOmSlL2ReceivedMSUs OBJECT-TYPE
+    SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -4490,21 +4494,21 @@ mtpSlL2CurrentReceivedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D receivedMSUs
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.5
 	 ITU-T Rec. Q.751.1 (10/95) : receivedMSUs."
-    ::= { mtpSlL2CurrentEntry 11 }
+    ::= { mtpOmSlL2Entry 11 }
 
 
 -- ====================================================================
 
-mtpSlL2Int5minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSlL2Int5minEntry
+mtpOmSlL2Int5minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSlL2Int5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	"Provides a 5 minute interval table for MTP Level 2 statistics."
     ::= { mtpOmSlStats 6 }
 
-mtpSlL2Int5minEntry OBJECT-TYPE
-    SYNTAX	MtpSlL2Int5minEntry
+mtpOmSlL2Int5minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSlL2Int5minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -4515,41 +4519,41 @@ mtpSlL2Int5minEntry OBJECT-TYPE
 	mtpSpId, -- shared index
 	mtpLsId, -- shared index
 	mtpSlSlCode, -- shared index
-	mtpSlL2Int5minInterval
+	mtpOmSlL2Int5minInterval
     }
-    ::= { mtpSlL2Int5minTable 1 }
+    ::= { mtpOmSlL2Int5minTable 1 }
 
-MtpSlL2Int5minEntry ::= SEQUENCE {
-    mtpSlL2Int5minInterval			Unsigned32,
-    mtpSlL2Int5minTimestamp			TimeStamp,
-    mtpSlL2Int5minSlInServiceDuration		PerfIntervalCount, -- Q.752, 1.1
-    mtpSlL2Int5minSlAlignment			PerfIntervalCount, -- Q.752, 1.7
-    mtpSlL2Int5minSignUnitsReceived		PerfIntervalCount, -- Q.752, 1.8
-    mtpSlL2Int5minNegAckReceived		PerfIntervalCount, -- Q.752, 1.9
-    mtpSlL2Int5minTransmittedOctetsSIFSIO	PerfIntervalCount, -- Q.752, 3.1
-    mtpSlL2Int5minRetransmittedOctets		PerfIntervalCount, -- Q.752, 3.2
-    mtpSlL2Int5minTransmittedMSUs		PerfIntervalCount, -- Q.752, 3.3
-    mtpSlL2Int5minReceivedOctetsSIFSIO		PerfIntervalCount, -- Q.752, 3.4
-    mtpSlL2Int5minReceivedMSUs			PerfIntervalCount  -- Q.752, 3.5
+MtpOmSlL2Int5minEntry ::= SEQUENCE {
+    mtpOmSlL2Int5minInterval			Unsigned32,
+    mtpOmSlL2Int5minTimestamp			TimeStamp,
+    mtpOmSlL2Int5minSlInServiceDuration		PerfIntervalCount, -- Q.752, 1.1
+    mtpOmSlL2Int5minSlAlignment			PerfIntervalCount, -- Q.752, 1.7
+    mtpOmSlL2Int5minSignUnitsReceived		PerfIntervalCount, -- Q.752, 1.8
+    mtpOmSlL2Int5minNegAckReceived		PerfIntervalCount, -- Q.752, 1.9
+    mtpOmSlL2Int5minTransmittedOctetsSIFSIO	PerfIntervalCount, -- Q.752, 3.1
+    mtpOmSlL2Int5minRetransmittedOctets		PerfIntervalCount, -- Q.752, 3.2
+    mtpOmSlL2Int5minTransmittedMSUs		PerfIntervalCount, -- Q.752, 3.3
+    mtpOmSlL2Int5minReceivedOctetsSIFSIO	PerfIntervalCount, -- Q.752, 3.4
+    mtpOmSlL2Int5minReceivedMSUs		PerfIntervalCount  -- Q.752, 3.5
 }
 
-mtpSlL2Int5minInterval OBJECT-TYPE
+mtpOmSlL2Int5minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL2Int5minEntry 1 }
+    ::= { mtpOmSlL2Int5minEntry 1 }
 
-mtpSlL2Int5minTimestamp OBJECT-TYPE
+mtpOmSlL2Int5minTimestamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL2Int5minEntry 2 }
+    ::= { mtpOmSlL2Int5minEntry 2 }
 
-mtpSlL2Int5minSlInServiceDuration OBJECT-TYPE
+mtpOmSlL2Int5minSlInServiceDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4574,9 +4578,9 @@ mtpSlL2Int5minSlInServiceDuration OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 1 (1.1).
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.1
 	 ITU-T Rec. Q.751.1, (10/95) : slInServiceDuration."
-    ::= { mtpSlL2Int5minEntry 3 }
+    ::= { mtpOmSlL2Int5minEntry 3 }
 
-mtpSlL2Int5minSlAlignment OBJECT-TYPE
+mtpOmSlL2Int5minSlAlignment OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4589,9 +4593,9 @@ mtpSlL2Int5minSlAlignment OBJECT-TYPE
 	"ANSI T1.116.1D slAlignment
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.7
 	 ITU-T Rec. Q.751.1 (10/95) : slAlignment."
-    ::= { mtpSlL2Int5minEntry 4 }
+    ::= { mtpOmSlL2Int5minEntry 4 }
 
-mtpSlL2Int5minSignUnitsReceived OBJECT-TYPE
+mtpOmSlL2Int5minSignUnitsReceived OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4604,9 +4608,9 @@ mtpSlL2Int5minSignUnitsReceived OBJECT-TYPE
 	"ANSI T1.116.1D signUnitsReceived
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.8
 	 ITU-T Rec. Q.751.1 (10/95) : signUnitsReceived."
-    ::= { mtpSlL2Int5minEntry 5 }
+    ::= { mtpOmSlL2Int5minEntry 5 }
 
-mtpSlL2Int5minNegAckReceived OBJECT-TYPE
+mtpOmSlL2Int5minNegAckReceived OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4618,9 +4622,9 @@ mtpSlL2Int5minNegAckReceived OBJECT-TYPE
 	"ANSI T1.116.1D negAckReceived
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.9
 	 ITU-T Rec. Q.751.1 (10/95) : negAckReceived."
-    ::= { mtpSlL2Int5minEntry 6 }
+    ::= { mtpOmSlL2Int5minEntry 6 }
 
-mtpSlL2Int5minTransmittedOctetsSIFSIO OBJECT-TYPE
+mtpOmSlL2Int5minTransmittedOctetsSIFSIO OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4634,9 +4638,9 @@ mtpSlL2Int5minTransmittedOctetsSIFSIO OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsSIFSIO
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.1
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsSIFSIO."
-    ::= { mtpSlL2Int5minEntry 7 }
+    ::= { mtpOmSlL2Int5minEntry 7 }
 
-mtpSlL2Int5minRetransmittedOctets OBJECT-TYPE
+mtpOmSlL2Int5minRetransmittedOctets OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4649,9 +4653,9 @@ mtpSlL2Int5minRetransmittedOctets OBJECT-TYPE
 	"ANSI T1.116.1D retransmittedOctets
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.2
 	 ITU-T Rec. Q.751.1 (10/95) : retransmittedOctets."
-    ::= { mtpSlL2Int5minEntry 8 }
+    ::= { mtpOmSlL2Int5minEntry 8 }
 
-mtpSlL2Int5minTransmittedMSUs OBJECT-TYPE
+mtpOmSlL2Int5minTransmittedMSUs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4664,9 +4668,9 @@ mtpSlL2Int5minTransmittedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D transmittedMSUs
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.3
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedMSUs."
-    ::= { mtpSlL2Int5minEntry 9 }
+    ::= { mtpOmSlL2Int5minEntry 9 }
 
-mtpSlL2Int5minReceivedOctetsSIFSIO OBJECT-TYPE
+mtpOmSlL2Int5minReceivedOctetsSIFSIO OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4676,9 +4680,9 @@ mtpSlL2Int5minReceivedOctetsSIFSIO OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsSIFSIO
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.4
 	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsSIFSIO."
-    ::= { mtpSlL2Int5minEntry 10 }
+    ::= { mtpOmSlL2Int5minEntry 10 }
 
-mtpSlL2Int5minReceivedMSUs OBJECT-TYPE
+mtpOmSlL2Int5minReceivedMSUs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4691,13 +4695,13 @@ mtpSlL2Int5minReceivedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D receivedMSUs
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.5
 	 ITU-T Rec. Q.751.1 (10/95) : receivedMSUs."
-    ::= { mtpSlL2Int5minEntry 11 }
+    ::= { mtpOmSlL2Int5minEntry 11 }
 
 
 -- ====================================================================
 
-mtpSlL2Int15minTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSlL2Int15minEntry
+mtpOmSlL2Int15minTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSlL2Int15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -4705,8 +4709,8 @@ mtpSlL2Int15minTable OBJECT-TYPE
 	 statistics."
     ::= { mtpOmSlStats 7 }
 
-mtpSlL2Int15minEntry OBJECT-TYPE
-    SYNTAX	MtpSlL2Int15minEntry
+mtpOmSlL2Int15minEntry OBJECT-TYPE
+    SYNTAX	MtpOmSlL2Int15minEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -4717,41 +4721,41 @@ mtpSlL2Int15minEntry OBJECT-TYPE
 	mtpSpId, -- shared index
 	mtpLsId, -- shared index
 	mtpSlSlCode, -- shared index
-	mtpSlL2Int15minInterval
+	mtpOmSlL2Int15minInterval
     }
-    ::= { mtpSlL2Int15minTable 1 }
+    ::= { mtpOmSlL2Int15minTable 1 }
 
-MtpSlL2Int15minEntry ::= SEQUENCE {
-    mtpSlL2Int15minInterval			Unsigned32,
-    mtpSlL2Int15minTimestamp			TimeStamp,
-    mtpSlL2Int15minSlInServiceDuration		PerfIntervalCount, -- Q.752, 1.1
-    mtpSlL2Int15minSlAlignment			PerfIntervalCount, -- Q.752, 1.7
-    mtpSlL2Int15minSignUnitsReceived		PerfIntervalCount, -- Q.752, 1.8
-    mtpSlL2Int15minNegAckReceived		PerfIntervalCount, -- Q.752, 1.9
-    mtpSlL2Int15minTransmittedOctetsSIFSIO	PerfIntervalCount, -- Q.752, 3.1
-    mtpSlL2Int15minRetransmittedOctets		PerfIntervalCount, -- Q.752, 3.2
-    mtpSlL2Int15minTransmittedMSUs		PerfIntervalCount, -- Q.752, 3.3
-    mtpSlL2Int15minReceivedOctetsSIFSIO		PerfIntervalCount, -- Q.752, 3.4
-    mtpSlL2Int15minReceivedMSUs			PerfIntervalCount  -- Q.752, 3.5
+MtpOmSlL2Int15minEntry ::= SEQUENCE {
+    mtpOmSlL2Int15minInterval			Unsigned32,
+    mtpOmSlL2Int15minTimestamp			TimeStamp,
+    mtpOmSlL2Int15minSlInServiceDuration	PerfIntervalCount, -- Q.752, 1.1
+    mtpOmSlL2Int15minSlAlignment		PerfIntervalCount, -- Q.752, 1.7
+    mtpOmSlL2Int15minSignUnitsReceived		PerfIntervalCount, -- Q.752, 1.8
+    mtpOmSlL2Int15minNegAckReceived		PerfIntervalCount, -- Q.752, 1.9
+    mtpOmSlL2Int15minTransmittedOctetsSIFSIO	PerfIntervalCount, -- Q.752, 3.1
+    mtpOmSlL2Int15minRetransmittedOctets	PerfIntervalCount, -- Q.752, 3.2
+    mtpOmSlL2Int15minTransmittedMSUs		PerfIntervalCount, -- Q.752, 3.3
+    mtpOmSlL2Int15minReceivedOctetsSIFSIO	PerfIntervalCount, -- Q.752, 3.4
+    mtpOmSlL2Int15minReceivedMSUs		PerfIntervalCount  -- Q.752, 3.5
 }
 
-mtpSlL2Int15minInterval OBJECT-TYPE
+mtpOmSlL2Int15minInterval OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL2Int15minEntry 1 }
+    ::= { mtpOmSlL2Int15minEntry 1 }
 
-mtpSlL2Int15minTimestamp OBJECT-TYPE
+mtpOmSlL2Int15minTimestamp OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSlL2Int15minEntry 2 }
+    ::= { mtpOmSlL2Int15minEntry 2 }
 
-mtpSlL2Int15minSlInServiceDuration OBJECT-TYPE
+mtpOmSlL2Int15minSlInServiceDuration OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4776,9 +4780,9 @@ mtpSlL2Int15minSlInServiceDuration OBJECT-TYPE
 	 ANSI T1.116.1/2000 Table 1 (1.1).
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.1
 	 ITU-T Rec. Q.751.1, (10/95) : slInServiceDuration."
-    ::= { mtpSlL2Int15minEntry 3 }
+    ::= { mtpOmSlL2Int15minEntry 3 }
 
-mtpSlL2Int15minSlAlignment OBJECT-TYPE
+mtpOmSlL2Int15minSlAlignment OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4791,9 +4795,9 @@ mtpSlL2Int15minSlAlignment OBJECT-TYPE
 	"ANSI T1.116.1D slAlignment
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.7
 	 ITU-T Rec. Q.751.1 (10/95) : slAlignment."
-    ::= { mtpSlL2Int15minEntry 4 }
+    ::= { mtpOmSlL2Int15minEntry 4 }
 
-mtpSlL2Int15minSignUnitsReceived OBJECT-TYPE
+mtpOmSlL2Int15minSignUnitsReceived OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4806,9 +4810,9 @@ mtpSlL2Int15minSignUnitsReceived OBJECT-TYPE
 	"ANSI T1.116.1D signUnitsReceived
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.8
 	 ITU-T Rec. Q.751.1 (10/95) : signUnitsReceived."
-    ::= { mtpSlL2Int15minEntry 5 }
+    ::= { mtpOmSlL2Int15minEntry 5 }
 
-mtpSlL2Int15minNegAckReceived OBJECT-TYPE
+mtpOmSlL2Int15minNegAckReceived OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4820,9 +4824,9 @@ mtpSlL2Int15minNegAckReceived OBJECT-TYPE
 	"ANSI T1.116.1D negAckReceived
 	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.9
 	 ITU-T Rec. Q.751.1 (10/95) : negAckReceived."
-    ::= { mtpSlL2Int15minEntry 6 }
+    ::= { mtpOmSlL2Int15minEntry 6 }
 
-mtpSlL2Int15minTransmittedOctetsSIFSIO OBJECT-TYPE
+mtpOmSlL2Int15minTransmittedOctetsSIFSIO OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4836,9 +4840,9 @@ mtpSlL2Int15minTransmittedOctetsSIFSIO OBJECT-TYPE
 	"ANSI T1.116.1D transmittedOctetsSIFSIO
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.1
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedOctetsSIFSIO."
-    ::= { mtpSlL2Int15minEntry 7 }
+    ::= { mtpOmSlL2Int15minEntry 7 }
 
-mtpSlL2Int15minRetransmittedOctets OBJECT-TYPE
+mtpOmSlL2Int15minRetransmittedOctets OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4851,9 +4855,9 @@ mtpSlL2Int15minRetransmittedOctets OBJECT-TYPE
 	"ANSI T1.116.1D retransmittedOctets
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.2
 	 ITU-T Rec. Q.751.1 (10/95) : retransmittedOctets."
-    ::= { mtpSlL2Int15minEntry 8 }
+    ::= { mtpOmSlL2Int15minEntry 8 }
 
-mtpSlL2Int15minTransmittedMSUs OBJECT-TYPE
+mtpOmSlL2Int15minTransmittedMSUs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4866,9 +4870,9 @@ mtpSlL2Int15minTransmittedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D transmittedMSUs
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.3
 	 ITU-T Rec. Q.751.1 (10/95) : transmittedMSUs."
-    ::= { mtpSlL2Int15minEntry 9 }
+    ::= { mtpOmSlL2Int15minEntry 9 }
 
-mtpSlL2Int15minReceivedOctetsSIFSIO OBJECT-TYPE
+mtpOmSlL2Int15minReceivedOctetsSIFSIO OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4878,9 +4882,9 @@ mtpSlL2Int15minReceivedOctetsSIFSIO OBJECT-TYPE
 	"ANSI T1.116.1D receivedOctetsSIFSIO
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.4
 	 ITU-T Rec. Q.751.1 (10/95) : receivedOctetsSIFSIO."
-    ::= { mtpSlL2Int15minEntry 10 }
+    ::= { mtpOmSlL2Int15minEntry 10 }
 
-mtpSlL2Int15minReceivedMSUs OBJECT-TYPE
+mtpOmSlL2Int15minReceivedMSUs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     MAX-ACCESS	read-only
     STATUS	current
@@ -4893,13 +4897,13 @@ mtpSlL2Int15minReceivedMSUs OBJECT-TYPE
 	"ANSI T1.116.1D receivedMSUs
 	 ITU-T Rec. Q.752, (1997) : Table 3/Q.752 3.5
 	 ITU-T Rec. Q.751.1 (10/95) : receivedMSUs."
-    ::= { mtpSlL2Int15minEntry 11 }
+    ::= { mtpOmSlL2Int15minEntry 11 }
 
 
 -- ====================================================================
 
-mtpSdtStatsTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSdtStatsEntry
+mtpOmSdtStatsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSdtStatsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -4907,8 +4911,8 @@ mtpSdtStatsTable OBJECT-TYPE
 	 associated with signalling terminals."
     ::= { mtpOmSdtStats 1 }
 
-mtpSdtStatsEntry OBJECT-TYPE
-    SYNTAX	MtpSdtStatsEntry
+mtpOmSdtStatsEntry OBJECT-TYPE
+    SYNTAX	MtpOmSdtStatsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -4931,36 +4935,36 @@ mtpSdtStatsEntry OBJECT-TYPE
     AUGMENTS	{
 	mtpSdtEntry
     }
-    ::= { mtpSdtStatsTable 1 }
+    ::= { mtpOmSdtStatsTable 1 }
 
-MtpSdtStatsEntry ::= SEQUENCE {
-    mtpSdtStatsTxBytes				Counter32,
-    mtpSdtStatsTxSus				Counter32,
-    mtpSdtStatsTxSusRepeated			Counter32,
-    mtpSdtStatsTxUnderruns			Counter32,
-    mtpSdtStatsTxAborts				Counter32,
-    mtpSdtStatsTxBufferOverflows		Counter32,
-    mtpSdtStatsTxSusInError			Counter32,
-    mtpSdtStatsRxBytes				Counter32,
-    mtpSdtStatsRxSusCompressed			Counter32,
-    mtpSdtStatsRxOverruns			Counter32,
-    mtpSdtStatsRxAborts				Counter32,
-    mtpSdtStatsRxBufferOverflows		Counter32,
-    mtpSdtStatsRxSusInError			Counter32,
-    mtpSdtStatsRxSyncTransitions		Counter32,
-    mtpSdtStatsRxBitsOctetCounted		Counter32,
-    mtpSdtStatsRxCrcErrors			Counter32,
-    mtpSdtStatsRxFrameErrors			Counter32,
-    mtpSdtStatsRxFrameOverflows			Counter32,
-    mtpSdtStatsRxFrameTooLong			Counter32,
-    mtpSdtStatsRxFrameTooShort			Counter32,
-    mtpSdtStatsRxResidueErrors			Counter32,
-    mtpSdtStatsCarrierCtsLost			Counter32,
-    mtpSdtStatsCarrierDcdLost			Counter32,
-    mtpSdtStatsCarrierLost			Counter32
+MtpOmSdtStatsEntry ::= SEQUENCE {
+    mtpOmSdtStatsTxBytes			Counter32,
+    mtpOmSdtStatsTxSus				Counter32,
+    mtpOmSdtStatsTxSusRepeated			Counter32,
+    mtpOmSdtStatsTxUnderruns			Counter32,
+    mtpOmSdtStatsTxAborts			Counter32,
+    mtpOmSdtStatsTxBufferOverflows		Counter32,
+    mtpOmSdtStatsTxSusInError			Counter32,
+    mtpOmSdtStatsRxBytes			Counter32,
+    mtpOmSdtStatsRxSusCompressed		Counter32,
+    mtpOmSdtStatsRxOverruns			Counter32,
+    mtpOmSdtStatsRxAborts			Counter32,
+    mtpOmSdtStatsRxBufferOverflows		Counter32,
+    mtpOmSdtStatsRxSusInError			Counter32,
+    mtpOmSdtStatsRxSyncTransitions		Counter32,
+    mtpOmSdtStatsRxBitsOctetCounted		Counter32,
+    mtpOmSdtStatsRxCrcErrors			Counter32,
+    mtpOmSdtStatsRxFrameErrors			Counter32,
+    mtpOmSdtStatsRxFrameOverflows		Counter32,
+    mtpOmSdtStatsRxFrameTooLong			Counter32,
+    mtpOmSdtStatsRxFrameTooShort		Counter32,
+    mtpOmSdtStatsRxResidueErrors		Counter32,
+    mtpOmSdtStatsCarrierCtsLost			Counter32,
+    mtpOmSdtStatsCarrierDcdLost			Counter32,
+    mtpOmSdtStatsCarrierLost			Counter32
 }
 
-mtpSdtStatsTxBytes OBJECT-TYPE
+mtpOmSdtStatsTxBytes OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Octets"
     MAX-ACCESS	read-only
@@ -4971,9 +4975,9 @@ mtpSdtStatsTxBytes OBJECT-TYPE
 	 normal operation.  When this count does not increase, it means 
 	 that the transmitters are not transmitting data."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 1 }
+    ::= { mtpOmSdtStatsEntry 1 }
 
-mtpSdtStatsTxSus OBJECT-TYPE
+mtpOmSdtStatsTxSus OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Signal Units"
     MAX-ACCESS	read-only
@@ -4985,9 +4989,9 @@ mtpSdtStatsTxSus OBJECT-TYPE
 	 count does not increase, it means that the signalling terminal 
 	 is not transmitting SUs."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 2 }
+    ::= { mtpOmSdtStatsEntry 2 }
 
-mtpSdtStatsTxSusRepeated OBJECT-TYPE
+mtpOmSdtStatsTxSusRepeated OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Signal Units"
     MAX-ACCESS	read-only
@@ -5003,9 +5007,9 @@ mtpSdtStatsTxSusRepeated OBJECT-TYPE
 	 for this count to not increase when the line is busy (activiely 
 	 carrying a significant traffic load of MSUs."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 3 }
+    ::= { mtpOmSdtStatsEntry 3 }
 
-mtpSdtStatsTxUnderruns OBJECT-TYPE
+mtpOmSdtStatsTxUnderruns OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5019,9 +5023,9 @@ mtpSdtStatsTxUnderruns OBJECT-TYPE
 	 initialized for the first time.  Large counts here represent a 
 	 significant problem."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 4 }
+    ::= { mtpOmSdtStatsEntry 4 }
 
-mtpSdtStatsTxAborts OBJECT-TYPE
+mtpOmSdtStatsTxAborts OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5033,9 +5037,9 @@ mtpSdtStatsTxAborts OBJECT-TYPE
 	 zero.  A significant number here represents a heavy testing or 
 	 a significant problem."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 5 }
+    ::= { mtpOmSdtStatsEntry 5 }
 
-mtpSdtStatsTxBufferOverflows OBJECT-TYPE
+mtpOmSdtStatsTxBufferOverflows OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5050,9 +5054,9 @@ mtpSdtStatsTxBufferOverflows OBJECT-TYPE
 	 There should be no counts in this item.  A significant number 
 	 here would represent a significant problem."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 6 }
+    ::= { mtpOmSdtStatsEntry 6 }
 
-mtpSdtStatsTxSusInError OBJECT-TYPE
+mtpOmSdtStatsTxSusInError OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Signal Units"
     MAX-ACCESS	read-only
@@ -5064,9 +5068,9 @@ mtpSdtStatsTxSusInError OBJECT-TYPE
 	 low or zero.  A significant number here reflects heavy testing 
 	 or a significant error."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 7 }
+    ::= { mtpOmSdtStatsEntry 7 }
 
-mtpSdtStatsRxBytes OBJECT-TYPE
+mtpOmSdtStatsRxBytes OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Octets"
     MAX-ACCESS	read-only
@@ -5076,9 +5080,9 @@ mtpSdtStatsRxBytes OBJECT-TYPE
 	 terminal from the signalling data link.  This number should 
 	 increase rapidly under normal operation."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 8 }
+    ::= { mtpOmSdtStatsEntry 8 }
 
-mtpSdtStatsRxSusCompressed OBJECT-TYPE
+mtpOmSdtStatsRxSusCompressed OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Signal Units"
     MAX-ACCESS	read-only
@@ -5091,9 +5095,9 @@ mtpSdtStatsRxSusCompressed OBJECT-TYPE
 	 increase rapidly during normal operation when the line is idle 
 	 (e.g. it is idling FISUs)."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 9 }
+    ::= { mtpOmSdtStatsEntry 9 }
 
-mtpSdtStatsRxOverruns OBJECT-TYPE
+mtpOmSdtStatsRxOverruns OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5111,9 +5115,9 @@ mtpSdtStatsRxOverruns OBJECT-TYPE
 	 link.  A significant number here would represent a significant 
 	 problem."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 10 }
+    ::= { mtpOmSdtStatsEntry 10 }
 
-mtpSdtStatsRxAborts OBJECT-TYPE
+mtpOmSdtStatsRxAborts OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5130,9 +5134,9 @@ mtpSdtStatsRxAborts OBJECT-TYPE
 	 link an increasing count here represends a problem with the 
 	 facility or a problem with the remote signalling terminal."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 11 }
+    ::= { mtpOmSdtStatsEntry 11 }
 
-mtpSdtStatsRxBufferOverflows OBJECT-TYPE
+mtpOmSdtStatsRxBufferOverflows OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5149,9 +5153,9 @@ mtpSdtStatsRxBufferOverflows OBJECT-TYPE
 	 occur.  An increasing number here represents a serious 
 	 problem."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 12 }
+    ::= { mtpOmSdtStatsEntry 12 }
 
-mtpSdtStatsRxSusInError OBJECT-TYPE
+mtpOmSdtStatsRxSusInError OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Signal Units"
     MAX-ACCESS	read-only
@@ -5168,9 +5172,9 @@ mtpSdtStatsRxSusInError OBJECT-TYPE
     REFERENCE
 	"Q.751.1, ANSI T1.116.1, Table 1/1.8"
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 13 }
+    ::= { mtpOmSdtStatsEntry 13 }
 
-mtpSdtStatsRxSyncTransitions OBJECT-TYPE
+mtpOmSdtStatsRxSyncTransitions OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5190,9 +5194,9 @@ mtpSdtStatsRxSyncTransitions OBJECT-TYPE
 	 facility, an increasing number here would indicate a difficulty 
 	 with the remote signalling terminal."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 14 }
+    ::= { mtpOmSdtStatsEntry 14 }
 
-mtpSdtStatsRxBitsOctetCounted OBJECT-TYPE
+mtpOmSdtStatsRxBitsOctetCounted OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Bits"
     MAX-ACCESS	read-only
@@ -5208,9 +5212,9 @@ mtpSdtStatsRxBitsOctetCounted OBJECT-TYPE
 	 either be caused by a failed facility or by a serious problem 
 	 with the remote signalling terminal."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 15 }
+    ::= { mtpOmSdtStatsEntry 15 }
 
-mtpSdtStatsRxCrcErrors OBJECT-TYPE
+mtpOmSdtStatsRxCrcErrors OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5226,9 +5230,9 @@ mtpSdtStatsRxCrcErrors OBJECT-TYPE
 	 unlikely to affect flags.  A increasing or significant number 
 	 here indicates a noisy signalling data link."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 16 }
+    ::= { mtpOmSdtStatsEntry 16 }
 
-mtpSdtStatsRxFrameErrors OBJECT-TYPE
+mtpOmSdtStatsRxFrameErrors OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5237,9 +5241,9 @@ mtpSdtStatsRxFrameErrors OBJECT-TYPE
 	"This is the count of the number of frame errors in the received 
 	 bit stream."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 17 }
+    ::= { mtpOmSdtStatsEntry 17 }
 
-mtpSdtStatsRxFrameOverflows OBJECT-TYPE
+mtpOmSdtStatsRxFrameOverflows OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5247,9 +5251,9 @@ mtpSdtStatsRxFrameOverflows OBJECT-TYPE
     DESCRIPTION
 	""
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 18 }
+    ::= { mtpOmSdtStatsEntry 18 }
 
-mtpSdtStatsRxFrameTooLong OBJECT-TYPE
+mtpOmSdtStatsRxFrameTooLong OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Frames"
     MAX-ACCESS	read-only
@@ -5263,9 +5267,9 @@ mtpSdtStatsRxFrameTooLong OBJECT-TYPE
 	 hosting the signalling data link, a noisy signalilng data link, 
 	 or a serious problem with the remote signalling terminal."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 19 }
+    ::= { mtpOmSdtStatsEntry 19 }
 
-mtpSdtStatsRxFrameTooShort OBJECT-TYPE
+mtpOmSdtStatsRxFrameTooShort OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Frames"
     MAX-ACCESS	read-only
@@ -5278,9 +5282,9 @@ mtpSdtStatsRxFrameTooShort OBJECT-TYPE
 	 hosting the signalling data link, a noisy signalling data link 
 	 or a serious problem with the remote signalling terminal."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 20 }
+    ::= { mtpOmSdtStatsEntry 20 }
 
-mtpSdtStatsRxResidueErrors OBJECT-TYPE
+mtpOmSdtStatsRxResidueErrors OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Frames"
     MAX-ACCESS	read-only
@@ -5294,9 +5298,9 @@ mtpSdtStatsRxResidueErrors OBJECT-TYPE
 	 data link, or a serious problem with the remote signalling 
 	 terminal."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 21 }
+    ::= { mtpOmSdtStatsEntry 21 }
 
-mtpSdtStatsCarrierCtsLost OBJECT-TYPE
+mtpOmSdtStatsCarrierCtsLost OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5308,9 +5312,9 @@ mtpSdtStatsCarrierCtsLost OBJECT-TYPE
 	 modem or channel bank providing access to the signalling data 
 	 link over the V.35 interface."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 22 }
+    ::= { mtpOmSdtStatsEntry 22 }
 
-mtpSdtStatsCarrierDcdLost OBJECT-TYPE
+mtpOmSdtStatsCarrierDcdLost OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5322,9 +5326,9 @@ mtpSdtStatsCarrierDcdLost OBJECT-TYPE
 	 the modem or channel bank providing access to the signalling 
 	 data link over the V.35 interface."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 23 }
+    ::= { mtpOmSdtStatsEntry 23 }
 
-mtpSdtStatsCarrierLost OBJECT-TYPE
+mtpOmSdtStatsCarrierLost OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Events"
     MAX-ACCESS	read-only
@@ -5335,13 +5339,13 @@ mtpSdtStatsCarrierLost OBJECT-TYPE
 	 field indicates that there is a problem with syncrhonization of 
 	 the group carrier containing the signalling data link."
     DEFVAL { 0 }
-    ::= { mtpSdtStatsEntry 24 }
+    ::= { mtpOmSdtStatsEntry 24 }
 
 
 -- ====================================================================
 
-mtpSdlStatsTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF MtpSdlStatsEntry
+mtpOmSdlStatsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MtpOmSdlStatsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -5349,8 +5353,8 @@ mtpSdlStatsTable OBJECT-TYPE
 	 associated with signalling data links."
     ::= { mtpOmSdlStats 1 }
 
-mtpSdlStatsEntry OBJECT-TYPE
-    SYNTAX	MtpSdlStatsEntry
+mtpOmSdlStatsEntry OBJECT-TYPE
+    SYNTAX	MtpOmSdlStatsEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -5373,22 +5377,22 @@ mtpSdlStatsEntry OBJECT-TYPE
     AUGMENTS	{
 	mtpSdlEntry
     }
-    ::= { mtpSdlStatsTable 1 }
+    ::= { mtpOmSdlStatsTable 1 }
 
-MtpSdlStatsEntry ::= SEQUENCE {
-    mtpSdlStatsRxOctets				Counter32,
-    mtpSdlStatsTxOctets				Counter32,
-    mtpSdlStatsRXOverruns			Counter32,
-    mtpSdlStatsTxUnderruns			Counter32,
-    mtpSdlStatsRxBufferOverflows		Counter32,
-    mtpSdlStatsTxBufferOverflows		Counter32,
-    mtpSdlStatsLeadCtsLost			Counter32,
-    mtpSdlStatsLeadDcdLost			Counter32,
-    mtpSdlStatsCarrierLost			Counter32,
-    mtpSdlStatsBipolarViolations		Counter32
+MtpOmSdlStatsEntry ::= SEQUENCE {
+    mtpOmSdlStatsRxOctets			Counter32,
+    mtpOmSdlStatsTxOctets			Counter32,
+    mtpOmSdlStatsRXOverruns			Counter32,
+    mtpOmSdlStatsTxUnderruns			Counter32,
+    mtpOmSdlStatsRxBufferOverflows		Counter32,
+    mtpOmSdlStatsTxBufferOverflows		Counter32,
+    mtpOmSdlStatsLeadCtsLost			Counter32,
+    mtpOmSdlStatsLeadDcdLost			Counter32,
+    mtpOmSdlStatsCarrierLost			Counter32,
+    mtpOmSdlStatsBipolarViolations		Counter32
 }
 
-mtpSdlStatsRxOctets OBJECT-TYPE
+mtpOmSdlStatsRxOctets OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Octets"
     MAX-ACCESS	read-only
@@ -5402,9 +5406,9 @@ mtpSdlStatsRxOctets OBJECT-TYPE
 	 verifying the bit rate of the signalling data link.  During 
 	 normal operation, this column should increase at a fixe rate 
 	 equal to the bit rate of the signalling data link."
-    ::= { mtpSdlStatsEntry 1 }
+    ::= { mtpOmSdlStatsEntry 1 }
 
-mtpSdlStatsTxOctets OBJECT-TYPE
+mtpOmSdlStatsTxOctets OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Octets"
     MAX-ACCESS	read-only
@@ -5419,9 +5423,9 @@ mtpSdlStatsTxOctets OBJECT-TYPE
 	 link.  During normal operation, this column should increase at 
 	 a fixed rate equal to the bit rate of the signalling data 
 	 link."
-    ::= { mtpSdlStatsEntry 2 }
+    ::= { mtpOmSdlStatsEntry 2 }
 
-mtpSdlStatsRXOverruns OBJECT-TYPE
+mtpOmSdlStatsRXOverruns OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Occurences"
     MAX-ACCESS	read-only
@@ -5439,9 +5443,9 @@ mtpSdlStatsRXOverruns OBJECT-TYPE
 	 latencies in some device driver which is performing too many 
 	 functions with interrupts suppressed.  (Or the CPU is just too 
 	 slow.)"
-    ::= { mtpSdlStatsEntry 3 }
+    ::= { mtpOmSdlStatsEntry 3 }
 
-mtpSdlStatsTxUnderruns OBJECT-TYPE
+mtpOmSdlStatsTxUnderruns OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Occurences"
     MAX-ACCESS	read-only
@@ -5458,9 +5462,9 @@ mtpSdlStatsTxUnderruns OBJECT-TYPE
 	 are significant latencies in some device driver which is 
 	 performing too many functions with interrupts suppressed.  (Or 
 	 the CPU is just too slow.)"
-    ::= { mtpSdlStatsEntry 4 }
+    ::= { mtpOmSdlStatsEntry 4 }
 
-mtpSdlStatsRxBufferOverflows OBJECT-TYPE
+mtpOmSdlStatsRxBufferOverflows OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Occurences"
     MAX-ACCESS	read-only
@@ -5478,18 +5482,18 @@ mtpSdlStatsRxBufferOverflows OBJECT-TYPE
 	 are significant latencies in some device driver which is 
 	 performing too many functions with interrupts diabled.  (Or the 
 	 CPU is just too slow.)"
-    ::= { mtpSdlStatsEntry 5 }
+    ::= { mtpOmSdlStatsEntry 5 }
 
-mtpSdlStatsTxBufferOverflows OBJECT-TYPE
+mtpOmSdlStatsTxBufferOverflows OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Occurences"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
 	""
-    ::= { mtpSdlStatsEntry 6 }
+    ::= { mtpOmSdlStatsEntry 6 }
 
-mtpSdlStatsLeadCtsLost OBJECT-TYPE
+mtpOmSdlStatsLeadCtsLost OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Occurences"
     MAX-ACCESS	read-only
@@ -5500,9 +5504,9 @@ mtpSdlStatsLeadCtsLost OBJECT-TYPE
 	 significant number in this column indicates a problem with the 
 	 modem or channel bank providing access to the signalling data 
 	 link over the V.35 interface."
-    ::= { mtpSdlStatsEntry 7 }
+    ::= { mtpOmSdlStatsEntry 7 }
 
-mtpSdlStatsLeadDcdLost OBJECT-TYPE
+mtpOmSdlStatsLeadDcdLost OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Occurences"
     MAX-ACCESS	read-only
@@ -5513,9 +5517,9 @@ mtpSdlStatsLeadDcdLost OBJECT-TYPE
 	 A significant number in this column indicates a problemw tih 
 	 the modem or channel bank providing access to the signalling 
 	 data link over the V.35 interface."
-    ::= { mtpSdlStatsEntry 8 }
+    ::= { mtpOmSdlStatsEntry 8 }
 
-mtpSdlStatsCarrierLost OBJECT-TYPE
+mtpOmSdlStatsCarrierLost OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Occurences"
     MAX-ACCESS	read-only
@@ -5525,9 +5529,9 @@ mtpSdlStatsCarrierLost OBJECT-TYPE
 	 lost on a DS0/DS1 interface.  A significant number in this 
 	 field indicates that there is a problem with syncrhonization of 
 	 the group carrier containing the signalling data link."
-    ::= { mtpSdlStatsEntry 9 }
+    ::= { mtpOmSdlStatsEntry 9 }
 
-mtpSdlStatsBipolarViolations OBJECT-TYPE
+mtpOmSdlStatsBipolarViolations OBJECT-TYPE
     SYNTAX	Counter32
     UNITS	"Occurences"
     MAX-ACCESS	read-only
@@ -5535,7 +5539,7 @@ mtpSdlStatsBipolarViolations OBJECT-TYPE
     DESCRIPTION
 	"This is the count of the number of bipolar violations received 
 	 on a T1, J1 or E1 carrier."
-    ::= { mtpSdlStatsEntry 10 }
+    ::= { mtpOmSdlStatsEntry 10 }
 
 -- ==========================================================================
 -- SCALARS
@@ -5549,13 +5553,13 @@ mtpOm1stAndIntervalActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 first-and-interval basis are marked as obligatory but requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object corresponding to the PerfCurrentCount for the 
-	 measurement will activate the first-and-interval measurement if 
-	 not already activated.  When the object cannot be activated, an 
-	 SNMP error will be returned.
+	 object corresponding to the Counter32 for the measurement will 
+	 activate the first-and-interval measurement if not already 
+	 activated.  When the object cannot be activated, an SNMP error 
+	 will be returned.
 	 
 	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
+	 attempting to read its PerfValue.  This is because these 
 	 texutal conventions will return an error ('wrong value') if the 
 	 particular columnar object is not activated (the data collected 
 	 is invalid or missing).
@@ -5578,13 +5582,13 @@ mtpOm1stAndIntervalDeactivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 first-and-interval basis are marked as obligatory but requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object corresponding to the PerfCurrentCount for the 
-	 measurement will deactivate the first-and-interval measurement 
-	 if not already activated.  When the object cannot be 
-	 deactivated, an SNMP error will be returned.
+	 object corresponding to the Counter32 for the measurement will 
+	 deactivate the first-and-interval measurement if not already 
+	 activated.  When the object cannot be deactivated, an SNMP 
+	 error will be returned.
 	 
 	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
+	 attempting to read its PerfValue.  This is because these 
 	 texutal conventions will return an error if they particular 
 	 columnar object is not activated (the data collected is invalid 
 	 or missing).
@@ -5607,13 +5611,13 @@ mtpOm5MinActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 5-minute basis are marked as obligatory by requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object coresponding to the PerfCurrentCount for the measurement 
-	 will activate the 5-minute measurement if not already 
-	 activated.  When the object cannot be activated, an SNMP error 
-	 will be returned.
+	 object coresponding to the Counter32 for the measurement will 
+	 activate the 5-minute measurement if not already activated.  
+	 When the object cannot be activated, an SNMP error will be 
+	 returned.
 	 
 	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
+	 attempting to read its PerfValue.  This is because these 
 	 texutal conventions will return an error if they particular 
 	 columnar object is not activated (the data collected is invalid 
 	 or missing)."
@@ -5629,13 +5633,13 @@ mtpOm5MinDeaActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 5-minute basis are marked as obligatory by requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object coresponding to the PerfCurrentCount for the measurement 
-	 will deactivate the 5-minute measurement if not already 
-	 deactivated.  When the object cannot be deactivated, an SNMP 
-	 error will be returned.
+	 object coresponding to the Counter32 for the measurement will 
+	 deactivate the 5-minute measurement if not already deactivated.  
+	 When the object cannot be deactivated, an SNMP error will be 
+	 returned.
 
 	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
+	 attempting to read its PerfValue.  This is because these 
 	 texutal conventions will return an error if they particular 
 	 columnar object is not activated (the data collected is invalid 
 	 or missing)."
@@ -5651,13 +5655,13 @@ mtpOm15MinActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 15-minute basis are marked as obligatory by requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object coresponding to the PerfCurrentCount for the measurement 
-	 will activate the 15-minute measurement if not already 
-	 activated.  When the object cannot be activated, an SNMP error 
-	 will be returned.
+	 object coresponding to the Counter32 for the measurement will 
+	 activate the 15-minute measurement if not already activated.  
+	 When the object cannot be activated, an SNMP error will be 
+	 returned.
 	 
 	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
+	 attempting to read its PerfValue.  This is because these 
 	 texutal conventions will return an error if they particular 
 	 columnar object is not activated (the data collected is invalid 
 	 or missing)."
@@ -5673,13 +5677,13 @@ mtpOm15MinDeaActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 15-minute basis are marked as obligatory by requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object coresponding to the PerfCurrentCount for the measurement 
-	 will deactivate the 15-minute measurement if not already 
+	 object coresponding to the Counter32 for the measurement will 
+	 deactivate the 15-minute measurement if not already 
 	 deactivated.  When the object cannot be deactivated, an SNMP 
 	 error will be returned.
 	 
 	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
+	 attempting to read its PerfValue.  This is because these 
 	 texutal conventions will return an error if they particular 
 	 columnar object is not activated (the data collected is invalid 
 	 or missing)."

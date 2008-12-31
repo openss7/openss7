@@ -1,0 +1,3824 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-SL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+    Unsigned32, zeroDotZero
+	    FROM SNMPv2-SMI
+
+    RowPointer, RowStatus, TimeInterval, TruthValue
+	FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+	FROM SNMPv2-CONF
+
+    MtpResultOfAction, MtpCongestionLevel, NetworkPointCode, 
+    MtpTransmissionRate
+	FROM OPENSS7-MTP-MIB
+
+    Ss7ProtocolVariant
+	FROM OPENSS7-SS7-MIB
+
+    AdministrativeState, AvailabilityStatus, OperationalState, 
+    ProceduralStatus, SimpleNameType, UsageState
+	FROM OPENSS7-SMI-MIB
+
+    CircuitCode, CircuitIdentificationCode, MilliSeconds, 
+    CommonLanguageName
+	FROM OPENSS7-TC
+
+    openss7, openss7Q, openss7Q751
+	FROM OPENSS7-SMI;
+
+slMIB MODULE-IDENTITY
+    LAST-UPDATED	"200812300356Z"
+    ORGANIZATION	"The OpenSS7 Project"
+    CONTACT-INFO
+	"Brian Bidulock
+	 OpenSS7 Corporation
+	 1469 Jefferys Crescent
+	 Edmonton, Alberta  T6L 6T1
+	 CANADA
+	 Tel: +1 780 490 1141
+	 Fax: +1 780 490 1241
+	 Mob: +1 780 953 0557
+	 mailto:bidulock@openss7.org"
+    DESCRIPTION	
+	""
+    REVISION	"200812300356Z"
+    DESCRIPTION	
+	"First release of this module."
+    ::= { openss7Q751 1 2 }
+
+ -- top level organization of the MIB
+
+slNotifications		OBJECT IDENTIFIER ::= { slMIB		 0 }
+slObjects		OBJECT IDENTIFIER ::= { slMIB		 1 }
+slConformance		OBJECT IDENTIFIER ::= { slMIB		 2 }
+
+slTables		OBJECT IDENTIFIER ::= { slObjects	 1 }
+slScalars		OBJECT IDENTIFIER ::= { slObjects	 2 }
+slNotifs		OBJECT IDENTIFIER ::= { slObjects	 3 }
+slOids			OBJECT IDENTIFIER ::= { slObjects	 4 }
+
+slGroups		OBJECT IDENTIFIER ::= { slConformance	 1 }
+slCompliance		OBJECT IDENTIFIER ::= { slConformance	 2 }
+slCapabilities		OBJECT IDENTIFIER ::= { slConformance	 3 }
+
+slDefaults		OBJECT IDENTIFIER ::= { slScalars	 1 }
+
+slProtocols		OBJECT IDENTIFIER ::= { slOids		 1 }
+slProbableCauses	OBJECT IDENTIFIER ::= { slOids		 2 }
+slSpecificProblems	OBJECT IDENTIFIER ::= { slOids		 3 }
+slExtensions		OBJECT IDENTIFIER ::= { slOids		 4 }
+
+slSl			OBJECT IDENTIFIER ::= { slTables	 1 }
+slSdt			OBJECT IDENTIFIER ::= { slTables	 2 }
+slSdl			OBJECT IDENTIFIER ::= { slTables	 3 }
+
+-- =============================================================================
+
+-- (1.3.6.1.4.1.29591.17.751.1.2) slMIB
+-- |__(0) slNotifications
+-- |
+-- |__(1) slObjects
+-- |  |__(1) slTables
+-- |  |  |__( 1) slSl
+-- |  |  |  |__( 1) slProfileTable
+-- |  |  |  |  |__( 1) slProfileEntry
+-- |  |  |  |     |__( 1) slProfileId
+-- |  |  |  |     |__( 2) slProfileTransmissionRate
+-- |  |  |  |     |__( 3) slProfileProtocolVariant
+-- |  |  |  |     |__( 4) slProfileErrorCorrectionMethod
+-- |  |  |  |     |__( 5) slProfileTimerT1
+-- |  |  |  |     |__( 6) slProfileTimerT2
+-- |  |  |  |     |__( 7) slProfileTimerT2L
+-- |  |  |  |     |__( 8) slProfileTimerT2H
+-- |  |  |  |     |__( 9) slProfileTimerT3
+-- |  |  |  |     |__(10) slProfileTimerT4N
+-- |  |  |  |     |__(11) slProfileTimerT4E
+-- |  |  |  |     |__(12) slProfileTimerT5
+-- |  |  |  |     |__(13) slProfileTimerT6
+-- |  |  |  |     |__(14) slProfileTimerT7
+-- |  |  |  |     |__(15) slProfileTbOnset1
+-- |  |  |  |     |__(16) slProfileTbAbate1
+-- |  |  |  |     |__(17) slProfileNumberOfThresholdLevels
+-- |  |  |  |     |__(18) slProfileCongestionCounting
+-- |  |  |  |     |__(19) slProfileCongestionReportingBaseObject
+-- |  |  |  |     |__(20) slProfileLoopDelay
+-- |  |  |  |     |__(21) slProfileName
+-- |  |  |  |     |__(22) slProfileTbOnset2
+-- |  |  |  |     |__(23) slProfileTbAbate2
+-- |  |  |  |     |__(24) slProfileTbOnset3
+-- |  |  |  |     |__(25) slProfileTbAbate3
+-- |  |  |  |     |__(26) slProfileTbDiscard1
+-- |  |  |  |     |__(27) slProfileTbDiscard2
+-- |  |  |  |     |__(28) slProfileTbDiscard3
+-- |  |  |  |     |__(29) slProfileTimerTx
+-- |  |  |  |     |__(30) slProfileTimerTy
+-- |  |  |  |     |__(31) slProfileNumberOfCongestionStates
+-- |  |  |  |     |__(32) slProfileInitialLevelOfCongestion
+-- |  |  |  |     |__(33) slProfileMaxMSUsRetransN1
+-- |  |  |  |     |__(34) slProfileMaxOctRetransN2
+-- |  |  |  |     |__(35) slProfileReceiveCongestionThresholdOnset
+-- |  |  |  |     |__(36) slProfileReceiveCongestionThresholdAbate
+-- |  |  |  |     |__(37) slProfileReceiveCongestionThresholdDiscard
+-- |  |  |  |     |__(38) slProfileM
+-- |  |  |  |     |__(39) slProfileRowStatus
+-- |  |  |  |
+-- |  |  |  |__( 2) slTable
+-- |  |  |  |  |__( 1) slEntry
+-- |  |  |  |     |__( 1) slId
+-- |  |  |  |     |__( 2) slMaxCapacitySL
+-- |  |  |  |     |__( 3) slProceduralStatus
+-- |  |  |  |     |__( 4) slProfilePointer
+-- |  |  |  |     |__( 5) slSignTermPointer
+-- |  |  |  |     |__( 6) slSignDataLinkTpPointer
+-- |  |  |  |     |__( 7) slReplaceSt
+-- |  |  |  |     |__( 8) slCongestionLevel
+-- |  |  |  |     |__( 9) slRelatedLinkGroupNumber
+-- |  |  |  |     |__(10) slSdlList
+-- |  |  |  |     |__(11) slName
+-- |  |  |  |     |__(12) slSdtList
+-- |  |  |  |     |__(13) slRowStatus
+-- |  |  |  |
+-- |  |  |  |__( 3) slSdlListTable
+-- |  |  |  |  |__( 1) slSdlListEntry
+-- |  |  |  |     |__( 1) slSdlListId
+-- |  |  |  |     |__( 2) slSdlListPointer
+-- |  |  |  |     |__( 3) slSdlListRowStatus
+-- |  |  |  |
+-- |  |  |  |__( 4) slSdtListTable
+-- |  |  |     |__( 1) slSdtListEntry
+-- |  |  |        |__( 1) slSdtListId
+-- |  |  |        |__( 2) slSdtListPointer
+-- |  |  |        |__( 3) slSdtListRowStatus
+-- |  |  |
+-- |  |  |__( 2) slSdt
+-- |  |  |  |__( 1) slNbTable
+-- |  |  |  |  |__( 1) slNbEntry
+-- |  |  |  |     |__( 1) slSdtProfileId
+-- |  |  |  |     |__( 2) slNbTransmissionRate
+-- |  |  |  |     |__( 3) slNbTimerT8
+-- |  |  |  |     |__( 4) slNbTin
+-- |  |  |  |     |__( 5) slNbTie
+-- |  |  |  |     |__( 6) slNbT
+-- |  |  |  |     |__( 7) slNbD
+-- |  |  |  |     |__( 8) slNbTe
+-- |  |  |  |     |__( 9) slNbDe
+-- |  |  |  |     |__(10) slNbUe
+-- |  |  |  |     |__(11) slNbN
+-- |  |  |  |     |__(12) slNbm
+-- |  |  |  |     |__(13) slNbb
+-- |  |  |  |     |__(14) slNbf
+-- |  |  |  |     |__(15) slNbRowStatus
+-- |  |  |  |
+-- |  |  |  |__( 2) slSaalTable
+-- |  |  |  |  |__( 1) slSaalEntry
+-- |  |  |  |     |__( 1) slSaalBufferRelease
+-- |  |  |  |     |__( 2) slSaalMaxCc
+-- |  |  |  |     |__( 3) slSaalMaxNrp
+-- |  |  |  |     |__( 4) slSaalMaxInformationFieldLength
+-- |  |  |  |     |__( 5) slSaalMaxLengthSscopUuField
+-- |  |  |  |     |__( 6) slSaalMaxPd
+-- |  |  |  |     |__( 7) slSaalMaxSscopCreditToPeer
+-- |  |  |  |     |__( 8) slSaalMaxStat
+-- |  |  |  |     |__( 9) slSaalN1
+-- |  |  |  |     |__(10) slSaalNniLayerManagementProvingState
+-- |  |  |  |     |__(11) slSaalNniLayerManagementTimerNoCredit
+-- |  |  |  |     |__(12) slSaalNniLayerManagementTimerRepeatSrec
+-- |  |  |  |     |__(13) slSaalNniTimerT1
+-- |  |  |  |     |__(14) slSaalNniTimerT2
+-- |  |  |  |     |__(15) slSaalNniTimerT3
+-- |  |  |  |     |__(16) slSaalSscopTimerCc
+-- |  |  |  |     |__(17) slSaalSscopTimerIdle
+-- |  |  |  |     |__(18) slSaalSscopTimerKeepAlive
+-- |  |  |  |     |__(19) slSaalSscopTimerNoResponse
+-- |  |  |  |     |__(20) slSaalSscopTimerPoll
+-- |  |  |  |     |__(21) slSaalTransmissionRateIntervalLower
+-- |  |  |  |     |__(22) slSaalTransmissionRateIntervalUpper
+-- |  |  |  |     |__(23) slSaalEgressTransmissionRateIntervalLower
+-- |  |  |  |     |__(24) slSaalEgressTransmissionRateIntervalUpper
+-- |  |  |  |     |__(25) slSaalPollAfterRetransmission
+-- |  |  |  |     |__(26) slSaalRowStatus
+-- |  |  |  |
+-- |  |  |  |__( 3) slM2paTable
+-- |  |  |  |  |__( 1) slM2paEntry
+-- |  |  |  |     |__( 1) slM2paN1
+-- |  |  |  |     |__( 2) slM2paProving
+-- |  |  |  |     |__( 3) slM2paManagementProvingState
+-- |  |  |  |     |__( 4) slM2paLoopDelayLower
+-- |  |  |  |     |__( 5) slM2paLoopDelayUpper
+-- |  |  |  |     |__( 6) slM2paTransmissionRateIntervalLower
+-- |  |  |  |     |__( 7) slM2paTransmissionRateIntervalUpper
+-- |  |  |  |     |__( 8) slM2paSctpNoDelay
+-- |  |  |  |     |__( 9) slM2paSctpMaxseg
+-- |  |  |  |     |__(10) slM2paSctpHeartbeatItvl
+-- |  |  |  |     |__(11) slM2paSctpHeartbeat
+-- |  |  |  |     |__(12) slM2paSctpRtoInitial
+-- |  |  |  |     |__(13) slM2paSctpRtoMin
+-- |  |  |  |     |__(14) slM2paSctpRtoMax
+-- |  |  |  |     |__(15) slM2paSctpPathMaxRetrans
+-- |  |  |  |     |__(16) slM2paSctpCookieLife
+-- |  |  |  |     |__(17) slM2paSctpCookieInc
+-- |  |  |  |     |__(18) slM2paSctpMaxInitRetries
+-- |  |  |  |     |__(19) slM2paSctpMaxBurst
+-- |  |  |  |     |__(20) slM2paSctpAssocMaxRetrans
+-- |  |  |  |     |__(21) slM2paSctpSackDelay
+-- |  |  |  |     |__(22) slM2paSctpLifetime
+-- |  |  |  |     |__(23) slM2paProvingAttempts
+-- |  |  |  |     |__(24) slM2paRowStatus
+-- |  |  |  |
+-- |  |  |  |__( 4) slSdtNextIndex
+-- |  |  |  |__( 5) slSdtTable
+-- |  |  |     |__( 1) slSdtEntry
+-- |  |  |        |__( 1) slSdtId
+-- |  |  |        |__( 2) slSdtAdministrativeState
+-- |  |  |        |__( 3) slSdtOperationalState
+-- |  |  |        |__( 4) slSdtUsageState
+-- |  |  |        |__( 5) slSdtProceduralStatus
+-- |  |  |        |__( 6) slSdtAvailabilityStatus
+-- |  |  |        |__( 7) slSdtEquipmentPointer
+-- |  |  |        |__( 8) slSdtName
+-- |  |  |        |__( 9) slSdtProfilePointer
+-- |  |  |        |__(10) slSdtRowStatus
+-- |  |  |
+-- |  |  |__( 3) slSdl
+-- |  |     |__( 1) slSdlNextIndex
+-- |  |     |__( 2) slSdlTable
+-- |  |        |__( 1) slSdlEntry
+-- |  |           |__( 1) slSdlId
+-- |  |           |__( 2) slSdlAdjPc
+-- |  |           |__( 3) slSdlTransmissionRate
+-- |  |           |__( 4) slSdlLoopDelay
+-- |  |           |__( 5) slSdlOperationalState
+-- |  |           |__( 6) slSdlEquipmentPointer
+-- |  |           |__( 7) slSdlCIC
+-- |  |           |__( 8) slSdlName
+-- |  |           |__( 9) slSdlStmChannel
+-- |  |           |__(10) slSdlVcTTpPointer
+-- |  |           |__(11) slSdlRowStatus
+-- |  |
+-- |  |__(2) slScalars
+-- |  |  |__( 1) slDefaults
+-- |  |     |__( 1) slM2paDefaultSctpNoDelay
+-- |  |     |__( 2) slM2paDefaultSctpMaxseg
+-- |  |     |__( 3) slM2paDefaultSctpHeartbeatItvl
+-- |  |     |__( 4) slM2paDefaultSctpHeartbeat
+-- |  |     |__( 5) slM2paDefaultSctpRtoInitial
+-- |  |     |__( 6) slM2paDefaultSctpRtoMin
+-- |  |     |__( 7) slM2paDefaultSctpRtoMax
+-- |  |     |__( 8) slM2paDefaultSctpPathMaxRetrans
+-- |  |     |__( 9) slM2paDefaultSctpCookieLife
+-- |  |     |__(10) slM2paDefaultSctpCookieInc
+-- |  |     |__(11) slM2paDefaultSctpMaxInitRetries
+-- |  |     |__(12) slM2paDefaultSctpMaxBurst
+-- |  |     |__(13) slM2paDefaultSctpAssocMaxRetrans
+-- |  |     |__(14) slM2paDefaultSctpSackDelay
+-- |  |     |__(15) slM2paDefaultSctpLifetime
+-- |  |
+-- |  |__(3) slNotifs
+-- |  |
+-- |  |__(4) slOids
+-- |     |__( 1) slProtocols
+-- |     |  |__( 1) slProtocolItut
+-- |     |  |__( 2) slProtocolEtsi
+-- |     |  |__( 3) slProtocolAnsi
+-- |     |  |__( 4) slProtocolJttc
+-- |     |  |__( 5) slProtocolChin
+-- |     |  |__( 6) slProtocolPnoc
+-- |     |  |__( 7) slProtocolSing
+-- |     |  |__( 8) slProtocolSpan
+-- |     |
+-- |     |__( 2) slProbableCauses
+-- |     |
+-- |     |__( 3) slSpecificProblems
+-- |     |
+-- |     |__( 4) slExtensions
+-- |
+-- |__(2) slConformance
+--    |__(1) slGroups
+--    |
+--    |__(2) slCompliance
+--    |
+--    |__(3) slCapabilities
+
+-- =============================================================================
+
+slProfileTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlProfileEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides the MTP signalling link level 2 protocol profile 
+	 table.  This able contains MTP Level 2 protocol profiles for 
+	 various transmission rates."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     mtpL2ProtocolProfile MOC."
+    ::= { slSl 1 }
+
+slProfileEntry OBJECT-TYPE
+    SYNTAX	SlProfileEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides the MTP signalling link level 2 protocol profile 
+	 table entry.  Included in the entry is the transmission rate 
+	 which is applicable to the entry as well as the settings of the 
+	 various timer values and other fundamental protocol parameters.  
+	 Each entry can be referred to by index or by RowPointer.  When 
+	 a table refers to this one, the agent should ensure the 
+	 consistency of MTP SL values with the transmission rate of the 
+	 referencing table, and the MTP L3 protocol values associated 
+	 with the referenceing table."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     mtpL2ProtocolProfile MO."
+    INDEX	{
+	slProfileId,
+	slProfileTransmissionRate
+    }
+    ::= { slProfileTable 1 }
+
+SlProfileEntry ::= SEQUENCE {
+    slProfileId
+	SimpleNameType,
+    slProfileTransmissionRate
+	MtpTransmissionRate,
+    slProfileErrorCorrectionMethod
+	INTEGER,
+    slProfileProtocolVariant
+	Ss7ProtocolVariant,
+    slProfileTimerT1
+	TimeInterval,
+    slProfileTimerT2
+	TimeInterval,
+    slProfileTimerT2L
+	TimeInterval,
+    slProfileTimerT2H
+	TimeInterval,
+    slProfileTimerT3
+	TimeInterval,
+    slProfileTimerT4N
+	TimeInterval,
+    slProfileTimerT4E
+	TimeInterval,
+    slProfileTimerT5
+	TimeInterval,
+    slProfileTimerT6
+	TimeInterval,
+    slProfileTimerT7
+	TimeInterval,
+    slProfileTbOnset1
+	Unsigned32,
+    slProfileTbAbate1
+	Unsigned32,
+    slProfileNumberOfThresholdLevels
+	Unsigned32,
+    slProfileCongestionCounting
+	INTEGER,
+    slProfileCongestionReportingBaseObject
+	INTEGER,
+    slProfileLoopDelay
+	MilliSeconds,
+    slProfileName
+	SimpleNameType,
+    slProfileTbOnset2
+	Unsigned32,
+    slProfileTbAbate2
+	Unsigned32,
+    slProfileTbOnset3
+	Unsigned32,
+    slProfileTbAbate3
+	Unsigned32,
+    slProfileTbDiscard1
+	Unsigned32,
+    slProfileTbDiscard2
+	Unsigned32,
+    slProfileTbDiscard3
+	Unsigned32,
+    slProfileTimerTx
+	TimeInterval,
+    slProfileTimerTy
+	TimeInterval,
+    slProfileNumberOfCongestionStates
+	Unsigned32,
+    slProfileInitialLevelOfCongestion
+	Unsigned32,
+    slProfileMaxMSUsRetransN1
+	Unsigned32,
+    slProfileMaxOctRetransN2
+	Unsigned32,
+    slProfileReceiveCongestionThresholdOnset
+	Unsigned32,
+    slProfileReceiveCongestionThresholdAbate
+	Unsigned32,
+    slProfileReceiveCongestionThresholdDiscard
+	Unsigned32,
+    slProfileM
+	Unsigned32,
+    slProfileRowStatus
+	RowStatus
+}
+
+slProfileId OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	not-accessible -- index
+    STATUS	current
+    DESCRIPTION	
+	"Provides an index into the signalling link MTP Level 2 profile 
+	 table.  Rows in this table can be referred to using this index 
+	 or using the RowPointer pointer.  The index valud zero (0) has 
+	 special semantics: the zero index contains default default 
+	 values.  Other vendors requiring additional device specific 
+	 profile information can augment this table.
+	 
+	 Identifies a mtpL2ProtocolProfile instance within the 
+	 managedSwitching-element; this is an attribute type whose 
+	 distinguished value can be used as an RDN when naming an 
+	 instance of the mtpL2ProtocolProfile object class."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     mtpL2ProtocolProfileId attribute."
+    ::= { slProfileEntry 1 }
+
+slProfileTransmissionRate OBJECT-TYPE
+    SYNTAX	MtpTransmissionRate
+    MAX-ACCESS	not-accessible -- index
+    STATUS	current
+    DESCRIPTION	
+	""
+    REFERENCE	
+	"ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    ::= { slProfileEntry 2 }
+
+slProfileErrorCorrectionMethod OBJECT-TYPE
+    SYNTAX	INTEGER {
+	basicRetr(0), prevCyclRetr(1) }
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is used to specify the type of error-correction 
+	 the signalling link is using.
+	 
+	 - basicRetr(0), basic retransmission method;
+	 
+	 - prevCyclRetr(1), preventative cyclic retransmission method.
+	 
+	 Not all methods are applicable to all signalling links and all 
+	 implementations."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 errorCorrectionMethod attribute."
+    DEFVAL	{ 0 } -- basicRetr
+    ::= { slProfileEntry 3 }
+
+slProfileProtocolVariant OBJECT-TYPE
+    SYNTAX	Ss7ProtocolVariant
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Provides the SS7 protocol variant used by the signalling link.  
+	 The SS7 protocol variant can determine the presence of other 
+	 columns and their default or required values."
+    ::= { slProfileEntry 4 }
+
+slProfileTimerT1 OBJECT-TYPE
+    SYNTAX	TimeInterval (1290..60000)
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T1 timer.
+	 
+	 Q.703/T1.111.3: Level 2 timer 'Alignment ready'.
+	 
+	 Timeout interval T1.  This is the time interval that a 
+	 signalling link will await an MSU or FISU after sending an MSU 
+	 or FISU at the end of the initial alignment procedure.
+	 
+	 For modems, ITU-T specifies a range from 500 to 600 seconds 
+	 with a nominal value of 550 seconds.  For ds0, ITU-T specifies 
+	 a range from 40 to 50 seconds with a nominal value of 45 
+	 seconds.  For t1 and e1, ITU-T specifies a range of 25 to 350 
+	 seconds with a nomiinal value of 300 seconds.
+	 
+	 For ds0a and ds0, ANSI specifies a range from 12.9 to 16 
+	 seconds, with a nominal value of 13 seconds.  For t1, ANSI 
+	 specifies a range of 165 to 200 seconds with a nominal value of 
+	 170 seconds.
+	 
+	 It is the responsibility of the agent to enforce any necessary 
+	 bounds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), l2TimerT1 
+	     attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1.
+	 ITU-T Rec. Q.703, ANSI T1.111.3, T1 timer.
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T1.
+	 ITU-T Rec. Q.703 (07/96) Annex A, A.12.3, Timer T1."
+    DEFVAL	{ 4500 } -- 45 seconds
+    ::= { slProfileEntry 5 }
+
+slProfileTimerT2 OBJECT-TYPE
+    SYNTAX	TimeInterval (500..15000)
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T2 timer.
+	 
+	 Q.703/T1.111.3: Level 2 timer 'Not aligned'.
+	 
+	 Timeout interval T2.  This is the time interval that a 
+	 signalling link will await an SIO after sending an SIO at the 
+	 start of the initial alignment procedure.
+	 
+	 For all signalling link transmission rates, ITU-T specifies a 
+	 range of 5 to 150 seconds, with a nominal value of 5 seconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), l2TimerT2 
+	     attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1.
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T2.
+	 ITU-T Rec. Q.703, ANSI T1.111.3, T2 timer."
+    DEFVAL	{ 500 } -- 5 seconds
+    ::= { slProfileEntry 6 }
+
+slProfileTimerT2L OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T2 timer: low value for automatic allocation of 
+	 signalling data terminals.
+
+	 Timeout interval T2l.  This is the time interval that a 
+	 signalling link will await an SIO after sending an SIO at the 
+	 start of the intial alignment procedure.  This is the low value 
+	 for use with automatic allocation of signalling data links and 
+	 terminals, where the value of T2 at either end of the link must 
+	 be different.
+	 
+	 For all signalling link transmission speeds, ITU-T specifies a 
+	 range of 5 to 50 seconds, with a provisional value of 20 
+	 seconds."
+    REFERENCE	
+	"ITU-T Rec. Q.704 (1996) : 12.3.4.3
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T2 low.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 2000 } -- 20 seconds
+    ::= { slProfileEntry 7 }
+
+slProfileTimerT2H OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T2 timer: high value for automatic allocation of 
+	 signalling data terminals.
+
+	 Timeout interval T2h.  This is the time interval that a 
+	 signalling link will await an SIO after sending an SIO at the 
+	 start of the initial alignment procedure.  This is the high 
+	 value for use with automatic allocation of signalling data 
+	 links and terminals, where the value of T2 at either end of the 
+	 link must be different.
+	 
+	 For all signalling link transmission speeds, ITU-T specifies a 
+	 range of 70 to 150 seconds, with a provisional value of 100 
+	 seconds."
+    REFERENCE	
+	"ITU-T Rec. Q.704 (1996) : 12.3.4.3
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T2 high.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 10000 } -- 100 seconds
+    ::= { slProfileEntry 8 }
+
+slProfileTimerT3 OBJECT-TYPE
+    SYNTAX	TimeInterval (100..1400)
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T3 timer.
+	 
+	 Q.703/T1.111.3: Level 2 timer 'Aligned'.
+	 
+	 Timeout interval T3.  This is the time interval that a 
+	 signalling link will await an MSU or FISU after sending an MSU 
+	 or FISU at the end of the initial alignment procedure.
+	 
+	 For all signalling link tranmission rates, ITU-T specifies a 
+	 range of 1 to 2 seconds, with a provisional value of 1 second."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), l2TimerT3 
+	     attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1.
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T3.
+	 ITU-T Rec. Q.703, ANSI T1.111.3, T3 timer."
+    DEFVAL	{ 100 } -- 1 seconds
+    ::= { slProfileEntry 9 }
+
+slProfileTimerT4N OBJECT-TYPE
+    SYNTAX	TimeInterval (230..12000)
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T4n (normal) timer.
+	 
+	 Q.703/T1.111.3: Level 2 timer 'Proving period timer normal'.
+	 
+	 Timeout interval T4n.  This is the period for which a 
+	 signalling link will send continuous SIN during the initial 
+	 alignement procedure.  This is the interval of the 'normal' 
+	 proving period.
+	 
+	 ITU-T 4800            110s (100-120s) (2^16)
+	 ITU-T 64              8.2s (7.5-9.5s) (2^16)
+	 ITU-T 1.536/1.984Mbps 30s (3-70s) (2^16)
+	 ANSI  64/56           2.3s (+-10%) (2^14)
+	 ANSI  1.536           30s (+-10%)
+	"
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), l2TimerT4N 
+	     attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1.
+	 ITU-T Rec. Q.703, ANSI T1.111.3, T4n timer.
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T4n(4.8) and T4n(64).
+	 ITU-T Rec. Q.703 (07/96) Annex A, A.12.3, Timer T4n."
+    DEFVAL	{ 800 } -- 8 seconds
+    ::= { slProfileEntry 10 }
+
+slProfileTimerT4E OBJECT-TYPE
+    SYNTAX	TimeInterval (40..800)
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T4e (emergency) timer.
+
+	 Q.703/T1.111.3: Level 2 timer 'Proving period timer 
+	 emergency'.
+
+	 Timeout interval T4e.  This is the period for which a 
+	 signalling link will send continuous SIE during the initial 
+	 alignment procedure.  This is the interval of the 'emergency' 
+	 proving period.
+
+	 ITU-T 4800            7s (6-8s) (2^12)
+	 ITU-T 64              500ms (400-600ms) (2^12)
+	 ITU-T 1.536/1.984Mbps 400-600ms (2^12)
+	 ANSI  64/56           0.6s (+-10%) (2^12)
+	 ANSI  1.536           5s (+-10%)
+	"
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), l2TimerT4E 
+	     attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1.
+	 ITU-T Rec. Q.703, ANSI T1.111.3, T4e timer.
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T4e(4.8) and T4e(64).
+	 ITU-T Rec. Q.703 (07/96) Annex A, A.12.3, Timer T4n."
+    DEFVAL	{ 50 } -- 500 milliseconds
+    ::= { slProfileEntry 11 }
+
+slProfileTimerT5 OBJECT-TYPE
+    SYNTAX	TimeInterval (8..12)
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T5 timer.
+	 
+	 Q.703/T1.111.3: Level 2 timer 'Sending SIB'.
+	 
+	 Timeout interval T5.  This time interval defines the frequency 
+	 at which a signalling link will sent SIB when it is 
+	 experiencing receive congestion.
+	 
+	 For all transmission rates, ITU-T specifies a range of 80 to 
+	 120 milliseconds with a provisional value of 100 milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), l2TimerT5 
+	     attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1.
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T5.
+	 ITU-T Rec. Q.703, ANSI T1.111.3, T5 timer."
+    DEFVAL	{ 10 } -- 100 milliseconds
+    ::= { slProfileEntry 12 }
+
+slProfileTimerT6 OBJECT-TYPE
+    SYNTAX	TimeInterval (300..1200)
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T6 timer.
+	 
+	 Q.703/T1.111.3: Level 2 timer 'Remote congestion'.
+	 
+	 Timeout interval T6.  This interval is the maximum amount of 
+	 time that a signalling link will await an acknowledgement for a 
+	 previously sent signalling unit, when the remote signalling 
+	 link is busy, before failing the signalling link.
+	 
+	 For modems, ITU-T specifies a range of 8 to 12 seconds, with a 
+	 provisional value of 10 seconds.  For ds0 and e1, ITU-T 
+	 specifies a range of 3 to 6 seconds, with a provisional value 
+	 of 4 seconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), l2TimerT6 
+	     attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1.
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T6(4.8) and T6(64).
+	 ITU-T Rec. Q.703, ANSI T1.111.3, T6 timer."
+    DEFVAL	{ 4000 } -- 4 seconds
+    ::= { slProfileEntry 13 }
+
+slProfileTimerT7 OBJECT-TYPE
+    SYNTAX	TimeInterval (50..600)
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"MTP Level 2 T7 timer.
+	 
+	 Q.703/T1.111.3: Level 2 timer 'Excessive delay of 
+	 acknowledgement'.
+	 
+	 Timeout interval T7.  This interval is the maximum amount of 
+	 time that a signalling link will await an acknowledgement for a 
+	 previously sent signalling unit, when the remote signalling 
+	 link is not busy, before failing the signalling link.
+	 
+	 For modems, ITU-T specifies a range of 4 to 6 seconds, with a 
+	 provisional value of 5 seconds.  For ds0 and e1, ITU-T 
+	 specifies a range of 0.5 to 2 seconds, with a provisional value 
+	 of 1 second."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), l2TimerT7 
+	     attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1.
+	 ITU-T Rec. Q.703 (07/96) 12.3, Timer T7(4.8) and T7(64).
+	 ITU-T Rec. Q.703, ANSI T1.111.3, T7 timer."
+    DEFVAL	{ 1000 } -- 1 seconds
+    ::= { slProfileEntry 14 }
+
+slProfileTbOnset1 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transmission / retransmission 
+	 buffer gets bigger than this value, the respective link is 
+	 congested in congestionLevel 1.  CongestionLevel 1 measures 
+	 start.
+	 
+	 Transmit congestion onset threshold 1.  When the number of 
+	 octets in the transmission buffers surpasses this threshold, 
+	 MTP will issue congestion indications to the message originator 
+	 for congestion level 1."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionCongestionThresholdOnsetLevel1 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 256 * 272 } -- octets
+    ::= { slProfileEntry 15 }
+
+slProfileTbAbate1 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transmission / retransmission 
+	 buffer gets smaller than this number, Level 2 flow control 
+	 measures end. The value has to be smaller than the respective 
+	 congestion onset threshold.
+	 
+	 Transmit congestion abate threshold 1.  When the number of 
+	 MSUs or octets in the transmission buffers falls beneath this 
+	 threshold, MTP will resume sending MSUs of message priority 0."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transCongThreshAbatementLevel1 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 128 * 272 } -- octets
+    ::= { slProfileEntry 16 }
+
+slProfileNumberOfThresholdLevels OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute equals the number of threshold levels that are 
+	 used for congestion control."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 numberOfThresholdLevels attribute."
+    ::= { slProfileEntry 17 }
+
+slProfileCongestionCounting OBJECT-TYPE
+    SYNTAX	INTEGER {
+	octet(0), message(1) }
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute indicates whether congestion counting is message 
+	 based or octet based."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 congestionCounting attribute."
+    ::= { slProfileEntry 18 }
+
+slProfileCongestionReportingBaseObject OBJECT-TYPE
+    SYNTAX	INTEGER {
+	routeSet(0), linkSetOfCongestedRouteSet(1), 
+	linkOfCongestedRouteSet(2), congestedLinkOfCongestedRoute(3) }
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute indicates on what object congestion counting is 
+	 based."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 congestionReportingBaseObject attribute."
+    ::= { slProfileEntry 19 }
+
+slProfileLoopDelay OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute models loop delay.  The value is in 
+	 milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), loopDelay 
+	 attribute."
+    ::= { slProfileEntry 20 }
+
+slProfileName OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is an additional name for instances of the 
+	 mtpL2ProtocolProfile managed object class.  Provides an 
+	 optional administrative name for this signalling link MTP Level 
+	 2 profile."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     mtpL2ProtocolProfileName attribute."
+    ::= { slProfileEntry 21 }
+
+slProfileTbOnset2 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transmission / retransmission 
+	 buffer gets bigger than this value, the respective link is 
+	 congested in congestionLevel 2.  CongestionLevel 2 measures 
+	 start.
+	 
+	 Transmit congestion onset threshold 2.  When the number of MSUs 
+	 or octets in the transmission buffers surpasses this threshold, 
+	 MTP will issue congestion indications to the message originator 
+	 for congestion level 1."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionCongestionThresholdOnsetLevel2 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 640 * 272 }
+    ::= { slProfileEntry 22 }
+
+slProfileTbAbate2 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transm./retransm. buffer of a link 
+	 in the congestionLevel 2 gets smaller than this number, the 
+	 resp. link is not any more in congestionLevel 2.  
+	 CongestionLevel 2 measures end.  The value has to be smaller 
+	 than the respective congestion onset threshold.
+	 
+	 Transmit congestion abate threshold 2.  When the number of MSUs 
+	 or octets in the transmission buffers falls beneath this 
+	 threshold, MTP will resume sending MSUs of message priority 1."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionCongestionThresholdAbatementLevel2 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 512 * 272 }
+    ::= { slProfileEntry 23 }
+
+slProfileTbOnset3 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transmission / retransmission 
+	 buffer gets bigger than this value, the respective link is 
+	 congested in congestionLevel 3.  CongestionLevel 3 measures 
+	 start.
+	 
+	 Transmit congestion onset threshold 2.  When the number of MSUs 
+	 or octets in the transmission buffers surpasses this threshold, 
+	 MTP will issue congestion indications to the message originator 
+	 for congestion level 2."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionCongestionThresholdOnsetLevel3 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 1024 * 272 }
+    ::= { slProfileEntry 24 }
+
+slProfileTbAbate3 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transm./retransm. buffer of a link 
+	 in the congestionLevel 3 gets smaller than this number, the 
+	 resp. link is not any more in congestionLevel 3.  
+	 CongestionLevel 3 measures end.  The value has to be smaller 
+	 than the respective congestion onset threshold.
+	 
+	 Transmit congestion abate threshold 2.  When the number of 
+	 MSUs or octets in the transmission buffers falls beneath this 
+	 threshold, MTP will resume sending MSUs of message priority 2."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionCongestionThresholdAbatementLevel3 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 896 * 272 }
+    ::= { slProfileEntry 25 }
+
+slProfileTbDiscard1 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transmission / retransmission 
+	 buffer of a link in the congestion level 1 gets bigger than 
+	 this number, MSUs are discarded (this threshold equals the 
+	 respective buffer size).  The value has to be bigger than the 
+	 respective congestion onset threshold.
+	 
+	 Transmit congestion discard threshold 1.  When the number of 
+	 MSUs or octets in the transmission buffer surpasses this 
+	 threshold, MTP will discard MSUs of message priority 0."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionCongestionThresholdDiscardLevel1 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 384 * 272 }
+    ::= { slProfileEntry 26 }
+
+slProfileTbDiscard2 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transm./retransm buffer of a link 
+	 in the congestion level 2 gets bigger than this number, MSUs 
+	 are discarded (this threshold equals the respective buffer 
+	 size).  The value has to be bigger than the respective 
+	 congestion onset threshold.
+	 
+	 Transmit congestion discard threshold 2.  When the number of 
+	 MSUs or octets in the transmission buffer surpasses this 
+	 threshold, MTP will discard MSUs of message priority 1."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionCongestionThresholdDiscardLevel2 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 768 * 272 }
+    ::= { slProfileEntry 27 }
+
+slProfileTbDiscard3 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs or octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the transmission / retransmission 
+	 buffer of a link in the congestion level 3 gets bigger than 
+	 this number, MSUs are discarded (this threshold equals the 
+	 respective buffer size).  The value has to be bigger than the 
+	 respective congestion onset threshold.
+	 
+	 Transmit congestion discard threshold 3.  When the number of 
+	 MSUs or octets in the transmission buffer surpasses this 
+	 threshold, MTP will discard MSUs of message priority 2."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionCongestionThresholdDiscardLevel3 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 1152 * 272 }
+    ::= { slProfileEntry 28 }
+
+slProfileTimerTx OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute identifies the Tx timer value for the 'multiple 
+	 link congestion states without congestion priority' mechanism 
+	 as described in 3.8.2.3/T1.111.4 or 3.8.2.3/Q.704."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), timerTx 
+	 attribute."
+    ::= { slProfileEntry 29 }
+
+slProfileTimerTy OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute identifies the Ty timer value for the 'multiple 
+	 link congestion states without congestion priority' mechanism 
+	 as described in 3.8.2.3/T1.111.4 or 3.8.2.3/Q.704."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), timerTy 
+	 attribute."
+    ::= { slProfileEntry 30 }
+
+slProfileNumberOfCongestionStates OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute specifies the number of congestion states used 
+	 in the 'multiple link congestion states without congestion 
+	 priority' mechanism as described in 3.8.2.3/T1.111.4 or 
+	 3.8.2.3/Q.704."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 numberOfCongestionStates attribute."
+    ::= { slProfileEntry 31 }
+
+slProfileInitialLevelOfCongestion OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute represents the initial level of congestion."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 initialLevelOfCongestion attribute."
+    ::= { slProfileEntry 32 }
+
+slProfileMaxMSUsRetransN1 OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..16777215)
+    UNITS	"messages"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute specifies the maximum number of MSUs which are 
+	 available for retransmission (name in Q.703/T1.111.3:N1) 0..127 
+	 for normal sequence numbers 0..4095 for extended sequence 
+	 numbers.
+	 
+	 This is the maximum numer of MSUs that can be outstanding (held 
+	 in the retransmission buffer).  The maximum value of this 
+	 object depends on the size of the sequence number field.  For 
+	 low speed signalling links the maximum value is (2^7 - 1), or 
+	 127.  For high speed signalling links with extended sequence 
+	 numbers and length fields, the maximum value is (2^12 - 1) or 
+	 4095.  For M2PA signalling links, the maximum value is (2^24 - 
+	 1) or 16777215.  This value is not applicable to ATM SAAL 
+	 links.
+	 
+	 The agent is responsible for enforcing any ranges or maximums 
+	 set by the implementation"
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     maxMSUsRetransN1 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 127 }
+    ::= { slProfileEntry 33 }
+
+slProfileMaxOctRetransN2 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute specifies the maximum number of octets, which 
+	 are available for retransmission (Q.703/T1.111.3: N2).
+	 
+	 This is the maximum number of message octets that can be 
+	 outstanding (held in the retransmission buffer).  If the value 
+	 is greater than N1 x m, where m is the maximum message length 
+	 in octets, then this value will not act as a constraint on the 
+	 retransmission buffer.  That is, when set to a suitably large 
+	 value, this protocol parameter has no effect on the state 
+	 machine."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     maxOctRetransN2 attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 8192 }
+    ::= { slProfileEntry 34 }
+
+slProfileReceiveCongestionThresholdOnset OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the reception buffer gets bigger than 
+	 this value, Level 2 flow control measures begin.  MSUs are 
+	 still accepted.
+	 
+	 Receive congestion accept threshold.  When the number of MSUs 
+	 awaiting delivery to MTP Level 3 surpasses this number, the 
+	 signalling links will consider itself in receive congestion and 
+	 will begin sending periodic SIBs."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     receiveCongestionThresholdOnset attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 6 }
+    ::= { slProfileEntry 35 }
+
+slProfileReceiveCongestionThresholdAbate OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"If the number of MSUs in the reception buffer gets smaller than 
+	 this number, Level 2 flow control measures end.  The value has 
+	 to be smaller than the respective congestion onset threshold.
+	 
+	 Receive congestion abate threshold.  When the number of MSUs 
+	 awaiting delivery to MTP Level 3 falls beneath this number, the 
+	 signalling link will consider itself to have ceased receive 
+	 congestion and will stop sending periodic SIBs."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     receiveCongestionThresholdAbatement attribute.
+	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 3 }
+    ::= { slProfileEntry 36 }
+
+slProfileReceiveCongestionThresholdDiscard OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"MSUs"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Receive congestion discard threshold.  When the number of MSUs 
+	 awaiting delivery to MTP Level 3 surpasses this number, the 
+	 signalling link will begin discarding received MSUs."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL	{ 9 }
+    ::= { slProfileEntry 37 }
+
+slProfileM OBJECT-TYPE
+    SYNTAX	Unsigned32 (5)
+    UNITS	"periods"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This object specifies the maximum number of failed proving 
+	 periods that the signalling link will entertain consequtively 
+	 before declaring the initial alignment procedure failed and 
+	 failing the signalling link.  This value is always 5."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
+    DEFVAL { 5 }
+    ::= { slProfileEntry 38 }
+
+slProfileRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management station can create and 
+	 delete rows in this table.  Aside from a number of default rows 
+	 provided by the managed system, rows are created and deleted by 
+	 management stations.
+	 
+	 If the name package is supported: a create request with a value 
+	 for the name attribute that is already used by another instance 
+	 of the same object class will be rejected.  If an attempt is 
+	 made to delete an slProfileEntry which is still referenced by a 
+	 signLinkTp the delete request will be rejected."
+    REFERENCE	
+	"STD 58, SNMPv2-TC RowStatus.
+	 ITU-T Rec. Q.751.1 (1997) : 
+	     managedSwitchingElement-mtpL2ProtocolProfile NAME BINDING."
+    ::= { slProfileEntry 39 }
+
+
+-- =============================================================================
+
+slTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"This managed object represents the termination of the 
+	 signalling link within the signalling point as defined in 
+	 Recommendation Q.703.  The signLinkTp object class represents 
+	 that part of a signalling link which is located in one NE.
+	 
+	 The following state and status attributes are supported:
+	 
+	  1. administrative state:
+	 
+	     - locked: it is administratively not permitted to transport 
+	       traffic on the link termination point.
+	 
+	     - unlocked: it is administratively permitted to transport 
+	       user part traffic or test traffic on the link termination 
+	       point.
+	 
+	  2. operational state:
+	 
+	     - enabled: the link termination point is operationally able 
+	       to transport user part traffic or test traffic.
+	 
+	     - disabled: the link termination point is operationally 
+	       unable to transport user part traffic or test traffic.  
+	       The operational state is disabled whenever the link 
+	       termination point status contains Failed, Deactivated, 
+	       Local Blocked, Remote Blocked, or the procedural status 
+	       is Initializing.
+	 
+	  3. usage state:
+	 
+	     - idle: the link termination point carries no user part 
+	       traffic (test traffic may be present).
+	 
+	     - 'active': the link termination point is not congested.  
+	       Currently the link termination point carries user part 
+	       traffic.
+	 
+	     - busy: the link termination point is congested due to user 
+	       part traffic.  The usage state is idle whenever the link 
+	       termination point status is not empty i.e. the usage 
+	       state immediately reflects the availability of the 
+	       signLinkTp for user traffic.
+	 
+	     For national MTP options applying several congestion levels 
+	     an additional attribute indicating these levels may be 
+	     added.
+	 
+	  4. procedural status:
+	 
+	     The procedural status initializing is valid during initial 
+	     alignment procedure.
+	 
+	     The procedural status not initalized applies when the link 
+	     termination point is not aligned and the initial alignment 
+	     procedure has not been started.
+	 
+	  5. Link termination point status.  This is a set-valued 
+	     attribute.  The following statusses can exist alone or in 
+	     combinations with each other.  The exact definition for 
+	     each of the following SS7-functional states is to be gained 
+	     from Q.704 local blocked remote blocked local inhibited 
+	     remote inhibited failed deactivated.
+	 
+	 If the 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 
+	 1992':communicationsAlarm notification is used, the following 
+	 probable causes can apply:
+	 
+	  - Probable C102 (slFailure) which represents measurement 
+	    Q.752/1.2 measurement Q.752/1.6 (SpecificProblems=003 
+	    abnormalFIBRorBSNR, 004 excessiveAckDelay, 005 
+	    excessiveErrorRate, 006 excessiveCongDuration) and 
+	    Q.752/1.12.(PerceivedSeverity=cleared)
+	 
+	 If the ss7OnOccEventPackage is present, the event notifications 
+	 with the following probable causes can apply:
+	 
+	  - Probable Cause = 110 (localChangeOver) which represents 
+	    measurement Q.752/1.10 (PerceivedSeverity=Maj/Min/War) and 
+	    measurement Q.752/1.11 (PerceivedSeverity=Cleared).
+	 
+	  - Probable Cause = 210 (remoteProcOutage) which represents 
+	    measurements Q.752/2.10 (PerceivedSeverity=Maj/Min/War) and 
+	    Q.752/2.11 (PerceivedSeverity=Cleared).
+	 
+	  - Probable Cause = 216 (start of local inhibition) which 
+	    represents measurement Q.752/2.16 
+	    (PerceivedSeverity=Maj/Min/War) and Q.752/2.17 
+	    (PerceivedSeverity=Cleared).
+	 
+	  - Probable Cause = 218 (start of remote inhibition) which 
+	    represents measurement Q.752/2.18 
+	    (PerceivedSeverity=Maj/Min/War) and Q.752/2.19 
+	    (PerceivedSeverity=Cleared).
+	 
+	 A create or set request is rejected, if
+	 
+	  1. a pointer would reference an instance, which does not 
+	     belong to the appropriate object class OR
+	 
+	  2. a pointer would reference an instance which is not existing 
+	     OR
+	 
+	  3. a signDataLinkTpPointer would reference a signDataLinkTp 
+	     which is not in the same mtpSignPoint OR
+	 
+	  4. a signDataLinkTpPointer would reference a signDataLinkTp 
+	     which has a different value of adjPc than the superior 
+	     signLinkSetTp OR
+	 
+	  5. the link would reference a datalink and a 
+	     mtpL2ProtocolProfile whose transmissionRates is not the 
+	     same OR
+	 
+	  6. the link would reference a mtpL2ProtocolProfile where the 
+	     appropriate packages for the congestionControlMethod of the 
+	     superior signLinkSetTp are not present (see B.1.2.9.2) OR
+	 
+	  7. the spTimersProfilePackage is present in the superior 
+	     mtpSignPoint AND the link would reference a 
+	     mtpL2ProtocolProfile whose l2TimerT2 is not bigger than the 
+	     q704-t17 of the spTimersProfile referenced by the 
+	     mtpSignPoint OR
+	 
+	  8. the spTimersPackage is present in the superior mtpSignPoint 
+	     AND the link would reference a mtpL2ProtocolProfile whose 
+	     l2TimerT2 is not bigger than the q704-t17 of the 
+	     mtpSignPoint.
+	 
+	 The rejection also takes place if only a single pointer within 
+	 the signDataLinkList or the signTermList (if present) is wrong.
+	 
+	 A delete request is rejected, if the linkTpStatus does not 
+	 contain the value deactivated."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signLinkTp 
+	     MOC.
+	 ITU-T Rec. Q.703 (1996)."
+    ::= { slSl 2 }
+
+slEntry OBJECT-TYPE
+    SYNTAX	SlEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"This is the signalling link table entry.  Each entry in the 
+	 signalling link table represents a signalling link configured 
+	 for operation in the managed element.
+	 
+	 Entries in this table can generate a communicationsAlarm with 
+	 parameters:
+	 
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 1.2,
+		probableCause = 102 (slFailure)
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 1.3,
+		probableCause = 102, (slFailure)
+		specificProblems = 003
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 1.4,
+		probableCause = 102, (slFailure)
+		specificProblems = 004
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 1.5,
+		probableCause = 102, (slFailure)
+		specificProblems = 005
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 1.6,
+		probableCause = 102, (slFailure)
+		specificProblems = 006
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 1.12,
+		probableCause = 102, (slFailure)
+		PerceivedSeverity = Cleared
+	 
+	 Entries in this table can generate an ss7OnOccEvent with 
+	 parameters:
+	 
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 1.10,
+		probableCause = 110, (localAutomaticChange)
+		PerceivedSeverity = M/m/W
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 1.11,
+		probableCause = 110, (localAutomaticChange)
+		PerceivedSeverity = Cleared
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 2.10,
+		probableCause = 210, (remoteProcOutage)
+		PerceivedSeverity = M/m/W
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 2.11,
+		probableCause = 210, (remoteProcOutage)
+		PerceivedSeverity = Cleared
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 2.16,
+		probableCause = 216, (localInhibition)
+		PerceivedSeverity = M/m/W
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 2.17,
+		probableCause = 216, (localInhibition)
+		PerceivedSeverity = Cleared
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 2.18,
+		probableCause = 218, (remoteInhibition)
+		PerceivedSeverity = M/m/W
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 2.19,
+		probableCause = 218, (remoteInhibition)
+		PerceivedSeverity = Cleared
+	 
+	 Entries in this table can generate a qualityOfServiceAlarm with 
+	 parameters:
+	 
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 3.6,
+		probableCause = 306, (linkCongestionIndications)
+		PerceivedSeverity = M/m/W
+		(also first and interval)
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 3.9,
+		probableCause = 306, (linkCongestionIndications)
+		PerceivedSeverity = Cleared
+		(also first and interval)
+	  - ITU-T Rec. Q.752 (1997) : Table 1/Q.752 3.11,
+		probableCause = 311, (linkCongestionDiscard)
+		PerceivedSeverity = M/m/W
+		(also first and interval)
+	 
+	 The mtpSpId and mtpLsId specify an index into the mtpLsTable 
+	 that specifies the link set to which this signalling link will 
+	 belong.  Underspecified values on management station SET 
+	 operations that create an entry in this table may be inherited 
+	 from the specified mtpLsTable link set entry."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signLinkTp 
+	     MO.
+	 ITU-T Rec. Q.751.1 signLinkSetTp-signLinkTp NAME BINDING
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.2
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.3
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.4
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.5
+	 ITU-T Rec. Q.752, (1997) : Table 1/Q.752 1.6"
+    INDEX	{
+	slId
+    }
+    ::= { slTable 1 }
+
+SlEntry ::= SEQUENCE {
+    slId
+	Unsigned32,
+    slMaxCapacitySL
+	Unsigned32,
+    slProceduralStatus
+	ProceduralStatus,
+    slProfilePointer
+	SimpleNameType,
+    slSignTermPointer
+	SimpleNameType,
+    slSignDataLinkTpPointer
+	SimpleNameType,
+    slReplaceSt
+	MtpResultOfAction,
+    slCongestionLevel
+	MtpCongestionLevel,
+    slRelatedLinkGroupNumber
+	Unsigned32,
+    slSdlList
+	Unsigned32,
+    slName
+	CommonLanguageName,
+    slSdtList
+	Unsigned32,
+    slRowStatus
+	RowStatus
+}
+
+slId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible -- index
+    STATUS	current
+    DESCRIPTION	
+	""
+    REFERENCE	
+	""
+    ::= { slEntry 1 }
+
+slMaxCapacitySL OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..512000)
+    UNITS	"octets per second"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Specifies the maximum traffic handling capacity of the 
+	 signalling link in octets per second.
+	 
+	 This attribute represents the current capacity of a signalling 
+	 link.  The capacity set can be less than the available capacity 
+	 of the link.  The available capacity is 600 octets per second 
+	 for 4.8 kbps signalling links, 7000 octets per second, 56 kbps 
+	 signalling links, 8000 octets per second, 64 kbps, 192000, 
+	 1.544 Mbps, 248000, 2.048 Mbps, 512000, 4.096 Mbps."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxCapacitySL 
+	     attribute."
+    ::= { slEntry 2 }
+
+slProceduralStatus OBJECT-TYPE
+    SYNTAX	ProceduralStatus
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Provides the procedural status of the signalling link 
+	 termination point following the ProceduralStatus textual 
+	 convention of the OPENSS7-SMI-MIB module and according to ITU-T 
+	 Rec. X.721 | ISO/IEC 10165-2.
+	 
+	 - initializationRequired(0), initialization is required;
+	 
+	 - notInitialized(1), the signalling link is failed, deactivated 
+	   by MTP L3 or deactivated by OS; the procedural status 
+	   notInitialized(1) applies when the link is not aligned and 
+	   the initial alignment procedure has not been started;
+	 
+	 - initializing(2), the signalling link has failed and is being 
+	   restored, or is being activated by MTP L3; the procedural 
+	   status initializing(2) is valid during initial alignment 
+	   procedure;
+	 
+	 - reporting(3), not used;
+	 - terminating(4), not used.
+	
+	 Signalling links are created in the initialization required 
+	 state."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 signLinkTpBehaviour
+	 ITU-T Rec. X.721 | ISO/IEC 10165-2, proceduralStatus 
+	     attribute.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+	     proceduralStatus attribute."
+    DEFVAL { 0 } -- initializationRequired
+    ::= { slEntry 3 }
+
+slProfilePointer OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Identifies an mtpL2ProtocolProfile instance."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     mtpL2ProtocolProfilePointer attribute."
+    ::= { slEntry 4 }
+
+slSignTermPointer OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute identifies a particular signTerm instance."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 signTermPointer attribute."
+    DEFVAL { { zeroDotZero }}
+    ::= { slEntry 5 }
+
+slSignDataLinkTpPointer OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute references a particular mtpSignDataLinkTp 
+	 instance.  The following restriction applies to this attribute: 
+	 modification is only allowed if the administrative state of the 
+	 instance that contains this attribute is 'locked'."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 signDataLinkTpPointer attribute."
+    DEFVAL { { zeroDotZero }}
+    ::= { slEntry 6 }
+
+slReplaceSt OBJECT-TYPE
+    SYNTAX	MtpResultOfAction
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This action replaces the signalling terminal in a signalling 
+	 link termination point.  This action is not performed if:
+	 
+	 i)   the signTermPointer does not reference a signTerm or
+	 ii)  the new signTerm does not exist or
+	 iii) the signTerm is already referenced by the link or
+	 iv)  the linkTpStatus does not contain the values 'deactivated' 
+	 or 'failed'.
+	 
+	 If the action has been successful, the signTermPointer has the 
+	 value of the signTermId given in the information syntax; 
+	 otherwise the pointer value remains unchanged."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 replaceSignTerm action."
+    ::= { slEntry 7 }
+
+slCongestionLevel OBJECT-TYPE
+    SYNTAX	MtpCongestionLevel
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This object reflects the current transmit congestion level 
+	 being experienced by the signalling link.  Note that it would 
+	 be abnormal for a signalling link to indicate 
+	 congestionLevel3(3).
+	 
+	 This attribute is used to reflect link congestion when multiple 
+	 congestion levels are used.  Its value in the case of no 
+	 congestion is none(0) and, when congested, has one of the 
+	 values congestionLevel1(1), congestionLevel2(2) or 
+	 congestionLevel3(3).  Its value can by changed by the managed 
+	 system.  Transition between congestion levels are indicated 
+	 with a qualityOfServiceAlarm."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     linkCongestionLevel attribute."
+    ::= { slEntry 8 }
+
+slRelatedLinkGroupNumber OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..15)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute identifies the link group which the signalling 
+	 link belongs to."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     relatedLinkGroupNumber attribute."
+    ::= { slEntry 9 }
+
+slSdlList OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute lists the signalling data link instances that 
+	 can be used for dynamical allocation to the sl.  The integer 
+	 value is the number of entries in the slSdlListTable that 
+	 correspond to this signalling link.  When automatic allocation 
+	 of signalling data links is in effect, this value will be 
+	 greater than zero; otherwise, the value will be zero."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 signDataLinkTpList attribute."
+    ::= { slEntry 10 }
+
+slName OBJECT-TYPE
+    SYNTAX	CommonLanguageName
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides an optional administrative name for this signalling 
+	 link.  Signalling links are typically named using, as a prefix, 
+	 the common language name of the managed switching element to 
+	 which the signalling link terminates (e.g. EDTNAB01DS1SL0).
+	 
+	 This attribute is an additional name for instances of the 
+	 signLinkTp managed object class."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signLinkTpName 
+	     attribute."
+    ::= { slEntry 11 }
+
+slSdtList OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute lists the signTerm instances that can be used 
+	 for dynamical allocation to the signLinkTp.  The integer value 
+	 is the number of entries in the signTermListTable that 
+	 correspond to this signalling link.  When automatic allocation 
+	 of signalling terminals is in effect, this value will be 
+	 greater than zero; otherwise, the value will be zero."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signTermList 
+	     attribute."
+    ::= { slEntry 12 }
+
+slRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management stations may create or 
+	 delete signalling link termination point entries in this table.
+	 
+	 If the name package is supported: a create request with a value 
+	 for the name attribute that is already used by another instance 
+	 of the same object class will be rejected."
+    REFERENCE	
+	"STD 58, SNMPv2-TC RowStatus.
+	 ITU-T Rec. Q.751.1 (1997) : signLinkSetTp-signLinkTp NAME 
+	 BINDING."
+    ::= { slEntry 13 }
+
+-- =============================================================================
+
+slSdlListTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlSdlListEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides a side table of the signalling link termination point 
+	 table that provides the signalling data links that can be used 
+	 to provide a given signalling link.
+	 
+	 When automatic signalling data link allocation is in effect, 
+	 one or more signalling data links in the list will be provided 
+	 for each signaling link.  Otherwise, the list will be empty."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     signDataLinkList attribute."
+    ::= { slSl 3 }
+
+slSdlListEntry OBJECT-TYPE
+    SYNTAX	SlSdlListEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides an entry in the signalling data link termination point 
+	 list table.  The combination of indices uniquely identifies a 
+	 signalling link within a signalling link set within a signalling 
+	 point and the ordinal value of the signalling data link 
+	 termination point within the list."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     signDataLinkList attribute."
+    INDEX	{
+	slId,	    -- shared index
+	slSdlListId
+    }
+    ::= { slSdlListTable 1 }
+
+SlSdlListEntry ::= SEQUENCE {
+    slSdlListId
+	Unsigned32,
+    slSdlListPointer
+	SimpleNameType,
+    slSdlListRowStatus
+	RowStatus
+}
+
+slSdlListId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides an ordinal index for this element in the signalling 
+	 data link termination point list.  Each ordinal index for the 
+	 same slId specifies a signalling data link that may be used to 
+	 provide the identified signalling link."
+    ::= { slSdlListEntry 1 }
+
+slSdlListPointer OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a pointer to a signalling data link termination point 
+	 instance.  The value specifies an index into the slSdlTable of 
+	 the signalling data link that is identified.  The value may 
+	 either be an unsigned decimal index value or the unique name 
+	 assigned to a signalling data link in the table."
+    ::= { slSdlListEntry 2 }
+
+slSdlListRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management stations may create or 
+	 delete entries in the signalling data link termination point 
+	 list."
+    ::= { slSdlListEntry 3 }
+
+-- =============================================================================
+
+slSdtListTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlSdtListEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides a side table of the signalling link termination point 
+	 table that provides the signalling terminals that can be used 
+	 to provide a given signalling link.
+	 
+	 When automatic signalling terminal allocation is in effect, one 
+	 or more signalling terminal in the list will be provided for 
+	 each signalling link.  Otherwise,  the list will be empty."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signTermList 
+	     attribute."
+    ::= { slSl 4 }
+
+slSdtListEntry OBJECT-TYPE
+    SYNTAX	SlSdtListEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides an entry in the signalling terminal list table.  The 
+	 combination of indices uniquely identifies a signalling link 
+	 within a signalling link set within a signalling point and the 
+	 ordinal value of the signalling terminal within the list."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signTermList 
+	     attribute."
+    INDEX	{
+	slId,		-- shared index
+	slSdtListId
+    }
+    ::= { slSdtListTable 1 }
+
+SlSdtListEntry ::= SEQUENCE {
+    slSdtListId
+	Unsigned32,
+    slSdtListPointer
+	SimpleNameType,
+    slSdtListRowStatus
+	RowStatus
+}
+
+slSdtListId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides an ordinal index for this element in the signalling 
+	 terminal list.  Each ordinal index for the same slId specifies 
+	 a signalling terminal that may be used to provide the 
+	 identified signalling link."
+    ::= { slSdtListEntry 1 }
+
+slSdtListPointer OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a pointer to a signalling terminal instance.  The 
+	 value specifies an index into the slSdtTable of the signalling 
+	 terminal that is identified.  The value may either be an 
+	 unsigned decimal index value or the unique name assigned to the 
+	 signalling terminal in the table."
+    ::= { slSdtListEntry 2 }
+
+slSdtListRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management stations may create or 
+	 delete entries in the signalling terminal list."
+    ::= { slSdtListEntry 3 }
+
+
+-- =============================================================================
+
+slNbTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlNbEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides an auxillary table of narrowband specific MTP Level 2 
+	 protocol profile information for Signalling Terminals."
+    REFERENCE	
+	""
+    ::= { slSdt 1 }
+
+slNbEntry OBJECT-TYPE
+    SYNTAX	SlNbEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Each entry in this table shares an index with an entry in the 
+	 mtpSlL2ProfileTable which provides the common MTP Level 2 
+	 protocol profile information whereas each of these entries 
+	 provides narrowband signalling link specific information."
+    REFERENCE	
+	""
+    INDEX	{
+	slSdtProfileId
+    }
+    ::= { slNbTable 1 }
+
+SlNbEntry ::= SEQUENCE {
+    slSdtProfileId
+	SimpleNameType,
+    slNbTransmissionRate
+	MtpTransmissionRate,
+    slNbTimerT8
+	MilliSeconds,
+    slNbTin
+	Unsigned32,
+    slNbTie
+	Unsigned32,
+    slNbT
+	Unsigned32,
+    slNbD
+	Unsigned32,
+    slNbTe
+	Unsigned32,
+    slNbDe
+	Unsigned32,
+    slNbUe
+	Unsigned32,
+    slNbN
+	Unsigned32,
+    slNbm
+	Unsigned32,
+    slNbb
+	Unsigned32,
+    slNbf
+	INTEGER,
+    slNbRowStatus
+	RowStatus
+}
+
+slSdtProfileId OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides a signalling terminal protocol profile index for the 
+	 narrowband, ATM SAAL and M2PA protocol profile tables."
+    REFERENCE	
+	""
+    ::= { slNbEntry 1 }
+
+
+slNbTransmissionRate OBJECT-TYPE
+    SYNTAX	MtpTransmissionRate
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute specifies the transmissionRate and implies the 
+	 transmissionType (i.e. 56 and 64 kbits imply digital, 4.8 kbits 
+	 implies analog transmission).  It can have one of the 
+	 folllowing values:
+	 
+	  - kbits4point8(0), the transmission rate is for modem (4800 
+	    baud, analog link);
+	  - kbits56(1), the transmission rate is for DS0-A (56kbps, 
+	    low-speed digital link);
+	  - kbits64(2), the transmission rate is for DS0 (64kbps, 
+	    low-speed digital link);
+	  - kbits1544(3), the transmission rate is for T1 (1536kbps, 
+	    high-speed digial link);
+	  - kbits2048(4), the transmission rate is for E1 (1984kbps, 
+	    high-speed digial link).
+	 
+	 "
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     transmissionRate attribute."
+    DEFVAL	{ 2 } -- kbits64
+    ::= { slNbEntry 2 }
+
+slNbTimerT8 OBJECT-TYPE
+    SYNTAX	MilliSeconds (100)
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the Timer T8 which is used on high speed links (full 
+	 E1, T1 or J1).  This timer value is zero (0) for low speed 
+	 links.  Conceptual rows in this table that represent analog or 
+	 low-speed digital links do not have this column present.  The 
+	 standard value for both 1.544 Mbps and 2.048 Mbps high-speed 
+	 signalling links is 100 milliseconds.  This column is not 
+	 present for low-speed digital and analog signalling terminals."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (07/96) Annex A, Table A.1, Parameter T8."
+    DEFVAL	{ 100 }
+    ::= { slNbEntry 3 }
+
+slNbTin OBJECT-TYPE
+    SYNTAX	Unsigned32 (4)
+    UNITS	"periods"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the number of iterations of the normal proving period.  
+	 This value is always 4.  Some implementations may permit this 
+	 value to be writable."
+    DEFVAL { 4 }
+    ::= { slNbEntry 4 }
+
+slNbTie OBJECT-TYPE
+    SYNTAX	Unsigned32 (1)
+    UNITS	"periods"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the number of iterations of the emergency proving 
+	 period.  This value is always 1.  Some implementations may 
+	 permit this value to be writable."
+    DEFVAL { 1 }
+    ::= { slNbEntry 5 }
+
+slNbT OBJECT-TYPE
+    SYNTAX	Unsigned32 (32|64)
+    UNITS	"signal units"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the threshold on the AERM and SUERM for analog and 
+	 low-speed digital links.  This value is 32 for analog links and 
+	 64 for low-speed digital links.  Conceptual rows in this table 
+	 that represent high-speed digital links do not have this column 
+	 present.  Some implementations may permit this value to be 
+	 writable."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (07/96) 10.2.6, Parameter T."
+    DEFVAL { 64 }
+    ::= { slNbEntry 6 }
+
+slNbD OBJECT-TYPE
+    SYNTAX	Unsigned32 (256)
+    UNITS	"signal units"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is correct signal unit decrement threshold for the SUERM 
+	 leaky bucket algorithm.  This value is always 256.  Conceptual 
+	 rows in this table that represent high-speed digital links do 
+	 not have this column present.  Some implementations may permit 
+	 this value to be writable."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (07/96) 10.2.6, Parameter D."
+    DEFVAL { 256 }
+    ::= { slNbEntry 7 }
+
+slNbTe OBJECT-TYPE
+    SYNTAX	Unsigned32 (577169|793544)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the threshold on the Errored Interval Monitor (EIM) for 
+	 high speed links.  The default value depends upon the 
+	 transmission rate of the Signalling Data Link.  The standard 
+	 value for 1.544 Mbps operation is 577169, for 2.058 Mbps 
+	 operation is 793544.  This column is not present for low-speed 
+	 digital an analog signalling terminals."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (07/96) Annex A, Table A.1, Parameter Te."
+    ::= { slNbEntry 8 }
+
+slNbDe OBJECT-TYPE
+    SYNTAX	Unsigned32 (9308|11328)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the correct interval decrement for the Errored Interval 
+	 Monitor (EIM) for high speed links.  The default value depends 
+	 upon the transmission rate of the Signalling Data Link.  The 
+	 standard value for 1.544 Mbps operation is 9308, for 2.048 Mbps 
+	 operation is 11328.  This column is not present for low-speed 
+	 digital an analog signalling terminals."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (07/96) Annex A, Table A.1, Parameter De."
+    ::= { slNbEntry 9 }
+
+slNbUe OBJECT-TYPE
+    SYNTAX	Unsigned32 (144292|198384)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the errored interval increment for the Errored Interval 
+	 Monitor (EIM) for high speed links.  The default value depends 
+	 upon the transmission rate of the Signalling Data Link.  The 
+	 standard value for 1.544 Mbps operation is 144292, for 2.048 
+	 Mbps operation, 198384.  This column is not present for 
+	 low-speed digital an analog signalling terminals."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (07/96) Annex A, Table A.1, Parameter Ue."
+    ::= { slNbEntry 10 }
+
+slNbN OBJECT-TYPE
+    SYNTAX	Unsigned32 (16)
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the number of octets that will be considered as an 
+	 signal unit in error when the DAEDR is in octet counting mode.  
+	 This is only applicable to analog low speed links and is always 
+	 16.  This column is not present for high-speed digital 
+	 signalling terminals."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (07/96) 10.2.6, Parameter N."
+    DEFVAL { 16 }
+    ::= { slNbEntry 11 }
+
+slNbm OBJECT-TYPE
+    SYNTAX	Unsigned32 (272)
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the maximum size of the SIF before the DAEDR enters 
+	 octet counting mode (or the EIM considers the frame errored).  
+	 The value, 272 octets, is the same for analog, low- and 
+	 high-speed links."
+    REFERENCE	
+	"ITU-T Rec. Q.703 (07/96) 2.3.8, 4.1.3."
+    DEFVAL { 272 }
+    ::= { slNbEntry 12 }
+
+slNbb OBJECT-TYPE
+    SYNTAX	Unsigned32 (8|192|256)
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"This is the maximum number of octets in a transmission block.  
+	 It consists of 1 millisecond worth of octets and is 8 for 
+	 V.35/DS0/DS0A channels, 192 for T1/J1 high speed links, and 256 
+	 for E1 high speed links."
+    ::= { slNbEntry 13 }
+
+slNbf OBJECT-TYPE
+    SYNTAX	INTEGER {
+	one(0), shared(1), two(2), three(3), four(4), five(5), six(6) }
+    UNITS	"flags"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This is the number of transmitted flags between frames counting 
+	 the closing flag of the preceding frame and the opening flag of 
+	 the following frame.  Some poorly designed equipment is 
+	 incapable of receiving one flag between frames when idling 
+	 FISUs.  This value should always default to one(0).
+	 
+	  - one(0), place one flag between transmitted frames: the 
+	    closing flag of the last frame is the opening flag of the 
+	    next frame.
+	  - shared(1), place a shared flag between transmitted frames: 
+	    the closing flag of the last frame overlaps by one bit with 
+	    the opening flag of the next frame.
+	  - two(2), place two flags between transmitted frames: the 
+	    closing flag of the last frame is separate from the opening 
+	    flag of the next frame.
+	  - three(3), place three flags between transmitted frames.
+	  - four(4), place four flags between transmitted frames.
+	  - five(5), place five flags between transmitted frames.
+	  - six(6), place six flags between transmitted frames.
+	 
+	 Placing more than six flags between transmitted frames 
+	 undermines the error detection capabilities of the MTP 
+	 signalling link and should not be used.  This value should be 
+	 set to the lowest value that the remote signalling terminal can 
+	 handle."
+    DEFVAL { 0 } -- one
+    ::= { slNbEntry 14 }
+
+slNbRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management stations may create and 
+	 delete rows in this table.  Rows in this table provide 
+	 narrowband information pertaining to the indexed slProfileTable 
+	 entry.  Deleting the corresponding entry in the slProfileTable 
+	 results in deletion of this entry."
+    REFERENCE	
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { slNbEntry 15 }
+
+-- =============================================================================
+
+slSaalTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlSaalEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Provides an auxillary table of MTP3b specific MTP Level 2 
+	 protocol profile information for Signalling Terminals."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     saalNniProtocolProfile MOC."
+    ::= { slSdt 2 }
+
+slSaalEntry OBJECT-TYPE
+    SYNTAX	SlSaalEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Each entry in this table shares an index with an entry in the 
+	 slSdtProfileTable that provides the common MTP Level 2 protocol 
+	 profile information whereas each of these entries provides 
+	 MTP3b signalling link specific information."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     saalNniProtocolProfile MO."
+    INDEX	{
+	slSdtProfileId -- shared index
+    }
+    ::= { slSaalTable 1 }
+
+SlSaalEntry ::= SEQUENCE {
+    slSaalBufferRelease
+	TruthValue,
+    slSaalMaxCc
+	Unsigned32,
+    slSaalMaxNrp
+	Unsigned32,
+    slSaalMaxInformationFieldLength
+	Unsigned32,
+    slSaalMaxLengthSscopUuField
+	Unsigned32,
+    slSaalMaxPd
+	Unsigned32,
+    slSaalMaxSscopCreditToPeer
+	Unsigned32,
+    slSaalMaxStat
+	Unsigned32,
+    slSaalN1
+	Unsigned32,
+    slSaalNniLayerManagementProvingState
+	INTEGER,
+    slSaalNniLayerManagementTimerNoCredit
+	TimeInterval,
+    slSaalNniLayerManagementTimerRepeatSrec
+	TimeInterval,
+    slSaalNniTimerT1
+	TimeInterval,
+    slSaalNniTimerT2
+	TimeInterval,
+    slSaalNniTimerT3
+	TimeInterval,
+    slSaalSscopTimerCc
+	TimeInterval,
+    slSaalSscopTimerIdle
+	TimeInterval,
+    slSaalSscopTimerKeepAlive
+	TimeInterval,
+    slSaalSscopTimerNoResponse
+	TimeInterval,
+    slSaalSscopTimerPoll
+	TimeInterval,
+    slSaalTransmissionRateIntervalLower
+	Unsigned32,
+    slSaalTransmissionRateIntervalUpper
+	Unsigned32,
+    slSaalEgressTransmissionRateIntervalLower
+	Unsigned32,
+    slSaalEgressTransmissionRateIntervalUpper
+	Unsigned32,
+    slSaalPollAfterRetransmission
+	TruthValue,
+    slSaalRowStatus
+	RowStatus
+}
+
+slSaalBufferRelease OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute determines whether SSCOP can release its 
+	 transmission buffer and transmission queue on connection 
+	 release and can selectively release messages from the 
+	 transmission buffer when older messages are still outstanding."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), bufferRelease 
+	 attribute."
+    ::= { slSaalEntry 1 }
+
+slSaalMaxCc OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the maximum value [PDUs] of the state 
+	 variable VT(CC), corresponding to the maximum number of 
+	 transmissions of BGN, END, ER or RS PDUs."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxCc 
+	 attribute."
+    DEFVAL { 4 }
+    ::= { slSaalEntry 2 }
+
+slSaalMaxNrp OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the maximum number of retransmissions 
+	 allowed during proving."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxNrp 
+	 attribute."
+    ::= { slSaalEntry 3 }
+
+slSaalMaxInformationFieldLength OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the maximum length of the information 
+	 field in SD PDUs, UD PDUs and MD PDUs kh.  The unit of the 
+	 INTEGER value is octets."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 maxInformationFieldLength attribute."
+    DEFVAL { 4096 }
+    ::= { slSaalEntry 4 }
+
+slSaalMaxLengthSscopUuField OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the maximum length of a variable length 
+	 SSCOP UU field j.  The SSCOP UU is an optional field of BGN 
+	 PDUs, BGAK PDUs, BGREJ PDUs, END PDUs and RS PDUs.  The unit of 
+	 the INTEGER value is octets."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 maxLengthSscopUuField attribute."
+    DEFVAL { 4 }
+    ::= { slSaalEntry 5 }
+
+slSaalMaxPd OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the maximum acceptable value [PDUs] of 
+	 the state variable VT(PD) before sending a POLL PDU and 
+	 resetting VT(PD) to zero.  The VT(PD) is incremented each time 
+	 an SD PDU is transmitted."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxPd 
+	 attribute."
+    DEFVAL { 500 }
+    ::= { slSaalEntry 6 }
+
+slSaalMaxSscopCreditToPeer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the absolute value [PDUs] of the size of 
+	 the receive window given to the peer.  This value is added to 
+	 VR(R) to generate VR(MR).  VR(MR) is mapped to N(MR) by 
+	 transmission of STAT, USTAT, RS RSAK, ER, ERAK, BGN or BGAK 
+	 PDUs."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 maxSscopCreditToPeer attribute."
+    ::= { slSaalEntry 7 }
+
+slSaalMaxStat OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the maximum number of list elements 
+	 placed in a STAT PDU."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxStat 
+	 attribute."
+    DEFVAL { 67 }
+    ::= { slSaalEntry 8 }
+
+slSaalN1 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the number of PDUs sent during normal 
+	 proving."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), n1 attribute."
+    DEFVAL { 1000 }
+    ::= { slSaalEntry 9 }
+
+slSaalNniLayerManagementProvingState OBJECT-TYPE
+    SYNTAX	INTEGER {
+	normal(0), emergency(1), neutral(2) }
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the type of proving required by 
+	 management.  The value of the management proving state 
+	 overrides the value of proving required by MTP L3.  It can take 
+	 the values: Normal, emergency neutral."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 nniLayerManagementProvingState attribute."
+    ::= { slSaalEntry 10 }
+
+slSaalNniLayerManagementTimerNoCredit OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the maximum time interval that the value 
+	 of VT(MS) may remain less than or equal VT(S) before the link 
+	 is taken out of service.  The unit for the INTEGER value is 
+	 milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 nniLayerManagementTimerNoCredit attribute."
+    ::= { slSaalEntry 11 }
+
+slSaalNniLayerManagementTimerRepeatSrec OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the minimum time between SSCOP 
+	 recoveries which does not result in a release of the 
+	 connection.  The unit for the INTEGER value is milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 nniLayerManagementTimerRepeatSrec attribute."
+    ::= { slSaalEntry 12 }
+
+slSaalNniTimerT1 OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the time between the link release action 
+	 and the next link establish action during alignment.  The unit 
+	 for the INTEGER value is milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), nniTimerT1 
+	 attribute."
+    DEFVAL { 500 } -- 5 seconds
+    ::= { slSaalEntry 13 }
+
+slSaalNniTimerT2 OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the total time that SSCF NNI will 
+	 attempt alignment.  The unit for the INTEGER value is 
+	 milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), nniTimerT2 
+	 attribute."
+    DEFVAL { 3000 } -- 30 seconds
+    ::= { slSaalEntry 14 }
+
+slSaalNniTimerT3 OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"The time between proving PDUs such that proving PDUs are 
+	 transmitted with half of the channel bandwidth.  The unit for 
+	 the INTEGER value is microseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), nniTimerT3 
+	 attribute."
+    ::= { slSaalEntry 15 }
+
+slSaalSscopTimerCc OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the time interval between transmissions 
+	 of BGN, END, RS and ER PDUs when an acknowledge to these PDUs 
+	 has not been received.  The unit for the INTEGER value is 
+	 milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), sscopTimerCc 
+	 attribute."
+    DEFVAL { 20 } -- 200 milliseconds
+    ::= { slSaalEntry 16 }
+
+slSaalSscopTimerIdle OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the SSCOP timer IDLE.  The SSCOP 
+	 connection is partitioned into phases.  The SSCOP timer IDLE 
+	 supervises the idle phase.  In this phase the timer NO_RESPONSE 
+	 is not running and no POLL PDUs are transmitted.  The unit for 
+	 the INTEGER value is milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), sscopTimerIdle 
+	 attribute."
+    DEFVAL { 10 } -- 100 milliseconds
+    ::= { slSaalEntry 17 }
+
+slSaalSscopTimerKeepAlive OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the SSCOP timer KEEP_ALIVE.  The SSCOP 
+	 connection is partitioned into phases.  The SSCOP timer IDLE 
+	 supervises the transient phase.  In this phase there are no 
+	 outstanding acknowledgements or new data pending transmission.  
+	 The unit for the INTEGER value is milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 sscopTimerKeepAlive attribute."
+    DEFVAL { 10 } -- 100 milliseconds
+    ::= { slSaalEntry 18 }
+
+slSaalSscopTimerNoResponse OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the SSCOP timer NO_RESPONSE.  This timer 
+	 is used to detect a faulty connection.  The timer runs with 
+	 either the timer POLL or KEEP_ALIVE simultaneously.  The unit 
+	 for the INTEGER value is milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 sscopTimerNoResponse attribute."
+    DEFVAL { 150 } -- 1.5 seconds
+    ::= { slSaalEntry 19 }
+
+slSaalSscopTimerPoll OBJECT-TYPE
+    SYNTAX	TimeInterval
+    UNITS	"centiseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the SSCOP timer POLL.  The SSCOP 
+	 connection is partitioned into phases.  The SSCOP timer POLL 
+	 supervises the active phase.  In this new data is pending, 
+	 transmission or acknowledgements are outstanding.  The unit for 
+	 the INTEGER value is milliseconds."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), sscopTimerPoll 
+	 attribute."
+    DEFVAL { 10 } -- 100 milliseconds
+    ::= { slSaalEntry 20 }
+
+slSaalTransmissionRateIntervalLower OBJECT-TYPE
+    SYNTAX	Unsigned32 (64..4096)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the lower and upper boundaries for the 
+	 transmission rate to which the other attributes are set to fit 
+	 to.
+	 
+	 If the conditional egressTransmissionRateInterval attribute is 
+	 not present, the value of this attribute refers to both egress 
+	 and ingress traffic.  If the egressTransmissionRateInterval 
+	 attribute is present, the value of this attribute refers to 
+	 ingress traffic only.
+	 
+	 The unit of the INTEGER values is kbits per second.  The whole 
+	 NNI bandwidth range from 64 to 4096 kbit/s should be covered by 
+	 several slSaalProfile instances."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 transmissionRateInterval attribute."
+    DEFVAL { 129 }
+    ::= { slSaalEntry 21 }
+
+slSaalTransmissionRateIntervalUpper OBJECT-TYPE
+    SYNTAX	Unsigned32 (64..4096)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the lower and upper boundaries for the 
+	 transmission rate to which the other attributes are set to fit 
+	 to.
+	 
+	 If the conditional egressTransmissionRateInterval attribute is 
+	 not present, the value of this attribute refers to both egress 
+	 and ingress traffic.  If the egressTransmissionRateInterval 
+	 attribute is present, the value of this attribute refers to 
+	 ingress traffic only.
+	 
+	 The unit of the INTEGER values is kbits per second.  The whole 
+	 NNI bandwidth range from 64 to 4096 kbit/s should be covered by 
+	 several slSaalProfile instances."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 transmissionRateInterval attribute."
+    DEFVAL { 256 }
+    ::= { slSaalEntry 22 }
+
+slSaalEgressTransmissionRateIntervalLower OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the lower and upper boundaries for the 
+	 transmission rate to which the other attributes regarding 
+	 egress traffic are set to fit to.
+	 
+	 The unit of the INTEGER values is kbits per second.  The whole 
+	 NNI bandwidth range should be covered by several slSaalProfile 
+	 instances."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 egressTransmissionRateInterval attribute."
+    ::= { slSaalEntry 23 }
+
+slSaalEgressTransmissionRateIntervalUpper OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute defines the lower and upper boundaries for the 
+	 transmission rate to which the other attributes regarding 
+	 egress traffic are set to fit to.
+	 
+	 The unit of the INTEGER values is kbits per second.  The whole 
+	 NNI bandwidth range should be covered by several slSaalProfile 
+	 instances."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 egressTransmissionRateInterval attribute."
+    ::= { slSaalEntry 24 }
+
+slSaalPollAfterRetransmission OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute specifies if a POLL is transmitted each time the 
+	 retransmission queue is emptied."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 pollAfterRetransmission attribute."
+    ::= { slSaalEntry 25 }
+
+slSaalRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management stations may create and 
+	 delete rows in this table.  Asside from several default 
+	 entries, entires are only created or deleted from this table by 
+	 management stations.  Entries created in this table must 
+	 survive an agent reboot."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     slSaalProtocolProfileRowStatus attribute.
+	 STD 58, SNMPv2-TC RowStatus."
+    ::= { slSaalEntry 26 }
+
+
+-- =============================================================================
+
+slM2paTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlM2paEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"This table provides a table of protocol parameter profiles for 
+	 M2PA signalling links.  The entries in this table are used when 
+	 creating rows for M2PA signalling links to determine the 
+	 initial values of protocol parameters associated with the 
+	 link."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     slM2paProtocolProfile MOC.
+	 RFC 4165, ITU-T Rec. Q.703, ITU-T Rec. Q.751.1, ANSI T1.116.1, 
+	 ITU-T Rec. Q.2751.1."
+    ::= { slSdt 3 }
+
+slM2paEntry OBJECT-TYPE
+    SYNTAX	SlM2paEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"Each entry in the table provides one profile which may be used 
+	 when creating rows in the m2paLinkTable and is used for default 
+	 values of the protocol parameters.  Each entry is indexed by 
+	 protocol variant."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     slM2paProtocolProfile MO.
+	 RFC 4165, ITU-T Rec. Q.703, ITU-T Rec. Q.751.1, ANSI T1.116.1, 
+	 ITU-T Rec. Q.2751.1."
+    INDEX	{
+	slSdtProfileId	-- shared index
+    }
+    ::= { slM2paTable 1 }
+
+SlM2paEntry ::= SEQUENCE {
+    slM2paN1
+	Unsigned32,
+    slM2paProving
+	TruthValue,
+    slM2paManagementProvingState
+	INTEGER,
+    slM2paLoopDelayLower
+	MilliSeconds,
+    slM2paLoopDelayUpper
+	MilliSeconds,
+    slM2paTransmissionRateIntervalLower
+	Unsigned32,
+    slM2paTransmissionRateIntervalUpper
+	Unsigned32,
+    slM2paSctpNoDelay
+	TruthValue,
+    slM2paSctpMaxseg
+	Unsigned32,
+    slM2paSctpHeartbeatItvl
+	MilliSeconds,
+    slM2paSctpHeartbeat
+	TruthValue,
+    slM2paSctpRtoInitial
+	MilliSeconds,
+    slM2paSctpRtoMin
+	MilliSeconds,
+    slM2paSctpRtoMax
+	MilliSeconds,
+    slM2paSctpPathMaxRetrans
+	Unsigned32,
+    slM2paSctpCookieLife
+	MilliSeconds,
+    slM2paSctpCookieInc
+	MilliSeconds,
+    slM2paSctpMaxInitRetries
+	Unsigned32,
+    slM2paSctpMaxBurst
+	Unsigned32,
+    slM2paSctpAssocMaxRetrans
+	Unsigned32,
+    slM2paSctpSackDelay
+	MilliSeconds,
+    slM2paSctpLifetime
+	MilliSeconds,
+    slM2paProvingAttempts
+	Unsigned32,
+    slM2paRowStatus
+	RowStatus
+}
+
+slM2paN1 OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the number of PDUs sent during normal 
+	 proving."
+    REFERENCE	
+	"ITU-T Rec. Q.2751.1 (1997) n1."
+    DEFVAL { 1000 }
+    ::= { slM2paEntry 1 }
+
+slM2paProving OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines whether the M2PA signalling link using this 
+	 M2PA protocol profile will, when true(1),  perform proving in 
+	 accordance with Q.703, ANSI T1.111.3, and optional Q.2140 
+	 procedures, or whether the M2PA signalling link will, when 
+	 false(2), forego proving althogether."
+    REFERENCE	
+	""
+    DEFVAL { 1 } -- true(1)
+    ::= { slM2paEntry 2 }
+
+slM2paManagementProvingState OBJECT-TYPE
+    SYNTAX	INTEGER {
+	normal(0), emergency(1), neutral(2) }
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the type of proving required by management.  
+	 The value of the management proving state overrides the value 
+	 of proving required by MTP L3.  It can take the values:
+	  - normal: normal proving is always applied to the signalling 
+	    link;
+	  - emergency: emergency proving is always applied to the 
+	    signalling link;
+	  - neutral: whichever form of proving is requested by MTP L3 is 
+	    applied to the signalling link.
+	 This column only takes effect when slM2paProving is true(1).  
+	 When slM2paProving is false(2), no proving is performed."
+    REFERENCE	
+	"ITU-T Rec. Q.2751.1 (1997) nniLayerManagementProvingState."
+    ::= { slM2paEntry 3 }
+
+slM2paLoopDelayLower OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the lower boundary for the loop delay 
+	 (round trip time) for which the other attributes in the 
+	 conceptual row are applicable.    The lower M2PA loop delay 
+	 must be less than the upper M2PA loop delay.  The range defined 
+	 by the lower and upper M2PA loop delay and the range defined by 
+	 the lower and upper M2PA transmission rate cannot overlap in 
+	 conjunction with another pair of ranges belonging to another 
+	 entry belonging to the same managed switching system and 
+	 network entity."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 4 }
+
+slM2paLoopDelayUpper OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the upper boundary for the loop delay 
+	 (round trip time) for which the other attributes in the 
+	 conceptual row are applicable.  The upper M2PA loop delay must 
+	 be greater than the lower M2PA loop delay.  The range defined 
+	 by the lower and upper M2PA loop delay and the range defined by 
+	 the lower and upper M2PA transmission rate cannot overlap in 
+	 conjunction with another pair of ranges belonging to another 
+	 entry belonging to the same managed switching system and 
+	 network entity."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 5 }
+
+slM2paTransmissionRateIntervalLower OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"bits per second"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the lower boundary for the transmission 
+	 rate range for which the other attributes in the conceptual row 
+	 are applicable.  The lower M2PA transmission rate must be less 
+	 than the upper M2PA transmission rate.  The range defined by 
+	 the lower and upper M2PA transmission rates and the range 
+	 defined byt he lower and upper M2PA loop delay cannot overlap 
+	 in conjunction with another pair of ranges belonging to another 
+	 entry belonging to the same managed switching element and 
+	 network entity."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 6 }
+
+slM2paTransmissionRateIntervalUpper OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"bits per second"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the upper boundary for the transmission 
+	 rate range for which the other attributes in the conceptual row 
+	 are applicable.  The upper M2PA transmission rate must be 
+	 greater than the lower M2PA transmission rate.  The range 
+	 defined by the lower and upper M2PA transmission rates and the 
+	 range defined byt he lower and upper M2PA loop delay cannot 
+	 overlap in conjunction with another pair of ranges belonging to 
+	 another entry belonging to the same managed switching element 
+	 and network entity."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 7 }
+
+slM2paSctpNoDelay OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines, under this M2PA profile, whether the Nagle 
+	 algorithm should be applied to SCTP associations.  The Nagle 
+	 algorithm increases the size of the packets placed on the 
+	 network at the expense of delaying the transmission of some 
+	 data during congestion episodes.  When set to true(1), the 
+	 Nagle algorithm is suppresed; otherwise, set to false(2), the 
+	 Nagle algorithm is in effect.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpNoDelay."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 8 }
+
+slM2paSctpMaxseg OBJECT-TYPE
+    SYNTAX	Unsigned32 (1..65536)
+    UNITS	"octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the maximum SCTP payload size for outgoing 
+	 packets.  Values greater than the association MTU are ignored 
+	 and have no effect.  The value determines the maximum size (in 
+	 octets) above which SCCP will fragment larger DATA chunis into 
+	 smaller DATA chunks, and beneath which SCTP will bundle DATA 
+	 chunks into a single packate or combine smaller DATA chunks 
+	 into larger DATA chunks.  Normally this value is the 
+	 association MTU value must the size of the current IP and SCTP 
+	 headers, minus the size of one DATA chunk header.  When set to 
+	 a lower value, the lower value will be used.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpMaxseg."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 9 }
+
+slM2paSctpHeartbeatItvl OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the time interval (in milliseconds) between 
+	 successive HEARTBEAT messages used to probe destination 
+	 transport addresses for RTT calculation and activity.  Valid 
+	 values are zero (0) - do not heartbeat, or a value of 1 
+	 millisecond or greater.
+	 
+	 The default value is determined by the setting of 
+	 m2paDefaultHeartbeatItvl."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 10 }
+
+slM2paSctpHeartbeat OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column determines whether HEARTBEAT messages used to probe 
+	 destination transport addresses for RTT calculation and 
+	 activity will be sent periodically.  The default value from RFC 
+	 2960 is true(1).
+	 
+	 Disabling heartbeats reduces the protocol's responsiveness in 
+	 detection of failures and redirection of traffic away from 
+	 failed paths and interfaces.  This column should normally be 
+	 left at its default value.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpHeartbeat."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 11 }
+
+slM2paSctpRtoInitial OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the initial time interval (in milliseconds) 
+	 that will be used as an initial RTO (retransmission timeout) 
+	 value when sending packets to a destination for the first time.  
+	 Valid values are zero or greater but must be within the range 
+	 slM2paSctpRtoMin to slM2paSctpRtoMax.  The default value is 
+	 the value recommended by RFC 2960 and RFC 4960 (1000 
+	 milliseconds, or 1 second).
+	 
+	 Note that, in general, the RTO initial should not be less than 
+	 the peer's maximum SACK delay, otherwise, excessive 
+	 retransmission migh occur while the peer is delaying 
+	 acknowledgements.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpRtoInitial."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 12 }
+
+slM2paSctpRtoMin OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the minimum timer interval (in 
+	 milliseconds) that will be used as an RTO (retranmission 
+	 timeout) value when sending packets to a destination transport 
+	 address and expecting acknowledgements.  Valid values are zero 
+	 or greater and must be less than or equal to 
+	 slM2paSctpRtoInitial and strictly less than and 
+	 slM2paSctpRtoMax.  The default value is the value recommended 
+	 by RFC 2960 and RFC 4960 (1000 milliseconds, or 1 second).
+	 
+	 Note that, in general, the RTO minimum should not be less than 
+	 the peer's maximum SACK delay, otherwise, excessive 
+	 retransmission migh occur while the peer is delaying 
+	 acknowledgements.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpRtoMin."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 13 }
+
+slM2paSctpRtoMax OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the maximum time interval (in milliseconds) 
+	 that will be used as an RTO (retransmission timeout) value when 
+	 sending packets t a destination transport address and expecting 
+	 acknowledgements.  Valid values are zero or greater but must be 
+	 greater than or equal to slM2paSctpRtoInitial and strictly 
+	 greater than slM2paSctpRtoMin.  The default value is the value 
+	 recommended by RFC 2960 and RFC 4960 (60000 milliseconds, or 60 
+	 seconds).
+	 
+	 Note that, in general, the RTO maximum should not be less than 
+	 the peer's maximum SACK delay, otherwise, excessive 
+	 retransmission migh occur while the peer is delaying 
+	 acknowledgements.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpRtoMax."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 14 }
+
+slM2paSctpPathMaxRetrans OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"retransmissions"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the number of times that SCTP will attempt 
+	 retransmitting a packet to a given detination transport address 
+	 before it considers that destination transport address 
+	 inactive.  Valid values are zero or greater.  The default value 
+	 is the value recommended in RFC 2960 (5 retransmissions).
+	 
+	 Adjusting this value has an effect on th period of time taken 
+	 to fail-over between destinations for multi-homed connections.  
+	 Lower values (including zero) will yield faster fail-over 
+	 response times.  Lower values, however, may cause thrashing 
+	 between destinations contributing to congestion in the network.  
+	 Deafult values are applicable to Internet applicaions.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpPathMaxRetrans."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 15 }
+
+slM2paSctpCookieLife OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the time interval (in milliseconds) in 
+	 conjunction with slM2paSctpCookieInc beyond which a 
+	 COOKIE-ECHO received with a cookie sent in an INIT-ACK will no 
+	 longer be accepted.  For SCTP, this also limits the maximum 
+	 time interval for which the HMAC secret key for the cookie will 
+	 be valid.  Valid values are zero or greater.  Values of zero 
+	 will  be converted to a system clock tick.  The default value 
+	 is the value recommended by RFC 2960 (60,000 milliseconds, or 
+	 60 seconds).
+	 
+	 Reducing this value will increase the probability that passive 
+	 connection attempts will fail due to expired cookies.  
+	 Increasing the value will reduce the overall security of the 
+	 system by permitting attackers an increased interval within 
+	 which to crack HMACs and guess verification tags.  This value 
+	 may be adjusted in conjunction with slM2paSctpCookieInc to 
+	 meet most objectives for successful passive connection attempts 
+	 with the best security afforded by smaller values of 
+	 slM2paSctpCookieLife.
+	 
+	 Unfortunately, the slM2paSctpCookieLife and 
+	 slM2paSctpCookieInc must be adjusted to accomodate the slowest 
+	 peer on the slowest connection.  The default setting is 
+	 adequate for Internet applications.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpCookieLife."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 16 }
+
+slM2paSctpCookieInc OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the time increment (in milliseconds) that 
+	 will be added to the lifespan of the cookie in an INIT-ACK if 
+	 the recieved INIT requests cookie preservative to lengthen the 
+	 lifespan of the cookie.  Valid values are zero or greater.  The 
+	 default value is the value recommended in RFC 
+	 2960 5.2.6 (1000 milliseconds, or 1 second).
+	 
+	 This value can be adjusted in conjunction with 
+	 slM2paSctpCookieLife to meet objectives of successful passive 
+	 connection attempts and security.  The default setting is 
+	 adequate for Internet applications.
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpCookieInc."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 17 }
+
+slM2paSctpMaxInitRetries OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"retries"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the number of times that an INIT or 
+	 COOKIE-ECHO will be resent to a given destination before 
+	 abandoning an active open attempt.  Value values are zero or 
+	 greater.  The default value is the value recommended by RFC 
+	 2960 (8 retries).
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpMaxInitRetries."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 18 }
+
+slM2paSctpMaxBurst OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"packets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the maximum number of MTUs of new data 
+	 chunks that will be sent in a burst in accordance with SCTP 
+	 Specification Errata and Issues, RFC 4460 and RFC 4960.  The 
+	 default value is the value recommended in RFC 4960 (4 MTUs).
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpMaxBurst."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 19 }
+
+slM2paSctpAssocMaxRetrans OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"retransmissions"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the number of times that the sending 
+	 endpoint will attempt retransmitting a packet on any active 
+	 destination transport address before it aborts the association.  
+	 Value values are zero or greater.  The default value is the 
+	 value recommended in RFC 2960 (10 retransmissions).
+	 
+	 This value should be larger  than sum of the path maximum 
+	 number of retransmission values of each of the destinations.
+	 
+	 Setting this value to less than the sum of the path maximum 
+	 retransmission values for all of the destinations has the 
+	 interesting effect of permitting a connection to persist even 
+	 when all destinations have been deemed inactive.
+	 
+	 The default value is determined by the setting of 
+	 m2paDefaultAssocMaxRetrans."
+    REFERENCE	
+	""
+    DEFVAL { 20 } -- 200 milliseconds
+    ::= { slM2paEntry 20 }
+
+slM2paSctpSackDelay OBJECT-TYPE
+    SYNTAX	MilliSeconds (0..50)
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This column defines the interval of time (in milliseconds) that 
+	 will be used as an RTO (retransmission timeout) value when 
+	 sending packets to a destination transport address.  Valid 
+	 values are zero or to 500 milliseconds (RFC 2960 forbits 
+	 setting this value larger than 500 milliseconds).  The default 
+	 value is the value recommended in RFC 2960 (200 milliseconds).
+	 
+	 The default value is determined by the setting of 
+	 slM2paDefaultSctpSackDelay."
+    REFERENCE	
+	""
+    DEFVAL { 20 } -- 200 milliseconds
+    ::= { slM2paEntry 21 }
+
+slM2paSctpLifetime OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"The default value is determined by the setting of 
+	 slM2paDefaultSctpLifetime."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 22 }
+
+slM2paProvingAttempts OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Defines the number of unsuccesful proving attempts that will be 
+	 conducted during link alignment before the alignment procedures 
+	 will be considered unsuccessful."
+    REFERENCE	
+	""
+    ::= { slM2paEntry 23 }
+
+slM2paRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management stations, following the 
+	 RowStatus textual convention from the SNMPv2-TC module, may 
+	 create or destroy conceptual rows in this table."
+    REFERENCE	
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { slM2paEntry 24 }
+
+
+-- =============================================================================
+
+slSdtNextIndex OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Provides the next available index in the slSdtTable."
+    ::= { slSdt 4 }
+
+slSdtTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlSdtEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"This is the Signalling Data Terminal table.  Each entry in this 
+	 table represents a Signalling Data Terminal.
+	 
+	 The signTerm MOC defines the management capabilities for the 
+	 signalling terminal.  The signalling terminal is defined in 
+	 ITU-T Rec. Q.703."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signTerm MOC."
+    ::= { slSdt 5 }
+
+slSdtEntry OBJECT-TYPE
+    SYNTAX	SlSdtEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"An entry (row) in the slSdtTable."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signTerm MO."
+    INDEX	{
+	slSdtId
+    }
+    ::= { slSdtTable 1 }
+
+SlSdtEntry ::= SEQUENCE {
+    slSdtId
+	Unsigned32,
+    slSdtAdministrativeState
+	AdministrativeState,
+    slSdtOperationalState
+	OperationalState,
+    slSdtUsageState
+	UsageState,
+    slSdtProceduralStatus
+	ProceduralStatus,
+    slSdtAvailabilityStatus
+	AvailabilityStatus,
+    slSdtEquipmentPointer
+	RowPointer,
+    slSdtName
+	CommonLanguageName,
+    slSdtProfilePointer
+	SimpleNameType,
+    slSdtRowStatus
+	RowStatus
+}
+
+slSdtId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is used for naming instances."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signTermId 
+	 attribute."
+    ::= { slSdtEntry 1 }
+
+slSdtAdministrativeState OBJECT-TYPE
+    SYNTAX	AdministrativeState
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides the administrative state of the signalling terminal 
+	 following the AdministativeState textual convention of the 
+	 OPENSS7-SMI-MIB module and ITU-T Rec. X.721 | ISO/IEC 10165-2.
+
+	  - locked(0), 
+	  - unlocked(1), 
+	  - shuttingDown(2), 
+	"
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+	     administrativeState attribute.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+	     administrativeState attribute."
+    DEFVAL { 0 } -- locked
+    ::= { slSdtEntry 2 }
+
+slSdtOperationalState OBJECT-TYPE
+    SYNTAX	OperationalState
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Provides the operational state of the signalling terminal 
+	 following the OperationalState textual convention of the 
+	 OPENSS7-SMI-MIB module and ITU-T Rec. X.721 | ISO/IEC 10165-2.
+	 
+	  - disabled(0), 
+	  - enabled(1), 
+	 "
+    REFERENCE	
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.OperationalState.
+	 ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+	     Section 8.1.1.1.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     operationalState attribute."
+    DEFVAL { 0 } -- disabled
+    ::= { slSdtEntry 3 }
+
+slSdtUsageState OBJECT-TYPE
+    SYNTAX	UsageState
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Provides the usage state of the signalling terminal following 
+	 the UsageState textual convention of the OPENSS7-SMI-MIB module 
+	 and ITU-T Rec. X.721 | ISO/IEC 10165-2.
+
+	  - idle(0),
+	  - active(1),
+	  - busy(2),
+	 "
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), usageState 
+	     attribute."
+    DEFVAL { 0 } -- idle
+    ::= { slSdtEntry 4 }
+
+slSdtProceduralStatus OBJECT-TYPE
+    SYNTAX	ProceduralStatus
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Provides the procedural status of the signalling terminal 
+	 following the ProceduralStatus textual convention of the 
+	 OPENSS7-SMI-MIB module and ITU-T Rec. X.721 | ISO/IEC 10165-2.
+	 
+	  - initializationRequired(0),
+	  - notInitialized(1),
+	  - initializing(2),
+	  - reporting(3),
+	  - terminating(4),
+	 "
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	 proceduralStatus attribute."
+    ::= { slSdtEntry 5 }
+
+slSdtAvailabilityStatus OBJECT-TYPE
+    SYNTAX	AvailabilityStatus
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Provides the availabilty status of the signalling terminal 
+	 following the AvailabilityStatus textual convention of the 
+	 OPENSS7-SMI-MIB module and ITU-T Rec. X.721 | ISO/IEC 
+	 10165-2.
+	 
+	  - inTest(0),
+	  - failed(1),
+	  - powerOff(2),
+	  - offLine(3),
+	  - offDuty(4),
+	  - dependency(5),
+	  - degraded(6),
+	  - notInstalled(7),
+	  - logFull(8),
+	"
+    REFERENCE	
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2, availabilityStatus 
+	     attribute.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     availabilityStatus attribute."
+    ::= { slSdtEntry 6 }
+
+slSdtEquipmentPointer OBJECT-TYPE
+    SYNTAX	RowPointer
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is used to reference physical equipment."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     equipmentPointer attribute."
+    DEFVAL { { zeroDotZero } }
+    ::= { slSdtEntry 7 }
+
+slSdtName OBJECT-TYPE
+    SYNTAX	CommonLanguageName
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is an additional name for instances of the 
+	 signTerm managed object class."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signTermName 
+	 attribute."
+    ::= { slSdtEntry 8 }
+
+slSdtProfilePointer OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a pointer to a signalling terminal protocol profile to 
+	 be used with the signalling terminal.  This points to an entry 
+	 in the slNbTable, an entry in the slSaalTable or a entry in the 
+	 slM2paTable, as appropriate."
+    REFERENCE	
+	""
+    ::= { slSdtEntry 9 }
+
+slSdtRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management stations may create and 
+	 delete rows in this table.
+	 
+	 A create request is rejected if the equipmentPointer would 
+	 reference equipment that does not exist.  If the name package 
+	 is supported: a create request with a value for the name 
+	 attribute that is already used by another instance of the same 
+	 object class will be rejected."
+    REFERENCE	
+	"STD 58, SNMPv2-TC RowStatus.
+	 ITU-T Rec. Q.751.1 (1997) : managedSwitchingElement-signTerm 
+	     NAME BINDING."
+    ::= { slSdtEntry 10 }
+
+
+-- =============================================================================
+
+slSdlNextIndex OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Provides the next available index in the slSdlTable."
+    ::= { slSdl 1 }
+
+slSdlTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SlSdlEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"This managed object represents the termination of the 
+	 signalling data link within the SP as defined in Q.702.
+	 
+	 The operational state is enabled in normal operation. In case 
+	 of failure of the part of the signalling data link that is 
+	 within control of the managed switching element, this state 
+	 will be 'disabled'.
+	 
+	 If the vcTTpPointer attribute is present, then the transmission 
+	 rate is determined by the cell rate fixed in the 
+	 trafficDescriptorPackages of the vcTTPBidirectional instance 
+	 referenced by the signDataLinkTp.
+	
+	 Note that for a complete view of the status of a signalling 
+	 data link a network view is required."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signDataLinkTp 
+	     MOC."
+    ::= { slSdl 2 }
+
+slSdlEntry OBJECT-TYPE
+    SYNTAX	SlSdlEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"This is an entry (row) in the SDL table."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signDataLinkTp 
+	     MO."
+    INDEX	{
+	slSdlId
+    }
+    ::= { slSdlTable 1 }
+
+SlSdlEntry ::= SEQUENCE {
+    slSdlId
+	Unsigned32,
+    slSdlAdjPc
+	NetworkPointCode,
+    slSdlTransmissionRate
+	MtpTransmissionRate,
+    slSdlLoopDelay
+	MilliSeconds,
+    slSdlOperationalState
+	OperationalState,
+    slSdlEquipmentPointer
+	RowPointer,
+    slSdlCIC
+	CircuitIdentificationCode,
+    slSdlName
+	CommonLanguageName,
+    slSdlStmChannel
+	CircuitCode,
+    slSdlVcTTpPointer
+	RowPointer,
+    slSdlRowStatus
+	RowStatus
+}
+
+slSdlId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is used for naming instances."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), attribute."
+    ::= { slSdlEntry 1 }
+
+slSdlAdjPc OBJECT-TYPE
+    SYNTAX	NetworkPointCode
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This columnar object is an entry of the SDL table that 
+	 indicates the signalling point code of the adjacent signalling 
+	 point (the signalling point at the opposite end of the link).  
+	 Becase the Signalling Point could be operating in multiple 
+	 National and International networks, the NetworkPointCode 
+	 contains a network identifier."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), attribute."
+    ::= { slSdlEntry 2 }
+
+slSdlTransmissionRate OBJECT-TYPE
+    SYNTAX	MtpTransmissionRate
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Specifies or indicates the nominal transmission rate associated 
+	 with the narrowband signalling data link."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), attribute."
+    ::= { slSdlEntry 3 }
+
+slSdlLoopDelay OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Specifies the nominal loop delay (in milliseconds) associated 
+	 with the narrowband signalling data link.  The value zero (0), 
+	 indicates that the nominal loop delay of the signalling data 
+	 link is unknown and unspecified."
+    DEFVAL { 0 }
+    ::= { slSdlEntry 4 }
+
+slSdlOperationalState OBJECT-TYPE
+    SYNTAX	OperationalState
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides the operational state of the signalling data link 
+	 following the OperationalState textual convention of the 
+	 OPENSS7-SMI-MIB module, and according to ITU-T Rec. X.721 | 
+	 ISO/IEC 10165-2.
+	 
+	  - disabled(0), 
+	  - enabled(1), 
+	 "
+    REFERENCE	
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.OperationalState.
+	 ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+	     Section 8.1.1.1.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     operationalState attribute."
+    DEFVAL { 0 } -- disabled
+    ::= { slSdlEntry 5 }
+
+slSdlEquipmentPointer OBJECT-TYPE
+    SYNTAX	RowPointer
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is used to reference physical equipment."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), attribute."
+    DEFVAL { { zeroDotZero } }
+    ::= { slSdlEntry 6 }
+
+slSdlCIC OBJECT-TYPE
+    SYNTAX	CircuitIdentificationCode
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is used to reference the SS No. 7 trunk used by 
+	 the datalink.  Its value has to be unique within the SP's 
+	 connected by the trunk.
+	 
+	 This columnar object is an entry of the SDL table that 
+	 indicates the circuit identification code (CIC) which 
+	 identifies the SDL channel between the local and adjacent 
+	 signalling points.  This value is only necessary when the 
+	 automatic allocation of signalling data links is supported.  
+	 For IUT-T based networks, the CIC can have a value 0..4095, for 
+	 ANSI based networks, the CIC can have a value 0..16383."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     signDataLinkTp::cIC ATTRIBUTE."
+    DEFVAL { 0 }
+    ::= { slSdlEntry 7 }
+
+slSdlName OBJECT-TYPE
+    SYNTAX	CommonLanguageName
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute is an additional name for instances of the 
+	 signDataLinkTp managed object class."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), attribute."
+    ::= { slSdlEntry 8 }
+
+slSdlStmChannel OBJECT-TYPE
+    SYNTAX	CircuitCode
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This is a circuit code which uniquely identifies the circuit 
+	 group or circuit facility which provides the signalling data 
+	 link.
+	 
+	 This attribute denotes the STM channel which defines the 
+	 signalling datalink on the PCM transmission system.  Note that 
+	 the range is (1..31) for E1 and (1..24) for T1 and J1.
+	 
+	 For broadband (SAAL) and SIGTRAN (M2PA) signalling data links, 
+	 this column is not present."
+    REFERENCE	
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	    signDataLinkTp::stmChannel ATTRIBUTE.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	    MTPDefinedTypesModule.StmChannel."
+    ::= { slSdlEntry 9 }
+
+slSdlVcTTpPointer OBJECT-TYPE
+    SYNTAX	RowPointer
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"This attribute references an object class defined in I.751.  It 
+	 must be present for a broadband signalling data link, it must 
+	 not be present for a narrowband datalink (the term ebroadband 
+	 signalling data linkl signifies a data link using the SAAL 
+	 NNI).  The referenced instance has a mandatory relation via its 
+	 upstream- and downstreamConnectivityPointers to one instance of 
+	 object class vcCTPBidirectional, whose Id represents the VCI of 
+	 the virtual channel used by the data link.  This 
+	 vcCTPBidirectional is contained in a superior object 
+	 vpTTPBidirectional, which has a mandatory relation via its 
+	 upstream- and downstreamConnectivityPointers to one instance of 
+	 the object class vpTTPBidirectional, whose Id represents the 
+	 VPI of the virtual path used by the data link.
+	 
+	 For narrowband (TDM) and SIGTRAN (M2PA) signalling data links, 
+	 this column is not present."
+    REFERENCE	
+	"ITU-T Rec. Q.2751.1 (1997), signDataLinkTp::vcTTpPointer 
+	     ATTRIBUTE."
+    ::= { slSdlEntry 10 }
+
+slSdlRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"Provides a mechanism whereby management stations may create and 
+	 delete entries in this table.
+	 
+	 A create request is rejected if the equipmentPointer would 
+	 reference equipment that does not exist.  If the name package 
+	 is supported: a create request with a value for the name 
+	 attribute that is already used by another instance of the same 
+	 object class will be rejected."
+    REFERENCE	
+	"STD 58, SNMPv2-TC RowStatus.
+	 ITU-T Rec. Q.751.1 (1997) : mtpSignPoint-signDataLinkTp NAME 
+	     BINDING."
+    ::= { slSdlEntry 11 }
+
+
+-- =============================================================================
+
+END -- OPENSS7-SL-MIB module
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+

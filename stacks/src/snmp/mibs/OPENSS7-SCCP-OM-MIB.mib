@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SCCP-OM-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-12-27 15:29:49 $
+-- @(#) $RCSfile: OPENSS7-SCCP-OM-MIB.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-31 16:04:49 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-27 15:29:49 $ by $Author: brian $
+-- Last Modified $Date: 2008-12-31 16:04:49 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SCCP-OM-MIB.mib,v $
+-- Revision 0.9.2.5  2008-12-31 16:04:49  brian
+-- - updated mibs
+--
 -- Revision 0.9.2.4  2008-12-27 15:29:49  brian
 -- - split MTP and MTP OM mib
 --
@@ -71,7 +74,8 @@ OPENSS7-SCCP-OM-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32
 	FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, InstancePointer, TimeStamp, TimeInterval
+    TEXTUAL-CONVENTION, InstancePointer, TimeStamp, TimeInterval, 
+    Counter
 	FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
 	FROM SNMPv2-CONF
@@ -922,30 +926,30 @@ sccpOmErrorsEntry OBJECT-TYPE
 SccpOmErrorsEntry ::=
     SEQUENCE {
 	-- Obligatory 1st & Int. and 15 min
-	sccpOmNoTranslatorForAddress		PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmNoRuleForAddress			PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmPointCodeNotAvailable		PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmPointCodeCongested		PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmSubsystemUnavailable		PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmSubsystemCongested		PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmUnequippedSubsystem		PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmSyntaxErrorDetected		PerfCurrentCount, -- (scrc)
-	sccpOmRoutingFailure			PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmReassemblyTimeOut			PerfCurrentCount, -- reassemblyErrorData (sclc)
-	sccpOmSegmentOutOfOrder			PerfCurrentCount, -- reassemblyErrorData (sclc)
-	sccpOmNoReassemblySpace			PerfCurrentCount, -- reassemblyErrorData (sclc)
-	sccpOmHopCounterViolation		PerfCurrentCount, -- routingFailureData (scrc)
-	sccpOmTooLargeForSegmentation		PerfCurrentCount, -- (sccpAccessPoint)
-	sccpOmReleaseFailure			PerfCurrentCount, -- (sclc ^Q.751.2)
-	sccpOmInactivityTimerExpiry		PerfCurrentCount, -- (sclc ^Q.751.2)
-	sccpOmProviderInitiatedReset		PerfCurrentCount, -- (sclc ^Q.751.2)
-	sccpOmProviderInitiatedRelease		PerfCurrentCount, -- (sclc ^Q.751.2)
+	sccpOmNoTranslatorForAddress		Counter, -- routingFailureData (scrc)
+	sccpOmNoRuleForAddress			Counter, -- routingFailureData (scrc)
+	sccpOmPointCodeNotAvailable		Counter, -- routingFailureData (scrc)
+	sccpOmPointCodeCongested		Counter, -- routingFailureData (scrc)
+	sccpOmSubsystemUnavailable		Counter, -- routingFailureData (scrc)
+	sccpOmSubsystemCongested		Counter, -- routingFailureData (scrc)
+	sccpOmUnequippedSubsystem		Counter, -- routingFailureData (scrc)
+	sccpOmSyntaxErrorDetected		Counter, -- (scrc)
+	sccpOmRoutingFailure			Counter, -- routingFailureData (scrc)
+	sccpOmReassemblyTimeOut			Counter, -- reassemblyErrorData (sclc)
+	sccpOmSegmentOutOfOrder			Counter, -- reassemblyErrorData (sclc)
+	sccpOmNoReassemblySpace			Counter, -- reassemblyErrorData (sclc)
+	sccpOmHopCounterViolation		Counter, -- routingFailureData (scrc)
+	sccpOmTooLargeForSegmentation		Counter, -- (sccpAccessPoint)
+	sccpOmReleaseFailure			Counter, -- (sclc ^Q.751.2)
+	sccpOmInactivityTimerExpiry		Counter, -- (sclc ^Q.751.2)
+	sccpOmProviderInitiatedReset		Counter, -- (sclc ^Q.751.2)
+	sccpOmProviderInitiatedRelease		Counter, -- (sclc ^Q.751.2)
 	-- Non-Obligatory 1st & Int. and 15 min
-	sccpOmNoSegmentationSupport		PerfCurrentCount, -- segmentationErrorData (sclc)
+	sccpOmNoSegmentationSupport		Counter, -- segmentationErrorData (sclc)
 	-- Obligatory 1st & Int. and 15 min
-	sccpOmSegmentationFailure		PerfCurrentCount, -- segmentationErrorData (sclc)
+	sccpOmSegmentationFailure		Counter, -- segmentationErrorData (sclc)
 	-- Non-Obligatory 1st & Int. and 15 min
-	sccpOmReassemblyFailure			PerfCurrentCount, -- reassemblyErrorData (sclc)
+	sccpOmReassemblyFailure			Counter, -- reassemblyErrorData (sclc)
 	sccpOmErrors5MinValidIntervals		HCPerfValidIntervals,
 	sccpOmErrors15MinValidIntervals		HCPerfValidIntervals
    }
@@ -953,7 +957,7 @@ SccpOmErrorsEntry ::=
 -- Obligatory 1st & Int. and 15 min
 
 sccpOmNoTranslatorForAddress OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -990,7 +994,7 @@ sccpOmNoTranslatorForAddress OBJECT-TYPE
     ::= { sccpOmErrorsEntry 1 }
 
 sccpOmNoRuleForAddress OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1028,7 +1032,7 @@ sccpOmNoRuleForAddress OBJECT-TYPE
     ::= { sccpOmErrorsEntry 2 }
 
 sccpOmPointCodeNotAvailable OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1063,7 +1067,7 @@ sccpOmPointCodeNotAvailable OBJECT-TYPE
     ::= { sccpOmErrorsEntry 3 }
 
 sccpOmPointCodeCongested OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1097,7 +1101,7 @@ sccpOmPointCodeCongested OBJECT-TYPE
     ::= { sccpOmErrorsEntry 4 }
 
 sccpOmSubsystemUnavailable OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1132,7 +1136,7 @@ sccpOmSubsystemUnavailable OBJECT-TYPE
     ::= { sccpOmErrorsEntry 5 }
 
 sccpOmSubsystemCongested OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1166,7 +1170,7 @@ sccpOmSubsystemCongested OBJECT-TYPE
     ::= { sccpOmErrorsEntry 6 }
 
 sccpOmUnequippedSubsystem OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1199,7 +1203,7 @@ sccpOmUnequippedSubsystem OBJECT-TYPE
     ::= { sccpOmErrorsEntry 7 }
 
 sccpOmSyntaxErrorDetected OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1230,7 +1234,7 @@ sccpOmSyntaxErrorDetected OBJECT-TYPE
     ::= { sccpOmErrorsEntry 8 }
 
 sccpOmRoutingFailure OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1263,7 +1267,7 @@ sccpOmRoutingFailure OBJECT-TYPE
     ::= { sccpOmErrorsEntry 9 }
 
 sccpOmReassemblyTimeOut OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1297,7 +1301,7 @@ sccpOmReassemblyTimeOut OBJECT-TYPE
     ::= { sccpOmErrorsEntry 10 }
 
 sccpOmSegmentOutOfOrder OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1332,7 +1336,7 @@ sccpOmSegmentOutOfOrder OBJECT-TYPE
     ::= { sccpOmErrorsEntry 11 }
 
 sccpOmNoReassemblySpace OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1367,7 +1371,7 @@ sccpOmNoReassemblySpace OBJECT-TYPE
     ::= { sccpOmErrorsEntry 12 }
 
 sccpOmHopCounterViolation OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1403,7 +1407,7 @@ sccpOmHopCounterViolation OBJECT-TYPE
     ::= { sccpOmErrorsEntry 13 }
 
 sccpOmTooLargeForSegmentation OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1438,7 +1442,7 @@ sccpOmTooLargeForSegmentation OBJECT-TYPE
     ::= { sccpOmErrorsEntry 14 }
 
 sccpOmReleaseFailure OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1455,7 +1459,7 @@ sccpOmReleaseFailure OBJECT-TYPE
     ::= { sccpOmErrorsEntry 15 }
 
 sccpOmInactivityTimerExpiry OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1471,7 +1475,7 @@ sccpOmInactivityTimerExpiry OBJECT-TYPE
     ::= { sccpOmErrorsEntry 16 }
 
 sccpOmProviderInitiatedReset OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1488,7 +1492,7 @@ sccpOmProviderInitiatedReset OBJECT-TYPE
     ::= { sccpOmErrorsEntry 17 }
 
 sccpOmProviderInitiatedRelease OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1507,7 +1511,7 @@ sccpOmProviderInitiatedRelease OBJECT-TYPE
 -- Non-Obligatory 1st & Int. and 15 min
 
 sccpOmNoSegmentationSupport OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1544,7 +1548,7 @@ sccpOmNoSegmentationSupport OBJECT-TYPE
 -- Obligatory 1st & Int. and 15 min
 
 sccpOmSegmentationFailure OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1580,7 +1584,7 @@ sccpOmSegmentationFailure OBJECT-TYPE
 -- Non-Obligatory 1st & Int. and 15 min
 
 sccpOmReassemblyFailure OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     UNITS "Events/SCCP"
     MAX-ACCESS read-only
     STATUS current
@@ -1716,29 +1720,29 @@ sccpOmMessageEntry OBJECT-TYPE
 
 SccpOmMessageEntry ::=
     SEQUENCE {
-	sccpOmTotalMessagesHandled		PerfCurrentCount, -- sccpMessagesCounts (scrc)
-	sccpOmTotalMessagesLocal		PerfCurrentCount, -- sccpMessagesCounts (scrc)
-	sccpOmTotalMessagesGTT			PerfCurrentCount, -- sccpMessagesCounts (scrc)
-	sccpOmUDTMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmUDTSMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmUDTMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmUDTSMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmCRMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmCREFMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmCRMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmCREFMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmRSRMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmRSRMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmERRMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmERRMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmXUDTMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmXUDTSMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmXUDTMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmXUDTSMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmLUDTMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmLUDTSMessagesSent			PerfCurrentCount, -- (scrc)
-	sccpOmLUDTMessagesReceived		PerfCurrentCount, -- (scrc)
-	sccpOmLUDTSMessagesReceived		PerfCurrentCount, -- (scrc)
+	sccpOmTotalMessagesHandled		Counter, -- sccpMessagesCounts (scrc)
+	sccpOmTotalMessagesLocal		Counter, -- sccpMessagesCounts (scrc)
+	sccpOmTotalMessagesGTT			Counter, -- sccpMessagesCounts (scrc)
+	sccpOmUDTMessagesSent			Counter, -- (scrc)
+	sccpOmUDTSMessagesSent			Counter, -- (scrc)
+	sccpOmUDTMessagesReceived		Counter, -- (scrc)
+	sccpOmUDTSMessagesReceived		Counter, -- (scrc)
+	sccpOmCRMessagesSent			Counter, -- (scrc)
+	sccpOmCREFMessagesSent			Counter, -- (scrc)
+	sccpOmCRMessagesReceived		Counter, -- (scrc)
+	sccpOmCREFMessagesReceived		Counter, -- (scrc)
+	sccpOmRSRMessagesSent			Counter, -- (scrc)
+	sccpOmRSRMessagesReceived		Counter, -- (scrc)
+	sccpOmERRMessagesSent			Counter, -- (scrc)
+	sccpOmERRMessagesReceived		Counter, -- (scrc)
+	sccpOmXUDTMessagesSent			Counter, -- (scrc)
+	sccpOmXUDTSMessagesSent			Counter, -- (scrc)
+	sccpOmXUDTMessagesReceived		Counter, -- (scrc)
+	sccpOmXUDTSMessagesReceived		Counter, -- (scrc)
+	sccpOmLUDTMessagesSent			Counter, -- (scrc)
+	sccpOmLUDTSMessagesSent			Counter, -- (scrc)
+	sccpOmLUDTMessagesReceived		Counter, -- (scrc)
+	sccpOmLUDTSMessagesReceived		Counter, -- (scrc)
 	sccpOmMessage5MinValidIntervals		HCPerfValidIntervals,
 	sccpOmMessage15MinValidIntervals	HCPerfValidIntervals
     }
@@ -1746,7 +1750,7 @@ SccpOmMessageEntry ::=
 -- Non-Obligatory 5 and 15 min
 
 sccpOmTotalMessagesHandled OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1772,7 +1776,7 @@ sccpOmTotalMessagesHandled OBJECT-TYPE
     ::= { sccpOmMessageEntry 1 }
 
 sccpOmTotalMessagesLocal OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1797,7 +1801,7 @@ sccpOmTotalMessagesLocal OBJECT-TYPE
     ::= { sccpOmMessageEntry 2 }
 
 sccpOmTotalMessagesGTT OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1825,7 +1829,7 @@ sccpOmTotalMessagesGTT OBJECT-TYPE
     ::= { sccpOmMessageEntry 3 }
 
 sccpOmUDTMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1848,7 +1852,7 @@ sccpOmUDTMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 4 }
 
 sccpOmUDTSMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1870,7 +1874,7 @@ sccpOmUDTSMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 5 }
 
 sccpOmUDTMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1893,7 +1897,7 @@ sccpOmUDTMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 6 }
 
 sccpOmUDTSMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1915,7 +1919,7 @@ sccpOmUDTSMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 7 }
 
 sccpOmCRMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1938,7 +1942,7 @@ sccpOmCRMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 8 }
 
 sccpOmCREFMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1960,7 +1964,7 @@ sccpOmCREFMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 9 }
 
 sccpOmCRMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1983,7 +1987,7 @@ sccpOmCRMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 10 }
 
 sccpOmCREFMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2006,7 +2010,7 @@ sccpOmCREFMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 11 }
 
 sccpOmRSRMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2028,7 +2032,7 @@ sccpOmRSRMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 12 }
 
 sccpOmRSRMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2050,7 +2054,7 @@ sccpOmRSRMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 13 }
 
 sccpOmERRMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2072,7 +2076,7 @@ sccpOmERRMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 14 }
 
 sccpOmERRMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2094,7 +2098,7 @@ sccpOmERRMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 15 }
 
 sccpOmXUDTMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2116,7 +2120,7 @@ sccpOmXUDTMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 16 }
 
 sccpOmXUDTSMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2138,7 +2142,7 @@ sccpOmXUDTSMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 17 }
 
 sccpOmXUDTMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2160,7 +2164,7 @@ sccpOmXUDTMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 18 }
 
 sccpOmXUDTSMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2182,7 +2186,7 @@ sccpOmXUDTSMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 19 }
 
 sccpOmLUDTMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2204,7 +2208,7 @@ sccpOmLUDTMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 20 }
 
 sccpOmLUDTSMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2226,7 +2230,7 @@ sccpOmLUDTSMessagesSent OBJECT-TYPE
     ::= { sccpOmMessageEntry 21 }
 
 sccpOmLUDTMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2248,7 +2252,7 @@ sccpOmLUDTMessagesReceived OBJECT-TYPE
     ::= { sccpOmMessageEntry 22 }
 
 sccpOmLUDTSMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2323,8 +2327,8 @@ sccpOmAccessibilityEntry OBJECT-TYPE
 
 SccpOmAccessibilityEntry ::=
     SEQUENCE {
-	sccpOmSSCMessageReceived		PerfCurrentCount,
-	sccpOmSSPMessageReceived		PerfCurrentCount, -- (sccpAccessPoint)
+	sccpOmSSCMessageReceived		Counter,
+	sccpOmSSPMessageReceived		Counter, -- (sccpAccessPoint)
 	-- Non-Obligatory 15 min Duration
 	sccpOmSccpUnavailableDuration		HCPerfIntervalThreshold, -- (sccp)
 	-- 8.5 Duration of local SCCP unavailable - all reasons
@@ -2336,7 +2340,7 @@ SccpOmAccessibilityEntry ::=
 -- Non-Obligatory 1st & Int.
 
 sccpOmSSCMessageReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2352,7 +2356,7 @@ sccpOmSSCMessageReceived OBJECT-TYPE
     ::= { sccpOmAccessibilityEntry 1 }
 
 sccpOmSSPMessageReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2499,18 +2503,18 @@ sccpOmUtilizationEntry OBJECT-TYPE
 SccpOmUtilizationEntry ::=
     SEQUENCE {
 	-- Non-Obligatory 5 min, Obligatory 15 min, per class per SSN
-	sccpOmLXUDTMessagesOrigClass0		PerfCurrentCount, -- (sclc)
-	sccpOmLXUDTMessagesOrigClass1		PerfCurrentCount, -- (sclc)
-	sccpOmLXUDTMessagesTermClass0		PerfCurrentCount, -- (sclc)
-	sccpOmLXUDTMessagesTermClass1		PerfCurrentCount, -- (sclc)
-	sccpOmMessagesSentToBackup		PerfCurrentCount, -- (scrc)
+	sccpOmLXUDTMessagesOrigClass0		Counter, -- (sclc)
+	sccpOmLXUDTMessagesOrigClass1		Counter, -- (sclc)
+	sccpOmLXUDTMessagesTermClass0		Counter, -- (sclc)
+	sccpOmLXUDTMessagesTermClass1		Counter, -- (sclc)
+	sccpOmMessagesSentToBackup		Counter, -- (scrc)
 	-- Non-Obligatory 5 and 15 min, Events per SSN
-	sccpOmDT1MessagesReceived		PerfCurrentCount,
-	sccpOmDT1MessagesSent			PerfCurrentCount,
-	sccpOmDT2MessagesReceived		PerfCurrentCount,
-	sccpOmDT2MessagesSent			PerfCurrentCount,
-	sccpOmEDMessagesSent			PerfCurrentCount,
-	sccpOmEDMessagesReceived		PerfCurrentCount,
+	sccpOmDT1MessagesReceived		Counter,
+	sccpOmDT1MessagesSent			Counter,
+	sccpOmDT2MessagesReceived		Counter,
+	sccpOmDT2MessagesSent			Counter,
+	sccpOmEDMessagesSent			Counter,
+	sccpOmEDMessagesReceived		Counter,
 	sccpOmUtilization5MinValidIntervals	HCPerfValidIntervals,
 	sccpOmUtilization15MinValidIntervals	HCPerfValidIntervals
     }
@@ -2520,7 +2524,7 @@ SccpOmUtilizationEntry ::=
 -- NOTE: Q.751.2 shows this as having both a pointCode attribute and an 
 -- ssn attribute.
 sccpOmLXUDTMessagesOrigClass0 OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2563,7 +2567,7 @@ sccpOmLXUDTMessagesOrigClass0 OBJECT-TYPE
 -- NOTE: Q.751.2 shows this as having both a pointCode attribute and an 
 -- ssn attribute.
 sccpOmLXUDTMessagesOrigClass1 OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2603,7 +2607,7 @@ sccpOmLXUDTMessagesOrigClass1 OBJECT-TYPE
 -- NOTE: Q.751.2 shows this as having both a pointCode attribute and an 
 -- ssn attribute.
 sccpOmLXUDTMessagesTermClass0 OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2647,7 +2651,7 @@ sccpOmLXUDTMessagesTermClass0 OBJECT-TYPE
 -- NOTE: Q.751.2 shows this as having both a pointCode attribute and an 
 -- ssn attribute.
 sccpOmLXUDTMessagesTermClass1 OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2686,7 +2690,7 @@ sccpOmLXUDTMessagesTermClass1 OBJECT-TYPE
     ::= { sccpOmUtilizationEntry 4 }
 
 sccpOmMessagesSentToBackup OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2727,7 +2731,7 @@ sccpOmMessagesSentToBackup OBJECT-TYPE
 
 -- 9.9 DT1 messages received from MTP per sink SSN
 sccpOmDT1MessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2750,7 +2754,7 @@ sccpOmDT1MessagesReceived OBJECT-TYPE
 
 -- 9.10 DT1 messages sent to MTP per source SSN
 sccpOmDT1MessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2773,7 +2777,7 @@ sccpOmDT1MessagesSent OBJECT-TYPE
 
 -- 9.11 DT2 messages received from MTP per sink SSN
 sccpOmDT2MessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2796,7 +2800,7 @@ sccpOmDT2MessagesReceived OBJECT-TYPE
 
 -- 9.12 DT2 messages sent to MTP per source SSN
 sccpOmDT2MessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2818,7 +2822,7 @@ sccpOmDT2MessagesSent OBJECT-TYPE
 
 -- 9.13 ED messages sent to MTP per source SSN
 sccpOmEDMessagesSent OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2841,7 +2845,7 @@ sccpOmEDMessagesSent OBJECT-TYPE
 
 -- 9.14 ED messages received from MTP per sink SSN
 sccpOmEDMessagesReceived OBJECT-TYPE
-    SYNTAX PerfCurrentCount
+    SYNTAX Counter
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -4379,7 +4383,7 @@ sccpOm1stAndIntervalActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 first-and-interval basis are marked as obligatory but requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object corresponding to the PerfCurrentCount for the 
+	 object corresponding to the Counter for the 
 	 measurement will activate the first-and-interval measurement if 
 	 not already activated.  When the object cannot be activated, an 
 	 SNMP error will be returned.
@@ -4408,7 +4412,7 @@ sccpOm1stAndIntervalDeactivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 first-and-interval basis are marked as obligatory but requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object corresponding to the PerfCurrentCount for the 
+	 object corresponding to the Counter for the 
 	 measurement will deactivate the first-and-interval measurement 
 	 if not already activated.  When the object cannot be 
 	 deactivated, an SNMP error will be returned.
@@ -4437,7 +4441,7 @@ sccpOm5MinActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 5-minute basis are marked as obligatory by requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object coresponding to the PerfCurrentCount for the measurement 
+	 object coresponding to the Counter for the measurement 
 	 will activate the 5-minute measurement if not already 
 	 activated.  When the object cannot be activated, an SNMP error 
 	 will be returned.
@@ -4459,7 +4463,7 @@ sccpOm5MinDeaActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 5-minute basis are marked as obligatory by requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object coresponding to the PerfCurrentCount for the measurement 
+	 object coresponding to the Counter for the measurement 
 	 will deactivate the 5-minute measurement if not already 
 	 deactivated.  When the object cannot be deactivated, an SNMP 
 	 error will be returned.
@@ -4481,7 +4485,7 @@ sccpOm15MinActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 15-minute basis are marked as obligatory by requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object coresponding to the PerfCurrentCount for the measurement 
+	 object coresponding to the Counter for the measurement 
 	 will activate the 15-minute measurement if not already 
 	 activated.  When the object cannot be activated, an SNMP error 
 	 will be returned.
@@ -4503,7 +4507,7 @@ sccpOm15MinDeaActivate OBJECT-TYPE
 	"Some measurements in this MIB that are to be collected on a 
 	 15-minute basis are marked as obligatory by requiring 
 	 activation.  Writing the instance pointer of the columnar 
-	 object coresponding to the PerfCurrentCount for the measurement 
+	 object coresponding to the Counter for the measurement 
 	 will deactivate the 15-minute measurement if not already 
 	 deactivated.  When the object cannot be deactivated, an SNMP 
 	 error will be returned.

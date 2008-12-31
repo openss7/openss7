@@ -7,7 +7,6 @@
 /* our storage structure(s) */
 struct lapbMIB_data {
 	uint lapbMIB_request;
-
 	int32_t lapbDiscontinuityTime;
 	int32_t sLPConnectionDefaultInterfaceType;
 	int32_t sLPConnectionDefaultK;
@@ -21,7 +20,8 @@ struct lapbMIB_data {
 };
 struct lAPBDLETable_data {
 	uint lAPBDLETable_request;
-	char *lAPBDLEcommunicationsEntityId;
+	uint lAPBDLETable_refs;
+	uint8_t *lAPBDLEcommunicationsEntityId;
 	int lAPBDLEcommunicationsEntityIdLen;
 	oid *lAPBDLElocalSapNames;
 	int lAPBDLElocalSapNamesLen;
@@ -45,9 +45,10 @@ struct lAPBDLETable_data {
 };
 struct dLSAPTable_data {
 	uint dLSAPTable_request;
-	char *lAPBDLEcommunicationsEntityId;
+	uint dLSAPTable_refs;
+	uint8_t *lAPBDLEcommunicationsEntityId;
 	int lAPBDLEcommunicationsEntityIdLen;
-	char *dLSAPsapId;
+	uint8_t *dLSAPsapId;
 	int dLSAPsapIdLen;
 	uint32_t dLSAPsap1Address;
 	oid *dLSAPuserEntityNames;
@@ -56,9 +57,10 @@ struct dLSAPTable_data {
 };
 struct sLPPMTable_data {
 	uint sLPPMTable_request;
-	char *lAPBDLEcommunicationsEntityId;
+	uint sLPPMTable_refs;
+	uint8_t *lAPBDLEcommunicationsEntityId;
 	int lAPBDLEcommunicationsEntityIdLen;
-	char *sLPPMcoProtocolMachineId;
+	uint8_t *sLPPMcoProtocolMachineId;
 	int sLPPMcoProtocolMachineIdLen;
 	int32_t sLPPMoperationalState;
 	int32_t sLPPMadministrativeState;
@@ -66,7 +68,8 @@ struct sLPPMTable_data {
 };
 struct sLPConnectionTable_data {
 	uint sLPConnectionTable_request;
-	char *sLPConnectionConnectionId;
+	uint sLPConnectionTable_refs;
+	uint8_t *sLPConnectionConnectionId;
 	int sLPConnectionConnectionIdLen;
 	oid *sLPConnectionUnderlyingConnectionNames;
 	int sLPConnectionUnderlyingConnectionNamesLen;
@@ -107,17 +110,18 @@ struct sLPConnectionTable_data {
 	int32_t sLPConnectionAdministrativeState;
 	int32_t sLPConnectionOperationalState;
 	int32_t sLPConnectionUsageState;
-	char *sLPConnectionProceduralStatus;
+	uint8_t *sLPConnectionProceduralStatus;
 	int sLPConnectionProceduralStatusLen;
-	char *sLPConnectionAlarmStatus;
+	uint8_t *sLPConnectionAlarmStatus;
 	int sLPConnectionAlarmStatusLen;
 	int32_t sLPConnectionRowStatus;
 };
 struct sLPConnectionIVMOTable_data {
 	uint sLPConnectionIVMOTable_request;
-	char *sLPConnectionConnectionId;
+	uint sLPConnectionIVMOTable_refs;
+	uint8_t *sLPConnectionConnectionId;
 	int sLPConnectionConnectionIdLen;
-	char *sLPConnectionIVMOid;
+	uint8_t *sLPConnectionIVMOid;
 	int sLPConnectionIVMOidLen;
 	int32_t sLPConnectionIVMOinterfaceType;
 	int32_t sLPConnectionIVMOk;
@@ -201,22 +205,32 @@ void parse_lapbMIB(const char *, char *);
 SNMPCallback store_lapbMIB;
 void refresh_lapbMIB(void);
 FindVarMethod var_lAPBDLETable;
+int lAPBDLETable_add(struct lAPBDLETable_data *);
+int lAPBDLETable_del(struct lAPBDLETable_data **);
 void parse_lAPBDLETable(const char *, char *);
 SNMPCallback store_lAPBDLETable;
 void refresh_lAPBDLETable(void);
 FindVarMethod var_dLSAPTable;
+int dLSAPTable_add(struct dLSAPTable_data *);
+int dLSAPTable_del(struct dLSAPTable_data **);
 void parse_dLSAPTable(const char *, char *);
 SNMPCallback store_dLSAPTable;
 void refresh_dLSAPTable(void);
 FindVarMethod var_sLPPMTable;
+int sLPPMTable_add(struct sLPPMTable_data *);
+int sLPPMTable_del(struct sLPPMTable_data **);
 void parse_sLPPMTable(const char *, char *);
 SNMPCallback store_sLPPMTable;
 void refresh_sLPPMTable(void);
 FindVarMethod var_sLPConnectionTable;
+int sLPConnectionTable_add(struct sLPConnectionTable_data *);
+int sLPConnectionTable_del(struct sLPConnectionTable_data **);
 void parse_sLPConnectionTable(const char *, char *);
 SNMPCallback store_sLPConnectionTable;
 void refresh_sLPConnectionTable(void);
 FindVarMethod var_sLPConnectionIVMOTable;
+int sLPConnectionIVMOTable_add(struct sLPConnectionIVMOTable_data *);
+int sLPConnectionIVMOTable_del(struct sLPConnectionIVMOTable_data **);
 void parse_sLPConnectionIVMOTable(const char *, char *);
 SNMPCallback store_sLPConnectionIVMOTable;
 void refresh_sLPConnectionIVMOTable(void);
@@ -266,5 +280,4 @@ WriteMethod write_sLPConnectionDefaultT1Timer;
 WriteMethod write_sLPConnectionDefaultT2Timer;
 WriteMethod write_sLPConnectionDefaultT3Timer;
 WriteMethod write_sLPConnectionDefaultT4Timer;
-
 #endif				/* __LOCAL_LAPBMIB_H__ */

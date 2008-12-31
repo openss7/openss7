@@ -37,7 +37,6 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include "mib_modules.h"
 #endif				/* HAVE_NET_SNMP_AGENT_MIB_MODULES_H */
 #endif				/* HAVE_UCD_SNMP_MIB_MODULES_H */
-#include "cdr2MIB.h"
 #include <stdint.h>
 #include <signal.h>
 #include <sys/stat.h>		/* for struct stat, fstat() */
@@ -54,44 +53,46 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
-extern const char sa_program[];
+#include "cdr2MIB.h"
+const char sa_program[] = "cdr2mib";
 
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #if !defined MODULE
-extern int sa_dump;			/* default packet dump */
-extern int sa_debug;			/* default no debug */
-extern int sa_nomead;			/* default daemon mode */
-extern int sa_output;			/* default normal output */
-extern int sa_agentx;			/* default agentx mode */
-extern int sa_alarms;			/* default application alarms */
-extern int sa_fclose;			/* default close files between requests */
-extern int sa_logaddr;			/* log addresses */
-extern int sa_logfillog;		/* log to sa_logfile */
-extern int sa_logstderr;		/* log to standard error */
-extern int sa_logstdout;		/* log to standard output */
-extern int sa_logsyslog;		/* log to system logs */
-extern int sa_logcallog;		/* log to callback logs */
-extern int sa_appendlog;		/* append to log file without truncating */
-extern char sa_logfile[256];
-extern char sa_pidfile[256];
-extern char sa_sysctlf[256];
+int sa_dump = 0;			/* default packet dump */
+int sa_debug = 0;			/* default no debug */
+int sa_nomead = 1;			/* default daemon mode */
+int sa_output = 1;			/* default normal output */
+int sa_agentx = 1;			/* default agentx mode */
+int sa_alarms = 1;			/* default application alarms */
+int sa_fclose = 1;			/* default close files between requests */
+int sa_logaddr = 0;			/* log addresses */
+int sa_logfillog = 0;			/* log to sa_logfile */
+int sa_logstderr = 0;			/* log to standard error */
+int sa_logstdout = 0;			/* log to standard output */
+int sa_logsyslog = 0;			/* log to system logs */
+int sa_logcallog = 0;			/* log to callback logs */
+int sa_appendlog = 0;			/* append to log file without truncating */
+char sa_logfile[256] = "/var/log/cdr2mib.log";
+char sa_pidfile[256] = "/var/run/cdr2mib.pid";
+char sa_sysctlf[256] = "/etc/cdr2mib.conf";
 int allow_severity = LOG_ERR;
 int deny_severity = LOG_ERR;
 
 /* file stream for log file */
-extern FILE *stdlog;
+FILE *stdlog = NULL;
 
 /* file descriptor for MIB use */
-extern int sa_fd;
+int sa_fd = 0;
 
 /* indication to reread MIB configuration */
-extern int sa_changed;
+int sa_changed = 1;
 
 /* indications that statistics, the mib or its tables need to be refreshed */
-extern int sa_stats_refresh;
+int sa_stats_refresh = 1;
+#else				/* !defined MODULE */
 #endif				/* !defined MODULE */
 /* request number for per-request actions */
-extern int sa_request;
+int sa_request = 1;
 volatile int cdr2MIB_refresh = 1;
 volatile int callDetailDataTable_refresh = 1;
 volatile int simpleUsageMeteringControlTable_refresh = 1;
@@ -104,10 +105,9 @@ volatile int blockGeneratingLogR2Table_refresh = 1;
 volatile int callDetailLogRecordR2Table_refresh = 1;
 
 /*
- * cdr2MIB_variables_oid:
- *   this is the top level oid that we want to register under.  This
- *   is essentially a prefix, with the suffix appearing in the
- *   variable below.
+ * cdr2MIB_variables_oid: object identifier for cdr2MIB
+ * This is the top level oid that we want to register under.  This is essentially a prefix, with the
+ * suffix appearing in the variable below.
  */
 oid cdr2MIB_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 17, 825, 2 };
 oid simpleUsageMeteringControlTable_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 17, 825, 2, 1, 3, 1, 1 };
@@ -117,488 +117,487 @@ oid fileGeneratingLogTable_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 17, 825,
 oid configurableSimpleUsageMeteringControlR2Table_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 17, 825, 2, 1, 8, 1, 1 };
 
 /*
- * variable7 cdr2MIB_variables:
- *   this variable defines function callbacks and type return information
- *   for the cdr2MIB mib section
+ * variable7 cdr2MIB_variables: tree for cdr2MIB
+ * This variable defines function callbacks and type return information for the cdr2MIB mib section
  */
 struct variable7 cdr2MIB_variables[] = {
-/*  magic number        , variable type , ro/rw , callback fn  , L, oidsuffix */
-#define   CALLDETAILDATAID      3
+	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
+#define   CALLDETAILDATAID      (3 % 256)
 	{CALLDETAILDATAID, ASN_OCTET_STR, RONLY, var_callDetailDataTable, 5, {1, 2, 1, 1, 1}},
-#define   CREATIONTRIGGERLIST   7
+#define   CREATIONTRIGGERLIST   (7 % 256)
 	{CREATIONTRIGGERLIST, ASN_BIT_STR, RWRITE, var_simpleUsageMeteringControlTable, 5, {1, 3, 1, 1, 1}},
-#define   SIMPLEUSAGEMETERINGCONTROLENTRYSTATUS  8
+#define   SIMPLEUSAGEMETERINGCONTROLENTRYSTATUS  (8 % 256)
 	{SIMPLEUSAGEMETERINGCONTROLENTRYSTATUS, ASN_INTEGER, RWRITE, var_simpleUsageMeteringControlTable, 5, {1, 3, 1, 1, 2}},
-#define   SAMPLINGRATE          12
+#define   SAMPLINGRATE          (12 % 256)
 	{SAMPLINGRATE, ASN_INTEGER, RWRITE, var_configurableSimpleUsageMeteringControlTable, 5, {1, 4, 1, 1, 1}},
-#define   CONFIGURATIONMASK     13
+#define   CONFIGURATIONMASK     (13 % 256)
 	{CONFIGURATIONMASK, ASN_BIT_STR, RWRITE, var_configurableSimpleUsageMeteringControlTable, 5, {1, 4, 1, 1, 2}},
-#define   CONFIGURATIONROWSTATUS  14
+#define   CONFIGURATIONROWSTATUS  (14 % 256)
 	{CONFIGURATIONROWSTATUS, ASN_INTEGER, RWRITE, var_configurableSimpleUsageMeteringControlTable, 5, {1, 4, 1, 1, 3}},
-#define   BLOCKGENERATINGLOGMAXBLOCKSIZE  18
+#define   BLOCKGENERATINGLOGMAXBLOCKSIZE  (18 % 256)
 	{BLOCKGENERATINGLOGMAXBLOCKSIZE, ASN_INTEGER, RWRITE, var_blockGeneratingLogTable, 5, {1, 5, 1, 1, 1}},
-#define   BLOCKGENERATINGLOGMAXTIMEINTERVAL  19
+#define   BLOCKGENERATINGLOGMAXTIMEINTERVAL  (19 % 256)
 	{BLOCKGENERATINGLOGMAXTIMEINTERVAL, ASN_INTEGER, RWRITE, var_blockGeneratingLogTable, 5, {1, 5, 1, 1, 2}},
-#define   BLOCKGENERATINGLOGSTORAGETYPE  20
+#define   BLOCKGENERATINGLOGSTORAGETYPE  (20 % 256)
 	{BLOCKGENERATINGLOGSTORAGETYPE, ASN_INTEGER, RWRITE, var_blockGeneratingLogTable, 5, {1, 5, 1, 1, 3}},
-#define   BLOCKGENERATINGLOGROWSTATUS  21
+#define   BLOCKGENERATINGLOGROWSTATUS  (21 % 256)
 	{BLOCKGENERATINGLOGROWSTATUS, ASN_INTEGER, RWRITE, var_blockGeneratingLogTable, 5, {1, 5, 1, 1, 4}},
-#define   TIMESOFDAY            25
+#define   TIMESOFDAY            (25 % 256)
 	{TIMESOFDAY, ASN_OCTET_STR, RWRITE, var_fileGeneratingLogTable, 5, {1, 6, 1, 1, 1}},
-#define   PERIODICTRIGGER       26
+#define   PERIODICTRIGGER       (26 % 256)
 	{PERIODICTRIGGER, ASN_INTEGER, RWRITE, var_fileGeneratingLogTable, 5, {1, 6, 1, 1, 2}},
-#define   FILEGENERATINGLOGSTORAGETYPE  27
+#define   FILEGENERATINGLOGSTORAGETYPE  (27 % 256)
 	{FILEGENERATINGLOGSTORAGETYPE, ASN_INTEGER, RWRITE, var_fileGeneratingLogTable, 5, {1, 6, 1, 1, 3}},
-#define   FILEGENERATINGLOGENTRYSTATUS  28
+#define   FILEGENERATINGLOGENTRYSTATUS  (28 % 256)
 	{FILEGENERATINGLOGENTRYSTATUS, ASN_INTEGER, RWRITE, var_fileGeneratingLogTable, 5, {1, 6, 1, 1, 4}},
-#define   NETWORKPROVIDERID     33
+#define   NETWORKPROVIDERID     (33 % 256)
 	{NETWORKPROVIDERID, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 1}},
-#define   RECORDTYPE            34
+#define   RECORDTYPE            (34 % 256)
 	{RECORDTYPE, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 2}},
-#define   SEIZURETIME           35
+#define   SEIZURETIME           (35 % 256)
 	{SEIZURETIME, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 3}},
-#define   ANSWERTIME            36
+#define   ANSWERTIME            (36 % 256)
 	{ANSWERTIME, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 4}},
-#define   PARTIALTIME           37
+#define   PARTIALTIME           (37 % 256)
 	{PARTIALTIME, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 5}},
-#define   EVENTTIME             38
+#define   EVENTTIME             (38 % 256)
 	{EVENTTIME, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 6}},
-#define   CALLINGPARTYNUMBER    39
+#define   CALLINGPARTYNUMBER    (39 % 256)
 	{CALLINGPARTYNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 7}},
-#define   CALLEDPARTYNUMBER     40
+#define   CALLEDPARTYNUMBER     (40 % 256)
 	{CALLEDPARTYNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 8}},
-#define   REDIRECTINGNUMBER     41
+#define   REDIRECTINGNUMBER     (41 % 256)
 	{REDIRECTINGNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 9}},
-#define   REDIRECTIONNUMBER     42
+#define   REDIRECTIONNUMBER     (42 % 256)
 	{REDIRECTIONNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 10}},
-#define   ORIGINALCALLEDNUMBER  43
+#define   ORIGINALCALLEDNUMBER  (43 % 256)
 	{ORIGINALCALLEDNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 11}},
-#define   CALLINGPARTYNUMBERNOTSCREENED  44
+#define   CALLINGPARTYNUMBERNOTSCREENED  (44 % 256)
 	{CALLINGPARTYNUMBERNOTSCREENED, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 12}},
-#define   OPERATORSPECIFIC1NUMBER  45
+#define   OPERATORSPECIFIC1NUMBER  (45 % 256)
 	{OPERATORSPECIFIC1NUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 13}},
-#define   OPERATORSPECIFIC2NUMBER  46
+#define   OPERATORSPECIFIC2NUMBER  (46 % 256)
 	{OPERATORSPECIFIC2NUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 14}},
-#define   OPERATORSPECIFIC3NUMBER  47
+#define   OPERATORSPECIFIC3NUMBER  (47 % 256)
 	{OPERATORSPECIFIC3NUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 15}},
-#define   BEARERSERVICE         48
+#define   BEARERSERVICE         (48 % 256)
 	{BEARERSERVICE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 16}},
-#define   PARTICIPANTSERVICEUSER  49
+#define   PARTICIPANTSERVICEUSER  (49 % 256)
 	{PARTICIPANTSERVICEUSER, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 17}},
-#define   CALLIDENTIFICATIONNUMBER  50
+#define   CALLIDENTIFICATIONNUMBER  (50 % 256)
 	{CALLIDENTIFICATIONNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 18}},
-#define   SUPPLEMENTARYSERVICES  51
+#define   SUPPLEMENTARYSERVICES  (51 % 256)
 	{SUPPLEMENTARYSERVICES, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 19}},
-#define   IMMEDIATENOTIFICATIONFORUSAGEMETERING  52
+#define   IMMEDIATENOTIFICATIONFORUSAGEMETERING  (52 % 256)
 	{IMMEDIATENOTIFICATIONFORUSAGEMETERING, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 20}},
-#define   CAUSE                 53
+#define   CAUSE                 (53 % 256)
 	{CAUSE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 21}},
-#define   PERSONALUSERID        54
+#define   PERSONALUSERID        (54 % 256)
 	{PERSONALUSERID, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 22}},
-#define   CHARGEDPARTICIPANT    55
+#define   CHARGEDPARTICIPANT    (55 % 256)
 	{CHARGEDPARTICIPANT, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 23}},
-#define   CHARGEDDIRECTORYNUMBER  56
+#define   CHARGEDDIRECTORYNUMBER  (56 % 256)
 	{CHARGEDDIRECTORYNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 24}},
-#define   PERCENTAGETOBEBILLED  57
+#define   PERCENTAGETOBEBILLED  (57 % 256)
 	{PERCENTAGETOBEBILLED, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 25}},
-#define   ACCOUNTCODEINPUT      58
+#define   ACCOUNTCODEINPUT      (58 % 256)
 	{ACCOUNTCODEINPUT, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 26}},
-#define   INSERVICECODE         59
+#define   INSERVICECODE         (59 % 256)
 	{INSERVICECODE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 27}},
-#define   QUEUETIMESTAMP        60
+#define   QUEUETIMESTAMP        (60 % 256)
 	{QUEUETIMESTAMP, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 28}},
-#define   QUEUEDURATION         61
+#define   QUEUEDURATION         (61 % 256)
 	{QUEUEDURATION, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 29}},
-#define   SERVICESPECIFICININFORMATION  62
+#define   SERVICESPECIFICININFORMATION  (62 % 256)
 	{SERVICESPECIFICININFORMATION, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 30}},
-#define   PARTIALRECORDNUMBER   63
+#define   PARTIALRECORDNUMBER   (63 % 256)
 	{PARTIALRECORDNUMBER, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 31}},
-#define   PARTIALRECORDREASON   64
+#define   PARTIALRECORDREASON   (64 % 256)
 	{PARTIALRECORDREASON, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 32}},
-#define   EXCHANGEINFO          65
+#define   EXCHANGEINFO          (65 % 256)
 	{EXCHANGEINFO, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 33}},
-#define   RELATEDCALLNUMBER     66
+#define   RELATEDCALLNUMBER     (66 % 256)
 	{RELATEDCALLNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 34}},
-#define   CDRPURPOSE            67
+#define   CDRPURPOSE            (67 % 256)
 	{CDRPURPOSE, ASN_BIT_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 35}},
-#define   PHYSICALLINECODE      68
+#define   PHYSICALLINECODE      (68 % 256)
 	{PHYSICALLINECODE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 36}},
-#define   RECEIVEDDIGITS        69
+#define   RECEIVEDDIGITS        (69 % 256)
 	{RECEIVEDDIGITS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 37}},
-#define   OPERATORSPECIFIC1ADDITIONALNUMBER  70
+#define   OPERATORSPECIFIC1ADDITIONALNUMBER  (70 % 256)
 	{OPERATORSPECIFIC1ADDITIONALNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 38}},
-#define   OPERATORSPECIFIC2ADDITIONALNUMBER  71
+#define   OPERATORSPECIFIC2ADDITIONALNUMBER  (71 % 256)
 	{OPERATORSPECIFIC2ADDITIONALNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 39}},
-#define   OPERATORSPECIFIC3ADDITIONALNUMBER  72
+#define   OPERATORSPECIFIC3ADDITIONALNUMBER  (72 % 256)
 	{OPERATORSPECIFIC3ADDITIONALNUMBER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 40}},
-#define   CALLINGPARTYCATEGORY  73
+#define   CALLINGPARTYCATEGORY  (73 % 256)
 	{CALLINGPARTYCATEGORY, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 41}},
-#define   CALLINGPARTYTYPE      74
+#define   CALLINGPARTYTYPE      (74 % 256)
 	{CALLINGPARTYTYPE, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 42}},
-#define   CHARGEINFORMATION     75
+#define   CHARGEINFORMATION     (75 % 256)
 	{CHARGEINFORMATION, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 43}},
-#define   PROGRESS              76
+#define   PROGRESS              (76 % 256)
 	{PROGRESS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 44}},
-#define   ACCESSDELIVERY        77
+#define   ACCESSDELIVERY        (77 % 256)
 	{ACCESSDELIVERY, ASN_BIT_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 45}},
-#define   TRUNKGROUPOUTGOING    78
+#define   TRUNKGROUPOUTGOING    (78 % 256)
 	{TRUNKGROUPOUTGOING, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 46}},
-#define   TRUNKGROUPINCOMING    79
+#define   TRUNKGROUPINCOMING    (79 % 256)
 	{TRUNKGROUPINCOMING, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 47}},
-#define   FALLBACKBEARERSERVICE  80
+#define   FALLBACKBEARERSERVICE  (80 % 256)
 	{FALLBACKBEARERSERVICE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 48}},
-#define   TELESERVICE           81
+#define   TELESERVICE           (81 % 256)
 	{TELESERVICE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 49}},
-#define   CONVERSATIONTIME      82
+#define   CONVERSATIONTIME      (82 % 256)
 	{CONVERSATIONTIME, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 50}},
-#define   DURATIONTIMEACM       83
+#define   DURATIONTIMEACM       (83 % 256)
 	{DURATIONTIMEACM, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 51}},
-#define   DURATIONTIMEBANSWER   84
+#define   DURATIONTIMEBANSWER   (84 % 256)
 	{DURATIONTIMEBANSWER, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 52}},
-#define   DURATIONTIMENOBANSWER  85
+#define   DURATIONTIMENOBANSWER  (85 % 256)
 	{DURATIONTIMENOBANSWER, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 53}},
-#define   UUINFO                86
+#define   UUINFO                (86 % 256)
 	{UUINFO, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 54}},
-#define   STANDARDEXTENSIONS    87
+#define   STANDARDEXTENSIONS    (87 % 256)
 	{STANDARDEXTENSIONS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 55}},
-#define   RECORDEXTENSIONS      88
+#define   RECORDEXTENSIONS      (88 % 256)
 	{RECORDEXTENSIONS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 56}},
-#define   BPARTYCATEGORY        89
+#define   BPARTYCATEGORY        (89 % 256)
 	{BPARTYCATEGORY, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 57}},
-#define   ISUPPREFERRED         90
+#define   ISUPPREFERRED         (90 % 256)
 	{ISUPPREFERRED, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 58}},
-#define   NETWORKMANAGEMENTCONTROLS  91
+#define   NETWORKMANAGEMENTCONTROLS  (91 % 256)
 	{NETWORKMANAGEMENTCONTROLS, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 59}},
-#define   GLARE                 92
+#define   GLARE                 (92 % 256)
 	{GLARE, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 60}},
-#define   RECORDID              93
+#define   RECORDID              (93 % 256)
 	{RECORDID, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 61}},
-#define   DATAVALIDITY          94
+#define   DATAVALIDITY          (94 % 256)
 	{DATAVALIDITY, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 62}},
-#define   CALLSTATUS            95
+#define   CALLSTATUS            (95 % 256)
 	{CALLSTATUS, ASN_INTEGER, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 63}},
-#define   CARRIERID             96
+#define   CARRIERID             (96 % 256)
 	{CARRIERID, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 64}},
-#define   DPC                   97
+#define   DPC                   (97 % 256)
 	{DPC, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 65}},
-#define   OPC                   98
+#define   OPC                   (98 % 256)
 	{OPC, ASN_OCTET_STR, RONLY, var_callDetailLogRecordTable, 5, {1, 7, 1, 1, 66}},
-#define   CONFIGURATIONR2MASK   102
+#define   CONFIGURATIONR2MASK   (102 % 256)
 	{CONFIGURATIONR2MASK, ASN_BIT_STR, RWRITE, var_configurableSimpleUsageMeteringControlR2Table, 5, {1, 8, 1, 1, 1}},
-#define   CONFIGURATIONR2STATUS  103
+#define   CONFIGURATIONR2STATUS  (103 % 256)
 	{CONFIGURATIONR2STATUS, ASN_INTEGER, RWRITE, var_configurableSimpleUsageMeteringControlR2Table, 5, {1, 8, 1, 1, 2}},
-#define   BLOCKGENERATINGLOGVERSION  107
+#define   BLOCKGENERATINGLOGVERSION  (107 % 256)
 	{BLOCKGENERATINGLOGVERSION, ASN_INTEGER, RWRITE, var_blockGeneratingLogR2Table, 5, {1, 10, 1, 1, 1}},
-#define   SEQUENCEID            112
+#define   SEQUENCEID            (112 % 256)
 	{SEQUENCEID, ASN_COUNTER64, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 1}},
-#define   ZONEID                113
+#define   ZONEID                (113 % 256)
 	{ZONEID, ASN_COUNTER64, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 2}},
-#define   RECSEQID              114
+#define   RECSEQID              (114 % 256)
 	{RECSEQID, ASN_COUNTER64, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 3}},
-#define   FILESEQID             115
+#define   FILESEQID             (115 % 256)
 	{FILESEQID, ASN_COUNTER64, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 4}},
-#define   CALLID                116
+#define   CALLID                (116 % 256)
 	{CALLID, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 5}},
-#define   LASTUPDATE            117
+#define   LASTUPDATE            (117 % 256)
 	{LASTUPDATE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 6}},
-#define   EVENTORDER            118
+#define   EVENTORDER            (118 % 256)
 	{EVENTORDER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 7}},
-#define   STATUS                119
+#define   STATUS                (119 % 256)
 	{STATUS, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 8}},
-#define   CALLTYPE              120
+#define   CALLTYPE              (120 % 256)
 	{CALLTYPE, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 9}},
-#define   CLNGPTYNBR            121
+#define   CLNGPTYNBR            (121 % 256)
 	{CLNGPTYNBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 10}},
-#define   CHARGENBR             122
+#define   CHARGENBR             (122 % 256)
 	{CHARGENBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 11}},
-#define   CLLDPTYNBR            123
+#define   CLLDPTYNBR            (123 % 256)
 	{CLLDPTYNBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 12}},
-#define   CLLDPTYNOA            124
+#define   CLLDPTYNOA            (124 % 256)
 	{CLLDPTYNOA, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 13}},
-#define   ORIGLNINFO            125
+#define   ORIGLNINFO            (125 % 256)
 	{ORIGLNINFO, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 14}},
-#define   INGLRN                126
+#define   INGLRN                (126 % 256)
 	{INGLRN, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 15}},
-#define   INGCIC                127
+#define   INGCIC                (127 % 256)
 	{INGCIC, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 16}},
-#define   INGCSI                128
+#define   INGCSI                (128 % 256)
 	{INGCSI, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 17}},
-#define   INGCCEID              129
+#define   INGCCEID              (129 % 256)
 	{INGCCEID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 18}},
-#define   INGTGPROT             130
+#define   INGTGPROT             (130 % 256)
 	{INGTGPROT, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 19}},
-#define   INGTGTYPE             131
+#define   INGTGTYPE             (131 % 256)
 	{INGTGTYPE, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 20}},
-#define   INGTGID               132
+#define   INGTGID               (132 % 256)
 	{INGTGID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 21}},
-#define   INGCALLSTART          133
+#define   INGCALLSTART          (133 % 256)
 	{INGCALLSTART, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 22}},
-#define   INGGATEID             134
+#define   INGGATEID             (134 % 256)
 	{INGGATEID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 23}},
-#define   INGCARDID             135
+#define   INGCARDID             (135 % 256)
 	{INGCARDID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 24}},
-#define   INGSPANID             136
+#define   INGSPANID             (136 % 256)
 	{INGSPANID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 25}},
-#define   INGCHANID             137
+#define   INGCHANID             (137 % 256)
 	{INGCHANID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 26}},
-#define   INGISDNDCHAN          138
+#define   INGISDNDCHAN          (138 % 256)
 	{INGISDNDCHAN, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 27}},
-#define   INGISDNCRN            139
+#define   INGISDNCRN            (139 % 256)
 	{INGISDNCRN, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 28}},
-#define   INGCREATCONNCPLT      140
+#define   INGCREATCONNCPLT      (140 % 256)
 	{INGCREATCONNCPLT, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 29}},
-#define   INGADDRCPLT           141
+#define   INGADDRCPLT           (141 % 256)
 	{INGADDRCPLT, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 30}},
-#define   INGCALLANS            142
+#define   INGCALLANS            (142 % 256)
 	{INGCALLANS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 31}},
-#define   TRANSNBR              143
+#define   TRANSNBR              (143 % 256)
 	{TRANSNBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 32}},
-#define   TERMLRN               144
+#define   TERMLRN               (144 % 256)
 	{TERMLRN, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 33}},
-#define   TRANSCIC              145
+#define   TRANSCIC              (145 % 256)
 	{TRANSCIC, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 34}},
-#define   INGCALLRLS            146
+#define   INGCALLRLS            (146 % 256)
 	{INGCALLRLS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 35}},
-#define   INGRLSCAUSE           147
+#define   INGRLSCAUSE           (147 % 256)
 	{INGRLSCAUSE, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 36}},
-#define   EGRCCEID              148
+#define   EGRCCEID              (148 % 256)
 	{EGRCCEID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 37}},
-#define   EGRTGPROT             149
+#define   EGRTGPROT             (149 % 256)
 	{EGRTGPROT, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 38}},
-#define   EGRTGTYPE             150
+#define   EGRTGTYPE             (150 % 256)
 	{EGRTGTYPE, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 39}},
-#define   EGRTGID               151
+#define   EGRTGID               (151 % 256)
 	{EGRTGID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 40}},
-#define   EGRCALLSTART          152
+#define   EGRCALLSTART          (152 % 256)
 	{EGRCALLSTART, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 41}},
-#define   EGRGATEID             153
+#define   EGRGATEID             (153 % 256)
 	{EGRGATEID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 42}},
-#define   EGRCARDID             154
+#define   EGRCARDID             (154 % 256)
 	{EGRCARDID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 43}},
-#define   EGRSPANID             155
+#define   EGRSPANID             (155 % 256)
 	{EGRSPANID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 44}},
-#define   EGRCHANID             156
+#define   EGRCHANID             (156 % 256)
 	{EGRCHANID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 45}},
-#define   EGRISDNDCHAN          157
+#define   EGRISDNDCHAN          (157 % 256)
 	{EGRISDNDCHAN, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 46}},
-#define   EGRISDNCRN            158
+#define   EGRISDNCRN            (158 % 256)
 	{EGRISDNCRN, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 47}},
-#define   EGRCREATCONNCPLT      159
+#define   EGRCREATCONNCPLT      (159 % 256)
 	{EGRCREATCONNCPLT, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 48}},
-#define   EGRADDRCPLT           160
+#define   EGRADDRCPLT           (160 % 256)
 	{EGRADDRCPLT, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 49}},
-#define   EGRCALLANS            161
+#define   EGRCALLANS            (161 % 256)
 	{EGRCALLANS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 50}},
-#define   EGRCALLRLS            162
+#define   EGRCALLRLS            (162 % 256)
 	{EGRCALLRLS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 51}},
-#define   EGRRLSCAUSE           163
+#define   EGRRLSCAUSE           (163 % 256)
 	{EGRRLSCAUSE, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 52}},
-#define   CHKPTFIRST            164
+#define   CHKPTFIRST            (164 % 256)
 	{CHKPTFIRST, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 53}},
-#define   CHKPTLAST             165
+#define   CHKPTLAST             (165 % 256)
 	{CHKPTLAST, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 54}},
-#define   INGGATENAME           166
+#define   INGGATENAME           (166 % 256)
 	{INGGATENAME, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 55}},
-#define   EGRGATENAME           167
+#define   EGRGATENAME           (167 % 256)
 	{EGRGATENAME, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 56}},
-#define   INGTGNAME             168
+#define   INGTGNAME             (168 % 256)
 	{INGTGNAME, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 57}},
-#define   EGRTGNAME             169
+#define   EGRTGNAME             (169 % 256)
 	{EGRTGNAME, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 58}},
-#define   ORIGGATEIP            170
+#define   ORIGGATEIP            (170 % 256)
 	{ORIGGATEIP, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 59}},
-#define   TERMGATEIP            171
+#define   TERMGATEIP            (171 % 256)
 	{TERMGATEIP, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 60}},
-#define   H323CONFID            172
+#define   H323CONFID            (172 % 256)
 	{H323CONFID, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 61}},
-#define   INGCARDPORT           173
+#define   INGCARDPORT           (173 % 256)
 	{INGCARDPORT, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 62}},
-#define   INGCARDPATH           174
+#define   INGCARDPATH           (174 % 256)
 	{INGCARDPATH, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 63}},
-#define   EGRCARDPORT           175
+#define   EGRCARDPORT           (175 % 256)
 	{EGRCARDPORT, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 64}},
-#define   EGRCARDPATH           176
+#define   EGRCARDPATH           (176 % 256)
 	{EGRCARDPATH, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 65}},
-#define   INGTG                 177
+#define   INGTG                 (177 % 256)
 	{INGTG, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 66}},
-#define   EGRTG                 178
+#define   EGRTG                 (178 % 256)
 	{EGRTG, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 67}},
-#define   DIALEDNBR             179
+#define   DIALEDNBR             (179 % 256)
 	{DIALEDNBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 68}},
-#define   DIALEDNOA             180
+#define   DIALEDNOA             (180 % 256)
 	{DIALEDNOA, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 69}},
-#define   REDIRNBR              181
+#define   REDIRNBR              (181 % 256)
 	{REDIRNBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 70}},
-#define   REDIRNOA              182
+#define   REDIRNOA              (182 % 256)
 	{REDIRNOA, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 71}},
-#define   REDIRIND              183
+#define   REDIRIND              (183 % 256)
 	{REDIRIND, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 72}},
-#define   REDIRRSN              184
+#define   REDIRRSN              (184 % 256)
 	{REDIRRSN, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 73}},
-#define   CALLEDNBR             185
+#define   CALLEDNBR             (185 % 256)
 	{CALLEDNBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 74}},
-#define   CALLEDNOA             186
+#define   CALLEDNOA             (186 % 256)
 	{CALLEDNOA, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 75}},
-#define   REDIRRSNORIG          187
+#define   REDIRRSNORIG          (187 % 256)
 	{REDIRRSNORIG, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 76}},
-#define   REDIRCNTR             188
+#define   REDIRCNTR             (188 % 256)
 	{REDIRCNTR, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 77}},
-#define   REDIRPRSNTNIND        189
+#define   REDIRPRSNTNIND        (189 % 256)
 	{REDIRPRSNTNIND, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 78}},
-#define   INGJURIS              190
+#define   INGJURIS              (190 % 256)
 	{INGJURIS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 79}},
-#define   EGRJURIS              191
+#define   EGRJURIS              (191 % 256)
 	{EGRJURIS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 80}},
-#define   INGTRUNKBEARCAP       192
+#define   INGTRUNKBEARCAP       (192 % 256)
 	{INGTRUNKBEARCAP, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 81}},
-#define   EGRTRUNKBEARCAP       193
+#define   EGRTRUNKBEARCAP       (193 % 256)
 	{EGRTRUNKBEARCAP, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 82}},
-#define   TRANSNETSELCARR       194
+#define   TRANSNETSELCARR       (194 % 256)
 	{TRANSNETSELCARR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 83}},
-#define   CLNGPTYNOA            195
+#define   CLNGPTYNOA            (195 % 256)
 	{CLNGPTYNOA, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 84}},
-#define   INGRLSCAUSEINTRNL     196
+#define   INGRLSCAUSEINTRNL     (196 % 256)
 	{INGRLSCAUSEINTRNL, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 85}},
-#define   EGRRLSCAUSEINTRNL     197
+#define   EGRRLSCAUSEINTRNL     (197 % 256)
 	{EGRRLSCAUSEINTRNL, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 86}},
-#define   EGRCLLDNBR            198
+#define   EGRCLLDNBR            (198 % 256)
 	{EGRCLLDNBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 87}},
-#define   EGRCLLDNOA            199
+#define   EGRCLLDNOA            (199 % 256)
 	{EGRCLLDNOA, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 88}},
-#define   EGRCNNDNBR            200
+#define   EGRCNNDNBR            (200 % 256)
 	{EGRCNNDNBR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 89}},
-#define   EGRCNNDNOA            201
+#define   EGRCNNDNOA            (201 % 256)
 	{EGRCNNDNOA, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 90}},
-#define   CLNGPTYPRSNTNIND      202
+#define   CLNGPTYPRSNTNIND      (202 % 256)
 	{CLNGPTYPRSNTNIND, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 91}},
-#define   INGIRI                203
+#define   INGIRI                (203 % 256)
 	{INGIRI, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 92}},
-#define   EGRORI                204
+#define   EGRORI                (204 % 256)
 	{EGRORI, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 93}},
-#define   INGCALLIDEXTRNL       205
+#define   INGCALLIDEXTRNL       (205 % 256)
 	{INGCALLIDEXTRNL, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 94}},
-#define   EGRCALLIDEXTRNL       206
+#define   EGRCALLIDEXTRNL       (206 % 256)
 	{EGRCALLIDEXTRNL, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 95}},
-#define   INGCHARGEINFO         207
+#define   INGCHARGEINFO         (207 % 256)
 	{INGCHARGEINFO, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 96}},
-#define   EGRCHARGEINFO         208
+#define   EGRCHARGEINFO         (208 % 256)
 	{EGRCHARGEINFO, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 97}},
-#define   INGPRTLIND            209
+#define   INGPRTLIND            (209 % 256)
 	{INGPRTLIND, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 98}},
-#define   INGNATFWDCLIBLKIND    210
+#define   INGNATFWDCLIBLKIND    (210 % 256)
 	{INGNATFWDCLIBLKIND, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 99}},
-#define   INGNATFWDNTAIND       211
+#define   INGNATFWDNTAIND       (211 % 256)
 	{INGNATFWDNTAIND, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 100}},
-#define   INGLASTDVRTLNDIGS     212
+#define   INGLASTDVRTLNDIGS     (212 % 256)
 	{INGLASTDVRTLNDIGS, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 101}},
-#define   INGLASTDVRTLNNOA      213
+#define   INGLASTDVRTLNNOA      (213 % 256)
 	{INGLASTDVRTLNNOA, ASN_INTEGER, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 102}},
-#define   J7INGADDLPTYCAT       214
+#define   J7INGADDLPTYCAT       (214 % 256)
 	{J7INGADDLPTYCAT, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 103}},
-#define   J7INGCHGAREAINFO      215
+#define   J7INGCHGAREAINFO      (215 % 256)
 	{J7INGCHGAREAINFO, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 104}},
-#define   J7INGFWDCALLIND       216
+#define   J7INGFWDCALLIND       (216 % 256)
 	{J7INGFWDCALLIND, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 105}},
-#define   J7EGRADDLPTYCAT       217
+#define   J7EGRADDLPTYCAT       (217 % 256)
 	{J7EGRADDLPTYCAT, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 106}},
-#define   J7EGRCHGAREAINFO      218
+#define   J7EGRCHGAREAINFO      (218 % 256)
 	{J7EGRCHGAREAINFO, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 107}},
-#define   J7EGRBKWCALLIND       219
+#define   J7EGRBKWCALLIND       (219 % 256)
 	{J7EGRBKWCALLIND, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 108}},
-#define   J7CARRINFOXFER        220
+#define   J7CARRINFOXFER        (220 % 256)
 	{J7CARRINFOXFER, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 109}},
-#define   INGSS7GNRCPARM        221
+#define   INGSS7GNRCPARM        (221 % 256)
 	{INGSS7GNRCPARM, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 110}},
-#define   EGRSS7GNRCPARM        222
+#define   EGRSS7GNRCPARM        (222 % 256)
 	{EGRSS7GNRCPARM, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 111}},
-#define   INGPKTSSENT           223
+#define   INGPKTSSENT           (223 % 256)
 	{INGPKTSSENT, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 112}},
-#define   INGPKTSRCVD           224
+#define   INGPKTSRCVD           (224 % 256)
 	{INGPKTSRCVD, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 113}},
-#define   INGPKTSLOST           225
+#define   INGPKTSLOST           (225 % 256)
 	{INGPKTSLOST, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 114}},
-#define   INGPKTSXFER           226
+#define   INGPKTSXFER           (226 % 256)
 	{INGPKTSXFER, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 115}},
-#define   INGJITTER             227
+#define   INGJITTER             (227 % 256)
 	{INGJITTER, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 116}},
-#define   INGLTNCY              228
+#define   INGLTNCY              (228 % 256)
 	{INGLTNCY, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 117}},
-#define   EGRPKTSSENT           229
+#define   EGRPKTSSENT           (229 % 256)
 	{EGRPKTSSENT, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 118}},
-#define   EGRPKTSRCVD           230
+#define   EGRPKTSRCVD           (230 % 256)
 	{EGRPKTSRCVD, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 119}},
-#define   EGRPKTSLOST           231
+#define   EGRPKTSLOST           (231 % 256)
 	{EGRPKTSLOST, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 120}},
-#define   EGRPKTSXFER           232
+#define   EGRPKTSXFER           (232 % 256)
 	{EGRPKTSXFER, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 121}},
-#define   EGRJITTER             233
+#define   EGRJITTER             (233 % 256)
 	{EGRJITTER, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 122}},
-#define   EGRLTNCY              234
+#define   EGRLTNCY              (234 % 256)
 	{EGRLTNCY, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 123}},
-#define   INGCRCTID             235
+#define   INGCRCTID             (235 % 256)
 	{INGCRCTID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 124}},
-#define   EGRCRCTID             236
+#define   EGRCRCTID             (236 % 256)
 	{EGRCRCTID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 125}},
-#define   INGCODEC              237
+#define   INGCODEC              (237 % 256)
 	{INGCODEC, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 126}},
-#define   EGRCODEC              238
+#define   EGRCODEC              (238 % 256)
 	{EGRCODEC, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 127}},
-#define   INGLOCGATEID          239
+#define   INGLOCGATEID          (239 % 256)
 	{INGLOCGATEID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 128}},
-#define   EGRLOCGATEID          240
+#define   EGRLOCGATEID          (240 % 256)
 	{EGRLOCGATEID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 129}},
-#define   INGCASCRCTSZR         241
+#define   INGCASCRCTSZR         (241 % 256)
 	{INGCASCRCTSZR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 130}},
-#define   EGRCASCRCTSZR         242
+#define   EGRCASCRCTSZR         (242 % 256)
 	{EGRCASCRCTSZR, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 131}},
-#define   INGZZ                 243
+#define   INGZZ                 (243 % 256)
 	{INGZZ, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 132}},
-#define   EGRZZ                 244
+#define   EGRZZ                 (244 % 256)
 	{EGRZZ, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 133}},
-#define   INGCTRYADDRTYPE       245
+#define   INGCTRYADDRTYPE       (245 % 256)
 	{INGCTRYADDRTYPE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 134}},
-#define   EGRCTRYADDRTYPE       246
+#define   EGRCTRYADDRTYPE       (246 % 256)
 	{EGRCTRYADDRTYPE, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 135}},
-#define   INGPARTITION          247
+#define   INGPARTITION          (247 % 256)
 	{INGPARTITION, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 136}},
-#define   EGRPARTITION          248
+#define   EGRPARTITION          (248 % 256)
 	{EGRPARTITION, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 137}},
-#define   INGCLNGPTYCAT         249
+#define   INGCLNGPTYCAT         (249 % 256)
 	{INGCLNGPTYCAT, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 138}},
-#define   INGRLSCAUSELCTN       250
+#define   INGRLSCAUSELCTN       (250 % 256)
 	{INGRLSCAUSELCTN, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 139}},
-#define   EGRRLSCAUSELCTN       251
+#define   EGRRLSCAUSELCTN       (251 % 256)
 	{EGRRLSCAUSELCTN, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 140}},
-#define   CLLDPTYCAT            252
+#define   CLLDPTYCAT            (252 % 256)
 	{CLLDPTYCAT, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 141}},
-#define   CALLDURATION          253
+#define   CALLDURATION          (253 % 256)
 	{CALLDURATION, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 142}},
-#define   INGRLSDRCTN           254
+#define   INGRLSDRCTN           (254 % 256)
 	{INGRLSDRCTN, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 143}},
-#define   EGRRLSDRCTN           255
+#define   EGRRLSDRCTN           (255 % 256)
 	{EGRRLSDRCTN, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 144}},
-#define   INGANSLCTIM           256
+#define   INGANSLCTIM           (256 % 256)
 	{INGANSLCTIM, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 145}},
-#define   EGRANSLCTIM           257
+#define   EGRANSLCTIM           (257 % 256)
 	{EGRANSLCTIM, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 146}},
-#define   INGHLCCHRSID          258
+#define   INGHLCCHRSID          (258 % 256)
 	{INGHLCCHRSID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 147}},
-#define   EGRHLCCHRSID          259
+#define   EGRHLCCHRSID          (259 % 256)
 	{EGRHLCCHRSID, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 148}},
-#define   INGLLCXFERCAP         260
+#define   INGLLCXFERCAP         (260 % 256)
 	{INGLLCXFERCAP, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 149}},
-#define   EGRLLCXFERCAP         261
+#define   EGRLLCXFERCAP         (261 % 256)
 	{EGRLLCXFERCAP, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 150}},
-#define   ROUTELIST             262
+#define   ROUTELIST             (262 % 256)
 	{ROUTELIST, ASN_OCTET_STR, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 151}},
-#define   INGPOINTCODE          263
+#define   INGPOINTCODE          (263 % 256)
 	{INGPOINTCODE, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 152}},
-#define   EGRPOINTCODE          264
+#define   EGRPOINTCODE          (264 % 256)
 	{EGRPOINTCODE, ASN_UNSIGNED, RONLY, var_callDetailLogRecordR2Table, 5, {1, 11, 1, 1, 153}},
 
 };
 
-/*    (L = length of the oidsuffix) */
+/* (L = length of the oidsuffix) */
 struct cdr2MIB_data *cdr2MIBStorage = NULL;
 
 /* global storage of our data, saved in and configured by header_complex() */
@@ -613,9 +612,9 @@ struct header_complex_index *blockGeneratingLogR2TableStorage = NULL;
 struct header_complex_index *callDetailLogRecordR2TableStorage = NULL;
 
 /*
- * init_cdr2MIB():
- *   Initialization routine.  This is called when the agent starts up.
- *   At a minimum, registration of your variables should take place here.
+ * init_cdr2MIB(): Initialization routine.
+ * This is called when the agent starts up.  At a minimum, registration of your variables should
+ * take place here.
  */
 void
 init_cdr2MIB(void)
@@ -653,9 +652,9 @@ init_cdr2MIB(void)
 }
 
 /*
- * deinit_cdr2MIB():
- *   Deinitialization routine.  This is called before the agent is unloaded.
- *   At a minimum, deregistration of your variables should take place here.
+ * deinit_cdr2MIB(): Deinitialization routine.
+ * This is called before the agent is unloaded.  At a minimum, deregistration of your variables
+ * should take place here.
  */
 void
 deinit_cdr2MIB(void)
@@ -697,13 +696,12 @@ cdr2MIB_add(struct cdr2MIB_data *thedata)
 }
 
 /*
- * parse_cdr2MIB():
- *   parses .conf file entries needed to configure the mib.
+ * parse_cdr2MIB(): parses .conf file entries needed to configure the mib.
  */
 void
 parse_cdr2MIB(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct cdr2MIB_data *StorageTmp = SNMP_MALLOC_STRUCT(cdr2MIB_data);
 
 	DEBUGMSGTL(("cdr2MIB", "parsing config...  "));
@@ -713,20 +711,19 @@ parse_cdr2MIB(const char *token, char *line)
 	}
 
 	cdr2MIB_add(StorageTmp);
-	(void) tmpint;
+	(void) tmpsize;
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 }
 
 /*
- * store_cdr2MIB():
- *   stores .conf file entries needed to configure the mib.
+ * store_cdr2MIB(): stores .conf file entries needed to configure the mib.
  */
 int
 store_cdr2MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct cdr2MIB_data *StorageTmp;
 
 	DEBUGMSGTL(("cdr2MIB", "storing data...  "));
@@ -735,14 +732,15 @@ store_cdr2MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		DEBUGMSGTL(("cdr2MIB", "error.\n"));
 		return SNMPERR_GENERR;
 	}
-	(void) tmpint;
-	/* XXX: if (StorageTmp->cdr2MIBStorageType == ST_NONVOLATILE) { */
-	memset(line, 0, sizeof(line));
-	strcat(line, "cdr2MIB ");
-	cptr = line + strlen(line);
+	(void) tmpsize;
+	/* XXX: if (StorageTmp->cdr2MIBStorageType == ST_NONVOLATILE) */
+	{
+		memset(line, 0, sizeof(line));
+		strcat(line, "cdr2MIB ");
+		cptr = line + strlen(line);
 
-	snmpd_store_config(line);
-	/* } */
+		snmpd_store_config(line);
+	}
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
@@ -750,21 +748,23 @@ store_cdr2MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * refresh_cdr2MIB: refresh cdr2MIB scalars
  *
- * Normally, the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread scalars and tables from the STREAMS susbystem.  This function
- * is used when the agent starts for the first time, or after a SIGPOLL
- * has been received (and a scalar has been requested).
+ * Normally, the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread scalars and
+ * tables from the STREAMS susbystem.  This function is used when the agent starts for the first
+ * time, or after a SIGPOLL has been received (and a scalar has been requested).
  */
 void
 refresh_cdr2MIB(void)
 {
 	if (cdr2MIBStorage == NULL) {
-		if ((cdr2MIBStorage = SNMP_MALLOC_STRUCT(cdr2MIB_data)) == NULL)
+		struct cdr2MIB_data *StorageNew;
+
+		if ((StorageNew = SNMP_MALLOC_STRUCT(cdr2MIB_data)) == NULL)
 			return;
 		/* Update scalar defaults as required here... */
+
+		cdr2MIBStorage = StorageNew;
 		cdr2MIB_refresh = 1;
 	}
 	if (cdr2MIB_refresh == 0)
@@ -774,24 +774,21 @@ refresh_cdr2MIB(void)
 }
 
 /*
- * var_cdr2MIB():
- *   This function is called every time the agent gets a request for
- *   a scalar variable that might be found within your mib section
- *   registered above.  It is up to you to do the right thing and
- *   return the correct value.
- *     You should also correct the value of "var_len" if necessary.
+ * var_cdr2MIB(): locate variables in cdr2MIB
  *
- *   Please see the documentation for more information about writing
- *   module extensions, and check out the examples in the examples
- *   and mibII directories.
+ * This function is called every time the agent gets a request for a scalar variable that might be
+ * found within your mib section registered above.  It is up to you to do the right thing and return
+ * the correct value.  You should also correct the value of "var_len" if necessary.
+ *
+ * Please see the documentation for more information about writing module extensions, and check out
+ * the examples in the examples and mibII directories.
  */
-uint8_t *
+u_char *
 var_cdr2MIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct cdr2MIB_data *StorageTmp;
 
-	if (header_generic(vp, name, length, exact, var_len, write_method)
-	    == MATCH_FAILED)
+	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
 	/* Refresh the MIB values if required. */
 	refresh_cdr2MIB();
@@ -818,7 +815,7 @@ callDetailDataTable_add(struct callDetailDataTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* callDetailDataId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->callDetailDataId, thedata->callDetailDataIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->callDetailDataId, thedata->callDetailDataIdLen);
 
 	header_complex_add_data(&callDetailDataTableStorage, vars, thedata);
 	DEBUGMSGTL(("callDetailDataTable", "registered an entry\n"));
@@ -827,13 +824,33 @@ callDetailDataTable_add(struct callDetailDataTable_data *thedata)
 }
 
 /*
- * parse_callDetailDataTable():
- *   parses .conf file entries needed to configure the mib.
+ * callDetailDataTable_del(): delete a structure
+ */
+int
+callDetailDataTable_del(struct callDetailDataTable_data **thedata)
+{
+	struct callDetailDataTable_data *StorageDel;
+
+	DEBUGMSGTL(("callDetailDataTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->callDetailDataId);
+		StorageDel->callDetailDataIdLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("callDetailDataTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_callDetailDataTable(): parse configuration file for callDetailDataTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_callDetailDataTable(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct callDetailDataTable_data *StorageTmp = SNMP_MALLOC_STRUCT(callDetailDataTable_data);
 
 	DEBUGMSGTL(("callDetailDataTable", "parsing config...  "));
@@ -841,41 +858,46 @@ parse_callDetailDataTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callDetailDataId, &StorageTmp->callDetailDataIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callDetailDataId, &tmpsize);
+	StorageTmp->callDetailDataIdLen = tmpsize;
 	if (StorageTmp->callDetailDataId == NULL) {
 		config_perror("invalid specification for callDetailDataId");
 		return;
 	}
 
 	callDetailDataTable_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("callDetailDataTable", "done.\n"));
 }
 
 /*
- * store_callDetailDataTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_callDetailDataTable(): store configuraiton file for callDetailDataTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_callDetailDataTable(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct callDetailDataTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("callDetailDataTable", "storing data...  "));
 	refresh_callDetailDataTable();
+	(void) tmpsize;
 	for (hcindex = callDetailDataTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct callDetailDataTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->callDetailDataTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "callDetailDataTable ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callDetailDataId, &StorageTmp->callDetailDataIdLen);
+		/* XXX: if (StorageTmp->callDetailDataStorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "callDetailDataTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->callDetailDataIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callDetailDataId, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("callDetailDataTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -893,7 +915,7 @@ simpleUsageMeteringControlTable_add(struct simpleUsageMeteringControlTable_data 
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* controlObjectId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->controlObjectId, thedata->controlObjectIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->controlObjectId, thedata->controlObjectIdLen);
 
 	header_complex_add_data(&simpleUsageMeteringControlTableStorage, vars, thedata);
 	DEBUGMSGTL(("simpleUsageMeteringControlTable", "registered an entry\n"));
@@ -902,13 +924,35 @@ simpleUsageMeteringControlTable_add(struct simpleUsageMeteringControlTable_data 
 }
 
 /*
- * parse_simpleUsageMeteringControlTable():
- *   parses .conf file entries needed to configure the mib.
+ * simpleUsageMeteringControlTable_del(): delete a structure
+ */
+int
+simpleUsageMeteringControlTable_del(struct simpleUsageMeteringControlTable_data **thedata)
+{
+	struct simpleUsageMeteringControlTable_data *StorageDel;
+
+	DEBUGMSGTL(("simpleUsageMeteringControlTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->controlObjectId);
+		StorageDel->controlObjectIdLen = 0;
+		SNMP_FREE(StorageDel->creationTriggerList);
+		StorageDel->creationTriggerListLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("simpleUsageMeteringControlTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_simpleUsageMeteringControlTable(): parse configuration file for simpleUsageMeteringControlTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_simpleUsageMeteringControlTable(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct simpleUsageMeteringControlTable_data *StorageTmp = SNMP_MALLOC_STRUCT(simpleUsageMeteringControlTable_data);
 
 	DEBUGMSGTL(("simpleUsageMeteringControlTable", "parsing config...  "));
@@ -916,51 +960,58 @@ parse_simpleUsageMeteringControlTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->controlObjectId, &tmpsize);
+	StorageTmp->controlObjectIdLen = tmpsize;
 	if (StorageTmp->controlObjectId == NULL) {
 		config_perror("invalid specification for controlObjectId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->creationTriggerList, &StorageTmp->creationTriggerListLen);
+	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->creationTriggerList, &tmpsize);
+	StorageTmp->creationTriggerListLen = tmpsize;
 	if (StorageTmp->creationTriggerList == NULL) {
 		config_perror("invalid specification for creationTriggerList");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->simpleUsageMeteringControlEntryStatus, &tmpint);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->simpleUsageMeteringControlEntryStatus, &tmpsize);
 
 	simpleUsageMeteringControlTable_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("simpleUsageMeteringControlTable", "done.\n"));
 }
 
 /*
- * store_simpleUsageMeteringControlTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_simpleUsageMeteringControlTable(): store configuraiton file for simpleUsageMeteringControlTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_simpleUsageMeteringControlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct simpleUsageMeteringControlTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("simpleUsageMeteringControlTable", "storing data...  "));
 	refresh_simpleUsageMeteringControlTable();
+	(void) tmpsize;
 	for (hcindex = simpleUsageMeteringControlTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct simpleUsageMeteringControlTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->simpleUsageMeteringControlTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "simpleUsageMeteringControlTable ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
-		cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->creationTriggerList, &StorageTmp->creationTriggerListLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->simpleUsageMeteringControlEntryStatus, &tmpint);
+		/* XXX: if (StorageTmp->simpleUsageMeteringControlStorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "simpleUsageMeteringControlTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->controlObjectIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &tmpsize);
+			tmpsize = StorageTmp->creationTriggerListLen;
+			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->creationTriggerList, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->simpleUsageMeteringControlEntryStatus, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("simpleUsageMeteringControlTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -978,7 +1029,7 @@ configurableSimpleUsageMeteringControlTable_add(struct configurableSimpleUsageMe
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* controlObjectId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->controlObjectId, thedata->controlObjectIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->controlObjectId, thedata->controlObjectIdLen);
 
 	header_complex_add_data(&configurableSimpleUsageMeteringControlTableStorage, vars, thedata);
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlTable", "registered an entry\n"));
@@ -987,13 +1038,35 @@ configurableSimpleUsageMeteringControlTable_add(struct configurableSimpleUsageMe
 }
 
 /*
- * parse_configurableSimpleUsageMeteringControlTable():
- *   parses .conf file entries needed to configure the mib.
+ * configurableSimpleUsageMeteringControlTable_del(): delete a structure
+ */
+int
+configurableSimpleUsageMeteringControlTable_del(struct configurableSimpleUsageMeteringControlTable_data **thedata)
+{
+	struct configurableSimpleUsageMeteringControlTable_data *StorageDel;
+
+	DEBUGMSGTL(("configurableSimpleUsageMeteringControlTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->controlObjectId);
+		StorageDel->controlObjectIdLen = 0;
+		SNMP_FREE(StorageDel->configurationMask);
+		StorageDel->configurationMaskLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("configurableSimpleUsageMeteringControlTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_configurableSimpleUsageMeteringControlTable(): parse configuration file for configurableSimpleUsageMeteringControlTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_configurableSimpleUsageMeteringControlTable(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = SNMP_MALLOC_STRUCT(configurableSimpleUsageMeteringControlTable_data);
 
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlTable", "parsing config...  "));
@@ -1001,53 +1074,61 @@ parse_configurableSimpleUsageMeteringControlTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->controlObjectId, &tmpsize);
+	StorageTmp->controlObjectIdLen = tmpsize;
 	if (StorageTmp->controlObjectId == NULL) {
 		config_perror("invalid specification for controlObjectId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->samplingRate, &tmpint);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->configurationMask, &StorageTmp->configurationMaskLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->samplingRate, &tmpsize);
+	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->configurationMask, &tmpsize);
+	StorageTmp->configurationMaskLen = tmpsize;
 	if (StorageTmp->configurationMask == NULL) {
 		config_perror("invalid specification for configurationMask");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->configurationRowStatus, &tmpint);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->configurationRowStatus, &tmpsize);
 
 	configurableSimpleUsageMeteringControlTable_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlTable", "done.\n"));
 }
 
 /*
- * store_configurableSimpleUsageMeteringControlTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_configurableSimpleUsageMeteringControlTable(): store configuraiton file for configurableSimpleUsageMeteringControlTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_configurableSimpleUsageMeteringControlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlTable", "storing data...  "));
 	refresh_configurableSimpleUsageMeteringControlTable();
+	(void) tmpsize;
 	for (hcindex = configurableSimpleUsageMeteringControlTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct configurableSimpleUsageMeteringControlTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->configurableSimpleUsageMeteringControlTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "configurableSimpleUsageMeteringControlTable ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->samplingRate, &tmpint);
-		cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->configurationMask, &StorageTmp->configurationMaskLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->configurationRowStatus, &tmpint);
+		/* XXX: if (StorageTmp->configurableSimpleUsageMeteringControlStorageType ==
+		   ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "configurableSimpleUsageMeteringControlTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->controlObjectIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->samplingRate, &tmpsize);
+			tmpsize = StorageTmp->configurationMaskLen;
+			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->configurationMask, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->configurationRowStatus, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1065,7 +1146,7 @@ blockGeneratingLogTable_add(struct blockGeneratingLogTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* logId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->logId, thedata->logIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logId, thedata->logIdLen);
 
 	header_complex_add_data(&blockGeneratingLogTableStorage, vars, thedata);
 	DEBUGMSGTL(("blockGeneratingLogTable", "registered an entry\n"));
@@ -1074,13 +1155,33 @@ blockGeneratingLogTable_add(struct blockGeneratingLogTable_data *thedata)
 }
 
 /*
- * parse_blockGeneratingLogTable():
- *   parses .conf file entries needed to configure the mib.
+ * blockGeneratingLogTable_del(): delete a structure
+ */
+int
+blockGeneratingLogTable_del(struct blockGeneratingLogTable_data **thedata)
+{
+	struct blockGeneratingLogTable_data *StorageDel;
+
+	DEBUGMSGTL(("blockGeneratingLogTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->logId);
+		StorageDel->logIdLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("blockGeneratingLogTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_blockGeneratingLogTable(): parse configuration file for blockGeneratingLogTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_blockGeneratingLogTable(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct blockGeneratingLogTable_data *StorageTmp = SNMP_MALLOC_STRUCT(blockGeneratingLogTable_data);
 
 	DEBUGMSGTL(("blockGeneratingLogTable", "parsing config...  "));
@@ -1088,50 +1189,54 @@ parse_blockGeneratingLogTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &StorageTmp->logIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &tmpsize);
+	StorageTmp->logIdLen = tmpsize;
 	if (StorageTmp->logId == NULL) {
 		config_perror("invalid specification for logId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogMaxBlockSize, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogMaxTimeInterval, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogStorageType, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogRowStatus, &tmpint);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogMaxBlockSize, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogMaxTimeInterval, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogStorageType, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogRowStatus, &tmpsize);
 
 	blockGeneratingLogTable_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("blockGeneratingLogTable", "done.\n"));
 }
 
 /*
- * store_blockGeneratingLogTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_blockGeneratingLogTable(): store configuraiton file for blockGeneratingLogTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_blockGeneratingLogTable(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct blockGeneratingLogTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("blockGeneratingLogTable", "storing data...  "));
 	refresh_blockGeneratingLogTable();
+	(void) tmpsize;
 	for (hcindex = blockGeneratingLogTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct blockGeneratingLogTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->blockGeneratingLogTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "blockGeneratingLogTable ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogMaxBlockSize, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogMaxTimeInterval, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogStorageType, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogRowStatus, &tmpint);
+		if (StorageTmp->blockGeneratingLogStorageType == ST_NONVOLATILE) {
+			memset(line, 0, sizeof(line));
+			strcat(line, "blockGeneratingLogTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->logIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogMaxBlockSize, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogMaxTimeInterval, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogStorageType, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogRowStatus, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("blockGeneratingLogTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1149,7 +1254,7 @@ fileGeneratingLogTable_add(struct fileGeneratingLogTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* logId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->logId, thedata->logIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logId, thedata->logIdLen);
 
 	header_complex_add_data(&fileGeneratingLogTableStorage, vars, thedata);
 	DEBUGMSGTL(("fileGeneratingLogTable", "registered an entry\n"));
@@ -1158,13 +1263,35 @@ fileGeneratingLogTable_add(struct fileGeneratingLogTable_data *thedata)
 }
 
 /*
- * parse_fileGeneratingLogTable():
- *   parses .conf file entries needed to configure the mib.
+ * fileGeneratingLogTable_del(): delete a structure
+ */
+int
+fileGeneratingLogTable_del(struct fileGeneratingLogTable_data **thedata)
+{
+	struct fileGeneratingLogTable_data *StorageDel;
+
+	DEBUGMSGTL(("fileGeneratingLogTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->logId);
+		StorageDel->logIdLen = 0;
+		SNMP_FREE(StorageDel->timesOfDay);
+		StorageDel->timesOfDayLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("fileGeneratingLogTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_fileGeneratingLogTable(): parse configuration file for fileGeneratingLogTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_fileGeneratingLogTable(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct fileGeneratingLogTable_data *StorageTmp = SNMP_MALLOC_STRUCT(fileGeneratingLogTable_data);
 
 	DEBUGMSGTL(("fileGeneratingLogTable", "parsing config...  "));
@@ -1172,55 +1299,61 @@ parse_fileGeneratingLogTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &StorageTmp->logIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &tmpsize);
+	StorageTmp->logIdLen = tmpsize;
 	if (StorageTmp->logId == NULL) {
 		config_perror("invalid specification for logId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->timesOfDay, &StorageTmp->timesOfDayLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->timesOfDay, &tmpsize);
+	StorageTmp->timesOfDayLen = tmpsize;
 	if (StorageTmp->timesOfDay == NULL) {
 		config_perror("invalid specification for timesOfDay");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->periodicTrigger, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->fileGeneratingLogStorageType, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->fileGeneratingLogEntryStatus, &tmpint);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->periodicTrigger, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->fileGeneratingLogStorageType, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->fileGeneratingLogEntryStatus, &tmpsize);
 
 	fileGeneratingLogTable_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("fileGeneratingLogTable", "done.\n"));
 }
 
 /*
- * store_fileGeneratingLogTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_fileGeneratingLogTable(): store configuraiton file for fileGeneratingLogTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_fileGeneratingLogTable(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct fileGeneratingLogTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("fileGeneratingLogTable", "storing data...  "));
 	refresh_fileGeneratingLogTable();
+	(void) tmpsize;
 	for (hcindex = fileGeneratingLogTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct fileGeneratingLogTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->fileGeneratingLogTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "fileGeneratingLogTable ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->timesOfDay, &StorageTmp->timesOfDayLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->periodicTrigger, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->fileGeneratingLogStorageType, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->fileGeneratingLogEntryStatus, &tmpint);
+		if (StorageTmp->fileGeneratingLogStorageType == ST_NONVOLATILE) {
+			memset(line, 0, sizeof(line));
+			strcat(line, "fileGeneratingLogTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->logIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &tmpsize);
+			tmpsize = StorageTmp->timesOfDayLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->timesOfDay, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->periodicTrigger, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->fileGeneratingLogStorageType, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->fileGeneratingLogEntryStatus, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("fileGeneratingLogTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1238,9 +1371,9 @@ callDetailLogRecordTable_add(struct callDetailLogRecordTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* logId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->logId, thedata->logIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logId, thedata->logIdLen);
 	/* logRecordId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->logRecordId, thedata->logRecordIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logRecordId, thedata->logRecordIdLen);
 
 	header_complex_add_data(&callDetailLogRecordTableStorage, vars, thedata);
 	DEBUGMSGTL(("callDetailLogRecordTable", "registered an entry\n"));
@@ -1249,13 +1382,129 @@ callDetailLogRecordTable_add(struct callDetailLogRecordTable_data *thedata)
 }
 
 /*
- * parse_callDetailLogRecordTable():
- *   parses .conf file entries needed to configure the mib.
+ * callDetailLogRecordTable_del(): delete a structure
+ */
+int
+callDetailLogRecordTable_del(struct callDetailLogRecordTable_data **thedata)
+{
+	struct callDetailLogRecordTable_data *StorageDel;
+
+	DEBUGMSGTL(("callDetailLogRecordTable", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->logId);
+		StorageDel->logIdLen = 0;
+		SNMP_FREE(StorageDel->logRecordId);
+		StorageDel->logRecordIdLen = 0;
+		SNMP_FREE(StorageDel->networkProviderId);
+		StorageDel->networkProviderIdLen = 0;
+		SNMP_FREE(StorageDel->seizureTime);
+		StorageDel->seizureTimeLen = 0;
+		SNMP_FREE(StorageDel->answerTime);
+		StorageDel->answerTimeLen = 0;
+		SNMP_FREE(StorageDel->partialTime);
+		StorageDel->partialTimeLen = 0;
+		SNMP_FREE(StorageDel->eventTime);
+		StorageDel->eventTimeLen = 0;
+		SNMP_FREE(StorageDel->callingPartyNumber);
+		StorageDel->callingPartyNumberLen = 0;
+		SNMP_FREE(StorageDel->calledPartyNumber);
+		StorageDel->calledPartyNumberLen = 0;
+		SNMP_FREE(StorageDel->redirectingNumber);
+		StorageDel->redirectingNumberLen = 0;
+		SNMP_FREE(StorageDel->redirectionNumber);
+		StorageDel->redirectionNumberLen = 0;
+		SNMP_FREE(StorageDel->originalCalledNumber);
+		StorageDel->originalCalledNumberLen = 0;
+		SNMP_FREE(StorageDel->callingPartyNumberNotScreened);
+		StorageDel->callingPartyNumberNotScreenedLen = 0;
+		SNMP_FREE(StorageDel->operatorSpecific1Number);
+		StorageDel->operatorSpecific1NumberLen = 0;
+		SNMP_FREE(StorageDel->operatorSpecific2Number);
+		StorageDel->operatorSpecific2NumberLen = 0;
+		SNMP_FREE(StorageDel->operatorSpecific3Number);
+		StorageDel->operatorSpecific3NumberLen = 0;
+		SNMP_FREE(StorageDel->bearerService);
+		StorageDel->bearerServiceLen = 0;
+		SNMP_FREE(StorageDel->callIdentificationNumber);
+		StorageDel->callIdentificationNumberLen = 0;
+		SNMP_FREE(StorageDel->supplementaryServices);
+		StorageDel->supplementaryServicesLen = 0;
+		SNMP_FREE(StorageDel->cause);
+		StorageDel->causeLen = 0;
+		SNMP_FREE(StorageDel->personalUserId);
+		StorageDel->personalUserIdLen = 0;
+		SNMP_FREE(StorageDel->chargedDirectoryNumber);
+		StorageDel->chargedDirectoryNumberLen = 0;
+		SNMP_FREE(StorageDel->accountCodeInput);
+		StorageDel->accountCodeInputLen = 0;
+		SNMP_FREE(StorageDel->iNServiceCode);
+		StorageDel->iNServiceCodeLen = 0;
+		SNMP_FREE(StorageDel->queueTimeStamp);
+		StorageDel->queueTimeStampLen = 0;
+		SNMP_FREE(StorageDel->serviceSpecificINInformation);
+		StorageDel->serviceSpecificINInformationLen = 0;
+		SNMP_FREE(StorageDel->exchangeInfo);
+		StorageDel->exchangeInfoLen = 0;
+		SNMP_FREE(StorageDel->relatedCallNumber);
+		StorageDel->relatedCallNumberLen = 0;
+		SNMP_FREE(StorageDel->cDRPurpose);
+		StorageDel->cDRPurposeLen = 0;
+		SNMP_FREE(StorageDel->physicalLineCode);
+		StorageDel->physicalLineCodeLen = 0;
+		SNMP_FREE(StorageDel->receivedDigits);
+		StorageDel->receivedDigitsLen = 0;
+		SNMP_FREE(StorageDel->operatorSpecific1AdditionalNumber);
+		StorageDel->operatorSpecific1AdditionalNumberLen = 0;
+		SNMP_FREE(StorageDel->operatorSpecific2AdditionalNumber);
+		StorageDel->operatorSpecific2AdditionalNumberLen = 0;
+		SNMP_FREE(StorageDel->operatorSpecific3AdditionalNumber);
+		StorageDel->operatorSpecific3AdditionalNumberLen = 0;
+		SNMP_FREE(StorageDel->callingPartyCategory);
+		StorageDel->callingPartyCategoryLen = 0;
+		SNMP_FREE(StorageDel->chargeInformation);
+		StorageDel->chargeInformationLen = 0;
+		SNMP_FREE(StorageDel->progress);
+		StorageDel->progressLen = 0;
+		SNMP_FREE(StorageDel->accessDelivery);
+		StorageDel->accessDeliveryLen = 0;
+		SNMP_FREE(StorageDel->trunkGroupOutgoing);
+		StorageDel->trunkGroupOutgoingLen = 0;
+		SNMP_FREE(StorageDel->trunkGroupIncoming);
+		StorageDel->trunkGroupIncomingLen = 0;
+		SNMP_FREE(StorageDel->fallbackBearerService);
+		StorageDel->fallbackBearerServiceLen = 0;
+		SNMP_FREE(StorageDel->teleservice);
+		StorageDel->teleserviceLen = 0;
+		SNMP_FREE(StorageDel->uUInfo);
+		StorageDel->uUInfoLen = 0;
+		SNMP_FREE(StorageDel->standardExtensions);
+		StorageDel->standardExtensionsLen = 0;
+		SNMP_FREE(StorageDel->recordExtensions);
+		StorageDel->recordExtensionsLen = 0;
+		SNMP_FREE(StorageDel->bPartyCategory);
+		StorageDel->bPartyCategoryLen = 0;
+		SNMP_FREE(StorageDel->carrierId);
+		StorageDel->carrierIdLen = 0;
+		SNMP_FREE(StorageDel->dPC);
+		StorageDel->dPCLen = 0;
+		SNMP_FREE(StorageDel->oPC);
+		StorageDel->oPCLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("callDetailLogRecordTable", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_callDetailLogRecordTable(): parse configuration file for callDetailLogRecordTable
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_callDetailLogRecordTable(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct callDetailLogRecordTable_data *StorageTmp = SNMP_MALLOC_STRUCT(callDetailLogRecordTable_data);
 
 	DEBUGMSGTL(("callDetailLogRecordTable", "parsing config...  "));
@@ -1263,415 +1512,516 @@ parse_callDetailLogRecordTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &StorageTmp->logIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &tmpsize);
+	StorageTmp->logIdLen = tmpsize;
 	if (StorageTmp->logId == NULL) {
 		config_perror("invalid specification for logId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logRecordId, &tmpsize);
+	StorageTmp->logRecordIdLen = tmpsize;
 	if (StorageTmp->logRecordId == NULL) {
 		config_perror("invalid specification for logRecordId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->networkProviderId, &StorageTmp->networkProviderIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->networkProviderId, &tmpsize);
+	StorageTmp->networkProviderIdLen = tmpsize;
 	if (StorageTmp->networkProviderId == NULL) {
 		config_perror("invalid specification for networkProviderId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->recordType, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->seizureTime, &StorageTmp->seizureTimeLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->recordType, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->seizureTime, &tmpsize);
+	StorageTmp->seizureTimeLen = tmpsize;
 	if (StorageTmp->seizureTime == NULL) {
 		config_perror("invalid specification for seizureTime");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->answerTime, &StorageTmp->answerTimeLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->answerTime, &tmpsize);
+	StorageTmp->answerTimeLen = tmpsize;
 	if (StorageTmp->answerTime == NULL) {
 		config_perror("invalid specification for answerTime");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->partialTime, &StorageTmp->partialTimeLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->partialTime, &tmpsize);
+	StorageTmp->partialTimeLen = tmpsize;
 	if (StorageTmp->partialTime == NULL) {
 		config_perror("invalid specification for partialTime");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->eventTime, &StorageTmp->eventTimeLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->eventTime, &tmpsize);
+	StorageTmp->eventTimeLen = tmpsize;
 	if (StorageTmp->eventTime == NULL) {
 		config_perror("invalid specification for eventTime");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callingPartyNumber, &StorageTmp->callingPartyNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callingPartyNumber, &tmpsize);
+	StorageTmp->callingPartyNumberLen = tmpsize;
 	if (StorageTmp->callingPartyNumber == NULL) {
 		config_perror("invalid specification for callingPartyNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->calledPartyNumber, &StorageTmp->calledPartyNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->calledPartyNumber, &tmpsize);
+	StorageTmp->calledPartyNumberLen = tmpsize;
 	if (StorageTmp->calledPartyNumber == NULL) {
 		config_perror("invalid specification for calledPartyNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->redirectingNumber, &StorageTmp->redirectingNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->redirectingNumber, &tmpsize);
+	StorageTmp->redirectingNumberLen = tmpsize;
 	if (StorageTmp->redirectingNumber == NULL) {
 		config_perror("invalid specification for redirectingNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->redirectionNumber, &StorageTmp->redirectionNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->redirectionNumber, &tmpsize);
+	StorageTmp->redirectionNumberLen = tmpsize;
 	if (StorageTmp->redirectionNumber == NULL) {
 		config_perror("invalid specification for redirectionNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->originalCalledNumber, &StorageTmp->originalCalledNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->originalCalledNumber, &tmpsize);
+	StorageTmp->originalCalledNumberLen = tmpsize;
 	if (StorageTmp->originalCalledNumber == NULL) {
 		config_perror("invalid specification for originalCalledNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callingPartyNumberNotScreened, &StorageTmp->callingPartyNumberNotScreenedLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callingPartyNumberNotScreened, &tmpsize);
+	StorageTmp->callingPartyNumberNotScreenedLen = tmpsize;
 	if (StorageTmp->callingPartyNumberNotScreened == NULL) {
 		config_perror("invalid specification for callingPartyNumberNotScreened");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific1Number, &StorageTmp->operatorSpecific1NumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific1Number, &tmpsize);
+	StorageTmp->operatorSpecific1NumberLen = tmpsize;
 	if (StorageTmp->operatorSpecific1Number == NULL) {
 		config_perror("invalid specification for operatorSpecific1Number");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific2Number, &StorageTmp->operatorSpecific2NumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific2Number, &tmpsize);
+	StorageTmp->operatorSpecific2NumberLen = tmpsize;
 	if (StorageTmp->operatorSpecific2Number == NULL) {
 		config_perror("invalid specification for operatorSpecific2Number");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific3Number, &StorageTmp->operatorSpecific3NumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific3Number, &tmpsize);
+	StorageTmp->operatorSpecific3NumberLen = tmpsize;
 	if (StorageTmp->operatorSpecific3Number == NULL) {
 		config_perror("invalid specification for operatorSpecific3Number");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->bearerService, &StorageTmp->bearerServiceLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->bearerService, &tmpsize);
+	StorageTmp->bearerServiceLen = tmpsize;
 	if (StorageTmp->bearerService == NULL) {
 		config_perror("invalid specification for bearerService");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->participantServiceUser, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callIdentificationNumber, &StorageTmp->callIdentificationNumberLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->participantServiceUser, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callIdentificationNumber, &tmpsize);
+	StorageTmp->callIdentificationNumberLen = tmpsize;
 	if (StorageTmp->callIdentificationNumber == NULL) {
 		config_perror("invalid specification for callIdentificationNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->supplementaryServices, &StorageTmp->supplementaryServicesLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->supplementaryServices, &tmpsize);
+	StorageTmp->supplementaryServicesLen = tmpsize;
 	if (StorageTmp->supplementaryServices == NULL) {
 		config_perror("invalid specification for supplementaryServices");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->immediateNotificationForUsageMetering, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cause, &StorageTmp->causeLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->immediateNotificationForUsageMetering, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cause, &tmpsize);
+	StorageTmp->causeLen = tmpsize;
 	if (StorageTmp->cause == NULL) {
 		config_perror("invalid specification for cause");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->personalUserId, &StorageTmp->personalUserIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->personalUserId, &tmpsize);
+	StorageTmp->personalUserIdLen = tmpsize;
 	if (StorageTmp->personalUserId == NULL) {
 		config_perror("invalid specification for personalUserId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->chargedParticipant, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chargedDirectoryNumber, &StorageTmp->chargedDirectoryNumberLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->chargedParticipant, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chargedDirectoryNumber, &tmpsize);
+	StorageTmp->chargedDirectoryNumberLen = tmpsize;
 	if (StorageTmp->chargedDirectoryNumber == NULL) {
 		config_perror("invalid specification for chargedDirectoryNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->percentageToBeBilled, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->accountCodeInput, &StorageTmp->accountCodeInputLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->percentageToBeBilled, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->accountCodeInput, &tmpsize);
+	StorageTmp->accountCodeInputLen = tmpsize;
 	if (StorageTmp->accountCodeInput == NULL) {
 		config_perror("invalid specification for accountCodeInput");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->iNServiceCode, &StorageTmp->iNServiceCodeLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->iNServiceCode, &tmpsize);
+	StorageTmp->iNServiceCodeLen = tmpsize;
 	if (StorageTmp->iNServiceCode == NULL) {
 		config_perror("invalid specification for iNServiceCode");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->queueTimeStamp, &StorageTmp->queueTimeStampLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->queueTimeStamp, &tmpsize);
+	StorageTmp->queueTimeStampLen = tmpsize;
 	if (StorageTmp->queueTimeStamp == NULL) {
 		config_perror("invalid specification for queueTimeStamp");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->queueDuration, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->serviceSpecificINInformation, &StorageTmp->serviceSpecificINInformationLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->queueDuration, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->serviceSpecificINInformation, &tmpsize);
+	StorageTmp->serviceSpecificINInformationLen = tmpsize;
 	if (StorageTmp->serviceSpecificINInformation == NULL) {
 		config_perror("invalid specification for serviceSpecificINInformation");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->partialRecordNumber, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->partialRecordReason, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->exchangeInfo, &StorageTmp->exchangeInfoLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->partialRecordNumber, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->partialRecordReason, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->exchangeInfo, &tmpsize);
+	StorageTmp->exchangeInfoLen = tmpsize;
 	if (StorageTmp->exchangeInfo == NULL) {
 		config_perror("invalid specification for exchangeInfo");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->relatedCallNumber, &StorageTmp->relatedCallNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->relatedCallNumber, &tmpsize);
+	StorageTmp->relatedCallNumberLen = tmpsize;
 	if (StorageTmp->relatedCallNumber == NULL) {
 		config_perror("invalid specification for relatedCallNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->cDRPurpose, &StorageTmp->cDRPurposeLen);
+	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->cDRPurpose, &tmpsize);
+	StorageTmp->cDRPurposeLen = tmpsize;
 	if (StorageTmp->cDRPurpose == NULL) {
 		config_perror("invalid specification for cDRPurpose");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->physicalLineCode, &StorageTmp->physicalLineCodeLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->physicalLineCode, &tmpsize);
+	StorageTmp->physicalLineCodeLen = tmpsize;
 	if (StorageTmp->physicalLineCode == NULL) {
 		config_perror("invalid specification for physicalLineCode");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->receivedDigits, &StorageTmp->receivedDigitsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->receivedDigits, &tmpsize);
+	StorageTmp->receivedDigitsLen = tmpsize;
 	if (StorageTmp->receivedDigits == NULL) {
 		config_perror("invalid specification for receivedDigits");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific1AdditionalNumber, &StorageTmp->operatorSpecific1AdditionalNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific1AdditionalNumber, &tmpsize);
+	StorageTmp->operatorSpecific1AdditionalNumberLen = tmpsize;
 	if (StorageTmp->operatorSpecific1AdditionalNumber == NULL) {
 		config_perror("invalid specification for operatorSpecific1AdditionalNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific2AdditionalNumber, &StorageTmp->operatorSpecific2AdditionalNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific2AdditionalNumber, &tmpsize);
+	StorageTmp->operatorSpecific2AdditionalNumberLen = tmpsize;
 	if (StorageTmp->operatorSpecific2AdditionalNumber == NULL) {
 		config_perror("invalid specification for operatorSpecific2AdditionalNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific3AdditionalNumber, &StorageTmp->operatorSpecific3AdditionalNumberLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->operatorSpecific3AdditionalNumber, &tmpsize);
+	StorageTmp->operatorSpecific3AdditionalNumberLen = tmpsize;
 	if (StorageTmp->operatorSpecific3AdditionalNumber == NULL) {
 		config_perror("invalid specification for operatorSpecific3AdditionalNumber");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callingPartyCategory, &StorageTmp->callingPartyCategoryLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callingPartyCategory, &tmpsize);
+	StorageTmp->callingPartyCategoryLen = tmpsize;
 	if (StorageTmp->callingPartyCategory == NULL) {
 		config_perror("invalid specification for callingPartyCategory");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->callingPartyType, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chargeInformation, &StorageTmp->chargeInformationLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->callingPartyType, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chargeInformation, &tmpsize);
+	StorageTmp->chargeInformationLen = tmpsize;
 	if (StorageTmp->chargeInformation == NULL) {
 		config_perror("invalid specification for chargeInformation");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->progress, &StorageTmp->progressLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->progress, &tmpsize);
+	StorageTmp->progressLen = tmpsize;
 	if (StorageTmp->progress == NULL) {
 		config_perror("invalid specification for progress");
 		return;
 	}
 
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->accessDelivery, &StorageTmp->accessDeliveryLen);
+	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->accessDelivery, &tmpsize);
+	StorageTmp->accessDeliveryLen = tmpsize;
 	if (StorageTmp->accessDelivery == NULL) {
 		config_perror("invalid specification for accessDelivery");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->trunkGroupOutgoing, &StorageTmp->trunkGroupOutgoingLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->trunkGroupOutgoing, &tmpsize);
+	StorageTmp->trunkGroupOutgoingLen = tmpsize;
 	if (StorageTmp->trunkGroupOutgoing == NULL) {
 		config_perror("invalid specification for trunkGroupOutgoing");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->trunkGroupIncoming, &StorageTmp->trunkGroupIncomingLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->trunkGroupIncoming, &tmpsize);
+	StorageTmp->trunkGroupIncomingLen = tmpsize;
 	if (StorageTmp->trunkGroupIncoming == NULL) {
 		config_perror("invalid specification for trunkGroupIncoming");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->fallbackBearerService, &StorageTmp->fallbackBearerServiceLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->fallbackBearerService, &tmpsize);
+	StorageTmp->fallbackBearerServiceLen = tmpsize;
 	if (StorageTmp->fallbackBearerService == NULL) {
 		config_perror("invalid specification for fallbackBearerService");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->teleservice, &StorageTmp->teleserviceLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->teleservice, &tmpsize);
+	StorageTmp->teleserviceLen = tmpsize;
 	if (StorageTmp->teleservice == NULL) {
 		config_perror("invalid specification for teleservice");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->conversationTime, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->durationTimeACM, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->durationTimeBAnswer, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->durationTimeNoBAnswer, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->uUInfo, &StorageTmp->uUInfoLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->conversationTime, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->durationTimeACM, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->durationTimeBAnswer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->durationTimeNoBAnswer, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->uUInfo, &tmpsize);
+	StorageTmp->uUInfoLen = tmpsize;
 	if (StorageTmp->uUInfo == NULL) {
 		config_perror("invalid specification for uUInfo");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->standardExtensions, &StorageTmp->standardExtensionsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->standardExtensions, &tmpsize);
+	StorageTmp->standardExtensionsLen = tmpsize;
 	if (StorageTmp->standardExtensions == NULL) {
 		config_perror("invalid specification for standardExtensions");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->recordExtensions, &StorageTmp->recordExtensionsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->recordExtensions, &tmpsize);
+	StorageTmp->recordExtensionsLen = tmpsize;
 	if (StorageTmp->recordExtensions == NULL) {
 		config_perror("invalid specification for recordExtensions");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->bPartyCategory, &StorageTmp->bPartyCategoryLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->bPartyCategory, &tmpsize);
+	StorageTmp->bPartyCategoryLen = tmpsize;
 	if (StorageTmp->bPartyCategory == NULL) {
 		config_perror("invalid specification for bPartyCategory");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->iSUPPreferred, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->networkManagementControls, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->glare, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->recordId, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dataValidity, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->callStatus, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->carrierId, &StorageTmp->carrierIdLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->iSUPPreferred, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->networkManagementControls, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->glare, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->recordId, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dataValidity, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->callStatus, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->carrierId, &tmpsize);
+	StorageTmp->carrierIdLen = tmpsize;
 	if (StorageTmp->carrierId == NULL) {
 		config_perror("invalid specification for carrierId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dPC, &StorageTmp->dPCLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dPC, &tmpsize);
+	StorageTmp->dPCLen = tmpsize;
 	if (StorageTmp->dPC == NULL) {
 		config_perror("invalid specification for dPC");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->oPC, &StorageTmp->oPCLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->oPC, &tmpsize);
+	StorageTmp->oPCLen = tmpsize;
 	if (StorageTmp->oPC == NULL) {
 		config_perror("invalid specification for oPC");
 		return;
 	}
 
 	callDetailLogRecordTable_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("callDetailLogRecordTable", "done.\n"));
 }
 
 /*
- * store_callDetailLogRecordTable():
- *   stores .conf file entries needed to configure the mib.
+ * store_callDetailLogRecordTable(): store configuraiton file for callDetailLogRecordTable
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_callDetailLogRecordTable(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct callDetailLogRecordTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("callDetailLogRecordTable", "storing data...  "));
 	refresh_callDetailLogRecordTable();
+	(void) tmpsize;
 	for (hcindex = callDetailLogRecordTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct callDetailLogRecordTable_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->callDetailLogRecordTableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "callDetailLogRecordTable ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->networkProviderId, &StorageTmp->networkProviderIdLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->recordType, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->seizureTime, &StorageTmp->seizureTimeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->answerTime, &StorageTmp->answerTimeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->partialTime, &StorageTmp->partialTimeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->eventTime, &StorageTmp->eventTimeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callingPartyNumber, &StorageTmp->callingPartyNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->calledPartyNumber, &StorageTmp->calledPartyNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->redirectingNumber, &StorageTmp->redirectingNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->redirectionNumber, &StorageTmp->redirectionNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->originalCalledNumber, &StorageTmp->originalCalledNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callingPartyNumberNotScreened, &StorageTmp->callingPartyNumberNotScreenedLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific1Number, &StorageTmp->operatorSpecific1NumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific2Number, &StorageTmp->operatorSpecific2NumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific3Number, &StorageTmp->operatorSpecific3NumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->bearerService, &StorageTmp->bearerServiceLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->participantServiceUser, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callIdentificationNumber, &StorageTmp->callIdentificationNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->supplementaryServices, &StorageTmp->supplementaryServicesLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->immediateNotificationForUsageMetering, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->cause, &StorageTmp->causeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->personalUserId, &StorageTmp->personalUserIdLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->chargedParticipant, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chargedDirectoryNumber, &StorageTmp->chargedDirectoryNumberLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->percentageToBeBilled, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->accountCodeInput, &StorageTmp->accountCodeInputLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->iNServiceCode, &StorageTmp->iNServiceCodeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->queueTimeStamp, &StorageTmp->queueTimeStampLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->queueDuration, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->serviceSpecificINInformation, &StorageTmp->serviceSpecificINInformationLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->partialRecordNumber, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->partialRecordReason, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->exchangeInfo, &StorageTmp->exchangeInfoLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->relatedCallNumber, &StorageTmp->relatedCallNumberLen);
-		cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->cDRPurpose, &StorageTmp->cDRPurposeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->physicalLineCode, &StorageTmp->physicalLineCodeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->receivedDigits, &StorageTmp->receivedDigitsLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific1AdditionalNumber, &StorageTmp->operatorSpecific1AdditionalNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific2AdditionalNumber, &StorageTmp->operatorSpecific2AdditionalNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific3AdditionalNumber, &StorageTmp->operatorSpecific3AdditionalNumberLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callingPartyCategory, &StorageTmp->callingPartyCategoryLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->callingPartyType, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chargeInformation, &StorageTmp->chargeInformationLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->progress, &StorageTmp->progressLen);
-		cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->accessDelivery, &StorageTmp->accessDeliveryLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->trunkGroupOutgoing, &StorageTmp->trunkGroupOutgoingLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->trunkGroupIncoming, &StorageTmp->trunkGroupIncomingLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->fallbackBearerService, &StorageTmp->fallbackBearerServiceLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->teleservice, &StorageTmp->teleserviceLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->conversationTime, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->durationTimeACM, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->durationTimeBAnswer, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->durationTimeNoBAnswer, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->uUInfo, &StorageTmp->uUInfoLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->standardExtensions, &StorageTmp->standardExtensionsLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->recordExtensions, &StorageTmp->recordExtensionsLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->bPartyCategory, &StorageTmp->bPartyCategoryLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->iSUPPreferred, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->networkManagementControls, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->glare, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->recordId, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dataValidity, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->callStatus, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->carrierId, &StorageTmp->carrierIdLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dPC, &StorageTmp->dPCLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->oPC, &StorageTmp->oPCLen);
+		/* XXX: if (StorageTmp->callDetailLogRecordStorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "callDetailLogRecordTable ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->logIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &tmpsize);
+			tmpsize = StorageTmp->logRecordIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &tmpsize);
+			tmpsize = StorageTmp->networkProviderIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->networkProviderId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->recordType, &tmpsize);
+			tmpsize = StorageTmp->seizureTimeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->seizureTime, &tmpsize);
+			tmpsize = StorageTmp->answerTimeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->answerTime, &tmpsize);
+			tmpsize = StorageTmp->partialTimeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->partialTime, &tmpsize);
+			tmpsize = StorageTmp->eventTimeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->eventTime, &tmpsize);
+			tmpsize = StorageTmp->callingPartyNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callingPartyNumber, &tmpsize);
+			tmpsize = StorageTmp->calledPartyNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->calledPartyNumber, &tmpsize);
+			tmpsize = StorageTmp->redirectingNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->redirectingNumber, &tmpsize);
+			tmpsize = StorageTmp->redirectionNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->redirectionNumber, &tmpsize);
+			tmpsize = StorageTmp->originalCalledNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->originalCalledNumber, &tmpsize);
+			tmpsize = StorageTmp->callingPartyNumberNotScreenedLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callingPartyNumberNotScreened, &tmpsize);
+			tmpsize = StorageTmp->operatorSpecific1NumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific1Number, &tmpsize);
+			tmpsize = StorageTmp->operatorSpecific2NumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific2Number, &tmpsize);
+			tmpsize = StorageTmp->operatorSpecific3NumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific3Number, &tmpsize);
+			tmpsize = StorageTmp->bearerServiceLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->bearerService, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->participantServiceUser, &tmpsize);
+			tmpsize = StorageTmp->callIdentificationNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callIdentificationNumber, &tmpsize);
+			tmpsize = StorageTmp->supplementaryServicesLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->supplementaryServices, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->immediateNotificationForUsageMetering, &tmpsize);
+			tmpsize = StorageTmp->causeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->cause, &tmpsize);
+			tmpsize = StorageTmp->personalUserIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->personalUserId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->chargedParticipant, &tmpsize);
+			tmpsize = StorageTmp->chargedDirectoryNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chargedDirectoryNumber, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->percentageToBeBilled, &tmpsize);
+			tmpsize = StorageTmp->accountCodeInputLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->accountCodeInput, &tmpsize);
+			tmpsize = StorageTmp->iNServiceCodeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->iNServiceCode, &tmpsize);
+			tmpsize = StorageTmp->queueTimeStampLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->queueTimeStamp, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->queueDuration, &tmpsize);
+			tmpsize = StorageTmp->serviceSpecificINInformationLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->serviceSpecificINInformation, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->partialRecordNumber, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->partialRecordReason, &tmpsize);
+			tmpsize = StorageTmp->exchangeInfoLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->exchangeInfo, &tmpsize);
+			tmpsize = StorageTmp->relatedCallNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->relatedCallNumber, &tmpsize);
+			tmpsize = StorageTmp->cDRPurposeLen;
+			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->cDRPurpose, &tmpsize);
+			tmpsize = StorageTmp->physicalLineCodeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->physicalLineCode, &tmpsize);
+			tmpsize = StorageTmp->receivedDigitsLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->receivedDigits, &tmpsize);
+			tmpsize = StorageTmp->operatorSpecific1AdditionalNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific1AdditionalNumber, &tmpsize);
+			tmpsize = StorageTmp->operatorSpecific2AdditionalNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific2AdditionalNumber, &tmpsize);
+			tmpsize = StorageTmp->operatorSpecific3AdditionalNumberLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->operatorSpecific3AdditionalNumber, &tmpsize);
+			tmpsize = StorageTmp->callingPartyCategoryLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callingPartyCategory, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->callingPartyType, &tmpsize);
+			tmpsize = StorageTmp->chargeInformationLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chargeInformation, &tmpsize);
+			tmpsize = StorageTmp->progressLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->progress, &tmpsize);
+			tmpsize = StorageTmp->accessDeliveryLen;
+			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->accessDelivery, &tmpsize);
+			tmpsize = StorageTmp->trunkGroupOutgoingLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->trunkGroupOutgoing, &tmpsize);
+			tmpsize = StorageTmp->trunkGroupIncomingLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->trunkGroupIncoming, &tmpsize);
+			tmpsize = StorageTmp->fallbackBearerServiceLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->fallbackBearerService, &tmpsize);
+			tmpsize = StorageTmp->teleserviceLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->teleservice, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->conversationTime, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->durationTimeACM, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->durationTimeBAnswer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->durationTimeNoBAnswer, &tmpsize);
+			tmpsize = StorageTmp->uUInfoLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->uUInfo, &tmpsize);
+			tmpsize = StorageTmp->standardExtensionsLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->standardExtensions, &tmpsize);
+			tmpsize = StorageTmp->recordExtensionsLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->recordExtensions, &tmpsize);
+			tmpsize = StorageTmp->bPartyCategoryLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->bPartyCategory, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->iSUPPreferred, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->networkManagementControls, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->glare, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->recordId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dataValidity, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->callStatus, &tmpsize);
+			tmpsize = StorageTmp->carrierIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->carrierId, &tmpsize);
+			tmpsize = StorageTmp->dPCLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dPC, &tmpsize);
+			tmpsize = StorageTmp->oPCLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->oPC, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("callDetailLogRecordTable", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1689,7 +2039,7 @@ configurableSimpleUsageMeteringControlR2Table_add(struct configurableSimpleUsage
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* controlObjectId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->controlObjectId, thedata->controlObjectIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->controlObjectId, thedata->controlObjectIdLen);
 
 	header_complex_add_data(&configurableSimpleUsageMeteringControlR2TableStorage, vars, thedata);
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlR2Table", "registered an entry\n"));
@@ -1698,13 +2048,35 @@ configurableSimpleUsageMeteringControlR2Table_add(struct configurableSimpleUsage
 }
 
 /*
- * parse_configurableSimpleUsageMeteringControlR2Table():
- *   parses .conf file entries needed to configure the mib.
+ * configurableSimpleUsageMeteringControlR2Table_del(): delete a structure
+ */
+int
+configurableSimpleUsageMeteringControlR2Table_del(struct configurableSimpleUsageMeteringControlR2Table_data **thedata)
+{
+	struct configurableSimpleUsageMeteringControlR2Table_data *StorageDel;
+
+	DEBUGMSGTL(("configurableSimpleUsageMeteringControlR2Table", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->controlObjectId);
+		StorageDel->controlObjectIdLen = 0;
+		SNMP_FREE(StorageDel->configurationR2Mask);
+		StorageDel->configurationR2MaskLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("configurableSimpleUsageMeteringControlR2Table", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_configurableSimpleUsageMeteringControlR2Table(): parse configuration file for configurableSimpleUsageMeteringControlR2Table
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_configurableSimpleUsageMeteringControlR2Table(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp = SNMP_MALLOC_STRUCT(configurableSimpleUsageMeteringControlR2Table_data);
 
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlR2Table", "parsing config...  "));
@@ -1712,51 +2084,59 @@ parse_configurableSimpleUsageMeteringControlR2Table(const char *token, char *lin
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->controlObjectId, &tmpsize);
+	StorageTmp->controlObjectIdLen = tmpsize;
 	if (StorageTmp->controlObjectId == NULL) {
 		config_perror("invalid specification for controlObjectId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->configurationR2Mask, &StorageTmp->configurationR2MaskLen);
+	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->configurationR2Mask, &tmpsize);
+	StorageTmp->configurationR2MaskLen = tmpsize;
 	if (StorageTmp->configurationR2Mask == NULL) {
 		config_perror("invalid specification for configurationR2Mask");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->configurationR2Status, &tmpint);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->configurationR2Status, &tmpsize);
 
 	configurableSimpleUsageMeteringControlR2Table_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlR2Table", "done.\n"));
 }
 
 /*
- * store_configurableSimpleUsageMeteringControlR2Table():
- *   stores .conf file entries needed to configure the mib.
+ * store_configurableSimpleUsageMeteringControlR2Table(): store configuraiton file for configurableSimpleUsageMeteringControlR2Table
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_configurableSimpleUsageMeteringControlR2Table(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlR2Table", "storing data...  "));
 	refresh_configurableSimpleUsageMeteringControlR2Table();
+	(void) tmpsize;
 	for (hcindex = configurableSimpleUsageMeteringControlR2TableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct configurableSimpleUsageMeteringControlR2Table_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->configurableSimpleUsageMeteringControlR2TableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "configurableSimpleUsageMeteringControlR2Table ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
-		cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->configurationR2Mask, &StorageTmp->configurationR2MaskLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->configurationR2Status, &tmpint);
+		/* XXX: if (StorageTmp->configurableSimpleUsageMeteringControlR2StorageType ==
+		   ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "configurableSimpleUsageMeteringControlR2Table ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->controlObjectIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &tmpsize);
+			tmpsize = StorageTmp->configurationR2MaskLen;
+			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->configurationR2Mask, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->configurationR2Status, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("configurableSimpleUsageMeteringControlR2Table", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1774,7 +2154,7 @@ blockGeneratingLogR2Table_add(struct blockGeneratingLogR2Table_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* logId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->logId, thedata->logIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logId, thedata->logIdLen);
 
 	header_complex_add_data(&blockGeneratingLogR2TableStorage, vars, thedata);
 	DEBUGMSGTL(("blockGeneratingLogR2Table", "registered an entry\n"));
@@ -1783,13 +2163,33 @@ blockGeneratingLogR2Table_add(struct blockGeneratingLogR2Table_data *thedata)
 }
 
 /*
- * parse_blockGeneratingLogR2Table():
- *   parses .conf file entries needed to configure the mib.
+ * blockGeneratingLogR2Table_del(): delete a structure
+ */
+int
+blockGeneratingLogR2Table_del(struct blockGeneratingLogR2Table_data **thedata)
+{
+	struct blockGeneratingLogR2Table_data *StorageDel;
+
+	DEBUGMSGTL(("blockGeneratingLogR2Table", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->logId);
+		StorageDel->logIdLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("blockGeneratingLogR2Table", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_blockGeneratingLogR2Table(): parse configuration file for blockGeneratingLogR2Table
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_blockGeneratingLogR2Table(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct blockGeneratingLogR2Table_data *StorageTmp = SNMP_MALLOC_STRUCT(blockGeneratingLogR2Table_data);
 
 	DEBUGMSGTL(("blockGeneratingLogR2Table", "parsing config...  "));
@@ -1797,44 +2197,49 @@ parse_blockGeneratingLogR2Table(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &StorageTmp->logIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &tmpsize);
+	StorageTmp->logIdLen = tmpsize;
 	if (StorageTmp->logId == NULL) {
 		config_perror("invalid specification for logId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogVersion, &tmpint);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->blockGeneratingLogVersion, &tmpsize);
 
 	blockGeneratingLogR2Table_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("blockGeneratingLogR2Table", "done.\n"));
 }
 
 /*
- * store_blockGeneratingLogR2Table():
- *   stores .conf file entries needed to configure the mib.
+ * store_blockGeneratingLogR2Table(): store configuraiton file for blockGeneratingLogR2Table
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_blockGeneratingLogR2Table(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct blockGeneratingLogR2Table_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("blockGeneratingLogR2Table", "storing data...  "));
 	refresh_blockGeneratingLogR2Table();
+	(void) tmpsize;
 	for (hcindex = blockGeneratingLogR2TableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct blockGeneratingLogR2Table_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->blockGeneratingLogR2TableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "blockGeneratingLogR2Table ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogVersion, &tmpint);
+		/* XXX: if (StorageTmp->blockGeneratingLogR2StorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "blockGeneratingLogR2Table ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->logIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogVersion, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("blockGeneratingLogR2Table", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -1852,9 +2257,9 @@ callDetailLogRecordR2Table_add(struct callDetailLogRecordR2Table_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 	/* logId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->logId, thedata->logIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logId, thedata->logIdLen);
 	/* logRecordId */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (uint8_t *) thedata->logRecordId, thedata->logRecordIdLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logRecordId, thedata->logRecordIdLen);
 
 	header_complex_add_data(&callDetailLogRecordR2TableStorage, vars, thedata);
 	DEBUGMSGTL(("callDetailLogRecordR2Table", "registered an entry\n"));
@@ -1863,13 +2268,165 @@ callDetailLogRecordR2Table_add(struct callDetailLogRecordR2Table_data *thedata)
 }
 
 /*
- * parse_callDetailLogRecordR2Table():
- *   parses .conf file entries needed to configure the mib.
+ * callDetailLogRecordR2Table_del(): delete a structure
+ */
+int
+callDetailLogRecordR2Table_del(struct callDetailLogRecordR2Table_data **thedata)
+{
+	struct callDetailLogRecordR2Table_data *StorageDel;
+
+	DEBUGMSGTL(("callDetailLogRecordR2Table", "deleting data...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->logId);
+		StorageDel->logIdLen = 0;
+		SNMP_FREE(StorageDel->logRecordId);
+		StorageDel->logRecordIdLen = 0;
+		SNMP_FREE(StorageDel->callId);
+		StorageDel->callIdLen = 0;
+		SNMP_FREE(StorageDel->lastUpdate);
+		StorageDel->lastUpdateLen = 0;
+		SNMP_FREE(StorageDel->eventOrder);
+		StorageDel->eventOrderLen = 0;
+		SNMP_FREE(StorageDel->clngPtyNbr);
+		StorageDel->clngPtyNbrLen = 0;
+		SNMP_FREE(StorageDel->chargeNbr);
+		StorageDel->chargeNbrLen = 0;
+		SNMP_FREE(StorageDel->clldPtyNbr);
+		StorageDel->clldPtyNbrLen = 0;
+		SNMP_FREE(StorageDel->origLnInfo);
+		StorageDel->origLnInfoLen = 0;
+		SNMP_FREE(StorageDel->ingLrn);
+		StorageDel->ingLrnLen = 0;
+		SNMP_FREE(StorageDel->ingCic);
+		StorageDel->ingCicLen = 0;
+		SNMP_FREE(StorageDel->ingCallStart);
+		StorageDel->ingCallStartLen = 0;
+		SNMP_FREE(StorageDel->ingCreatConnCplt);
+		StorageDel->ingCreatConnCpltLen = 0;
+		SNMP_FREE(StorageDel->ingAddrCplt);
+		StorageDel->ingAddrCpltLen = 0;
+		SNMP_FREE(StorageDel->ingCallAns);
+		StorageDel->ingCallAnsLen = 0;
+		SNMP_FREE(StorageDel->transNbr);
+		StorageDel->transNbrLen = 0;
+		SNMP_FREE(StorageDel->termLrn);
+		StorageDel->termLrnLen = 0;
+		SNMP_FREE(StorageDel->transCic);
+		StorageDel->transCicLen = 0;
+		SNMP_FREE(StorageDel->ingCallRls);
+		StorageDel->ingCallRlsLen = 0;
+		SNMP_FREE(StorageDel->egrCallStart);
+		StorageDel->egrCallStartLen = 0;
+		SNMP_FREE(StorageDel->egrCreatConnCplt);
+		StorageDel->egrCreatConnCpltLen = 0;
+		SNMP_FREE(StorageDel->egrAddrCplt);
+		StorageDel->egrAddrCpltLen = 0;
+		SNMP_FREE(StorageDel->egrCallAns);
+		StorageDel->egrCallAnsLen = 0;
+		SNMP_FREE(StorageDel->egrCallRls);
+		StorageDel->egrCallRlsLen = 0;
+		SNMP_FREE(StorageDel->chkptFirst);
+		StorageDel->chkptFirstLen = 0;
+		SNMP_FREE(StorageDel->chkptLast);
+		StorageDel->chkptLastLen = 0;
+		SNMP_FREE(StorageDel->ingGateName);
+		StorageDel->ingGateNameLen = 0;
+		SNMP_FREE(StorageDel->egrGateName);
+		StorageDel->egrGateNameLen = 0;
+		SNMP_FREE(StorageDel->ingTgName);
+		StorageDel->ingTgNameLen = 0;
+		SNMP_FREE(StorageDel->egrTgName);
+		StorageDel->egrTgNameLen = 0;
+		SNMP_FREE(StorageDel->origGateIp);
+		StorageDel->origGateIpLen = 0;
+		SNMP_FREE(StorageDel->termGateIp);
+		StorageDel->termGateIpLen = 0;
+		SNMP_FREE(StorageDel->h323ConfId);
+		StorageDel->h323ConfIdLen = 0;
+		SNMP_FREE(StorageDel->dialedNbr);
+		StorageDel->dialedNbrLen = 0;
+		SNMP_FREE(StorageDel->redirNbr);
+		StorageDel->redirNbrLen = 0;
+		SNMP_FREE(StorageDel->calledNbr);
+		StorageDel->calledNbrLen = 0;
+		SNMP_FREE(StorageDel->ingJuris);
+		StorageDel->ingJurisLen = 0;
+		SNMP_FREE(StorageDel->egrJuris);
+		StorageDel->egrJurisLen = 0;
+		SNMP_FREE(StorageDel->transNetSelCarr);
+		StorageDel->transNetSelCarrLen = 0;
+		SNMP_FREE(StorageDel->ingRlsCauseIntrnl);
+		StorageDel->ingRlsCauseIntrnlLen = 0;
+		SNMP_FREE(StorageDel->egrRlsCauseIntrnl);
+		StorageDel->egrRlsCauseIntrnlLen = 0;
+		SNMP_FREE(StorageDel->egrClldNbr);
+		StorageDel->egrClldNbrLen = 0;
+		SNMP_FREE(StorageDel->egrCnndNbr);
+		StorageDel->egrCnndNbrLen = 0;
+		SNMP_FREE(StorageDel->ingCallidExtrnl);
+		StorageDel->ingCallidExtrnlLen = 0;
+		SNMP_FREE(StorageDel->egrCallidExtrnl);
+		StorageDel->egrCallidExtrnlLen = 0;
+		SNMP_FREE(StorageDel->ingChargeInfo);
+		StorageDel->ingChargeInfoLen = 0;
+		SNMP_FREE(StorageDel->egrChargeInfo);
+		StorageDel->egrChargeInfoLen = 0;
+		SNMP_FREE(StorageDel->ingPrtlInd);
+		StorageDel->ingPrtlIndLen = 0;
+		SNMP_FREE(StorageDel->ingLastDvrtLnDigs);
+		StorageDel->ingLastDvrtLnDigsLen = 0;
+		SNMP_FREE(StorageDel->j7IngAddlPtyCat);
+		StorageDel->j7IngAddlPtyCatLen = 0;
+		SNMP_FREE(StorageDel->j7IngChgAreaInfo);
+		StorageDel->j7IngChgAreaInfoLen = 0;
+		SNMP_FREE(StorageDel->j7IngFwdCallInd);
+		StorageDel->j7IngFwdCallIndLen = 0;
+		SNMP_FREE(StorageDel->j7EgrAddlPtyCat);
+		StorageDel->j7EgrAddlPtyCatLen = 0;
+		SNMP_FREE(StorageDel->j7EgrChgAreaInfo);
+		StorageDel->j7EgrChgAreaInfoLen = 0;
+		SNMP_FREE(StorageDel->j7EgrBkwCallInd);
+		StorageDel->j7EgrBkwCallIndLen = 0;
+		SNMP_FREE(StorageDel->j7CarrInfoXfer);
+		StorageDel->j7CarrInfoXferLen = 0;
+		SNMP_FREE(StorageDel->ingSs7GnrcParm);
+		StorageDel->ingSs7GnrcParmLen = 0;
+		SNMP_FREE(StorageDel->egrSs7GnrcParm);
+		StorageDel->egrSs7GnrcParmLen = 0;
+		SNMP_FREE(StorageDel->ingCasCrctSzr);
+		StorageDel->ingCasCrctSzrLen = 0;
+		SNMP_FREE(StorageDel->egrCasCrctSzr);
+		StorageDel->egrCasCrctSzrLen = 0;
+		SNMP_FREE(StorageDel->ingZz);
+		StorageDel->ingZzLen = 0;
+		SNMP_FREE(StorageDel->egrZz);
+		StorageDel->egrZzLen = 0;
+		SNMP_FREE(StorageDel->ingCtryAddrType);
+		StorageDel->ingCtryAddrTypeLen = 0;
+		SNMP_FREE(StorageDel->egrCtryAddrType);
+		StorageDel->egrCtryAddrTypeLen = 0;
+		SNMP_FREE(StorageDel->ingAnsLctim);
+		StorageDel->ingAnsLctimLen = 0;
+		SNMP_FREE(StorageDel->egrAnsLctim);
+		StorageDel->egrAnsLctimLen = 0;
+		SNMP_FREE(StorageDel->routeList);
+		StorageDel->routeListLen = 0;
+
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("callDetailLogRecordR2Table", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/*
+ * parse_callDetailLogRecordR2Table(): parse configuration file for callDetailLogRecordR2Table
+ * parses .conf file entries needed to configure the mib.
  */
 void
 parse_callDetailLogRecordR2Table(const char *token, char *line)
 {
-	size_t tmpint;
+	size_t tmpsize;
 	struct callDetailLogRecordR2Table_data *StorageTmp = SNMP_MALLOC_STRUCT(callDetailLogRecordR2Table_data);
 
 	DEBUGMSGTL(("callDetailLogRecordR2Table", "parsing config...  "));
@@ -1877,680 +2434,817 @@ parse_callDetailLogRecordR2Table(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &StorageTmp->logIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logId, &tmpsize);
+	StorageTmp->logIdLen = tmpsize;
 	if (StorageTmp->logId == NULL) {
 		config_perror("invalid specification for logId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logRecordId, &tmpsize);
+	StorageTmp->logRecordIdLen = tmpsize;
 	if (StorageTmp->logRecordId == NULL) {
 		config_perror("invalid specification for logRecordId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->sequenceId, &tmpint);
-	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->zoneId, &tmpint);
-	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->recSeqId, &tmpint);
-	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->fileSeqId, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callId, &StorageTmp->callIdLen);
+	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->sequenceId, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->zoneId, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->recSeqId, &tmpsize);
+	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->fileSeqId, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->callId, &tmpsize);
+	StorageTmp->callIdLen = tmpsize;
 	if (StorageTmp->callId == NULL) {
 		config_perror("invalid specification for callId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lastUpdate, &StorageTmp->lastUpdateLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lastUpdate, &tmpsize);
+	StorageTmp->lastUpdateLen = tmpsize;
 	if (StorageTmp->lastUpdate == NULL) {
 		config_perror("invalid specification for lastUpdate");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->eventOrder, &StorageTmp->eventOrderLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->eventOrder, &tmpsize);
+	StorageTmp->eventOrderLen = tmpsize;
 	if (StorageTmp->eventOrder == NULL) {
 		config_perror("invalid specification for eventOrder");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->status, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->callType, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clngPtyNbr, &StorageTmp->clngPtyNbrLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->status, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->callType, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clngPtyNbr, &tmpsize);
+	StorageTmp->clngPtyNbrLen = tmpsize;
 	if (StorageTmp->clngPtyNbr == NULL) {
 		config_perror("invalid specification for clngPtyNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chargeNbr, &StorageTmp->chargeNbrLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chargeNbr, &tmpsize);
+	StorageTmp->chargeNbrLen = tmpsize;
 	if (StorageTmp->chargeNbr == NULL) {
 		config_perror("invalid specification for chargeNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clldPtyNbr, &StorageTmp->clldPtyNbrLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clldPtyNbr, &tmpsize);
+	StorageTmp->clldPtyNbrLen = tmpsize;
 	if (StorageTmp->clldPtyNbr == NULL) {
 		config_perror("invalid specification for clldPtyNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->clldPtyNoa, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->origLnInfo, &StorageTmp->origLnInfoLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->clldPtyNoa, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->origLnInfo, &tmpsize);
+	StorageTmp->origLnInfoLen = tmpsize;
 	if (StorageTmp->origLnInfo == NULL) {
 		config_perror("invalid specification for origLnInfo");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingLrn, &StorageTmp->ingLrnLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingLrn, &tmpsize);
+	StorageTmp->ingLrnLen = tmpsize;
 	if (StorageTmp->ingLrn == NULL) {
 		config_perror("invalid specification for ingLrn");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCic, &StorageTmp->ingCicLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCic, &tmpsize);
+	StorageTmp->ingCicLen = tmpsize;
 	if (StorageTmp->ingCic == NULL) {
 		config_perror("invalid specification for ingCic");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingCsi, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCceId, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingTgProt, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingTgType, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingTgId, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCallStart, &StorageTmp->ingCallStartLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingCsi, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCceId, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingTgProt, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingTgType, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingTgId, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCallStart, &tmpsize);
+	StorageTmp->ingCallStartLen = tmpsize;
 	if (StorageTmp->ingCallStart == NULL) {
 		config_perror("invalid specification for ingCallStart");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingGateId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCardId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingSpanId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingChanId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingIsdnDChan, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingIsdnCrn, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCreatConnCplt, &StorageTmp->ingCreatConnCpltLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingGateId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCardId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingSpanId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingChanId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingIsdnDChan, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingIsdnCrn, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCreatConnCplt, &tmpsize);
+	StorageTmp->ingCreatConnCpltLen = tmpsize;
 	if (StorageTmp->ingCreatConnCplt == NULL) {
 		config_perror("invalid specification for ingCreatConnCplt");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingAddrCplt, &StorageTmp->ingAddrCpltLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingAddrCplt, &tmpsize);
+	StorageTmp->ingAddrCpltLen = tmpsize;
 	if (StorageTmp->ingAddrCplt == NULL) {
 		config_perror("invalid specification for ingAddrCplt");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCallAns, &StorageTmp->ingCallAnsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCallAns, &tmpsize);
+	StorageTmp->ingCallAnsLen = tmpsize;
 	if (StorageTmp->ingCallAns == NULL) {
 		config_perror("invalid specification for ingCallAns");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->transNbr, &StorageTmp->transNbrLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->transNbr, &tmpsize);
+	StorageTmp->transNbrLen = tmpsize;
 	if (StorageTmp->transNbr == NULL) {
 		config_perror("invalid specification for transNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->termLrn, &StorageTmp->termLrnLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->termLrn, &tmpsize);
+	StorageTmp->termLrnLen = tmpsize;
 	if (StorageTmp->termLrn == NULL) {
 		config_perror("invalid specification for termLrn");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->transCic, &StorageTmp->transCicLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->transCic, &tmpsize);
+	StorageTmp->transCicLen = tmpsize;
 	if (StorageTmp->transCic == NULL) {
 		config_perror("invalid specification for transCic");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCallRls, &StorageTmp->ingCallRlsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCallRls, &tmpsize);
+	StorageTmp->ingCallRlsLen = tmpsize;
 	if (StorageTmp->ingCallRls == NULL) {
 		config_perror("invalid specification for ingCallRls");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingRlsCause, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCceId, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrTgProt, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrTgType, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrTgId, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCallStart, &StorageTmp->egrCallStartLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingRlsCause, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCceId, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrTgProt, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrTgType, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrTgId, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCallStart, &tmpsize);
+	StorageTmp->egrCallStartLen = tmpsize;
 	if (StorageTmp->egrCallStart == NULL) {
 		config_perror("invalid specification for egrCallStart");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrGateId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCardId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrSpanId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrChanId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrIsdnDChan, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrIsdnCrn, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCreatConnCplt, &StorageTmp->egrCreatConnCpltLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrGateId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCardId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrSpanId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrChanId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrIsdnDChan, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrIsdnCrn, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCreatConnCplt, &tmpsize);
+	StorageTmp->egrCreatConnCpltLen = tmpsize;
 	if (StorageTmp->egrCreatConnCplt == NULL) {
 		config_perror("invalid specification for egrCreatConnCplt");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrAddrCplt, &StorageTmp->egrAddrCpltLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrAddrCplt, &tmpsize);
+	StorageTmp->egrAddrCpltLen = tmpsize;
 	if (StorageTmp->egrAddrCplt == NULL) {
 		config_perror("invalid specification for egrAddrCplt");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCallAns, &StorageTmp->egrCallAnsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCallAns, &tmpsize);
+	StorageTmp->egrCallAnsLen = tmpsize;
 	if (StorageTmp->egrCallAns == NULL) {
 		config_perror("invalid specification for egrCallAns");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCallRls, &StorageTmp->egrCallRlsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCallRls, &tmpsize);
+	StorageTmp->egrCallRlsLen = tmpsize;
 	if (StorageTmp->egrCallRls == NULL) {
 		config_perror("invalid specification for egrCallRls");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrRlsCause, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chkptFirst, &StorageTmp->chkptFirstLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrRlsCause, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chkptFirst, &tmpsize);
+	StorageTmp->chkptFirstLen = tmpsize;
 	if (StorageTmp->chkptFirst == NULL) {
 		config_perror("invalid specification for chkptFirst");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chkptLast, &StorageTmp->chkptLastLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->chkptLast, &tmpsize);
+	StorageTmp->chkptLastLen = tmpsize;
 	if (StorageTmp->chkptLast == NULL) {
 		config_perror("invalid specification for chkptLast");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingGateName, &StorageTmp->ingGateNameLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingGateName, &tmpsize);
+	StorageTmp->ingGateNameLen = tmpsize;
 	if (StorageTmp->ingGateName == NULL) {
 		config_perror("invalid specification for ingGateName");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrGateName, &StorageTmp->egrGateNameLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrGateName, &tmpsize);
+	StorageTmp->egrGateNameLen = tmpsize;
 	if (StorageTmp->egrGateName == NULL) {
 		config_perror("invalid specification for egrGateName");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingTgName, &StorageTmp->ingTgNameLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingTgName, &tmpsize);
+	StorageTmp->ingTgNameLen = tmpsize;
 	if (StorageTmp->ingTgName == NULL) {
 		config_perror("invalid specification for ingTgName");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrTgName, &StorageTmp->egrTgNameLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrTgName, &tmpsize);
+	StorageTmp->egrTgNameLen = tmpsize;
 	if (StorageTmp->egrTgName == NULL) {
 		config_perror("invalid specification for egrTgName");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->origGateIp, &StorageTmp->origGateIpLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->origGateIp, &tmpsize);
+	StorageTmp->origGateIpLen = tmpsize;
 	if (StorageTmp->origGateIp == NULL) {
 		config_perror("invalid specification for origGateIp");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->termGateIp, &StorageTmp->termGateIpLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->termGateIp, &tmpsize);
+	StorageTmp->termGateIpLen = tmpsize;
 	if (StorageTmp->termGateIp == NULL) {
 		config_perror("invalid specification for termGateIp");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->h323ConfId, &StorageTmp->h323ConfIdLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->h323ConfId, &tmpsize);
+	StorageTmp->h323ConfIdLen = tmpsize;
 	if (StorageTmp->h323ConfId == NULL) {
 		config_perror("invalid specification for h323ConfId");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCardPort, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCardPath, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCardPort, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCardPath, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingTg, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrTg, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dialedNbr, &StorageTmp->dialedNbrLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCardPort, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCardPath, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCardPort, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCardPath, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingTg, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrTg, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dialedNbr, &tmpsize);
+	StorageTmp->dialedNbrLen = tmpsize;
 	if (StorageTmp->dialedNbr == NULL) {
 		config_perror("invalid specification for dialedNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dialedNoa, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->redirNbr, &StorageTmp->redirNbrLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dialedNoa, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->redirNbr, &tmpsize);
+	StorageTmp->redirNbrLen = tmpsize;
 	if (StorageTmp->redirNbr == NULL) {
 		config_perror("invalid specification for redirNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirNoa, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirInd, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirRsn, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->calledNbr, &StorageTmp->calledNbrLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirNoa, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirInd, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirRsn, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->calledNbr, &tmpsize);
+	StorageTmp->calledNbrLen = tmpsize;
 	if (StorageTmp->calledNbr == NULL) {
 		config_perror("invalid specification for calledNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->calledNoa, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirRsnOrig, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->redirCntr, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirPrsntnInd, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingJuris, &StorageTmp->ingJurisLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->calledNoa, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirRsnOrig, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->redirCntr, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->redirPrsntnInd, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingJuris, &tmpsize);
+	StorageTmp->ingJurisLen = tmpsize;
 	if (StorageTmp->ingJuris == NULL) {
 		config_perror("invalid specification for ingJuris");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrJuris, &StorageTmp->egrJurisLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrJuris, &tmpsize);
+	StorageTmp->egrJurisLen = tmpsize;
 	if (StorageTmp->egrJuris == NULL) {
 		config_perror("invalid specification for egrJuris");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingTrunkBearCap, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrTrunkBearCap, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->transNetSelCarr, &StorageTmp->transNetSelCarrLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingTrunkBearCap, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrTrunkBearCap, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->transNetSelCarr, &tmpsize);
+	StorageTmp->transNetSelCarrLen = tmpsize;
 	if (StorageTmp->transNetSelCarr == NULL) {
 		config_perror("invalid specification for transNetSelCarr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->clngPtyNoa, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingRlsCauseIntrnl, &StorageTmp->ingRlsCauseIntrnlLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->clngPtyNoa, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingRlsCauseIntrnl, &tmpsize);
+	StorageTmp->ingRlsCauseIntrnlLen = tmpsize;
 	if (StorageTmp->ingRlsCauseIntrnl == NULL) {
 		config_perror("invalid specification for ingRlsCauseIntrnl");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrRlsCauseIntrnl, &StorageTmp->egrRlsCauseIntrnlLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrRlsCauseIntrnl, &tmpsize);
+	StorageTmp->egrRlsCauseIntrnlLen = tmpsize;
 	if (StorageTmp->egrRlsCauseIntrnl == NULL) {
 		config_perror("invalid specification for egrRlsCauseIntrnl");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrClldNbr, &StorageTmp->egrClldNbrLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrClldNbr, &tmpsize);
+	StorageTmp->egrClldNbrLen = tmpsize;
 	if (StorageTmp->egrClldNbr == NULL) {
 		config_perror("invalid specification for egrClldNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrClldNoa, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCnndNbr, &StorageTmp->egrCnndNbrLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrClldNoa, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCnndNbr, &tmpsize);
+	StorageTmp->egrCnndNbrLen = tmpsize;
 	if (StorageTmp->egrCnndNbr == NULL) {
 		config_perror("invalid specification for egrCnndNbr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrCnndNoa, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->clngPtyPrsntnInd, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingIri, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrOri, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCallidExtrnl, &StorageTmp->ingCallidExtrnlLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrCnndNoa, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->clngPtyPrsntnInd, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingIri, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->egrOri, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCallidExtrnl, &tmpsize);
+	StorageTmp->ingCallidExtrnlLen = tmpsize;
 	if (StorageTmp->ingCallidExtrnl == NULL) {
 		config_perror("invalid specification for ingCallidExtrnl");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCallidExtrnl, &StorageTmp->egrCallidExtrnlLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCallidExtrnl, &tmpsize);
+	StorageTmp->egrCallidExtrnlLen = tmpsize;
 	if (StorageTmp->egrCallidExtrnl == NULL) {
 		config_perror("invalid specification for egrCallidExtrnl");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingChargeInfo, &StorageTmp->ingChargeInfoLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingChargeInfo, &tmpsize);
+	StorageTmp->ingChargeInfoLen = tmpsize;
 	if (StorageTmp->ingChargeInfo == NULL) {
 		config_perror("invalid specification for ingChargeInfo");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrChargeInfo, &StorageTmp->egrChargeInfoLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrChargeInfo, &tmpsize);
+	StorageTmp->egrChargeInfoLen = tmpsize;
 	if (StorageTmp->egrChargeInfo == NULL) {
 		config_perror("invalid specification for egrChargeInfo");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingPrtlInd, &StorageTmp->ingPrtlIndLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingPrtlInd, &tmpsize);
+	StorageTmp->ingPrtlIndLen = tmpsize;
 	if (StorageTmp->ingPrtlInd == NULL) {
 		config_perror("invalid specification for ingPrtlInd");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingNatfwdCliblkInd, &tmpint);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingNatfwdNtaInd, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingLastDvrtLnDigs, &StorageTmp->ingLastDvrtLnDigsLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingNatfwdCliblkInd, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingNatfwdNtaInd, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingLastDvrtLnDigs, &tmpsize);
+	StorageTmp->ingLastDvrtLnDigsLen = tmpsize;
 	if (StorageTmp->ingLastDvrtLnDigs == NULL) {
 		config_perror("invalid specification for ingLastDvrtLnDigs");
 		return;
 	}
 
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingLastDvrtLnNoa, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7IngAddlPtyCat, &StorageTmp->j7IngAddlPtyCatLen);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ingLastDvrtLnNoa, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7IngAddlPtyCat, &tmpsize);
+	StorageTmp->j7IngAddlPtyCatLen = tmpsize;
 	if (StorageTmp->j7IngAddlPtyCat == NULL) {
 		config_perror("invalid specification for j7IngAddlPtyCat");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7IngChgAreaInfo, &StorageTmp->j7IngChgAreaInfoLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7IngChgAreaInfo, &tmpsize);
+	StorageTmp->j7IngChgAreaInfoLen = tmpsize;
 	if (StorageTmp->j7IngChgAreaInfo == NULL) {
 		config_perror("invalid specification for j7IngChgAreaInfo");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7IngFwdCallInd, &StorageTmp->j7IngFwdCallIndLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7IngFwdCallInd, &tmpsize);
+	StorageTmp->j7IngFwdCallIndLen = tmpsize;
 	if (StorageTmp->j7IngFwdCallInd == NULL) {
 		config_perror("invalid specification for j7IngFwdCallInd");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7EgrAddlPtyCat, &StorageTmp->j7EgrAddlPtyCatLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7EgrAddlPtyCat, &tmpsize);
+	StorageTmp->j7EgrAddlPtyCatLen = tmpsize;
 	if (StorageTmp->j7EgrAddlPtyCat == NULL) {
 		config_perror("invalid specification for j7EgrAddlPtyCat");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7EgrChgAreaInfo, &StorageTmp->j7EgrChgAreaInfoLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7EgrChgAreaInfo, &tmpsize);
+	StorageTmp->j7EgrChgAreaInfoLen = tmpsize;
 	if (StorageTmp->j7EgrChgAreaInfo == NULL) {
 		config_perror("invalid specification for j7EgrChgAreaInfo");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7EgrBkwCallInd, &StorageTmp->j7EgrBkwCallIndLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7EgrBkwCallInd, &tmpsize);
+	StorageTmp->j7EgrBkwCallIndLen = tmpsize;
 	if (StorageTmp->j7EgrBkwCallInd == NULL) {
 		config_perror("invalid specification for j7EgrBkwCallInd");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7CarrInfoXfer, &StorageTmp->j7CarrInfoXferLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->j7CarrInfoXfer, &tmpsize);
+	StorageTmp->j7CarrInfoXferLen = tmpsize;
 	if (StorageTmp->j7CarrInfoXfer == NULL) {
 		config_perror("invalid specification for j7CarrInfoXfer");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingSs7GnrcParm, &StorageTmp->ingSs7GnrcParmLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingSs7GnrcParm, &tmpsize);
+	StorageTmp->ingSs7GnrcParmLen = tmpsize;
 	if (StorageTmp->ingSs7GnrcParm == NULL) {
 		config_perror("invalid specification for ingSs7GnrcParm");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrSs7GnrcParm, &StorageTmp->egrSs7GnrcParmLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrSs7GnrcParm, &tmpsize);
+	StorageTmp->egrSs7GnrcParmLen = tmpsize;
 	if (StorageTmp->egrSs7GnrcParm == NULL) {
 		config_perror("invalid specification for egrSs7GnrcParm");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPktsSent, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPktsRcvd, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPktsLost, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPktsXfer, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingJitter, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingLtncy, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPktsSent, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPktsRcvd, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPktsLost, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPktsXfer, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrJitter, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrLtncy, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCrctId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCrctId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCodec, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCodec, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingLocGateId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrLocGateId, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCasCrctSzr, &StorageTmp->ingCasCrctSzrLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPktsSent, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPktsRcvd, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPktsLost, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPktsXfer, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingJitter, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingLtncy, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPktsSent, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPktsRcvd, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPktsLost, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPktsXfer, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrJitter, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrLtncy, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCrctId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCrctId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingCodec, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrCodec, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingLocGateId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrLocGateId, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCasCrctSzr, &tmpsize);
+	StorageTmp->ingCasCrctSzrLen = tmpsize;
 	if (StorageTmp->ingCasCrctSzr == NULL) {
 		config_perror("invalid specification for ingCasCrctSzr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCasCrctSzr, &StorageTmp->egrCasCrctSzrLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCasCrctSzr, &tmpsize);
+	StorageTmp->egrCasCrctSzrLen = tmpsize;
 	if (StorageTmp->egrCasCrctSzr == NULL) {
 		config_perror("invalid specification for egrCasCrctSzr");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingZz, &StorageTmp->ingZzLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingZz, &tmpsize);
+	StorageTmp->ingZzLen = tmpsize;
 	if (StorageTmp->ingZz == NULL) {
 		config_perror("invalid specification for ingZz");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrZz, &StorageTmp->egrZzLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrZz, &tmpsize);
+	StorageTmp->egrZzLen = tmpsize;
 	if (StorageTmp->egrZz == NULL) {
 		config_perror("invalid specification for egrZz");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCtryAddrType, &StorageTmp->ingCtryAddrTypeLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingCtryAddrType, &tmpsize);
+	StorageTmp->ingCtryAddrTypeLen = tmpsize;
 	if (StorageTmp->ingCtryAddrType == NULL) {
 		config_perror("invalid specification for ingCtryAddrType");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCtryAddrType, &StorageTmp->egrCtryAddrTypeLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrCtryAddrType, &tmpsize);
+	StorageTmp->egrCtryAddrTypeLen = tmpsize;
 	if (StorageTmp->egrCtryAddrType == NULL) {
 		config_perror("invalid specification for egrCtryAddrType");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPartition, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPartition, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingClngPtyCat, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingRlsCauseLctn, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrRlsCauseLctn, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->clldPtyCat, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->callDuration, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingRlsDrctn, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrRlsDrctn, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingAnsLctim, &StorageTmp->ingAnsLctimLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPartition, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPartition, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingClngPtyCat, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingRlsCauseLctn, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrRlsCauseLctn, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->clldPtyCat, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->callDuration, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingRlsDrctn, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrRlsDrctn, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->ingAnsLctim, &tmpsize);
+	StorageTmp->ingAnsLctimLen = tmpsize;
 	if (StorageTmp->ingAnsLctim == NULL) {
 		config_perror("invalid specification for ingAnsLctim");
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrAnsLctim, &StorageTmp->egrAnsLctimLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->egrAnsLctim, &tmpsize);
+	StorageTmp->egrAnsLctimLen = tmpsize;
 	if (StorageTmp->egrAnsLctim == NULL) {
 		config_perror("invalid specification for egrAnsLctim");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingHlcChrsId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrHlcChrsId, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingLlcXferCap, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrLlcXferCap, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->routeList, &StorageTmp->routeListLen);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingHlcChrsId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrHlcChrsId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingLlcXferCap, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrLlcXferCap, &tmpsize);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->routeList, &tmpsize);
+	StorageTmp->routeListLen = tmpsize;
 	if (StorageTmp->routeList == NULL) {
 		config_perror("invalid specification for routeList");
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPointCode, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPointCode, &tmpint);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->ingPointCode, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->egrPointCode, &tmpsize);
 
 	callDetailLogRecordR2Table_add(StorageTmp);
+	(void) tmpsize;
 	DEBUGMSGTL(("callDetailLogRecordR2Table", "done.\n"));
 }
 
 /*
- * store_callDetailLogRecordR2Table():
- *   stores .conf file entries needed to configure the mib.
+ * store_callDetailLogRecordR2Table(): store configuraiton file for callDetailLogRecordR2Table
+ * stores .conf file entries needed to configure the mib.
  */
 int
 store_callDetailLogRecordR2Table(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
-	size_t tmpint;
+	size_t tmpsize;
 	struct callDetailLogRecordR2Table_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("callDetailLogRecordR2Table", "storing data...  "));
 	refresh_callDetailLogRecordR2Table();
+	(void) tmpsize;
 	for (hcindex = callDetailLogRecordR2TableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct callDetailLogRecordR2Table_data *) hcindex->data;
-/*   XXX:  if (StorageTmp->callDetailLogRecordR2TableStorageType == ST_NONVOLATILE) { */
-		memset(line, 0, sizeof(line));
-		strcat(line, "callDetailLogRecordR2Table ");
-		cptr = line + strlen(line);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
-		cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->sequenceId, &tmpint);
-		cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->zoneId, &tmpint);
-		cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->recSeqId, &tmpint);
-		cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->fileSeqId, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callId, &StorageTmp->callIdLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lastUpdate, &StorageTmp->lastUpdateLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->eventOrder, &StorageTmp->eventOrderLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->status, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->callType, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clngPtyNbr, &StorageTmp->clngPtyNbrLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chargeNbr, &StorageTmp->chargeNbrLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clldPtyNbr, &StorageTmp->clldPtyNbrLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->clldPtyNoa, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->origLnInfo, &StorageTmp->origLnInfoLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingLrn, &StorageTmp->ingLrnLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCic, &StorageTmp->ingCicLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingCsi, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCceId, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingTgProt, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingTgType, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingTgId, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCallStart, &StorageTmp->ingCallStartLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingGateId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCardId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingSpanId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingChanId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingIsdnDChan, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingIsdnCrn, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCreatConnCplt, &StorageTmp->ingCreatConnCpltLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingAddrCplt, &StorageTmp->ingAddrCpltLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCallAns, &StorageTmp->ingCallAnsLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->transNbr, &StorageTmp->transNbrLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->termLrn, &StorageTmp->termLrnLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->transCic, &StorageTmp->transCicLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCallRls, &StorageTmp->ingCallRlsLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingRlsCause, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCceId, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrTgProt, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrTgType, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrTgId, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCallStart, &StorageTmp->egrCallStartLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrGateId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCardId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrSpanId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrChanId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrIsdnDChan, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrIsdnCrn, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCreatConnCplt, &StorageTmp->egrCreatConnCpltLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrAddrCplt, &StorageTmp->egrAddrCpltLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCallAns, &StorageTmp->egrCallAnsLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCallRls, &StorageTmp->egrCallRlsLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrRlsCause, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chkptFirst, &StorageTmp->chkptFirstLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chkptLast, &StorageTmp->chkptLastLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingGateName, &StorageTmp->ingGateNameLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrGateName, &StorageTmp->egrGateNameLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingTgName, &StorageTmp->ingTgNameLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrTgName, &StorageTmp->egrTgNameLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->origGateIp, &StorageTmp->origGateIpLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->termGateIp, &StorageTmp->termGateIpLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->h323ConfId, &StorageTmp->h323ConfIdLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCardPort, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCardPath, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCardPort, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCardPath, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingTg, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrTg, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dialedNbr, &StorageTmp->dialedNbrLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dialedNoa, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->redirNbr, &StorageTmp->redirNbrLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirNoa, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirInd, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirRsn, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->calledNbr, &StorageTmp->calledNbrLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->calledNoa, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirRsnOrig, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->redirCntr, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirPrsntnInd, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingJuris, &StorageTmp->ingJurisLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrJuris, &StorageTmp->egrJurisLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingTrunkBearCap, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrTrunkBearCap, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->transNetSelCarr, &StorageTmp->transNetSelCarrLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->clngPtyNoa, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingRlsCauseIntrnl, &StorageTmp->ingRlsCauseIntrnlLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrRlsCauseIntrnl, &StorageTmp->egrRlsCauseIntrnlLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrClldNbr, &StorageTmp->egrClldNbrLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrClldNoa, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCnndNbr, &StorageTmp->egrCnndNbrLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrCnndNoa, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->clngPtyPrsntnInd, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingIri, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrOri, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCallidExtrnl, &StorageTmp->ingCallidExtrnlLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCallidExtrnl, &StorageTmp->egrCallidExtrnlLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingChargeInfo, &StorageTmp->ingChargeInfoLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrChargeInfo, &StorageTmp->egrChargeInfoLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingPrtlInd, &StorageTmp->ingPrtlIndLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingNatfwdCliblkInd, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingNatfwdNtaInd, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingLastDvrtLnDigs, &StorageTmp->ingLastDvrtLnDigsLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingLastDvrtLnNoa, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7IngAddlPtyCat, &StorageTmp->j7IngAddlPtyCatLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7IngChgAreaInfo, &StorageTmp->j7IngChgAreaInfoLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7IngFwdCallInd, &StorageTmp->j7IngFwdCallIndLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7EgrAddlPtyCat, &StorageTmp->j7EgrAddlPtyCatLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7EgrChgAreaInfo, &StorageTmp->j7EgrChgAreaInfoLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7EgrBkwCallInd, &StorageTmp->j7EgrBkwCallIndLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7CarrInfoXfer, &StorageTmp->j7CarrInfoXferLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingSs7GnrcParm, &StorageTmp->ingSs7GnrcParmLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrSs7GnrcParm, &StorageTmp->egrSs7GnrcParmLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPktsSent, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPktsRcvd, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPktsLost, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPktsXfer, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingJitter, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingLtncy, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPktsSent, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPktsRcvd, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPktsLost, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPktsXfer, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrJitter, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrLtncy, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCrctId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCrctId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCodec, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCodec, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingLocGateId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrLocGateId, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCasCrctSzr, &StorageTmp->ingCasCrctSzrLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCasCrctSzr, &StorageTmp->egrCasCrctSzrLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingZz, &StorageTmp->ingZzLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrZz, &StorageTmp->egrZzLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCtryAddrType, &StorageTmp->ingCtryAddrTypeLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCtryAddrType, &StorageTmp->egrCtryAddrTypeLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPartition, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPartition, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingClngPtyCat, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingRlsCauseLctn, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrRlsCauseLctn, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->clldPtyCat, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->callDuration, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingRlsDrctn, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrRlsDrctn, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingAnsLctim, &StorageTmp->ingAnsLctimLen);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrAnsLctim, &StorageTmp->egrAnsLctimLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingHlcChrsId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrHlcChrsId, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingLlcXferCap, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrLlcXferCap, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->routeList, &StorageTmp->routeListLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPointCode, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPointCode, &tmpint);
+		/* XXX: if (StorageTmp->callDetailLogRecordR2StorageType == ST_NONVOLATILE) */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "callDetailLogRecordR2Table ");
+			cptr = line + strlen(line);
+			tmpsize = StorageTmp->logIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &tmpsize);
+			tmpsize = StorageTmp->logRecordIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->sequenceId, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->zoneId, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->recSeqId, &tmpsize);
+			cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->fileSeqId, &tmpsize);
+			tmpsize = StorageTmp->callIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callId, &tmpsize);
+			tmpsize = StorageTmp->lastUpdateLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lastUpdate, &tmpsize);
+			tmpsize = StorageTmp->eventOrderLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->eventOrder, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->status, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->callType, &tmpsize);
+			tmpsize = StorageTmp->clngPtyNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clngPtyNbr, &tmpsize);
+			tmpsize = StorageTmp->chargeNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chargeNbr, &tmpsize);
+			tmpsize = StorageTmp->clldPtyNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clldPtyNbr, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->clldPtyNoa, &tmpsize);
+			tmpsize = StorageTmp->origLnInfoLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->origLnInfo, &tmpsize);
+			tmpsize = StorageTmp->ingLrnLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingLrn, &tmpsize);
+			tmpsize = StorageTmp->ingCicLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCic, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingCsi, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCceId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingTgProt, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingTgType, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingTgId, &tmpsize);
+			tmpsize = StorageTmp->ingCallStartLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCallStart, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingGateId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCardId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingSpanId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingChanId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingIsdnDChan, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingIsdnCrn, &tmpsize);
+			tmpsize = StorageTmp->ingCreatConnCpltLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCreatConnCplt, &tmpsize);
+			tmpsize = StorageTmp->ingAddrCpltLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingAddrCplt, &tmpsize);
+			tmpsize = StorageTmp->ingCallAnsLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCallAns, &tmpsize);
+			tmpsize = StorageTmp->transNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->transNbr, &tmpsize);
+			tmpsize = StorageTmp->termLrnLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->termLrn, &tmpsize);
+			tmpsize = StorageTmp->transCicLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->transCic, &tmpsize);
+			tmpsize = StorageTmp->ingCallRlsLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCallRls, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingRlsCause, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCceId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrTgProt, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrTgType, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrTgId, &tmpsize);
+			tmpsize = StorageTmp->egrCallStartLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCallStart, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrGateId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCardId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrSpanId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrChanId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrIsdnDChan, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrIsdnCrn, &tmpsize);
+			tmpsize = StorageTmp->egrCreatConnCpltLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCreatConnCplt, &tmpsize);
+			tmpsize = StorageTmp->egrAddrCpltLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrAddrCplt, &tmpsize);
+			tmpsize = StorageTmp->egrCallAnsLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCallAns, &tmpsize);
+			tmpsize = StorageTmp->egrCallRlsLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCallRls, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrRlsCause, &tmpsize);
+			tmpsize = StorageTmp->chkptFirstLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chkptFirst, &tmpsize);
+			tmpsize = StorageTmp->chkptLastLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->chkptLast, &tmpsize);
+			tmpsize = StorageTmp->ingGateNameLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingGateName, &tmpsize);
+			tmpsize = StorageTmp->egrGateNameLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrGateName, &tmpsize);
+			tmpsize = StorageTmp->ingTgNameLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingTgName, &tmpsize);
+			tmpsize = StorageTmp->egrTgNameLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrTgName, &tmpsize);
+			tmpsize = StorageTmp->origGateIpLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->origGateIp, &tmpsize);
+			tmpsize = StorageTmp->termGateIpLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->termGateIp, &tmpsize);
+			tmpsize = StorageTmp->h323ConfIdLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->h323ConfId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCardPort, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCardPath, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCardPort, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCardPath, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingTg, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrTg, &tmpsize);
+			tmpsize = StorageTmp->dialedNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dialedNbr, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dialedNoa, &tmpsize);
+			tmpsize = StorageTmp->redirNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->redirNbr, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirNoa, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirInd, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirRsn, &tmpsize);
+			tmpsize = StorageTmp->calledNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->calledNbr, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->calledNoa, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirRsnOrig, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->redirCntr, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->redirPrsntnInd, &tmpsize);
+			tmpsize = StorageTmp->ingJurisLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingJuris, &tmpsize);
+			tmpsize = StorageTmp->egrJurisLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrJuris, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingTrunkBearCap, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrTrunkBearCap, &tmpsize);
+			tmpsize = StorageTmp->transNetSelCarrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->transNetSelCarr, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->clngPtyNoa, &tmpsize);
+			tmpsize = StorageTmp->ingRlsCauseIntrnlLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingRlsCauseIntrnl, &tmpsize);
+			tmpsize = StorageTmp->egrRlsCauseIntrnlLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrRlsCauseIntrnl, &tmpsize);
+			tmpsize = StorageTmp->egrClldNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrClldNbr, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrClldNoa, &tmpsize);
+			tmpsize = StorageTmp->egrCnndNbrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCnndNbr, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrCnndNoa, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->clngPtyPrsntnInd, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingIri, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->egrOri, &tmpsize);
+			tmpsize = StorageTmp->ingCallidExtrnlLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCallidExtrnl, &tmpsize);
+			tmpsize = StorageTmp->egrCallidExtrnlLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCallidExtrnl, &tmpsize);
+			tmpsize = StorageTmp->ingChargeInfoLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingChargeInfo, &tmpsize);
+			tmpsize = StorageTmp->egrChargeInfoLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrChargeInfo, &tmpsize);
+			tmpsize = StorageTmp->ingPrtlIndLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingPrtlInd, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingNatfwdCliblkInd, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingNatfwdNtaInd, &tmpsize);
+			tmpsize = StorageTmp->ingLastDvrtLnDigsLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingLastDvrtLnDigs, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ingLastDvrtLnNoa, &tmpsize);
+			tmpsize = StorageTmp->j7IngAddlPtyCatLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7IngAddlPtyCat, &tmpsize);
+			tmpsize = StorageTmp->j7IngChgAreaInfoLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7IngChgAreaInfo, &tmpsize);
+			tmpsize = StorageTmp->j7IngFwdCallIndLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7IngFwdCallInd, &tmpsize);
+			tmpsize = StorageTmp->j7EgrAddlPtyCatLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7EgrAddlPtyCat, &tmpsize);
+			tmpsize = StorageTmp->j7EgrChgAreaInfoLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7EgrChgAreaInfo, &tmpsize);
+			tmpsize = StorageTmp->j7EgrBkwCallIndLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7EgrBkwCallInd, &tmpsize);
+			tmpsize = StorageTmp->j7CarrInfoXferLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->j7CarrInfoXfer, &tmpsize);
+			tmpsize = StorageTmp->ingSs7GnrcParmLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingSs7GnrcParm, &tmpsize);
+			tmpsize = StorageTmp->egrSs7GnrcParmLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrSs7GnrcParm, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPktsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPktsRcvd, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPktsLost, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPktsXfer, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingJitter, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingLtncy, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPktsSent, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPktsRcvd, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPktsLost, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPktsXfer, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrJitter, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrLtncy, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCrctId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCrctId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingCodec, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrCodec, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingLocGateId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrLocGateId, &tmpsize);
+			tmpsize = StorageTmp->ingCasCrctSzrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCasCrctSzr, &tmpsize);
+			tmpsize = StorageTmp->egrCasCrctSzrLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCasCrctSzr, &tmpsize);
+			tmpsize = StorageTmp->ingZzLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingZz, &tmpsize);
+			tmpsize = StorageTmp->egrZzLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrZz, &tmpsize);
+			tmpsize = StorageTmp->ingCtryAddrTypeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingCtryAddrType, &tmpsize);
+			tmpsize = StorageTmp->egrCtryAddrTypeLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrCtryAddrType, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPartition, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPartition, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingClngPtyCat, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingRlsCauseLctn, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrRlsCauseLctn, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->clldPtyCat, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->callDuration, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingRlsDrctn, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrRlsDrctn, &tmpsize);
+			tmpsize = StorageTmp->ingAnsLctimLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->ingAnsLctim, &tmpsize);
+			tmpsize = StorageTmp->egrAnsLctimLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->egrAnsLctim, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingHlcChrsId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrHlcChrsId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingLlcXferCap, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrLlcXferCap, &tmpsize);
+			tmpsize = StorageTmp->routeListLen;
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->routeList, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->ingPointCode, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->egrPointCode, &tmpsize);
 
-		snmpd_store_config(line);
-/*   } */
+			snmpd_store_config(line);
+		}
 	}
 	DEBUGMSGTL(("callDetailLogRecordR2Table", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -2559,13 +3253,11 @@ store_callDetailLogRecordR2Table(int majorID, int minorID, void *serverarg, void
 /**
  * refresh_callDetailDataTable(): refresh callDetailDataTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_callDetailDataTable(void)
@@ -2579,11 +3271,9 @@ refresh_callDetailDataTable(void)
 /**
  * refresh_callDetailDataTable_row(): refresh callDetailDataTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp)
@@ -2594,11 +3284,11 @@ refresh_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp)
 }
 
 /*
- * var_callDetailDataTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_callDetailDataTable(): locate variables in callDetailDataTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_callDetailDataTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct callDetailDataTable_data *StorageTmp = NULL;
@@ -2618,7 +3308,7 @@ var_callDetailDataTable(struct variable *vp, oid * name, size_t *length, int exa
 	case CALLDETAILDATAID:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->callDetailDataIdLen;
-		return (uint8_t *) StorageTmp->callDetailDataId;
+		return (u_char *) StorageTmp->callDetailDataId;
 
 	default:
 		ERROR_MSG("");
@@ -2629,13 +3319,11 @@ var_callDetailDataTable(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * refresh_simpleUsageMeteringControlTable(): refresh simpleUsageMeteringControlTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_simpleUsageMeteringControlTable(void)
@@ -2649,11 +3337,9 @@ refresh_simpleUsageMeteringControlTable(void)
 /**
  * refresh_simpleUsageMeteringControlTable_row(): refresh simpleUsageMeteringControlTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
@@ -2664,11 +3350,11 @@ refresh_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTab
 }
 
 /*
- * var_simpleUsageMeteringControlTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_simpleUsageMeteringControlTable(): locate variables in simpleUsageMeteringControlTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_simpleUsageMeteringControlTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct simpleUsageMeteringControlTable_data *StorageTmp = NULL;
@@ -2688,11 +3374,11 @@ var_simpleUsageMeteringControlTable(struct variable *vp, oid * name, size_t *len
 	case CREATIONTRIGGERLIST:
 		*write_method = write_creationTriggerList;
 		*var_len = StorageTmp->creationTriggerListLen;
-		return (uint8_t *) StorageTmp->creationTriggerList;
+		return (u_char *) StorageTmp->creationTriggerList;
 	case SIMPLEUSAGEMETERINGCONTROLENTRYSTATUS:
 		*write_method = write_simpleUsageMeteringControlEntryStatus;
 		*var_len = sizeof(StorageTmp->simpleUsageMeteringControlEntryStatus);
-		return (uint8_t *) &StorageTmp->simpleUsageMeteringControlEntryStatus;
+		return (u_char *) &StorageTmp->simpleUsageMeteringControlEntryStatus;
 
 	default:
 		ERROR_MSG("");
@@ -2703,13 +3389,11 @@ var_simpleUsageMeteringControlTable(struct variable *vp, oid * name, size_t *len
 /**
  * refresh_configurableSimpleUsageMeteringControlTable(): refresh configurableSimpleUsageMeteringControlTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_configurableSimpleUsageMeteringControlTable(void)
@@ -2723,11 +3407,9 @@ refresh_configurableSimpleUsageMeteringControlTable(void)
 /**
  * refresh_configurableSimpleUsageMeteringControlTable_row(): refresh configurableSimpleUsageMeteringControlTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
@@ -2738,11 +3420,11 @@ refresh_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpl
 }
 
 /*
- * var_configurableSimpleUsageMeteringControlTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_configurableSimpleUsageMeteringControlTable(): locate variables in configurableSimpleUsageMeteringControlTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_configurableSimpleUsageMeteringControlTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL;
@@ -2762,15 +3444,15 @@ var_configurableSimpleUsageMeteringControlTable(struct variable *vp, oid * name,
 	case SAMPLINGRATE:
 		*write_method = write_samplingRate;
 		*var_len = sizeof(StorageTmp->samplingRate);
-		return (uint8_t *) &StorageTmp->samplingRate;
+		return (u_char *) &StorageTmp->samplingRate;
 	case CONFIGURATIONMASK:
 		*write_method = write_configurationMask;
 		*var_len = StorageTmp->configurationMaskLen;
-		return (uint8_t *) StorageTmp->configurationMask;
+		return (u_char *) StorageTmp->configurationMask;
 	case CONFIGURATIONROWSTATUS:
 		*write_method = write_configurationRowStatus;
 		*var_len = sizeof(StorageTmp->configurationRowStatus);
-		return (uint8_t *) &StorageTmp->configurationRowStatus;
+		return (u_char *) &StorageTmp->configurationRowStatus;
 
 	default:
 		ERROR_MSG("");
@@ -2781,13 +3463,11 @@ var_configurableSimpleUsageMeteringControlTable(struct variable *vp, oid * name,
 /**
  * refresh_blockGeneratingLogTable(): refresh blockGeneratingLogTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_blockGeneratingLogTable(void)
@@ -2801,11 +3481,9 @@ refresh_blockGeneratingLogTable(void)
 /**
  * refresh_blockGeneratingLogTable_row(): refresh blockGeneratingLogTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
@@ -2816,11 +3494,11 @@ refresh_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *Storage
 }
 
 /*
- * var_blockGeneratingLogTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_blockGeneratingLogTable(): locate variables in blockGeneratingLogTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_blockGeneratingLogTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct blockGeneratingLogTable_data *StorageTmp = NULL;
@@ -2840,19 +3518,19 @@ var_blockGeneratingLogTable(struct variable *vp, oid * name, size_t *length, int
 	case BLOCKGENERATINGLOGMAXBLOCKSIZE:
 		*write_method = write_blockGeneratingLogMaxBlockSize;
 		*var_len = sizeof(StorageTmp->blockGeneratingLogMaxBlockSize);
-		return (uint8_t *) &StorageTmp->blockGeneratingLogMaxBlockSize;
+		return (u_char *) &StorageTmp->blockGeneratingLogMaxBlockSize;
 	case BLOCKGENERATINGLOGMAXTIMEINTERVAL:
 		*write_method = write_blockGeneratingLogMaxTimeInterval;
 		*var_len = sizeof(StorageTmp->blockGeneratingLogMaxTimeInterval);
-		return (uint8_t *) &StorageTmp->blockGeneratingLogMaxTimeInterval;
+		return (u_char *) &StorageTmp->blockGeneratingLogMaxTimeInterval;
 	case BLOCKGENERATINGLOGSTORAGETYPE:
 		*write_method = write_blockGeneratingLogStorageType;
 		*var_len = sizeof(StorageTmp->blockGeneratingLogStorageType);
-		return (uint8_t *) &StorageTmp->blockGeneratingLogStorageType;
+		return (u_char *) &StorageTmp->blockGeneratingLogStorageType;
 	case BLOCKGENERATINGLOGROWSTATUS:
 		*write_method = write_blockGeneratingLogRowStatus;
 		*var_len = sizeof(StorageTmp->blockGeneratingLogRowStatus);
-		return (uint8_t *) &StorageTmp->blockGeneratingLogRowStatus;
+		return (u_char *) &StorageTmp->blockGeneratingLogRowStatus;
 
 	default:
 		ERROR_MSG("");
@@ -2863,13 +3541,11 @@ var_blockGeneratingLogTable(struct variable *vp, oid * name, size_t *length, int
 /**
  * refresh_fileGeneratingLogTable(): refresh fileGeneratingLogTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_fileGeneratingLogTable(void)
@@ -2883,11 +3559,9 @@ refresh_fileGeneratingLogTable(void)
 /**
  * refresh_fileGeneratingLogTable_row(): refresh fileGeneratingLogTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
@@ -2898,11 +3572,11 @@ refresh_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTm
 }
 
 /*
- * var_fileGeneratingLogTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_fileGeneratingLogTable(): locate variables in fileGeneratingLogTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_fileGeneratingLogTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct fileGeneratingLogTable_data *StorageTmp = NULL;
@@ -2922,19 +3596,19 @@ var_fileGeneratingLogTable(struct variable *vp, oid * name, size_t *length, int 
 	case TIMESOFDAY:
 		*write_method = write_timesOfDay;
 		*var_len = StorageTmp->timesOfDayLen;
-		return (uint8_t *) StorageTmp->timesOfDay;
+		return (u_char *) StorageTmp->timesOfDay;
 	case PERIODICTRIGGER:
 		*write_method = write_periodicTrigger;
 		*var_len = sizeof(StorageTmp->periodicTrigger);
-		return (uint8_t *) &StorageTmp->periodicTrigger;
+		return (u_char *) &StorageTmp->periodicTrigger;
 	case FILEGENERATINGLOGSTORAGETYPE:
 		*write_method = write_fileGeneratingLogStorageType;
 		*var_len = sizeof(StorageTmp->fileGeneratingLogStorageType);
-		return (uint8_t *) &StorageTmp->fileGeneratingLogStorageType;
+		return (u_char *) &StorageTmp->fileGeneratingLogStorageType;
 	case FILEGENERATINGLOGENTRYSTATUS:
 		*write_method = write_fileGeneratingLogEntryStatus;
 		*var_len = sizeof(StorageTmp->fileGeneratingLogEntryStatus);
-		return (uint8_t *) &StorageTmp->fileGeneratingLogEntryStatus;
+		return (u_char *) &StorageTmp->fileGeneratingLogEntryStatus;
 
 	default:
 		ERROR_MSG("");
@@ -2945,13 +3619,11 @@ var_fileGeneratingLogTable(struct variable *vp, oid * name, size_t *length, int 
 /**
  * refresh_callDetailLogRecordTable(): refresh callDetailLogRecordTable
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_callDetailLogRecordTable(void)
@@ -2965,11 +3637,9 @@ refresh_callDetailLogRecordTable(void)
 /**
  * refresh_callDetailLogRecordTable_row(): refresh callDetailLogRecordTable row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_callDetailLogRecordTable_row(struct callDetailLogRecordTable_data *StorageTmp)
@@ -2980,11 +3650,11 @@ refresh_callDetailLogRecordTable_row(struct callDetailLogRecordTable_data *Stora
 }
 
 /*
- * var_callDetailLogRecordTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_callDetailLogRecordTable(): locate variables in callDetailLogRecordTable
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_callDetailLogRecordTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct callDetailLogRecordTable_data *StorageTmp = NULL;
@@ -3004,267 +3674,267 @@ var_callDetailLogRecordTable(struct variable *vp, oid * name, size_t *length, in
 	case NETWORKPROVIDERID:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->networkProviderIdLen;
-		return (uint8_t *) StorageTmp->networkProviderId;
+		return (u_char *) StorageTmp->networkProviderId;
 	case RECORDTYPE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->recordType);
-		return (uint8_t *) &StorageTmp->recordType;
+		return (u_char *) &StorageTmp->recordType;
 	case SEIZURETIME:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->seizureTimeLen;
-		return (uint8_t *) StorageTmp->seizureTime;
+		return (u_char *) StorageTmp->seizureTime;
 	case ANSWERTIME:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->answerTimeLen;
-		return (uint8_t *) StorageTmp->answerTime;
+		return (u_char *) StorageTmp->answerTime;
 	case PARTIALTIME:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->partialTimeLen;
-		return (uint8_t *) StorageTmp->partialTime;
+		return (u_char *) StorageTmp->partialTime;
 	case EVENTTIME:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->eventTimeLen;
-		return (uint8_t *) StorageTmp->eventTime;
+		return (u_char *) StorageTmp->eventTime;
 	case CALLINGPARTYNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->callingPartyNumberLen;
-		return (uint8_t *) StorageTmp->callingPartyNumber;
+		return (u_char *) StorageTmp->callingPartyNumber;
 	case CALLEDPARTYNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->calledPartyNumberLen;
-		return (uint8_t *) StorageTmp->calledPartyNumber;
+		return (u_char *) StorageTmp->calledPartyNumber;
 	case REDIRECTINGNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->redirectingNumberLen;
-		return (uint8_t *) StorageTmp->redirectingNumber;
+		return (u_char *) StorageTmp->redirectingNumber;
 	case REDIRECTIONNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->redirectionNumberLen;
-		return (uint8_t *) StorageTmp->redirectionNumber;
+		return (u_char *) StorageTmp->redirectionNumber;
 	case ORIGINALCALLEDNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->originalCalledNumberLen;
-		return (uint8_t *) StorageTmp->originalCalledNumber;
+		return (u_char *) StorageTmp->originalCalledNumber;
 	case CALLINGPARTYNUMBERNOTSCREENED:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->callingPartyNumberNotScreenedLen;
-		return (uint8_t *) StorageTmp->callingPartyNumberNotScreened;
+		return (u_char *) StorageTmp->callingPartyNumberNotScreened;
 	case OPERATORSPECIFIC1NUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->operatorSpecific1NumberLen;
-		return (uint8_t *) StorageTmp->operatorSpecific1Number;
+		return (u_char *) StorageTmp->operatorSpecific1Number;
 	case OPERATORSPECIFIC2NUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->operatorSpecific2NumberLen;
-		return (uint8_t *) StorageTmp->operatorSpecific2Number;
+		return (u_char *) StorageTmp->operatorSpecific2Number;
 	case OPERATORSPECIFIC3NUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->operatorSpecific3NumberLen;
-		return (uint8_t *) StorageTmp->operatorSpecific3Number;
+		return (u_char *) StorageTmp->operatorSpecific3Number;
 	case BEARERSERVICE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->bearerServiceLen;
-		return (uint8_t *) StorageTmp->bearerService;
+		return (u_char *) StorageTmp->bearerService;
 	case PARTICIPANTSERVICEUSER:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->participantServiceUser);
-		return (uint8_t *) &StorageTmp->participantServiceUser;
+		return (u_char *) &StorageTmp->participantServiceUser;
 	case CALLIDENTIFICATIONNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->callIdentificationNumberLen;
-		return (uint8_t *) StorageTmp->callIdentificationNumber;
+		return (u_char *) StorageTmp->callIdentificationNumber;
 	case SUPPLEMENTARYSERVICES:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->supplementaryServicesLen;
-		return (uint8_t *) StorageTmp->supplementaryServices;
+		return (u_char *) StorageTmp->supplementaryServices;
 	case IMMEDIATENOTIFICATIONFORUSAGEMETERING:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->immediateNotificationForUsageMetering);
-		return (uint8_t *) &StorageTmp->immediateNotificationForUsageMetering;
+		return (u_char *) &StorageTmp->immediateNotificationForUsageMetering;
 	case CAUSE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->causeLen;
-		return (uint8_t *) StorageTmp->cause;
+		return (u_char *) StorageTmp->cause;
 	case PERSONALUSERID:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->personalUserIdLen;
-		return (uint8_t *) StorageTmp->personalUserId;
+		return (u_char *) StorageTmp->personalUserId;
 	case CHARGEDPARTICIPANT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->chargedParticipant);
-		return (uint8_t *) &StorageTmp->chargedParticipant;
+		return (u_char *) &StorageTmp->chargedParticipant;
 	case CHARGEDDIRECTORYNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->chargedDirectoryNumberLen;
-		return (uint8_t *) StorageTmp->chargedDirectoryNumber;
+		return (u_char *) StorageTmp->chargedDirectoryNumber;
 	case PERCENTAGETOBEBILLED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->percentageToBeBilled);
-		return (uint8_t *) &StorageTmp->percentageToBeBilled;
+		return (u_char *) &StorageTmp->percentageToBeBilled;
 	case ACCOUNTCODEINPUT:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->accountCodeInputLen;
-		return (uint8_t *) StorageTmp->accountCodeInput;
+		return (u_char *) StorageTmp->accountCodeInput;
 	case INSERVICECODE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->iNServiceCodeLen;
-		return (uint8_t *) StorageTmp->iNServiceCode;
+		return (u_char *) StorageTmp->iNServiceCode;
 	case QUEUETIMESTAMP:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->queueTimeStampLen;
-		return (uint8_t *) StorageTmp->queueTimeStamp;
+		return (u_char *) StorageTmp->queueTimeStamp;
 	case QUEUEDURATION:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->queueDuration);
-		return (uint8_t *) &StorageTmp->queueDuration;
+		return (u_char *) &StorageTmp->queueDuration;
 	case SERVICESPECIFICININFORMATION:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->serviceSpecificINInformationLen;
-		return (uint8_t *) StorageTmp->serviceSpecificINInformation;
+		return (u_char *) StorageTmp->serviceSpecificINInformation;
 	case PARTIALRECORDNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->partialRecordNumber);
-		return (uint8_t *) &StorageTmp->partialRecordNumber;
+		return (u_char *) &StorageTmp->partialRecordNumber;
 	case PARTIALRECORDREASON:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->partialRecordReason);
-		return (uint8_t *) &StorageTmp->partialRecordReason;
+		return (u_char *) &StorageTmp->partialRecordReason;
 	case EXCHANGEINFO:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->exchangeInfoLen;
-		return (uint8_t *) StorageTmp->exchangeInfo;
+		return (u_char *) StorageTmp->exchangeInfo;
 	case RELATEDCALLNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->relatedCallNumberLen;
-		return (uint8_t *) StorageTmp->relatedCallNumber;
+		return (u_char *) StorageTmp->relatedCallNumber;
 	case CDRPURPOSE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->cDRPurposeLen;
-		return (uint8_t *) StorageTmp->cDRPurpose;
+		return (u_char *) StorageTmp->cDRPurpose;
 	case PHYSICALLINECODE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->physicalLineCodeLen;
-		return (uint8_t *) StorageTmp->physicalLineCode;
+		return (u_char *) StorageTmp->physicalLineCode;
 	case RECEIVEDDIGITS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->receivedDigitsLen;
-		return (uint8_t *) StorageTmp->receivedDigits;
+		return (u_char *) StorageTmp->receivedDigits;
 	case OPERATORSPECIFIC1ADDITIONALNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->operatorSpecific1AdditionalNumberLen;
-		return (uint8_t *) StorageTmp->operatorSpecific1AdditionalNumber;
+		return (u_char *) StorageTmp->operatorSpecific1AdditionalNumber;
 	case OPERATORSPECIFIC2ADDITIONALNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->operatorSpecific2AdditionalNumberLen;
-		return (uint8_t *) StorageTmp->operatorSpecific2AdditionalNumber;
+		return (u_char *) StorageTmp->operatorSpecific2AdditionalNumber;
 	case OPERATORSPECIFIC3ADDITIONALNUMBER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->operatorSpecific3AdditionalNumberLen;
-		return (uint8_t *) StorageTmp->operatorSpecific3AdditionalNumber;
+		return (u_char *) StorageTmp->operatorSpecific3AdditionalNumber;
 	case CALLINGPARTYCATEGORY:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->callingPartyCategoryLen;
-		return (uint8_t *) StorageTmp->callingPartyCategory;
+		return (u_char *) StorageTmp->callingPartyCategory;
 	case CALLINGPARTYTYPE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->callingPartyType);
-		return (uint8_t *) &StorageTmp->callingPartyType;
+		return (u_char *) &StorageTmp->callingPartyType;
 	case CHARGEINFORMATION:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->chargeInformationLen;
-		return (uint8_t *) StorageTmp->chargeInformation;
+		return (u_char *) StorageTmp->chargeInformation;
 	case PROGRESS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->progressLen;
-		return (uint8_t *) StorageTmp->progress;
+		return (u_char *) StorageTmp->progress;
 	case ACCESSDELIVERY:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->accessDeliveryLen;
-		return (uint8_t *) StorageTmp->accessDelivery;
+		return (u_char *) StorageTmp->accessDelivery;
 	case TRUNKGROUPOUTGOING:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->trunkGroupOutgoingLen;
-		return (uint8_t *) StorageTmp->trunkGroupOutgoing;
+		return (u_char *) StorageTmp->trunkGroupOutgoing;
 	case TRUNKGROUPINCOMING:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->trunkGroupIncomingLen;
-		return (uint8_t *) StorageTmp->trunkGroupIncoming;
+		return (u_char *) StorageTmp->trunkGroupIncoming;
 	case FALLBACKBEARERSERVICE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->fallbackBearerServiceLen;
-		return (uint8_t *) StorageTmp->fallbackBearerService;
+		return (u_char *) StorageTmp->fallbackBearerService;
 	case TELESERVICE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->teleserviceLen;
-		return (uint8_t *) StorageTmp->teleservice;
+		return (u_char *) StorageTmp->teleservice;
 	case CONVERSATIONTIME:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->conversationTime);
-		return (uint8_t *) &StorageTmp->conversationTime;
+		return (u_char *) &StorageTmp->conversationTime;
 	case DURATIONTIMEACM:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->durationTimeACM);
-		return (uint8_t *) &StorageTmp->durationTimeACM;
+		return (u_char *) &StorageTmp->durationTimeACM;
 	case DURATIONTIMEBANSWER:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->durationTimeBAnswer);
-		return (uint8_t *) &StorageTmp->durationTimeBAnswer;
+		return (u_char *) &StorageTmp->durationTimeBAnswer;
 	case DURATIONTIMENOBANSWER:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->durationTimeNoBAnswer);
-		return (uint8_t *) &StorageTmp->durationTimeNoBAnswer;
+		return (u_char *) &StorageTmp->durationTimeNoBAnswer;
 	case UUINFO:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->uUInfoLen;
-		return (uint8_t *) StorageTmp->uUInfo;
+		return (u_char *) StorageTmp->uUInfo;
 	case STANDARDEXTENSIONS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->standardExtensionsLen;
-		return (uint8_t *) StorageTmp->standardExtensions;
+		return (u_char *) StorageTmp->standardExtensions;
 	case RECORDEXTENSIONS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->recordExtensionsLen;
-		return (uint8_t *) StorageTmp->recordExtensions;
+		return (u_char *) StorageTmp->recordExtensions;
 	case BPARTYCATEGORY:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->bPartyCategoryLen;
-		return (uint8_t *) StorageTmp->bPartyCategory;
+		return (u_char *) StorageTmp->bPartyCategory;
 	case ISUPPREFERRED:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->iSUPPreferred);
-		return (uint8_t *) &StorageTmp->iSUPPreferred;
+		return (u_char *) &StorageTmp->iSUPPreferred;
 	case NETWORKMANAGEMENTCONTROLS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->networkManagementControls);
-		return (uint8_t *) &StorageTmp->networkManagementControls;
+		return (u_char *) &StorageTmp->networkManagementControls;
 	case GLARE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->glare);
-		return (uint8_t *) &StorageTmp->glare;
+		return (u_char *) &StorageTmp->glare;
 	case RECORDID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->recordId);
-		return (uint8_t *) &StorageTmp->recordId;
+		return (u_char *) &StorageTmp->recordId;
 	case DATAVALIDITY:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->dataValidity);
-		return (uint8_t *) &StorageTmp->dataValidity;
+		return (u_char *) &StorageTmp->dataValidity;
 	case CALLSTATUS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->callStatus);
-		return (uint8_t *) &StorageTmp->callStatus;
+		return (u_char *) &StorageTmp->callStatus;
 	case CARRIERID:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->carrierIdLen;
-		return (uint8_t *) StorageTmp->carrierId;
+		return (u_char *) StorageTmp->carrierId;
 	case DPC:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->dPCLen;
-		return (uint8_t *) StorageTmp->dPC;
+		return (u_char *) StorageTmp->dPC;
 	case OPC:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->oPCLen;
-		return (uint8_t *) StorageTmp->oPC;
+		return (u_char *) StorageTmp->oPC;
 
 	default:
 		ERROR_MSG("");
@@ -3275,13 +3945,11 @@ var_callDetailLogRecordTable(struct variable *vp, oid * name, size_t *length, in
 /**
  * refresh_configurableSimpleUsageMeteringControlR2Table(): refresh configurableSimpleUsageMeteringControlR2Table
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_configurableSimpleUsageMeteringControlR2Table(void)
@@ -3295,11 +3963,9 @@ refresh_configurableSimpleUsageMeteringControlR2Table(void)
 /**
  * refresh_configurableSimpleUsageMeteringControlR2Table_row(): refresh configurableSimpleUsageMeteringControlR2Table row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
@@ -3310,11 +3976,11 @@ refresh_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSim
 }
 
 /*
- * var_configurableSimpleUsageMeteringControlR2Table():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_configurableSimpleUsageMeteringControlR2Table(): locate variables in configurableSimpleUsageMeteringControlR2Table
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_configurableSimpleUsageMeteringControlR2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp = NULL;
@@ -3334,11 +4000,11 @@ var_configurableSimpleUsageMeteringControlR2Table(struct variable *vp, oid * nam
 	case CONFIGURATIONR2MASK:
 		*write_method = write_configurationR2Mask;
 		*var_len = StorageTmp->configurationR2MaskLen;
-		return (uint8_t *) StorageTmp->configurationR2Mask;
+		return (u_char *) StorageTmp->configurationR2Mask;
 	case CONFIGURATIONR2STATUS:
 		*write_method = write_configurationR2Status;
 		*var_len = sizeof(StorageTmp->configurationR2Status);
-		return (uint8_t *) &StorageTmp->configurationR2Status;
+		return (u_char *) &StorageTmp->configurationR2Status;
 
 	default:
 		ERROR_MSG("");
@@ -3349,13 +4015,11 @@ var_configurableSimpleUsageMeteringControlR2Table(struct variable *vp, oid * nam
 /**
  * refresh_blockGeneratingLogR2Table(): refresh blockGeneratingLogR2Table
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_blockGeneratingLogR2Table(void)
@@ -3369,11 +4033,9 @@ refresh_blockGeneratingLogR2Table(void)
 /**
  * refresh_blockGeneratingLogR2Table_row(): refresh blockGeneratingLogR2Table row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *StorageTmp)
@@ -3384,11 +4046,11 @@ refresh_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *Sto
 }
 
 /*
- * var_blockGeneratingLogR2Table():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_blockGeneratingLogR2Table(): locate variables in blockGeneratingLogR2Table
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_blockGeneratingLogR2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct blockGeneratingLogR2Table_data *StorageTmp = NULL;
@@ -3408,7 +4070,7 @@ var_blockGeneratingLogR2Table(struct variable *vp, oid * name, size_t *length, i
 	case BLOCKGENERATINGLOGVERSION:
 		*write_method = write_blockGeneratingLogVersion;
 		*var_len = sizeof(StorageTmp->blockGeneratingLogVersion);
-		return (uint8_t *) &StorageTmp->blockGeneratingLogVersion;
+		return (u_char *) &StorageTmp->blockGeneratingLogVersion;
 
 	default:
 		ERROR_MSG("");
@@ -3419,13 +4081,11 @@ var_blockGeneratingLogR2Table(struct variable *vp, oid * name, size_t *length, i
 /**
  * refresh_callDetailLogRecordR2Table(): refresh callDetailLogRecordR2Table
  *
- * Normally the values retrieved from the operating system are cached.
- * When the agent receives a SIGPOLL from an open STREAMS configuration
- * or administrative driver Stream, the STREAMS subsystem indicates to
- * the agent that the cache has been invalidated and that it should
- * reread tables from the STREAMS subsystem.  This function is used when
- * the agent start for the first time, or after a SIGPOLL has been
- * received (and a row or column has been requested).
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread tables from
+ * the STREAMS subsystem.  This function is used when the agent start for the first time, or after a
+ * SIGPOLL has been received (and a row or column has been requested).
  */
 void
 refresh_callDetailLogRecordR2Table(void)
@@ -3439,11 +4099,9 @@ refresh_callDetailLogRecordR2Table(void)
 /**
  * refresh_callDetailLogRecordR2Table_row(): refresh callDetailLogRecordR2Table row
  *
- * Normally the values retrieved from the operating system are cached.
- * However, if a row contains temporal values, such as statistics
- * counters, gauges, timestamps, or other transient columns, it may be
- * necessary to refresh the row on some other basis, but normally only
- * once per request.
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
 void
 refresh_callDetailLogRecordR2Table_row(struct callDetailLogRecordR2Table_data *StorageTmp)
@@ -3454,11 +4112,11 @@ refresh_callDetailLogRecordR2Table_row(struct callDetailLogRecordR2Table_data *S
 }
 
 /*
- * var_callDetailLogRecordR2Table():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_cdr2MIB above.
+ * var_callDetailLogRecordR2Table(): locate variables in callDetailLogRecordR2Table
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_cdr2MIB above.
  */
-uint8_t *
+u_char *
 var_callDetailLogRecordR2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct callDetailLogRecordR2Table_data *StorageTmp = NULL;
@@ -3478,615 +4136,615 @@ var_callDetailLogRecordR2Table(struct variable *vp, oid * name, size_t *length, 
 	case SEQUENCEID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->sequenceId);
-		return (uint8_t *) &StorageTmp->sequenceId;
+		return (u_char *) &StorageTmp->sequenceId;
 	case ZONEID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->zoneId);
-		return (uint8_t *) &StorageTmp->zoneId;
+		return (u_char *) &StorageTmp->zoneId;
 	case RECSEQID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->recSeqId);
-		return (uint8_t *) &StorageTmp->recSeqId;
+		return (u_char *) &StorageTmp->recSeqId;
 	case FILESEQID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->fileSeqId);
-		return (uint8_t *) &StorageTmp->fileSeqId;
+		return (u_char *) &StorageTmp->fileSeqId;
 	case CALLID:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->callIdLen;
-		return (uint8_t *) StorageTmp->callId;
+		return (u_char *) StorageTmp->callId;
 	case LASTUPDATE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->lastUpdateLen;
-		return (uint8_t *) StorageTmp->lastUpdate;
+		return (u_char *) StorageTmp->lastUpdate;
 	case EVENTORDER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->eventOrderLen;
-		return (uint8_t *) StorageTmp->eventOrder;
+		return (u_char *) StorageTmp->eventOrder;
 	case STATUS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->status);
-		return (uint8_t *) &StorageTmp->status;
+		return (u_char *) &StorageTmp->status;
 	case CALLTYPE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->callType);
-		return (uint8_t *) &StorageTmp->callType;
+		return (u_char *) &StorageTmp->callType;
 	case CLNGPTYNBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->clngPtyNbrLen;
-		return (uint8_t *) StorageTmp->clngPtyNbr;
+		return (u_char *) StorageTmp->clngPtyNbr;
 	case CHARGENBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->chargeNbrLen;
-		return (uint8_t *) StorageTmp->chargeNbr;
+		return (u_char *) StorageTmp->chargeNbr;
 	case CLLDPTYNBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->clldPtyNbrLen;
-		return (uint8_t *) StorageTmp->clldPtyNbr;
+		return (u_char *) StorageTmp->clldPtyNbr;
 	case CLLDPTYNOA:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->clldPtyNoa);
-		return (uint8_t *) &StorageTmp->clldPtyNoa;
+		return (u_char *) &StorageTmp->clldPtyNoa;
 	case ORIGLNINFO:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->origLnInfoLen;
-		return (uint8_t *) StorageTmp->origLnInfo;
+		return (u_char *) StorageTmp->origLnInfo;
 	case INGLRN:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingLrnLen;
-		return (uint8_t *) StorageTmp->ingLrn;
+		return (u_char *) StorageTmp->ingLrn;
 	case INGCIC:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingCicLen;
-		return (uint8_t *) StorageTmp->ingCic;
+		return (u_char *) StorageTmp->ingCic;
 	case INGCSI:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingCsi);
-		return (uint8_t *) &StorageTmp->ingCsi;
+		return (u_char *) &StorageTmp->ingCsi;
 	case INGCCEID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingCceId);
-		return (uint8_t *) &StorageTmp->ingCceId;
+		return (u_char *) &StorageTmp->ingCceId;
 	case INGTGPROT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingTgProt);
-		return (uint8_t *) &StorageTmp->ingTgProt;
+		return (u_char *) &StorageTmp->ingTgProt;
 	case INGTGTYPE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingTgType);
-		return (uint8_t *) &StorageTmp->ingTgType;
+		return (u_char *) &StorageTmp->ingTgType;
 	case INGTGID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingTgId);
-		return (uint8_t *) &StorageTmp->ingTgId;
+		return (u_char *) &StorageTmp->ingTgId;
 	case INGCALLSTART:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingCallStartLen;
-		return (uint8_t *) StorageTmp->ingCallStart;
+		return (u_char *) StorageTmp->ingCallStart;
 	case INGGATEID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingGateId);
-		return (uint8_t *) &StorageTmp->ingGateId;
+		return (u_char *) &StorageTmp->ingGateId;
 	case INGCARDID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingCardId);
-		return (uint8_t *) &StorageTmp->ingCardId;
+		return (u_char *) &StorageTmp->ingCardId;
 	case INGSPANID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingSpanId);
-		return (uint8_t *) &StorageTmp->ingSpanId;
+		return (u_char *) &StorageTmp->ingSpanId;
 	case INGCHANID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingChanId);
-		return (uint8_t *) &StorageTmp->ingChanId;
+		return (u_char *) &StorageTmp->ingChanId;
 	case INGISDNDCHAN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingIsdnDChan);
-		return (uint8_t *) &StorageTmp->ingIsdnDChan;
+		return (u_char *) &StorageTmp->ingIsdnDChan;
 	case INGISDNCRN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingIsdnCrn);
-		return (uint8_t *) &StorageTmp->ingIsdnCrn;
+		return (u_char *) &StorageTmp->ingIsdnCrn;
 	case INGCREATCONNCPLT:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingCreatConnCpltLen;
-		return (uint8_t *) StorageTmp->ingCreatConnCplt;
+		return (u_char *) StorageTmp->ingCreatConnCplt;
 	case INGADDRCPLT:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingAddrCpltLen;
-		return (uint8_t *) StorageTmp->ingAddrCplt;
+		return (u_char *) StorageTmp->ingAddrCplt;
 	case INGCALLANS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingCallAnsLen;
-		return (uint8_t *) StorageTmp->ingCallAns;
+		return (u_char *) StorageTmp->ingCallAns;
 	case TRANSNBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->transNbrLen;
-		return (uint8_t *) StorageTmp->transNbr;
+		return (u_char *) StorageTmp->transNbr;
 	case TERMLRN:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->termLrnLen;
-		return (uint8_t *) StorageTmp->termLrn;
+		return (u_char *) StorageTmp->termLrn;
 	case TRANSCIC:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->transCicLen;
-		return (uint8_t *) StorageTmp->transCic;
+		return (u_char *) StorageTmp->transCic;
 	case INGCALLRLS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingCallRlsLen;
-		return (uint8_t *) StorageTmp->ingCallRls;
+		return (u_char *) StorageTmp->ingCallRls;
 	case INGRLSCAUSE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingRlsCause);
-		return (uint8_t *) &StorageTmp->ingRlsCause;
+		return (u_char *) &StorageTmp->ingRlsCause;
 	case EGRCCEID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrCceId);
-		return (uint8_t *) &StorageTmp->egrCceId;
+		return (u_char *) &StorageTmp->egrCceId;
 	case EGRTGPROT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrTgProt);
-		return (uint8_t *) &StorageTmp->egrTgProt;
+		return (u_char *) &StorageTmp->egrTgProt;
 	case EGRTGTYPE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrTgType);
-		return (uint8_t *) &StorageTmp->egrTgType;
+		return (u_char *) &StorageTmp->egrTgType;
 	case EGRTGID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrTgId);
-		return (uint8_t *) &StorageTmp->egrTgId;
+		return (u_char *) &StorageTmp->egrTgId;
 	case EGRCALLSTART:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrCallStartLen;
-		return (uint8_t *) StorageTmp->egrCallStart;
+		return (u_char *) StorageTmp->egrCallStart;
 	case EGRGATEID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrGateId);
-		return (uint8_t *) &StorageTmp->egrGateId;
+		return (u_char *) &StorageTmp->egrGateId;
 	case EGRCARDID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrCardId);
-		return (uint8_t *) &StorageTmp->egrCardId;
+		return (u_char *) &StorageTmp->egrCardId;
 	case EGRSPANID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrSpanId);
-		return (uint8_t *) &StorageTmp->egrSpanId;
+		return (u_char *) &StorageTmp->egrSpanId;
 	case EGRCHANID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrChanId);
-		return (uint8_t *) &StorageTmp->egrChanId;
+		return (u_char *) &StorageTmp->egrChanId;
 	case EGRISDNDCHAN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrIsdnDChan);
-		return (uint8_t *) &StorageTmp->egrIsdnDChan;
+		return (u_char *) &StorageTmp->egrIsdnDChan;
 	case EGRISDNCRN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrIsdnCrn);
-		return (uint8_t *) &StorageTmp->egrIsdnCrn;
+		return (u_char *) &StorageTmp->egrIsdnCrn;
 	case EGRCREATCONNCPLT:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrCreatConnCpltLen;
-		return (uint8_t *) StorageTmp->egrCreatConnCplt;
+		return (u_char *) StorageTmp->egrCreatConnCplt;
 	case EGRADDRCPLT:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrAddrCpltLen;
-		return (uint8_t *) StorageTmp->egrAddrCplt;
+		return (u_char *) StorageTmp->egrAddrCplt;
 	case EGRCALLANS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrCallAnsLen;
-		return (uint8_t *) StorageTmp->egrCallAns;
+		return (u_char *) StorageTmp->egrCallAns;
 	case EGRCALLRLS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrCallRlsLen;
-		return (uint8_t *) StorageTmp->egrCallRls;
+		return (u_char *) StorageTmp->egrCallRls;
 	case EGRRLSCAUSE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrRlsCause);
-		return (uint8_t *) &StorageTmp->egrRlsCause;
+		return (u_char *) &StorageTmp->egrRlsCause;
 	case CHKPTFIRST:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->chkptFirstLen;
-		return (uint8_t *) StorageTmp->chkptFirst;
+		return (u_char *) StorageTmp->chkptFirst;
 	case CHKPTLAST:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->chkptLastLen;
-		return (uint8_t *) StorageTmp->chkptLast;
+		return (u_char *) StorageTmp->chkptLast;
 	case INGGATENAME:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingGateNameLen;
-		return (uint8_t *) StorageTmp->ingGateName;
+		return (u_char *) StorageTmp->ingGateName;
 	case EGRGATENAME:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrGateNameLen;
-		return (uint8_t *) StorageTmp->egrGateName;
+		return (u_char *) StorageTmp->egrGateName;
 	case INGTGNAME:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingTgNameLen;
-		return (uint8_t *) StorageTmp->ingTgName;
+		return (u_char *) StorageTmp->ingTgName;
 	case EGRTGNAME:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrTgNameLen;
-		return (uint8_t *) StorageTmp->egrTgName;
+		return (u_char *) StorageTmp->egrTgName;
 	case ORIGGATEIP:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->origGateIpLen;
-		return (uint8_t *) StorageTmp->origGateIp;
+		return (u_char *) StorageTmp->origGateIp;
 	case TERMGATEIP:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->termGateIpLen;
-		return (uint8_t *) StorageTmp->termGateIp;
+		return (u_char *) StorageTmp->termGateIp;
 	case H323CONFID:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->h323ConfIdLen;
-		return (uint8_t *) StorageTmp->h323ConfId;
+		return (u_char *) StorageTmp->h323ConfId;
 	case INGCARDPORT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingCardPort);
-		return (uint8_t *) &StorageTmp->ingCardPort;
+		return (u_char *) &StorageTmp->ingCardPort;
 	case INGCARDPATH:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingCardPath);
-		return (uint8_t *) &StorageTmp->ingCardPath;
+		return (u_char *) &StorageTmp->ingCardPath;
 	case EGRCARDPORT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrCardPort);
-		return (uint8_t *) &StorageTmp->egrCardPort;
+		return (u_char *) &StorageTmp->egrCardPort;
 	case EGRCARDPATH:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrCardPath);
-		return (uint8_t *) &StorageTmp->egrCardPath;
+		return (u_char *) &StorageTmp->egrCardPath;
 	case INGTG:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingTg);
-		return (uint8_t *) &StorageTmp->ingTg;
+		return (u_char *) &StorageTmp->ingTg;
 	case EGRTG:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrTg);
-		return (uint8_t *) &StorageTmp->egrTg;
+		return (u_char *) &StorageTmp->egrTg;
 	case DIALEDNBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->dialedNbrLen;
-		return (uint8_t *) StorageTmp->dialedNbr;
+		return (u_char *) StorageTmp->dialedNbr;
 	case DIALEDNOA:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->dialedNoa);
-		return (uint8_t *) &StorageTmp->dialedNoa;
+		return (u_char *) &StorageTmp->dialedNoa;
 	case REDIRNBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->redirNbrLen;
-		return (uint8_t *) StorageTmp->redirNbr;
+		return (u_char *) StorageTmp->redirNbr;
 	case REDIRNOA:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->redirNoa);
-		return (uint8_t *) &StorageTmp->redirNoa;
+		return (u_char *) &StorageTmp->redirNoa;
 	case REDIRIND:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->redirInd);
-		return (uint8_t *) &StorageTmp->redirInd;
+		return (u_char *) &StorageTmp->redirInd;
 	case REDIRRSN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->redirRsn);
-		return (uint8_t *) &StorageTmp->redirRsn;
+		return (u_char *) &StorageTmp->redirRsn;
 	case CALLEDNBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->calledNbrLen;
-		return (uint8_t *) StorageTmp->calledNbr;
+		return (u_char *) StorageTmp->calledNbr;
 	case CALLEDNOA:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->calledNoa);
-		return (uint8_t *) &StorageTmp->calledNoa;
+		return (u_char *) &StorageTmp->calledNoa;
 	case REDIRRSNORIG:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->redirRsnOrig);
-		return (uint8_t *) &StorageTmp->redirRsnOrig;
+		return (u_char *) &StorageTmp->redirRsnOrig;
 	case REDIRCNTR:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->redirCntr);
-		return (uint8_t *) &StorageTmp->redirCntr;
+		return (u_char *) &StorageTmp->redirCntr;
 	case REDIRPRSNTNIND:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->redirPrsntnInd);
-		return (uint8_t *) &StorageTmp->redirPrsntnInd;
+		return (u_char *) &StorageTmp->redirPrsntnInd;
 	case INGJURIS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingJurisLen;
-		return (uint8_t *) StorageTmp->ingJuris;
+		return (u_char *) StorageTmp->ingJuris;
 	case EGRJURIS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrJurisLen;
-		return (uint8_t *) StorageTmp->egrJuris;
+		return (u_char *) StorageTmp->egrJuris;
 	case INGTRUNKBEARCAP:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingTrunkBearCap);
-		return (uint8_t *) &StorageTmp->ingTrunkBearCap;
+		return (u_char *) &StorageTmp->ingTrunkBearCap;
 	case EGRTRUNKBEARCAP:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrTrunkBearCap);
-		return (uint8_t *) &StorageTmp->egrTrunkBearCap;
+		return (u_char *) &StorageTmp->egrTrunkBearCap;
 	case TRANSNETSELCARR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->transNetSelCarrLen;
-		return (uint8_t *) StorageTmp->transNetSelCarr;
+		return (u_char *) StorageTmp->transNetSelCarr;
 	case CLNGPTYNOA:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->clngPtyNoa);
-		return (uint8_t *) &StorageTmp->clngPtyNoa;
+		return (u_char *) &StorageTmp->clngPtyNoa;
 	case INGRLSCAUSEINTRNL:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingRlsCauseIntrnlLen;
-		return (uint8_t *) StorageTmp->ingRlsCauseIntrnl;
+		return (u_char *) StorageTmp->ingRlsCauseIntrnl;
 	case EGRRLSCAUSEINTRNL:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrRlsCauseIntrnlLen;
-		return (uint8_t *) StorageTmp->egrRlsCauseIntrnl;
+		return (u_char *) StorageTmp->egrRlsCauseIntrnl;
 	case EGRCLLDNBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrClldNbrLen;
-		return (uint8_t *) StorageTmp->egrClldNbr;
+		return (u_char *) StorageTmp->egrClldNbr;
 	case EGRCLLDNOA:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrClldNoa);
-		return (uint8_t *) &StorageTmp->egrClldNoa;
+		return (u_char *) &StorageTmp->egrClldNoa;
 	case EGRCNNDNBR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrCnndNbrLen;
-		return (uint8_t *) StorageTmp->egrCnndNbr;
+		return (u_char *) StorageTmp->egrCnndNbr;
 	case EGRCNNDNOA:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrCnndNoa);
-		return (uint8_t *) &StorageTmp->egrCnndNoa;
+		return (u_char *) &StorageTmp->egrCnndNoa;
 	case CLNGPTYPRSNTNIND:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->clngPtyPrsntnInd);
-		return (uint8_t *) &StorageTmp->clngPtyPrsntnInd;
+		return (u_char *) &StorageTmp->clngPtyPrsntnInd;
 	case INGIRI:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingIri);
-		return (uint8_t *) &StorageTmp->ingIri;
+		return (u_char *) &StorageTmp->ingIri;
 	case EGRORI:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrOri);
-		return (uint8_t *) &StorageTmp->egrOri;
+		return (u_char *) &StorageTmp->egrOri;
 	case INGCALLIDEXTRNL:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingCallidExtrnlLen;
-		return (uint8_t *) StorageTmp->ingCallidExtrnl;
+		return (u_char *) StorageTmp->ingCallidExtrnl;
 	case EGRCALLIDEXTRNL:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrCallidExtrnlLen;
-		return (uint8_t *) StorageTmp->egrCallidExtrnl;
+		return (u_char *) StorageTmp->egrCallidExtrnl;
 	case INGCHARGEINFO:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingChargeInfoLen;
-		return (uint8_t *) StorageTmp->ingChargeInfo;
+		return (u_char *) StorageTmp->ingChargeInfo;
 	case EGRCHARGEINFO:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrChargeInfoLen;
-		return (uint8_t *) StorageTmp->egrChargeInfo;
+		return (u_char *) StorageTmp->egrChargeInfo;
 	case INGPRTLIND:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingPrtlIndLen;
-		return (uint8_t *) StorageTmp->ingPrtlInd;
+		return (u_char *) StorageTmp->ingPrtlInd;
 	case INGNATFWDCLIBLKIND:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingNatfwdCliblkInd);
-		return (uint8_t *) &StorageTmp->ingNatfwdCliblkInd;
+		return (u_char *) &StorageTmp->ingNatfwdCliblkInd;
 	case INGNATFWDNTAIND:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingNatfwdNtaInd);
-		return (uint8_t *) &StorageTmp->ingNatfwdNtaInd;
+		return (u_char *) &StorageTmp->ingNatfwdNtaInd;
 	case INGLASTDVRTLNDIGS:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingLastDvrtLnDigsLen;
-		return (uint8_t *) StorageTmp->ingLastDvrtLnDigs;
+		return (u_char *) StorageTmp->ingLastDvrtLnDigs;
 	case INGLASTDVRTLNNOA:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingLastDvrtLnNoa);
-		return (uint8_t *) &StorageTmp->ingLastDvrtLnNoa;
+		return (u_char *) &StorageTmp->ingLastDvrtLnNoa;
 	case J7INGADDLPTYCAT:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->j7IngAddlPtyCatLen;
-		return (uint8_t *) StorageTmp->j7IngAddlPtyCat;
+		return (u_char *) StorageTmp->j7IngAddlPtyCat;
 	case J7INGCHGAREAINFO:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->j7IngChgAreaInfoLen;
-		return (uint8_t *) StorageTmp->j7IngChgAreaInfo;
+		return (u_char *) StorageTmp->j7IngChgAreaInfo;
 	case J7INGFWDCALLIND:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->j7IngFwdCallIndLen;
-		return (uint8_t *) StorageTmp->j7IngFwdCallInd;
+		return (u_char *) StorageTmp->j7IngFwdCallInd;
 	case J7EGRADDLPTYCAT:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->j7EgrAddlPtyCatLen;
-		return (uint8_t *) StorageTmp->j7EgrAddlPtyCat;
+		return (u_char *) StorageTmp->j7EgrAddlPtyCat;
 	case J7EGRCHGAREAINFO:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->j7EgrChgAreaInfoLen;
-		return (uint8_t *) StorageTmp->j7EgrChgAreaInfo;
+		return (u_char *) StorageTmp->j7EgrChgAreaInfo;
 	case J7EGRBKWCALLIND:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->j7EgrBkwCallIndLen;
-		return (uint8_t *) StorageTmp->j7EgrBkwCallInd;
+		return (u_char *) StorageTmp->j7EgrBkwCallInd;
 	case J7CARRINFOXFER:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->j7CarrInfoXferLen;
-		return (uint8_t *) StorageTmp->j7CarrInfoXfer;
+		return (u_char *) StorageTmp->j7CarrInfoXfer;
 	case INGSS7GNRCPARM:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingSs7GnrcParmLen;
-		return (uint8_t *) StorageTmp->ingSs7GnrcParm;
+		return (u_char *) StorageTmp->ingSs7GnrcParm;
 	case EGRSS7GNRCPARM:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrSs7GnrcParmLen;
-		return (uint8_t *) StorageTmp->egrSs7GnrcParm;
+		return (u_char *) StorageTmp->egrSs7GnrcParm;
 	case INGPKTSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingPktsSent);
-		return (uint8_t *) &StorageTmp->ingPktsSent;
+		return (u_char *) &StorageTmp->ingPktsSent;
 	case INGPKTSRCVD:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingPktsRcvd);
-		return (uint8_t *) &StorageTmp->ingPktsRcvd;
+		return (u_char *) &StorageTmp->ingPktsRcvd;
 	case INGPKTSLOST:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingPktsLost);
-		return (uint8_t *) &StorageTmp->ingPktsLost;
+		return (u_char *) &StorageTmp->ingPktsLost;
 	case INGPKTSXFER:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingPktsXfer);
-		return (uint8_t *) &StorageTmp->ingPktsXfer;
+		return (u_char *) &StorageTmp->ingPktsXfer;
 	case INGJITTER:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingJitter);
-		return (uint8_t *) &StorageTmp->ingJitter;
+		return (u_char *) &StorageTmp->ingJitter;
 	case INGLTNCY:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingLtncy);
-		return (uint8_t *) &StorageTmp->ingLtncy;
+		return (u_char *) &StorageTmp->ingLtncy;
 	case EGRPKTSSENT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrPktsSent);
-		return (uint8_t *) &StorageTmp->egrPktsSent;
+		return (u_char *) &StorageTmp->egrPktsSent;
 	case EGRPKTSRCVD:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrPktsRcvd);
-		return (uint8_t *) &StorageTmp->egrPktsRcvd;
+		return (u_char *) &StorageTmp->egrPktsRcvd;
 	case EGRPKTSLOST:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrPktsLost);
-		return (uint8_t *) &StorageTmp->egrPktsLost;
+		return (u_char *) &StorageTmp->egrPktsLost;
 	case EGRPKTSXFER:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrPktsXfer);
-		return (uint8_t *) &StorageTmp->egrPktsXfer;
+		return (u_char *) &StorageTmp->egrPktsXfer;
 	case EGRJITTER:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrJitter);
-		return (uint8_t *) &StorageTmp->egrJitter;
+		return (u_char *) &StorageTmp->egrJitter;
 	case EGRLTNCY:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrLtncy);
-		return (uint8_t *) &StorageTmp->egrLtncy;
+		return (u_char *) &StorageTmp->egrLtncy;
 	case INGCRCTID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingCrctId);
-		return (uint8_t *) &StorageTmp->ingCrctId;
+		return (u_char *) &StorageTmp->ingCrctId;
 	case EGRCRCTID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrCrctId);
-		return (uint8_t *) &StorageTmp->egrCrctId;
+		return (u_char *) &StorageTmp->egrCrctId;
 	case INGCODEC:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingCodec);
-		return (uint8_t *) &StorageTmp->ingCodec;
+		return (u_char *) &StorageTmp->ingCodec;
 	case EGRCODEC:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrCodec);
-		return (uint8_t *) &StorageTmp->egrCodec;
+		return (u_char *) &StorageTmp->egrCodec;
 	case INGLOCGATEID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingLocGateId);
-		return (uint8_t *) &StorageTmp->ingLocGateId;
+		return (u_char *) &StorageTmp->ingLocGateId;
 	case EGRLOCGATEID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrLocGateId);
-		return (uint8_t *) &StorageTmp->egrLocGateId;
+		return (u_char *) &StorageTmp->egrLocGateId;
 	case INGCASCRCTSZR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingCasCrctSzrLen;
-		return (uint8_t *) StorageTmp->ingCasCrctSzr;
+		return (u_char *) StorageTmp->ingCasCrctSzr;
 	case EGRCASCRCTSZR:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrCasCrctSzrLen;
-		return (uint8_t *) StorageTmp->egrCasCrctSzr;
+		return (u_char *) StorageTmp->egrCasCrctSzr;
 	case INGZZ:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingZzLen;
-		return (uint8_t *) StorageTmp->ingZz;
+		return (u_char *) StorageTmp->ingZz;
 	case EGRZZ:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrZzLen;
-		return (uint8_t *) StorageTmp->egrZz;
+		return (u_char *) StorageTmp->egrZz;
 	case INGCTRYADDRTYPE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingCtryAddrTypeLen;
-		return (uint8_t *) StorageTmp->ingCtryAddrType;
+		return (u_char *) StorageTmp->ingCtryAddrType;
 	case EGRCTRYADDRTYPE:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrCtryAddrTypeLen;
-		return (uint8_t *) StorageTmp->egrCtryAddrType;
+		return (u_char *) StorageTmp->egrCtryAddrType;
 	case INGPARTITION:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingPartition);
-		return (uint8_t *) &StorageTmp->ingPartition;
+		return (u_char *) &StorageTmp->ingPartition;
 	case EGRPARTITION:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrPartition);
-		return (uint8_t *) &StorageTmp->egrPartition;
+		return (u_char *) &StorageTmp->egrPartition;
 	case INGCLNGPTYCAT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingClngPtyCat);
-		return (uint8_t *) &StorageTmp->ingClngPtyCat;
+		return (u_char *) &StorageTmp->ingClngPtyCat;
 	case INGRLSCAUSELCTN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingRlsCauseLctn);
-		return (uint8_t *) &StorageTmp->ingRlsCauseLctn;
+		return (u_char *) &StorageTmp->ingRlsCauseLctn;
 	case EGRRLSCAUSELCTN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrRlsCauseLctn);
-		return (uint8_t *) &StorageTmp->egrRlsCauseLctn;
+		return (u_char *) &StorageTmp->egrRlsCauseLctn;
 	case CLLDPTYCAT:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->clldPtyCat);
-		return (uint8_t *) &StorageTmp->clldPtyCat;
+		return (u_char *) &StorageTmp->clldPtyCat;
 	case CALLDURATION:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->callDuration);
-		return (uint8_t *) &StorageTmp->callDuration;
+		return (u_char *) &StorageTmp->callDuration;
 	case INGRLSDRCTN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingRlsDrctn);
-		return (uint8_t *) &StorageTmp->ingRlsDrctn;
+		return (u_char *) &StorageTmp->ingRlsDrctn;
 	case EGRRLSDRCTN:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrRlsDrctn);
-		return (uint8_t *) &StorageTmp->egrRlsDrctn;
+		return (u_char *) &StorageTmp->egrRlsDrctn;
 	case INGANSLCTIM:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->ingAnsLctimLen;
-		return (uint8_t *) StorageTmp->ingAnsLctim;
+		return (u_char *) StorageTmp->ingAnsLctim;
 	case EGRANSLCTIM:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->egrAnsLctimLen;
-		return (uint8_t *) StorageTmp->egrAnsLctim;
+		return (u_char *) StorageTmp->egrAnsLctim;
 	case INGHLCCHRSID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingHlcChrsId);
-		return (uint8_t *) &StorageTmp->ingHlcChrsId;
+		return (u_char *) &StorageTmp->ingHlcChrsId;
 	case EGRHLCCHRSID:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrHlcChrsId);
-		return (uint8_t *) &StorageTmp->egrHlcChrsId;
+		return (u_char *) &StorageTmp->egrHlcChrsId;
 	case INGLLCXFERCAP:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingLlcXferCap);
-		return (uint8_t *) &StorageTmp->ingLlcXferCap;
+		return (u_char *) &StorageTmp->ingLlcXferCap;
 	case EGRLLCXFERCAP:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrLlcXferCap);
-		return (uint8_t *) &StorageTmp->egrLlcXferCap;
+		return (u_char *) &StorageTmp->egrLlcXferCap;
 	case ROUTELIST:
 		*write_method = NULL;	/* read-only */
 		*var_len = StorageTmp->routeListLen;
-		return (uint8_t *) StorageTmp->routeList;
+		return (u_char *) StorageTmp->routeList;
 	case INGPOINTCODE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->ingPointCode);
-		return (uint8_t *) &StorageTmp->ingPointCode;
+		return (u_char *) &StorageTmp->ingPointCode;
 	case EGRPOINTCODE:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->egrPointCode);
-		return (uint8_t *) &StorageTmp->egrPointCode;
+		return (u_char *) &StorageTmp->egrPointCode;
 
 	default:
 		ERROR_MSG("");
@@ -4095,14 +4753,14 @@ var_callDetailLogRecordR2Table(struct variable *vp, oid * name, size_t *length, 
 }
 
 int
-write_creationTriggerList(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_creationTriggerList(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static char *tmpvar;
+	static uint8_t *old_value;
 	struct simpleUsageMeteringControlTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_creationTriggerList entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(simpleUsageMeteringControlTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4112,41 +4770,49 @@ write_creationTriggerList(int action, uint8_t *var_val, uint8_t var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to creationTriggerList not ASN_BIT_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > SPRINT_MAX_LEN) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to creationTriggerList: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->creationTriggerList;
-		tmplen = StorageTmp->creationTriggerListLen;
-		memdup((void *) &StorageTmp->creationTriggerList, var_val, var_val_len);
+		old_value = StorageTmp->creationTriggerList;
+		old_length = StorageTmp->creationTriggerListLen;
+		StorageTmp->creationTriggerList = string;
 		StorageTmp->creationTriggerListLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->creationTriggerList);
-		StorageTmp->creationTriggerList = tmpvar;
-		StorageTmp->creationTriggerListLen = tmplen;
+		StorageTmp->creationTriggerList = old_value;
+		StorageTmp->creationTriggerListLen = old_length;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(tmpvar);
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_samplingRate(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_samplingRate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long tmpvar;
+	static int32_t old_value;
 	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_samplingRate entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(configurableSimpleUsageMeteringControlTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4156,37 +4822,40 @@ write_samplingRate(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to samplingRate not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to samplingRate: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->samplingRate;
-		StorageTmp->samplingRate = *((long *) var_val);
+		old_value = StorageTmp->samplingRate;
+		StorageTmp->samplingRate = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->samplingRate = tmpvar;
+		StorageTmp->samplingRate = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_configurationMask(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_configurationMask(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static char *tmpvar;
+	static uint8_t *old_value;
 	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_configurationMask entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(configurableSimpleUsageMeteringControlTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4196,41 +4865,49 @@ write_configurationMask(int action, uint8_t *var_val, uint8_t var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurationMask not ASN_BIT_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > SPRINT_MAX_LEN) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurationMask: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->configurationMask;
-		tmplen = StorageTmp->configurationMaskLen;
-		memdup((void *) &StorageTmp->configurationMask, var_val, var_val_len);
+		old_value = StorageTmp->configurationMask;
+		old_length = StorageTmp->configurationMaskLen;
+		StorageTmp->configurationMask = string;
 		StorageTmp->configurationMaskLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->configurationMask);
-		StorageTmp->configurationMask = tmpvar;
-		StorageTmp->configurationMaskLen = tmplen;
+		StorageTmp->configurationMask = old_value;
+		StorageTmp->configurationMaskLen = old_length;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(tmpvar);
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_blockGeneratingLogMaxBlockSize(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_blockGeneratingLogMaxBlockSize(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long tmpvar;
+	static int32_t old_value;
 	struct blockGeneratingLogTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_blockGeneratingLogMaxBlockSize entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(blockGeneratingLogTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4240,37 +4917,44 @@ write_blockGeneratingLogMaxBlockSize(int action, uint8_t *var_val, uint8_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogMaxBlockSize not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogMaxBlockSize: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..32767 */
+		if ((0 > set_value || set_value > 32767)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogMaxBlockSize: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->blockGeneratingLogMaxBlockSize;
-		StorageTmp->blockGeneratingLogMaxBlockSize = *((long *) var_val);
+		old_value = StorageTmp->blockGeneratingLogMaxBlockSize;
+		StorageTmp->blockGeneratingLogMaxBlockSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->blockGeneratingLogMaxBlockSize = tmpvar;
+		StorageTmp->blockGeneratingLogMaxBlockSize = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_blockGeneratingLogMaxTimeInterval(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_blockGeneratingLogMaxTimeInterval(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long tmpvar;
+	static int32_t old_value;
 	struct blockGeneratingLogTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_blockGeneratingLogMaxTimeInterval entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(blockGeneratingLogTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4280,37 +4964,44 @@ write_blockGeneratingLogMaxTimeInterval(int action, uint8_t *var_val, uint8_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogMaxTimeInterval not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogMaxTimeInterval: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges 0..32767 */
+		if ((0 > set_value || set_value > 32767)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogMaxTimeInterval: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->blockGeneratingLogMaxTimeInterval;
-		StorageTmp->blockGeneratingLogMaxTimeInterval = *((long *) var_val);
+		old_value = StorageTmp->blockGeneratingLogMaxTimeInterval;
+		StorageTmp->blockGeneratingLogMaxTimeInterval = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->blockGeneratingLogMaxTimeInterval = tmpvar;
+		StorageTmp->blockGeneratingLogMaxTimeInterval = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_blockGeneratingLogStorageType(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_blockGeneratingLogStorageType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long tmpvar;
+	static int32_t old_value;
 	struct blockGeneratingLogTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_blockGeneratingLogStorageType entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(blockGeneratingLogTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4320,37 +5011,51 @@ write_blockGeneratingLogStorageType(int action, uint8_t *var_val, uint8_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogStorageType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogStorageType: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case BLOCKGENERATINGLOGSTORAGETYPE_OTHER:
+		case BLOCKGENERATINGLOGSTORAGETYPE_VOLATILE:
+		case BLOCKGENERATINGLOGSTORAGETYPE_NONVOLATILE:
+		case BLOCKGENERATINGLOGSTORAGETYPE_PERMANENT:
+		case BLOCKGENERATINGLOGSTORAGETYPE_READONLY:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogStorageType: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->blockGeneratingLogStorageType;
-		StorageTmp->blockGeneratingLogStorageType = *((long *) var_val);
+		old_value = StorageTmp->blockGeneratingLogStorageType;
+		StorageTmp->blockGeneratingLogStorageType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->blockGeneratingLogStorageType = tmpvar;
+		StorageTmp->blockGeneratingLogStorageType = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_timesOfDay(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_timesOfDay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static char *tmpvar;
+	static uint8_t *old_value;
 	struct fileGeneratingLogTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_timesOfDay entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(fileGeneratingLogTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4360,41 +5065,51 @@ write_timesOfDay(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to timesOfDay not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 0 && var_val_len != 2)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to timesOfDay: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value \"\" */
+		/* Note: ranges 0..0 2..2 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->timesOfDay;
-		tmplen = StorageTmp->timesOfDayLen;
-		memdup((void *) &StorageTmp->timesOfDay, var_val, var_val_len);
+		old_value = StorageTmp->timesOfDay;
+		old_length = StorageTmp->timesOfDayLen;
+		StorageTmp->timesOfDay = string;
 		StorageTmp->timesOfDayLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->timesOfDay);
-		StorageTmp->timesOfDay = tmpvar;
-		StorageTmp->timesOfDayLen = tmplen;
+		StorageTmp->timesOfDay = old_value;
+		StorageTmp->timesOfDayLen = old_length;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(tmpvar);
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_periodicTrigger(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_periodicTrigger(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long tmpvar;
+	static int32_t old_value;
 	struct fileGeneratingLogTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_periodicTrigger entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(fileGeneratingLogTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4404,37 +5119,45 @@ write_periodicTrigger(int action, uint8_t *var_val, uint8_t var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to periodicTrigger not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to periodicTrigger: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 0 */
+		/* Note: ranges 0..512 */
+		if ((0 > set_value || set_value > 512)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to periodicTrigger: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->periodicTrigger;
-		StorageTmp->periodicTrigger = *((long *) var_val);
+		old_value = StorageTmp->periodicTrigger;
+		StorageTmp->periodicTrigger = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->periodicTrigger = tmpvar;
+		StorageTmp->periodicTrigger = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_fileGeneratingLogStorageType(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_fileGeneratingLogStorageType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long tmpvar;
+	static int32_t old_value;
 	struct fileGeneratingLogTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_fileGeneratingLogStorageType entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(fileGeneratingLogTableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4444,37 +5167,52 @@ write_fileGeneratingLogStorageType(int action, uint8_t *var_val, uint8_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to fileGeneratingLogStorageType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to fileGeneratingLogStorageType: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value nonVolatile */
+		switch (set_value) {
+		case FILEGENERATINGLOGSTORAGETYPE_OTHER:
+		case FILEGENERATINGLOGSTORAGETYPE_VOLATILE:
+		case FILEGENERATINGLOGSTORAGETYPE_NONVOLATILE:
+		case FILEGENERATINGLOGSTORAGETYPE_PERMANENT:
+		case FILEGENERATINGLOGSTORAGETYPE_READONLY:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to fileGeneratingLogStorageType: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->fileGeneratingLogStorageType;
-		StorageTmp->fileGeneratingLogStorageType = *((long *) var_val);
+		old_value = StorageTmp->fileGeneratingLogStorageType;
+		StorageTmp->fileGeneratingLogStorageType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->fileGeneratingLogStorageType = tmpvar;
+		StorageTmp->fileGeneratingLogStorageType = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_configurationR2Mask(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_configurationR2Mask(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static char *tmpvar;
+	static uint8_t *old_value;
 	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_configurationR2Mask entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(configurableSimpleUsageMeteringControlR2TableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4484,41 +5222,49 @@ write_configurationR2Mask(int action, uint8_t *var_val, uint8_t var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurationR2Mask not ASN_BIT_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > SPRINT_MAX_LEN) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurationR2Mask: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->configurationR2Mask;
-		tmplen = StorageTmp->configurationR2MaskLen;
-		memdup((void *) &StorageTmp->configurationR2Mask, var_val, var_val_len);
+		old_value = StorageTmp->configurationR2Mask;
+		old_length = StorageTmp->configurationR2MaskLen;
+		StorageTmp->configurationR2Mask = string;
 		StorageTmp->configurationR2MaskLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->configurationR2Mask);
-		StorageTmp->configurationR2Mask = tmpvar;
-		StorageTmp->configurationR2MaskLen = tmplen;
+		StorageTmp->configurationR2Mask = old_value;
+		StorageTmp->configurationR2MaskLen = old_length;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(tmpvar);
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_blockGeneratingLogVersion(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_blockGeneratingLogVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long tmpvar;
+	static int32_t old_value;
 	struct blockGeneratingLogR2Table_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1);
+	long set_value = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("cdr2MIB", "write_blockGeneratingLogVersion entering action=%d...  \n", action));
 	if ((StorageTmp = header_complex(blockGeneratingLogR2TableStorage, NULL, &name[sizeof(cdr2MIB_variables_oid) / sizeof(oid) + 6 - 1], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4528,30 +5274,42 @@ write_blockGeneratingLogVersion(int action, uint8_t *var_val, uint8_t var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogVersion not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogVersion: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value version1 */
+		switch (set_value) {
+		case BLOCKGENERATINGLOGVERSION_VERSION1:
+		case BLOCKGENERATINGLOGVERSION_VERSION2:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogVersion: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in long_ret for you to use, and you
-				   have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in set_value for you to use, and
+				   you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		tmpvar = StorageTmp->blockGeneratingLogVersion;
-		StorageTmp->blockGeneratingLogVersion = *((long *) var_val);
+		old_value = StorageTmp->blockGeneratingLogVersion;
+		StorageTmp->blockGeneratingLogVersion = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->blockGeneratingLogVersion = tmpvar;
+		StorageTmp->blockGeneratingLogVersion = old_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_simpleUsageMeteringControlEntryStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_simpleUsageMeteringControlEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct simpleUsageMeteringControlTable_data *StorageTmp = NULL;
 	static struct simpleUsageMeteringControlTable_data *StorageNew, *StorageDel;
@@ -4573,100 +5331,153 @@ write_simpleUsageMeteringControlEntryStatus(int action, uint8_t *var_val, uint8_
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->simpleUsageMeteringControlTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->simpleUsageMeteringControlTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* controlObjectId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* controlObjectId 
+												 */
 
 			if (header_complex_parse_oid(&(name[sizeof(simpleUsageMeteringControlTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(simpleUsageMeteringControlTable_data);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(simpleUsageMeteringControlTable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
 			memdup((void *) &StorageNew->controlObjectId, vp->val.string, vp->val_len);
 			StorageNew->controlObjectIdLen = vp->val_len;
 			vp = vp->next_variable;
 
 			/* XXX: fill in default row values here into StorageNew */
 
-			StorageNew->simpleUsageMeteringControlEntryStatus = set_value;
+			StorageNew->simpleUsageMeteringControlEntryStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			simpleUsageMeteringControlTable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been
+		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				simpleUsageMeteringControlTable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			simpleUsageMeteringControlTable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->simpleUsageMeteringControlEntryStatus;
-			StorageTmp->simpleUsageMeteringControlEntryStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(simpleUsageMeteringControlTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&simpleUsageMeteringControlTableStorage, hciptr);
+			StorageTmp->simpleUsageMeteringControlEntryStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(simpleUsageMeteringControlTableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&simpleUsageMeteringControlTableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(simpleUsageMeteringControlTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&simpleUsageMeteringControlTableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(simpleUsageMeteringControlTableStorage, StorageNew);
+			header_complex_extract_entry(&simpleUsageMeteringControlTableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->simpleUsageMeteringControlEntryStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			simpleUsageMeteringControlTable_add(StorageDel);
-		} else {
-			StorageTmp->simpleUsageMeteringControlEntryStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->simpleUsageMeteringControlEntryStatus == RS_CREATEANDGO) {
-				StorageTmp->simpleUsageMeteringControlEntryStatus = RS_ACTIVE;
-			} else if (StorageTmp && StorageTmp->simpleUsageMeteringControlEntryStatus == RS_CREATEANDWAIT) {
-				StorageTmp->simpleUsageMeteringControlEntryStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->simpleUsageMeteringControlEntryStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->simpleUsageMeteringControlEntryStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			simpleUsageMeteringControlTable_del(&StorageDel);
+			/* simpleUsageMeteringControlTable_del() can handle NULL pointers. */
+			break;
 		}
 		break;
 	}
@@ -4674,7 +5485,7 @@ write_simpleUsageMeteringControlEntryStatus(int action, uint8_t *var_val, uint8_
 }
 
 int
-write_configurationRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_configurationRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL;
 	static struct configurableSimpleUsageMeteringControlTable_data *StorageNew, *StorageDel;
@@ -4698,100 +5509,154 @@ write_configurationRowStatus(int action, uint8_t *var_val, uint8_t var_val_type,
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->configurationRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->configurableSimpleUsageMeteringControlTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->configurableSimpleUsageMeteringControlTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* controlObjectId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* controlObjectId 
+												 */
 
 			if (header_complex_parse_oid(&(name[sizeof(configurableSimpleUsageMeteringControlTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(configurableSimpleUsageMeteringControlTable_data);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(configurableSimpleUsageMeteringControlTable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
 			memdup((void *) &StorageNew->controlObjectId, vp->val.string, vp->val_len);
 			StorageNew->controlObjectIdLen = vp->val_len;
 			vp = vp->next_variable;
 
 			/* XXX: fill in default row values here into StorageNew */
 
-			StorageNew->configurationRowStatus = set_value;
+			StorageNew->configurationRowStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			configurableSimpleUsageMeteringControlTable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been
+		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				configurableSimpleUsageMeteringControlTable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			configurableSimpleUsageMeteringControlTable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->configurationRowStatus;
-			StorageTmp->configurationRowStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(configurableSimpleUsageMeteringControlTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&configurableSimpleUsageMeteringControlTableStorage, hciptr);
+			StorageTmp->configurationRowStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(configurableSimpleUsageMeteringControlTableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&configurableSimpleUsageMeteringControlTableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(configurableSimpleUsageMeteringControlTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&configurableSimpleUsageMeteringControlTableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(configurableSimpleUsageMeteringControlTableStorage, StorageNew);
+			header_complex_extract_entry(&configurableSimpleUsageMeteringControlTableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->configurationRowStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			configurableSimpleUsageMeteringControlTable_add(StorageDel);
-		} else {
-			StorageTmp->configurationRowStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->configurationRowStatus == RS_CREATEANDGO) {
-				StorageTmp->configurationRowStatus = RS_ACTIVE;
-			} else if (StorageTmp && StorageTmp->configurationRowStatus == RS_CREATEANDWAIT) {
-				StorageTmp->configurationRowStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->configurationRowStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->configurationRowStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			configurableSimpleUsageMeteringControlTable_del(&StorageDel);
+			/* configurableSimpleUsageMeteringControlTable_del() can handle NULL
+			   pointers. */
+			break;
 		}
 		break;
 	}
@@ -4799,7 +5664,7 @@ write_configurationRowStatus(int action, uint8_t *var_val, uint8_t var_val_type,
 }
 
 int
-write_blockGeneratingLogRowStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_blockGeneratingLogRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct blockGeneratingLogTable_data *StorageTmp = NULL;
 	static struct blockGeneratingLogTable_data *StorageNew, *StorageDel;
@@ -4821,100 +5686,153 @@ write_blockGeneratingLogRowStatus(int action, uint8_t *var_val, uint8_t var_val_
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->blockGeneratingLogRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->blockGeneratingLogTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->blockGeneratingLogTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* logId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* logId 
+												 */
 
 			if (header_complex_parse_oid(&(name[sizeof(blockGeneratingLogTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(blockGeneratingLogTable_data);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(blockGeneratingLogTable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
 			memdup((void *) &StorageNew->logId, vp->val.string, vp->val_len);
 			StorageNew->logIdLen = vp->val_len;
 			vp = vp->next_variable;
 
 			/* XXX: fill in default row values here into StorageNew */
 
-			StorageNew->blockGeneratingLogRowStatus = set_value;
+			StorageNew->blockGeneratingLogRowStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			blockGeneratingLogTable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been
+		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				blockGeneratingLogTable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			blockGeneratingLogTable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->blockGeneratingLogRowStatus;
-			StorageTmp->blockGeneratingLogRowStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(blockGeneratingLogTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&blockGeneratingLogTableStorage, hciptr);
+			StorageTmp->blockGeneratingLogRowStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(blockGeneratingLogTableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&blockGeneratingLogTableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(blockGeneratingLogTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&blockGeneratingLogTableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(blockGeneratingLogTableStorage, StorageNew);
+			header_complex_extract_entry(&blockGeneratingLogTableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->blockGeneratingLogRowStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			blockGeneratingLogTable_add(StorageDel);
-		} else {
-			StorageTmp->blockGeneratingLogRowStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->blockGeneratingLogRowStatus == RS_CREATEANDGO) {
-				StorageTmp->blockGeneratingLogRowStatus = RS_ACTIVE;
-			} else if (StorageTmp && StorageTmp->blockGeneratingLogRowStatus == RS_CREATEANDWAIT) {
-				StorageTmp->blockGeneratingLogRowStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->blockGeneratingLogRowStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->blockGeneratingLogRowStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			blockGeneratingLogTable_del(&StorageDel);
+			/* blockGeneratingLogTable_del() can handle NULL pointers. */
+			break;
 		}
 		break;
 	}
@@ -4922,7 +5840,7 @@ write_blockGeneratingLogRowStatus(int action, uint8_t *var_val, uint8_t var_val_
 }
 
 int
-write_fileGeneratingLogEntryStatus(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_fileGeneratingLogEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct fileGeneratingLogTable_data *StorageTmp = NULL;
 	static struct fileGeneratingLogTable_data *StorageNew, *StorageDel;
@@ -4944,41 +5862,60 @@ write_fileGeneratingLogEntryStatus(int action, uint8_t *var_val, uint8_t var_val
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->fileGeneratingLogEntryStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->fileGeneratingLogTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->fileGeneratingLogTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* logId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* logId 
+												 */
 
 			if (header_complex_parse_oid(&(name[sizeof(fileGeneratingLogTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(fileGeneratingLogTable_data);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(fileGeneratingLogTable_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
 			memdup((void *) &StorageNew->logId, vp->val.string, vp->val_len);
 			StorageNew->logIdLen = vp->val_len;
 			vp = vp->next_variable;
@@ -4988,59 +5925,93 @@ write_fileGeneratingLogEntryStatus(int action, uint8_t *var_val, uint8_t var_val
 			StorageNew->timesOfDayLen = strlen("\"\"");
 			StorageNew->fileGeneratingLogStorageType = nonVolatile;
 
-			StorageNew->fileGeneratingLogEntryStatus = set_value;
+			StorageNew->fileGeneratingLogEntryStatus = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			fileGeneratingLogTable_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been
+		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				fileGeneratingLogTable_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			fileGeneratingLogTable_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->fileGeneratingLogEntryStatus;
-			StorageTmp->fileGeneratingLogEntryStatus = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(fileGeneratingLogTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&fileGeneratingLogTableStorage, hciptr);
+			StorageTmp->fileGeneratingLogEntryStatus = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(fileGeneratingLogTableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&fileGeneratingLogTableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(fileGeneratingLogTableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&fileGeneratingLogTableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(fileGeneratingLogTableStorage, StorageNew);
+			header_complex_extract_entry(&fileGeneratingLogTableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->fileGeneratingLogEntryStatus = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			fileGeneratingLogTable_add(StorageDel);
-		} else {
-			StorageTmp->fileGeneratingLogEntryStatus = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->fileGeneratingLogEntryStatus == RS_CREATEANDGO) {
-				StorageTmp->fileGeneratingLogEntryStatus = RS_ACTIVE;
-			} else if (StorageTmp && StorageTmp->fileGeneratingLogEntryStatus == RS_CREATEANDWAIT) {
-				StorageTmp->fileGeneratingLogEntryStatus = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->fileGeneratingLogEntryStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->fileGeneratingLogEntryStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			fileGeneratingLogTable_del(&StorageDel);
+			/* fileGeneratingLogTable_del() can handle NULL pointers. */
+			break;
 		}
 		break;
 	}
@@ -5048,7 +6019,7 @@ write_fileGeneratingLogEntryStatus(int action, uint8_t *var_val, uint8_t var_val
 }
 
 int
-write_configurationR2Status(int action, uint8_t *var_val, uint8_t var_val_type, size_t var_val_len, uint8_t *statP, oid * name, size_t name_len)
+write_configurationR2Status(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp = NULL;
 	static struct configurableSimpleUsageMeteringControlR2Table_data *StorageNew, *StorageDel;
@@ -5072,100 +6043,154 @@ write_configurationR2Status(int action, uint8_t *var_val, uint8_t var_val_type, 
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
-		if (StorageTmp == NULL) {
-			/* create the row now? */
-			/* ditch illegal values now */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE)
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			/* destroying a non-existent row is actually legal */
-			if (set_value == RS_DESTROY) {
-				return SNMP_ERR_NOERROR;
-			}
-			/* illegal creation values */
-			if (set_value == RS_ACTIVE || set_value == RS_NOTINSERVICE) {
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
-		} else {
-			/* row exists.  Check for a valid state change */
-			if (set_value == RS_CREATEANDGO || set_value == RS_CREATEANDWAIT) {
-				/* can't create a row that exists */
+			if (StorageTmp->configurationR2Status == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			}
 			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->configurableSimpleUsageMeteringControlR2Table_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->configurableSimpleUsageMeteringControlR2Table_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
 	case RESERVE2:
 		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* controlObjectId */
+			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);	/* controlObjectId 
+												 */
 
 			if (header_complex_parse_oid(&(name[sizeof(configurableSimpleUsageMeteringControlR2Table_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			StorageNew = SNMP_MALLOC_STRUCT(configurableSimpleUsageMeteringControlR2Table_data);
+			if ((StorageNew = SNMP_MALLOC_STRUCT(configurableSimpleUsageMeteringControlR2Table_data)) == NULL) {
+				/* XXX: free, zero vars */
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
 			memdup((void *) &StorageNew->controlObjectId, vp->val.string, vp->val_len);
 			StorageNew->controlObjectIdLen = vp->val_len;
 			vp = vp->next_variable;
 
 			/* XXX: fill in default row values here into StorageNew */
 
-			StorageNew->configurationR2Status = set_value;
+			StorageNew->configurationR2Status = RS_NOTREADY;
 			/* XXX: free, zero vars, no longer needed? */
+			break;
 		}
 		break;
 	case FREE:
-		/* XXX: free, zero vars */
 		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			configurableSimpleUsageMeteringControlR2Table_del(&StorageNew);
+			/* XXX: free, zero vars */
+			break;
+		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been
+		/* The variable has been stored in set_value for you to use, and you have just been 
 		   asked to do something with it.  Note that anything done here must be reversable
 		   in the UNDO case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so add it */
-			if (StorageNew != NULL)
-				configurableSimpleUsageMeteringControlR2Table_add(StorageNew);
-			/* XXX: ack, and if it is NULL? */
-		} else if (set_value != RS_DESTROY) {
+			configurableSimpleUsageMeteringControlR2Table_add(StorageNew);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
 			/* set the flag? */
 			old_value = StorageTmp->configurationR2Status;
-			StorageTmp->configurationR2Status = *((int *) var_val);
-		} else {
-			/* destroy...  extract it for now */
-			hciptr = header_complex_find_entry(configurableSimpleUsageMeteringControlR2TableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&configurableSimpleUsageMeteringControlR2TableStorage, hciptr);
+			StorageTmp->configurationR2Status = set_value;
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				hciptr = header_complex_find_entry(configurableSimpleUsageMeteringControlR2TableStorage, StorageTmp);
+				StorageDel = header_complex_extract_entry(&configurableSimpleUsageMeteringControlR2TableStorage, hciptr);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
-		if (StorageTmp == NULL) {
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
 			/* row creation, so remove it again */
-			hciptr = header_complex_find_entry(configurableSimpleUsageMeteringControlR2TableStorage, StorageTmp);
-			StorageDel = header_complex_extract_entry(&configurableSimpleUsageMeteringControlR2TableStorage, hciptr);
-			/* XXX: free it */
-		} else if (StorageDel != NULL) {
+			hciptr = header_complex_find_entry(configurableSimpleUsageMeteringControlR2TableStorage, StorageNew);
+			header_complex_extract_entry(&configurableSimpleUsageMeteringControlR2TableStorage, hciptr);
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->configurationR2Status = old_value;
+			break;
+		case RS_DESTROY:
 			/* row deletion, so add it again */
 			configurableSimpleUsageMeteringControlR2Table_add(StorageDel);
-		} else {
-			StorageTmp->configurationR2Status = old_value;
+			break;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
-		if (StorageDel != NULL) {
-			StorageDel = 0;
-			/* XXX: free it, its dead */
-		} else {
-			if (StorageTmp && StorageTmp->configurationR2Status == RS_CREATEANDGO) {
-				StorageTmp->configurationR2Status = RS_ACTIVE;
-			} else if (StorageTmp && StorageTmp->configurationR2Status == RS_CREATEANDWAIT) {
-				StorageTmp->configurationR2Status = RS_NOTINSERVICE;
-			}
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->configurationR2Status = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
+			StorageTmp->configurationR2Status = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			configurableSimpleUsageMeteringControlR2Table_del(&StorageDel);
+			/* configurableSimpleUsageMeteringControlR2Table_del() can handle NULL
+			   pointers. */
+			break;
 		}
 		break;
 	}
@@ -5371,7 +6396,7 @@ static int sa_int_signal = 0;
 static int sa_trm_signal = 0;
 static int sa_alm_handle = 0;
 void
-sa_alm_callback(unsigned int req, void *arg)
+sa_alm_callback(uint req, void *arg)
 {
 	if (req == sa_alm_handle)
 		sa_alm_handle = 0;
@@ -5386,7 +6411,7 @@ sa_alm_handler(int signum)
 	return (RETSIGTYPE) (0);
 }
 static void
-sa_snmp_alm_handler(unsigned int reg, void *clientarg)
+sa_snmp_alm_handler(uint reg, void *clientarg)
 {
 	sa_alm_signal = 1;
 	return;
@@ -5404,7 +6429,7 @@ sa_alm_block(void)
 	if (sa_alarms)
 		return sa_sig_register(SIGALRM, NULL);
 	if (sa_alm_handle) {
-		unsigned int handle = sa_alm_handle;
+		uint handle = sa_alm_handle;
 
 		sa_alm_handle = 0;
 		snmp_alarm_unregister(handle);

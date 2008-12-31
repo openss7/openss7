@@ -43,8 +43,7 @@ struct variable7 lapbMIB_simple_variables[] = {
 #define   LAPBDLEOPERATIONALSTATE  5
 	{LAPBDLEOPERATIONALSTATE, ASN_INTEGER, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 3}},
 #define   LAPBDLEPROVIDERENTITYNAMES  6
-	{LAPBDLEPROVIDERENTITYNAMES, ASN_OBJECT_ID, RWRITE, var_lAPBDLETable, 6,
-	 {1, 1, 1, 1, 1, 4}},
+	{LAPBDLEPROVIDERENTITYNAMES, ASN_OBJECT_ID, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 4}},
 #define   LAPBDLEMT1TIMER       7
 	{LAPBDLEMT1TIMER, ASN_INTEGER, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 5}},
 #define   LAPBDLEMT3TIMER       8
@@ -68,11 +67,9 @@ struct variable7 lapbMIB_simple_variables[] = {
 #define   LAPBDLEMLPFRAMESSENT  17
 	{LAPBDLEMLPFRAMESSENT, ASN_COUNTER, RONLY, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 15}},
 #define   LAPBDLEMLPFRAMESOUTSIDEWINDOWGUARD  18
-	{LAPBDLEMLPFRAMESOUTSIDEWINDOWGUARD, ASN_COUNTER, RONLY, var_lAPBDLETable, 6,
-	 {1, 1, 1, 1, 1, 16}},
+	{LAPBDLEMLPFRAMESOUTSIDEWINDOWGUARD, ASN_COUNTER, RONLY, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 16}},
 #define   LAPBDLERECEIVEDMLPFRAMESINGUARDREGION  19
-	{LAPBDLERECEIVEDMLPFRAMESINGUARDREGION, ASN_COUNTER, RONLY, var_lAPBDLETable, 6,
-	 {1, 1, 1, 1, 1, 17}},
+	{LAPBDLERECEIVEDMLPFRAMESINGUARDREGION, ASN_COUNTER, RONLY, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 17}},
 #define   LAPBDLEROWSTATUS      20
 	{LAPBDLEROWSTATUS, ASN_INTEGER, RWRITE, var_lAPBDLETable, 6, {1, 1, 1, 1, 1, 18}},
 #define   DLSAPSAP1ADDRESS      25
@@ -88,14 +85,11 @@ struct variable7 lapbMIB_simple_variables[] = {
 #define   SLPPMROWSTATUS        34
 	{SLPPMROWSTATUS, ASN_INTEGER, RWRITE, var_sLPPMTable, 6, {1, 1, 3, 1, 1, 4}},
 #define   SLPCONNECTIONUNDERLYINGCONNECTIONNAMES  38
-	{SLPCONNECTIONUNDERLYINGCONNECTIONNAMES, ASN_OBJECT_ID, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 2}},
+	{SLPCONNECTIONUNDERLYINGCONNECTIONNAMES, ASN_OBJECT_ID, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 2}},
 #define   SLPCONNECTIONSUPPORTEDCONNECTIONNAMES  39
-	{SLPCONNECTIONSUPPORTEDCONNECTIONNAMES, ASN_OBJECT_ID, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 3}},
+	{SLPCONNECTIONSUPPORTEDCONNECTIONNAMES, ASN_OBJECT_ID, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 3}},
 #define   SLPCONNECTIONINTERFACETYPE  40
-	{SLPCONNECTIONINTERFACETYPE, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 4}},
+	{SLPCONNECTIONINTERFACETYPE, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 4}},
 #define   SLPCONNECTIONK        41
 	{SLPCONNECTIONK, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 5}},
 #define   SLPCONNECTIONN1       42
@@ -103,134 +97,95 @@ struct variable7 lapbMIB_simple_variables[] = {
 #define   SLPCONNECTIONN2       43
 	{SLPCONNECTIONN2, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 7}},
 #define   SLPCONNECTIONSEQUENCEMODULUS  44
-	{SLPCONNECTIONSEQUENCEMODULUS, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 8}},
+	{SLPCONNECTIONSEQUENCEMODULUS, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 8}},
 #define   SLPCONNECTIONT1TIMER  45
 	{SLPCONNECTIONT1TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 9}},
 #define   SLPCONNECTIONT2TIMER  46
 	{SLPCONNECTIONT2TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 10}},
 #define   SLPCONNECTIONFCSERRORSRECEIVED  47
-	{SLPCONNECTIONFCSERRORSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 11}},
+	{SLPCONNECTIONFCSERRORSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 11}},
 #define   SLPCONNECTIONFRMRSRECEIVED  48
-	{SLPCONNECTIONFRMRSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 12}},
+	{SLPCONNECTIONFRMRSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 12}},
 #define   SLPCONNECTIONFRMRSSENT  49
-	{SLPCONNECTIONFRMRSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 13}},
+	{SLPCONNECTIONFRMRSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 13}},
 #define   SLPCONNECTIONIFRAMEDATAOCTETSRECEIVED  50
-	{SLPCONNECTIONIFRAMEDATAOCTETSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 14}},
+	{SLPCONNECTIONIFRAMEDATAOCTETSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 14}},
 #define   SLPCONNECTIONIFRAMEDATAOCTETSSENT  51
-	{SLPCONNECTIONIFRAMEDATAOCTETSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 15}},
+	{SLPCONNECTIONIFRAMEDATAOCTETSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 15}},
 #define   SLPCONNECTIONIFRAMESRECEIVED  52
-	{SLPCONNECTIONIFRAMESRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 16}},
+	{SLPCONNECTIONIFRAMESRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 16}},
 #define   SLPCONNECTIONIFRAMESSENT  53
-	{SLPCONNECTIONIFRAMESSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 17}},
+	{SLPCONNECTIONIFRAMESSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 17}},
 #define   SLPCONNECTIONPOLLSRECEIVED  54
-	{SLPCONNECTIONPOLLSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 18}},
+	{SLPCONNECTIONPOLLSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 18}},
 #define   SLPCONNECTIONREJSRECEIVED  55
-	{SLPCONNECTIONREJSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 19}},
+	{SLPCONNECTIONREJSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 19}},
 #define   SLPCONNECTIONREJSSENT  56
 	{SLPCONNECTIONREJSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 20}},
 #define   SLPCONNECTIONRNRSRECEIVED  57
-	{SLPCONNECTIONRNRSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 21}},
+	{SLPCONNECTIONRNRSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 21}},
 #define   SLPCONNECTIONRNRSSENT  58
 	{SLPCONNECTIONRNRSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 22}},
 #define   SLPCONNECTIONSABMSRECEIVED  59
-	{SLPCONNECTIONSABMSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 23}},
+	{SLPCONNECTIONSABMSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 23}},
 #define   SLPCONNECTIONSABMSSENT  60
-	{SLPCONNECTIONSABMSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 24}},
+	{SLPCONNECTIONSABMSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 24}},
 #define   SLPCONNECTIONPROTOCOLSTATE  61
-	{SLPCONNECTIONPROTOCOLSTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 25}},
+	{SLPCONNECTIONPROTOCOLSTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 25}},
 #define   SLPCONNECTIONTIMEST1EXPIRED  62
-	{SLPCONNECTIONTIMEST1EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 26}},
+	{SLPCONNECTIONTIMEST1EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 26}},
 #define   SLPCONNECTIONT3TIMER  63
 	{SLPCONNECTIONT3TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 27}},
 #define   SLPCONNECTIONTIMEST3EXPIRED  64
-	{SLPCONNECTIONTIMEST3EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 28}},
+	{SLPCONNECTIONTIMEST3EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 28}},
 #define   SLPCONNECTIONT4TIMER  65
 	{SLPCONNECTIONT4TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 29}},
 #define   SLPCONNECTIONTIMEST4EXPIRED  66
-	{SLPCONNECTIONTIMEST4EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 30}},
+	{SLPCONNECTIONTIMEST4EXPIRED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 30}},
 #define   SLPCONNECTIONABNORMALLINKDISCONNECTSRECEIVED  67
-	{SLPCONNECTIONABNORMALLINKDISCONNECTSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable,
-	 6, {1, 1, 4, 1, 1, 31}},
+	{SLPCONNECTIONABNORMALLINKDISCONNECTSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 31}},
 #define   SLPCONNECTIONABNORMALLINKDISCONNECTSSENT  68
-	{SLPCONNECTIONABNORMALLINKDISCONNECTSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 32}},
+	{SLPCONNECTIONABNORMALLINKDISCONNECTSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 32}},
 #define   SLPCONNECTIONLINKRESETSRECEIVED  69
-	{SLPCONNECTIONLINKRESETSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 33}},
+	{SLPCONNECTIONLINKRESETSRECEIVED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 33}},
 #define   SLPCONNECTIONLINKRESETSSENT  70
-	{SLPCONNECTIONLINKRESETSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 34}},
+	{SLPCONNECTIONLINKRESETSSENT, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 34}},
 #define   SLPCONNECTIONTIMESN2REACHED  71
-	{SLPCONNECTIONTIMESN2REACHED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 35}},
+	{SLPCONNECTIONTIMESN2REACHED, ASN_COUNTER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 35}},
 #define   SLPCONNECTIONADMINISTRATIVESTATE  72
-	{SLPCONNECTIONADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 36}},
+	{SLPCONNECTIONADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 36}},
 #define   SLPCONNECTIONOPERATIONALSTATE  73
-	{SLPCONNECTIONOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 37}},
+	{SLPCONNECTIONOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 37}},
 #define   SLPCONNECTIONUSAGESTATE  74
-	{SLPCONNECTIONUSAGESTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 38}},
+	{SLPCONNECTIONUSAGESTATE, ASN_INTEGER, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 38}},
 #define   SLPCONNECTIONPROCEDURALSTATUS  75
-	{SLPCONNECTIONPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 39}},
+	{SLPCONNECTIONPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 39}},
 #define   SLPCONNECTIONALARMSTATUS  76
-	{SLPCONNECTIONALARMSTATUS, ASN_BIT_STR, RONLY, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 40}},
+	{SLPCONNECTIONALARMSTATUS, ASN_BIT_STR, RONLY, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 40}},
 #define   SLPCONNECTIONROWSTATUS  77
-	{SLPCONNECTIONROWSTATUS, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6,
-	 {1, 1, 4, 1, 1, 41}},
+	{SLPCONNECTIONROWSTATUS, ASN_INTEGER, RWRITE, var_sLPConnectionTable, 6, {1, 1, 4, 1, 1, 41}},
 #define   SLPCONNECTIONIVMOID   81
-	{SLPCONNECTIONIVMOID, ASN_OCTET_STR, RONLY, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 1}},
+	{SLPCONNECTIONIVMOID, ASN_OCTET_STR, RONLY, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 1}},
 #define   SLPCONNECTIONIVMOINTERFACETYPE  82
-	{SLPCONNECTIONIVMOINTERFACETYPE, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 2}},
+	{SLPCONNECTIONIVMOINTERFACETYPE, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 2}},
 #define   SLPCONNECTIONIVMOK    83
-	{SLPCONNECTIONIVMOK, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 3}},
+	{SLPCONNECTIONIVMOK, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 3}},
 #define   SLPCONNECTIONIVMON1   84
-	{SLPCONNECTIONIVMON1, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 4}},
+	{SLPCONNECTIONIVMON1, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 4}},
 #define   SLPCONNECTIONIVMON2   85
-	{SLPCONNECTIONIVMON2, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 5}},
+	{SLPCONNECTIONIVMON2, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 5}},
 #define   SLPCONNECTIONIVMOSEQUENCEMODULUS  86
-	{SLPCONNECTIONIVMOSEQUENCEMODULUS, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 6}},
+	{SLPCONNECTIONIVMOSEQUENCEMODULUS, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 6}},
 #define   SLPCONNECTIONIVMOT1TIMER  87
-	{SLPCONNECTIONIVMOT1TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 7}},
+	{SLPCONNECTIONIVMOT1TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 7}},
 #define   SLPCONNECTIONIVMOT2TIMER  88
-	{SLPCONNECTIONIVMOT2TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 8}},
+	{SLPCONNECTIONIVMOT2TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 8}},
 #define   SLPCONNECTIONIVMOT3TIMER  89
-	{SLPCONNECTIONIVMOT3TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 9}},
+	{SLPCONNECTIONIVMOT3TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 9}},
 #define   SLPCONNECTIONIVMOT4TIMER  90
-	{SLPCONNECTIONIVMOT4TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 10}},
+	{SLPCONNECTIONIVMOT4TIMER, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 10}},
 #define   SLPCONNECTIONIVMOROWSTATUS  91
-	{SLPCONNECTIONIVMOROWSTATUS, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6,
-	 {1, 1, 5, 1, 1, 11}},
+	{SLPCONNECTIONIVMOROWSTATUS, ASN_INTEGER, RWRITE, var_sLPConnectionIVMOTable, 6, {1, 1, 5, 1, 1, 11}},
 #define   LAPBDISCONTINUITYTIME  92
 	{LAPBDISCONTINUITYTIME, ASN_TIMETICKS, RONLY, var_lapbMIB, 4, {1, 2, 1, 1}},
 #define   SLPCONNECTIONDEFAULTINTERFACETYPE  93
@@ -251,7 +206,6 @@ struct variable7 lapbMIB_simple_variables[] = {
 	{SLPCONNECTIONDEFAULTT3TIMER, ASN_INTEGER, RWRITE, var_lapbMIB, 5, {1, 2, 2, 1, 8}},
 #define   SLPCONNECTIONDEFAULTT4TIMER  101
 	{SLPCONNECTIONDEFAULTT4TIMER, ASN_INTEGER, RWRITE, var_lapbMIB, 5, {1, 2, 2, 1, 9}},
-
 };
 
 /*    (L = length of the oidsuffix) */
@@ -266,8 +220,7 @@ init_lapbMIB_simple(void)
 {
 
 	/* register ourselves with the agent to handle our mib tree */
-	REGISTER_MIB("lapbMIB_simple", lapbMIB_simple_variables, variable7,
-		     lapbMIB_simple_variables_oid);
+	REGISTER_MIB("lapbMIB_simple", lapbMIB_simple_variables, variable7, lapbMIB_simple_variables_oid);
 
 	/* place any other initialization junk you need here */
 }
@@ -285,8 +238,7 @@ init_lapbMIB_simple(void)
  *   and mibII directories.
  */
 unsigned char *
-var_lapbMIB_simple(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-		   WriteMethod ** write_method)
+var_lapbMIB_simple(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 
 	/* variables we may use later */
@@ -317,8 +269,7 @@ var_lapbMIB_simple(struct variable *vp, oid * name, size_t *length, int exact, s
  *   The workings of this are basically the same as for var_lapbMIB_simple above.
  */
 unsigned char *
-var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-		 WriteMethod ** write_method)
+var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 
 	/* variables we may use later */
@@ -353,84 +304,68 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case LAPBDLEOPERATIONALSTATE:
 		*write_method = write_lAPBDLEoperationalState;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEPROVIDERENTITYNAMES:
 		*write_method = write_lAPBDLEproviderEntityNames;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case LAPBDLEMT1TIMER:
 		*write_method = write_lAPBDLEmT1Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEMT3TIMER:
 		*write_method = write_lAPBDLEmT3Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEMW:
 		*write_method = write_lAPBDLEmW;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEMXSEND:
 		*write_method = write_lAPBDLEmXSend;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEMXRECEIVE:
 		*write_method = write_lAPBDLEmXReceive;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEMT2TIMER:
 		*write_method = write_lAPBDLEmT2Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLERECEIVEDMLPRESETS:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLETIMESMT1EXPIRED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEIFRAMESREASSIGNMENTS:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEMLPFRAMESRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEMLPFRAMESSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEMLPFRAMESOUTSIDEWINDOWGUARD:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLERECEIVEDMLPFRAMESINGUARDREGION:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case LAPBDLEROWSTATUS:
 		*write_method = write_lAPBDLERowStatus;
 		long_ret = 0;
@@ -448,8 +383,7 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
  *   The workings of this are basically the same as for var_lapbMIB_simple above.
  */
 unsigned char *
-var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-	       WriteMethod ** write_method)
+var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 
 	/* variables we may use later */
@@ -482,14 +416,12 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case DLSAPUSERENTITYNAMES:
 
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case DLSAPROWSTATUS:
 		*write_method = write_dLSAPRowStatus;
 		long_ret = 0;
@@ -507,8 +439,7 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
  *   The workings of this are basically the same as for var_lapbMIB_simple above.
  */
 unsigned char *
-var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-	       WriteMethod ** write_method)
+var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 
 	/* variables we may use later */
@@ -541,12 +472,10 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPPMADMINISTRATIVESTATE:
 		*write_method = write_sLPPMadministrativeState;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPPMROWSTATUS:
 		*write_method = write_sLPPMRowStatus;
 		long_ret = 0;
@@ -564,8 +493,7 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
  *   The workings of this are basically the same as for var_lapbMIB_simple above.
  */
 unsigned char *
-var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
-		       WriteMethod ** write_method)
+var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 
 	/* variables we may use later */
@@ -600,201 +528,162 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case SLPCONNECTIONSUPPORTEDCONNECTIONNAMES:
 		*write_method = write_sLPConnectionSupportedConnectionNames;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case SLPCONNECTIONINTERFACETYPE:
 		*write_method = write_sLPConnectionInterfaceType;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONK:
 		*write_method = write_sLPConnectionK;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONN1:
 		*write_method = write_sLPConnectionN1;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONN2:
 		*write_method = write_sLPConnectionN2;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONSEQUENCEMODULUS:
 		*write_method = write_sLPConnectionSequenceModulus;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONT1TIMER:
 		*write_method = write_sLPConnectionT1Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONT2TIMER:
 		*write_method = write_sLPConnectionT2Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONFCSERRORSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONFRMRSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONFRMRSSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIFRAMEDATAOCTETSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIFRAMEDATAOCTETSSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIFRAMESRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIFRAMESSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONPOLLSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONREJSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONREJSSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONRNRSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONRNRSSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONSABMSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONSABMSSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONPROTOCOLSTATE:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONTIMEST1EXPIRED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONT3TIMER:
 		*write_method = write_sLPConnectionT3Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONTIMEST3EXPIRED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONT4TIMER:
 		*write_method = write_sLPConnectionT4Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONTIMEST4EXPIRED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONABNORMALLINKDISCONNECTSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONABNORMALLINKDISCONNECTSSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONLINKRESETSRECEIVED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONLINKRESETSSENT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONTIMESN2REACHED:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONADMINISTRATIVESTATE:
 		*write_method = write_sLPConnectionAdministrativeState;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONOPERATIONALSTATE:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONUSAGESTATE:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONPROCEDURALSTATUS:
 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case SLPCONNECTIONALARMSTATUS:
 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case SLPCONNECTIONROWSTATUS:
 		*write_method = write_sLPConnectionRowStatus;
 		long_ret = 0;
@@ -812,8 +701,7 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
  *   The workings of this are basically the same as for var_lapbMIB_simple above.
  */
 unsigned char *
-var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int exact,
-			   size_t *var_len, WriteMethod ** write_method)
+var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 
 	/* variables we may use later */
@@ -847,52 +735,42 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case SLPCONNECTIONIVMOINTERFACETYPE:
 		*write_method = write_sLPConnectionIVMOinterfaceType;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMOK:
 		*write_method = write_sLPConnectionIVMOk;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMON1:
 		*write_method = write_sLPConnectionIVMOn1;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMON2:
 		*write_method = write_sLPConnectionIVMOn2;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMOSEQUENCEMODULUS:
 		*write_method = write_sLPConnectionIVMOsequenceModulus;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMOT1TIMER:
 		*write_method = write_sLPConnectionIVMOt1Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMOT2TIMER:
 		*write_method = write_sLPConnectionIVMOt2Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMOT3TIMER:
 		*write_method = write_sLPConnectionIVMOt3Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMOT4TIMER:
 		*write_method = write_sLPConnectionIVMOt4Timer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case SLPCONNECTIONIVMOROWSTATUS:
 		*write_method = write_sLPConnectionIVMORowStatus;
 		long_ret = 0;
@@ -905,8 +783,7 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 int
-write_lAPBDLElocalSapNames(int action, unsigned char *var_val, unsigned char var_val_type,
-			   size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLElocalSapNames(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static oid *objid;
 	int size;
@@ -952,8 +829,7 @@ write_lAPBDLElocalSapNames(int action, unsigned char *var_val, unsigned char var
 }
 
 int
-write_lAPBDLEoperationalState(int action, unsigned char *var_val, unsigned char var_val_type,
-			      size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLEoperationalState(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -999,9 +875,7 @@ write_lAPBDLEoperationalState(int action, unsigned char *var_val, unsigned char 
 }
 
 int
-write_lAPBDLEproviderEntityNames(int action, unsigned char *var_val, unsigned char var_val_type,
-				 size_t var_val_len, unsigned char *statP, oid * name,
-				 size_t name_len)
+write_lAPBDLEproviderEntityNames(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static oid *objid;
 	int size;
@@ -1047,8 +921,7 @@ write_lAPBDLEproviderEntityNames(int action, unsigned char *var_val, unsigned ch
 }
 
 int
-write_lAPBDLEmT1Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-		      size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLEmT1Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1094,8 +967,7 @@ write_lAPBDLEmT1Timer(int action, unsigned char *var_val, unsigned char var_val_
 }
 
 int
-write_lAPBDLEmT3Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-		      size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLEmT3Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1141,8 +1013,7 @@ write_lAPBDLEmT3Timer(int action, unsigned char *var_val, unsigned char var_val_
 }
 
 int
-write_lAPBDLEmW(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len,
-		unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLEmW(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1188,8 +1059,7 @@ write_lAPBDLEmW(int action, unsigned char *var_val, unsigned char var_val_type, 
 }
 
 int
-write_lAPBDLEmXSend(int action, unsigned char *var_val, unsigned char var_val_type,
-		    size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLEmXSend(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1235,8 +1105,7 @@ write_lAPBDLEmXSend(int action, unsigned char *var_val, unsigned char var_val_ty
 }
 
 int
-write_lAPBDLEmXReceive(int action, unsigned char *var_val, unsigned char var_val_type,
-		       size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLEmXReceive(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1282,8 +1151,7 @@ write_lAPBDLEmXReceive(int action, unsigned char *var_val, unsigned char var_val
 }
 
 int
-write_lAPBDLEmT2Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-		      size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLEmT2Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1329,8 +1197,7 @@ write_lAPBDLEmT2Timer(int action, unsigned char *var_val, unsigned char var_val_
 }
 
 int
-write_lAPBDLERowStatus(int action, unsigned char *var_val, unsigned char var_val_type,
-		       size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_lAPBDLERowStatus(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1376,8 +1243,7 @@ write_lAPBDLERowStatus(int action, unsigned char *var_val, unsigned char var_val
 }
 
 int
-write_dLSAPRowStatus(int action, unsigned char *var_val, unsigned char var_val_type,
-		     size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_dLSAPRowStatus(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1423,9 +1289,7 @@ write_dLSAPRowStatus(int action, unsigned char *var_val, unsigned char var_val_t
 }
 
 int
-write_sLPPMadministrativeState(int action, unsigned char *var_val, unsigned char var_val_type,
-			       size_t var_val_len, unsigned char *statP, oid * name,
-			       size_t name_len)
+write_sLPPMadministrativeState(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1471,8 +1335,7 @@ write_sLPPMadministrativeState(int action, unsigned char *var_val, unsigned char
 }
 
 int
-write_sLPPMRowStatus(int action, unsigned char *var_val, unsigned char var_val_type,
-		     size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPPMRowStatus(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1518,9 +1381,7 @@ write_sLPPMRowStatus(int action, unsigned char *var_val, unsigned char var_val_t
 }
 
 int
-write_sLPConnectionUnderlyingConnectionNames(int action, unsigned char *var_val,
-					     unsigned char var_val_type, size_t var_val_len,
-					     unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionUnderlyingConnectionNames(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static oid *objid;
 	int size;
@@ -1528,13 +1389,11 @@ write_sLPConnectionUnderlyingConnectionNames(int action, unsigned char *var_val,
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_OBJECT_ID) {
-			fprintf(stderr,
-				"write to sLPConnectionUnderlyingConnectionNames not ASN_OBJECT_ID\n");
+			fprintf(stderr, "write to sLPConnectionUnderlyingConnectionNames not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(objid)) {
-			fprintf(stderr,
-				"write to sLPConnectionUnderlyingConnectionNames: bad length\n");
+			fprintf(stderr, "write to sLPConnectionUnderlyingConnectionNames: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -1568,9 +1427,7 @@ write_sLPConnectionUnderlyingConnectionNames(int action, unsigned char *var_val,
 }
 
 int
-write_sLPConnectionSupportedConnectionNames(int action, unsigned char *var_val,
-					    unsigned char var_val_type, size_t var_val_len,
-					    unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionSupportedConnectionNames(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static oid *objid;
 	int size;
@@ -1578,13 +1435,11 @@ write_sLPConnectionSupportedConnectionNames(int action, unsigned char *var_val,
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_OBJECT_ID) {
-			fprintf(stderr,
-				"write to sLPConnectionSupportedConnectionNames not ASN_OBJECT_ID\n");
+			fprintf(stderr, "write to sLPConnectionSupportedConnectionNames not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(objid)) {
-			fprintf(stderr,
-				"write to sLPConnectionSupportedConnectionNames: bad length\n");
+			fprintf(stderr, "write to sLPConnectionSupportedConnectionNames: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -1618,9 +1473,7 @@ write_sLPConnectionSupportedConnectionNames(int action, unsigned char *var_val,
 }
 
 int
-write_sLPConnectionInterfaceType(int action, unsigned char *var_val, unsigned char var_val_type,
-				 size_t var_val_len, unsigned char *statP, oid * name,
-				 size_t name_len)
+write_sLPConnectionInterfaceType(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1666,8 +1519,7 @@ write_sLPConnectionInterfaceType(int action, unsigned char *var_val, unsigned ch
 }
 
 int
-write_sLPConnectionK(int action, unsigned char *var_val, unsigned char var_val_type,
-		     size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionK(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1713,8 +1565,7 @@ write_sLPConnectionK(int action, unsigned char *var_val, unsigned char var_val_t
 }
 
 int
-write_sLPConnectionN1(int action, unsigned char *var_val, unsigned char var_val_type,
-		      size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionN1(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1760,8 +1611,7 @@ write_sLPConnectionN1(int action, unsigned char *var_val, unsigned char var_val_
 }
 
 int
-write_sLPConnectionN2(int action, unsigned char *var_val, unsigned char var_val_type,
-		      size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionN2(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1807,9 +1657,7 @@ write_sLPConnectionN2(int action, unsigned char *var_val, unsigned char var_val_
 }
 
 int
-write_sLPConnectionSequenceModulus(int action, unsigned char *var_val, unsigned char var_val_type,
-				   size_t var_val_len, unsigned char *statP, oid * name,
-				   size_t name_len)
+write_sLPConnectionSequenceModulus(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1855,8 +1703,7 @@ write_sLPConnectionSequenceModulus(int action, unsigned char *var_val, unsigned 
 }
 
 int
-write_sLPConnectionT1Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-			   size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionT1Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1902,8 +1749,7 @@ write_sLPConnectionT1Timer(int action, unsigned char *var_val, unsigned char var
 }
 
 int
-write_sLPConnectionT2Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-			   size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionT2Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1949,8 +1795,7 @@ write_sLPConnectionT2Timer(int action, unsigned char *var_val, unsigned char var
 }
 
 int
-write_sLPConnectionT3Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-			   size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionT3Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1996,8 +1841,7 @@ write_sLPConnectionT3Timer(int action, unsigned char *var_val, unsigned char var
 }
 
 int
-write_sLPConnectionT4Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-			   size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionT4Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2043,9 +1887,7 @@ write_sLPConnectionT4Timer(int action, unsigned char *var_val, unsigned char var
 }
 
 int
-write_sLPConnectionAdministrativeState(int action, unsigned char *var_val,
-				       unsigned char var_val_type, size_t var_val_len,
-				       unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionAdministrativeState(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2053,8 +1895,7 @@ write_sLPConnectionAdministrativeState(int action, unsigned char *var_val,
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr,
-				"write to sLPConnectionAdministrativeState not ASN_INTEGER\n");
+			fprintf(stderr, "write to sLPConnectionAdministrativeState not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(long_ret)) {
@@ -2092,8 +1933,7 @@ write_sLPConnectionAdministrativeState(int action, unsigned char *var_val,
 }
 
 int
-write_sLPConnectionRowStatus(int action, unsigned char *var_val, unsigned char var_val_type,
-			     size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionRowStatus(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2139,9 +1979,7 @@ write_sLPConnectionRowStatus(int action, unsigned char *var_val, unsigned char v
 }
 
 int
-write_sLPConnectionIVMOinterfaceType(int action, unsigned char *var_val, unsigned char var_val_type,
-				     size_t var_val_len, unsigned char *statP, oid * name,
-				     size_t name_len)
+write_sLPConnectionIVMOinterfaceType(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2149,8 +1987,7 @@ write_sLPConnectionIVMOinterfaceType(int action, unsigned char *var_val, unsigne
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr,
-				"write to sLPConnectionIVMOinterfaceType not ASN_INTEGER\n");
+			fprintf(stderr, "write to sLPConnectionIVMOinterfaceType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(long_ret)) {
@@ -2188,8 +2025,7 @@ write_sLPConnectionIVMOinterfaceType(int action, unsigned char *var_val, unsigne
 }
 
 int
-write_sLPConnectionIVMOk(int action, unsigned char *var_val, unsigned char var_val_type,
-			 size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOk(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2235,8 +2071,7 @@ write_sLPConnectionIVMOk(int action, unsigned char *var_val, unsigned char var_v
 }
 
 int
-write_sLPConnectionIVMOn1(int action, unsigned char *var_val, unsigned char var_val_type,
-			  size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOn1(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2282,8 +2117,7 @@ write_sLPConnectionIVMOn1(int action, unsigned char *var_val, unsigned char var_
 }
 
 int
-write_sLPConnectionIVMOn2(int action, unsigned char *var_val, unsigned char var_val_type,
-			  size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOn2(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2329,9 +2163,7 @@ write_sLPConnectionIVMOn2(int action, unsigned char *var_val, unsigned char var_
 }
 
 int
-write_sLPConnectionIVMOsequenceModulus(int action, unsigned char *var_val,
-				       unsigned char var_val_type, size_t var_val_len,
-				       unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionIVMOsequenceModulus(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2339,8 +2171,7 @@ write_sLPConnectionIVMOsequenceModulus(int action, unsigned char *var_val,
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr,
-				"write to sLPConnectionIVMOsequenceModulus not ASN_INTEGER\n");
+			fprintf(stderr, "write to sLPConnectionIVMOsequenceModulus not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(long_ret)) {
@@ -2378,9 +2209,7 @@ write_sLPConnectionIVMOsequenceModulus(int action, unsigned char *var_val,
 }
 
 int
-write_sLPConnectionIVMOt1Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-			       size_t var_val_len, unsigned char *statP, oid * name,
-			       size_t name_len)
+write_sLPConnectionIVMOt1Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2426,9 +2255,7 @@ write_sLPConnectionIVMOt1Timer(int action, unsigned char *var_val, unsigned char
 }
 
 int
-write_sLPConnectionIVMOt2Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-			       size_t var_val_len, unsigned char *statP, oid * name,
-			       size_t name_len)
+write_sLPConnectionIVMOt2Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2474,9 +2301,7 @@ write_sLPConnectionIVMOt2Timer(int action, unsigned char *var_val, unsigned char
 }
 
 int
-write_sLPConnectionIVMOt3Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-			       size_t var_val_len, unsigned char *statP, oid * name,
-			       size_t name_len)
+write_sLPConnectionIVMOt3Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2522,9 +2347,7 @@ write_sLPConnectionIVMOt3Timer(int action, unsigned char *var_val, unsigned char
 }
 
 int
-write_sLPConnectionIVMOt4Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-			       size_t var_val_len, unsigned char *statP, oid * name,
-			       size_t name_len)
+write_sLPConnectionIVMOt4Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2570,9 +2393,7 @@ write_sLPConnectionIVMOt4Timer(int action, unsigned char *var_val, unsigned char
 }
 
 int
-write_sLPConnectionIVMORowStatus(int action, unsigned char *var_val, unsigned char var_val_type,
-				 size_t var_val_len, unsigned char *statP, oid * name,
-				 size_t name_len)
+write_sLPConnectionIVMORowStatus(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2618,9 +2439,7 @@ write_sLPConnectionIVMORowStatus(int action, unsigned char *var_val, unsigned ch
 }
 
 int
-write_sLPConnectionDefaultInterfaceType(int action, unsigned char *var_val,
-					unsigned char var_val_type, size_t var_val_len,
-					unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultInterfaceType(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2628,8 +2447,7 @@ write_sLPConnectionDefaultInterfaceType(int action, unsigned char *var_val,
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr,
-				"write to sLPConnectionDefaultInterfaceType not ASN_INTEGER\n");
+			fprintf(stderr, "write to sLPConnectionDefaultInterfaceType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(long_ret)) {
@@ -2667,8 +2485,7 @@ write_sLPConnectionDefaultInterfaceType(int action, unsigned char *var_val,
 }
 
 int
-write_sLPConnectionDefaultK(int action, unsigned char *var_val, unsigned char var_val_type,
-			    size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultK(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2714,8 +2531,7 @@ write_sLPConnectionDefaultK(int action, unsigned char *var_val, unsigned char va
 }
 
 int
-write_sLPConnectionDefaultN1(int action, unsigned char *var_val, unsigned char var_val_type,
-			     size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultN1(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2761,8 +2577,7 @@ write_sLPConnectionDefaultN1(int action, unsigned char *var_val, unsigned char v
 }
 
 int
-write_sLPConnectionDefaultN2(int action, unsigned char *var_val, unsigned char var_val_type,
-			     size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultN2(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2808,9 +2623,7 @@ write_sLPConnectionDefaultN2(int action, unsigned char *var_val, unsigned char v
 }
 
 int
-write_sLPConnectionDefaultSequenceModulus(int action, unsigned char *var_val,
-					  unsigned char var_val_type, size_t var_val_len,
-					  unsigned char *statP, oid * name, size_t name_len)
+write_sLPConnectionDefaultSequenceModulus(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2818,13 +2631,11 @@ write_sLPConnectionDefaultSequenceModulus(int action, unsigned char *var_val,
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr,
-				"write to sLPConnectionDefaultSequenceModulus not ASN_INTEGER\n");
+			fprintf(stderr, "write to sLPConnectionDefaultSequenceModulus not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(long_ret)) {
-			fprintf(stderr,
-				"write to sLPConnectionDefaultSequenceModulus: bad length\n");
+			fprintf(stderr, "write to sLPConnectionDefaultSequenceModulus: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -2858,9 +2669,7 @@ write_sLPConnectionDefaultSequenceModulus(int action, unsigned char *var_val,
 }
 
 int
-write_sLPConnectionDefaultT1Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-				  size_t var_val_len, unsigned char *statP, oid * name,
-				  size_t name_len)
+write_sLPConnectionDefaultT1Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2906,9 +2715,7 @@ write_sLPConnectionDefaultT1Timer(int action, unsigned char *var_val, unsigned c
 }
 
 int
-write_sLPConnectionDefaultT2Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-				  size_t var_val_len, unsigned char *statP, oid * name,
-				  size_t name_len)
+write_sLPConnectionDefaultT2Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2954,9 +2761,7 @@ write_sLPConnectionDefaultT2Timer(int action, unsigned char *var_val, unsigned c
 }
 
 int
-write_sLPConnectionDefaultT3Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-				  size_t var_val_len, unsigned char *statP, oid * name,
-				  size_t name_len)
+write_sLPConnectionDefaultT3Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -3002,9 +2807,7 @@ write_sLPConnectionDefaultT3Timer(int action, unsigned char *var_val, unsigned c
 }
 
 int
-write_sLPConnectionDefaultT4Timer(int action, unsigned char *var_val, unsigned char var_val_type,
-				  size_t var_val_len, unsigned char *statP, oid * name,
-				  size_t name_len)
+write_sLPConnectionDefaultT4Timer(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
