@@ -2,7 +2,7 @@
 #!/usr/bin/perl -W
 # =============================================================================
 # 
-# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-20 13:00:02 $
+# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-31 16:04:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-20 13:00:02 $ by $Author: brian $
+# Last Modified $Date: 2008-12-31 16:04:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -91,9 +91,9 @@ $\ = "\n";
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-20 13:00:02 $';
-my $version = '$Revision: 0.9.2.5 $';
-my $date = '$Date: 2008-12-20 13:00:02 $';
+my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-31 16:04:52 $';
+my $version = '$Revision: 0.9.2.6 $';
+my $date = '$Date: 2008-12-31 16:04:52 $';
 my $title = 'OpenSS7 Network Manager';
 
 my $Title = <<EOF;
@@ -2592,6 +2592,7 @@ OPENSS7-SS7-OM-MIB
 OPENSS7-X400P-MIB
 OPENSS7-M2PA-MIB
 OPENSS7-SL-MUX-MIB
+OPENSS7-SL-MIB
 OPENSS7-MTP-MIB
 OPENSS7-MTP-OM-MIB
 OPENSS7-CLNS-MIB
@@ -3026,6 +3027,9 @@ exit;
 # =============================================================================
 #
 # $Log: mibbrowser,v $
+# Revision 0.9.2.6  2008-12-31 16:04:52  brian
+# - updated mibs
+#
 # Revision 0.9.2.5  2008-12-20 13:00:02  brian
 # - working changes
 #

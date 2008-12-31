@@ -7,7 +7,6 @@
 /* our storage structure(s) */
 struct llcMIB_data {
 	uint llcMIB_request;
-
 	int32_t llcDiscontinuityTime;
 	int32_t lLCConnection2DefaultMaximumRetransmissions;
 	int32_t lLCConnection2DefaultReceivedWindowSize;
@@ -16,7 +15,7 @@ struct llcMIB_data {
 	int32_t lLCConnection2DefaultBusyStateTimeoutValue;
 	int32_t lLCConnection2DefaultPBitTimeoutValue;
 	int32_t lLCConnection2DefaultRejectTimeoutValue;
-	char *lLCConnection2DefaultRoute;
+	uint8_t *lLCConnection2DefaultRoute;
 	int lLCConnection2DefaultRouteLen;
 	int32_t lLCConnection2DefaultKStep;
 	int32_t lLCConnection2DefaultMaxSendWindowSize;
@@ -26,7 +25,8 @@ struct llcMIB_data {
 };
 struct mACDLETable_data {
 	uint mACDLETable_request;
-	char *mACDLECommunicationsEntityId;
+	uint mACDLETable_refs;
+	uint8_t *mACDLECommunicationsEntityId;
 	int mACDLECommunicationsEntityIdLen;
 	oid *mACDLELocalSapNames;
 	int mACDLELocalSapNamesLen;
@@ -37,33 +37,36 @@ struct mACDLETable_data {
 };
 struct mACTable_data {
 	uint mACTable_request;
-	char *mACDLECommunicationsEntityId;
+	uint mACTable_refs;
+	uint8_t *mACDLECommunicationsEntityId;
 	int mACDLECommunicationsEntityIdLen;
 	int32_t mACOperationalState;
-	char *mACId;
+	uint8_t *mACId;
 	int mACIdLen;
 	int32_t mACRowStatus;
 };
 struct resourceTypeIdTable_data {
 	uint resourceTypeIdTable_request;
-	char *mACDLECommunicationsEntityId;
+	uint resourceTypeIdTable_refs;
+	uint8_t *mACDLECommunicationsEntityId;
 	int mACDLECommunicationsEntityIdLen;
-	char *resourceTypeIdName;
+	uint8_t *resourceTypeIdName;
 	int resourceTypeIdNameLen;
-	char *resourceInfoManufacturerOUI;
+	uint8_t *resourceInfoManufacturerOUI;
 	int resourceInfoManufacturerOUILen;
-	char *resourceInfoManufacturerName;
+	uint8_t *resourceInfoManufacturerName;
 	int resourceInfoManufacturerNameLen;
-	char *resourceInfoManufacturerProductName;
+	uint8_t *resourceInfoManufacturerProductName;
 	int resourceInfoManufacturerProductNameLen;
-	char *resourceInfoManufacturerProductVersion;
+	uint8_t *resourceInfoManufacturerProductVersion;
 	int resourceInfoManufacturerProductVersionLen;
 };
 struct dLSAPTable_data {
 	uint dLSAPTable_request;
-	char *mACDLECommunicationsEntityId;
+	uint dLSAPTable_refs;
+	uint8_t *mACDLECommunicationsEntityId;
 	int mACDLECommunicationsEntityIdLen;
-	char *dLSAPSapId;
+	uint8_t *dLSAPSapId;
 	int dLSAPSapIdLen;
 	int32_t dLSAPSap1Address;
 	oid *dLSAPUserEntityNames;
@@ -72,7 +75,8 @@ struct dLSAPTable_data {
 };
 struct lLCDLETable_data {
 	uint lLCDLETable_request;
-	char *lLCDLECommunicationsEntityId;
+	uint lLCDLETable_refs;
+	uint8_t *lLCDLECommunicationsEntityId;
 	int lLCDLECommunicationsEntityIdLen;
 	oid *lLCDLELocalSapNames;
 	int lLCDLELocalSapNamesLen;
@@ -83,15 +87,16 @@ struct lLCDLETable_data {
 };
 struct lLCStationTable_data {
 	uint lLCStationTable_request;
-	char *lLCDLECommunicationsEntityId;
+	uint lLCStationTable_refs;
+	uint8_t *lLCDLECommunicationsEntityId;
 	int lLCDLECommunicationsEntityIdLen;
-	char *dLSAPSapId;
+	uint8_t *dLSAPSapId;
 	int dLSAPSapIdLen;
-	char *lLCStationLLCName;
+	uint8_t *lLCStationLLCName;
 	int lLCStationLLCNameLen;
 	int32_t lLCStationMaximumLSAPsConfigured;
 	int32_t lLCStationNumberOfActiveLSAPs;
-	char *lLCStationSupportedServicesTypes;
+	uint8_t *lLCStationSupportedServicesTypes;
 	int lLCStationSupportedServicesTypesLen;
 	int32_t lLCStationStatus;
 	int32_t lLCStationType1AcknowledgeTimeoutValue;
@@ -108,28 +113,30 @@ struct lLCStationTable_data {
 	int32_t lLCStationMaxBufferUseSize;
 	int32_t lLCStationInactiveLSAP;
 	int32_t lLCStationPDUsDiscard;
-	char *lLCStationSTRIndicator;
+	uint8_t *lLCStationSTRIndicator;
 	int lLCStationSTRIndicatorLen;
 	int32_t lLCStationVersionNumber;
 	int32_t lLCStationType1AcknowledgmentTimerTimeouts;
 };
 struct lLCSAPTable_data {
 	uint lLCSAPTable_request;
-	char *lLCDLECommunicationsEntityId;
+	uint lLCSAPTable_refs;
+	uint8_t *lLCDLECommunicationsEntityId;
 	int lLCDLECommunicationsEntityIdLen;
-	char *dLSAPSapId;
+	uint8_t *dLSAPSapId;
 	int dLSAPSapIdLen;
-	char *lLCSAPName;
+	uint8_t *lLCSAPName;
 	int lLCSAPNameLen;
-	char *lLCSAPAddress;
+	uint8_t *lLCSAPAddress;
 	int lLCSAPAddressLen;
 	int32_t lLCSAPRDE;
 };
 struct rDESetupTable_data {
 	uint rDESetupTable_request;
-	char *lLCDLECommunicationsEntityId;
+	uint rDESetupTable_refs;
+	uint8_t *lLCDLECommunicationsEntityId;
 	int lLCDLECommunicationsEntityIdLen;
-	char *dLSAPSapId;
+	uint8_t *dLSAPSapId;
 	int dLSAPSapIdLen;
 	int32_t rDESetupAgingEnabled;
 	int32_t rDESetupAgingValue;
@@ -144,23 +151,25 @@ struct rDESetupTable_data {
 };
 struct rDEPairTable_data {
 	uint rDEPairTable_request;
-	char *lLCDLECommunicationsEntityId;
+	uint rDEPairTable_refs;
+	uint8_t *lLCDLECommunicationsEntityId;
 	int lLCDLECommunicationsEntityIdLen;
-	char *dLSAPSapId;
+	uint8_t *dLSAPSapId;
 	int dLSAPSapIdLen;
-	char *rDEPairName;
+	uint8_t *rDEPairName;
 	int rDEPairNameLen;
 	int32_t rDEPairDiscardCounter;
 	int32_t rDEPairNSRPDUCounter;
 	int32_t rDEPairNSRSelectedCounter;
-	char *rDEPairRIF;
+	uint8_t *rDEPairRIF;
 	int rDEPairRIFLen;
 	int32_t rDEPairSRFPDUCounter;
 	int32_t rDEPairQueryCounter;
 };
 struct lLCCLPMTable_data {
 	uint lLCCLPMTable_request;
-	char *lLCCLPMClProtocolMachineId;
+	uint lLCCLPMTable_refs;
+	uint8_t *lLCCLPMClProtocolMachineId;
 	int lLCCLPMClProtocolMachineIdLen;
 	int32_t lLCCLPMOperationalState;
 	int32_t lLCCLPMTotalRemoteSAPs;
@@ -168,7 +177,8 @@ struct lLCCLPMTable_data {
 };
 struct lLCConnectionLessTable_data {
 	uint lLCConnectionLessTable_request;
-	char *lLCConnectionlessName;
+	uint lLCConnectionLessTable_refs;
+	uint8_t *lLCConnectionlessName;
 	int lLCConnectionlessNameLen;
 	int32_t lLCConnectionlessMaximumLLCInformationFieldSize;
 	int32_t lLCConnectionlessTESTReceivedABBResponse;
@@ -186,14 +196,16 @@ struct lLCConnectionLessTable_data {
 };
 struct lLCCOPMTable_data {
 	uint lLCCOPMTable_request;
-	char *lLCCOPMCoProtocolMachineId;
+	uint lLCCOPMTable_refs;
+	uint8_t *lLCCOPMCoProtocolMachineId;
 	int lLCCOPMCoProtocolMachineIdLen;
 	int32_t lLCCOPMOperationalState;
 	int32_t lLCCOPMRowStatus;
 };
 struct lLCConnection2Table_data {
 	uint lLCConnection2Table_request;
-	char *lLCConnection2Name;
+	uint lLCConnection2Table_refs;
+	uint8_t *lLCConnection2Name;
 	int lLCConnection2NameLen;
 	int32_t lLCConnection2MaximumRetransmissions;
 	int32_t lLCConnection2ReceivedWindowSize;
@@ -207,7 +219,7 @@ struct lLCConnection2Table_data {
 	int32_t lLCConnection2RemoteReset;
 	int32_t lLCConnection2LocalReset;
 	int32_t lLCConnection2ProviderReset;
-	char *lLCConnection2Route;
+	uint8_t *lLCConnection2Route;
 	int lLCConnection2RouteLen;
 	int32_t lLCConnection2KStep;
 	int32_t lLCConnection2MaxSendWindowSize;
@@ -241,14 +253,15 @@ struct lLCConnection2Table_data {
 	int32_t lLCConnection2AdministrativeState;
 	int32_t lLCConnection2OperationalState;
 	int32_t lLCConnection2UsageState;
-	char *lLCConnection2ProceduralStatus;
+	uint8_t *lLCConnection2ProceduralStatus;
 	int lLCConnection2ProceduralStatusLen;
-	char *lLCConnection2AlarmStatus;
+	uint8_t *lLCConnection2AlarmStatus;
 	int lLCConnection2AlarmStatusLen;
 };
 struct lLCConnection2IVMOTable_data {
 	uint lLCConnection2IVMOTable_request;
-	char *lLCConnection2IVMOName;
+	uint lLCConnection2IVMOTable_refs;
+	uint8_t *lLCConnection2IVMOName;
 	int lLCConnection2IVMONameLen;
 	uint32_t lLCConnection2IVMOMaximumRetransmissions;
 	uint32_t lLCConnection2IVMOReceivedWindowSize;
@@ -264,7 +277,8 @@ struct lLCConnection2IVMOTable_data {
 };
 struct lLCConnectionlessAckTable_data {
 	uint lLCConnectionlessAckTable_request;
-	char *lLCConnectionlessAckName;
+	uint lLCConnectionlessAckTable_refs;
+	uint8_t *lLCConnectionlessAckName;
 	int lLCConnectionlessAckNameLen;
 	int32_t lLCConnectionlessAckMaximumLLCInformationFieldSize;
 	int32_t lLCConnectionlessAckMaximumRetransmissions;
@@ -304,7 +318,8 @@ struct lLCConnectionlessAckTable_data {
 };
 struct lLCConnectionlessAckIVMOTable_data {
 	uint lLCConnectionlessAckIVMOTable_request;
-	char *lLCConnectionlessAckIVMOName;
+	uint lLCConnectionlessAckIVMOTable_refs;
+	uint8_t *lLCConnectionlessAckIVMOName;
 	int lLCConnectionlessAckIVMONameLen;
 	int32_t lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize;
 	int32_t lLCConnectionlessAckIVMOMaximumRetransmissions;
@@ -428,66 +443,98 @@ void parse_llcMIB(const char *, char *);
 SNMPCallback store_llcMIB;
 void refresh_llcMIB(void);
 FindVarMethod var_mACDLETable;
+int mACDLETable_add(struct mACDLETable_data *);
+int mACDLETable_del(struct mACDLETable_data **);
 void parse_mACDLETable(const char *, char *);
 SNMPCallback store_mACDLETable;
 void refresh_mACDLETable(void);
 FindVarMethod var_mACTable;
+int mACTable_add(struct mACTable_data *);
+int mACTable_del(struct mACTable_data **);
 void parse_mACTable(const char *, char *);
 SNMPCallback store_mACTable;
 void refresh_mACTable(void);
 FindVarMethod var_resourceTypeIdTable;
+int resourceTypeIdTable_add(struct resourceTypeIdTable_data *);
+int resourceTypeIdTable_del(struct resourceTypeIdTable_data **);
 void parse_resourceTypeIdTable(const char *, char *);
 SNMPCallback store_resourceTypeIdTable;
 void refresh_resourceTypeIdTable(void);
 FindVarMethod var_dLSAPTable;
+int dLSAPTable_add(struct dLSAPTable_data *);
+int dLSAPTable_del(struct dLSAPTable_data **);
 void parse_dLSAPTable(const char *, char *);
 SNMPCallback store_dLSAPTable;
 void refresh_dLSAPTable(void);
 FindVarMethod var_lLCDLETable;
+int lLCDLETable_add(struct lLCDLETable_data *);
+int lLCDLETable_del(struct lLCDLETable_data **);
 void parse_lLCDLETable(const char *, char *);
 SNMPCallback store_lLCDLETable;
 void refresh_lLCDLETable(void);
 FindVarMethod var_lLCStationTable;
+int lLCStationTable_add(struct lLCStationTable_data *);
+int lLCStationTable_del(struct lLCStationTable_data **);
 void parse_lLCStationTable(const char *, char *);
 SNMPCallback store_lLCStationTable;
 void refresh_lLCStationTable(void);
 FindVarMethod var_lLCSAPTable;
+int lLCSAPTable_add(struct lLCSAPTable_data *);
+int lLCSAPTable_del(struct lLCSAPTable_data **);
 void parse_lLCSAPTable(const char *, char *);
 SNMPCallback store_lLCSAPTable;
 void refresh_lLCSAPTable(void);
 FindVarMethod var_rDESetupTable;
+int rDESetupTable_add(struct rDESetupTable_data *);
+int rDESetupTable_del(struct rDESetupTable_data **);
 void parse_rDESetupTable(const char *, char *);
 SNMPCallback store_rDESetupTable;
 void refresh_rDESetupTable(void);
 FindVarMethod var_rDEPairTable;
+int rDEPairTable_add(struct rDEPairTable_data *);
+int rDEPairTable_del(struct rDEPairTable_data **);
 void parse_rDEPairTable(const char *, char *);
 SNMPCallback store_rDEPairTable;
 void refresh_rDEPairTable(void);
 FindVarMethod var_lLCCLPMTable;
+int lLCCLPMTable_add(struct lLCCLPMTable_data *);
+int lLCCLPMTable_del(struct lLCCLPMTable_data **);
 void parse_lLCCLPMTable(const char *, char *);
 SNMPCallback store_lLCCLPMTable;
 void refresh_lLCCLPMTable(void);
 FindVarMethod var_lLCConnectionLessTable;
+int lLCConnectionLessTable_add(struct lLCConnectionLessTable_data *);
+int lLCConnectionLessTable_del(struct lLCConnectionLessTable_data **);
 void parse_lLCConnectionLessTable(const char *, char *);
 SNMPCallback store_lLCConnectionLessTable;
 void refresh_lLCConnectionLessTable(void);
 FindVarMethod var_lLCCOPMTable;
+int lLCCOPMTable_add(struct lLCCOPMTable_data *);
+int lLCCOPMTable_del(struct lLCCOPMTable_data **);
 void parse_lLCCOPMTable(const char *, char *);
 SNMPCallback store_lLCCOPMTable;
 void refresh_lLCCOPMTable(void);
 FindVarMethod var_lLCConnection2Table;
+int lLCConnection2Table_add(struct lLCConnection2Table_data *);
+int lLCConnection2Table_del(struct lLCConnection2Table_data **);
 void parse_lLCConnection2Table(const char *, char *);
 SNMPCallback store_lLCConnection2Table;
 void refresh_lLCConnection2Table(void);
 FindVarMethod var_lLCConnection2IVMOTable;
+int lLCConnection2IVMOTable_add(struct lLCConnection2IVMOTable_data *);
+int lLCConnection2IVMOTable_del(struct lLCConnection2IVMOTable_data **);
 void parse_lLCConnection2IVMOTable(const char *, char *);
 SNMPCallback store_lLCConnection2IVMOTable;
 void refresh_lLCConnection2IVMOTable(void);
 FindVarMethod var_lLCConnectionlessAckTable;
+int lLCConnectionlessAckTable_add(struct lLCConnectionlessAckTable_data *);
+int lLCConnectionlessAckTable_del(struct lLCConnectionlessAckTable_data **);
 void parse_lLCConnectionlessAckTable(const char *, char *);
 SNMPCallback store_lLCConnectionlessAckTable;
 void refresh_lLCConnectionlessAckTable(void);
 FindVarMethod var_lLCConnectionlessAckIVMOTable;
+int lLCConnectionlessAckIVMOTable_add(struct lLCConnectionlessAckIVMOTable_data *);
+int lLCConnectionlessAckIVMOTable_del(struct lLCConnectionlessAckIVMOTable_data **);
 void parse_lLCConnectionlessAckIVMOTable(const char *, char *);
 SNMPCallback store_lLCConnectionlessAckIVMOTable;
 void refresh_lLCConnectionlessAckIVMOTable(void);
@@ -598,5 +645,4 @@ WriteMethod write_lLCConnection2DefaultMaxSendWindowSize;
 WriteMethod write_lLCConnection2DefaultOptionalTolerationIPDUs;
 WriteMethod write_lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize;
 WriteMethod write_lLCConnectionlessAckDefaultMaximumRetransmissions;
-
 #endif				/* __LOCAL_LLCMIB_H__ */

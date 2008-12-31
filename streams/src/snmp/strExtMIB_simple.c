@@ -56,7 +56,6 @@ struct variable7 strExtMIB_simple_variables[] = {
 	{STREXTSTRLOGRECORDROWSTATUS, ASN_INTEGER, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 8}},
 #define   STRNLOGARGS           12
 	{STRNLOGARGS, ASN_UNSIGNED, RWRITE, var_strExtMIB, 3, {1, 2, 1}},
-
 };
 
 /*    (L = length of the oidsuffix) */
@@ -153,39 +152,32 @@ var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int
 
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case STREXTSTRLOGRECORDTIMESTAMP:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case STREXTSTRLOGRECORDMID:
 		*write_method = write_strExtStrlogRecordMid;
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case STREXTSTRLOGRECORDSID:
 		*write_method = write_strExtStrlogRecordSid;
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case STREXTSTRLOGRECORDLEVEL:
 		*write_method = write_strExtStrlogRecordLevel;
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case STREXTSTRLOGRECORDFLAGS:
 		*write_method = write_strExtStrlogRecordFlags;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case STREXTSTRLOGRECORDMSGSTRING:
 		*write_method = write_strExtStrlogRecordMsgString;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case STREXTSTRLOGRECORDROWSTATUS:
 		*write_method = write_strExtStrlogRecordRowStatus;
 		long_ret = 0;
@@ -236,39 +228,32 @@ var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int
 
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case STREXTSTRLOGRECORDTIMESTAMP:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case STREXTSTRLOGRECORDMID:
 		*write_method = write_strExtStrlogRecordMid;
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case STREXTSTRLOGRECORDSID:
 		*write_method = write_strExtStrlogRecordSid;
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case STREXTSTRLOGRECORDLEVEL:
 		*write_method = write_strExtStrlogRecordLevel;
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-
 	case STREXTSTRLOGRECORDFLAGS:
 		*write_method = write_strExtStrlogRecordFlags;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case STREXTSTRLOGRECORDMSGSTRING:
 		*write_method = write_strExtStrlogRecordMsgString;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case STREXTSTRLOGRECORDROWSTATUS:
 		*write_method = write_strExtStrlogRecordRowStatus;
 		long_ret = 0;
@@ -418,7 +403,7 @@ write_strExtStrlogRecordLevel(int action, unsigned char *var_val, unsigned char 
 int
 write_strExtStrlogRecordFlags(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -435,7 +420,7 @@ write_strExtStrlogRecordFlags(int action, unsigned char *var_val, unsigned char 
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -463,7 +448,7 @@ write_strExtStrlogRecordFlags(int action, unsigned char *var_val, unsigned char 
 int
 write_strExtStrlogRecordMsgString(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -480,7 +465,7 @@ write_strExtStrlogRecordMsgString(int action, unsigned char *var_val, unsigned c
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 

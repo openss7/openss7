@@ -1,3 +1,11 @@
+2008-12-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/perl/mibbrowser: updated mibs
+	* src/snmp/strExtMIB.c: updated mibs
+	* src/snmp/strExtMIB.h: updated mibs
+	* src/snmp/strMIB.c: updated mibs
+	* src/snmp/strMIB.h: updated mibs
+
 2008-12-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/strMIB.c: updated mibs

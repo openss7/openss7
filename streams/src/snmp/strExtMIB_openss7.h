@@ -11,31 +11,31 @@ struct strExtMIB_data {
 };
 struct strExtStrlogRecordTable_data {
 	uint strExtStrlogRecordTable_request;
+	uint strExtStrlogRecordTable_refs;
 	uint32_t strExtStrlogRecordNextIndex;
-
 	uint32_t strExtStrlogRecordIndex;
 	int32_t strExtStrlogRecordTimeStamp;
 	uint32_t strExtStrlogRecordMid;
 	uint32_t strExtStrlogRecordSid;
 	uint32_t strExtStrlogRecordLevel;
-	char *strExtStrlogRecordFlags;
+	uint8_t *strExtStrlogRecordFlags;
 	int strExtStrlogRecordFlagsLen;
-	char *strExtStrlogRecordMsgString;
+	uint8_t *strExtStrlogRecordMsgString;
 	int strExtStrlogRecordMsgStringLen;
 	int32_t strExtStrlogRecordRowStatus;
 };
 struct strExtStrlogRecordTable_data {
 	uint strExtStrlogRecordTable_request;
+	uint strExtStrlogRecordTable_refs;
 	uint32_t strExtStrlogRecordNextIndex;
-
 	uint32_t strExtStrlogRecordIndex;
 	int32_t strExtStrlogRecordTimeStamp;
 	uint32_t strExtStrlogRecordMid;
 	uint32_t strExtStrlogRecordSid;
 	uint32_t strExtStrlogRecordLevel;
-	char *strExtStrlogRecordFlags;
+	uint8_t *strExtStrlogRecordFlags;
 	int strExtStrlogRecordFlagsLen;
-	char *strExtStrlogRecordMsgString;
+	uint8_t *strExtStrlogRecordMsgString;
 	int strExtStrlogRecordMsgStringLen;
 	int32_t strExtStrlogRecordRowStatus;
 };
@@ -65,10 +65,14 @@ void parse_strExtMIB(const char *, char *);
 SNMPCallback store_strExtMIB;
 void refresh_strExtMIB(void);
 FindVarMethod var_strExtStrlogRecordTable;
+int strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *);
+int strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data **);
 void parse_strExtStrlogRecordTable(const char *, char *);
 SNMPCallback store_strExtStrlogRecordTable;
 void refresh_strExtStrlogRecordTable(void);
 FindVarMethod var_strExtStrlogRecordTable;
+int strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *);
+int strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data **);
 void parse_strExtStrlogRecordTable(const char *, char *);
 SNMPCallback store_strExtStrlogRecordTable;
 void refresh_strExtStrlogRecordTable(void);
@@ -80,5 +84,4 @@ WriteMethod write_strExtStrlogRecordFlags;
 WriteMethod write_strExtStrlogRecordMsgString;
 WriteMethod write_strExtStrlogRecordRowStatus;
 WriteMethod write_strNlogargs;
-
 #endif				/* __LOCAL_STREXTMIB_H__ */

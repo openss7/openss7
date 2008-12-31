@@ -8506,10 +8506,9 @@ write_x25PLEAdministrativeState(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEAdministrativeState entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8533,14 +8532,13 @@ write_x25PLEAdministrativeState(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEAdministrativeState;
-		StorageTmp->x25PLEAdministrativeState = *((long *) var_val);
+		StorageTmp->x25PLEAdministrativeState = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEAdministrativeState = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8552,10 +8550,10 @@ write_x25PLELocalDTEAddress(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static char *tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLELocalDTEAddress entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLETableStorage, NULL,
@@ -8571,25 +8569,30 @@ write_x25PLELocalDTEAddress(int action, uint8_t *var_val, uint8_t var_val_type, 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLELocalDTEAddress;
 		tmplen = StorageTmp->x25PLELocalDTEAddressLen;
-		memdup((void *) &StorageTmp->x25PLELocalDTEAddress, var_val, var_val_len);
+		StorageTmp->x25PLELocalDTEAddress = string;
 		StorageTmp->x25PLELocalDTEAddressLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLELocalDTEAddress);
 		StorageTmp->x25PLELocalDTEAddress = tmpvar;
 		StorageTmp->x25PLELocalDTEAddressLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8601,10 +8604,10 @@ write_x25PLEFacilityNonNegotiable(int action, uint8_t *var_val, uint8_t var_val_
 {
 	static char *tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEFacilityNonNegotiable entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8621,25 +8624,30 @@ write_x25PLEFacilityNonNegotiable(int action, uint8_t *var_val, uint8_t var_val_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEFacilityNonNegotiable;
 		tmplen = StorageTmp->x25PLEFacilityNonNegotiableLen;
-		memdup((void *) &StorageTmp->x25PLEFacilityNonNegotiable, var_val, var_val_len);
+		StorageTmp->x25PLEFacilityNonNegotiable = string;
 		StorageTmp->x25PLEFacilityNonNegotiableLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEFacilityNonNegotiable);
 		StorageTmp->x25PLEFacilityNonNegotiable = tmpvar;
 		StorageTmp->x25PLEFacilityNonNegotiableLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8651,10 +8659,10 @@ write_x25PLEFacilityAvailability(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static char *tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEFacilityAvailability entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8671,25 +8679,30 @@ write_x25PLEFacilityAvailability(int action, uint8_t *var_val, uint8_t var_val_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEFacilityAvailability;
 		tmplen = StorageTmp->x25PLEFacilityAvailabilityLen;
-		memdup((void *) &StorageTmp->x25PLEFacilityAvailability, var_val, var_val_len);
+		StorageTmp->x25PLEFacilityAvailability = string;
 		StorageTmp->x25PLEFacilityAvailabilityLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEFacilityAvailability);
 		StorageTmp->x25PLEFacilityAvailability = tmpvar;
 		StorageTmp->x25PLEFacilityAvailabilityLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8701,10 +8714,10 @@ write_x25PLEFacilityNegotiation(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static char *tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEFacilityNegotiation entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8721,25 +8734,30 @@ write_x25PLEFacilityNegotiation(int action, uint8_t *var_val, uint8_t var_val_ty
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEFacilityNegotiation;
 		tmplen = StorageTmp->x25PLEFacilityNegotiationLen;
-		memdup((void *) &StorageTmp->x25PLEFacilityNegotiation, var_val, var_val_len);
+		StorageTmp->x25PLEFacilityNegotiation = string;
 		StorageTmp->x25PLEFacilityNegotiationLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEFacilityNegotiation);
 		StorageTmp->x25PLEFacilityNegotiation = tmpvar;
 		StorageTmp->x25PLEFacilityNegotiationLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8751,10 +8769,10 @@ write_x25PLEFacilityWhileIdle(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static char *tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEFacilityWhileIdle entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8771,25 +8789,30 @@ write_x25PLEFacilityWhileIdle(int action, uint8_t *var_val, uint8_t var_val_type
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEFacilityWhileIdle;
 		tmplen = StorageTmp->x25PLEFacilityWhileIdleLen;
-		memdup((void *) &StorageTmp->x25PLEFacilityWhileIdle, var_val, var_val_len);
+		StorageTmp->x25PLEFacilityWhileIdle = string;
 		StorageTmp->x25PLEFacilityWhileIdleLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEFacilityWhileIdle);
 		StorageTmp->x25PLEFacilityWhileIdle = tmpvar;
 		StorageTmp->x25PLEFacilityWhileIdleLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8801,10 +8824,9 @@ write_x25PLEPacketSequenceNumbering(int action, uint8_t *var_val, uint8_t var_va
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEPacketSequenceNumbering entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8828,14 +8850,13 @@ write_x25PLEPacketSequenceNumbering(int action, uint8_t *var_val, uint8_t var_va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEPacketSequenceNumbering;
-		StorageTmp->x25PLEPacketSequenceNumbering = *((long *) var_val);
+		StorageTmp->x25PLEPacketSequenceNumbering = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEPacketSequenceNumbering = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8848,10 +8869,9 @@ write_x25PLEDefaultPacketSizeIncoming(int action, uint8_t *var_val, uint8_t var_
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDefaultPacketSizeIncoming entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8875,14 +8895,13 @@ write_x25PLEDefaultPacketSizeIncoming(int action, uint8_t *var_val, uint8_t var_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDefaultPacketSizeIncoming;
-		StorageTmp->x25PLEDefaultPacketSizeIncoming = *((long *) var_val);
+		StorageTmp->x25PLEDefaultPacketSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDefaultPacketSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8895,10 +8914,9 @@ write_x25PLEDefaultPacketSizeOutgoing(int action, uint8_t *var_val, uint8_t var_
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDefaultPacketSizeOutgoing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8922,14 +8940,13 @@ write_x25PLEDefaultPacketSizeOutgoing(int action, uint8_t *var_val, uint8_t var_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDefaultPacketSizeOutgoing;
-		StorageTmp->x25PLEDefaultPacketSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEDefaultPacketSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDefaultPacketSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8942,10 +8959,9 @@ write_x25PLEDefaultWindowSizeIncoming(int action, uint8_t *var_val, uint8_t var_
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDefaultWindowSizeIncoming entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -8969,14 +8985,13 @@ write_x25PLEDefaultWindowSizeIncoming(int action, uint8_t *var_val, uint8_t var_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDefaultWindowSizeIncoming;
-		StorageTmp->x25PLEDefaultWindowSizeIncoming = *((long *) var_val);
+		StorageTmp->x25PLEDefaultWindowSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDefaultWindowSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8989,10 +9004,9 @@ write_x25PLEDefaultWindowSizeOutgoing(int action, uint8_t *var_val, uint8_t var_
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDefaultWindowSizeOutgoing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -9016,14 +9030,13 @@ write_x25PLEDefaultWindowSizeOutgoing(int action, uint8_t *var_val, uint8_t var_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDefaultWindowSizeOutgoing;
-		StorageTmp->x25PLEDefaultWindowSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEDefaultWindowSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDefaultWindowSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9036,10 +9049,9 @@ write_x25PLEDefaultThroughputClassIncoming(int action, uint8_t *var_val, uint8_t
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDefaultThroughputClassIncoming entering action=%d...  \n",
 		    action));
@@ -9064,14 +9076,13 @@ write_x25PLEDefaultThroughputClassIncoming(int action, uint8_t *var_val, uint8_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDefaultThroughputClassIncoming;
-		StorageTmp->x25PLEDefaultThroughputClassIncoming = *((long *) var_val);
+		StorageTmp->x25PLEDefaultThroughputClassIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDefaultThroughputClassIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9084,10 +9095,9 @@ write_x25PLEDefaultThroughputClassOutgoing(int action, uint8_t *var_val, uint8_t
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDefaultThroughputClassOutgoing entering action=%d...  \n",
 		    action));
@@ -9112,14 +9122,13 @@ write_x25PLEDefaultThroughputClassOutgoing(int action, uint8_t *var_val, uint8_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDefaultThroughputClassOutgoing;
-		StorageTmp->x25PLEDefaultThroughputClassOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEDefaultThroughputClassOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDefaultThroughputClassOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9131,10 +9140,10 @@ write_x25PLESNServiceProvider(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static oid *tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLESNServiceProvider entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -9151,25 +9160,30 @@ write_x25PLESNServiceProvider(int action, uint8_t *var_val, uint8_t var_val_type
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid =
+		     snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_GENERR;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLESNServiceProvider;
 		tmplen = StorageTmp->x25PLESNServiceProviderLen;
-		memdup((void *) &StorageTmp->x25PLESNServiceProvider, var_val, var_val_len);
+		StorageTmp->x25PLESNServiceProvider = objid;
 		StorageTmp->x25PLESNServiceProviderLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLESNServiceProvider);
 		StorageTmp->x25PLESNServiceProvider = tmpvar;
 		StorageTmp->x25PLESNServiceProviderLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9181,10 +9195,10 @@ write_x25PLESNSAP(int action, uint8_t *var_val, uint8_t var_val_type, size_t var
 {
 	static oid *tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLESNSAP entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLETableStorage, NULL,
@@ -9200,25 +9214,30 @@ write_x25PLESNSAP(int action, uint8_t *var_val, uint8_t var_val_type, size_t var
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid =
+		     snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_GENERR;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLESNSAP;
 		tmplen = StorageTmp->x25PLESNSAPLen;
-		memdup((void *) &StorageTmp->x25PLESNSAP, var_val, var_val_len);
+		StorageTmp->x25PLESNSAP = objid;
 		StorageTmp->x25PLESNSAPLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLESNSAP);
 		StorageTmp->x25PLESNSAP = tmpvar;
 		StorageTmp->x25PLESNSAPLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9231,10 +9250,9 @@ write_x25PLELogicalChannelAssignmentHIC(int action, uint8_t *var_val, uint8_t va
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLELogicalChannelAssignmentHIC entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9258,14 +9276,13 @@ write_x25PLELogicalChannelAssignmentHIC(int action, uint8_t *var_val, uint8_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLELogicalChannelAssignmentHIC;
-		StorageTmp->x25PLELogicalChannelAssignmentHIC = *((long *) var_val);
+		StorageTmp->x25PLELogicalChannelAssignmentHIC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLELogicalChannelAssignmentHIC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9278,10 +9295,9 @@ write_x25PLELogicalChannelAssignmentLIC(int action, uint8_t *var_val, uint8_t va
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLELogicalChannelAssignmentLIC entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9305,14 +9321,13 @@ write_x25PLELogicalChannelAssignmentLIC(int action, uint8_t *var_val, uint8_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLELogicalChannelAssignmentLIC;
-		StorageTmp->x25PLELogicalChannelAssignmentLIC = *((long *) var_val);
+		StorageTmp->x25PLELogicalChannelAssignmentLIC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLELogicalChannelAssignmentLIC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9325,10 +9340,9 @@ write_x25PLELogicalChannelAssignmentHTC(int action, uint8_t *var_val, uint8_t va
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLELogicalChannelAssignmentHTC entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9352,14 +9366,13 @@ write_x25PLELogicalChannelAssignmentHTC(int action, uint8_t *var_val, uint8_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLELogicalChannelAssignmentHTC;
-		StorageTmp->x25PLELogicalChannelAssignmentHTC = *((long *) var_val);
+		StorageTmp->x25PLELogicalChannelAssignmentHTC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLELogicalChannelAssignmentHTC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9372,10 +9385,9 @@ write_x25PLELogicalChannelAssignmentLTC(int action, uint8_t *var_val, uint8_t va
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLELogicalChannelAssignmentLTC entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9399,14 +9411,13 @@ write_x25PLELogicalChannelAssignmentLTC(int action, uint8_t *var_val, uint8_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLELogicalChannelAssignmentLTC;
-		StorageTmp->x25PLELogicalChannelAssignmentLTC = *((long *) var_val);
+		StorageTmp->x25PLELogicalChannelAssignmentLTC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLELogicalChannelAssignmentLTC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9419,10 +9430,9 @@ write_x25PLELogicalChannelAssignmentHOC(int action, uint8_t *var_val, uint8_t va
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLELogicalChannelAssignmentHOC entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9446,14 +9456,13 @@ write_x25PLELogicalChannelAssignmentHOC(int action, uint8_t *var_val, uint8_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLELogicalChannelAssignmentHOC;
-		StorageTmp->x25PLELogicalChannelAssignmentHOC = *((long *) var_val);
+		StorageTmp->x25PLELogicalChannelAssignmentHOC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLELogicalChannelAssignmentHOC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9466,10 +9475,9 @@ write_x25PLELogicalChannelAssignmentLOC(int action, uint8_t *var_val, uint8_t va
 {
 	static int32_t tmpvar;
 	struct x25PLETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLELogicalChannelAssignmentLOC entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9493,14 +9501,13 @@ write_x25PLELogicalChannelAssignmentLOC(int action, uint8_t *var_val, uint8_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLELogicalChannelAssignmentLOC;
-		StorageTmp->x25PLELogicalChannelAssignmentLOC = *((long *) var_val);
+		StorageTmp->x25PLELogicalChannelAssignmentLOC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLELogicalChannelAssignmentLOC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9513,10 +9520,9 @@ write_x25PLEIVMODefaultPacketSizeIncoming(int action, uint8_t *var_val, uint8_t 
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODefaultPacketSizeIncoming entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9540,14 +9546,13 @@ write_x25PLEIVMODefaultPacketSizeIncoming(int action, uint8_t *var_val, uint8_t 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODefaultPacketSizeIncoming;
-		StorageTmp->x25PLEIVMODefaultPacketSizeIncoming = *((long *) var_val);
+		StorageTmp->x25PLEIVMODefaultPacketSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODefaultPacketSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9560,10 +9565,9 @@ write_x25PLEIVMODefaultPacketSizeOutgoing(int action, uint8_t *var_val, uint8_t 
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODefaultPacketSizeOutgoing entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9587,14 +9591,13 @@ write_x25PLEIVMODefaultPacketSizeOutgoing(int action, uint8_t *var_val, uint8_t 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODefaultPacketSizeOutgoing;
-		StorageTmp->x25PLEIVMODefaultPacketSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEIVMODefaultPacketSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODefaultPacketSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9607,10 +9610,9 @@ write_x25PLEIVMODefaultThroughputClassIncoming(int action, uint8_t *var_val, uin
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODefaultThroughputClassIncoming entering action=%d...  \n",
 		    action));
@@ -9635,14 +9637,13 @@ write_x25PLEIVMODefaultThroughputClassIncoming(int action, uint8_t *var_val, uin
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODefaultThroughputClassIncoming;
-		StorageTmp->x25PLEIVMODefaultThroughputClassIncoming = *((long *) var_val);
+		StorageTmp->x25PLEIVMODefaultThroughputClassIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODefaultThroughputClassIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9655,10 +9656,9 @@ write_x25PLEIVMODefaultThroughputClassOutgoing(int action, uint8_t *var_val, uin
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODefaultThroughputClassOutgoing entering action=%d...  \n",
 		    action));
@@ -9683,14 +9683,13 @@ write_x25PLEIVMODefaultThroughputClassOutgoing(int action, uint8_t *var_val, uin
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODefaultThroughputClassOutgoing;
-		StorageTmp->x25PLEIVMODefaultThroughputClassOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEIVMODefaultThroughputClassOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODefaultThroughputClassOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9703,10 +9702,9 @@ write_x25PLEIVMODefaultWindowSizeIncoming(int action, uint8_t *var_val, uint8_t 
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODefaultWindowSizeIncoming entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9730,14 +9728,13 @@ write_x25PLEIVMODefaultWindowSizeIncoming(int action, uint8_t *var_val, uint8_t 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODefaultWindowSizeIncoming;
-		StorageTmp->x25PLEIVMODefaultWindowSizeIncoming = *((long *) var_val);
+		StorageTmp->x25PLEIVMODefaultWindowSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODefaultWindowSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9750,10 +9747,9 @@ write_x25PLEIVMODefaultWindowSizeOutgoing(int action, uint8_t *var_val, uint8_t 
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODefaultWindowSizeOutgoing entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -9777,14 +9773,13 @@ write_x25PLEIVMODefaultWindowSizeOutgoing(int action, uint8_t *var_val, uint8_t 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODefaultWindowSizeOutgoing;
-		StorageTmp->x25PLEIVMODefaultWindowSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEIVMODefaultWindowSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODefaultWindowSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9797,10 +9792,9 @@ write_x25PLEIVMOFlowControlParameterNegotiation(int action, uint8_t *var_val, ui
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOFlowControlParameterNegotiation entering action=%d...  \n",
 		    action));
@@ -9825,14 +9819,13 @@ write_x25PLEIVMOFlowControlParameterNegotiation(int action, uint8_t *var_val, ui
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOFlowControlParameterNegotiation;
-		StorageTmp->x25PLEIVMOFlowControlParameterNegotiation = *((long *) var_val);
+		StorageTmp->x25PLEIVMOFlowControlParameterNegotiation = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOFlowControlParameterNegotiation = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9844,10 +9837,10 @@ write_x25PLEIVMOLocalDTEAddress(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static char *tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMOLocalDTEAddress entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -9864,25 +9857,30 @@ write_x25PLEIVMOLocalDTEAddress(int action, uint8_t *var_val, uint8_t var_val_ty
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLocalDTEAddress;
 		tmplen = StorageTmp->x25PLEIVMOLocalDTEAddressLen;
-		memdup((void *) &StorageTmp->x25PLEIVMOLocalDTEAddress, var_val, var_val_len);
+		StorageTmp->x25PLEIVMOLocalDTEAddress = string;
 		StorageTmp->x25PLEIVMOLocalDTEAddressLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEIVMOLocalDTEAddress);
 		StorageTmp->x25PLEIVMOLocalDTEAddress = tmpvar;
 		StorageTmp->x25PLEIVMOLocalDTEAddressLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9895,10 +9893,9 @@ write_x25PLEIVMOLogicalChannelAssignmentHPC(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOLogicalChannelAssignmentHPC entering action=%d...  \n",
 		    action));
@@ -9923,14 +9920,13 @@ write_x25PLEIVMOLogicalChannelAssignmentHPC(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLogicalChannelAssignmentHPC;
-		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHPC = *((long *) var_val);
+		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHPC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHPC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9943,10 +9939,9 @@ write_x25PLEIVMOLogicalChannelAssignmentLPC(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOLogicalChannelAssignmentLPC entering action=%d...  \n",
 		    action));
@@ -9971,14 +9966,13 @@ write_x25PLEIVMOLogicalChannelAssignmentLPC(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLogicalChannelAssignmentLPC;
-		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLPC = *((long *) var_val);
+		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLPC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLPC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9991,10 +9985,9 @@ write_x25PLEIVMOLogicalChannelAssignmentHIC(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOLogicalChannelAssignmentHIC entering action=%d...  \n",
 		    action));
@@ -10019,14 +10012,13 @@ write_x25PLEIVMOLogicalChannelAssignmentHIC(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLogicalChannelAssignmentHIC;
-		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHIC = *((long *) var_val);
+		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHIC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHIC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10039,10 +10031,9 @@ write_x25PLEIVMOLogicalChannelAssignmentLIC(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOLogicalChannelAssignmentLIC entering action=%d...  \n",
 		    action));
@@ -10067,14 +10058,13 @@ write_x25PLEIVMOLogicalChannelAssignmentLIC(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLogicalChannelAssignmentLIC;
-		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLIC = *((long *) var_val);
+		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLIC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLIC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10087,10 +10077,9 @@ write_x25PLEIVMOLogicalChannelAssignmentHTC(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOLogicalChannelAssignmentHTC entering action=%d...  \n",
 		    action));
@@ -10115,14 +10104,13 @@ write_x25PLEIVMOLogicalChannelAssignmentHTC(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLogicalChannelAssignmentHTC;
-		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHTC = *((long *) var_val);
+		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHTC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHTC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10135,10 +10123,9 @@ write_x25PLEIVMOLogicalChannelAssignmentLTC(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOLogicalChannelAssignmentLTC entering action=%d...  \n",
 		    action));
@@ -10163,14 +10150,13 @@ write_x25PLEIVMOLogicalChannelAssignmentLTC(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLogicalChannelAssignmentLTC;
-		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLTC = *((long *) var_val);
+		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLTC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLTC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10183,10 +10169,9 @@ write_x25PLEIVMOLogicalChannelAssignmentHOC(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOLogicalChannelAssignmentHOC entering action=%d...  \n",
 		    action));
@@ -10211,14 +10196,13 @@ write_x25PLEIVMOLogicalChannelAssignmentHOC(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLogicalChannelAssignmentHOC;
-		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHOC = *((long *) var_val);
+		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHOC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOLogicalChannelAssignmentHOC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10231,10 +10215,9 @@ write_x25PLEIVMOLogicalChannelAssignmentLOC(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOLogicalChannelAssignmentLOC entering action=%d...  \n",
 		    action));
@@ -10259,14 +10242,13 @@ write_x25PLEIVMOLogicalChannelAssignmentLOC(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOLogicalChannelAssignmentLOC;
-		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLOC = *((long *) var_val);
+		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLOC = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOLogicalChannelAssignmentLOC = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10278,10 +10260,10 @@ write_x25PLEIVMOSNServiceProvider(int action, uint8_t *var_val, uint8_t var_val_
 {
 	static oid *tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMOSNServiceProvider entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -10298,25 +10280,30 @@ write_x25PLEIVMOSNServiceProvider(int action, uint8_t *var_val, uint8_t var_val_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid =
+		     snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_GENERR;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOSNServiceProvider;
 		tmplen = StorageTmp->x25PLEIVMOSNServiceProviderLen;
-		memdup((void *) &StorageTmp->x25PLEIVMOSNServiceProvider, var_val, var_val_len);
+		StorageTmp->x25PLEIVMOSNServiceProvider = objid;
 		StorageTmp->x25PLEIVMOSNServiceProviderLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEIVMOSNServiceProvider);
 		StorageTmp->x25PLEIVMOSNServiceProvider = tmpvar;
 		StorageTmp->x25PLEIVMOSNServiceProviderLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10329,10 +10316,9 @@ write_x25PLEIVMOThroughputClassNegotiation(int action, uint8_t *var_val, uint8_t
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMOThroughputClassNegotiation entering action=%d...  \n",
 		    action));
@@ -10357,14 +10343,13 @@ write_x25PLEIVMOThroughputClassNegotiation(int action, uint8_t *var_val, uint8_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMOThroughputClassNegotiation;
-		StorageTmp->x25PLEIVMOThroughputClassNegotiation = *((long *) var_val);
+		StorageTmp->x25PLEIVMOThroughputClassNegotiation = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMOThroughputClassNegotiation = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10376,10 +10361,9 @@ write_x25PLEDTEPacketSequencing(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTEPacketSequencing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -10403,14 +10387,13 @@ write_x25PLEDTEPacketSequencing(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTEPacketSequencing;
-		StorageTmp->x25PLEDTEPacketSequencing = *((long *) var_val);
+		StorageTmp->x25PLEDTEPacketSequencing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTEPacketSequencing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10422,10 +10405,9 @@ write_x25PLEDTEMaxActiveCircuits(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTEMaxActiveCircuits entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -10449,14 +10431,13 @@ write_x25PLEDTEMaxActiveCircuits(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTEMaxActiveCircuits;
-		StorageTmp->x25PLEDTEMaxActiveCircuits = *((long *) var_val);
+		StorageTmp->x25PLEDTEMaxActiveCircuits = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTEMaxActiveCircuits = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10469,10 +10450,9 @@ write_x25PLEDTECallDeflectionSubscription(int action, uint8_t *var_val, uint8_t 
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDTECallDeflectionSubscription entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -10496,14 +10476,13 @@ write_x25PLEDTECallDeflectionSubscription(int action, uint8_t *var_val, uint8_t 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTECallDeflectionSubscription;
-		StorageTmp->x25PLEDTECallDeflectionSubscription = *((long *) var_val);
+		StorageTmp->x25PLEDTECallDeflectionSubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTECallDeflectionSubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10515,10 +10494,9 @@ write_x25PLEDTERestartTime(int action, uint8_t *var_val, uint8_t var_val_type, s
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTERestartTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDTETableStorage, NULL,
@@ -10541,14 +10519,13 @@ write_x25PLEDTERestartTime(int action, uint8_t *var_val, uint8_t var_val_type, s
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTERestartTime;
-		StorageTmp->x25PLEDTERestartTime = *((long *) var_val);
+		StorageTmp->x25PLEDTERestartTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTERestartTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10560,10 +10537,9 @@ write_x25PLEDTERestartCount(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTERestartCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDTETableStorage, NULL,
@@ -10586,14 +10562,13 @@ write_x25PLEDTERestartCount(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTERestartCount;
-		StorageTmp->x25PLEDTERestartCount = *((long *) var_val);
+		StorageTmp->x25PLEDTERestartCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTERestartCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10605,10 +10580,9 @@ write_x25PLEDTEMinimumRecallTimer(int action, uint8_t *var_val, uint8_t var_val_
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTEMinimumRecallTimer entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -10632,14 +10606,13 @@ write_x25PLEDTEMinimumRecallTimer(int action, uint8_t *var_val, uint8_t var_val_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTEMinimumRecallTimer;
-		StorageTmp->x25PLEDTEMinimumRecallTimer = *((long *) var_val);
+		StorageTmp->x25PLEDTEMinimumRecallTimer = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTEMinimumRecallTimer = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10651,10 +10624,9 @@ write_x25PLEDTERegistrationTime(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTERegistrationTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -10678,14 +10650,13 @@ write_x25PLEDTERegistrationTime(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTERegistrationTime;
-		StorageTmp->x25PLEDTERegistrationTime = *((long *) var_val);
+		StorageTmp->x25PLEDTERegistrationTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTERegistrationTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10697,10 +10668,9 @@ write_x25PLEDTERegistrationCount(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTERegistrationCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -10724,14 +10694,13 @@ write_x25PLEDTERegistrationCount(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTERegistrationCount;
-		StorageTmp->x25PLEDTERegistrationCount = *((long *) var_val);
+		StorageTmp->x25PLEDTERegistrationCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTERegistrationCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10744,10 +10713,9 @@ write_x25PLEDTERegistrationPermitted(int action, uint8_t *var_val, uint8_t var_v
 {
 	static int32_t tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTERegistrationPermitted entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -10771,14 +10739,13 @@ write_x25PLEDTERegistrationPermitted(int action, uint8_t *var_val, uint8_t var_v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTERegistrationPermitted;
-		StorageTmp->x25PLEDTERegistrationPermitted = *((long *) var_val);
+		StorageTmp->x25PLEDTERegistrationPermitted = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDTERegistrationPermitted = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10790,10 +10757,10 @@ write_x25PLEDTEProfile(int action, uint8_t *var_val, uint8_t var_val_type, size_
 {
 	static oid *tmpvar;
 	struct x25PLEDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDTEProfile entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDTETableStorage, NULL,
@@ -10809,25 +10776,30 @@ write_x25PLEDTEProfile(int action, uint8_t *var_val, uint8_t var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid =
+		     snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_GENERR;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDTEProfile;
 		tmplen = StorageTmp->x25PLEDTEProfileLen;
-		memdup((void *) &StorageTmp->x25PLEDTEProfile, var_val, var_val_len);
+		StorageTmp->x25PLEDTEProfile = objid;
 		StorageTmp->x25PLEDTEProfileLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEDTEProfile);
 		StorageTmp->x25PLEDTEProfile = tmpvar;
 		StorageTmp->x25PLEDTEProfileLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10839,10 +10811,9 @@ write_x25PLEDCEPacketSequencing(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEPacketSequencing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -10866,14 +10837,13 @@ write_x25PLEDCEPacketSequencing(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEPacketSequencing;
-		StorageTmp->x25PLEDCEPacketSequencing = *((long *) var_val);
+		StorageTmp->x25PLEDCEPacketSequencing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEPacketSequencing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10886,10 +10856,9 @@ write_x25PLEDCECallDeflectionSubscription(int action, uint8_t *var_val, uint8_t 
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCECallDeflectionSubscription entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -10913,14 +10882,13 @@ write_x25PLEDCECallDeflectionSubscription(int action, uint8_t *var_val, uint8_t 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCECallDeflectionSubscription;
-		StorageTmp->x25PLEDCECallDeflectionSubscription = *((long *) var_val);
+		StorageTmp->x25PLEDCECallDeflectionSubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCECallDeflectionSubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10932,10 +10900,9 @@ write_x25PLEDCECUG(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCECUG entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -10958,14 +10925,13 @@ write_x25PLEDCECUG(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCECUG;
-		StorageTmp->x25PLEDCECUG = *((long *) var_val);
+		StorageTmp->x25PLEDCECUG = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCECUG = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10977,10 +10943,9 @@ write_x25PLEDCEFastSelectAcceptance(int action, uint8_t *var_val, uint8_t var_va
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEFastSelectAcceptance entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11004,14 +10969,13 @@ write_x25PLEDCEFastSelectAcceptance(int action, uint8_t *var_val, uint8_t var_va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEFastSelectAcceptance;
-		StorageTmp->x25PLEDCEFastSelectAcceptance = *((long *) var_val);
+		StorageTmp->x25PLEDCEFastSelectAcceptance = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEFastSelectAcceptance = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11023,10 +10987,9 @@ write_x25PLEDCEIncomingCallsBarred(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEIncomingCallsBarred entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11050,14 +11013,13 @@ write_x25PLEDCEIncomingCallsBarred(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEIncomingCallsBarred;
-		StorageTmp->x25PLEDCEIncomingCallsBarred = *((long *) var_val);
+		StorageTmp->x25PLEDCEIncomingCallsBarred = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEIncomingCallsBarred = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11070,10 +11032,9 @@ write_x25PLEDCEOneWayLogicalChannelOutgoing(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEOneWayLogicalChannelOutgoing entering action=%d...  \n",
 		    action));
@@ -11098,14 +11059,13 @@ write_x25PLEDCEOneWayLogicalChannelOutgoing(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEOneWayLogicalChannelOutgoing;
-		StorageTmp->x25PLEDCEOneWayLogicalChannelOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEDCEOneWayLogicalChannelOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEOneWayLogicalChannelOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11117,10 +11077,9 @@ write_x25PLEDCEOutgoingCallsBarred(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEOutgoingCallsBarred entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11144,14 +11103,13 @@ write_x25PLEDCEOutgoingCallsBarred(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEOutgoingCallsBarred;
-		StorageTmp->x25PLEDCEOutgoingCallsBarred = *((long *) var_val);
+		StorageTmp->x25PLEDCEOutgoingCallsBarred = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEOutgoingCallsBarred = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11163,10 +11121,9 @@ write_x25PLEDCEBilateralCUG(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEBilateralCUG entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -11189,14 +11146,13 @@ write_x25PLEDCEBilateralCUG(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEBilateralCUG;
-		StorageTmp->x25PLEDCEBilateralCUG = *((long *) var_val);
+		StorageTmp->x25PLEDCEBilateralCUG = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEBilateralCUG = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11209,10 +11165,9 @@ write_x25PLEDCEBilateralCUGWithOutgoingAccess(int action, uint8_t *var_val, uint
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEBilateralCUGWithOutgoingAccess entering action=%d...  \n",
 		    action));
@@ -11237,14 +11192,13 @@ write_x25PLEDCEBilateralCUGWithOutgoingAccess(int action, uint8_t *var_val, uint
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEBilateralCUGWithOutgoingAccess;
-		StorageTmp->x25PLEDCEBilateralCUGWithOutgoingAccess = *((long *) var_val);
+		StorageTmp->x25PLEDCEBilateralCUGWithOutgoingAccess = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEBilateralCUGWithOutgoingAccess = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11256,10 +11210,9 @@ write_x25PLEDCECallRedirection(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCECallRedirection entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11283,14 +11236,13 @@ write_x25PLEDCECallRedirection(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCECallRedirection;
-		StorageTmp->x25PLEDCECallRedirection = *((long *) var_val);
+		StorageTmp->x25PLEDCECallRedirection = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCECallRedirection = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11302,10 +11254,9 @@ write_x25PLEDCEChargingInformation(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEChargingInformation entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11329,14 +11280,13 @@ write_x25PLEDCEChargingInformation(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEChargingInformation;
-		StorageTmp->x25PLEDCEChargingInformation = *((long *) var_val);
+		StorageTmp->x25PLEDCEChargingInformation = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEChargingInformation = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11349,10 +11299,9 @@ write_x25PLEDCECUGWithIncomingAccess(int action, uint8_t *var_val, uint8_t var_v
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCECUGWithIncomingAccess entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11376,14 +11325,13 @@ write_x25PLEDCECUGWithIncomingAccess(int action, uint8_t *var_val, uint8_t var_v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCECUGWithIncomingAccess;
-		StorageTmp->x25PLEDCECUGWithIncomingAccess = *((long *) var_val);
+		StorageTmp->x25PLEDCECUGWithIncomingAccess = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCECUGWithIncomingAccess = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11396,10 +11344,9 @@ write_x25PLEDCECUGWithOutgoingAccess(int action, uint8_t *var_val, uint8_t var_v
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCECUGWithOutgoingAccess entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11423,14 +11370,13 @@ write_x25PLEDCECUGWithOutgoingAccess(int action, uint8_t *var_val, uint8_t var_v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCECUGWithOutgoingAccess;
-		StorageTmp->x25PLEDCECUGWithOutgoingAccess = *((long *) var_val);
+		StorageTmp->x25PLEDCECUGWithOutgoingAccess = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCECUGWithOutgoingAccess = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11442,10 +11388,9 @@ write_x25PLEDCEDBitModification(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEDBitModification entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11469,14 +11414,13 @@ write_x25PLEDCEDBitModification(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEDBitModification;
-		StorageTmp->x25PLEDCEDBitModification = *((long *) var_val);
+		StorageTmp->x25PLEDCEDBitModification = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEDBitModification = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11489,10 +11433,9 @@ write_x25PLEDCEDefaultThroughputClassSubscription(int action, uint8_t *var_val,
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEDefaultThroughputClassSubscription entering action=%d...  \n",
 		    action));
@@ -11517,14 +11460,13 @@ write_x25PLEDCEDefaultThroughputClassSubscription(int action, uint8_t *var_val,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEDefaultThroughputClassSubscription;
-		StorageTmp->x25PLEDCEDefaultThroughputClassSubscription = *((long *) var_val);
+		StorageTmp->x25PLEDCEDefaultThroughputClassSubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEDefaultThroughputClassSubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11537,10 +11479,10 @@ write_x25PLEDCEDefaultThroughputClassSupported(int action, uint8_t *var_val, uin
 {
 	static char *tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEDefaultThroughputClassSupported entering action=%d...  \n",
 		    action));
@@ -11558,26 +11500,30 @@ write_x25PLEDCEDefaultThroughputClassSupported(int action, uint8_t *var_val, uin
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEDefaultThroughputClassSupported;
 		tmplen = StorageTmp->x25PLEDCEDefaultThroughputClassSupportedLen;
-		memdup((void *) &StorageTmp->x25PLEDCEDefaultThroughputClassSupported, var_val,
-		       var_val_len);
+		StorageTmp->x25PLEDCEDefaultThroughputClassSupported = string;
 		StorageTmp->x25PLEDCEDefaultThroughputClassSupportedLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEDCEDefaultThroughputClassSupported);
 		StorageTmp->x25PLEDCEDefaultThroughputClassSupported = tmpvar;
 		StorageTmp->x25PLEDCEDefaultThroughputClassSupportedLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11590,10 +11536,9 @@ write_x25PLEDCEDefaultThroughputClassIncoming(int action, uint8_t *var_val, uint
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEDefaultThroughputClassIncoming entering action=%d...  \n",
 		    action));
@@ -11618,14 +11563,13 @@ write_x25PLEDCEDefaultThroughputClassIncoming(int action, uint8_t *var_val, uint
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEDefaultThroughputClassIncoming;
-		StorageTmp->x25PLEDCEDefaultThroughputClassIncoming = *((long *) var_val);
+		StorageTmp->x25PLEDCEDefaultThroughputClassIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEDefaultThroughputClassIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11638,10 +11582,9 @@ write_x25PLEDCEDefaultThroughputClassOutgoing(int action, uint8_t *var_val, uint
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEDefaultThroughputClassOutgoing entering action=%d...  \n",
 		    action));
@@ -11666,14 +11609,13 @@ write_x25PLEDCEDefaultThroughputClassOutgoing(int action, uint8_t *var_val, uint
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEDefaultThroughputClassOutgoing;
-		StorageTmp->x25PLEDCEDefaultThroughputClassOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEDCEDefaultThroughputClassOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEDefaultThroughputClassOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11685,10 +11627,9 @@ write_x25PLEDCEHuntGroup(int action, uint8_t *var_val, uint8_t var_val_type, siz
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEHuntGroup entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -11711,14 +11652,13 @@ write_x25PLEDCEHuntGroup(int action, uint8_t *var_val, uint8_t var_val_type, siz
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEHuntGroup;
-		StorageTmp->x25PLEDCEHuntGroup = *((long *) var_val);
+		StorageTmp->x25PLEDCEHuntGroup = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEHuntGroup = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11731,10 +11671,9 @@ write_x25PLEDCEIncomingCallBarredWithinCUG(int action, uint8_t *var_val, uint8_t
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEIncomingCallBarredWithinCUG entering action=%d...  \n",
 		    action));
@@ -11759,14 +11698,13 @@ write_x25PLEDCEIncomingCallBarredWithinCUG(int action, uint8_t *var_val, uint8_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEIncomingCallBarredWithinCUG;
-		StorageTmp->x25PLEDCEIncomingCallBarredWithinCUG = *((long *) var_val);
+		StorageTmp->x25PLEDCEIncomingCallBarredWithinCUG = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEIncomingCallBarredWithinCUG = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11779,10 +11717,9 @@ write_x25PLEDCELocalChargingPrevention(int action, uint8_t *var_val, uint8_t var
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCELocalChargingPrevention entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -11806,14 +11743,13 @@ write_x25PLEDCELocalChargingPrevention(int action, uint8_t *var_val, uint8_t var
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCELocalChargingPrevention;
-		StorageTmp->x25PLEDCELocalChargingPrevention = *((long *) var_val);
+		StorageTmp->x25PLEDCELocalChargingPrevention = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCELocalChargingPrevention = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11826,10 +11762,9 @@ write_x25PLEDCENonStandardDefaultPacketSizeSubscription(int action, uint8_t *var
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCENonStandardDefaultPacketSizeSubscription entering action=%d...  \n",
 		    action));
@@ -11854,14 +11789,13 @@ write_x25PLEDCENonStandardDefaultPacketSizeSubscription(int action, uint8_t *var
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENonStandardDefaultPacketSizeSubscription;
-		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeSubscription = *((long *) var_val);
+		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeSubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeSubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11874,10 +11808,9 @@ write_x25PLEDCENonStandardDefaultPacketSizeMaximum(int action, uint8_t *var_val,
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCENonStandardDefaultPacketSizeMaximum entering action=%d...  \n",
 		    action));
@@ -11902,14 +11835,13 @@ write_x25PLEDCENonStandardDefaultPacketSizeMaximum(int action, uint8_t *var_val,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENonStandardDefaultPacketSizeMaximum;
-		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeMaximum = *((long *) var_val);
+		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeMaximum = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeMaximum = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11922,10 +11854,9 @@ write_x25PLEDCENonStandardDefaultPacketSizeIncoming(int action, uint8_t *var_val
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCENonStandardDefaultPacketSizeIncoming entering action=%d...  \n",
 		    action));
@@ -11950,14 +11881,13 @@ write_x25PLEDCENonStandardDefaultPacketSizeIncoming(int action, uint8_t *var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENonStandardDefaultPacketSizeIncoming;
-		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeIncoming = *((long *) var_val);
+		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11970,10 +11900,9 @@ write_x25PLEDCENonStandardDefaultPacketSizeOutgoing(int action, uint8_t *var_val
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCENonStandardDefaultPacketSizeOutgoing entering action=%d...  \n",
 		    action));
@@ -11998,14 +11927,13 @@ write_x25PLEDCENonStandardDefaultPacketSizeOutgoing(int action, uint8_t *var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENonStandardDefaultPacketSizeOutgoing;
-		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENonStandardDefaultPacketSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12018,10 +11946,9 @@ write_x25PLEDCENonStandardDefaultWindowSizeSubscription(int action, uint8_t *var
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCENonStandardDefaultWindowSizeSubscription entering action=%d...  \n",
 		    action));
@@ -12046,14 +11973,13 @@ write_x25PLEDCENonStandardDefaultWindowSizeSubscription(int action, uint8_t *var
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENonStandardDefaultWindowSizeSubscription;
-		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeSubscription = *((long *) var_val);
+		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeSubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeSubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12066,10 +11992,9 @@ write_x25PLEDCENonStandardDefaultWindowSizeMaximum(int action, uint8_t *var_val,
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCENonStandardDefaultWindowSizeMaximum entering action=%d...  \n",
 		    action));
@@ -12094,14 +12019,13 @@ write_x25PLEDCENonStandardDefaultWindowSizeMaximum(int action, uint8_t *var_val,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENonStandardDefaultWindowSizeMaximum;
-		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeMaximum = *((long *) var_val);
+		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeMaximum = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeMaximum = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12114,10 +12038,9 @@ write_x25PLEDCENonStandardDefaultWindowSizeIncoming(int action, uint8_t *var_val
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCENonStandardDefaultWindowSizeIncoming entering action=%d...  \n",
 		    action));
@@ -12142,14 +12065,13 @@ write_x25PLEDCENonStandardDefaultWindowSizeIncoming(int action, uint8_t *var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENonStandardDefaultWindowSizeIncoming;
-		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeIncoming = *((long *) var_val);
+		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12162,10 +12084,9 @@ write_x25PLEDCENonStandardDefaultWindowSizeOutgoing(int action, uint8_t *var_val
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCENonStandardDefaultWindowSizeOutgoing entering action=%d...  \n",
 		    action));
@@ -12190,14 +12111,13 @@ write_x25PLEDCENonStandardDefaultWindowSizeOutgoing(int action, uint8_t *var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENonStandardDefaultWindowSizeOutgoing;
-		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENonStandardDefaultWindowSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12209,10 +12129,9 @@ write_x25PLEDCENUIOverride(int action, uint8_t *var_val, uint8_t var_val_type, s
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCENUIOverride entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -12235,14 +12154,13 @@ write_x25PLEDCENUIOverride(int action, uint8_t *var_val, uint8_t var_val_type, s
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENUIOverride;
-		StorageTmp->x25PLEDCENUIOverride = *((long *) var_val);
+		StorageTmp->x25PLEDCENUIOverride = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENUIOverride = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12254,10 +12172,9 @@ write_x25PLEDCENUISubscription(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCENUISubscription entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -12281,14 +12198,13 @@ write_x25PLEDCENUISubscription(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCENUISubscription;
-		StorageTmp->x25PLEDCENUISubscription = *((long *) var_val);
+		StorageTmp->x25PLEDCENUISubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCENUISubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12301,10 +12217,9 @@ write_x25PLEDCEOneWayLogicalChannelIncoming(int action, uint8_t *var_val, uint8_
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEOneWayLogicalChannelIncoming entering action=%d...  \n",
 		    action));
@@ -12329,14 +12244,13 @@ write_x25PLEDCEOneWayLogicalChannelIncoming(int action, uint8_t *var_val, uint8_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEOneWayLogicalChannelIncoming;
-		StorageTmp->x25PLEDCEOneWayLogicalChannelIncoming = *((long *) var_val);
+		StorageTmp->x25PLEDCEOneWayLogicalChannelIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEOneWayLogicalChannelIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12349,10 +12263,9 @@ write_x25PLEDCEOnlineFacilityRegistration(int action, uint8_t *var_val, uint8_t 
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEOnlineFacilityRegistration entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -12376,14 +12289,13 @@ write_x25PLEDCEOnlineFacilityRegistration(int action, uint8_t *var_val, uint8_t 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEOnlineFacilityRegistration;
-		StorageTmp->x25PLEDCEOnlineFacilityRegistration = *((long *) var_val);
+		StorageTmp->x25PLEDCEOnlineFacilityRegistration = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEOnlineFacilityRegistration = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12396,10 +12308,9 @@ write_x25PLEDCEOutgoingCallBarredWithinCUG(int action, uint8_t *var_val, uint8_t
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEOutgoingCallBarredWithinCUG entering action=%d...  \n",
 		    action));
@@ -12424,14 +12335,13 @@ write_x25PLEDCEOutgoingCallBarredWithinCUG(int action, uint8_t *var_val, uint8_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEOutgoingCallBarredWithinCUG;
-		StorageTmp->x25PLEDCEOutgoingCallBarredWithinCUG = *((long *) var_val);
+		StorageTmp->x25PLEDCEOutgoingCallBarredWithinCUG = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEOutgoingCallBarredWithinCUG = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12443,10 +12353,9 @@ write_x25PLEDCEPacketRetransmission(int action, uint8_t *var_val, uint8_t var_va
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEPacketRetransmission entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -12470,14 +12379,13 @@ write_x25PLEDCEPacketRetransmission(int action, uint8_t *var_val, uint8_t var_va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEPacketRetransmission;
-		StorageTmp->x25PLEDCEPacketRetransmission = *((long *) var_val);
+		StorageTmp->x25PLEDCEPacketRetransmission = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEPacketRetransmission = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12490,10 +12398,9 @@ write_x25PLEDCEReverseChargingAcceptance(int action, uint8_t *var_val, uint8_t v
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDCEReverseChargingAcceptance entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -12517,14 +12424,13 @@ write_x25PLEDCEReverseChargingAcceptance(int action, uint8_t *var_val, uint8_t v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEReverseChargingAcceptance;
-		StorageTmp->x25PLEDCEReverseChargingAcceptance = *((long *) var_val);
+		StorageTmp->x25PLEDCEReverseChargingAcceptance = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEReverseChargingAcceptance = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12536,10 +12442,9 @@ write_x25PLEDCEROASubscription(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEROASubscription entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -12563,14 +12468,13 @@ write_x25PLEDCEROASubscription(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEROASubscription;
-		StorageTmp->x25PLEDCEROASubscription = *((long *) var_val);
+		StorageTmp->x25PLEDCEROASubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEROASubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12582,10 +12486,9 @@ write_x25PLEDCERestartIndication(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCERestartIndication entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -12609,14 +12512,13 @@ write_x25PLEDCERestartIndication(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCERestartIndication;
-		StorageTmp->x25PLEDCERestartIndication = *((long *) var_val);
+		StorageTmp->x25PLEDCERestartIndication = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCERestartIndication = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12628,10 +12530,9 @@ write_x25PLEDCERestartCount(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCERestartCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -12654,14 +12555,13 @@ write_x25PLEDCERestartCount(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCERestartCount;
-		StorageTmp->x25PLEDCERestartCount = *((long *) var_val);
+		StorageTmp->x25PLEDCERestartCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCERestartCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12673,10 +12573,9 @@ write_x25PLEDCEIncomingCall(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEIncomingCall entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -12699,14 +12598,13 @@ write_x25PLEDCEIncomingCall(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEIncomingCall;
-		StorageTmp->x25PLEDCEIncomingCall = *((long *) var_val);
+		StorageTmp->x25PLEDCEIncomingCall = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEIncomingCall = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12718,10 +12616,9 @@ write_x25PLEDCECallCount(int action, uint8_t *var_val, uint8_t var_val_type, siz
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCECallCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -12744,14 +12641,13 @@ write_x25PLEDCECallCount(int action, uint8_t *var_val, uint8_t var_val_type, siz
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCECallCount;
-		StorageTmp->x25PLEDCECallCount = *((long *) var_val);
+		StorageTmp->x25PLEDCECallCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCECallCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12763,10 +12659,9 @@ write_x25PLEDCEResetIndication(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEResetIndication entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -12790,14 +12685,13 @@ write_x25PLEDCEResetIndication(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEResetIndication;
-		StorageTmp->x25PLEDCEResetIndication = *((long *) var_val);
+		StorageTmp->x25PLEDCEResetIndication = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEResetIndication = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12809,10 +12703,9 @@ write_x25PLEDCEResetCount(int action, uint8_t *var_val, uint8_t var_val_type, si
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEResetCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -12835,14 +12728,13 @@ write_x25PLEDCEResetCount(int action, uint8_t *var_val, uint8_t var_val_type, si
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEResetCount;
-		StorageTmp->x25PLEDCEResetCount = *((long *) var_val);
+		StorageTmp->x25PLEDCEResetCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEResetCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12854,10 +12746,9 @@ write_x25PLEDCEClearIndication(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEClearIndication entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -12881,14 +12772,13 @@ write_x25PLEDCEClearIndication(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEClearIndication;
-		StorageTmp->x25PLEDCEClearIndication = *((long *) var_val);
+		StorageTmp->x25PLEDCEClearIndication = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEClearIndication = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12900,10 +12790,9 @@ write_x25PLEDCEClearCount(int action, uint8_t *var_val, uint8_t var_val_type, si
 {
 	static int32_t tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEClearCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -12926,14 +12815,13 @@ write_x25PLEDCEClearCount(int action, uint8_t *var_val, uint8_t var_val_type, si
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEClearCount;
-		StorageTmp->x25PLEDCEClearCount = *((long *) var_val);
+		StorageTmp->x25PLEDCEClearCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDCEClearCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12945,10 +12833,10 @@ write_x25PLEDCEProfile(int action, uint8_t *var_val, uint8_t var_val_type, size_
 {
 	static oid *tmpvar;
 	struct x25PLEDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDCEProfile entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDCETableStorage, NULL,
@@ -12964,25 +12852,30 @@ write_x25PLEDCEProfile(int action, uint8_t *var_val, uint8_t var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid =
+		     snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_GENERR;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDCEProfile;
 		tmplen = StorageTmp->x25PLEDCEProfileLen;
-		memdup((void *) &StorageTmp->x25PLEDCEProfile, var_val, var_val_len);
+		StorageTmp->x25PLEDCEProfile = objid;
 		StorageTmp->x25PLEDCEProfileLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEDCEProfile);
 		StorageTmp->x25PLEDCEProfile = tmpvar;
 		StorageTmp->x25PLEDCEProfileLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12994,10 +12887,9 @@ write_x25PLEDXEPacketSequencing(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXEPacketSequencing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13021,14 +12913,13 @@ write_x25PLEDXEPacketSequencing(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXEPacketSequencing;
-		StorageTmp->x25PLEDXEPacketSequencing = *((long *) var_val);
+		StorageTmp->x25PLEDXEPacketSequencing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXEPacketSequencing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13040,10 +12931,9 @@ write_x25PLEDXEMaxActiveCircuits(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXEMaxActiveCircuits entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13067,14 +12957,13 @@ write_x25PLEDXEMaxActiveCircuits(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXEMaxActiveCircuits;
-		StorageTmp->x25PLEDXEMaxActiveCircuits = *((long *) var_val);
+		StorageTmp->x25PLEDXEMaxActiveCircuits = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXEMaxActiveCircuits = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13087,10 +12976,9 @@ write_x25PLEDXECallDeflectionSubscription(int action, uint8_t *var_val, uint8_t 
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEDXECallDeflectionSubscription entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -13114,14 +13002,13 @@ write_x25PLEDXECallDeflectionSubscription(int action, uint8_t *var_val, uint8_t 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXECallDeflectionSubscription;
-		StorageTmp->x25PLEDXECallDeflectionSubscription = *((long *) var_val);
+		StorageTmp->x25PLEDXECallDeflectionSubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXECallDeflectionSubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13133,10 +13020,9 @@ write_x25PLEDXERestartTime(int action, uint8_t *var_val, uint8_t var_val_type, s
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXERestartTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDXETableStorage, NULL,
@@ -13159,14 +13045,13 @@ write_x25PLEDXERestartTime(int action, uint8_t *var_val, uint8_t var_val_type, s
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXERestartTime;
-		StorageTmp->x25PLEDXERestartTime = *((long *) var_val);
+		StorageTmp->x25PLEDXERestartTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXERestartTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13178,10 +13063,9 @@ write_x25PLEDXERestartCount(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXERestartCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDXETableStorage, NULL,
@@ -13204,14 +13088,13 @@ write_x25PLEDXERestartCount(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXERestartCount;
-		StorageTmp->x25PLEDXERestartCount = *((long *) var_val);
+		StorageTmp->x25PLEDXERestartCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXERestartCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13223,10 +13106,9 @@ write_x25PLEDXEMinimumRecallTimer(int action, uint8_t *var_val, uint8_t var_val_
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXEMinimumRecallTimer entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13250,14 +13132,13 @@ write_x25PLEDXEMinimumRecallTimer(int action, uint8_t *var_val, uint8_t var_val_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXEMinimumRecallTimer;
-		StorageTmp->x25PLEDXEMinimumRecallTimer = *((long *) var_val);
+		StorageTmp->x25PLEDXEMinimumRecallTimer = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXEMinimumRecallTimer = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13269,10 +13150,9 @@ write_x25PLEDXERegistrationTime(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXERegistrationTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13296,14 +13176,13 @@ write_x25PLEDXERegistrationTime(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXERegistrationTime;
-		StorageTmp->x25PLEDXERegistrationTime = *((long *) var_val);
+		StorageTmp->x25PLEDXERegistrationTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXERegistrationTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13315,10 +13194,9 @@ write_x25PLEDXERegistrationCount(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXERegistrationCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13342,14 +13220,13 @@ write_x25PLEDXERegistrationCount(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXERegistrationCount;
-		StorageTmp->x25PLEDXERegistrationCount = *((long *) var_val);
+		StorageTmp->x25PLEDXERegistrationCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXERegistrationCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13362,10 +13239,9 @@ write_x25PLEDXERegistrationPermitted(int action, uint8_t *var_val, uint8_t var_v
 {
 	static int32_t tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXERegistrationPermitted entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13389,14 +13265,13 @@ write_x25PLEDXERegistrationPermitted(int action, uint8_t *var_val, uint8_t var_v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXERegistrationPermitted;
-		StorageTmp->x25PLEDXERegistrationPermitted = *((long *) var_val);
+		StorageTmp->x25PLEDXERegistrationPermitted = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEDXERegistrationPermitted = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13408,10 +13283,10 @@ write_x25PLEDXEPLEClientMOName(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static oid *tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXEPLEClientMOName entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13428,25 +13303,30 @@ write_x25PLEDXEPLEClientMOName(int action, uint8_t *var_val, uint8_t var_val_typ
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid =
+		     snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_GENERR;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXEPLEClientMOName;
 		tmplen = StorageTmp->x25PLEDXEPLEClientMONameLen;
-		memdup((void *) &StorageTmp->x25PLEDXEPLEClientMOName, var_val, var_val_len);
+		StorageTmp->x25PLEDXEPLEClientMOName = objid;
 		StorageTmp->x25PLEDXEPLEClientMONameLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEDXEPLEClientMOName);
 		StorageTmp->x25PLEDXEPLEClientMOName = tmpvar;
 		StorageTmp->x25PLEDXEPLEClientMONameLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13458,10 +13338,10 @@ write_x25PLEDXEProfile(int action, uint8_t *var_val, uint8_t var_val_type, size_
 {
 	static oid *tmpvar;
 	struct x25PLEDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static oid *objid = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEDXEProfile entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEDXETableStorage, NULL,
@@ -13477,25 +13357,30 @@ write_x25PLEDXEProfile(int action, uint8_t *var_val, uint8_t var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid =
+		     snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_GENERR;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in objid for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEDXEProfile;
 		tmplen = StorageTmp->x25PLEDXEProfileLen;
-		memdup((void *) &StorageTmp->x25PLEDXEProfile, var_val, var_val_len);
+		StorageTmp->x25PLEDXEProfile = objid;
 		StorageTmp->x25PLEDXEProfileLen = var_val_len / sizeof(oid);
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PLEDXEProfile);
 		StorageTmp->x25PLEDXEProfile = tmpvar;
 		StorageTmp->x25PLEDXEProfileLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		objid = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13508,10 +13393,9 @@ write_x25PLEIVMODTECallDeflectionSubscription(int action, uint8_t *var_val, uint
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODTECallDeflectionSubscription entering action=%d...  \n",
 		    action));
@@ -13536,14 +13420,13 @@ write_x25PLEIVMODTECallDeflectionSubscription(int action, uint8_t *var_val, uint
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTECallDeflectionSubscription;
-		StorageTmp->x25PLEIVMODTECallDeflectionSubscription = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTECallDeflectionSubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTECallDeflectionSubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13555,10 +13438,9 @@ write_x25PLEIVMODTECallTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTECallTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEIVMODTETableStorage, NULL,
@@ -13581,14 +13463,13 @@ write_x25PLEIVMODTECallTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTECallTime;
-		StorageTmp->x25PLEIVMODTECallTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTECallTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTECallTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13600,10 +13481,9 @@ write_x25PLEIVMODTEClearTime(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEClearTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEIVMODTETableStorage, NULL,
@@ -13626,14 +13506,13 @@ write_x25PLEIVMODTEClearTime(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEClearTime;
-		StorageTmp->x25PLEIVMODTEClearTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEClearTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEClearTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13645,10 +13524,9 @@ write_x25PLEIVMODTEClearCount(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEClearCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13672,14 +13550,13 @@ write_x25PLEIVMODTEClearCount(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEClearCount;
-		StorageTmp->x25PLEIVMODTEClearCount = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEClearCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEClearCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13691,10 +13568,9 @@ write_x25PLEIVMODTEPacketSequencing(int action, uint8_t *var_val, uint8_t var_va
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEPacketSequencing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13718,14 +13594,13 @@ write_x25PLEIVMODTEPacketSequencing(int action, uint8_t *var_val, uint8_t var_va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEPacketSequencing;
-		StorageTmp->x25PLEIVMODTEPacketSequencing = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEPacketSequencing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEPacketSequencing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13737,10 +13612,9 @@ write_x25PLEIVMODTEInterruptTime(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEInterruptTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13764,14 +13638,13 @@ write_x25PLEIVMODTEInterruptTime(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEInterruptTime;
-		StorageTmp->x25PLEIVMODTEInterruptTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEInterruptTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEInterruptTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13784,10 +13657,9 @@ write_x25PLEIVMODTEMaxActiveCircuits(int action, uint8_t *var_val, uint8_t var_v
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEMaxActiveCircuits entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13811,14 +13683,13 @@ write_x25PLEIVMODTEMaxActiveCircuits(int action, uint8_t *var_val, uint8_t var_v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEMaxActiveCircuits;
-		StorageTmp->x25PLEIVMODTEMaxActiveCircuits = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEMaxActiveCircuits = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEMaxActiveCircuits = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13831,10 +13702,9 @@ write_x25PLEIVMODTEMinimumRecallTimer(int action, uint8_t *var_val, uint8_t var_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEMinimumRecallTimer entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13858,14 +13728,13 @@ write_x25PLEIVMODTEMinimumRecallTimer(int action, uint8_t *var_val, uint8_t var_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEMinimumRecallTimer;
-		StorageTmp->x25PLEIVMODTEMinimumRecallTimer = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEMinimumRecallTimer = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEMinimumRecallTimer = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13877,10 +13746,9 @@ write_x25PLEIVMODTEResetTime(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEResetTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEIVMODTETableStorage, NULL,
@@ -13903,14 +13771,13 @@ write_x25PLEIVMODTEResetTime(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEResetTime;
-		StorageTmp->x25PLEIVMODTEResetTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEResetTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEResetTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13922,10 +13789,9 @@ write_x25PLEIVMODTEResetCount(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEResetCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13949,14 +13815,13 @@ write_x25PLEIVMODTEResetCount(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEResetCount;
-		StorageTmp->x25PLEIVMODTEResetCount = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEResetCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEResetCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13968,10 +13833,9 @@ write_x25PLEIVMODTERestartTime(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERestartTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -13995,14 +13859,13 @@ write_x25PLEIVMODTERestartTime(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERestartTime;
-		StorageTmp->x25PLEIVMODTERestartTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERestartTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERestartTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14014,10 +13877,9 @@ write_x25PLEIVMODTERestartCount(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERestartCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14041,14 +13903,13 @@ write_x25PLEIVMODTERestartCount(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERestartCount;
-		StorageTmp->x25PLEIVMODTERestartCount = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERestartCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERestartCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14060,10 +13921,9 @@ write_x25PLEIVMODTEWindowTime(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEWindowTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14087,14 +13947,13 @@ write_x25PLEIVMODTEWindowTime(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEWindowTime;
-		StorageTmp->x25PLEIVMODTEWindowTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEWindowTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEWindowTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14106,10 +13965,9 @@ write_x25PLEIVMODTEDataTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEDataTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEIVMODTETableStorage, NULL,
@@ -14132,14 +13990,13 @@ write_x25PLEIVMODTEDataTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEDataTime;
-		StorageTmp->x25PLEIVMODTEDataTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEDataTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEDataTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14151,10 +14008,9 @@ write_x25PLEIVMODTEDataCount(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEDataCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25PLEIVMODTETableStorage, NULL,
@@ -14177,14 +14033,13 @@ write_x25PLEIVMODTEDataCount(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEDataCount;
-		StorageTmp->x25PLEIVMODTEDataCount = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEDataCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEDataCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14196,10 +14051,9 @@ write_x25PLEIVMODTERejectTime(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERejectTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14223,14 +14077,13 @@ write_x25PLEIVMODTERejectTime(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERejectTime;
-		StorageTmp->x25PLEIVMODTERejectTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERejectTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERejectTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14242,10 +14095,9 @@ write_x25PLEIVMODTERejectCount(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERejectCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14269,14 +14121,13 @@ write_x25PLEIVMODTERejectCount(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERejectCount;
-		StorageTmp->x25PLEIVMODTERejectCount = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERejectCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERejectCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14288,10 +14139,9 @@ write_x25PLEIVMODTERegistrationTime(int action, uint8_t *var_val, uint8_t var_va
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERegistrationTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14315,14 +14165,13 @@ write_x25PLEIVMODTERegistrationTime(int action, uint8_t *var_val, uint8_t var_va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERegistrationTime;
-		StorageTmp->x25PLEIVMODTERegistrationTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERegistrationTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERegistrationTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14335,10 +14184,9 @@ write_x25PLEIVMODTERegistrationCount(int action, uint8_t *var_val, uint8_t var_v
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERegistrationCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14362,14 +14210,13 @@ write_x25PLEIVMODTERegistrationCount(int action, uint8_t *var_val, uint8_t var_v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERegistrationCount;
-		StorageTmp->x25PLEIVMODTERegistrationCount = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERegistrationCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERegistrationCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14382,10 +14229,9 @@ write_x25PLEIVMODTERegistrationPermitted(int action, uint8_t *var_val, uint8_t v
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODTERegistrationPermitted entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -14409,14 +14255,13 @@ write_x25PLEIVMODTERegistrationPermitted(int action, uint8_t *var_val, uint8_t v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERegistrationPermitted;
-		StorageTmp->x25PLEIVMODTERegistrationPermitted = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERegistrationPermitted = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERegistrationPermitted = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14429,10 +14274,9 @@ write_x25PLEIVMODTECallDeflectionSubscription(int action, uint8_t *var_val, uint
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODTECallDeflectionSubscription entering action=%d...  \n",
 		    action));
@@ -14457,14 +14301,13 @@ write_x25PLEIVMODTECallDeflectionSubscription(int action, uint8_t *var_val, uint
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTECallDeflectionSubscription;
-		StorageTmp->x25PLEIVMODTECallDeflectionSubscription = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTECallDeflectionSubscription = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTECallDeflectionSubscription = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14477,10 +14320,9 @@ write_x25PLEIVMODTEMaxActiveCircuits(int action, uint8_t *var_val, uint8_t var_v
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEMaxActiveCircuits entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14504,14 +14346,13 @@ write_x25PLEIVMODTEMaxActiveCircuits(int action, uint8_t *var_val, uint8_t var_v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEMaxActiveCircuits;
-		StorageTmp->x25PLEIVMODTEMaxActiveCircuits = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEMaxActiveCircuits = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEMaxActiveCircuits = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14523,10 +14364,9 @@ write_x25PLEIVMODTERestartTime(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERestartTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14550,14 +14390,13 @@ write_x25PLEIVMODTERestartTime(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERestartTime;
-		StorageTmp->x25PLEIVMODTERestartTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERestartTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERestartTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14570,10 +14409,9 @@ write_x25PLEIVMODTEMinimumRecallTimer(int action, uint8_t *var_val, uint8_t var_
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEMinimumRecallTimer entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14597,14 +14435,13 @@ write_x25PLEIVMODTEMinimumRecallTimer(int action, uint8_t *var_val, uint8_t var_
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEMinimumRecallTimer;
-		StorageTmp->x25PLEIVMODTEMinimumRecallTimer = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEMinimumRecallTimer = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEMinimumRecallTimer = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14616,10 +14453,9 @@ write_x25PLEIVMODTERestartCount(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERestartCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14643,14 +14479,13 @@ write_x25PLEIVMODTERestartCount(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERestartCount;
-		StorageTmp->x25PLEIVMODTERestartCount = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERestartCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERestartCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14662,10 +14497,9 @@ write_x25PLEIVMODTEPacketSequencing(int action, uint8_t *var_val, uint8_t var_va
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTEPacketSequencing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14689,14 +14523,13 @@ write_x25PLEIVMODTEPacketSequencing(int action, uint8_t *var_val, uint8_t var_va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTEPacketSequencing;
-		StorageTmp->x25PLEIVMODTEPacketSequencing = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTEPacketSequencing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTEPacketSequencing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14708,10 +14541,9 @@ write_x25PLEIVMODTERegistrationTime(int action, uint8_t *var_val, uint8_t var_va
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERegistrationTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14735,14 +14567,13 @@ write_x25PLEIVMODTERegistrationTime(int action, uint8_t *var_val, uint8_t var_va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERegistrationTime;
-		StorageTmp->x25PLEIVMODTERegistrationTime = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERegistrationTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERegistrationTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14755,10 +14586,9 @@ write_x25PLEIVMODTERegistrationCount(int action, uint8_t *var_val, uint8_t var_v
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PLEIVMODTERegistrationCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14782,14 +14612,13 @@ write_x25PLEIVMODTERegistrationCount(int action, uint8_t *var_val, uint8_t var_v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERegistrationCount;
-		StorageTmp->x25PLEIVMODTERegistrationCount = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERegistrationCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERegistrationCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14802,10 +14631,9 @@ write_x25PLEIVMODTERegistrationPermitted(int action, uint8_t *var_val, uint8_t v
 {
 	static int32_t tmpvar;
 	struct x25PLEIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25PLEIVMODTERegistrationPermitted entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -14829,14 +14657,13 @@ write_x25PLEIVMODTERegistrationPermitted(int action, uint8_t *var_val, uint8_t v
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PLEIVMODTERegistrationPermitted;
-		StorageTmp->x25PLEIVMODTERegistrationPermitted = *((long *) var_val);
+		StorageTmp->x25PLEIVMODTERegistrationPermitted = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PLEIVMODTERegistrationPermitted = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14848,10 +14675,9 @@ write_x25VCPacketSequencing(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25VCTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25VCPacketSequencing entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25VCTableStorage, NULL,
@@ -14874,14 +14700,13 @@ write_x25VCPacketSequencing(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25VCPacketSequencing;
-		StorageTmp->x25VCPacketSequencing = *((long *) var_val);
+		StorageTmp->x25VCPacketSequencing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25VCPacketSequencing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14893,10 +14718,9 @@ write_x25VCPacketSizeIncoming(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25VCTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25VCPacketSizeIncoming entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14920,14 +14744,13 @@ write_x25VCPacketSizeIncoming(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25VCPacketSizeIncoming;
-		StorageTmp->x25VCPacketSizeIncoming = *((long *) var_val);
+		StorageTmp->x25VCPacketSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25VCPacketSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14939,10 +14762,9 @@ write_x25VCPacketSizeOutgoing(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25VCTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25VCPacketSizeOutgoing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -14966,14 +14788,13 @@ write_x25VCPacketSizeOutgoing(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25VCPacketSizeOutgoing;
-		StorageTmp->x25VCPacketSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25VCPacketSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25VCPacketSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14985,10 +14806,9 @@ write_x25VCWindowSizeIncoming(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25VCTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25VCWindowSizeIncoming entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15012,14 +14832,13 @@ write_x25VCWindowSizeIncoming(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25VCWindowSizeIncoming;
-		StorageTmp->x25VCWindowSizeIncoming = *((long *) var_val);
+		StorageTmp->x25VCWindowSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25VCWindowSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15031,10 +14850,9 @@ write_x25VCWindowSizeOutgoing(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25VCTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25VCWindowSizeOutgoing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15058,14 +14876,13 @@ write_x25VCWindowSizeOutgoing(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25VCWindowSizeOutgoing;
-		StorageTmp->x25VCWindowSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25VCWindowSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25VCWindowSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15077,10 +14894,9 @@ write_x25VCThroughputClassIncoming(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25VCTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25VCThroughputClassIncoming entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15104,14 +14920,13 @@ write_x25VCThroughputClassIncoming(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25VCThroughputClassIncoming;
-		StorageTmp->x25VCThroughputClassIncoming = *((long *) var_val);
+		StorageTmp->x25VCThroughputClassIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25VCThroughputClassIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15123,10 +14938,9 @@ write_x25VCThroughputClassOutgoing(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25VCTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25VCThroughputClassOutgoing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15150,14 +14964,13 @@ write_x25VCThroughputClassOutgoing(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25VCThroughputClassOutgoing;
-		StorageTmp->x25VCThroughputClassOutgoing = *((long *) var_val);
+		StorageTmp->x25VCThroughputClassOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25VCThroughputClassOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15169,10 +14982,9 @@ write_x25PVCDTELogicalChannel(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25PVCDTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PVCDTELogicalChannel entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15196,14 +15008,13 @@ write_x25PVCDTELogicalChannel(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PVCDTELogicalChannel;
-		StorageTmp->x25PVCDTELogicalChannel = *((long *) var_val);
+		StorageTmp->x25PVCDTELogicalChannel = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PVCDTELogicalChannel = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15215,10 +15026,9 @@ write_x25PVCDCELogicalChannel(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25PVCDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PVCDCELogicalChannel entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15242,14 +15052,13 @@ write_x25PVCDCELogicalChannel(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PVCDCELogicalChannel;
-		StorageTmp->x25PVCDCELogicalChannel = *((long *) var_val);
+		StorageTmp->x25PVCDCELogicalChannel = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PVCDCELogicalChannel = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15261,10 +15070,9 @@ write_x25PVCDCEChargingDirection(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25PVCDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PVCDCEChargingDirection entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15288,14 +15096,13 @@ write_x25PVCDCEChargingDirection(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PVCDCEChargingDirection;
-		StorageTmp->x25PVCDCEChargingDirection = *((long *) var_val);
+		StorageTmp->x25PVCDCEChargingDirection = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PVCDCEChargingDirection = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15307,10 +15114,10 @@ write_x25PVCDCERemoteDTEAddress(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static char *tmpvar;
 	struct x25PVCDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PVCDCERemoteDTEAddress entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15327,25 +15134,30 @@ write_x25PVCDCERemoteDTEAddress(int action, uint8_t *var_val, uint8_t var_val_ty
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PVCDCERemoteDTEAddress;
 		tmplen = StorageTmp->x25PVCDCERemoteDTEAddressLen;
-		memdup((void *) &StorageTmp->x25PVCDCERemoteDTEAddress, var_val, var_val_len);
+		StorageTmp->x25PVCDCERemoteDTEAddress = string;
 		StorageTmp->x25PVCDCERemoteDTEAddressLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25PVCDCERemoteDTEAddress);
 		StorageTmp->x25PVCDCERemoteDTEAddress = tmpvar;
 		StorageTmp->x25PVCDCERemoteDTEAddressLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15357,10 +15169,9 @@ write_x25PVCDCERemoteLogicalChannel(int action, uint8_t *var_val, uint8_t var_va
 {
 	static int32_t tmpvar;
 	struct x25PVCDCETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PVCDCERemoteLogicalChannel entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15384,14 +15195,13 @@ write_x25PVCDCERemoteLogicalChannel(int action, uint8_t *var_val, uint8_t var_va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PVCDCERemoteLogicalChannel;
-		StorageTmp->x25PVCDCERemoteLogicalChannel = *((long *) var_val);
+		StorageTmp->x25PVCDCERemoteLogicalChannel = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PVCDCERemoteLogicalChannel = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15403,10 +15213,9 @@ write_x25PVCDXELogicalChannel(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25PVCDXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25PVCDXELogicalChannel entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15430,14 +15239,13 @@ write_x25PVCDXELogicalChannel(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25PVCDXELogicalChannel;
-		StorageTmp->x25PVCDXELogicalChannel = *((long *) var_val);
+		StorageTmp->x25PVCDXELogicalChannel = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25PVCDXELogicalChannel = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15449,10 +15257,10 @@ write_x25SVCIVMOId(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 {
 	static char *tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOId entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMOTableStorage, NULL,
@@ -15468,25 +15276,30 @@ write_x25SVCIVMOId(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOId;
 		tmplen = StorageTmp->x25SVCIVMOIdLen;
-		memdup((void *) &StorageTmp->x25SVCIVMOId, var_val, var_val_len);
+		StorageTmp->x25SVCIVMOId = string;
 		StorageTmp->x25SVCIVMOIdLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25SVCIVMOId);
 		StorageTmp->x25SVCIVMOId = tmpvar;
 		StorageTmp->x25SVCIVMOIdLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15498,10 +15311,9 @@ write_x25SVCIVMOFastSelect(int action, uint8_t *var_val, uint8_t var_val_type, s
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOFastSelect entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMOTableStorage, NULL,
@@ -15524,14 +15336,13 @@ write_x25SVCIVMOFastSelect(int action, uint8_t *var_val, uint8_t var_val_type, s
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOFastSelect;
-		StorageTmp->x25SVCIVMOFastSelect = *((long *) var_val);
+		StorageTmp->x25SVCIVMOFastSelect = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMOFastSelect = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15543,10 +15354,9 @@ write_x25SVCIVMOPacketSizeIncoming(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOPacketSizeIncoming entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15570,14 +15380,13 @@ write_x25SVCIVMOPacketSizeIncoming(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOPacketSizeIncoming;
-		StorageTmp->x25SVCIVMOPacketSizeIncoming = *((long *) var_val);
+		StorageTmp->x25SVCIVMOPacketSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMOPacketSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15589,10 +15398,9 @@ write_x25SVCIVMOPacketSizeOutgoing(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOPacketSizeOutgoing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15616,14 +15424,13 @@ write_x25SVCIVMOPacketSizeOutgoing(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOPacketSizeOutgoing;
-		StorageTmp->x25SVCIVMOPacketSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25SVCIVMOPacketSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMOPacketSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15635,10 +15442,9 @@ write_x25SVCIVMOReverseCharging(int action, uint8_t *var_val, uint8_t var_val_ty
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOReverseCharging entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15662,14 +15468,13 @@ write_x25SVCIVMOReverseCharging(int action, uint8_t *var_val, uint8_t var_val_ty
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOReverseCharging;
-		StorageTmp->x25SVCIVMOReverseCharging = *((long *) var_val);
+		StorageTmp->x25SVCIVMOReverseCharging = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMOReverseCharging = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15682,10 +15487,9 @@ write_x25SVCIVMOThroughputClassIncoming(int action, uint8_t *var_val, uint8_t va
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25SVCIVMOThroughputClassIncoming entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -15709,14 +15513,13 @@ write_x25SVCIVMOThroughputClassIncoming(int action, uint8_t *var_val, uint8_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOThroughputClassIncoming;
-		StorageTmp->x25SVCIVMOThroughputClassIncoming = *((long *) var_val);
+		StorageTmp->x25SVCIVMOThroughputClassIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMOThroughputClassIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15729,10 +15532,9 @@ write_x25SVCIVMOThroughputClassOutgoing(int action, uint8_t *var_val, uint8_t va
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB",
 		    "write_x25SVCIVMOThroughputClassOutgoing entering action=%d...  \n", action));
 	if ((StorageTmp =
@@ -15756,14 +15558,13 @@ write_x25SVCIVMOThroughputClassOutgoing(int action, uint8_t *var_val, uint8_t va
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOThroughputClassOutgoing;
-		StorageTmp->x25SVCIVMOThroughputClassOutgoing = *((long *) var_val);
+		StorageTmp->x25SVCIVMOThroughputClassOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMOThroughputClassOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15775,10 +15576,9 @@ write_x25SVCIVMOWindowSizeIncoming(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOWindowSizeIncoming entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15802,14 +15602,13 @@ write_x25SVCIVMOWindowSizeIncoming(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOWindowSizeIncoming;
-		StorageTmp->x25SVCIVMOWindowSizeIncoming = *((long *) var_val);
+		StorageTmp->x25SVCIVMOWindowSizeIncoming = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMOWindowSizeIncoming = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15821,10 +15620,9 @@ write_x25SVCIVMOWindowSizeOutgoing(int action, uint8_t *var_val, uint8_t var_val
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMOTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOWindowSizeOutgoing entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -15848,14 +15646,13 @@ write_x25SVCIVMOWindowSizeOutgoing(int action, uint8_t *var_val, uint8_t var_val
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOWindowSizeOutgoing;
-		StorageTmp->x25SVCIVMOWindowSizeOutgoing = *((long *) var_val);
+		StorageTmp->x25SVCIVMOWindowSizeOutgoing = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMOWindowSizeOutgoing = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15867,10 +15664,10 @@ write_x25SVCIVMOId(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 {
 	static char *tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOId entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODTETableStorage, NULL,
@@ -15886,25 +15683,30 @@ write_x25SVCIVMOId(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOId;
 		tmplen = StorageTmp->x25SVCIVMOIdLen;
-		memdup((void *) &StorageTmp->x25SVCIVMOId, var_val, var_val_len);
+		StorageTmp->x25SVCIVMOId = string;
 		StorageTmp->x25SVCIVMOIdLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25SVCIVMOId);
 		StorageTmp->x25SVCIVMOId = tmpvar;
 		StorageTmp->x25SVCIVMOIdLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15916,10 +15718,9 @@ write_x25SVCIVMODTECallTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTECallTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODTETableStorage, NULL,
@@ -15942,14 +15743,13 @@ write_x25SVCIVMODTECallTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTECallTime;
-		StorageTmp->x25SVCIVMODTECallTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTECallTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTECallTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15961,10 +15761,9 @@ write_x25SVCIVMODTEResetTime(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTEResetTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODTETableStorage, NULL,
@@ -15987,14 +15786,13 @@ write_x25SVCIVMODTEResetTime(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTEResetTime;
-		StorageTmp->x25SVCIVMODTEResetTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTEResetTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTEResetTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16006,10 +15804,9 @@ write_x25SVCIVMODTEResetCount(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTEResetCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16033,14 +15830,13 @@ write_x25SVCIVMODTEResetCount(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTEResetCount;
-		StorageTmp->x25SVCIVMODTEResetCount = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTEResetCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTEResetCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16052,10 +15848,9 @@ write_x25SVCIVMODTEInterruptTime(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTEInterruptTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16079,14 +15874,13 @@ write_x25SVCIVMODTEInterruptTime(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTEInterruptTime;
-		StorageTmp->x25SVCIVMODTEInterruptTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTEInterruptTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTEInterruptTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16098,10 +15892,9 @@ write_x25SVCIVMODTEClearTime(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTEClearTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODTETableStorage, NULL,
@@ -16124,14 +15917,13 @@ write_x25SVCIVMODTEClearTime(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTEClearTime;
-		StorageTmp->x25SVCIVMODTEClearTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTEClearTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTEClearTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16143,10 +15935,9 @@ write_x25SVCIVMODTEClearCount(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTEClearCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16170,14 +15961,13 @@ write_x25SVCIVMODTEClearCount(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTEClearCount;
-		StorageTmp->x25SVCIVMODTEClearCount = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTEClearCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTEClearCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16189,10 +15979,9 @@ write_x25SVCIVMODTEWindowTime(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTEWindowTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16216,14 +16005,13 @@ write_x25SVCIVMODTEWindowTime(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTEWindowTime;
-		StorageTmp->x25SVCIVMODTEWindowTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTEWindowTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTEWindowTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16235,10 +16023,9 @@ write_x25SVCIVMODTEDataTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTEDataTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODTETableStorage, NULL,
@@ -16261,14 +16048,13 @@ write_x25SVCIVMODTEDataTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTEDataTime;
-		StorageTmp->x25SVCIVMODTEDataTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTEDataTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTEDataTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16280,10 +16066,9 @@ write_x25SVCIVMODTEDataCount(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTEDataCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODTETableStorage, NULL,
@@ -16306,14 +16091,13 @@ write_x25SVCIVMODTEDataCount(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTEDataCount;
-		StorageTmp->x25SVCIVMODTEDataCount = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTEDataCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTEDataCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16325,10 +16109,9 @@ write_x25SVCIVMODTERejectTime(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTERejectTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16352,14 +16135,13 @@ write_x25SVCIVMODTERejectTime(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTERejectTime;
-		StorageTmp->x25SVCIVMODTERejectTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTERejectTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTERejectTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16371,10 +16153,9 @@ write_x25SVCIVMODTERejectCount(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODTETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODTERejectCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16398,14 +16179,13 @@ write_x25SVCIVMODTERejectCount(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODTERejectCount;
-		StorageTmp->x25SVCIVMODTERejectCount = *((long *) var_val);
+		StorageTmp->x25SVCIVMODTERejectCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODTERejectCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16417,10 +16197,10 @@ write_x25SVCIVMOId(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 {
 	static char *tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	static size_t tmplen = 0;
+	static char *string = NULL;
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMOId entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODXETableStorage, NULL,
@@ -16436,25 +16216,30 @@ write_x25SVCIVMOId(int action, uint8_t *var_val, uint8_t var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len)) == NULL)
+			return SNMP_ERR_GENERR;
+		memcpy((void *) string, (void *) var_val, var_val_len);
 		break;
 	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMOId;
 		tmplen = StorageTmp->x25SVCIVMOIdLen;
-		memdup((void *) &StorageTmp->x25SVCIVMOId, var_val, var_val_len);
+		StorageTmp->x25SVCIVMOId = string;
 		StorageTmp->x25SVCIVMOIdLen = var_val_len;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		SNMP_FREE(StorageTmp->x25SVCIVMOId);
 		StorageTmp->x25SVCIVMOId = tmpvar;
 		StorageTmp->x25SVCIVMOIdLen = tmplen;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(tmpvar);
+		tmplen = 0;
+		string = NULL;
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16466,10 +16251,9 @@ write_x25SVCIVMODXECallTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXECallTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODXETableStorage, NULL,
@@ -16492,14 +16276,13 @@ write_x25SVCIVMODXECallTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXECallTime;
-		StorageTmp->x25SVCIVMODXECallTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXECallTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXECallTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16511,10 +16294,9 @@ write_x25SVCIVMODXEResetTime(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXEResetTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODXETableStorage, NULL,
@@ -16537,14 +16319,13 @@ write_x25SVCIVMODXEResetTime(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXEResetTime;
-		StorageTmp->x25SVCIVMODXEResetTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXEResetTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXEResetTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16556,10 +16337,9 @@ write_x25SVCIVMODXEClearTime(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXEClearTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODXETableStorage, NULL,
@@ -16582,14 +16362,13 @@ write_x25SVCIVMODXEClearTime(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXEClearTime;
-		StorageTmp->x25SVCIVMODXEClearTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXEClearTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXEClearTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16601,10 +16380,9 @@ write_x25SVCIVMODXEInterruptTime(int action, uint8_t *var_val, uint8_t var_val_t
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXEInterruptTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16628,14 +16406,13 @@ write_x25SVCIVMODXEInterruptTime(int action, uint8_t *var_val, uint8_t var_val_t
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXEInterruptTime;
-		StorageTmp->x25SVCIVMODXEInterruptTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXEInterruptTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXEInterruptTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16647,10 +16424,9 @@ write_x25SVCIVMODXEResetCount(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXEResetCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16674,14 +16450,13 @@ write_x25SVCIVMODXEResetCount(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXEResetCount;
-		StorageTmp->x25SVCIVMODXEResetCount = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXEResetCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXEResetCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16693,10 +16468,9 @@ write_x25SVCIVMODXEClearCount(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXEClearCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16720,14 +16494,13 @@ write_x25SVCIVMODXEClearCount(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXEClearCount;
-		StorageTmp->x25SVCIVMODXEClearCount = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXEClearCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXEClearCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16739,10 +16512,9 @@ write_x25SVCIVMODXEWindowTime(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXEWindowTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16766,14 +16538,13 @@ write_x25SVCIVMODXEWindowTime(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXEWindowTime;
-		StorageTmp->x25SVCIVMODXEWindowTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXEWindowTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXEWindowTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16785,10 +16556,9 @@ write_x25SVCIVMODXEDataTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXEDataTime entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODXETableStorage, NULL,
@@ -16811,14 +16581,13 @@ write_x25SVCIVMODXEDataTime(int action, uint8_t *var_val, uint8_t var_val_type, 
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXEDataTime;
-		StorageTmp->x25SVCIVMODXEDataTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXEDataTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXEDataTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16830,10 +16599,9 @@ write_x25SVCIVMODXEDataCount(int action, uint8_t *var_val, uint8_t var_val_type,
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXEDataCount entering action=%d...  \n", action));
 	if ((StorageTmp =
 	     header_complex(x25SVCIVMODXETableStorage, NULL,
@@ -16856,14 +16624,13 @@ write_x25SVCIVMODXEDataCount(int action, uint8_t *var_val, uint8_t var_val_type,
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXEDataCount;
-		StorageTmp->x25SVCIVMODXEDataCount = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXEDataCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXEDataCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16875,10 +16642,9 @@ write_x25SVCIVMODXERejectTime(int action, uint8_t *var_val, uint8_t var_val_type
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXERejectTime entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16902,14 +16668,13 @@ write_x25SVCIVMODXERejectTime(int action, uint8_t *var_val, uint8_t var_val_type
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXERejectTime;
-		StorageTmp->x25SVCIVMODXERejectTime = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXERejectTime = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXERejectTime = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -16921,10 +16686,9 @@ write_x25SVCIVMODXERejectCount(int action, uint8_t *var_val, uint8_t var_val_typ
 {
 	static int32_t tmpvar;
 	struct x25SVCIVMODXETable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(x25PLPMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	long long_ret = *((long *) var_val);
 
-	(void) tmplen;		/* not always used */
 	DEBUGMSGTL(("x25PLPMIB", "write_x25SVCIVMODXERejectCount entering action=%d...  \n",
 		    action));
 	if ((StorageTmp =
@@ -16948,14 +16712,13 @@ write_x25SVCIVMODXERejectCount(int action, uint8_t *var_val, uint8_t var_val_typ
 				   have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		tmpvar = StorageTmp->x25SVCIVMODXERejectCount;
-		StorageTmp->x25SVCIVMODXERejectCount = *((long *) var_val);
+		StorageTmp->x25SVCIVMODXERejectCount = long_ret;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->x25SVCIVMODXERejectCount = tmpvar;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change
 				   permanently.  Make sure that anything done here can't fail! */
-
 		break;
 	}
 	return SNMP_ERR_NOERROR;

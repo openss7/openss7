@@ -1,3 +1,16 @@
+2008-12-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/ds1.c: updated mibs
+	* src/snmp/ds1.h: updated mibs
+	* src/snmp/ds1EXT.c: updated mibs
+	* src/snmp/ds1EXT.h: updated mibs
+	* src/snmp/mxMIB.c: updated mibs
+	* src/snmp/mxMIB.h: updated mibs
+	* src/snmp/phyMIB.c: updated mibs
+	* src/snmp/phyMIB.h: updated mibs
+	* src/snmp/x400pMIB.c: updated mibs
+	* src/snmp/x400pMIB.h: updated mibs
+
 2008-12-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/mxMIB.c: correct default values

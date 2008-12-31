@@ -1,3 +1,31 @@
+2008-12-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: updated mibs
+	* src/snmp/cdr2MIB.c: updated mibs
+	* src/snmp/cdr2MIB.h: updated mibs
+	* src/snmp/makestubs: updated mibs
+	* src/snmp/mtpMIB.c: updated mibs
+	* src/snmp/mtpMIB.h: updated mibs
+	* src/snmp/mtpOmMIB.c: updated mibs
+	* src/snmp/mtpOmMIB.h: updated mibs
+	* src/snmp/sccpMIB.c: updated mibs
+	* src/snmp/sccpMIB.h: updated mibs
+	* src/snmp/sccpOmMIB.c: updated mibs
+	* src/snmp/sccpOmMIB.h: updated mibs
+	* src/snmp/ss7MIB.c: updated mibs
+	* src/snmp/ss7MIB.h: updated mibs
+	* src/snmp/ss7OmMIB.c: updated mibs
+	* src/snmp/tcapMIB.c: updated mibs
+	* src/snmp/tcapMIB.h: updated mibs
+	* src/snmp/x400pMIB.c: updated mibs
+	* src/snmp/x400pMIB.h: updated mibs
+	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-MTP-OM-MIB2.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-SCCP-OM-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-SS7-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-TCAP-MIB.mib: updated mibs
+	* src/snmp/mibs/OPENSS7-TCAP-OM-MIB.mib: updated mibs
+
 2008-12-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: rationalize mib versions

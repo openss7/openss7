@@ -239,8 +239,9 @@ sub loadMib {
 		next if (defined($variables{$i}{'skipif'}) &&
 			 eval $variables{$i}{'skipif'});
 		my $result = (eval "\"$variables{$i}{'code'}\"");
-		$variables{$i}{'processed'} .= "$result\n";
-		$variables{$vroutine}{$i}{'processed'} .= "$result\n";
+		$variables{$i}{'processed'} .= $result;
+		$variables{$vroutine}{$i}{'processed'} .= $result;
+		$variables{$vroutine}{$name}{$i}{'processed'} .= $result;
 	    }
 	}
 	if (defined($mib->{'indexes'})) {

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-12-27 15:29:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-12-31 16:04:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-27 15:29:45 $ by $Author: brian $
+# Last Modified $Date: 2008-12-31 16:04:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -177,6 +177,10 @@ ss7confd_SOURCES		= src/snmp/ss7MIB.c \
 				  src/snmp/sccpMIB.h \
 				  src/snmp/sccpOmMIB.c \
 				  src/snmp/sccpOmMIB.h \
+				  src/snmp/tcapMIB.c \
+				  src/snmp/tcapMIB.h \
+				  src/snmp/tcapOmMIB.c \
+				  src/snmp/tcapOmMIB.h \
 				  src/snmp/header_complex.h \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
@@ -1062,6 +1066,10 @@ ss7MIB_la_SOURCES		= \
 				  src/snmp/sccpMIB.h \
 				  src/snmp/sccpOmMIB.c \
 				  src/snmp/sccpOmMIB.h \
+				  src/snmp/tcapMIB.c \
+				  src/snmp/tcapMIB.h \
+				  src/snmp/tcapOmMIB.c \
+				  src/snmp/tcapOmMIB.h \
 				  src/snmp/ds_agent.h \
 				  src/snmp/header_complex.h \
 				  src/snmp/mib_modules.h \
@@ -1553,6 +1561,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.111  2008-12-31 16:04:42  brian
+## - updated mibs
+##
 ## Revision 0.9.2.110  2008-12-27 15:29:45  brian
 ## - split MTP and MTP OM mib
 ##
