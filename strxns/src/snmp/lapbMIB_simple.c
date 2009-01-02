@@ -206,6 +206,8 @@ struct variable7 lapbMIB_simple_variables[] = {
 	{SLPCONNECTIONDEFAULTT3TIMER, ASN_INTEGER, RWRITE, var_lapbMIB, 5, {1, 2, 2, 1, 8}},
 #define   SLPCONNECTIONDEFAULTT4TIMER  101
 	{SLPCONNECTIONDEFAULTT4TIMER, ASN_INTEGER, RWRITE, var_lapbMIB, 5, {1, 2, 2, 1, 9}},
+#define   FRMR                  102
+	{FRMR, ASN_OCTET_STR,, var_lapbMIB, 3, {1, 3, 1}},
 };
 
 /*    (L = length of the oidsuffix) */

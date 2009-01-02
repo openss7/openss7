@@ -871,7 +871,14 @@ struct variable7 x25MIB_simple_variables[] = {
 #define   X25PLEDXESTATSCLEARCOUNTSEXCEEDED  401
 	{X25PLEDXESTATSCLEARCOUNTSEXCEEDED, ASN_COUNTER64, RONLY, var_x25PLEDXEStatsTable, 6,
 	 {1, 1, 25, 1, 1, 19}},
-
+#define   NOTIFICATIONDATACHANNEL  402
+	{NOTIFICATIONDATACHANNEL, ASN_INTEGER,, var_x25PLPMIB, 2, {2, 1}},
+#define   NOTIFICATIONDATAPACKETHEADER  403
+	{NOTIFICATIONDATAPACKETHEADER, ASN_OCTET_STR,, var_x25PLPMIB, 2, {2, 2}},
+#define   NOTIFICATIONDATADIAGNOSTICCODE  404
+	{NOTIFICATIONDATADIAGNOSTICCODE, ASN_OCTET_STR,, var_x25PLPMIB, 2, {2, 3}},
+#define   NOTIFICATIONDATACAUSECODE  405
+	{NOTIFICATIONDATACAUSECODE, ASN_OCTET_STR,, var_x25PLPMIB, 2, {2, 4}},
 };
 
 /*    (L = length of the oidsuffix) */
@@ -971,127 +978,104 @@ var_x25PLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEADMINISTRATIVESTATE:
 		*write_method = write_x25PLEAdministrativeState;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEPROTOCOLVERSIONSSUPPORTED:
 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PLELOCALDTEADDRESS:
 		*write_method = write_x25PLELocalDTEAddress;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PLEINTERFACEMODE:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEFACILITYNONNEGOTIABLE:
 		*write_method = write_x25PLEFacilityNonNegotiable;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PLEFACILITYAVAILABILITY:
 		*write_method = write_x25PLEFacilityAvailability;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PLEFACILITYNEGOTIATION:
 		*write_method = write_x25PLEFacilityNegotiation;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PLEFACILITYWHILEIDLE:
 		*write_method = write_x25PLEFacilityWhileIdle;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PLEPACKETSEQUENCENUMBERING:
 		*write_method = write_x25PLEPacketSequenceNumbering;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDEFAULTPACKETSIZEINCOMING:
 		*write_method = write_x25PLEDefaultPacketSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDEFAULTPACKETSIZEOUTGOING:
 		*write_method = write_x25PLEDefaultPacketSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDEFAULTWINDOWSIZEINCOMING:
 		*write_method = write_x25PLEDefaultWindowSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDEFAULTWINDOWSIZEOUTGOING:
 		*write_method = write_x25PLEDefaultWindowSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDEFAULTTHROUGHPUTCLASSINCOMING:
 		*write_method = write_x25PLEDefaultThroughputClassIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDEFAULTTHROUGHPUTCLASSOUTGOING:
 		*write_method = write_x25PLEDefaultThroughputClassOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLESNSERVICEPROVIDER:
 		*write_method = write_x25PLESNServiceProvider;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case X25PLESNSAP:
 		*write_method = write_x25PLESNSAP;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case X25PLELOGICALCHANNELASSIGNMENTHIC:
 		*write_method = write_x25PLELogicalChannelAssignmentHIC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLELOGICALCHANNELASSIGNMENTLIC:
 		*write_method = write_x25PLELogicalChannelAssignmentLIC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLELOGICALCHANNELASSIGNMENTHTC:
 		*write_method = write_x25PLELogicalChannelAssignmentHTC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLELOGICALCHANNELASSIGNMENTLTC:
 		*write_method = write_x25PLELogicalChannelAssignmentLTC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLELOGICALCHANNELASSIGNMENTHOC:
 		*write_method = write_x25PLELogicalChannelAssignmentHOC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLELOGICALCHANNELASSIGNMENTLOC:
 		*write_method = write_x25PLELogicalChannelAssignmentLOC;
 		long_ret = 0;
@@ -1143,95 +1127,77 @@ var_x25PLEIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, 
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODEFAULTPACKETSIZEINCOMING:
 		*write_method = write_x25PLEIVMODefaultPacketSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODEFAULTPACKETSIZEOUTGOING:
 		*write_method = write_x25PLEIVMODefaultPacketSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODEFAULTTHROUGHPUTCLASSINCOMING:
 		*write_method = write_x25PLEIVMODefaultThroughputClassIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODEFAULTTHROUGHPUTCLASSOUTGOING:
 		*write_method = write_x25PLEIVMODefaultThroughputClassOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODEFAULTWINDOWSIZEINCOMING:
 		*write_method = write_x25PLEIVMODefaultWindowSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODEFAULTWINDOWSIZEOUTGOING:
 		*write_method = write_x25PLEIVMODefaultWindowSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOFLOWCONTROLPARAMETERNEGOTIATION:
 		*write_method = write_x25PLEIVMOFlowControlParameterNegotiation;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOLOCALDTEADDRESS:
 		*write_method = write_x25PLEIVMOLocalDTEAddress;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PLEIVMOLOGICALCHANNELASSIGNMENTHPC:
 		*write_method = write_x25PLEIVMOLogicalChannelAssignmentHPC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOLOGICALCHANNELASSIGNMENTLPC:
 		*write_method = write_x25PLEIVMOLogicalChannelAssignmentLPC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOLOGICALCHANNELASSIGNMENTHIC:
 		*write_method = write_x25PLEIVMOLogicalChannelAssignmentHIC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOLOGICALCHANNELASSIGNMENTLIC:
 		*write_method = write_x25PLEIVMOLogicalChannelAssignmentLIC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOLOGICALCHANNELASSIGNMENTHTC:
 		*write_method = write_x25PLEIVMOLogicalChannelAssignmentHTC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOLOGICALCHANNELASSIGNMENTLTC:
 		*write_method = write_x25PLEIVMOLogicalChannelAssignmentLTC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOLOGICALCHANNELASSIGNMENTHOC:
 		*write_method = write_x25PLEIVMOLogicalChannelAssignmentHOC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOLOGICALCHANNELASSIGNMENTLOC:
 		*write_method = write_x25PLEIVMOLogicalChannelAssignmentLOC;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMOSNSERVICEPROVIDER:
 		*write_method = write_x25PLEIVMOSNServiceProvider;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case X25PLEIVMOTHROUGHPUTCLASSNEGOTIATION:
 		*write_method = write_x25PLEIVMOThroughputClassNegotiation;
 		long_ret = 0;
@@ -1283,54 +1249,44 @@ var_x25PLEDTETable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_x25PLEDTEPacketSequencing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTEMAXACTIVECIRCUITS:
 		*write_method = write_x25PLEDTEMaxActiveCircuits;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTECALLDEFLECTIONSUBSCRIPTION:
 		*write_method = write_x25PLEDTECallDeflectionSubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTERESTARTTIME:
 		*write_method = write_x25PLEDTERestartTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTERESTARTCOUNT:
 		*write_method = write_x25PLEDTERestartCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTEMINIMUMRECALLTIMER:
 		*write_method = write_x25PLEDTEMinimumRecallTimer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTEREGISTRATIONTIME:
 		*write_method = write_x25PLEDTERegistrationTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTEREGISTRATIONCOUNT:
 		*write_method = write_x25PLEDTERegistrationCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTEREGISTRATIONPERMITTED:
 		*write_method = write_x25PLEDTERegistrationPermitted;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDTEPROFILE:
 		*write_method = write_x25PLEDTEProfile;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case X25PLEDTEROWSTATUS:
 		*write_method = write_x25PLEDTERowStatus;
 		long_ret = 0;
@@ -1382,235 +1338,189 @@ var_x25PLEDCETable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_x25PLEDCEPacketSequencing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECALLDEFLECTIONSUBSCRIPTION:
 		*write_method = write_x25PLEDCECallDeflectionSubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECUG:
 		*write_method = write_x25PLEDCECUG;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEFASTSELECTACCEPTANCE:
 		*write_method = write_x25PLEDCEFastSelectAcceptance;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEINCOMINGCALLSBARRED:
 		*write_method = write_x25PLEDCEIncomingCallsBarred;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEONEWAYLOGICALCHANNELOUTGOING:
 		*write_method = write_x25PLEDCEOneWayLogicalChannelOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEOUTGOINGCALLSBARRED:
 		*write_method = write_x25PLEDCEOutgoingCallsBarred;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEBILATERALCUG:
 		*write_method = write_x25PLEDCEBilateralCUG;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEBILATERALCUGWITHOUTGOINGACCESS:
 		*write_method = write_x25PLEDCEBilateralCUGWithOutgoingAccess;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECALLREDIRECTION:
 		*write_method = write_x25PLEDCECallRedirection;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECHARGINGINFORMATION:
 		*write_method = write_x25PLEDCEChargingInformation;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECUGWITHINCOMINGACCESS:
 		*write_method = write_x25PLEDCECUGWithIncomingAccess;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECUGWITHOUTGOINGACCESS:
 		*write_method = write_x25PLEDCECUGWithOutgoingAccess;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEDBITMODIFICATION:
 		*write_method = write_x25PLEDCEDBitModification;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEDEFAULTTHROUGHPUTCLASSSUBSCRIPTION:
 		*write_method = write_x25PLEDCEDefaultThroughputClassSubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEDEFAULTTHROUGHPUTCLASSSUPPORTED:
 		*write_method = write_x25PLEDCEDefaultThroughputClassSupported;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PLEDCEDEFAULTTHROUGHPUTCLASSINCOMING:
 		*write_method = write_x25PLEDCEDefaultThroughputClassIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEDEFAULTTHROUGHPUTCLASSOUTGOING:
 		*write_method = write_x25PLEDCEDefaultThroughputClassOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEHUNTGROUP:
 		*write_method = write_x25PLEDCEHuntGroup;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEINCOMINGCALLBARREDWITHINCUG:
 		*write_method = write_x25PLEDCEIncomingCallBarredWithinCUG;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCELOCALCHARGINGPREVENTION:
 		*write_method = write_x25PLEDCELocalChargingPrevention;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENONSTANDARDDEFAULTPACKETSIZESUBSCRIPTION:
 		*write_method = write_x25PLEDCENonStandardDefaultPacketSizeSubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENONSTANDARDDEFAULTPACKETSIZEMAXIMUM:
 		*write_method = write_x25PLEDCENonStandardDefaultPacketSizeMaximum;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENONSTANDARDDEFAULTPACKETSIZEINCOMING:
 		*write_method = write_x25PLEDCENonStandardDefaultPacketSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENONSTANDARDDEFAULTPACKETSIZEOUTGOING:
 		*write_method = write_x25PLEDCENonStandardDefaultPacketSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENONSTANDARDDEFAULTWINDOWSIZESUBSCRIPTION:
 		*write_method = write_x25PLEDCENonStandardDefaultWindowSizeSubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENONSTANDARDDEFAULTWINDOWSIZEMAXIMUM:
 		*write_method = write_x25PLEDCENonStandardDefaultWindowSizeMaximum;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENONSTANDARDDEFAULTWINDOWSIZEINCOMING:
 		*write_method = write_x25PLEDCENonStandardDefaultWindowSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENONSTANDARDDEFAULTWINDOWSIZEOUTGOING:
 		*write_method = write_x25PLEDCENonStandardDefaultWindowSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENUIOVERRIDE:
 		*write_method = write_x25PLEDCENUIOverride;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCENUISUBSCRIPTION:
 		*write_method = write_x25PLEDCENUISubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEONEWAYLOGICALCHANNELINCOMING:
 		*write_method = write_x25PLEDCEOneWayLogicalChannelIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEONLINEFACILITYREGISTRATION:
 		*write_method = write_x25PLEDCEOnlineFacilityRegistration;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEOUTGOINGCALLBARREDWITHINCUG:
 		*write_method = write_x25PLEDCEOutgoingCallBarredWithinCUG;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEPACKETRETRANSMISSION:
 		*write_method = write_x25PLEDCEPacketRetransmission;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEREVERSECHARGINGACCEPTANCE:
 		*write_method = write_x25PLEDCEReverseChargingAcceptance;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEROASUBSCRIPTION:
 		*write_method = write_x25PLEDCEROASubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCERESTARTINDICATION:
 		*write_method = write_x25PLEDCERestartIndication;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCERESTARTCOUNT:
 		*write_method = write_x25PLEDCERestartCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEINCOMINGCALL:
 		*write_method = write_x25PLEDCEIncomingCall;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECALLCOUNT:
 		*write_method = write_x25PLEDCECallCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCERESETINDICATION:
 		*write_method = write_x25PLEDCEResetIndication;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCERESETCOUNT:
 		*write_method = write_x25PLEDCEResetCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECLEARINDICATION:
 		*write_method = write_x25PLEDCEClearIndication;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCECLEARCOUNT:
 		*write_method = write_x25PLEDCEClearCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDCEPROFILE:
 		*write_method = write_x25PLEDCEProfile;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case X25PLEDCEROWSTATUS:
 		*write_method = write_x25PLEDCERowStatus;
 		long_ret = 0;
@@ -1662,61 +1572,50 @@ var_x25PLEDXETable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_x25PLEDXEPacketSequencing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXEMAXACTIVECIRCUITS:
 		*write_method = write_x25PLEDXEMaxActiveCircuits;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXECALLDEFLECTIONSUBSCRIPTION:
 		*write_method = write_x25PLEDXECallDeflectionSubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXERESTARTTIME:
 		*write_method = write_x25PLEDXERestartTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXERESTARTCOUNT:
 		*write_method = write_x25PLEDXERestartCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXEMINIMUMRECALLTIMER:
 		*write_method = write_x25PLEDXEMinimumRecallTimer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXEREGISTRATIONTIME:
 		*write_method = write_x25PLEDXERegistrationTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXEREGISTRATIONCOUNT:
 		*write_method = write_x25PLEDXERegistrationCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXEREGISTRATIONPERMITTED:
 		*write_method = write_x25PLEDXERegistrationPermitted;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEDXEPLECLIENTMONAME:
 		*write_method = write_x25PLEDXEPLEClientMOName;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case X25PLEDXEPROFILE:
 		*write_method = write_x25PLEDXEProfile;
 		objid[0] = 0;
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-
 	case X25PLEDXEROWSTATUS:
 		*write_method = write_x25PLEDXERowStatus;
 		long_ret = 0;
@@ -1768,102 +1667,82 @@ var_x25PLEIVMODTETable(struct variable *vp, oid * name, size_t *length, int exac
 		*write_method = write_x25PLEIVMODTECallDeflectionSubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTECALLTIME:
 		*write_method = write_x25PLEIVMODTECallTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTECLEARTIME:
 		*write_method = write_x25PLEIVMODTEClearTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTECLEARCOUNT:
 		*write_method = write_x25PLEIVMODTEClearCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEPACKETSEQUENCING:
 		*write_method = write_x25PLEIVMODTEPacketSequencing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEINTERRUPTTIME:
 		*write_method = write_x25PLEIVMODTEInterruptTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEMAXACTIVECIRCUITS:
 		*write_method = write_x25PLEIVMODTEMaxActiveCircuits;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEMINIMUMRECALLTIMER:
 		*write_method = write_x25PLEIVMODTEMinimumRecallTimer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTERESETTIME:
 		*write_method = write_x25PLEIVMODTEResetTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTERESETCOUNT:
 		*write_method = write_x25PLEIVMODTEResetCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTERESTARTTIME:
 		*write_method = write_x25PLEIVMODTERestartTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTERESTARTCOUNT:
 		*write_method = write_x25PLEIVMODTERestartCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEWINDOWTIME:
 		*write_method = write_x25PLEIVMODTEWindowTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEDATATIME:
 		*write_method = write_x25PLEIVMODTEDataTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEDATACOUNT:
 		*write_method = write_x25PLEIVMODTEDataCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEREJECTTIME:
 		*write_method = write_x25PLEIVMODTERejectTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEREJECTCOUNT:
 		*write_method = write_x25PLEIVMODTERejectCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEREGISTRATIONTIME:
 		*write_method = write_x25PLEIVMODTERegistrationTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEREGISTRATIONCOUNT:
 		*write_method = write_x25PLEIVMODTERegistrationCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEREGISTRATIONPERMITTED:
 		*write_method = write_x25PLEIVMODTERegistrationPermitted;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEROWSTATUS:
 		*write_method = write_x25PLEIVMODTERowStatus;
 		long_ret = 0;
@@ -1962,42 +1841,34 @@ var_x25PLEIVMODXETable(struct variable *vp, oid * name, size_t *length, int exac
 		*write_method = write_x25PLEIVMODTECallDeflectionSubscription;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEMAXACTIVECIRCUITS:
 		*write_method = write_x25PLEIVMODTEMaxActiveCircuits;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTERESTARTTIME:
 		*write_method = write_x25PLEIVMODTERestartTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEMINIMUMRECALLTIMER:
 		*write_method = write_x25PLEIVMODTEMinimumRecallTimer;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTERESTARTCOUNT:
 		*write_method = write_x25PLEIVMODTERestartCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEPACKETSEQUENCING:
 		*write_method = write_x25PLEIVMODTEPacketSequencing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEREGISTRATIONTIME:
 		*write_method = write_x25PLEIVMODTERegistrationTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEREGISTRATIONCOUNT:
 		*write_method = write_x25PLEIVMODTERegistrationCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PLEIVMODTEREGISTRATIONPERMITTED:
 		*write_method = write_x25PLEIVMODTERegistrationPermitted;
 		long_ret = 0;
@@ -2049,37 +1920,30 @@ var_x25VCTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25VCPACKETSEQUENCING:
 		*write_method = write_x25VCPacketSequencing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25VCPACKETSIZEINCOMING:
 		*write_method = write_x25VCPacketSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25VCPACKETSIZEOUTGOING:
 		*write_method = write_x25VCPacketSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25VCWINDOWSIZEINCOMING:
 		*write_method = write_x25VCWindowSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25VCWINDOWSIZEOUTGOING:
 		*write_method = write_x25VCWindowSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25VCTHROUGHPUTCLASSINCOMING:
 		*write_method = write_x25VCThroughputClassIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25VCTHROUGHPUTCLASSOUTGOING:
 		*write_method = write_x25VCThroughputClassOutgoing;
 		long_ret = 0;
@@ -2133,70 +1997,60 @@ var_x25VCDTETable(struct variable *vp, oid * name, size_t *length, int exact, si
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEOCTETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEDATAPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEDATAPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEDATATIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEINTERRUPTPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEINTERRUPTPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEINTERRUPTTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEPROVIDERRESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTEREMOTERESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDTERESETTIMEOUTS:
 
 		c64.high = 0;
@@ -2252,84 +2106,72 @@ var_x25VCDCETable(struct variable *vp, oid * name, size_t *length, int exact, si
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEOCTETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEDATAPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEDATAPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEINTERRUPTPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEINTERRUPTPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEPROVIDERRESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEREMOTERESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCERESETTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEREMOTERESTARTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEPROVIDERDISCONNECTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEX25SEGMENTSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDCEX25SEGMENTSSENT:
 
 		c64.high = 0;
@@ -2385,70 +2227,60 @@ var_x25VCDXETable(struct variable *vp, oid * name, size_t *length, int exact, si
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEOCTETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEDATAPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEDATAPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEDATATIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEINTERRUPTPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEINTERRUPTPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEINTERRUPTTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEPROVIDERRESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXEREMOTERESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25VCDXERESETTIMEOUTS:
 
 		c64.high = 0;
@@ -2502,7 +2334,6 @@ var_x25PVCDTETable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_x25PVCDTELogicalChannel;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PVCDTEROWSTATUS:
 		*write_method = write_x25PVCDTERowStatus;
 		long_ret = 0;
@@ -2554,28 +2385,23 @@ var_x25PVCDCETable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_x25PVCDCELogicalChannel;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PVCDCECHARGINGDIRECTION:
 		*write_method = write_x25PVCDCEChargingDirection;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PVCDCEOPERATIONALSTATE:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PVCDCEREMOTEDTEADDRESS:
 		*write_method = write_x25PVCDCERemoteDTEAddress;
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25PVCDCEREMOTELOGICALCHANNEL:
 		*write_method = write_x25PVCDCERemoteLogicalChannel;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PVCDCEROWSTATUS:
 		*write_method = write_x25PVCDCERowStatus;
 		long_ret = 0;
@@ -2627,7 +2453,6 @@ var_x25PVCDXETable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_x25PVCDXELogicalChannel;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25PVCDXEROWSTATUS:
 		*write_method = write_x25PVCDXERowStatus;
 		long_ret = 0;
@@ -2680,47 +2505,38 @@ var_x25SVCIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25SVCIVMOFASTSELECT:
 		*write_method = write_x25SVCIVMOFastSelect;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMOPACKETSIZEINCOMING:
 		*write_method = write_x25SVCIVMOPacketSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMOPACKETSIZEOUTGOING:
 		*write_method = write_x25SVCIVMOPacketSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMOREVERSECHARGING:
 		*write_method = write_x25SVCIVMOReverseCharging;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMOTHROUGHPUTCLASSINCOMING:
 		*write_method = write_x25SVCIVMOThroughputClassIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMOTHROUGHPUTCLASSOUTGOING:
 		*write_method = write_x25SVCIVMOThroughputClassOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMOWINDOWSIZEINCOMING:
 		*write_method = write_x25SVCIVMOWindowSizeIncoming;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMOWINDOWSIZEOUTGOING:
 		*write_method = write_x25SVCIVMOWindowSizeOutgoing;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMOROWSTATUS:
 		*write_method = write_x25SVCIVMORowStatus;
 		long_ret = 0;
@@ -2773,62 +2589,50 @@ var_x25SVCIVMODTETable(struct variable *vp, oid * name, size_t *length, int exac
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25SVCIVMODTECALLTIME:
 		*write_method = write_x25SVCIVMODTECallTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTERESETTIME:
 		*write_method = write_x25SVCIVMODTEResetTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTERESETCOUNT:
 		*write_method = write_x25SVCIVMODTEResetCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTEINTERRUPTTIME:
 		*write_method = write_x25SVCIVMODTEInterruptTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTECLEARTIME:
 		*write_method = write_x25SVCIVMODTEClearTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTECLEARCOUNT:
 		*write_method = write_x25SVCIVMODTEClearCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTEWINDOWTIME:
 		*write_method = write_x25SVCIVMODTEWindowTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTEDATATIME:
 		*write_method = write_x25SVCIVMODTEDataTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTEDATACOUNT:
 		*write_method = write_x25SVCIVMODTEDataCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTEREJECTTIME:
 		*write_method = write_x25SVCIVMODTERejectTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTEREJECTCOUNT:
 		*write_method = write_x25SVCIVMODTERejectCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODTEROWSTATUS:
 		*write_method = write_x25SVCIVMODTERowStatus;
 		long_ret = 0;
@@ -2881,62 +2685,50 @@ var_x25SVCIVMODXETable(struct variable *vp, oid * name, size_t *length, int exac
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25SVCIVMODXECALLTIME:
 		*write_method = write_x25SVCIVMODXECallTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXERESETTIME:
 		*write_method = write_x25SVCIVMODXEResetTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXECLEARTIME:
 		*write_method = write_x25SVCIVMODXEClearTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXEINTERRUPTTIME:
 		*write_method = write_x25SVCIVMODXEInterruptTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXERESETCOUNT:
 		*write_method = write_x25SVCIVMODXEResetCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXECLEARCOUNT:
 		*write_method = write_x25SVCIVMODXEClearCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXEROWSTATUS:
 		*write_method = write_x25SVCIVMODXERowStatus;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXEWINDOWTIME:
 		*write_method = write_x25SVCIVMODXEWindowTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXEDATATIME:
 		*write_method = write_x25SVCIVMODXEDataTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXEDATACOUNT:
 		*write_method = write_x25SVCIVMODXEDataCount;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXEREJECTTIME:
 		*write_method = write_x25SVCIVMODXERejectTime;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCIVMODXEREJECTCOUNT:
 		*write_method = write_x25SVCIVMODXERejectCount;
 		long_ret = 0;
@@ -2992,29 +2784,24 @@ var_x25SVCDTETable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDTEFASTSELECT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDTEORIGINALLYCALLEDADDRESS:
 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25SVCDTEREDIRECTREASON:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDTEREMOTEDTEADDRESS:
 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25SVCDTEREVERSECHARGING:
 
 		long_ret = 0;
@@ -3066,28 +2853,23 @@ var_x25SVCDCETable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDCECUGSELECTION:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDCEDIRECTION:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDCEFASTSELECT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDCEREMOTEDTEADDRESS:
 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25SVCDCETRANSITDELAYSELECTIONANDINDICATION:
 
 		long_ret = 0;
@@ -3139,29 +2921,24 @@ var_x25SVCDXETable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDXEREMOTEDTEADDRESS:
 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25SVCDXEFASTSELECT:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDXEREDIRECTREASON:
 
 		long_ret = 0;
 		return (u_char *) &long_ret;
-
 	case X25SVCDXEORIGINALLYCALLEDADDRESS:
 
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25SVCDXECALLINGADDRESSEXTENSION:
 
 	case X25SVCDXECALLEDADDRESSEXTENSION:
@@ -3213,21 +2990,18 @@ var_x25DSCTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-
 	case X25DSCRESETREQUESTINDICATIONPACKETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25DSCSEGMENTSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25DSCSEGMENTSRECEIVED:
 
 		c64.high = 0;
@@ -3283,126 +3057,108 @@ var_x25PLEDTEStatsTable(struct variable *vp, oid * name, size_t *length, int exa
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSPROTOCOLERRORSDETECTEDLOCALLY:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSPROTOCOLERRORSACCUSEDOF:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSCALLCOUNTSEXCEEDED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSOCTETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSOCTETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSCALLTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSCALLSCONNECTED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSDATAPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSDATAPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSDATATIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSPROVIDERRESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSPROVIDERDISCONNECTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSREMOTERESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSREMOTERESTARTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSRESETTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSRESTARTCOUNTSEXCEEDED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSCLEARTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDTESTATSCLEARCOUNTSEXCEEDED:
 
 		c64.high = 0;
@@ -3458,98 +3214,84 @@ var_x25PLEDCEStatsTable(struct variable *vp, oid * name, size_t *length, int exa
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSCALLSCONNECTED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSOCTETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSOCTETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSDATAPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSDATAPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSINTERRUPTPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSINTERRUPTPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSPROVIDERRESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSPROVIDERDISCONNECTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSREMOTERESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSREMOTERESTARTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSRESETTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSX25SEGMENTSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDCESTATSX25SEGMENTSSENT:
 
 		c64.high = 0;
@@ -3605,126 +3347,108 @@ var_x25PLEDXEStatsTable(struct variable *vp, oid * name, size_t *length, int exa
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSPROTOCOLERRORSDETECTEDLOCALLY:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSPROTOCOLERRORSACCUSEDOF:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSCALLCOUNTSEXCEEDED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSOCTETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSOCTETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSCALLTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSCALLSCONNECTED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSCLEARTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSDATAPACKETSRECEIVED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSDATAPACKETSSENT:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSDATATIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSPROVIDERRESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSPROVIDERDISCONNECTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSREMOTERESETS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSREMOTERESTARTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSRESETTIMEOUTS:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSRESTARTCOUNTSEXCEEDED:
 
 		c64.high = 0;
 		c64.low = 0;
 		*var_len = sizeof(c64);
 		return (u_char *) &c64;
-
 	case X25PLEDXESTATSCLEARCOUNTSEXCEEDED:
 
 		c64.high = 0;
@@ -3790,7 +3514,7 @@ int
 write_x25PLELocalDTEAddress(int action, unsigned char *var_val, unsigned char var_val_type,
 			    size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -3807,7 +3531,7 @@ write_x25PLELocalDTEAddress(int action, unsigned char *var_val, unsigned char va
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -3838,7 +3562,7 @@ write_x25PLEFacilityNonNegotiable(int action, unsigned char *var_val, unsigned c
 				  size_t var_val_len, unsigned char *statP, oid * name,
 				  size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -3855,7 +3579,7 @@ write_x25PLEFacilityNonNegotiable(int action, unsigned char *var_val, unsigned c
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -3886,7 +3610,7 @@ write_x25PLEFacilityAvailability(int action, unsigned char *var_val, unsigned ch
 				 size_t var_val_len, unsigned char *statP, oid * name,
 				 size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -3903,7 +3627,7 @@ write_x25PLEFacilityAvailability(int action, unsigned char *var_val, unsigned ch
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -3934,7 +3658,7 @@ write_x25PLEFacilityNegotiation(int action, unsigned char *var_val, unsigned cha
 				size_t var_val_len, unsigned char *statP, oid * name,
 				size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -3951,7 +3675,7 @@ write_x25PLEFacilityNegotiation(int action, unsigned char *var_val, unsigned cha
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -3981,7 +3705,7 @@ int
 write_x25PLEFacilityWhileIdle(int action, unsigned char *var_val, unsigned char var_val_type,
 			      size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -3998,7 +3722,7 @@ write_x25PLEFacilityWhileIdle(int action, unsigned char *var_val, unsigned char 
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -5111,7 +4835,7 @@ write_x25PLEIVMOLocalDTEAddress(int action, unsigned char *var_val, unsigned cha
 				size_t var_val_len, unsigned char *statP, oid * name,
 				size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -5128,7 +4852,7 @@ write_x25PLEIVMOLocalDTEAddress(int action, unsigned char *var_val, unsigned cha
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -6912,7 +6636,7 @@ write_x25PLEDCEDefaultThroughputClassSupported(int action, unsigned char *var_va
 					       unsigned char var_val_type, size_t var_val_len,
 					       unsigned char *statP, oid * name, size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -6931,7 +6655,7 @@ write_x25PLEDCEDefaultThroughputClassSupported(int action, unsigned char *var_va
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -11066,7 +10790,7 @@ write_x25PVCDCERemoteDTEAddress(int action, unsigned char *var_val, unsigned cha
 				size_t var_val_len, unsigned char *statP, oid * name,
 				size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -11083,7 +10807,7 @@ write_x25PVCDCERemoteDTEAddress(int action, unsigned char *var_val, unsigned cha
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -11302,7 +11026,7 @@ int
 write_x25SVCIVMOId(int action, unsigned char *var_val, unsigned char var_val_type,
 		   size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -11319,7 +11043,7 @@ write_x25SVCIVMOId(int action, unsigned char *var_val, unsigned char var_val_typ
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -11781,7 +11505,7 @@ int
 write_x25SVCIVMOId(int action, unsigned char *var_val, unsigned char var_val_type,
 		   size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -11798,7 +11522,7 @@ write_x25SVCIVMOId(int action, unsigned char *var_val, unsigned char var_val_typ
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 
@@ -12394,7 +12118,7 @@ int
 write_x25SVCIVMOId(int action, unsigned char *var_val, unsigned char var_val_type,
 		   size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static u_char string[SPRINT_MAX_LEN];
+	static uint8_t string[SPRINT_MAX_LEN];
 	int size;
 
 	switch (action) {
@@ -12411,7 +12135,7 @@ write_x25SVCIVMOId(int action, unsigned char *var_val, unsigned char var_val_typ
 
 	case RESERVE2:
 		size = var_val_len;
-		string = (char *) var_val;
+		string = (uint8_t *) var_val;
 
 		break;
 

@@ -1,5 +1,68 @@
 #!/usr/bin/perl
 #!/usr/bin/perl -w
+# =============================================================================
+#
+# @(#) $RCSfile: mib2c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.9 $) $Date: 2009-01-02 13:46:35 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacom Limited <http://www.monavacom.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2009-01-02 13:46:35 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: mib2c,v $
+# Revision 0.9.2.9  2009-01-02 13:46:35  brian
+# - more enhancements and corrections
+#
+# Revision 0.9.2.8  2009-01-02 08:34:01  brian
+# - more improvements and corrections
+#
+# Revision 0.9.2.7  2009-01-01 11:27:44  brian
+# - corrections and new copyright header
+#
+# =============================================================================
 
 #
 # Description: 
@@ -94,6 +157,13 @@ sub stripone {
 	return $temp;
 }
 
+sub countsubs {
+	my $temp = shift;
+	my $count = -1;
+	while ($temp =~ s/\.//) { $count=$count+1; }
+	return "$count";
+}
+
 $mib = $SNMP::MIB{$oid};
 if ($mib->{'label'} eq "mib-2") {
     print STDERR "Couldn\'t find mib node $oid\n";
@@ -110,6 +180,7 @@ $commaoid =~ s/\./,/g;
 $commaoid =~ s/^,//g;
 
 $mibName = $mib->{'label'};
+$mibName =~ s/-/_/g;
 $MIBNAME = uc($mibName);
 $mibname = lc($mibName);
 $outputName = $mib->{'label'} if (!defined($outputName));
@@ -173,7 +244,7 @@ foreach $vtable (@table_list) {
 	    (eval "\"$variables{$ptable}{'code'}\"") . "\n";
     }
     $var_routines .= 
-	(eval "\"$variables{'code-var_table'}{'code'}\"") . "\n";
+	(eval "\"$variables{'code-var-table'}{'code'}\"") . "\n";
 }
 
 #============================================
@@ -221,10 +292,10 @@ sub loadMib {
     my $depth = shift;
     $depth = $depth + 1;
     my $name = $mib->{'label'};
+    $name =~ s/-/_/g;
     my $NAME = uc($name);
     print "doing $mib->{label} : $mib->{objectID}\n" if $debug;
-    if (defined($mib->{'access'}) && 
-	$mib->{'access'} =~ /ReadOnly|ReadWrite|WriteOnly|Create|NoAccess/) {
+    if (defined($mib->{'access'})) {
 	$count = $count + 1;
 	$subid = $mib->{'objectID'};
 	if  ( $subid =~ s/$fulloid\.// ) {
@@ -248,8 +319,18 @@ sub loadMib {
 	    print "indexes: ", join(", ",@{$mib->{'indexes'}}),"\n" if ($debug);
 	    $variables{$vroutine}{'indexes'} = $mib->{'indexes'};
 	    foreach $i (@{$mib->{'indexes'}}) {
+		$variables{$mibName}{$i}{'isanindex'} = 1;
 		$variables{$vroutine}{$i}{'isanindex'} = 1;
 	    }
+	}
+    } elsif (defined($mib->{description})) {
+	foreach $i (@processoid) {
+	    next if (defined($variables{$i}{'skipif'}) &&
+		     eval $variables{$i}{'skipif'});
+	    my $result = (eval "\"$variables{$i}{'code'}\"");
+	    $variables{$i}{'processed'} .= $result;
+	    $variables{$vroutine}{$i}{'processed'} .= $result;
+	    $variables{$vroutine}{$name}{$i}{'processed'} .= $result;
 	}
     }
     my $children = $$mib{'children'}; 
@@ -260,6 +341,14 @@ sub loadMib {
 	    if ($j eq $i->{'label'}) {
 		$variables{$vroutine}{$j}{'ismyindex'} = 1;
 	    }
+	}
+	if ($i->{'textualConvention'} eq "RowStatus") {
+		$variables{$vroutine}{'rowstatus'} = $i->{'label'};
+		$variables{$vroutine}{'rowstatus'} =~ s/-/_/g;
+	}
+	if ($i->{'textualConvention'} eq "StorageType") {
+		$variables{$vroutine}{'storagetype'} = $i->{'label'};
+		$variables{$vroutine}{'storagetype'} =~ s/-/_/g;
 	}
     }
     foreach $j (@{$mib->{'indexes'}}) {
@@ -308,6 +397,8 @@ sub read_config() {
 		read_config($1);
 	    } elsif (/process:\s*(.*)/) {
 		push (@process, $1);
+	    } elsif (/processoid:\s*(.*)/) {
+		push (@processoid, $1);
 	    } elsif (/processtable:\s*(.*)/) {
 		push (@processtable, $1);
 	    } elsif (/delete:\s*(.*)/) {

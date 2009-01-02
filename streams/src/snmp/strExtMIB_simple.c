@@ -56,6 +56,24 @@ struct variable7 strExtMIB_simple_variables[] = {
 	{STREXTSTRLOGRECORDROWSTATUS, ASN_INTEGER, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 8}},
 #define   STRNLOGARGS           12
 	{STRNLOGARGS, ASN_UNSIGNED, RWRITE, var_strExtMIB, 3, {1, 2, 1}},
+#define   STREXTSTRLOGTIMESTAMP  13
+	{STREXTSTRLOGTIMESTAMP, ASN_TIMETICKS,, var_strExtMIB, 4, {1, 3, 1, 1}},
+#define   STREXTSTRLOGMID       14
+	{STREXTSTRLOGMID, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 2}},
+#define   STREXTSTRLOGSID       15
+	{STREXTSTRLOGSID, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 3}},
+#define   STREXTSTRLOGLEVEL     16
+	{STREXTSTRLOGLEVEL, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 4}},
+#define   STREXTSTRLOGFLAGS     17
+	{STREXTSTRLOGFLAGS, ASN_BIT_STR,, var_strExtMIB, 4, {1, 3, 1, 5}},
+#define   STREXTSTRLOGFMTSTRING  18
+	{STREXTSTRLOGFMTSTRING, ASN_OCTET_STR,, var_strExtMIB, 4, {1, 3, 1, 6}},
+#define   STREXTSTRLOGINTEGER   19
+	{STREXTSTRLOGINTEGER, ASN_INTEGER,, var_strExtMIB, 4, {1, 3, 1, 7}},
+#define   STREXTSTRLOGUNSIGNED  20
+	{STREXTSTRLOGUNSIGNED, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 8}},
+#define   STREXTSTRLOGSTRING    21
+	{STREXTSTRLOGSTRING, ASN_OCTET_STR,, var_strExtMIB, 4, {1, 3, 1, 9}},
 };
 
 /*    (L = length of the oidsuffix) */
