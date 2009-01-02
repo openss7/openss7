@@ -1,3 +1,11 @@
+2009-01-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/strExtMIB.c: updated agents
+	* src/snmp/strExtMIB.h: updated agents
+	* src/snmp/strMIB.c: updated agents
+	* src/snmp/strMIB.h: updated agents
+	* src/snmp/mibs/OPENSS7-STREAMS-MIB.mib: updated agents
+
 2008-12-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/perl/mibbrowser: updated mibs

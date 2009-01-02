@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SS7-MIB.mib,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-12-31 16:04:49 $
+-- @(#) $RCSfile: OPENSS7-SS7-MIB.mib,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-01-02 15:04:17 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-31 16:04:49 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-02 15:04:17 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SS7-MIB.mib,v $
+-- Revision 0.9.2.12  2009-01-02 15:04:17  brian
+-- - updated agents
+--
 -- Revision 0.9.2.11  2008-12-31 16:04:49  brian
 -- - updated mibs
 --
@@ -198,17 +201,7 @@ ss7Protocols		OBJECT IDENTIFIER ::= { ss7Oids		 1 }
 -- |        |  |__(2004) ss7ProtocolChin2004
 -- |        |  |__(2008) ss7ProtocolChin2008
 -- |        |
--- |        |__( 6) ss7ProtocolPnoc
--- |        |  |__(1980) ss7ProtocolPnoc1980
--- |        |  |__(1984) ss7ProtocolPnoc1984
--- |        |  |__(1988) ss7ProtocolPnoc1988
--- |        |  |__(1992) ss7ProtocolPnoc1992
--- |        |  |__(1996) ss7ProtocolPnoc1996
--- |        |  |__(2000) ss7ProtocolPnoc2000
--- |        |  |__(2004) ss7ProtocolPnoc2004
--- |        |  |__(2008) ss7ProtocolPnoc2008
--- |        |
--- |        |__( 7) ss7ProtocolSing
+-- |        |__( 6) ss7ProtocolSing
 -- |        |  |__(1980) ss7ProtocolSing1980
 -- |        |  |__(1984) ss7ProtocolSing1984
 -- |        |  |__(1988) ss7ProtocolSing1988
@@ -218,7 +211,7 @@ ss7Protocols		OBJECT IDENTIFIER ::= { ss7Oids		 1 }
 -- |        |  |__(2004) ss7ProtocolSing2004
 -- |        |  |__(2008) ss7ProtocolSing2008
 -- |        |
--- |        |__( 8) ss7ProtocolSpan
+-- |        |__( 7) ss7ProtocolSpan
 -- |        |  |__(1980) ss7ProtocolSpan1980
 -- |        |  |__(1984) ss7ProtocolSpan1984
 -- |        |  |__(1988) ss7ProtocolSpan1988
@@ -227,6 +220,16 @@ ss7Protocols		OBJECT IDENTIFIER ::= { ss7Oids		 1 }
 -- |        |  |__(2000) ss7ProtocolSpan2000
 -- |        |  |__(2004) ss7ProtocolSpan2004
 -- |        |  |__(2008) ss7ProtocolSpan2008
+-- |        |
+-- |        |__( 8) ss7ProtocolPnoc
+-- |           |__(1980) ss7ProtocolPnoc1980
+-- |           |__(1984) ss7ProtocolPnoc1984
+-- |           |__(1988) ss7ProtocolPnoc1988
+-- |           |__(1992) ss7ProtocolPnoc1992
+-- |           |__(1996) ss7ProtocolPnoc1996
+-- |           |__(2000) ss7ProtocolPnoc2000
+-- |           |__(2004) ss7ProtocolPnoc2004
+-- |           |__(2008) ss7ProtocolPnoc2008
 -- |
 
 -- ====================================================================
@@ -1155,6 +1158,70 @@ ss7ProtocolSpan2008 OBJECT-IDENTITY
 	"Provides an autonomous type for the Spanish protocol variants 
 	 based on the ITU-T 2008 plenary session."
     ::= { ss7ProtocolSpan 2008 }
+
+
+ss7ProtocolPnoc OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol variant 
+	 or protocol variants based on ETSI."
+    ::= { ss7Protocols 8 }
+
+ss7ProtocolPnoc1980 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol 
+	 variants based on the ITU-T 1980 plenary session."
+    ::= { ss7ProtocolPnoc 1980 }
+
+ss7ProtocolPnoc1984 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol 
+	 variants based on the ITU-T 1984 plenary session."
+    ::= { ss7ProtocolPnoc 1984 }
+
+ss7ProtocolPnoc1988 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol 
+	 variants based on the ITU-T 1988 plenary session."
+    ::= { ss7ProtocolPnoc 1988 }
+
+ss7ProtocolPnoc1992 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol 
+	 variants based on the ITU-T 1992 plenary session."
+    ::= { ss7ProtocolPnoc 1992 }
+
+ss7ProtocolPnoc1996 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol 
+	 variants based on the ITU-T 1996 plenary session."
+    ::= { ss7ProtocolPnoc 1996 }
+
+ss7ProtocolPnoc2000 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol 
+	 variants based on the ITU-T 2000 plenary session."
+    ::= { ss7ProtocolPnoc 2000 }
+
+ss7ProtocolPnoc2004 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol 
+	 variants based on the ITU-T 2004 plenary session."
+    ::= { ss7ProtocolPnoc 2004 }
+
+ss7ProtocolPnoc2008 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the UK BT PNOC protocol 
+	 variants based on the ITU-T 2008 plenary session."
+    ::= { ss7ProtocolPnoc 2008 }
 
 
 END

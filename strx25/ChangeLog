@@ -1,3 +1,8 @@
+2009-01-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/x25MIB.c: added agent
+	* src/snmp/x25MIB.h: added agent
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* strx25.spec.in: new stratm package

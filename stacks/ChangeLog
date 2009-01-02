@@ -1,3 +1,30 @@
+2009-01-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/cdr2MIB.c: updated agents
+	* src/snmp/cdr2MIB.h: updated agents
+	* src/snmp/mtpMIB.c: updated agents
+	* src/snmp/mtpMIB.h: updated agents
+	* src/snmp/mtpOmMIB.c: updated agents
+	* src/snmp/mtpOmMIB.h: updated agents
+	* src/snmp/sccpMIB.c: updated agents
+	* src/snmp/sccpMIB.h: updated agents
+	* src/snmp/sccpOmMIB.c: updated agents
+	* src/snmp/sccpOmMIB.h: updated agents
+	* src/snmp/slMIB.c: updated agents
+	* src/snmp/slMIB.h: updated agents
+	* src/snmp/ss7MIB.c: updated agents
+	* src/snmp/ss7MIB.h: updated agents
+	* src/snmp/ss7OmMIB.c: updated agents
+	* src/snmp/ss7OmMIB.h: updated agents
+	* src/snmp/tcapMIB.c: updated agents
+	* src/snmp/tcapMIB.h: updated agents
+	* src/snmp/tcapOmMIB.c: updated agents
+	* src/snmp/tcapOmMIB.h: updated agents
+	* src/snmp/x400pMIB.c: updated agents
+	* src/snmp/x400pMIB.h: updated agents
+	* src/snmp/mibs/OPENSS7-SL-MIB.mib: updated agents
+	* src/snmp/mibs/OPENSS7-SS7-MIB.mib: updated agents
+
 2008-12-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: updated mibs
