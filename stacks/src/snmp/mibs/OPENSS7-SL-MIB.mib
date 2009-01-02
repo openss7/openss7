@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SL-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-31 16:09:08 $
+-- @(#) $RCSfile: OPENSS7-SL-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-01-02 15:04:17 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-31 16:09:08 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-02 15:04:17 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SL-MIB.mib,v $
+-- Revision 0.9.2.2  2009-01-02 15:04:17  brian
+-- - updated agents
+--
 -- Revision 0.9.2.1  2008-12-31 16:09:08  brian
 -- - added new mibs
 --
@@ -544,7 +547,7 @@ slProfileProtocolVariant OBJECT-TYPE
 
 slProfileTimerT1 OBJECT-TYPE
     SYNTAX	TimeInterval (1290..60000)
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -581,7 +584,7 @@ slProfileTimerT1 OBJECT-TYPE
 
 slProfileTimerT2 OBJECT-TYPE
     SYNTAX	TimeInterval (500..15000)
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -606,7 +609,7 @@ slProfileTimerT2 OBJECT-TYPE
 
 slProfileTimerT2L OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -632,7 +635,7 @@ slProfileTimerT2L OBJECT-TYPE
 
 slProfileTimerT2H OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -658,7 +661,7 @@ slProfileTimerT2H OBJECT-TYPE
 
 slProfileTimerT3 OBJECT-TYPE
     SYNTAX	TimeInterval (100..1400)
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -683,7 +686,7 @@ slProfileTimerT3 OBJECT-TYPE
 
 slProfileTimerT4N OBJECT-TYPE
     SYNTAX	TimeInterval (230..12000)
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -714,7 +717,7 @@ slProfileTimerT4N OBJECT-TYPE
 
 slProfileTimerT4E OBJECT-TYPE
     SYNTAX	TimeInterval (40..800)
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -746,7 +749,7 @@ slProfileTimerT4E OBJECT-TYPE
 
 slProfileTimerT5 OBJECT-TYPE
     SYNTAX	TimeInterval (8..12)
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -771,7 +774,7 @@ slProfileTimerT5 OBJECT-TYPE
 
 slProfileTimerT6 OBJECT-TYPE
     SYNTAX	TimeInterval (300..1200)
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -799,7 +802,7 @@ slProfileTimerT6 OBJECT-TYPE
 
 slProfileTimerT7 OBJECT-TYPE
     SYNTAX	TimeInterval (50..600)
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -1091,7 +1094,7 @@ slProfileTbDiscard3 OBJECT-TYPE
 
 slProfileTimerTx OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -1105,7 +1108,7 @@ slProfileTimerTx OBJECT-TYPE
 
 slProfileTimerTy OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2357,6 +2360,7 @@ slSaalBufferRelease OBJECT-TYPE
 
 slSaalMaxCc OBJECT-TYPE
     SYNTAX	Unsigned32
+    UNITS	"PDUs"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2371,6 +2375,7 @@ slSaalMaxCc OBJECT-TYPE
 
 slSaalMaxNrp OBJECT-TYPE
     SYNTAX	Unsigned32
+    UNITS	"retransmissions"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2383,12 +2388,13 @@ slSaalMaxNrp OBJECT-TYPE
 
 slSaalMaxInformationFieldLength OBJECT-TYPE
     SYNTAX	Unsigned32
+    UNITS	"octets"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
 	"This attribute defines the maximum length of the information 
-	 field in SD PDUs, UD PDUs and MD PDUs kh.  The unit of the 
-	 INTEGER value is octets."
+	 field in SD PDUs, UD PDUs and MD PDUs.  The unit of the INTEGER 
+	 value is octets."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 maxInformationFieldLength attribute."
@@ -2397,6 +2403,7 @@ slSaalMaxInformationFieldLength OBJECT-TYPE
 
 slSaalMaxLengthSscopUuField OBJECT-TYPE
     SYNTAX	Unsigned32
+    UNITS	"octets"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2412,6 +2419,7 @@ slSaalMaxLengthSscopUuField OBJECT-TYPE
 
 slSaalMaxPd OBJECT-TYPE
     SYNTAX	Unsigned32
+    UNITS	"PDUs"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2427,6 +2435,7 @@ slSaalMaxPd OBJECT-TYPE
 
 slSaalMaxSscopCreditToPeer OBJECT-TYPE
     SYNTAX	Unsigned32
+    UNITS	"PDUs"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2442,6 +2451,7 @@ slSaalMaxSscopCreditToPeer OBJECT-TYPE
 
 slSaalMaxStat OBJECT-TYPE
     SYNTAX	Unsigned32
+    UNITS	"list elements"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2455,6 +2465,7 @@ slSaalMaxStat OBJECT-TYPE
 
 slSaalN1 OBJECT-TYPE
     SYNTAX	Unsigned32
+    UNITS	"PDUs"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2482,7 +2493,7 @@ slSaalNniLayerManagementProvingState OBJECT-TYPE
 
 slSaalNniLayerManagementTimerNoCredit OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2497,7 +2508,7 @@ slSaalNniLayerManagementTimerNoCredit OBJECT-TYPE
 
 slSaalNniLayerManagementTimerRepeatSrec OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2511,7 +2522,7 @@ slSaalNniLayerManagementTimerRepeatSrec OBJECT-TYPE
 
 slSaalNniTimerT1 OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2526,7 +2537,7 @@ slSaalNniTimerT1 OBJECT-TYPE
 
 slSaalNniTimerT2 OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2541,7 +2552,7 @@ slSaalNniTimerT2 OBJECT-TYPE
 
 slSaalNniTimerT3 OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2555,7 +2566,7 @@ slSaalNniTimerT3 OBJECT-TYPE
 
 slSaalSscopTimerCc OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2571,7 +2582,7 @@ slSaalSscopTimerCc OBJECT-TYPE
 
 slSaalSscopTimerIdle OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2588,7 +2599,7 @@ slSaalSscopTimerIdle OBJECT-TYPE
 
 slSaalSscopTimerKeepAlive OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2605,7 +2616,7 @@ slSaalSscopTimerKeepAlive OBJECT-TYPE
 
 slSaalSscopTimerNoResponse OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2621,7 +2632,7 @@ slSaalSscopTimerNoResponse OBJECT-TYPE
 
 slSaalSscopTimerPoll OBJECT-TYPE
     SYNTAX	TimeInterval
-    UNITS	"centiseconds"
+    UNITS	"seconds"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2638,6 +2649,7 @@ slSaalSscopTimerPoll OBJECT-TYPE
 
 slSaalTransmissionRateIntervalLower OBJECT-TYPE
     SYNTAX	Unsigned32 (64..4096)
+    UNITS	"kbps"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2662,6 +2674,7 @@ slSaalTransmissionRateIntervalLower OBJECT-TYPE
 
 slSaalTransmissionRateIntervalUpper OBJECT-TYPE
     SYNTAX	Unsigned32 (64..4096)
+    UNITS	"kbps"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2685,7 +2698,8 @@ slSaalTransmissionRateIntervalUpper OBJECT-TYPE
     ::= { slSaalEntry 22 }
 
 slSaalEgressTransmissionRateIntervalLower OBJECT-TYPE
-    SYNTAX	Unsigned32
+    SYNTAX	Unsigned32 (64..4096)
+    UNITS	"kbps"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -2702,7 +2716,8 @@ slSaalEgressTransmissionRateIntervalLower OBJECT-TYPE
     ::= { slSaalEntry 23 }
 
 slSaalEgressTransmissionRateIntervalUpper OBJECT-TYPE
-    SYNTAX	Unsigned32
+    SYNTAX	Unsigned32 (64..4096)
+    UNITS	"kbps"
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
@@ -3686,7 +3701,7 @@ slSdlLoopDelay OBJECT-TYPE
 
 slSdlOperationalState OBJECT-TYPE
     SYNTAX	OperationalState
-    MAX-ACCESS	read-create
+    MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Provides the operational state of the signalling data link 
