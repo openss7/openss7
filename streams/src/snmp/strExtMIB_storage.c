@@ -279,7 +279,7 @@ strExtMIB_create(void)
 {
 	struct strExtMIB_data *StorageNew = SNMP_MALLOC_STRUCT(strExtMIB_data);
 
-	DBUGMSGTL(("strExtMIB", "creating scalars...  "));
+	DEBUGMSGTL(("strExtMIB", "creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
 
@@ -304,12 +304,6 @@ strExtMIB_destroy(struct strExtMIB_data **thedata)
 
 	DEBUGMSGTL(("strExtMIB", "deleting scalars...  "));
 	if ((StorageDel = *thedata) != NULL) {
-		SNMP_FREE(StorageDel->strExtStrlogFlags);
-		StorageDel->strExtStrlogFlagsLen = 0;
-		SNMP_FREE(StorageDel->strExtStrlogFmtString);
-		StorageDel->strExtStrlogFmtStringLen = 0;
-		SNMP_FREE(StorageDel->strExtStrlogString);
-		StorageDel->strExtStrlogStringLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -470,7 +464,7 @@ strExtStrlogRecordTable_create(void)
 {
 	struct strExtStrlogRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(strExtStrlogRecordTable_data);
 
-	DBUGMSGTL(("strExtStrlogRecordTable", "creating row...  "));
+	DEBUGMSGTL(("strExtStrlogRecordTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->strExtStrlogRecordRowStatus = RS_NOTREADY;
@@ -651,7 +645,7 @@ strExtStrlogRecordTable_create(void)
 {
 	struct strExtStrlogRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(strExtStrlogRecordTable_data);
 
-	DBUGMSGTL(("strExtStrlogRecordTable", "creating row...  "));
+	DEBUGMSGTL(("strExtStrlogRecordTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->strExtStrlogRecordRowStatus = RS_NOTREADY;

@@ -1259,7 +1259,7 @@ x25PLPMIB_create(void)
 {
 	struct x25PLPMIB_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLPMIB_data);
 
-	DBUGMSGTL(("x25PLPMIB", "creating scalars...  "));
+	DEBUGMSGTL(("x25PLPMIB", "creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
 
@@ -1284,12 +1284,6 @@ x25PLPMIB_destroy(struct x25PLPMIB_data **thedata)
 
 	DEBUGMSGTL(("x25PLPMIB", "deleting scalars...  "));
 	if ((StorageDel = *thedata) != NULL) {
-		SNMP_FREE(StorageDel->notificationDataPacketHeader);
-		StorageDel->notificationDataPacketHeaderLen = 0;
-		SNMP_FREE(StorageDel->notificationDataDiagnosticCode);
-		StorageDel->notificationDataDiagnosticCodeLen = 0;
-		SNMP_FREE(StorageDel->notificationDataCauseCode);
-		StorageDel->notificationDataCauseCodeLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -1445,7 +1439,7 @@ x25PLETable_create(void)
 {
 	struct x25PLETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLETable_data);
 
-	DBUGMSGTL(("x25PLETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -1822,7 +1816,7 @@ x25PLEIVMOTable_create(void)
 {
 	struct x25PLEIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMOTable_data);
 
-	DBUGMSGTL(("x25PLEIVMOTable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEIVMODefaultThroughputClassIncoming = none(0);
@@ -2155,7 +2149,7 @@ x25PLEDTETable_create(void)
 {
 	struct x25PLEDTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEDTETable_data);
 
-	DBUGMSGTL(("x25PLEDTETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEDTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEDTEPacketSequencing = 1;
@@ -2404,7 +2398,7 @@ x25PLEDCETable_create(void)
 {
 	struct x25PLEDCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEDCETable_data);
 
-	DBUGMSGTL(("x25PLEDCETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEDCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEDCERestartIndication = 6000;
@@ -2911,7 +2905,7 @@ x25PLEDXETable_create(void)
 {
 	struct x25PLEDXETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEDXETable_data);
 
-	DBUGMSGTL(("x25PLEDXETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEDXETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEDXERestartTime = 18000;
@@ -3171,7 +3165,7 @@ x25PLEIVMODTETable_create(void)
 {
 	struct x25PLEIVMODTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMODTETable_data);
 
-	DBUGMSGTL(("x25PLEIVMODTETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEIVMODTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEIVMODTERowStatus = RS_NOTREADY;
@@ -3484,7 +3478,7 @@ x25PLEIVMODCETable_create(void)
 {
 	struct x25PLEIVMODCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMODCETable_data);
 
-	DBUGMSGTL(("x25PLEIVMODCETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEIVMODCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEIVMODCERowStatus = RS_NOTREADY;
@@ -3672,7 +3666,7 @@ x25PLEIVMODXETable_create(void)
 {
 	struct x25PLEIVMODXETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMODXETable_data);
 
-	DBUGMSGTL(("x25PLEIVMODXETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEIVMODXETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -3918,7 +3912,7 @@ x25VCTable_create(void)
 {
 	struct x25VCTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25VCTable_data);
 
-	DBUGMSGTL(("x25VCTable", "creating row...  "));
+	DEBUGMSGTL(("x25VCTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -4147,7 +4141,7 @@ x25VCDTETable_create(void)
 {
 	struct x25VCDTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25VCDTETable_data);
 
-	DBUGMSGTL(("x25VCDTETable", "creating row...  "));
+	DEBUGMSGTL(("x25VCDTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -4396,7 +4390,7 @@ x25VCDCETable_create(void)
 {
 	struct x25VCDCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25VCDCETable_data);
 
-	DBUGMSGTL(("x25VCDCETable", "creating row...  "));
+	DEBUGMSGTL(("x25VCDCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -4659,7 +4653,7 @@ x25VCDXETable_create(void)
 {
 	struct x25VCDXETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25VCDXETable_data);
 
-	DBUGMSGTL(("x25VCDXETable", "creating row...  "));
+	DEBUGMSGTL(("x25VCDXETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -4908,7 +4902,7 @@ x25PVCDTETable_create(void)
 {
 	struct x25PVCDTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PVCDTETable_data);
 
-	DBUGMSGTL(("x25PVCDTETable", "creating row...  "));
+	DEBUGMSGTL(("x25PVCDTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PVCDTERowStatus = RS_NOTREADY;
@@ -5100,7 +5094,7 @@ x25PVCDCETable_create(void)
 {
 	struct x25PVCDCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PVCDCETable_data);
 
-	DBUGMSGTL(("x25PVCDCETable", "creating row...  "));
+	DEBUGMSGTL(("x25PVCDCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PVCDCERowStatus = RS_NOTREADY;
@@ -5326,7 +5320,7 @@ x25PVCDXETable_create(void)
 {
 	struct x25PVCDXETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PVCDXETable_data);
 
-	DBUGMSGTL(("x25PVCDXETable", "creating row...  "));
+	DEBUGMSGTL(("x25PVCDXETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PVCDXERowStatus = RS_NOTREADY;
@@ -5518,7 +5512,7 @@ x25SVCIVMOTable_create(void)
 {
 	struct x25SVCIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25SVCIVMOTable_data);
 
-	DBUGMSGTL(("x25SVCIVMOTable", "creating row...  "));
+	DEBUGMSGTL(("x25SVCIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25SVCIVMORowStatus = RS_NOTREADY;
@@ -5759,7 +5753,7 @@ x25SVCIVMODTETable_create(void)
 {
 	struct x25SVCIVMODTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25SVCIVMODTETable_data);
 
-	DBUGMSGTL(("x25SVCIVMODTETable", "creating row...  "));
+	DEBUGMSGTL(("x25SVCIVMODTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25SVCIVMODTECallTime = 20000;
@@ -6014,7 +6008,7 @@ x25SVCIVMODXETable_create(void)
 {
 	struct x25SVCIVMODXETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25SVCIVMODXETable_data);
 
-	DBUGMSGTL(("x25SVCIVMODXETable", "creating row...  "));
+	DEBUGMSGTL(("x25SVCIVMODXETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25SVCIVMODXERowStatus = RS_NOTREADY;
@@ -6264,7 +6258,7 @@ x25SVCDTETable_create(void)
 {
 	struct x25SVCDTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25SVCDTETable_data);
 
-	DBUGMSGTL(("x25SVCDTETable", "creating row...  "));
+	DEBUGMSGTL(("x25SVCDTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -6503,7 +6497,7 @@ x25SVCDCETable_create(void)
 {
 	struct x25SVCDCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25SVCDCETable_data);
 
-	DBUGMSGTL(("x25SVCDCETable", "creating row...  "));
+	DEBUGMSGTL(("x25SVCDCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -6727,7 +6721,7 @@ x25SVCDXETable_create(void)
 {
 	struct x25SVCDXETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25SVCDXETable_data);
 
-	DBUGMSGTL(("x25SVCDXETable", "creating row...  "));
+	DEBUGMSGTL(("x25SVCDXETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -6960,7 +6954,7 @@ x25DSCTable_create(void)
 {
 	struct x25DSCTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25DSCTable_data);
 
-	DBUGMSGTL(("x25DSCTable", "creating row...  "));
+	DEBUGMSGTL(("x25DSCTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -7175,7 +7169,7 @@ x25PLEDTEStatsTable_create(void)
 {
 	struct x25PLEDTEStatsTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEDTEStatsTable_data);
 
-	DBUGMSGTL(("x25PLEDTEStatsTable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEDTEStatsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -7477,7 +7471,7 @@ x25PLEDCEStatsTable_create(void)
 {
 	struct x25PLEDCEStatsTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEDCEStatsTable_data);
 
-	DBUGMSGTL(("x25PLEDCEStatsTable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEDCEStatsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -7750,7 +7744,7 @@ x25PLEDXEStatsTable_create(void)
 {
 	struct x25PLEDXEStatsTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEDXEStatsTable_data);
 
-	DBUGMSGTL(("x25PLEDXEStatsTable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEDXEStatsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
