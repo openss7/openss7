@@ -1,3 +1,33 @@
+2009-01-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/cdr2MIB.c: updated agent
+	* src/snmp/cdr2MIB.h: updated agent
+	* src/snmp/makestubs: updated agent
+	* src/snmp/mib2c: updated agent
+	* src/snmp/mtpMIB.c: updated agent
+	* src/snmp/mtpMIB.h: updated agent
+	* src/snmp/mtpOmMIB.c: updated agent
+	* src/snmp/mtpOmMIB.h: updated agent
+	* src/snmp/sccpMIB.c: updated agent
+	* src/snmp/sccpMIB.h: updated agent
+	* src/snmp/sccpOmMIB.c: updated agent
+	* src/snmp/sccpOmMIB.h: updated agent
+	* src/snmp/slMIB.c: updated agent
+	* src/snmp/slMIB.h: updated agent
+	* src/snmp/ss7MIB.c: updated agent
+	* src/snmp/ss7MIB.h: updated agent
+	* src/snmp/ss7OmMIB.c: updated agent
+	* src/snmp/tcapMIB.c: updated agent
+	* src/snmp/tcapOmMIB.c: updated agent
+	* src/snmp/tcapOmMIB.h: updated agent
+	* src/snmp/x400pMIB.c: updated agent
+	* src/snmp/x400pMIB.h: updated agent
+	* src/snmp/mibs/OPENSS7-CDR2-MIB.mib: updated agent
+	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: updated agent
+	* src/snmp/mibs/OPENSS7-SCCP-MIB.mib: updated agent
+	* src/snmp/mibs/OPENSS7-SL-MIB.mib: updated agent
+	* src/snmp/mibs/OPENSS7-SS7-MIB.mib: updated agent
+
 2009-01-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/cdr2MIB.c: updated agents
