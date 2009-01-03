@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M3UA-SGP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-27 10:01:50 $
+-- @(#) $RCSfile: OPENSS7-M3UA-SGP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2009-01-03 10:51:00 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-27 10:01:50 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-03 10:51:00 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M3UA-SGP-MIB.mib,v $
+-- Revision 0.9.2.6  2009-01-03 10:51:00  brian
+-- - updated agent
+--
 -- Revision 0.9.2.5  2008-12-27 10:01:50  brian
 -- - updated mibs and stubs
 --
@@ -304,7 +307,7 @@ m3uaSgpAgProtocolVersion OBJECT-TYPE
          the versions defined by this MIB, or defined in another 
          document or MIB, including an enterprise MIB for 
          private or prorprietary protocol variations.  Protocol 
-         versions can be interoperableProtocolVersion, 
+         versions can be interoperableVersion, 
          indicating that the implementations in the AG 
          interoperate with all protocol versions; 
          m3uaRfc3332ProtocolVersion, indicating that the 
@@ -320,7 +323,7 @@ m3uaSgpAgProtocolVersion OBJECT-TYPE
          on an active entry is also implementation dependent."
     REFERENCE
         "OPENSS7-SIGTRAN-TC"
-    DEFVAL      { interoperableProtocolVersion }
+    DEFVAL      { { OPENSS7-SIGTRAN-TC:interoperableVersion } }
     ::= { m3uaSgpAgEntry 3 }
 
 m3uaSgpAgOptions OBJECT-TYPE
@@ -754,7 +757,7 @@ m3uaSgpAspSctpProfile OBJECT-TYPE
          ASP.  Management stations can force a new association 
          to be formed with this ASP using the 
          m3uaSgpAspAdministrativeState column."
-    DEFVAL      { zeroDotZero }
+    DEFVAL      { { zeroDotZero } }
     ::= { m3uaSgpAspEntry 10 }
 
 m3uaSgpAspMaxInitRetries OBJECT-TYPE
@@ -770,7 +773,7 @@ m3uaSgpAspMaxInitRetries OBJECT-TYPE
          Mangement stations can force a new association to be 
          formed using the AdministrativeState textual 
          convention."
-    ::= { m3uaSgpAspEntry 10 }
+    ::= { m3uaSgpAspEntry 11 }
 
 m3uaSgpAspMaxPathRetrans OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -785,7 +788,7 @@ m3uaSgpAspMaxPathRetrans OBJECT-TYPE
          formed with this ASP.  Mangement stations can force a 
          new association to be formed using the 
          AdministrativeState textual convention."
-    ::= { m3uaSgpAspEntry 11 }
+    ::= { m3uaSgpAspEntry 12 }
 
 m3uaSgpAspRtoMin OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -802,7 +805,7 @@ m3uaSgpAspRtoMin OBJECT-TYPE
          Mangement stations can force a new association to be 
          formed using the AdministrativeState textual 
          convention."
-    ::= { m3uaSgpAspEntry 12 }
+    ::= { m3uaSgpAspEntry 13 }
 
 m3uaSgpAspRtoMax OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -819,7 +822,7 @@ m3uaSgpAspRtoMax OBJECT-TYPE
          Mangement stations can force a new association to be 
          formed using the AdministrativeState textual 
          convention."
-    ::= { m3uaSgpAspEntry 12 }
+    ::= { m3uaSgpAspEntry 14 }
 
 m3uaSgpAspHeartbeatInterval OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -828,7 +831,7 @@ m3uaSgpAspHeartbeatInterval OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         ""
-    ::= { m3uaSgpAspEntry 12 }
+    ::= { m3uaSgpAspEntry 15 }
 
 m3uaSgpAspMaxLifeTime OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -837,7 +840,7 @@ m3uaSgpAspMaxLifeTime OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         ""
-    ::= { m3uaSgpAspEntry 13 }
+    ::= { m3uaSgpAspEntry 16 }
 
 m3uaSgpAspTimerDivert OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -846,7 +849,7 @@ m3uaSgpAspTimerDivert OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         ""
-    ::= { m3uaSgpAspEntry 14 }
+    ::= { m3uaSgpAspEntry 17 }
 
 m3uaSgpAspStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -854,7 +857,7 @@ m3uaSgpAspStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         ""
-    ::= { m3uaSgpAspEntry 15 }
+    ::= { m3uaSgpAspEntry 18 }
 
 
 

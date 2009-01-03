@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SS7-MIB.mib,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-01-02 15:04:17 $
+-- @(#) $RCSfile: OPENSS7-SS7-MIB.mib,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-01-03 10:51:10 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-02 15:04:17 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-03 10:51:10 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SS7-MIB.mib,v $
+-- Revision 0.9.2.13  2009-01-03 10:51:10  brian
+-- - updated agent
+--
 -- Revision 0.9.2.12  2009-01-02 15:04:17  brian
 -- - updated agents
 --
@@ -679,7 +682,7 @@ ss7NetworkProtocolVariant OBJECT-TYPE
 	 
 	 The purpose of identifying one of these standards bodies is to 
 	 arrive at a popular set of defaults for protocol options."
-    DEFVAL { { ss7ProtocoAnsi2000 } }
+    DEFVAL { { ss7ProtocolAnsi2000 } }
     ::= { ss7NetworkEntry 2 }
 
 ss7NetworkProtocolVersion OBJECT-TYPE
