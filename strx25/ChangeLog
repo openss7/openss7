@@ -1,3 +1,8 @@
+2009-01-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/x25MIB.c: agent updates
+	* src/snmp/x25MIB.h: agent updates
+
 2009-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/x25MIB.c: updated agent

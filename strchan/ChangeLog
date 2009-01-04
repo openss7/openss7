@@ -1,3 +1,16 @@
+2009-01-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/ds1.c: agent updates
+	* src/snmp/ds1.h: agent updates
+	* src/snmp/ds1EXT.c: agent updates
+	* src/snmp/ds1EXT.h: agent updates
+	* src/snmp/mxMIB.c: agent updates
+	* src/snmp/mxMIB.h: agent updates
+	* src/snmp/phyMIB.c: agent updates
+	* src/snmp/phyMIB.h: agent updates
+	* src/snmp/x400pMIB.c: agent updates
+	* src/snmp/x400pMIB.h: agent updates
+
 2009-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/ds1.c: updated agent

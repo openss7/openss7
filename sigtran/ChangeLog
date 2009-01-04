@@ -1,3 +1,18 @@
+2009-01-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/m2paMIB.c: agent updates
+	* src/snmp/m2paMIB.h: agent updates
+	* src/snmp/m2uaAspMIB.c: agent updates
+	* src/snmp/m2uaAspMIB.h: agent updates
+	* src/snmp/m2uaMIB.c: agent updates
+	* src/snmp/m2uaMIB.h: agent updates
+	* src/snmp/m3uaAspMIB.c: agent updates
+	* src/snmp/m3uaAspMIB.h: agent updates
+	* src/snmp/m3uaSgpMIB.c: agent updates
+	* src/snmp/m3uaSgpMIB.h: agent updates
+	* src/snmp/sigtranMIB.c: agent updates
+	* src/snmp/sigtranMIB.h: agent updates
+
 2009-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/m2paMIB.c: updated agent

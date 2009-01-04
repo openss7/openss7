@@ -1,3 +1,10 @@
+2009-01-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/strExtMIB.c: agent updates
+	* src/snmp/strExtMIB.h: agent updates
+	* src/snmp/strMIB.c: agent updates
+	* src/snmp/strMIB.h: agent updates
+
 2009-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/strExtMIB.c: updated agent
