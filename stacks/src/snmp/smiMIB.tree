@@ -1,0 +1,568 @@
++--smiMIB(2)
+   |
+   +--smiNotifications(0)
+   |  |
+   |  +--smi2Notifications(0)
+   |  |  |
+   |  |  +--attributeValueChangeType(1)
+   |  |  +--communicationsAlarmType(2)
+   |  |  +--environmentalAlarmType(3)
+   |  |  +--equipmentAlarmType(4)
+   |  |  +--integrityViolationType(5)
+   |  |  +--objectCreationType(6)
+   |  |  +--objectDeletionType(7)
+   |  |  +--operationalViolationType(8)
+   |  |  +--physicalViolationType(9)
+   |  |  +--processingErrorAlarmType(10)
+   |  |  +--qualityofServiceAlarmType(11)
+   |  |  +--relationshipChangeType(12)
+   |  |  +--securityServiceOrMechanismViolationType(13)
+   |  |  +--stateChangeType(14)
+   |  |  +--timeDomainViolationType(15)
+   |  |  +--communicationsInformationType(16)
+   |  |
+   |  +--attributeValueChange(1)
+   |  +--communicationsAlarm(2)
+   |  +--environmentalAlarm(3)
+   |  +--equipmentAlarm(4)
+   |  +--integrityViolation(5)
+   |  +--objectCreation(6)
+   |  +--objectDeletion(7)
+   |  +--operationalViolation(8)
+   |  +--physicalViolation(9)
+   |  +--processingErrorAlarm(10)
+   |  +--qualityofServiceAlarm(11)
+   |  +--relationshipChange(12)
+   |  +--securityServiceOrMechanismViolation(13)
+   |  +--stateChange(14)
+   |  +--timeDomainViolation(15)
+   |  +--communicationsInformation(16)
+   |
+   +--smiObjects(1)
+   |  |
+   |  +--smiScalars(1)
+   |  |
+   |  +--smiTables(2)
+   |  |  |
+   |  |  +--discriminator(1)
+   |  |  |  |
+   |  |  |  +--discriminatorTable(1)
+   |  |  |     |
+   |  |  |     +--discriminatorEntry(1)
+   |  |  |        |  Index: discriminatorId
+   |  |  |        |
+   |  |  |        +-- ---- String    discriminatorId(1)
+   |  |  |        |        Textual Convention: SimpleNameType
+   |  |  |        |        Size: 1..32
+   |  |  |        +-- CR-- String    discriminatorConstruct(2)
+   |  |  |        |        Textual Convention: EventDiscriminatorConstruct
+   |  |  |        +-- CR-- EnumVal   discriminatorAdministrativeState(3)
+   |  |  |        |        Textual Convention: AdministrativeState
+   |  |  |        |        Values: locked(0), unlocked(1), shuttingDown(2)
+   |  |  |        +-- -R-- EnumVal   discriminatorOperationalState(4)
+   |  |  |        |        Textual Convention: OperationalState
+   |  |  |        |        Values: disabled(0), enabled(1)
+   |  |  |        +-- -R-- BitString discriminatorAvailabilityStatus(5)
+   |  |  |        |        Textual Convention: AvailabilityStatus
+   |  |  |        |        Values: inTest(0), failed(1), powerOff(2), offLine(3), offDuty(4), dependency(5), degraded(6), notInstalled(7), logFull(8)
+   |  |  |        +-- CR-- TimeTicks discriminatorStartTime(6)
+   |  |  |        |        Textual Convention: TimeStamp
+   |  |  |        +-- CR-- TimeTicks discriminatorStopTime(7)
+   |  |  |        |        Textual Convention: TimeStamp
+   |  |  |        +-- CR-- String    discriminatorIntervalsOfDay(8)
+   |  |  |        |        Textual Convention: IntervalsOfDay
+   |  |  |        +-- CR-- String    discriminatorWeekMask(9)
+   |  |  |        |        Textual Convention: WeekMask
+   |  |  |        +-- CR-- ObjID     discriminatorSchedulerName(10)
+   |  |  |        |        Textual Convention: ObjectInstance
+   |  |  |        +-- CR-- EnumVal   discriminatorEntryStatus(11)
+   |  |  |                 Textual Convention: RowStatus
+   |  |  |                 Values: active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6)
+   |  |  |
+   |  |  +--eventForwardingDiscriminator(2)
+   |  |  |  |
+   |  |  |  +--eventForwardingDiscriminatorTable(1)
+   |  |  |     |
+   |  |  |     +--eventForwardingDiscriminatorEntry(1)
+   |  |  |        |  Index: discriminatorId
+   |  |  |        |
+   |  |  |        +-- CR-- String    destination(1)
+   |  |  |        |        Textual Convention: EventForwardingDestination
+   |  |  |        +-- CR-- String    activeDestination(2)
+   |  |  |        |        Textual Convention: EventForwardingDestination
+   |  |  |        +-- CR-- String    backUpDestinationList(3)
+   |  |  |        |        Textual Convention: EventForwardingDestinationList
+   |  |  |        +-- CR-- EnumVal   confirmedMode(4)
+   |  |  |        |        Textual Convention: TruthValue
+   |  |  |        |        Values: true(1), false(2)
+   |  |  |        +-- CR-- EnumVal   eventForwardingDiscriminatorEntryStatus(5)
+   |  |  |                 Textual Convention: RowStatus
+   |  |  |                 Values: active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6)
+   |  |  |
+   |  |  +--log(3)
+   |  |  |  |
+   |  |  |  +--logTable(1)
+   |  |  |     |
+   |  |  |     +--logEntry(1)
+   |  |  |        |  Index: logId
+   |  |  |        |
+   |  |  |        +-- ---- String    logId(1)
+   |  |  |        |        Textual Convention: SimpleNameType
+   |  |  |        |        Size: 1..32
+   |  |  |        +-- CR-- String    logDiscriminatorConstruct(2)
+   |  |  |        |        Textual Convention: EventDiscriminatorConstruct
+   |  |  |        +-- CR-- EnumVal   logAdministrativeState(3)
+   |  |  |        |        Textual Convention: AdministrativeState
+   |  |  |        |        Values: locked(0), unlocked(1), shuttingDown(2)
+   |  |  |        +-- -R-- EnumVal   logOperationalState(4)
+   |  |  |        |        Textual Convention: OperationalState
+   |  |  |        |        Values: disabled(0), enabled(1)
+   |  |  |        +-- CR-- BitString logAvailabilityStatus(5)
+   |  |  |        |        Textual Convention: AvailabilityStatus
+   |  |  |        |        Values: inTest(0), failed(1), powerOff(2), offLine(3), offDuty(4), dependency(5), degraded(6), notInstalled(7), logFull(8)
+   |  |  |        +-- CR-- EnumVal   logFullAction(6)
+   |  |  |        |        Textual Convention: FullAction
+   |  |  |        |        Values: wrap(0), halt(1)
+   |  |  |        +-- CR-- Unsigned  maxLogSize(7)
+   |  |  |        +-- -R-- Gauge     currentLogSize(8)
+   |  |  |        +-- -R-- Gauge     numberOfRecords(9)
+   |  |  |        +-- CR-- String    capacityAlarmThreshold(10)
+   |  |  |        |        Textual Convention: LogCapacityAlarmThreshold
+   |  |  |        +-- CR-- TimeTicks logStartTime(11)
+   |  |  |        |        Textual Convention: TimeStamp
+   |  |  |        +-- CR-- TimeTicks logStopTime(12)
+   |  |  |        |        Textual Convention: TimeStamp
+   |  |  |        +-- CR-- String    logIntervalsOfDay(13)
+   |  |  |        |        Textual Convention: IntervalsOfDay
+   |  |  |        +-- CR-- String    logWeekMask(14)
+   |  |  |        |        Textual Convention: WeekMask
+   |  |  |        +-- CR-- ObjID     logSchedulerName(15)
+   |  |  |        |        Textual Convention: ObjectInstance
+   |  |  |        +-- CR-- EnumVal   logEntryStatus(16)
+   |  |  |                 Textual Convention: RowStatus
+   |  |  |                 Values: active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6)
+   |  |  |
+   |  |  +--logRecord(4)
+   |  |  |  |
+   |  |  |  +--logRecordTable(1)
+   |  |  |     |
+   |  |  |     +--logRecordEntry(1)
+   |  |  |        |  Index: logId, logRecordId
+   |  |  |        |
+   |  |  |        +-- ---- String    logRecordId(1)
+   |  |  |        |        Textual Convention: SimpleNameType
+   |  |  |        |        Size: 1..32
+   |  |  |        +-- -R-- TimeTicks loggingTime(2)
+   |  |  |        |        Textual Convention: TimeStamp
+   |  |  |        +-- -RW- EnumVal   logRecordEntryStatus(3)
+   |  |  |                 Textual Convention: RowStatus
+   |  |  |                 Values: active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6)
+   |  |  |
+   |  |  +--eventLogRecord(5)
+   |  |  |  |
+   |  |  |  +--eventLogRecordTable(1)
+   |  |  |     |
+   |  |  |     +--eventLogRecordEntry(1)
+   |  |  |        |  Index: logId, logRecordId
+   |  |  |        |
+   |  |  |        +-- -R-- ObjID     managedObjectClass(1)
+   |  |  |        |        Textual Convention: ObjectClass
+   |  |  |        +-- -R-- ObjID     managedObjectInstance(2)
+   |  |  |        |        Textual Convention: ObjectInstance
+   |  |  |        +-- -R-- ObjID     eventType(3)
+   |  |  |        |        Textual Convention: EventTypeId
+   |  |  |        +-- -R-- TimeTicks eventTimes(4)
+   |  |  |        |        Textual Convention: EventTimeStamp
+   |  |  |        +-- -R-- Integer32 eventNotificationIdentifier(5)
+   |  |  |        |        Textual Convention: NotificationIdentifier
+   |  |  |        +-- -R-- String    eventCorrelatedNotifications(6)
+   |  |  |        |        Textual Convention: CorrelatedNotifications
+   |  |  |        +-- -R-- String    eventAdditionalText(7)
+   |  |  |        |        Textual Convention: AdditionalText
+   |  |  |        +-- -R-- String    eventAdditionalInformation(8)
+   |  |  |                 Textual Convention: AdditionalInformation
+   |  |  |
+   |  |  +--alarmRecord(6)
+   |  |  |  |
+   |  |  |  +--alarmRecordTable(1)
+   |  |  |     |
+   |  |  |     +--alarmRecordEntry(1)
+   |  |  |        |  Index: logId, logRecordId
+   |  |  |        |
+   |  |  |        +-- -R-- ObjID     alarmRecordProbableCause(1)
+   |  |  |        |        Textual Convention: ProbableCause
+   |  |  |        +-- -R-- EnumVal   alarmRecordPerceivedSeverity(2)
+   |  |  |        |        Textual Convention: PerceivedSeverity
+   |  |  |        |        Values: indeterminate(0), critical(1), major(2), minor(3), warning(4), cleared(5)
+   |  |  |        +-- -R-- ObjID     alarmRecordSpecificProblems(3)
+   |  |  |        |        Textual Convention: SpecificProblems
+   |  |  |        +-- -R-- EnumVal   alarmRecordBackedUpStatus(4)
+   |  |  |        |        Textual Convention: BackedUpStatus
+   |  |  |        |        Values: none(0), backedUp(1)
+   |  |  |        +-- -R-- ObjID     alarmRecordBackUpObject(5)
+   |  |  |        |        Textual Convention: BackUpObject
+   |  |  |        +-- -R-- EnumVal   alarmRecordTrendIndication(6)
+   |  |  |        |        Textual Convention: TrendIndication
+   |  |  |        |        Values: lessSevere(0), noChange(1), moreSevere(2)
+   |  |  |        +-- -R-- String    alarmRecordThresholdInfo(7)
+   |  |  |        |        Textual Convention: ThresholdInfo
+   |  |  |        +-- -R-- String    alarmRecordStateChangeDefinition(8)
+   |  |  |        |        Textual Convention: AttributeValueChangeDefinition
+   |  |  |        +-- -R-- String    alarmRecordMonitoredAttributes(9)
+   |  |  |        |        Textual Convention: MonitoredAttributes
+   |  |  |        +-- -R-- ObjID     alarmRecordProposedRepairActions(10)
+   |  |  |                 Textual Convention: ProposedRepairActions
+   |  |  |
+   |  |  +--attributeValueChangeRecord(7)
+   |  |  |  |
+   |  |  |  +--attributeValueChangeRecordTable(1)
+   |  |  |     |
+   |  |  |     +--attributeValueChangeRecordEntry(1)
+   |  |  |        |  Index: logId, logRecordId
+   |  |  |        |
+   |  |  |        +-- -R-- String    attributeValueChangeRecordDefinition(1)
+   |  |  |        |        Textual Convention: AttributeValueChangeDefinition
+   |  |  |        +-- -R-- EnumVal   attributeValueChangeSourceIndicator(2)
+   |  |  |        |        Textual Convention: SourceIndicator
+   |  |  |        |        Values: resourceOperation(0), managementOperation(1), unknown(2)
+   |  |  |        +-- -R-- ObjID     attributeValueChangeAttributeIdentifierList(3)
+   |  |  |                 Textual Convention: AttributeIdentifierList
+   |  |  |
+   |  |  +--objectCreationRecord(8)
+   |  |  |  |
+   |  |  |  +--objectCreationRecordTable(1)
+   |  |  |     |
+   |  |  |     +--objectCreationRecordEntry(1)
+   |  |  |        |  Index: logId, logRecordId
+   |  |  |        |
+   |  |  |        +-- -R-- EnumVal   objectCreationSourceIndicator(1)
+   |  |  |        |        Textual Convention: SourceIndicator
+   |  |  |        |        Values: resourceOperation(0), managementOperation(1), unknown(2)
+   |  |  |        +-- -R-- ObjID     objectCreationAttributeIdentifierList(2)
+   |  |  |                 Textual Convention: AttributeIdentifierList
+   |  |  |
+   |  |  +--objectDeletionRecord(9)
+   |  |  |  |
+   |  |  |  +--objectDeletionRecordTable(1)
+   |  |  |     |
+   |  |  |     +--objectDeletionRecordEntry(1)
+   |  |  |        |  Index: logId, logRecordId
+   |  |  |        |
+   |  |  |        +-- -R-- EnumVal   objectDeletionSourceIndicator(1)
+   |  |  |        |        Textual Convention: SourceIndicator
+   |  |  |        |        Values: resourceOperation(0), managementOperation(1), unknown(2)
+   |  |  |        +-- -R-- ObjID     objectDeletionAttributeIdentifierList(2)
+   |  |  |                 Textual Convention: AttributeIdentifierList
+   |  |  |
+   |  |  +--relationshipChangeRecord(10)
+   |  |  |  |
+   |  |  |  +--relationshipChangeRecordTable(1)
+   |  |  |     |
+   |  |  |     +--relationshipChangeRecordEntry(1)
+   |  |  |        |  Index: logId, logRecordId
+   |  |  |        |
+   |  |  |        +-- -R-- String    relationshipChangeRecordDefinition(1)
+   |  |  |        |        Textual Convention: AttributeValueChangeDefinition
+   |  |  |        +-- -R-- EnumVal   relationshipChangeSourceIndicator(2)
+   |  |  |        |        Textual Convention: SourceIndicator
+   |  |  |        |        Values: resourceOperation(0), managementOperation(1), unknown(2)
+   |  |  |        +-- -R-- ObjID     relationshipChangeAttributeIdentifierList(3)
+   |  |  |                 Textual Convention: AttributeIdentifierList
+   |  |  |
+   |  |  +--securityAlarmReportRecord(11)
+   |  |  |  |
+   |  |  |  +--securityAlarmReportRecordTable(1)
+   |  |  |     |
+   |  |  |     +--securityAlarmReportRecordEntry(1)
+   |  |  |        |  Index: logId, logRecordId
+   |  |  |        |
+   |  |  |        +-- -R-- ObjID     securityAlarmRecordCause(1)
+   |  |  |        |        Textual Convention: SecurityAlarmCause
+   |  |  |        +-- -R-- EnumVal   securityAlarmRecordSeverity(2)
+   |  |  |        |        Textual Convention: SecurityAlarmSeverity
+   |  |  |        |        Values: indeterminate(0), critical(1), major(2), minor(3), warning(4)
+   |  |  |        +-- -R-- ObjID     securityAlarmRecordDetector(3)
+   |  |  |        |        Textual Convention: SecurityAlarmDetector
+   |  |  |        +-- -R-- String    securityServiceUser(4)
+   |  |  |        |        Textual Convention: ServiceUser
+   |  |  |        +-- -R-- String    securityServiceProvider(5)
+   |  |  |                 Textual Convention: ServiceProvider
+   |  |  |
+   |  |  +--stateChangeRecord(12)
+   |  |     |
+   |  |     +--stateChangeRecordTable(1)
+   |  |        |
+   |  |        +--stateChangeRecordEntry(1)
+   |  |           |  Index: logId, logRecordId
+   |  |           |
+   |  |           +-- -R-- String    stateChangeRecordDefinition(1)
+   |  |           |        Textual Convention: AttributeValueChangeDefinition
+   |  |           +-- -R-- EnumVal   stateChangeSourceIndicator(2)
+   |  |           |        Textual Convention: SourceIndicator
+   |  |           |        Values: resourceOperation(0), managementOperation(1), unknown(2)
+   |  |           +-- -R-- ObjID     stateChangeAttributeIdentifierList(3)
+   |  |                    Textual Convention: AttributeIdentifierList
+   |  |
+   |  +--smiNotifObjects(3)
+   |  |  |
+   |  |  +-- ---N ObjID     tmnObjectInstance(1)
+   |  |  |        Textual Convention: ObjectInstance
+   |  |  +-- ---N Integer32 tmnNotificationIdentifier(2)
+   |  |  |        Textual Convention: NotificationIdentifier
+   |  |  +-- ---N String    tmnCorrelatedNotifications(3)
+   |  |  |        Textual Convention: CorrelatedNotifications
+   |  |  +-- ---N ObjID     tmnProbableCause(4)
+   |  |  |        Textual Convention: ProbableCause
+   |  |  +-- ---N ObjID     tmnSpecificProblems(5)
+   |  |  |        Textual Convention: SpecificProblems
+   |  |  +-- ---N EnumVal   tmnPerceivedSeverity(6)
+   |  |  |        Textual Convention: PerceivedSeverity
+   |  |  |        Values: indeterminate(0), critical(1), major(2), minor(3), warning(4), cleared(5)
+   |  |  +-- ---N EnumVal   tmnBackedUpStatus(7)
+   |  |  |        Textual Convention: BackedUpStatus
+   |  |  |        Values: none(0), backedUp(1)
+   |  |  +-- ---N ObjID     tmnBackUpObject(8)
+   |  |  |        Textual Convention: ObjectInstance
+   |  |  +-- ---N EnumVal   tmnTrendIndication(9)
+   |  |  |        Textual Convention: TrendIndication
+   |  |  |        Values: lessSevere(0), noChange(1), moreSevere(2)
+   |  |  +-- ---N String    tmnThresholdInfo(10)
+   |  |  |        Textual Convention: ThresholdInfo
+   |  |  +-- ---N String    tmnStateChangeDefinition(11)
+   |  |  |        Textual Convention: AttributeValueChangeDefinition
+   |  |  +-- ---N String    tmnMonitoredAttributes(12)
+   |  |  |        Textual Convention: MonitoredAttributes
+   |  |  +-- ---N ObjID     tmnProposedRepairActions(13)
+   |  |  |        Textual Convention: ProposedRepairActions
+   |  |  +-- ---N EnumVal   tmnSourceIndicator(14)
+   |  |  |        Textual Convention: SourceIndicator
+   |  |  |        Values: resourceOperation(0), managementOperation(1), unknown(2)
+   |  |  +-- ---N ObjID     tmnAttributeIdentifierList(15)
+   |  |  |        Textual Convention: AttributeIdentifierList
+   |  |  +-- ---N String    tmnAttributeValueChangeDefinition(16)
+   |  |  |        Textual Convention: AttributeValueChangeDefinition
+   |  |  +-- ---N String    tmnAdditionalText(17)
+   |  |  |        Textual Convention: AdditionalText
+   |  |  +-- ---N String    tmnAdditionalInformation(18)
+   |  |  |        Textual Convention: AdditionalInformation
+   |  |  +-- ---N ObjID     tmnSecurityAlarmCause(19)
+   |  |  |        Textual Convention: SecurityAlarmCause
+   |  |  +-- ---N EnumVal   tmnSecurityAlarmSeverity(20)
+   |  |  |        Textual Convention: SecurityAlarmSeverity
+   |  |  |        Values: indeterminate(0), critical(1), major(2), minor(3), warning(4)
+   |  |  +-- ---N ObjID     tmnSecurityAlarmDetector(21)
+   |  |  |        Textual Convention: SecurityAlarmDetector
+   |  |  +-- ---N String    tmnServiceUser(22)
+   |  |  |        Textual Convention: ServiceUser
+   |  |  +-- ---N String    tmnServiceProvider(23)
+   |  |  |        Textual Convention: ServiceProvider
+   |  |  +-- ---N ObjID     tmnAttributeList(24)
+   |  |  |        Textual Convention: AttributeList
+   |  |  +-- ---N String    tmnRelationshipChangeDefinition(25)
+   |  |  |        Textual Convention: AttributeValueChangeDefinition
+   |  |  +-- ---N ObjID     tmnInformationType(26)
+   |  |  |        Textual Convention: InformationType
+   |  |  +-- ---N String    tmnInformationData(27)
+   |  |           Textual Convention: InformationData
+   |  |
+   |  +--smiOids(4)
+   |     |
+   |     +--arfProbableCause(1)
+   |     |  |
+   |     |  +--adapterError(1)
+   |     |  +--applicationSubsystemFailure(2)
+   |     |  +--bandwidthReduced(3)
+   |     |  +--callEstablishmentError(4)
+   |     |  +--communicationsProtocolError(5)
+   |     |  +--communicationsSubsystemFailure(6)
+   |     |  +--configurationOrCustomizationError(7)
+   |     |  +--congestion(8)
+   |     |  +--corruptData(9)
+   |     |  +--cpuCyclesLimitExceeded(10)
+   |     |  +--dataSetOrModemError(11)
+   |     |  +--degradedSignal(12)
+   |     |  +--dTE-DCEInterfaceError(13)
+   |     |  +--enclosureDoorOpen(14)
+   |     |  +--equipmentMalfunction(15)
+   |     |  +--excessiveVibration(16)
+   |     |  +--fileError(17)
+   |     |  +--fireDetected(18)
+   |     |  +--floodDetected(19)
+   |     |  +--framingError(20)
+   |     |  +--heatingOrVentilationOrCoolingSystemProblem(21)
+   |     |  +--humidityUnacceptable(22)
+   |     |  +--inputOutputDeviceError(23)
+   |     |  +--inputDeviceError(24)
+   |     |  +--lANError(25)
+   |     |  +--leakDetected(26)
+   |     |  +--localNodeTransmissionError(27)
+   |     |  +--lossOfFrame(28)
+   |     |  +--lossOfSignal(29)
+   |     |  +--materialSupplyExhausted(30)
+   |     |  +--multiplexerProblem(31)
+   |     |  +--outOfMemory(32)
+   |     |  +--ouputDeviceError(33)
+   |     |  +--performanceDegraded(34)
+   |     |  +--powerProblem(35)
+   |     |  +--pressureUnacceptable(36)
+   |     |  +--processorProblem(37)
+   |     |  +--pumpFailure(38)
+   |     |  +--queueSizeExceeded(39)
+   |     |  +--receiveFailure(40)
+   |     |  +--receiverFailure(41)
+   |     |  +--remoteNodeTransmissionError(42)
+   |     |  +--resourceAtOrNearingCapacity(43)
+   |     |  +--responseTimeExcessive(44)
+   |     |  +--retransmissionRateExcessive(45)
+   |     |  +--softwareError(46)
+   |     |  +--softwareProgramAbnormallyTerminated(47)
+   |     |  +--softwareProgramError(48)
+   |     |  +--storageCapacityProblem(49)
+   |     |  +--temperatureUnacceptable(50)
+   |     |  +--thresholdCrossed(51)
+   |     |  +--timingProblem(52)
+   |     |  +--toxicLeakDetected(53)
+   |     |  +--transmitFailure(54)
+   |     |  +--transmitterFailure(55)
+   |     |  +--underlyingResourceUnavailable(56)
+   |     |  +--versionMismatch(57)
+   |     |
+   |     +--arfSecurityAlarmCause(2)
+   |     |  |
+   |     |  +--authenticationFailure(1)
+   |     |  +--breachOfConfidentiality(2)
+   |     |  +--cableTamper(3)
+   |     |  +--delayedInformation(4)
+   |     |  +--denialOfService(5)
+   |     |  +--duplicateInformation(6)
+   |     |  +--informationMissing(7)
+   |     |  +--informationModificationDetected(8)
+   |     |  +--informationOutOfSequence(9)
+   |     |  +--intrusionDetection(10)
+   |     |  +--keyExpired(11)
+   |     |  +--nonRepudiationFailure(12)
+   |     |  +--outOfHoursActivity(13)
+   |     |  +--outOfService(14)
+   |     |  +--proceduralError(15)
+   |     |  +--unauthorizedAccessAttempt(16)
+   |     |  +--unexpectedInformation(17)
+   |     |  +--unspecifiedReason(18)
+   |     |
+   |     +--arfProposedRepairAction(3)
+   |     |  |
+   |     |  +--noActionRequired(1)
+   |     |  +--repairActionRequired(2)
+   |     |
+   |     +--gnmProbableCause(4)
+   |        |
+   |        +--aIS(1)
+   |        +--callSetUpFailure(2)
+   |        +--degradedSignalGnm(3)
+   |        +--farEndReceiverFailure(4)
+   |        +--framingErrorGnm(5)
+   |        +--lossOfFrameGnm(6)
+   |        +--lossOfPointer(7)
+   |        +--lossOfSignalGnm(8)
+   |        +--payloadTypeMismatch(9)
+   |        +--transmissionError(10)
+   |        +--remoteAlarmInterface(11)
+   |        +--excessiveBER(12)
+   |        +--pathTraceMismatch(13)
+   |        +--unavailable(14)
+   |        +--signalLabelMismatch(15)
+   |        +--lossOfMultiFrame(16)
+   |        +--backplaneFailure(51)
+   |        +--dataSetProblem(52)
+   |        +--equipmentIdentifierDuplication(53)
+   |        +--externalIFDeviceProblem(54)
+   |        +--lineCardProblem(55)
+   |        +--multiplexerProblemGnm(56)
+   |        +--nEIdentifierDuplication(57)
+   |        +--powerProblemGnm(58)
+   |        +--processorProblemGnm(59)
+   |        +--protectionPathFailure(60)
+   |        +--receiverFailureGnm(61)
+   |        +--replaceableUnitMissing(62)
+   |        +--replaceableUnitTypeMismatch(63)
+   |        +--synchronizationSourceMismatch(64)
+   |        +--terminalProblem(65)
+   |        +--timingProblemGnm(66)
+   |        +--transmitterFailureGnm(67)
+   |        +--trunkCardProblem(68)
+   |        +--replaceableUnitProblem(69)
+   |        +--airCompressorFailure(101)
+   |        +--airConditioningFailure(102)
+   |        +--airDryerFailure(103)
+   |        +--batteryDischarging(104)
+   |        +--batteryFailure(105)
+   |        +--commercialPowerFailure(106)
+   |        +--coolingFanFailure(107)
+   |        +--engineFailure(108)
+   |        +--fireDetectorFailure(109)
+   |        +--fuseFailure(110)
+   |        +--generatorFailure(111)
+   |        +--lowBatteryThreshold(112)
+   |        +--pumpFailureGnm(113)
+   |        +--rectifierFailure(114)
+   |        +--rectifierHighVoltage(115)
+   |        +--rectifierLowVoltage(116)
+   |        +--ventilationsSystemFailure(117)
+   |        +--enclosureDoorOpenGnm(118)
+   |        +--explosiveGas(119)
+   |        +--fire(120)
+   |        +--flood(121)
+   |        +--highHumidity(122)
+   |        +--highTemperature(123)
+   |        +--highWind(124)
+   |        +--iceBuildUp(125)
+   |        +--intrusionDetectionGnm(126)
+   |        +--lowFuel(127)
+   |        +--lowHumidity(128)
+   |        +--lowCablePressure(129)
+   |        +--lowTemperature(130)
+   |        +--lowWater(131)
+   |        +--smoke(132)
+   |        +--toxicGas(133)
+   |        +--storageCapacityProblemGnm(151)
+   |        +--memoryMismatchGnm(152)
+   |        +--corruptDataGnm(153)
+   |        +--outOfCPUCycles(154)
+   |        +--sfwrEnvironmentProblem(155)
+   |        +--sfwrDownloadFailure(156)
+   |
+   +--smiConformance(2)
+      |
+      +--smiCompliances(1)
+      |  |
+      |  +--smiCompliance(1)
+      |
+      +--smiGroups(2)
+         |
+         +--smiMandatoryParametersGroup(1)
+         +--smiConditionalParametersGroup(2)
+         +--smiOptionalParametersGroup(3)
+         |
+         +--smiMandatoryNotificationsGroup(4)
+         |
+         +--smiConditionalNotificationsGroup(5)
+         |
+         +--smiOptionalNotificationsGroup(6)
+         |
+         +--smiDiscriminatorGroup(10)
+         +--smiEventForwardingDiscriminatorGroup(11)
+         +--smiLogGroup(12)
+         +--smiLogRecordGroup(13)
+         +--smiEventLogRecordGroup(14)
+         +--smiAlarmRecordGroup(15)
+         +--smiAttributeValueChangeRecordGroup(16)
+         +--smiObjectCreationRecordGroup(17)
+         +--smiObjectDeletionRecordGroup(18)
+         +--smiRelationshipChangeRecordGroup(19)
+         +--smiSecurityAlarmReportRecordGroup(20)
+         +--smiStateChangeRecordGroup(21)
+         |
+         +--createDeleteNotificationsPackage(22)
+         |
+         +--attributeValueChangeNotificationPackage(23)
+         |
+         +--communicationsAlarmPackage(24)

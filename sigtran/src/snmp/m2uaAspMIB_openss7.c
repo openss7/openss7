@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "ds_agent.h"
 #ifdef HAVE_UCD_SNMP_UTIL_FUNCS_H
 #include <ucd-snmp/util_funcs.h>
-/* Many recent net-snmp UCD compatible headers do not declard header_generic. */
+/* Many recent net-snmp UCD compatible headers do not declare header_generic. */
 int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMethod **);
 #else				/* HAVE_UCD_SNMP_UTIL_FUNCS_H */
 #include "util_funcs.h"
@@ -113,45 +113,38 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
-#include "m2uaAspMIB_openss7.h"
-const char sa_program[] = "m2uaaspmib";
+#include "m2uaAspMIB.h"
+extern const char sa_program[];
 
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
+#define MASTER 1
 #if !defined MODULE
-int sa_dump = 0;			/* default packet dump */
-int sa_debug = 0;			/* default no debug */
-int sa_nomead = 1;			/* default daemon mode */
-int sa_output = 1;			/* default normal output */
-int sa_agentx = 1;			/* default agentx mode */
-int sa_alarms = 1;			/* default application alarms */
-int sa_fclose = 1;			/* default close files between requests */
-int sa_logaddr = 0;			/* log addresses */
-int sa_logfillog = 0;			/* log to sa_logfile */
-int sa_logstderr = 0;			/* log to standard error */
-int sa_logstdout = 0;			/* log to standard output */
-int sa_logsyslog = 0;			/* log to system logs */
-int sa_logcallog = 0;			/* log to callback logs */
-int sa_appendlog = 0;			/* append to log file without truncating */
-char sa_logfile[256] = "/var/log/m2uaaspmib.log";
-char sa_pidfile[256] = "/var/run/m2uaaspmib.pid";
-char sa_sysctlf[256] = "/etc/m2uaaspmib.conf";
-int allow_severity = LOG_ERR;
-int deny_severity = LOG_ERR;
+extern int sa_dump;			/* default packet dump */
+extern int sa_debug;			/* default no debug */
+extern int sa_nomead;			/* default daemon mode */
+extern int sa_output;			/* default normal output */
+extern int sa_agentx;			/* default agentx mode */
+extern int sa_alarms;			/* default application alarms */
+extern int sa_logaddr;			/* log addresses */
+extern int sa_logfillog;		/* log to sa_logfile */
+extern int sa_logstderr;		/* log to standard error */
+extern int sa_logstdout;		/* log to standard output */
+extern int sa_logsyslog;		/* log to system logs */
+extern int sa_logcallog;		/* log to callback logs */
+extern int sa_appendlog;		/* append to log file without truncating */
+extern char sa_logfile[256];
+extern char sa_pidfile[256];
+extern char sa_sysctlf[256];
 
 /* file stream for log file */
-FILE *stdlog = NULL;
-
-/* file descriptor for MIB use */
-int sa_fd = 0;
-
-/* indication to reread MIB configuration */
-int sa_changed = 1;
-
-/* indications that statistics, the mib or its tables need to be refreshed */
-int sa_stats_refresh = 1;
+extern FILE *stdlog;
 #endif				/* !defined MODULE */
-/* request number for per-request actions */
-int sa_request = 1;
+extern int sa_fclose;			/* default close files between requests */
+extern int sa_fd;			/* file descriptor for MIB use */
+extern int sa_readfd;			/* file descriptor for autonomnous events */
+extern int sa_changed;			/* indication to reread MIB configuration */
+extern int sa_stats_refresh;		/* indications that statistics, the mib or its tables need to be refreshed */
+extern int sa_request;			/* request number for per-request actions */
 volatile int m2uaAspMIB_refresh = 1;
 volatile int m2uaAspTable_refresh = 1;
 volatile int m2uaSgTable_refresh = 1;
@@ -189,6 +182,9 @@ oid m2uaAspAsTable_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 221, 1, 1, 8,
 /*
  * Other oids defined in this MIB.
  */
+
+static const oid zeroDotZero_oid[2] = { 0, 0 };
+static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
 /*
  * variable7 m2uaAspMIB_variables: tree for m2uaAspMIB
@@ -360,14 +356,37 @@ struct header_complex_index *m2uaSgAsTableStorage = NULL;
 struct header_complex_index *m2uaAspAsTableStorage = NULL;
 struct header_complex_index *m2uaAspSgAsTableStorage = NULL;
 
-/*
- * init_m2uaAspMIB(): Initialization routine.
- * This is called when the agent starts up.  At a minimum, registration of your variables should
- * take place here.
+#if defined MODULE
+void (*m2uaAspMIBold_signal_handler) (int) = NULL;	/* save old signal handler just in case */
+void m2uaAspMIB_loop_handler(int);
+void m2uaAspMIB_fd_handler(int, void *);
+#endif				/* defined MOUDLE */
+/**
+ * @fn void init_m2uaAspMIB(void)
+ * @brief m2uaAspMIB initialization routine.
+ *
+ * This is called when the agent starts up.  At a minimum, registration of the MIB variables
+ * structure (m2uaAspMIB_variables) should take place here.  By default the function also
+ * registers the configuration handler and configuration store callbacks.
+ *
+ * Additional registrations that may be considered here are calls to regsiter_readfd(),
+ * register_writefd() and register_exceptfd() for hooking into the snmpd event loop, but only when
+ * used as a loadable module.  By default this function establishes a single file descriptor to
+ * read, or upon which to handle exceptions.  Note that the snmpd only supports a maximum of 32
+ * extneral file descriptors, so these should be used sparingly.
+ *
+ * When running as a loadable module, it is also necessary to hook into the snmpd event loop so that
+ * the current request number can be deteremined.  This is accomplished by using a trick of the
+ * external_signal_scheduled and external_signal_handler mechanism which is called on each event
+ * loop when external_signal_scheduled is non-zero.  This is used to increment the sa_request value
+ * on each snmpd event loop interation so that calls to MIB tree functions can determine whether
+ * they belong to a fresh request or not (primarily for cacheing and possibly to clean up non-polled
+ * file descriptors).
  */
 void
 init_m2uaAspMIB(void)
 {
+	(void) snmpTrapOID_oid;
 	DEBUGMSGTL(("m2uaAspMIB", "initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
 	REGISTER_MIB("m2uaAspMIB", m2uaAspMIB_variables, variable7, m2uaAspMIB_variables_oid);
@@ -397,18 +416,46 @@ init_m2uaAspMIB(void)
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_m2uaAspSgAsTable, NULL);
 
 	/* place any other initialization junk you need here */
+#if defined MODULE
+	if (sa_readfd != 0) {
+		register_readfd(sa_readfd, m2uaAspMIB_fd_handler, (void *) 0);
+		register_exceptfd(sa_readfd, m2uaAspMIB_fd_handler, (void *) 1);
+	}
+#if defined MASTER
+	m2uaAspMIBold_signal_handler = external_signal_handler[0];
+	external_signal_handler[0] = &m2uaAspMIB_loop_handler;
+#endif				/* defined MASTER */
+#endif				/* defined MODULE */
 	DEBUGMSGTL(("m2uaAspMIB", "done.\n"));
 }
 
-/*
- * deinit_m2uaAspMIB(): Deinitialization routine.
- * This is called before the agent is unloaded.  At a minimum, deregistration of your variables
- * should take place here.
+/**
+ * @fn void deinit_m2uaAspMIB(void)
+ * @brief deinitialization routine.
+ *
+ * This is called before the agent is unloaded.  At a minimum, deregistration of the MIB variables
+ * structure (m2uaAspMIB_variables) should take place here.  By default, the function also
+ * deregisters the the configuration file handlers for the MIB variables and table rows.
+ *
+ * Additional deregistrations that may be required here are calls to unregister_readfd(),
+ * unregister_writefd() and unregsiter_exceptfd() for unhooking from the snmpd event loop, but only
+ * when used as a loadable module.  By default if a read file descriptor exists, it is unregistered.
  */
 void
 deinit_m2uaAspMIB(void)
 {
 	DEBUGMSGTL(("m2uaAspMIB", "deinitializating...  "));
+#if defined MODULE
+#if defined MASTER
+	external_signal_handler[0] = m2uaAspMIBold_signal_handler;
+#endif				/* defined MASTER */
+	if (sa_readfd != 0) {
+		unregister_exceptfd(sa_readfd);
+		unregister_readfd(sa_readfd);
+		close(sa_readfd);
+		sa_readfd = 0;
+	}
+#endif				/* defined MODULE */
 	unregister_mib(m2uaAspMIB_variables_oid, sizeof(m2uaAspMIB_variables_oid) / sizeof(oid));
 	snmpd_unregister_config_handler("m2uaAspMIB");
 	snmpd_unregister_config_handler("m2uaAspTable");
@@ -435,6 +482,7 @@ term_m2uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaAspMIB_data *m2uaAspMIB_create(void)
  * @brief create a fresh data structure representing scalars in m2uaAspMIB.
+ *
  * Creates a new m2uaAspMIB_data structure by allocating dynamic memory for the structure and
  * initializing the default values of scalars in m2uaAspMIB.
  */
@@ -443,7 +491,7 @@ m2uaAspMIB_create(void)
 {
 	struct m2uaAspMIB_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspMIB_data);
 
-	DBUGMSGTL(("m2uaAspMIB", "creating scalars...  "));
+	DEBUGMSGTL(("m2uaAspMIB", "creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
 
@@ -454,11 +502,12 @@ m2uaAspMIB_create(void)
 
 /**
  * @fn int m2uaAspMIB_destroy(struct m2uaAspMIB_data **thedata)
- * @brief delete a scalars structure from m2uaAspMIB.
  * @param thedata pointer to the data structure in m2uaAspMIB.
+ * @brief delete a scalars structure from m2uaAspMIB.
+ *
  * Frees scalars that were previously removed from m2uaAspMIB.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -479,6 +528,7 @@ m2uaAspMIB_destroy(struct m2uaAspMIB_data **thedata)
  * @fn int m2uaAspMIB_add(struct m2uaAspMIB_data *thedata)
  * @param thedata the structure representing m2uaAspMIB scalars.
  * @brief adds node to the m2uaAspMIB scalar data set.
+ *
  * Adds a scalar structure to the m2uaAspMIB data set.  Note that this function is necessary even
  * when the scalar values are not peristent.
  */
@@ -496,6 +546,7 @@ m2uaAspMIB_add(struct m2uaAspMIB_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaAspMIB entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaAspMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
@@ -552,6 +603,7 @@ store_m2uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn void refresh_m2uaAspMIB(void)
  * @brief refresh the scalar values of m2uaAspMIB.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -576,21 +628,22 @@ refresh_m2uaAspMIB(void)
 }
 
 /**
-* @fn u_char * var_m2uaAspMIB(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
-* @param vp a pointer to the entry in the variables table for the requested variable.
-* @param name the object identifier for which to find.
-* @param length the length of the object identifier.
-* @param exact whether the name is exact.
-* @param var_len a pointer to the length of the representation of the object.
-* @param write_method a pointer to a write method for the object.
-* @brief locate variables in m2uaAspMIB.
-* This function returns a pointer to a memory area that is static across the request that contains
-* the UCD-SNMP representation of the scalar (so that it may be used to read from for a GET,
-* GET-NEXT or GET-BULK request).  This returned pointer may be NULL, in which case the function is
-* telling UCD-SNMP that the scalar does not exist for reading; however, if write_method is
-* overwritten with a non-NULL value, the function is telling UCD-SNMP that the scalar exists for
-* writing.  Write-only objects can be effected in this way.
-*/
+ * @fn u_char * var_m2uaAspMIB(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
+ * @param vp a pointer to the entry in the variables table for the requested variable.
+ * @param name the object identifier for which to find.
+ * @param length the length of the object identifier.
+ * @param exact whether the name is exact.
+ * @param var_len a pointer to the length of the representation of the object.
+ * @param write_method a pointer to a write method for the object.
+ * @brief locate variables in m2uaAspMIB.
+ *
+ * This function returns a pointer to a memory area that is static across the request that contains
+ * the UCD-SNMP representation of the scalar (so that it may be used to read from for a GET,
+ * GET-NEXT or GET-BULK request).  This returned pointer may be NULL, in which case the function is
+ * telling UCD-SNMP that the scalar does not exist for reading; however, if write_method is
+ * overwritten with a non-NULL value, the function is telling UCD-SNMP that the scalar exists for
+ * writing.  Write-only objects can be effected in this way.
+ */
 u_char *
 var_m2uaAspMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
@@ -613,6 +666,7 @@ var_m2uaAspMIB(struct variable *vp, oid * name, size_t *length, int exact, size_
 /**
  * @fn struct m2uaAspTable_data *m2uaAspTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaAspTable table.
+ *
  * Creates a new m2uaAspTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -622,7 +676,7 @@ m2uaAspTable_create(void)
 {
 	struct m2uaAspTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspTable_data);
 
-	DBUGMSGTL(("m2uaAspTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaAspTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2uaAspRowStatus = RS_NOTREADY;
@@ -632,12 +686,38 @@ m2uaAspTable_create(void)
 }
 
 /**
+ * @fn struct m2uaAspTable_data *m2uaAspTable_duplicate(struct m2uaAspTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaAspTable_data *
+m2uaAspTable_duplicate(struct m2uaAspTable_data *thedata)
+{
+	struct m2uaAspTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspTable_data);
+
+	DEBUGMSGTL(("m2uaAspTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaAspTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaAspTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaAspTable_destroy(struct m2uaAspTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -666,6 +746,7 @@ m2uaAspTable_destroy(struct m2uaAspTable_data **thedata)
  * @fn int m2uaAspTable_add(struct m2uaAspTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaAspTable table data set.
+ *
  * Adds a table row structure to the m2uaAspTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -676,8 +757,7 @@ m2uaAspTable_add(struct m2uaAspTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaAspTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaAspId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaAspId, thedata->m2uaAspIdLen);
 	header_complex_add_data(&m2uaAspTableStorage, vars, thedata);
@@ -688,8 +768,9 @@ m2uaAspTable_add(struct m2uaAspTable_data *thedata)
 
 /**
  * @fn int m2uaAspTable_del(struct m2uaAspTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaAspTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -718,6 +799,7 @@ m2uaAspTable_del(struct m2uaAspTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaAspTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaAspTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -811,6 +893,7 @@ store_m2uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaSgTable_data *m2uaSgTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaSgTable table.
+ *
  * Creates a new m2uaSgTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -820,7 +903,7 @@ m2uaSgTable_create(void)
 {
 	struct m2uaSgTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaSgTable_data);
 
-	DBUGMSGTL(("m2uaSgTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaSgTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2uaSgVersion = 1;
@@ -835,12 +918,38 @@ m2uaSgTable_create(void)
 }
 
 /**
+ * @fn struct m2uaSgTable_data *m2uaSgTable_duplicate(struct m2uaSgTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaSgTable_data *
+m2uaSgTable_duplicate(struct m2uaSgTable_data *thedata)
+{
+	struct m2uaSgTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaSgTable_data);
+
+	DEBUGMSGTL(("m2uaSgTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaSgTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaSgTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaSgTable_destroy(struct m2uaSgTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -869,6 +978,7 @@ m2uaSgTable_destroy(struct m2uaSgTable_data **thedata)
  * @fn int m2uaSgTable_add(struct m2uaSgTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaSgTable table data set.
+ *
  * Adds a table row structure to the m2uaSgTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -879,8 +989,7 @@ m2uaSgTable_add(struct m2uaSgTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaSgTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaSgId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaSgId, thedata->m2uaSgIdLen);
 	header_complex_add_data(&m2uaSgTableStorage, vars, thedata);
@@ -891,8 +1000,9 @@ m2uaSgTable_add(struct m2uaSgTable_data *thedata)
 
 /**
  * @fn int m2uaSgTable_del(struct m2uaSgTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaSgTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -921,6 +1031,7 @@ m2uaSgTable_del(struct m2uaSgTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaSgTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaSgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -1034,6 +1145,7 @@ store_m2uaSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaAspSgTable_data *m2uaAspSgTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaAspSgTable table.
+ *
  * Creates a new m2uaAspSgTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -1043,7 +1155,7 @@ m2uaAspSgTable_create(void)
 {
 	struct m2uaAspSgTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspSgTable_data);
 
-	DBUGMSGTL(("m2uaAspSgTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaAspSgTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2uaAspSgRowStatus = RS_NOTREADY;
@@ -1053,12 +1165,38 @@ m2uaAspSgTable_create(void)
 }
 
 /**
+ * @fn struct m2uaAspSgTable_data *m2uaAspSgTable_duplicate(struct m2uaAspSgTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaAspSgTable_data *
+m2uaAspSgTable_duplicate(struct m2uaAspSgTable_data *thedata)
+{
+	struct m2uaAspSgTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspSgTable_data);
+
+	DEBUGMSGTL(("m2uaAspSgTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaAspSgTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaAspSgTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaAspSgTable_destroy(struct m2uaAspSgTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -1087,6 +1225,7 @@ m2uaAspSgTable_destroy(struct m2uaAspSgTable_data **thedata)
  * @fn int m2uaAspSgTable_add(struct m2uaAspSgTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaAspSgTable table data set.
+ *
  * Adds a table row structure to the m2uaAspSgTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -1097,8 +1236,7 @@ m2uaAspSgTable_add(struct m2uaAspSgTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaAspSgTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaAspId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaAspId, thedata->m2uaAspIdLen);
 	/* m2uaSgId */
@@ -1111,8 +1249,9 @@ m2uaAspSgTable_add(struct m2uaAspSgTable_data *thedata)
 
 /**
  * @fn int m2uaAspSgTable_del(struct m2uaAspSgTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaAspSgTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -1141,6 +1280,7 @@ m2uaAspSgTable_del(struct m2uaAspSgTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaAspSgTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaAspSgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -1248,6 +1388,7 @@ store_m2uaAspSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaAsTable_data *m2uaAsTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaAsTable table.
+ *
  * Creates a new m2uaAsTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -1257,7 +1398,7 @@ m2uaAsTable_create(void)
 {
 	struct m2uaAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAsTable_data);
 
-	DBUGMSGTL(("m2uaAsTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaAsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2uaAsRowStatus = RS_NOTREADY;
@@ -1267,12 +1408,38 @@ m2uaAsTable_create(void)
 }
 
 /**
+ * @fn struct m2uaAsTable_data *m2uaAsTable_duplicate(struct m2uaAsTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaAsTable_data *
+m2uaAsTable_duplicate(struct m2uaAsTable_data *thedata)
+{
+	struct m2uaAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAsTable_data);
+
+	DEBUGMSGTL(("m2uaAsTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaAsTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaAsTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaAsTable_destroy(struct m2uaAsTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -1301,6 +1468,7 @@ m2uaAsTable_destroy(struct m2uaAsTable_data **thedata)
  * @fn int m2uaAsTable_add(struct m2uaAsTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaAsTable table data set.
+ *
  * Adds a table row structure to the m2uaAsTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -1311,8 +1479,7 @@ m2uaAsTable_add(struct m2uaAsTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaAsTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaAsId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaAsId, thedata->m2uaAsIdLen);
 	header_complex_add_data(&m2uaAsTableStorage, vars, thedata);
@@ -1323,8 +1490,9 @@ m2uaAsTable_add(struct m2uaAsTable_data *thedata)
 
 /**
  * @fn int m2uaAsTable_del(struct m2uaAsTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaAsTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -1353,6 +1521,7 @@ m2uaAsTable_del(struct m2uaAsTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaAsTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaAsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -1444,6 +1613,7 @@ store_m2uaAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaIfTable_data *m2uaIfTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaIfTable table.
+ *
  * Creates a new m2uaIfTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -1453,7 +1623,7 @@ m2uaIfTable_create(void)
 {
 	struct m2uaIfTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaIfTable_data);
 
-	DBUGMSGTL(("m2uaIfTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaIfTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2uaIfRowStatus = RS_NOTREADY;
@@ -1463,12 +1633,38 @@ m2uaIfTable_create(void)
 }
 
 /**
+ * @fn struct m2uaIfTable_data *m2uaIfTable_duplicate(struct m2uaIfTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaIfTable_data *
+m2uaIfTable_duplicate(struct m2uaIfTable_data *thedata)
+{
+	struct m2uaIfTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaIfTable_data);
+
+	DEBUGMSGTL(("m2uaIfTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaIfTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaIfTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaIfTable_destroy(struct m2uaIfTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -1495,6 +1691,7 @@ m2uaIfTable_destroy(struct m2uaIfTable_data **thedata)
  * @fn int m2uaIfTable_add(struct m2uaIfTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaIfTable table data set.
+ *
  * Adds a table row structure to the m2uaIfTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -1505,8 +1702,7 @@ m2uaIfTable_add(struct m2uaIfTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaIfTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaIfId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaIfId, thedata->m2uaIfIdLen);
 	header_complex_add_data(&m2uaIfTableStorage, vars, thedata);
@@ -1517,8 +1713,9 @@ m2uaIfTable_add(struct m2uaIfTable_data *thedata)
 
 /**
  * @fn int m2uaIfTable_del(struct m2uaIfTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaIfTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -1547,6 +1744,7 @@ m2uaIfTable_del(struct m2uaIfTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaIfTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaIfTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -1626,6 +1824,7 @@ store_m2uaIfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaAsIfTable_data *m2uaAsIfTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaAsIfTable table.
+ *
  * Creates a new m2uaAsIfTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -1635,7 +1834,7 @@ m2uaAsIfTable_create(void)
 {
 	struct m2uaAsIfTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAsIfTable_data);
 
-	DBUGMSGTL(("m2uaAsIfTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaAsIfTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -1645,12 +1844,38 @@ m2uaAsIfTable_create(void)
 }
 
 /**
+ * @fn struct m2uaAsIfTable_data *m2uaAsIfTable_duplicate(struct m2uaAsIfTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaAsIfTable_data *
+m2uaAsIfTable_duplicate(struct m2uaAsIfTable_data *thedata)
+{
+	struct m2uaAsIfTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAsIfTable_data);
+
+	DEBUGMSGTL(("m2uaAsIfTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaAsIfTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaAsIfTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaAsIfTable_destroy(struct m2uaAsIfTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -1675,6 +1900,7 @@ m2uaAsIfTable_destroy(struct m2uaAsIfTable_data **thedata)
  * @fn int m2uaAsIfTable_add(struct m2uaAsIfTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaAsIfTable table data set.
+ *
  * Adds a table row structure to the m2uaAsIfTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -1685,8 +1911,7 @@ m2uaAsIfTable_add(struct m2uaAsIfTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaAsIfTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaAsId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaAsId, thedata->m2uaAsIdLen);
 	/* m2uaIfId */
@@ -1699,8 +1924,9 @@ m2uaAsIfTable_add(struct m2uaAsIfTable_data *thedata)
 
 /**
  * @fn int m2uaAsIfTable_del(struct m2uaAsIfTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaAsIfTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -1729,6 +1955,7 @@ m2uaAsIfTable_del(struct m2uaAsIfTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaAsIfTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaAsIfTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -1798,6 +2025,7 @@ store_m2uaAsIfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaSgAsTable_data *m2uaSgAsTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaSgAsTable table.
+ *
  * Creates a new m2uaSgAsTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -1807,7 +2035,7 @@ m2uaSgAsTable_create(void)
 {
 	struct m2uaSgAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaSgAsTable_data);
 
-	DBUGMSGTL(("m2uaSgAsTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaSgAsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2uaSgAsRowStatus = RS_NOTREADY;
@@ -1817,12 +2045,38 @@ m2uaSgAsTable_create(void)
 }
 
 /**
+ * @fn struct m2uaSgAsTable_data *m2uaSgAsTable_duplicate(struct m2uaSgAsTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaSgAsTable_data *
+m2uaSgAsTable_duplicate(struct m2uaSgAsTable_data *thedata)
+{
+	struct m2uaSgAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaSgAsTable_data);
+
+	DEBUGMSGTL(("m2uaSgAsTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaSgAsTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaSgAsTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaSgAsTable_destroy(struct m2uaSgAsTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -1851,6 +2105,7 @@ m2uaSgAsTable_destroy(struct m2uaSgAsTable_data **thedata)
  * @fn int m2uaSgAsTable_add(struct m2uaSgAsTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaSgAsTable table data set.
+ *
  * Adds a table row structure to the m2uaSgAsTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -1861,8 +2116,7 @@ m2uaSgAsTable_add(struct m2uaSgAsTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaSgAsTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaSgId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaSgId, thedata->m2uaSgIdLen);
 	/* m2uaAsId */
@@ -1875,8 +2129,9 @@ m2uaSgAsTable_add(struct m2uaSgAsTable_data *thedata)
 
 /**
  * @fn int m2uaSgAsTable_del(struct m2uaSgAsTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaSgAsTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -1905,6 +2160,7 @@ m2uaSgAsTable_del(struct m2uaSgAsTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaSgAsTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaSgAsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -2004,6 +2260,7 @@ store_m2uaSgAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaAspAsTable_data *m2uaAspAsTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaAspAsTable table.
+ *
  * Creates a new m2uaAspAsTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -2013,7 +2270,7 @@ m2uaAspAsTable_create(void)
 {
 	struct m2uaAspAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspAsTable_data);
 
-	DBUGMSGTL(("m2uaAspAsTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaAspAsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2uaAspAsAsState = RS_NOTREADY;
@@ -2023,12 +2280,38 @@ m2uaAspAsTable_create(void)
 }
 
 /**
+ * @fn struct m2uaAspAsTable_data *m2uaAspAsTable_duplicate(struct m2uaAspAsTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaAspAsTable_data *
+m2uaAspAsTable_duplicate(struct m2uaAspAsTable_data *thedata)
+{
+	struct m2uaAspAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspAsTable_data);
+
+	DEBUGMSGTL(("m2uaAspAsTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaAspAsTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaAspAsTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaAspAsTable_destroy(struct m2uaAspAsTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -2055,6 +2338,7 @@ m2uaAspAsTable_destroy(struct m2uaAspAsTable_data **thedata)
  * @fn int m2uaAspAsTable_add(struct m2uaAspAsTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaAspAsTable table data set.
+ *
  * Adds a table row structure to the m2uaAspAsTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -2065,8 +2349,7 @@ m2uaAspAsTable_add(struct m2uaAspAsTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaAspAsTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaAspId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaAspId, thedata->m2uaAspIdLen);
 	/* m2uaAsId */
@@ -2079,8 +2362,9 @@ m2uaAspAsTable_add(struct m2uaAspAsTable_data *thedata)
 
 /**
  * @fn int m2uaAspAsTable_del(struct m2uaAspAsTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaAspAsTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -2109,6 +2393,7 @@ m2uaAspAsTable_del(struct m2uaAspAsTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaAspAsTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaAspAsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -2194,6 +2479,7 @@ store_m2uaAspAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct m2uaAspSgAsTable_data *m2uaAspSgAsTable_create(void)
  * @brief create a fresh data structure representing a new row in the m2uaAspSgAsTable table.
+ *
  * Creates a new m2uaAspSgAsTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -2203,7 +2489,7 @@ m2uaAspSgAsTable_create(void)
 {
 	struct m2uaAspSgAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspSgAsTable_data);
 
-	DBUGMSGTL(("m2uaAspSgAsTable", "creating row...  "));
+	DEBUGMSGTL(("m2uaAspSgAsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -2213,12 +2499,38 @@ m2uaAspSgAsTable_create(void)
 }
 
 /**
+ * @fn struct m2uaAspSgAsTable_data *m2uaAspSgAsTable_duplicate(struct m2uaAspSgAsTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct m2uaAspSgAsTable_data *
+m2uaAspSgAsTable_duplicate(struct m2uaAspSgAsTable_data *thedata)
+{
+	struct m2uaAspSgAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m2uaAspSgAsTable_data);
+
+	DEBUGMSGTL(("m2uaAspSgAsTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("m2uaAspSgAsTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2uaAspSgAsTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int m2uaAspSgAsTable_destroy(struct m2uaAspSgAsTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -2247,6 +2559,7 @@ m2uaAspSgAsTable_destroy(struct m2uaAspSgAsTable_data **thedata)
  * @fn int m2uaAspSgAsTable_add(struct m2uaAspSgAsTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the m2uaAspSgAsTable table data set.
+ *
  * Adds a table row structure to the m2uaAspSgAsTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -2257,8 +2570,7 @@ m2uaAspSgAsTable_add(struct m2uaAspSgAsTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("m2uaAspSgAsTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* m2uaAspId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->m2uaAspId, thedata->m2uaAspIdLen);
 	/* m2uaSgId */
@@ -2273,8 +2585,9 @@ m2uaAspSgAsTable_add(struct m2uaAspSgAsTable_data *thedata)
 
 /**
  * @fn int m2uaAspSgAsTable_del(struct m2uaAspSgAsTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the m2uaAspSgAsTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -2303,6 +2616,7 @@ m2uaAspSgAsTable_del(struct m2uaAspSgAsTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2uaAspSgAsTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case m2uaAspSgAsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -2394,6 +2708,7 @@ store_m2uaAspSgAsTable(int majorID, int minorID, void *serverarg, void *clientar
 /**
  * @fn void refresh_m2uaAspTable(void)
  * @brief refresh the scalar values of the m2uaAspTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -2412,6 +2727,7 @@ refresh_m2uaAspTable(void)
 /**
  * @fn void refresh_m2uaAspTable_row(struct m2uaAspTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaAspTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -2427,6 +2743,7 @@ refresh_m2uaAspTable_row(struct m2uaAspTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaAspTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaAspTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -2436,11 +2753,9 @@ var_m2uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	struct m2uaAspTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaAspTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaAspTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaAspTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaAspTable_row(StorageTmp);
@@ -2491,6 +2806,7 @@ var_m2uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 /**
  * @fn void refresh_m2uaSgTable(void)
  * @brief refresh the scalar values of the m2uaSgTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -2509,6 +2825,7 @@ refresh_m2uaSgTable(void)
 /**
  * @fn void refresh_m2uaSgTable_row(struct m2uaSgTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaSgTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -2524,6 +2841,7 @@ refresh_m2uaSgTable_row(struct m2uaSgTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaSgTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaSgTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -2533,11 +2851,9 @@ var_m2uaSgTable(struct variable *vp, oid * name, size_t *length, int exact, size
 	struct m2uaSgTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaSgTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaSgTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaSgTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaSgTable_row(StorageTmp);
@@ -2620,6 +2936,7 @@ var_m2uaSgTable(struct variable *vp, oid * name, size_t *length, int exact, size
 /**
  * @fn void refresh_m2uaAspSgTable(void)
  * @brief refresh the scalar values of the m2uaAspSgTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -2638,6 +2955,7 @@ refresh_m2uaAspSgTable(void)
 /**
  * @fn void refresh_m2uaAspSgTable_row(struct m2uaAspSgTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaAspSgTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -2653,6 +2971,7 @@ refresh_m2uaAspSgTable_row(struct m2uaAspSgTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaAspSgTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaAspSgTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -2662,11 +2981,9 @@ var_m2uaAspSgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 	struct m2uaAspSgTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaAspSgTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaAspSgTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaAspSgTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaAspSgTable_row(StorageTmp);
@@ -2733,6 +3050,7 @@ var_m2uaAspSgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 /**
  * @fn void refresh_m2uaAsTable(void)
  * @brief refresh the scalar values of the m2uaAsTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -2751,6 +3069,7 @@ refresh_m2uaAsTable(void)
 /**
  * @fn void refresh_m2uaAsTable_row(struct m2uaAsTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaAsTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -2766,6 +3085,7 @@ refresh_m2uaAsTable_row(struct m2uaAsTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaAsTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaAsTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -2775,11 +3095,9 @@ var_m2uaAsTable(struct variable *vp, oid * name, size_t *length, int exact, size
 	struct m2uaAsTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaAsTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaAsTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaAsTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaAsTable_row(StorageTmp);
@@ -2826,6 +3144,7 @@ var_m2uaAsTable(struct variable *vp, oid * name, size_t *length, int exact, size
 /**
  * @fn void refresh_m2uaIfTable(void)
  * @brief refresh the scalar values of the m2uaIfTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -2844,6 +3163,7 @@ refresh_m2uaIfTable(void)
 /**
  * @fn void refresh_m2uaIfTable_row(struct m2uaIfTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaIfTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -2859,6 +3179,7 @@ refresh_m2uaIfTable_row(struct m2uaIfTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaIfTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaIfTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -2868,11 +3189,9 @@ var_m2uaIfTable(struct variable *vp, oid * name, size_t *length, int exact, size
 	struct m2uaIfTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaIfTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaIfTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaIfTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaIfTable_row(StorageTmp);
@@ -2903,6 +3222,7 @@ var_m2uaIfTable(struct variable *vp, oid * name, size_t *length, int exact, size
 /**
  * @fn void refresh_m2uaAsIfTable(void)
  * @brief refresh the scalar values of the m2uaAsIfTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -2921,6 +3241,7 @@ refresh_m2uaAsIfTable(void)
 /**
  * @fn void refresh_m2uaAsIfTable_row(struct m2uaAsIfTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaAsIfTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -2936,6 +3257,7 @@ refresh_m2uaAsIfTable_row(struct m2uaAsIfTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaAsIfTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaAsIfTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -2945,11 +3267,9 @@ var_m2uaAsIfTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	struct m2uaAsIfTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaAsIfTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaAsIfTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaAsIfTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaAsIfTable_row(StorageTmp);
@@ -2964,6 +3284,7 @@ var_m2uaAsIfTable(struct variable *vp, oid * name, size_t *length, int exact, si
 /**
  * @fn void refresh_m2uaSgAsTable(void)
  * @brief refresh the scalar values of the m2uaSgAsTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -2982,6 +3303,7 @@ refresh_m2uaSgAsTable(void)
 /**
  * @fn void refresh_m2uaSgAsTable_row(struct m2uaSgAsTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaSgAsTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -2997,6 +3319,7 @@ refresh_m2uaSgAsTable_row(struct m2uaSgAsTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaSgAsTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaSgAsTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -3006,11 +3329,9 @@ var_m2uaSgAsTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	struct m2uaSgAsTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaSgAsTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaSgAsTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaSgAsTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaSgAsTable_row(StorageTmp);
@@ -3069,6 +3390,7 @@ var_m2uaSgAsTable(struct variable *vp, oid * name, size_t *length, int exact, si
 /**
  * @fn void refresh_m2uaAspAsTable(void)
  * @brief refresh the scalar values of the m2uaAspAsTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -3087,6 +3409,7 @@ refresh_m2uaAspAsTable(void)
 /**
  * @fn void refresh_m2uaAspAsTable_row(struct m2uaAspAsTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaAspAsTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -3102,6 +3425,7 @@ refresh_m2uaAspAsTable_row(struct m2uaAspAsTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaAspAsTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaAspAsTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -3111,11 +3435,9 @@ var_m2uaAspAsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 	struct m2uaAspAsTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaAspAsTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaAspAsTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaAspAsTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaAspAsTable_row(StorageTmp);
@@ -3154,6 +3476,7 @@ var_m2uaAspAsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 /**
  * @fn void refresh_m2uaAspSgAsTable(void)
  * @brief refresh the scalar values of the m2uaAspSgAsTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -3172,6 +3495,7 @@ refresh_m2uaAspSgAsTable(void)
 /**
  * @fn void refresh_m2uaAspSgAsTable_row(struct m2uaAspSgAsTable_data *StorageTmp)
  * @brief refresh the contents of the m2uaAspSgAsTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -3187,6 +3511,7 @@ refresh_m2uaAspSgAsTable_row(struct m2uaAspSgAsTable_data *StorageTmp)
 /**
  * @fn u_char *var_m2uaAspSgAsTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in m2uaAspSgAsTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_m2uaAspMIB above.
  */
@@ -3196,11 +3521,9 @@ var_m2uaAspSgAsTable(struct variable *vp, oid * name, size_t *length, int exact,
 	struct m2uaAspSgAsTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("m2uaAspMIB", "var_m2uaAspSgAsTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2uaAspSgAsTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(m2uaAspSgAsTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_m2uaAspSgAsTable_row(StorageTmp);
@@ -3295,17 +3618,15 @@ write_m2uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspAdministrativeState;
 		StorageTmp->m2uaAspAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3371,17 +3692,15 @@ write_m2uaAspAspState(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspAspState;
 		StorageTmp->m2uaAspAspState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspAspState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3446,9 +3765,8 @@ write_m2uaAspCapablities(int action, u_char *var_val, u_char var_val_type, size_
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaAspCapablities;
 		old_length = StorageTmp->m2uaAspCapablitiesLen;
 		StorageTmp->m2uaAspCapablities = string;
@@ -3458,8 +3776,7 @@ write_m2uaAspCapablities(int action, u_char *var_val, u_char var_val_type, size_
 		StorageTmp->m2uaAspCapablities = old_value;
 		StorageTmp->m2uaAspCapablitiesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -3529,17 +3846,15 @@ write_m2uaAspRegistrationPolicy(int action, u_char *var_val, u_char var_val_type
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspRegistrationPolicy;
 		StorageTmp->m2uaAspRegistrationPolicy = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspRegistrationPolicy = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3601,9 +3916,8 @@ write_m2uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaAspName;
 		old_length = StorageTmp->m2uaAspNameLen;
 		StorageTmp->m2uaAspName = string;
@@ -3613,8 +3927,7 @@ write_m2uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		StorageTmp->m2uaAspName = old_value;
 		StorageTmp->m2uaAspNameLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -3679,9 +3992,8 @@ write_m2uaSgName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaSgName;
 		old_length = StorageTmp->m2uaSgNameLen;
 		StorageTmp->m2uaSgName = string;
@@ -3691,8 +4003,7 @@ write_m2uaSgName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 		StorageTmp->m2uaSgName = old_value;
 		StorageTmp->m2uaSgNameLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -3761,17 +4072,15 @@ write_m2uaSgAdministrativeState(int action, u_char *var_val, u_char var_val_type
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgAdministrativeState;
 		StorageTmp->m2uaSgAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3838,17 +4147,15 @@ write_m2uaSgAspState(int action, u_char *var_val, u_char var_val_type, size_t va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgAspState;
 		StorageTmp->m2uaSgAspState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgAspState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3914,17 +4221,15 @@ write_m2uaSgVersion(int action, u_char *var_val, u_char var_val_type, size_t var
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgVersion;
 		StorageTmp->m2uaSgVersion = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgVersion = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3989,9 +4294,8 @@ write_m2uaSgOptions(int action, u_char *var_val, u_char var_val_type, size_t var
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaSgOptions;
 		old_length = StorageTmp->m2uaSgOptionsLen;
 		StorageTmp->m2uaSgOptions = string;
@@ -4001,8 +4305,7 @@ write_m2uaSgOptions(int action, u_char *var_val, u_char var_val_type, size_t var
 		StorageTmp->m2uaSgOptions = old_value;
 		StorageTmp->m2uaSgOptionsLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -4072,17 +4375,15 @@ write_m2uaSgRegistrationPolicy(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgRegistrationPolicy;
 		StorageTmp->m2uaSgRegistrationPolicy = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgRegistrationPolicy = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4144,17 +4445,15 @@ write_m2uaSgProtocolPayloadId(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgProtocolPayloadId;
 		StorageTmp->m2uaSgProtocolPayloadId = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgProtocolPayloadId = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4216,17 +4515,15 @@ write_m2uaSgIpPort(int action, u_char *var_val, u_char var_val_type, size_t var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgIpPort;
 		StorageTmp->m2uaSgIpPort = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgIpPort = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4287,9 +4584,8 @@ write_m2uaSgPrimaryIpAddress(int action, u_char *var_val, u_char var_val_type, s
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaSgPrimaryIpAddress;
 		old_length = StorageTmp->m2uaSgPrimaryIpAddressLen;
 		StorageTmp->m2uaSgPrimaryIpAddress = string;
@@ -4299,8 +4595,7 @@ write_m2uaSgPrimaryIpAddress(int action, u_char *var_val, u_char var_val_type, s
 		StorageTmp->m2uaSgPrimaryIpAddress = old_value;
 		StorageTmp->m2uaSgPrimaryIpAddressLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -4365,17 +4660,15 @@ write_m2uaSgMinOstreams(int action, u_char *var_val, u_char var_val_type, size_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgMinOstreams;
 		StorageTmp->m2uaSgMinOstreams = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgMinOstreams = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4437,17 +4730,15 @@ write_m2uaSgMaxIstreams(int action, u_char *var_val, u_char var_val_type, size_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgMaxIstreams;
 		StorageTmp->m2uaSgMaxIstreams = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgMaxIstreams = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4512,17 +4803,15 @@ write_m2uaAspSgAdminstrativeState(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspSgAdminstrativeState;
 		StorageTmp->m2uaAspSgAdminstrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspSgAdminstrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4588,17 +4877,15 @@ write_m2uaAspSgAspState(int action, u_char *var_val, u_char var_val_type, size_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspSgAspState;
 		StorageTmp->m2uaAspSgAspState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspSgAspState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4664,17 +4951,15 @@ write_m2uaAspSgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspSgAspIdPolicy;
 		StorageTmp->m2uaAspSgAspIdPolicy = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspSgAspIdPolicy = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4731,17 +5016,15 @@ write_m2uaAspSgAspId(int action, u_char *var_val, u_char var_val_type, size_t va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspSgAspId;
 		StorageTmp->m2uaAspSgAspId = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspSgAspId = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4808,17 +5091,15 @@ write_m2uaAspSgAssociationPolicy(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspSgAssociationPolicy;
 		StorageTmp->m2uaAspSgAssociationPolicy = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspSgAssociationPolicy = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4880,17 +5161,15 @@ write_m2uaAspSgIpPort(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspSgIpPort;
 		StorageTmp->m2uaAspSgIpPort = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspSgIpPort = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4951,9 +5230,8 @@ write_m2uaAspSgPrimaryIpAddress(int action, u_char *var_val, u_char var_val_type
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaAspSgPrimaryIpAddress;
 		old_length = StorageTmp->m2uaAspSgPrimaryIpAddressLen;
 		StorageTmp->m2uaAspSgPrimaryIpAddress = string;
@@ -4963,8 +5241,7 @@ write_m2uaAspSgPrimaryIpAddress(int action, u_char *var_val, u_char var_val_type
 		StorageTmp->m2uaAspSgPrimaryIpAddress = old_value;
 		StorageTmp->m2uaAspSgPrimaryIpAddressLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -5029,9 +5306,8 @@ write_m2uaAsName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaAsName;
 		old_length = StorageTmp->m2uaAsNameLen;
 		StorageTmp->m2uaAsName = string;
@@ -5041,8 +5317,7 @@ write_m2uaAsName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 		StorageTmp->m2uaAsName = old_value;
 		StorageTmp->m2uaAsNameLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -5105,9 +5380,8 @@ write_m2uaAsTrafficMode(int action, u_char *var_val, u_char var_val_type, size_t
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(objid);
 		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
+				   UNDO case */
 		old_value = StorageTmp->m2uaAsTrafficMode;
 		old_length = StorageTmp->m2uaAsTrafficModeLen;
 		StorageTmp->m2uaAsTrafficMode = objid;
@@ -5117,8 +5391,7 @@ write_m2uaAsTrafficMode(int action, u_char *var_val, u_char var_val_type, size_t
 		StorageTmp->m2uaAsTrafficMode = old_value;
 		StorageTmp->m2uaAsTrafficModeLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
@@ -5186,17 +5459,15 @@ write_m2uaAsAdministrativeState(int action, u_char *var_val, u_char var_val_type
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAsAdministrativeState;
 		StorageTmp->m2uaAsAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAsAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5261,9 +5532,8 @@ write_m2uaAsProceduralStatus(int action, u_char *var_val, u_char var_val_type, s
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaAsProceduralStatus;
 		old_length = StorageTmp->m2uaAsProceduralStatusLen;
 		StorageTmp->m2uaAsProceduralStatus = string;
@@ -5273,8 +5543,7 @@ write_m2uaAsProceduralStatus(int action, u_char *var_val, u_char var_val_type, s
 		StorageTmp->m2uaAsProceduralStatus = old_value;
 		StorageTmp->m2uaAsProceduralStatusLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -5342,17 +5611,15 @@ write_m2uaAsUsageState(int action, u_char *var_val, u_char var_val_type, size_t 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAsUsageState;
 		StorageTmp->m2uaAsUsageState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAsUsageState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5421,17 +5688,15 @@ write_m2uaAsAsState(int action, u_char *var_val, u_char var_val_type, size_t var
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAsAsState;
 		StorageTmp->m2uaAsAsState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAsAsState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5487,17 +5752,15 @@ write_m2uaIfAsIndex(int action, u_char *var_val, u_char var_val_type, size_t var
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaIfAsIndex;
 		StorageTmp->m2uaIfAsIndex = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaIfAsIndex = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5559,9 +5822,8 @@ write_m2uaIfIdentifier(int action, u_char *var_val, u_char var_val_type, size_t 
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaIfIdentifier;
 		old_length = StorageTmp->m2uaIfIdentifierLen;
 		StorageTmp->m2uaIfIdentifier = string;
@@ -5571,8 +5833,7 @@ write_m2uaIfIdentifier(int action, u_char *var_val, u_char var_val_type, size_t 
 		StorageTmp->m2uaIfIdentifier = old_value;
 		StorageTmp->m2uaIfIdentifierLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -5637,9 +5898,8 @@ write_m2uaIfName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->m2uaIfName;
 		old_length = StorageTmp->m2uaIfNameLen;
 		StorageTmp->m2uaIfName = string;
@@ -5649,8 +5909,7 @@ write_m2uaIfName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 		StorageTmp->m2uaIfName = old_value;
 		StorageTmp->m2uaIfNameLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -5709,17 +5968,15 @@ write_m2uaSgAsOrdering(int action, u_char *var_val, u_char var_val_type, size_t 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgAsOrdering;
 		StorageTmp->m2uaSgAsOrdering = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgAsOrdering = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5784,17 +6041,15 @@ write_m2uaSgAsAdministrativeState(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaSgAsAdministrativeState;
 		StorageTmp->m2uaSgAsAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgAsAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5860,17 +6115,15 @@ write_m2uaAspAsAdministrativeState(int action, u_char *var_val, u_char var_val_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspAsAdministrativeState;
 		StorageTmp->m2uaAspAsAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspAsAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5922,17 +6175,15 @@ write_m2uaAspSgAsAdministrativeState(int action, u_char *var_val, u_char var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspSgAsAdministrativeState;
 		StorageTmp->m2uaAspSgAsAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspSgAsAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5988,17 +6239,15 @@ write_m2uaAspSgAsRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->m2uaAspSgAsRowStatus;
 		StorageTmp->m2uaAspSgAsRowStatus = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspSgAsRowStatus = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6111,9 +6360,7 @@ write_m2uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -6158,8 +6405,7 @@ write_m2uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -6293,9 +6539,7 @@ write_m2uaSgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -6340,8 +6584,7 @@ write_m2uaSgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -6480,9 +6723,7 @@ write_m2uaAspSgRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -6527,8 +6768,7 @@ write_m2uaAspSgRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -6662,9 +6902,7 @@ write_m2uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -6709,8 +6947,7 @@ write_m2uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -6844,9 +7081,7 @@ write_m2uaIfRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -6891,8 +7126,7 @@ write_m2uaIfRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -7031,9 +7265,7 @@ write_m2uaSgAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -7078,8 +7310,7 @@ write_m2uaSgAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -7218,9 +7449,7 @@ write_m2uaAspAsAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -7265,8 +7494,7 @@ write_m2uaAspAsAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -7405,9 +7633,7 @@ write_m2uaAspAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -7452,8 +7678,7 @@ write_m2uaAspAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -7480,7 +7705,88 @@ write_m2uaAspAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 	return SNMP_ERR_NOERROR;
 }
 
+#if defined MODULE
+#if defined MASTER
+/**
+ * @fn void m2uaAspMIB_loop_handler(int dummy)
+ * @param dummy signal number (always zero (0))
+ * @brief handle event loop interation.
+ *
+ * This function is registered so that, when operating as a module, snmpd will call it one per event
+ * loop interation.  This function is called before the next requst is processed and after the
+ * previous request is processed.  Two things are done here:  1) The file descriptor that is used to
+ * synchronize the agent with (pseudo-)device drivers is closed.  (Another approach, instead of
+ * closing each time, would be to restart a timer each time that a request is made (loop is
+ * performed) and if it expires, close the file descriptor).  2) The request number is incremented.
+ * Although a request is not generated for each loop of the snmp event loop, it is true that a new
+ * request cannot be generated without performing a loop.  Therefore, the sa_request is not the
+ * request number but it is a temporally unique identifier for a request.
+ */
+void
+m2uaAspMIB_loop_handler(int dummy)
+{
+	if (external_signal_scheduled[dummy] == 0)
+		external_signal_scheduled[dummy]--;
+	/* close files after each request */
+	if (sa_fclose && sa_fd != 0) {
+		close(sa_fd);
+		sa_fd = 0;
+	}
+	/* prepare for next request */
+	sa_request++;
+}
+#endif				/* defined MASTER */
+/**
+ * @fn void m2uaAspMIB_readfd_handler(int fd, void *dummy)
+ * @param fd file descriptor to read.
+ * @param dummy client data passed to registration function (always NULL).
+ * @brief handle read event on file descriptor.
+ *
+ * This read file descriptor handler is normally used for (pseudo-)device drivers that generate
+ * statistical collection interval events, alarm events, or other operational measurement events, by
+ * placing a message on the read queue of the "event handling" Stream.  Normally this routine
+ * would adjust counts in some table or scalars, generate SNMP traps representing on-occurence
+ * events, first and interval events, and alarm indications.
+ */
+void
+m2uaAspMIB_readfd_handler(int fd, void *dummy)
+{
+	/* XXX: place actions to handle sa_readfd here... */
+	return;
+}
+#endif				/* defined MOUDLE */
+#if defined MASTER
+const char sa_program[] = "m2uaaspmib";
+int sa_fclose = 1;			/* default close files between requests */
+int sa_fd = 0;				/* file descriptor for MIB use */
+int sa_readfd = 0;			/* file descriptor for autonomnous events */
+int sa_changed = 1;			/* indication to reread MIB configuration */
+int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
+int sa_request = 1;			/* request number for per-request actions */
+#endif				/* defined MASTER */
+#if defined MASTER
 #if !defined MODULE
+int sa_dump = 0;			/* default packet dump */
+int sa_debug = 0;			/* default no debug */
+int sa_nomead = 1;			/* default daemon mode */
+int sa_output = 1;			/* default normal output */
+int sa_agentx = 1;			/* default agentx mode */
+int sa_alarms = 1;			/* default application alarms */
+int sa_logaddr = 0;			/* log addresses */
+int sa_logfillog = 0;			/* log to sa_logfile */
+int sa_logstderr = 0;			/* log to standard error */
+int sa_logstdout = 0;			/* log to standard output */
+int sa_logsyslog = 0;			/* log to system logs */
+int sa_logcallog = 0;			/* log to callback logs */
+int sa_appendlog = 0;			/* append to log file without truncating */
+char sa_logfile[256] = "/var/log/m2uaaspmib.log";
+char sa_pidfile[256] = "/var/run/m2uaaspmib.pid";
+char sa_sysctlf[256] = "/etc/m2uaaspmib.conf";
+int allow_severity = LOG_ERR;
+int deny_severity = LOG_ERR;
+
+/* file stream for log file */
+FILE *stdlog = NULL;
 static void
 sa_version(int argc, char *argv[])
 {
@@ -7653,8 +7959,7 @@ sa_help_directives(int argc, char *argv[])
 	init_mib();
 	init_snmp("m2uaAspMIB");
 	snmp_log(MY_FACILITY(LOG_INFO), "Configuration directives understood:\n");
-	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be
-	   writen to standard error and not standard output. */
+	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be writen to standard error and not standard output. */
 	read_config_print_usage("    ");
 }
 static int
@@ -7791,8 +8096,7 @@ sa_hup_block(void)
 static int
 sa_hup_action(void)
 {
-	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by
-	   logrotate asking us to close and reopen our log files. */
+	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by logrotate asking us to close and reopen our log files. */
 	sa_hup_signal = 0;
 	snmp_log(MY_FACILITY(LOG_WARNING), "Caught SIGHUP, reopening files.");
 	if (sa_output > 1)
@@ -7925,10 +8229,8 @@ sa_init_logging(int argc, char *argv[])
 {
 	static char progname[256];
 
-	/* The purpose of this function is to bring logging up before forking (and while still in
-	   the foreground) so that we can use the snmp_log() function before and during forking if
-	   necessary.  Note that the default configuration for snmp_log() is to send all logs to
-	   standard error. */
+	/* The purpose of this function is to bring logging up before forking (and while still in the foreground) so that we can use the snmp_log() function before and during forking if necessary.
+	   Note that the default configuration for snmp_log() is to send all logs to standard error. */
 	strncpy(progname, basename(argv[0]), sizeof(progname));
 	snmp_disable_log();
 	if (sa_logfillog) {
@@ -7936,9 +8238,8 @@ sa_init_logging(int argc, char *argv[])
 	}
 	if (sa_logstderr | sa_logstdout) {
 #if defined LOG_PERROR
-		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr,
-		   it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as
-		   the former is better formated. */
+		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better 
+		   formated. */
 		if (!sa_logsyslog)
 			snmp_enable_stderrlog();
 #else				/* defined LOG_PERROR */
@@ -7951,8 +8252,7 @@ sa_init_logging(int argc, char *argv[])
 #else				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
 		snmp_enable_syslog_ident("m2uaAspMIB", LOG_DAEMON);
 #endif				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		/* Note that the way that snmp sets up the logger is not really the way we want it,
-		   so close the log and reopen it the way we want. */
+		/* Note that the way that snmp sets up the logger is not really the way we want it, so close the log and reopen it the way we want. */
 		closelog();
 #if defined LOG_PERROR
 		openlog("m2uaAspMIB", LOG_PID | LOG_CONS | LOG_NDELAY | (sa_logstderr ? LOG_PERROR : 0), MY_FACILITY(0));
@@ -8060,8 +8360,7 @@ sa_mloop(int argc, char *argv[])
 	for (;;) {
 		int retval;
 
-		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of
-		   the agentx socket and add it to the fdset. */
+		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of the agentx socket and add it to the fdset. */
 		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
 #if 0
 		if (snmp_select() == 0) {
@@ -8321,11 +8620,8 @@ main(int argc, char *argv[])
 			sa_logfillog = 1;
 			break;
 		case 'L':	/* -L, --log-stderr, -Le, -LE p1[-p2] */
-			/* Note that the recent NET-SNMP version of this option is far more
-			   complicated: -Le is the same as the old version of the option; -Lf
-			   LOGFILE is like the -l option; -Ls is like the -s option; -Lo logs
-			   messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or
-			   O, logs priority p1 and above to X, or p1 thru p2 to X. */
+			/* Note that the recent NET-SNMP version of this option is far more complicated: -Le is the same as the old version of the option; -Lf LOGFILE is like the -l option; -Ls is
+			   like the -s option; -Lo logs messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or O, logs priority p1 and above to X, or p1 thru p2 to X. */
 			if (sa_debug)
 				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to standard error\n", argv[0]);
 			sa_logstderr = 1;
@@ -8540,3 +8836,4 @@ main(int argc, char *argv[])
 	exit(0);
 }
 #endif				/* !defined MODULE */
+#endif				/* defined MASTER */

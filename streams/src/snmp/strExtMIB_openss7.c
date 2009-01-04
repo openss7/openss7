@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "ds_agent.h"
 #ifdef HAVE_UCD_SNMP_UTIL_FUNCS_H
 #include <ucd-snmp/util_funcs.h>
-/* Many recent net-snmp UCD compatible headers do not declard header_generic. */
+/* Many recent net-snmp UCD compatible headers do not declare header_generic. */
 int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMethod **);
 #else				/* HAVE_UCD_SNMP_UTIL_FUNCS_H */
 #include "util_funcs.h"
@@ -113,45 +113,38 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
-#include "strExtMIB_openss7.h"
-const char sa_program[] = "strextmib";
+#include "strExtMIB.h"
+extern const char sa_program[];
 
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
+#define MASTER 1
 #if !defined MODULE
-int sa_dump = 0;			/* default packet dump */
-int sa_debug = 0;			/* default no debug */
-int sa_nomead = 1;			/* default daemon mode */
-int sa_output = 1;			/* default normal output */
-int sa_agentx = 1;			/* default agentx mode */
-int sa_alarms = 1;			/* default application alarms */
-int sa_fclose = 1;			/* default close files between requests */
-int sa_logaddr = 0;			/* log addresses */
-int sa_logfillog = 0;			/* log to sa_logfile */
-int sa_logstderr = 0;			/* log to standard error */
-int sa_logstdout = 0;			/* log to standard output */
-int sa_logsyslog = 0;			/* log to system logs */
-int sa_logcallog = 0;			/* log to callback logs */
-int sa_appendlog = 0;			/* append to log file without truncating */
-char sa_logfile[256] = "/var/log/strextmib.log";
-char sa_pidfile[256] = "/var/run/strextmib.pid";
-char sa_sysctlf[256] = "/etc/strextmib.conf";
-int allow_severity = LOG_ERR;
-int deny_severity = LOG_ERR;
+extern int sa_dump;			/* default packet dump */
+extern int sa_debug;			/* default no debug */
+extern int sa_nomead;			/* default daemon mode */
+extern int sa_output;			/* default normal output */
+extern int sa_agentx;			/* default agentx mode */
+extern int sa_alarms;			/* default application alarms */
+extern int sa_logaddr;			/* log addresses */
+extern int sa_logfillog;		/* log to sa_logfile */
+extern int sa_logstderr;		/* log to standard error */
+extern int sa_logstdout;		/* log to standard output */
+extern int sa_logsyslog;		/* log to system logs */
+extern int sa_logcallog;		/* log to callback logs */
+extern int sa_appendlog;		/* append to log file without truncating */
+extern char sa_logfile[256];
+extern char sa_pidfile[256];
+extern char sa_sysctlf[256];
 
 /* file stream for log file */
-FILE *stdlog = NULL;
-
-/* file descriptor for MIB use */
-int sa_fd = 0;
-
-/* indication to reread MIB configuration */
-int sa_changed = 1;
-
-/* indications that statistics, the mib or its tables need to be refreshed */
-int sa_stats_refresh = 1;
+extern FILE *stdlog;
 #endif				/* !defined MODULE */
-/* request number for per-request actions */
-int sa_request = 1;
+extern int sa_fclose;			/* default close files between requests */
+extern int sa_fd;			/* file descriptor for MIB use */
+extern int sa_readfd;			/* file descriptor for autonomnous events */
+extern int sa_changed;			/* indication to reread MIB configuration */
+extern int sa_stats_refresh;		/* indications that statistics, the mib or its tables need to be refreshed */
+extern int sa_request;			/* request number for per-request actions */
 volatile int strExtMIB_refresh = 1;
 volatile int strExtStrlogRecordTable_refresh = 1;
 volatile int strExtStrlogRecordTable_refresh = 1;
@@ -186,6 +179,9 @@ oid strExtStrlogString_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1 };
  * Other oids defined in this MIB.
  */
 
+static const oid zeroDotZero_oid[2] = { 0, 0 };
+static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
+
 /*
  * variable7 strExtMIB_variables: tree for strExtMIB
  * This variable defines function callbacks and type return information for the strExtMIB mib section
@@ -219,14 +215,37 @@ struct strExtMIB_data *strExtMIBStorage = NULL;
 struct header_complex_index *strExtStrlogRecordTableStorage = NULL;
 struct header_complex_index *strExtStrlogRecordTableStorage = NULL;
 
-/*
- * init_strExtMIB(): Initialization routine.
- * This is called when the agent starts up.  At a minimum, registration of your variables should
- * take place here.
+#if defined MODULE
+void (*strExtMIBold_signal_handler) (int) = NULL;	/* save old signal handler just in case */
+void strExtMIB_loop_handler(int);
+void strExtMIB_fd_handler(int, void *);
+#endif				/* defined MOUDLE */
+/**
+ * @fn void init_strExtMIB(void)
+ * @brief strExtMIB initialization routine.
+ *
+ * This is called when the agent starts up.  At a minimum, registration of the MIB variables
+ * structure (strExtMIB_variables) should take place here.  By default the function also
+ * registers the configuration handler and configuration store callbacks.
+ *
+ * Additional registrations that may be considered here are calls to regsiter_readfd(),
+ * register_writefd() and register_exceptfd() for hooking into the snmpd event loop, but only when
+ * used as a loadable module.  By default this function establishes a single file descriptor to
+ * read, or upon which to handle exceptions.  Note that the snmpd only supports a maximum of 32
+ * extneral file descriptors, so these should be used sparingly.
+ *
+ * When running as a loadable module, it is also necessary to hook into the snmpd event loop so that
+ * the current request number can be deteremined.  This is accomplished by using a trick of the
+ * external_signal_scheduled and external_signal_handler mechanism which is called on each event
+ * loop when external_signal_scheduled is non-zero.  This is used to increment the sa_request value
+ * on each snmpd event loop interation so that calls to MIB tree functions can determine whether
+ * they belong to a fresh request or not (primarily for cacheing and possibly to clean up non-polled
+ * file descriptors).
  */
 void
 init_strExtMIB(void)
 {
+	(void) snmpTrapOID_oid;
 	DEBUGMSGTL(("strExtMIB", "initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
 	REGISTER_MIB("strExtMIB", strExtMIB_variables, variable7, strExtMIB_variables_oid);
@@ -242,18 +261,46 @@ init_strExtMIB(void)
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strExtStrlogRecordTable, NULL);
 
 	/* place any other initialization junk you need here */
+#if defined MODULE
+	if (sa_readfd != 0) {
+		register_readfd(sa_readfd, strExtMIB_fd_handler, (void *) 0);
+		register_exceptfd(sa_readfd, strExtMIB_fd_handler, (void *) 1);
+	}
+#if defined MASTER
+	strExtMIBold_signal_handler = external_signal_handler[0];
+	external_signal_handler[0] = &strExtMIB_loop_handler;
+#endif				/* defined MASTER */
+#endif				/* defined MODULE */
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
 }
 
-/*
- * deinit_strExtMIB(): Deinitialization routine.
- * This is called before the agent is unloaded.  At a minimum, deregistration of your variables
- * should take place here.
+/**
+ * @fn void deinit_strExtMIB(void)
+ * @brief deinitialization routine.
+ *
+ * This is called before the agent is unloaded.  At a minimum, deregistration of the MIB variables
+ * structure (strExtMIB_variables) should take place here.  By default, the function also
+ * deregisters the the configuration file handlers for the MIB variables and table rows.
+ *
+ * Additional deregistrations that may be required here are calls to unregister_readfd(),
+ * unregister_writefd() and unregsiter_exceptfd() for unhooking from the snmpd event loop, but only
+ * when used as a loadable module.  By default if a read file descriptor exists, it is unregistered.
  */
 void
 deinit_strExtMIB(void)
 {
 	DEBUGMSGTL(("strExtMIB", "deinitializating...  "));
+#if defined MODULE
+#if defined MASTER
+	external_signal_handler[0] = strExtMIBold_signal_handler;
+#endif				/* defined MASTER */
+	if (sa_readfd != 0) {
+		unregister_exceptfd(sa_readfd);
+		unregister_readfd(sa_readfd);
+		close(sa_readfd);
+		sa_readfd = 0;
+	}
+#endif				/* defined MODULE */
 	unregister_mib(strExtMIB_variables_oid, sizeof(strExtMIB_variables_oid) / sizeof(oid));
 	snmpd_unregister_config_handler("strExtMIB");
 	snmpd_unregister_config_handler("strExtStrlogRecordTable");
@@ -273,6 +320,7 @@ term_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct strExtMIB_data *strExtMIB_create(void)
  * @brief create a fresh data structure representing scalars in strExtMIB.
+ *
  * Creates a new strExtMIB_data structure by allocating dynamic memory for the structure and
  * initializing the default values of scalars in strExtMIB.
  */
@@ -292,11 +340,12 @@ strExtMIB_create(void)
 
 /**
  * @fn int strExtMIB_destroy(struct strExtMIB_data **thedata)
- * @brief delete a scalars structure from strExtMIB.
  * @param thedata pointer to the data structure in strExtMIB.
+ * @brief delete a scalars structure from strExtMIB.
+ *
  * Frees scalars that were previously removed from strExtMIB.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -317,6 +366,7 @@ strExtMIB_destroy(struct strExtMIB_data **thedata)
  * @fn int strExtMIB_add(struct strExtMIB_data *thedata)
  * @param thedata the structure representing strExtMIB scalars.
  * @brief adds node to the strExtMIB scalar data set.
+ *
  * Adds a scalar structure to the strExtMIB data set.  Note that this function is necessary even
  * when the scalar values are not peristent.
  */
@@ -334,6 +384,7 @@ strExtMIB_add(struct strExtMIB_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for strExtMIB entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case strExtMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
@@ -392,6 +443,7 @@ store_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn void refresh_strExtMIB(void)
  * @brief refresh the scalar values of strExtMIB.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -416,21 +468,22 @@ refresh_strExtMIB(void)
 }
 
 /**
-* @fn u_char * var_strExtMIB(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
-* @param vp a pointer to the entry in the variables table for the requested variable.
-* @param name the object identifier for which to find.
-* @param length the length of the object identifier.
-* @param exact whether the name is exact.
-* @param var_len a pointer to the length of the representation of the object.
-* @param write_method a pointer to a write method for the object.
-* @brief locate variables in strExtMIB.
-* This function returns a pointer to a memory area that is static across the request that contains
-* the UCD-SNMP representation of the scalar (so that it may be used to read from for a GET,
-* GET-NEXT or GET-BULK request).  This returned pointer may be NULL, in which case the function is
-* telling UCD-SNMP that the scalar does not exist for reading; however, if write_method is
-* overwritten with a non-NULL value, the function is telling UCD-SNMP that the scalar exists for
-* writing.  Write-only objects can be effected in this way.
-*/
+ * @fn u_char * var_strExtMIB(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
+ * @param vp a pointer to the entry in the variables table for the requested variable.
+ * @param name the object identifier for which to find.
+ * @param length the length of the object identifier.
+ * @param exact whether the name is exact.
+ * @param var_len a pointer to the length of the representation of the object.
+ * @param write_method a pointer to a write method for the object.
+ * @brief locate variables in strExtMIB.
+ *
+ * This function returns a pointer to a memory area that is static across the request that contains
+ * the UCD-SNMP representation of the scalar (so that it may be used to read from for a GET,
+ * GET-NEXT or GET-BULK request).  This returned pointer may be NULL, in which case the function is
+ * telling UCD-SNMP that the scalar does not exist for reading; however, if write_method is
+ * overwritten with a non-NULL value, the function is telling UCD-SNMP that the scalar exists for
+ * writing.  Write-only objects can be effected in this way.
+ */
 u_char *
 var_strExtMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
@@ -457,6 +510,7 @@ var_strExtMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t
 /**
  * @fn struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_create(void)
  * @brief create a fresh data structure representing a new row in the strExtStrlogRecordTable table.
+ *
  * Creates a new strExtStrlogRecordTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -476,12 +530,38 @@ strExtStrlogRecordTable_create(void)
 }
 
 /**
+ * @fn struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct strExtStrlogRecordTable_data *
+strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *thedata)
+{
+	struct strExtStrlogRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(strExtStrlogRecordTable_data);
+
+	DEBUGMSGTL(("strExtStrlogRecordTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	strExtStrlogRecordTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int strExtStrlogRecordTable_destroy(struct strExtStrlogRecordTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -506,6 +586,7 @@ strExtStrlogRecordTable_destroy(struct strExtStrlogRecordTable_data **thedata)
  * @fn int strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the strExtStrlogRecordTable table data set.
+ *
  * Adds a table row structure to the strExtStrlogRecordTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -525,8 +606,9 @@ strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *thedata)
 
 /**
  * @fn int strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the strExtStrlogRecordTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -555,6 +637,7 @@ strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for strExtStrlogRecordTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case strExtStrlogRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -638,6 +721,7 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
 /**
  * @fn struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_create(void)
  * @brief create a fresh data structure representing a new row in the strExtStrlogRecordTable table.
+ *
  * Creates a new strExtStrlogRecordTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -657,12 +741,38 @@ strExtStrlogRecordTable_create(void)
 }
 
 /**
+ * @fn struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct strExtStrlogRecordTable_data *
+strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *thedata)
+{
+	struct strExtStrlogRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(strExtStrlogRecordTable_data);
+
+	DEBUGMSGTL(("strExtStrlogRecordTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	strExtStrlogRecordTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int strExtStrlogRecordTable_destroy(struct strExtStrlogRecordTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -687,6 +797,7 @@ strExtStrlogRecordTable_destroy(struct strExtStrlogRecordTable_data **thedata)
  * @fn int strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the strExtStrlogRecordTable table data set.
+ *
  * Adds a table row structure to the strExtStrlogRecordTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -706,8 +817,9 @@ strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *thedata)
 
 /**
  * @fn int strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the strExtStrlogRecordTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -736,6 +848,7 @@ strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for strExtStrlogRecordTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case strExtStrlogRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -819,6 +932,7 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
 /**
  * @fn void refresh_strExtStrlogRecordTable(void)
  * @brief refresh the scalar values of the strExtStrlogRecordTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -837,6 +951,7 @@ refresh_strExtStrlogRecordTable(void)
 /**
  * @fn void refresh_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
  * @brief refresh the contents of the strExtStrlogRecordTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -852,6 +967,7 @@ refresh_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *Storage
 /**
  * @fn u_char *var_strExtStrlogRecordTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in strExtStrlogRecordTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_strExtMIB above.
  */
@@ -910,6 +1026,7 @@ var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int
 /**
  * @fn void refresh_strExtStrlogRecordTable(void)
  * @brief refresh the scalar values of the strExtStrlogRecordTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -928,6 +1045,7 @@ refresh_strExtStrlogRecordTable(void)
 /**
  * @fn void refresh_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
  * @brief refresh the contents of the strExtStrlogRecordTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -943,6 +1061,7 @@ refresh_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *Storage
 /**
  * @fn u_char *var_strExtStrlogRecordTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in strExtStrlogRecordTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_strExtMIB above.
  */
@@ -1053,8 +1172,7 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been
-				   asked to do something with it.  Note that anything done here must be reversable in
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordMid;
 		StorageTmp->strExtStrlogRecordMid = set_value;
@@ -1062,8 +1180,7 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->strExtStrlogRecordMid = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure 
-				   that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1124,8 +1241,7 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been
-				   asked to do something with it.  Note that anything done here must be reversable in
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordSid;
 		StorageTmp->strExtStrlogRecordSid = set_value;
@@ -1133,8 +1249,7 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->strExtStrlogRecordSid = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure 
-				   that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1195,8 +1310,7 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been
-				   asked to do something with it.  Note that anything done here must be reversable in
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordLevel;
 		StorageTmp->strExtStrlogRecordLevel = set_value;
@@ -1204,8 +1318,7 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->strExtStrlogRecordLevel = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure 
-				   that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1270,8 +1383,7 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked
-				   to do something with it.  Note that anything done here must be reversable in the
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
 				   UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordFlags;
 		old_length = StorageTmp->strExtStrlogRecordFlagsLen;
@@ -1282,8 +1394,7 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 		StorageTmp->strExtStrlogRecordFlags = old_value;
 		StorageTmp->strExtStrlogRecordFlagsLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure 
-				   that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -1348,8 +1459,7 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked
-				   to do something with it.  Note that anything done here must be reversable in the
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
 				   UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordMsgString;
 		old_length = StorageTmp->strExtStrlogRecordMsgStringLen;
@@ -1360,8 +1470,7 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 		StorageTmp->strExtStrlogRecordMsgString = old_value;
 		StorageTmp->strExtStrlogRecordMsgStringLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure 
-				   that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -1411,8 +1520,7 @@ write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been
-				   asked to do something with it.  Note that anything done here must be reversable in
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->strNlogargs;
 		StorageTmp->strNlogargs = set_value;
@@ -1420,8 +1528,7 @@ write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->strNlogargs = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure 
-				   that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1529,8 +1636,7 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do
-		   something with it.  Note that anything done here must be reversable in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -1575,8 +1681,7 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything
-		   done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -1603,7 +1708,103 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 	return SNMP_ERR_NOERROR;
 }
 
+void
+send_strStrlogRecord_v2trap(struct variable_list *vars)
+{
+	struct variable_list trap;
+
+	trap.next_variable = vars;
+	trap.name = snmpTrapOID_oid;
+	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
+	trap.type = ASN_OBJECT_ID;
+	trap.val.objid = strStrlogRecord_oid;
+	trap.val_len = sizeof(strStrlogRecord_oid);
+	trap.index = 0;
+	send_v2trap(&trap);
+}
+
+#if defined MODULE
+#if defined MASTER
+/**
+ * @fn void strExtMIB_loop_handler(int dummy)
+ * @param dummy signal number (always zero (0))
+ * @brief handle event loop interation.
+ *
+ * This function is registered so that, when operating as a module, snmpd will call it one per event
+ * loop interation.  This function is called before the next requst is processed and after the
+ * previous request is processed.  Two things are done here:  1) The file descriptor that is used to
+ * synchronize the agent with (pseudo-)device drivers is closed.  (Another approach, instead of
+ * closing each time, would be to restart a timer each time that a request is made (loop is
+ * performed) and if it expires, close the file descriptor).  2) The request number is incremented.
+ * Although a request is not generated for each loop of the snmp event loop, it is true that a new
+ * request cannot be generated without performing a loop.  Therefore, the sa_request is not the
+ * request number but it is a temporally unique identifier for a request.
+ */
+void
+strExtMIB_loop_handler(int dummy)
+{
+	if (external_signal_scheduled[dummy] == 0)
+		external_signal_scheduled[dummy]--;
+	/* close files after each request */
+	if (sa_fclose && sa_fd != 0) {
+		close(sa_fd);
+		sa_fd = 0;
+	}
+	/* prepare for next request */
+	sa_request++;
+}
+#endif				/* defined MASTER */
+/**
+ * @fn void strExtMIB_readfd_handler(int fd, void *dummy)
+ * @param fd file descriptor to read.
+ * @param dummy client data passed to registration function (always NULL).
+ * @brief handle read event on file descriptor.
+ *
+ * This read file descriptor handler is normally used for (pseudo-)device drivers that generate
+ * statistical collection interval events, alarm events, or other operational measurement events, by
+ * placing a message on the read queue of the "event handling" Stream.  Normally this routine
+ * would adjust counts in some table or scalars, generate SNMP traps representing on-occurence
+ * events, first and interval events, and alarm indications.
+ */
+void
+strExtMIB_readfd_handler(int fd, void *dummy)
+{
+	/* XXX: place actions to handle sa_readfd here... */
+	return;
+}
+#endif				/* defined MOUDLE */
+#if defined MASTER
+const char sa_program[] = "strextmib";
+int sa_fclose = 1;			/* default close files between requests */
+int sa_fd = 0;				/* file descriptor for MIB use */
+int sa_readfd = 0;			/* file descriptor for autonomnous events */
+int sa_changed = 1;			/* indication to reread MIB configuration */
+int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
+int sa_request = 1;			/* request number for per-request actions */
+#endif				/* defined MASTER */
+#if defined MASTER
 #if !defined MODULE
+int sa_dump = 0;			/* default packet dump */
+int sa_debug = 0;			/* default no debug */
+int sa_nomead = 1;			/* default daemon mode */
+int sa_output = 1;			/* default normal output */
+int sa_agentx = 1;			/* default agentx mode */
+int sa_alarms = 1;			/* default application alarms */
+int sa_logaddr = 0;			/* log addresses */
+int sa_logfillog = 0;			/* log to sa_logfile */
+int sa_logstderr = 0;			/* log to standard error */
+int sa_logstdout = 0;			/* log to standard output */
+int sa_logsyslog = 0;			/* log to system logs */
+int sa_logcallog = 0;			/* log to callback logs */
+int sa_appendlog = 0;			/* append to log file without truncating */
+char sa_logfile[256] = "/var/log/strextmib.log";
+char sa_pidfile[256] = "/var/run/strextmib.pid";
+char sa_sysctlf[256] = "/etc/strextmib.conf";
+int allow_severity = LOG_ERR;
+int deny_severity = LOG_ERR;
+
+/* file stream for log file */
+FILE *stdlog = NULL;
 static void
 sa_version(int argc, char *argv[])
 {
@@ -1776,8 +1977,7 @@ sa_help_directives(int argc, char *argv[])
 	init_mib();
 	init_snmp("strExtMIB");
 	snmp_log(MY_FACILITY(LOG_INFO), "Configuration directives understood:\n");
-	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be writen to standard
-	   error and not standard output. */
+	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be writen to standard error and not standard output. */
 	read_config_print_usage("    ");
 }
 static int
@@ -1914,8 +2114,7 @@ sa_hup_block(void)
 static int
 sa_hup_action(void)
 {
-	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by logrotate asking us to 
-	   close and reopen our log files. */
+	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by logrotate asking us to close and reopen our log files. */
 	sa_hup_signal = 0;
 	snmp_log(MY_FACILITY(LOG_WARNING), "Caught SIGHUP, reopening files.");
 	if (sa_output > 1)
@@ -2048,9 +2247,8 @@ sa_init_logging(int argc, char *argv[])
 {
 	static char progname[256];
 
-	/* The purpose of this function is to bring logging up before forking (and while still in the foreground) so
-	   that we can use the snmp_log() function before and during forking if necessary.  Note that the default
-	   configuration for snmp_log() is to send all logs to standard error. */
+	/* The purpose of this function is to bring logging up before forking (and while still in the foreground) so that we can use the snmp_log() function before and during forking if necessary.
+	   Note that the default configuration for snmp_log() is to send all logs to standard error. */
 	strncpy(progname, basename(argv[0]), sizeof(progname));
 	snmp_disable_log();
 	if (sa_logfillog) {
@@ -2058,8 +2256,8 @@ sa_init_logging(int argc, char *argv[])
 	}
 	if (sa_logstderr | sa_logstdout) {
 #if defined LOG_PERROR
-		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use
-		   the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better formated. */
+		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better 
+		   formated. */
 		if (!sa_logsyslog)
 			snmp_enable_stderrlog();
 #else				/* defined LOG_PERROR */
@@ -2072,8 +2270,7 @@ sa_init_logging(int argc, char *argv[])
 #else				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
 		snmp_enable_syslog_ident("strExtMIB", LOG_DAEMON);
 #endif				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		/* Note that the way that snmp sets up the logger is not really the way we want it, so close the log
-		   and reopen it the way we want. */
+		/* Note that the way that snmp sets up the logger is not really the way we want it, so close the log and reopen it the way we want. */
 		closelog();
 #if defined LOG_PERROR
 		openlog("strExtMIB", LOG_PID | LOG_CONS | LOG_NDELAY | (sa_logstderr ? LOG_PERROR : 0), MY_FACILITY(0));
@@ -2181,8 +2378,7 @@ sa_mloop(int argc, char *argv[])
 	for (;;) {
 		int retval;
 
-		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of the agentx socket
-		   and add it to the fdset. */
+		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of the agentx socket and add it to the fdset. */
 		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
 #if 0
 		if (snmp_select() == 0) {
@@ -2442,10 +2638,8 @@ main(int argc, char *argv[])
 			sa_logfillog = 1;
 			break;
 		case 'L':	/* -L, --log-stderr, -Le, -LE p1[-p2] */
-			/* Note that the recent NET-SNMP version of this option is far more complicated: -Le is the
-			   same as the old version of the option; -Lf LOGFILE is like the -l option; -Ls is like the -s 
-			   option; -Lo logs messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or O, 
-			   logs priority p1 and above to X, or p1 thru p2 to X. */
+			/* Note that the recent NET-SNMP version of this option is far more complicated: -Le is the same as the old version of the option; -Lf LOGFILE is like the -l option; -Ls is
+			   like the -s option; -Lo logs messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or O, logs priority p1 and above to X, or p1 thru p2 to X. */
 			if (sa_debug)
 				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to standard error\n", argv[0]);
 			sa_logstderr = 1;
@@ -2660,3 +2854,4 @@ main(int argc, char *argv[])
 	exit(0);
 }
 #endif				/* !defined MODULE */
+#endif				/* defined MASTER */

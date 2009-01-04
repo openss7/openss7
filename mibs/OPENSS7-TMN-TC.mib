@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TMN-TC.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-12-14 10:32:18 $
+-- @(#) $RCSfile: OPENSS7-TMN-TC.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.11 $) $Date: 2009-01-04 05:19:28 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-14 10:32:18 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-04 05:19:28 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TMN-TC.mib,v $
+-- Revision 0.9.2.11  2009-01-04 05:19:28  brian
+-- - correct conflicts and errors
+--
 -- Revision 0.9.2.10  2008-12-14 10:32:18  brian
 -- - spelling correction
 --
@@ -89,7 +92,7 @@ IMPORTS
     TEXTUAL-CONVENTION, VariablePointer, RowPointer, TruthValue, 
     DisplayString, TimeStamp
 	FROM SNMPv2-TC
-    openss7
+    openss7, openss7Ms, openss7MsSmi
 	FROM OPENSS7-SMI;
 
 tmnTC MODULE-IDENTITY
@@ -124,7 +127,7 @@ tmnTC MODULE-IDENTITY
 	 Note that there is also an OPENSS7-TMN-SMI mib that defines 
 	 object identities and general purpose notifications for use 
 	 with some of these textual conventions."  
-    ::= { openss7 9 3 2 }
+    ::= { openss7MsSmi 0 }
 
 ObjectClass ::= TEXTUAL-CONVENTION
     STATUS current

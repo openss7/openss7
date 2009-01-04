@@ -33,11 +33,11 @@ config_require(util_funcs)
 	WriteMethod write_m3uaSgpAspAlarmStatus;
 	WriteMethod write_m3uaSgpAspAspState;
 	WriteMethod write_m3uaSgpAspSctpProfile;
-	WriteMethod write_m3uaSgpAspSctpProfile;
+	WriteMethod write_m3uaSgpAspMaxInitRetries;
 	WriteMethod write_m3uaSgpAspMaxPathRetrans;
 	WriteMethod write_m3uaSgpAspRtoMin;
-	WriteMethod write_m3uaSgpAspRtoMin;
-	WriteMethod write_m3uaSgpAspRtoMin;
+	WriteMethod write_m3uaSgpAspRtoMax;
+	WriteMethod write_m3uaSgpAspHeartbeatInterval;
 	WriteMethod write_m3uaSgpAspMaxLifeTime;
 	WriteMethod write_m3uaSgpAspTimerDivert;
 	WriteMethod write_m3uaSgpAspStatus;

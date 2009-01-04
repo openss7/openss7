@@ -8,7 +8,7 @@
 -bbo
 -ncdb
 -l200
--lc120
+-lc200
 -i8
 -ip8
 -cli0

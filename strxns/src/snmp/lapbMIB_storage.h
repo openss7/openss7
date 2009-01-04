@@ -263,6 +263,9 @@ extern oid fRMR_oid[11];
 /* object id definitions */
 
 /* function prototypes */
+/* trap function prototypes */
+
+/* variable function prototypes */
 void init_lapbMIB(void);
 void deinit_lapbMIB(void);
 int term_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg);
@@ -272,6 +275,7 @@ SNMPCallback store_lapbMIB;
 void refresh_lapbMIB(void);
 FindVarMethod var_lAPBDLETable;
 struct lAPBDLETable_data *lAPBDLETable_create(void);
+struct lAPBDLETable_data *lAPBDLETable_duplicate(struct lAPBDLETable_data *);
 int lAPBDLETable_destroy(struct lAPBDLETable_data **);
 int lAPBDLETable_add(struct lAPBDLETable_data *);
 int lAPBDLETable_del(struct lAPBDLETable_data *);
@@ -280,6 +284,7 @@ SNMPCallback store_lAPBDLETable;
 void refresh_lAPBDLETable(void);
 FindVarMethod var_dLSAPTable;
 struct dLSAPTable_data *dLSAPTable_create(void);
+struct dLSAPTable_data *dLSAPTable_duplicate(struct dLSAPTable_data *);
 int dLSAPTable_destroy(struct dLSAPTable_data **);
 int dLSAPTable_add(struct dLSAPTable_data *);
 int dLSAPTable_del(struct dLSAPTable_data *);
@@ -288,6 +293,7 @@ SNMPCallback store_dLSAPTable;
 void refresh_dLSAPTable(void);
 FindVarMethod var_sLPPMTable;
 struct sLPPMTable_data *sLPPMTable_create(void);
+struct sLPPMTable_data *sLPPMTable_duplicate(struct sLPPMTable_data *);
 int sLPPMTable_destroy(struct sLPPMTable_data **);
 int sLPPMTable_add(struct sLPPMTable_data *);
 int sLPPMTable_del(struct sLPPMTable_data *);
@@ -296,6 +302,7 @@ SNMPCallback store_sLPPMTable;
 void refresh_sLPPMTable(void);
 FindVarMethod var_sLPConnectionTable;
 struct sLPConnectionTable_data *sLPConnectionTable_create(void);
+struct sLPConnectionTable_data *sLPConnectionTable_duplicate(struct sLPConnectionTable_data *);
 int sLPConnectionTable_destroy(struct sLPConnectionTable_data **);
 int sLPConnectionTable_add(struct sLPConnectionTable_data *);
 int sLPConnectionTable_del(struct sLPConnectionTable_data *);
@@ -304,6 +311,7 @@ SNMPCallback store_sLPConnectionTable;
 void refresh_sLPConnectionTable(void);
 FindVarMethod var_sLPConnectionIVMOTable;
 struct sLPConnectionIVMOTable_data *sLPConnectionIVMOTable_create(void);
+struct sLPConnectionIVMOTable_data *sLPConnectionIVMOTable_duplicate(struct sLPConnectionIVMOTable_data *);
 int sLPConnectionIVMOTable_destroy(struct sLPConnectionIVMOTable_data **);
 int sLPConnectionIVMOTable_add(struct sLPConnectionIVMOTable_data *);
 int sLPConnectionIVMOTable_del(struct sLPConnectionIVMOTable_data *);

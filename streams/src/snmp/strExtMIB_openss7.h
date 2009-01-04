@@ -141,6 +141,10 @@ extern oid strExtStrlogString_oid[12];
 /* object id definitions */
 
 /* function prototypes */
+/* trap function prototypes */
+extern void send_strStrlogRecord_v2trap(struct variable_list *);
+
+/* variable function prototypes */
 void init_strExtMIB(void);
 void deinit_strExtMIB(void);
 int term_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg);
@@ -150,6 +154,7 @@ SNMPCallback store_strExtMIB;
 void refresh_strExtMIB(void);
 FindVarMethod var_strExtStrlogRecordTable;
 struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_create(void);
+struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *);
 int strExtStrlogRecordTable_destroy(struct strExtStrlogRecordTable_data **);
 int strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *);
 int strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data *);
@@ -158,6 +163,7 @@ SNMPCallback store_strExtStrlogRecordTable;
 void refresh_strExtStrlogRecordTable(void);
 FindVarMethod var_strExtStrlogRecordTable;
 struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_create(void);
+struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *);
 int strExtStrlogRecordTable_destroy(struct strExtStrlogRecordTable_data **);
 int strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *);
 int strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data *);
