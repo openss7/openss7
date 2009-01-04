@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.14 $) $Date: 2008-12-31 16:04:48 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.15 $) $Date: 2009-01-03 10:51:08 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-12-31 16:04:48 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-03 10:51:08 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB.mib,v $
+-- Revision 0.9.2.15  2009-01-03 10:51:08  brian
+-- - updated agent
+--
 -- Revision 0.9.2.14  2008-12-31 16:04:48  brian
 -- - updated mibs
 --
@@ -3432,7 +3435,8 @@ mtpMsOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 }  disabled
+    DEFVAL { disabled }
     ::= { mtpMsEntry 4 }
 
 mtpMsUsageState OBJECT-TYPE
@@ -3450,7 +3454,8 @@ mtpMsUsageState OBJECT-TYPE
 	"
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2 usageState attribute."
-    DEFVAL { 0 } -- idle
+    -- DEFVAL { 0 } idle
+    DEFVAL { idle }
     ::= { mtpMsEntry 5 }
 
 mtpMsManagedElementType OBJECT-TYPE
@@ -3619,12 +3624,12 @@ mtpNaProtocolVariant OBJECT-TYPE
 	 specifications."
     REFERENCE
 	""
-    DEFVAL { { ss7ProtocolItut 0 } }
+    DEFVAL { { OPENSS7-SS7-MIB:ss7ProtocolItut 0 } }
     ::= { mtpNaEntry 2 }
 
 mtpNaProtocolYear OBJECT-TYPE
     SYNTAX	INTEGER {
-	current(0), y1980(1980), y1984(1984), y1988(1988), y1992(1992), 
+	yCurrent(0), y1980(1980), y1984(1984), y1988(1988), y1992(1992), 
 	y1996(1996), y2000(2000), y2004(2004), y2008(2008) }
     MAX-ACCESS	read-create
     STATUS	current
@@ -3635,7 +3640,8 @@ mtpNaProtocolYear OBJECT-TYPE
 	 protocol version.  Provides a protocol issue year within the 
 	 major protocol variant.  Typical values are 1988, 1992, 1996, 
 	 2000, etc."
-    DEFVAL { 0 } -- current
+    -- DEFVAL { 0 } yCurrent
+    DEFVAL { yCurrent }
     ::= { mtpNaEntry 3 }
 
 mtpNaProtocolOptions OBJECT-TYPE
@@ -3997,7 +4003,8 @@ mtpGsAdministrativeState OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     administrativeState attribute."
-    DEFVAL { 0 } -- locked
+    -- DEFVAL { 0 } locked
+    DEFVAL { locked }
     ::= { mtpGsEntry 2 }
 
 mtpGsTreatmentOfOutsideRanges OBJECT-TYPE
@@ -5553,7 +5560,8 @@ mtpSpOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 } disabled
+    DEFVAL { disabled }
     ::= { mtpSpEntry 4 }
 
 mtpSpProceduralStatus OBJECT-TYPE
@@ -5582,7 +5590,8 @@ mtpSpProceduralStatus OBJECT-TYPE
 	     attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
 	     proceduralStatus attribute."
-    DEFVAL { 0 } -- initializationRequired
+    -- DEFVAL { 0 } initializationRequired
+    DEFVAL { { initializationRequired } }
     ::= { mtpSpEntry 5 }
 
 mtpSpAvailabilityStatus OBJECT-TYPE
@@ -6719,7 +6728,8 @@ mtpL3AdministrativeState OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 administrativeState attribute."
-    DEFVAL { 0 } -- locked
+    -- DEFVAL { 0 } locked
+    DEFVAL { locked }
     ::= { mtpL3Entry 2 }
 
 mtpL3OperationalState OBJECT-TYPE
@@ -6738,7 +6748,8 @@ mtpL3OperationalState OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 } disabled
+    DEFVAL { disabled }
     ::= { mtpL3Entry 3 }
 
 mtpL3UsageState OBJECT-TYPE
@@ -6757,7 +6768,8 @@ mtpL3UsageState OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), usageState 
 	 attribute."
-    DEFVAL { 0 } -- idle
+    -- DEFVAL { 0 } idle
+    DEFVAL { idle }
     ::= { mtpL3Entry 4 }
 
 mtpL3ProceduralStatus OBJECT-TYPE
@@ -6779,7 +6791,8 @@ mtpL3ProceduralStatus OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 proceduralStatus attribute."
-    DEFVAL { 0 } -- initializationRequired
+    -- DEFVAL { 0 } initializationRequired
+    DEFVAL { { initializationRequired } }
     ::= { mtpL3Entry 5 }
 
 mtpL3AsaProfilePointer OBJECT-TYPE
@@ -7241,7 +7254,8 @@ mtpRsAdministrativeState OBJECT-TYPE
 	     Attribute-ASN1Module.AdministrativeState.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     administrativeState attribute."
-    DEFVAL { 0 } -- locked
+    -- DEFVAL { 0 } locked
+    DEFVAL { locked }
     ::= { mtpRsEntry 4 }
 
 mtpRsOperationalState OBJECT-TYPE
@@ -7266,7 +7280,8 @@ mtpRsOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 } disabled
+    DEFVAL { disabled }
     ::= { mtpRsEntry 5 }
 
 mtpRsAsaProfilePointer OBJECT-TYPE
@@ -7748,7 +7763,8 @@ mtpRtAdministrativeState OBJECT-TYPE
 	     attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     administrativeState attribute."
-    DEFVAL { 0 } -- locked
+    -- DEFVAL { 0 } locked
+    DEFVAL { locked }
     ::= { mtpRtEntry 3 }
 
 mtpRtOperationalState OBJECT-TYPE
@@ -7785,7 +7801,8 @@ mtpRtOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 } disabled
+    DEFVAL { disabled }
     ::= { mtpRtEntry 4 }
 
 mtpRtAvailabilityStatus OBJECT-TYPE
@@ -8073,7 +8090,8 @@ mtpRtUsageState OBJECT-TYPE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2 usageState attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), usageState 
 	     attribute."
-    DEFVAL { 0 } -- idle
+    -- DEFVAL { 0 } idle
+    DEFVAL { idle }
     ::= { mtpRtEntry 14 }
 
 mtpRtRlSlot OBJECT-TYPE
@@ -8786,7 +8804,6 @@ mtpLsProfileName OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 lsTimersProfileId attribute."
-    DEFVAL { "" }
     ::= { mtpLsProfileEntry 12 }
 
 mtpLsProfileSlDefault OBJECT-TYPE
@@ -9104,7 +9121,8 @@ mtpLsUsageState OBJECT-TYPE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2, usageState attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), usageState 
 	     attribute."
-    DEFVAL { 0 } -- idle
+    -- DEFVAL { 0 } idle
+    DEFVAL { idle }
     ::= { mtpLsEntry 7 }
 
 mtpLsOperationalState OBJECT-TYPE
@@ -9145,7 +9163,8 @@ mtpLsOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 } disabled
+    DEFVAL { disabled }
     ::= { mtpLsEntry 8 }
 
 mtpLsAvailabilityStatus OBJECT-TYPE
@@ -9227,7 +9246,8 @@ mtpLsPeriodicLinkTestFlag OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     periodicLinkTestFlag attribute.
 	 ITU-T Rec. Q.751.1 signLinkSetTp::periodicLinkTestFlag"
-    DEFVAL { 0 } -- on
+    -- DEFVAL { 0 } on
+    DEFVAL { on }
     ::= { mtpLsEntry 10 }
 
 mtpLsPeriodicLinkTestFail OBJECT-TYPE
@@ -9246,7 +9266,8 @@ mtpLsPeriodicLinkTestFail OBJECT-TYPE
 	 from the containing combined link set."
     REFERENCE
 	"ANSI T1.111.7/2000 2.2"
-    DEFVAL { 1 } -- true(1)
+    -- DEFVAL { 1 } true(1)
+    DEFVAL { true }
     ::= { mtpLsEntry 11 }
 
 mtpLsAdministrativeState OBJECT-TYPE
@@ -9293,7 +9314,8 @@ mtpLsAdministrativeState OBJECT-TYPE
 	     attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     administrativeState attribute."
-    DEFVAL { 0 } -- locked
+    -- DEFVAL { 0 } locked
+    DEFVAL { locked }
     ::= { mtpLsEntry 12 }
 
 mtpLsInLsLoadShareAlgorithm OBJECT-TYPE
@@ -11673,7 +11695,8 @@ mtpSlAdministrativeState OBJECT-TYPE
 	     attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     administrativeState attribute."
-    DEFVAL { 0 } -- locked
+    -- DEFVAL { 0 } locked
+    DEFVAL { locked }
     ::= { mtpSlEntry 6 }
 
 mtpSlOperationalState OBJECT-TYPE
@@ -11706,7 +11729,8 @@ mtpSlOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 } disabled
+    DEFVAL { disabled }
     ::= { mtpSlEntry 7 }
 
 mtpSlUsageState OBJECT-TYPE
@@ -11743,7 +11767,8 @@ mtpSlUsageState OBJECT-TYPE
 	 ITU-T Rec. X.721 | ISO/IEC 10165-2, usageState attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), usageState 
 	 attribute."
-    DEFVAL { 0 } -- idle
+    -- DEFVAL { 0 } idle
+    DEFVAL { idle }
     ::= { mtpSlEntry 8 }
 
 mtpSlProceduralStatus OBJECT-TYPE
@@ -11779,7 +11804,8 @@ mtpSlProceduralStatus OBJECT-TYPE
 	     attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
 	     proceduralStatus attribute."
-    DEFVAL { 0 } -- initializationRequired
+    -- DEFVAL { 0 } initializationRequired
+    DEFVAL { { initializationRequired } }
     ::= { mtpSlEntry 9 }
 
 mtpSlMtpL2ProtocolProfilePointer OBJECT-TYPE
@@ -12005,7 +12031,6 @@ mtpSlL3ProfilePointer OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 slTimersProfilePointer attribute."
-    DEFVAL { { zeroDotZero } }
     ::= { mtpSlEntry 24 }
 
 mtpSlAlarmStatus OBJECT-TYPE
@@ -12424,7 +12449,8 @@ mtpNbf OBJECT-TYPE
 	 - four(4),
 	 - five(5),
 	 - six(6)."
-    DEFVAL { 0 } -- one
+    -- DEFVAL { 0 } one
+    DEFVAL { one }
     ::= { mtpNbEntry 14 }
 
 mtpNbRowStatus OBJECT-TYPE
@@ -12993,7 +13019,8 @@ mtpM2paProving OBJECT-TYPE
 	 false(2), forego proving althogether."
     REFERENCE
 	""
-    DEFVAL { 1 } -- true(1)
+    -- DEFVAL { 1 } true(1)
+    DEFVAL { true }
     ::= { mtpM2paEntry 2 }
 
 mtpM2paManagementProvingState OBJECT-TYPE
@@ -13528,7 +13555,8 @@ mtpSdtAdministrativeState OBJECT-TYPE
 	     administrativeState attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
 	     administrativeState attribute."
-    DEFVAL { 0 } -- locked
+    -- DEFVAL { 0 } locked
+    DEFVAL { locked }
     ::= { mtpSdtEntry 2 }
 
 mtpSdtOperationalState OBJECT-TYPE
@@ -13550,7 +13578,8 @@ mtpSdtOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 } disabled
+    DEFVAL { disabled }
     ::= { mtpSdtEntry 3 }
 
 mtpSdtUsageState OBJECT-TYPE
@@ -13569,7 +13598,8 @@ mtpSdtUsageState OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), usageState 
 	     attribute."
-    DEFVAL { 0 } -- idle
+    -- DEFVAL { 0 } idle
+    DEFVAL { idle }
     ::= { mtpSdtEntry 4 }
 
 mtpSdtProceduralStatus OBJECT-TYPE
@@ -13800,7 +13830,8 @@ mtpSdlOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    -- DEFVAL { 0 } disabled
+    DEFVAL { disabled }
     ::= { mtpSdlEntry 5 }
 
 mtpSdlEquipmentPointer OBJECT-TYPE
@@ -13948,7 +13979,8 @@ mtpM2paDefaultSctpNoDelay OBJECT-TYPE
 	 persist across system reboots."
     REFERENCE
 	"RFC 4960"
-    DEFVAL { 1 } -- true(1)
+    -- DEFVAL { 1 } true(1)
+    DEFVAL { true }
     ::= { mtpDefaults 1 }
 
 mtpM2paDefaultSctpMaxseg OBJECT-TYPE

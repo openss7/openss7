@@ -211,6 +211,9 @@ extern oid m2paThresholdsForMultCongLevelsPackage_oid[11];
 extern oid m2paThresholdsForMultCongLevelsWithPrioPackage_oid[11];
 
 /* function prototypes */
+/* trap function prototypes */
+
+/* variable function prototypes */
 void init_m2paMIB(void);
 void deinit_m2paMIB(void);
 int term_m2paMIB(int majorID, int minorID, void *serverarg, void *clientarg);
@@ -220,6 +223,7 @@ SNMPCallback store_m2paMIB;
 void refresh_m2paMIB(void);
 FindVarMethod var_m2paProtocolProfileTable;
 struct m2paProtocolProfileTable_data *m2paProtocolProfileTable_create(void);
+struct m2paProtocolProfileTable_data *m2paProtocolProfileTable_duplicate(struct m2paProtocolProfileTable_data *);
 int m2paProtocolProfileTable_destroy(struct m2paProtocolProfileTable_data **);
 int m2paProtocolProfileTable_add(struct m2paProtocolProfileTable_data *);
 int m2paProtocolProfileTable_del(struct m2paProtocolProfileTable_data *);

@@ -301,9 +301,7 @@ write_sigtranSctpProfileName(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -311,8 +309,7 @@ write_sigtranSctpProfileName(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -347,9 +344,7 @@ write_sigtranSctpProfileNodelay(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -357,8 +352,7 @@ write_sigtranSctpProfileNodelay(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -393,9 +387,7 @@ write_sigtranSctpPayloadProtocolId(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -403,8 +395,7 @@ write_sigtranSctpPayloadProtocolId(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -439,9 +430,7 @@ write_sigtranSctpLifetime(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -449,8 +438,7 @@ write_sigtranSctpLifetime(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -485,9 +473,7 @@ write_sigtranSctpProfileCsumType(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -495,8 +481,7 @@ write_sigtranSctpProfileCsumType(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -531,9 +516,7 @@ write_sigtranSctpProfileMacType(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -541,8 +524,7 @@ write_sigtranSctpProfileMacType(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -577,9 +559,7 @@ write_sigtranSctpProfileValidCookieLife(int action, unsigned char *var_val, unsi
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -587,8 +567,7 @@ write_sigtranSctpProfileValidCookieLife(int action, unsigned char *var_val, unsi
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -623,9 +602,7 @@ write_sigtranSctpProfileCookieInc(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -633,8 +610,7 @@ write_sigtranSctpProfileCookieInc(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -669,9 +645,7 @@ write_sigtranSctpProfileMaxIstreams(int action, unsigned char *var_val, unsigned
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -679,8 +653,7 @@ write_sigtranSctpProfileMaxIstreams(int action, unsigned char *var_val, unsigned
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -715,9 +688,7 @@ write_sigtranSctpProfileReqOstreams(int action, unsigned char *var_val, unsigned
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -725,8 +696,7 @@ write_sigtranSctpProfileReqOstreams(int action, unsigned char *var_val, unsigned
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -761,9 +731,7 @@ write_sigtranSctpEcn(int action, unsigned char *var_val, unsigned char var_val_t
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -771,8 +739,7 @@ write_sigtranSctpEcn(int action, unsigned char *var_val, unsigned char var_val_t
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -807,9 +774,7 @@ write_sigtranSctpAdaptationLayerInfo(int action, unsigned char *var_val, unsigne
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -817,8 +782,7 @@ write_sigtranSctpAdaptationLayerInfo(int action, unsigned char *var_val, unsigne
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -853,9 +817,7 @@ write_sigtranSctpProfileMaxInitRetries(int action, unsigned char *var_val, unsig
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -863,8 +825,7 @@ write_sigtranSctpProfileMaxInitRetries(int action, unsigned char *var_val, unsig
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -899,9 +860,7 @@ write_sigtranSctpProfileMaxBurst(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -909,8 +868,7 @@ write_sigtranSctpProfileMaxBurst(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -945,9 +903,7 @@ write_sigtranSctpProfileAssocMaxRetrans(int action, unsigned char *var_val, unsi
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -955,8 +911,7 @@ write_sigtranSctpProfileAssocMaxRetrans(int action, unsigned char *var_val, unsi
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -991,9 +946,7 @@ write_sigtranSctpProfileMaxSackDelay(int action, unsigned char *var_val, unsigne
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1001,8 +954,7 @@ write_sigtranSctpProfileMaxSackDelay(int action, unsigned char *var_val, unsigne
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1037,9 +989,7 @@ write_sigtranSctpProfileRtoMin(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1047,8 +997,7 @@ write_sigtranSctpProfileRtoMin(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1083,9 +1032,7 @@ write_sigtranSctpProfileRtoInitial(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1093,8 +1040,7 @@ write_sigtranSctpProfileRtoInitial(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1129,9 +1075,7 @@ write_sigtranSctpProfileRtoMax(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1139,8 +1083,7 @@ write_sigtranSctpProfileRtoMax(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1175,9 +1118,7 @@ write_sigtranSctpProfilePathMaxRetrans(int action, unsigned char *var_val, unsig
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1185,8 +1126,7 @@ write_sigtranSctpProfilePathMaxRetrans(int action, unsigned char *var_val, unsig
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1221,9 +1161,7 @@ write_sigtranSctpProfileHeartbeatItvl(int action, unsigned char *var_val, unsign
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1231,8 +1169,7 @@ write_sigtranSctpProfileHeartbeatItvl(int action, unsigned char *var_val, unsign
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1267,9 +1204,7 @@ write_sigtranSctpProfileStatus(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1277,8 +1212,7 @@ write_sigtranSctpProfileStatus(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;

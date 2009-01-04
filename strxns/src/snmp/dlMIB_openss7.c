@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "ds_agent.h"
 #ifdef HAVE_UCD_SNMP_UTIL_FUNCS_H
 #include <ucd-snmp/util_funcs.h>
-/* Many recent net-snmp UCD compatible headers do not declard header_generic. */
+/* Many recent net-snmp UCD compatible headers do not declare header_generic. */
 int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMethod **);
 #else				/* HAVE_UCD_SNMP_UTIL_FUNCS_H */
 #include "util_funcs.h"
@@ -113,45 +113,38 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
-#include "dlMIB_openss7.h"
-const char sa_program[] = "dlmib";
+#include "dlMIB.h"
+extern const char sa_program[];
 
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
+#define MASTER 1
 #if !defined MODULE
-int sa_dump = 0;			/* default packet dump */
-int sa_debug = 0;			/* default no debug */
-int sa_nomead = 1;			/* default daemon mode */
-int sa_output = 1;			/* default normal output */
-int sa_agentx = 1;			/* default agentx mode */
-int sa_alarms = 1;			/* default application alarms */
-int sa_fclose = 1;			/* default close files between requests */
-int sa_logaddr = 0;			/* log addresses */
-int sa_logfillog = 0;			/* log to sa_logfile */
-int sa_logstderr = 0;			/* log to standard error */
-int sa_logstdout = 0;			/* log to standard output */
-int sa_logsyslog = 0;			/* log to system logs */
-int sa_logcallog = 0;			/* log to callback logs */
-int sa_appendlog = 0;			/* append to log file without truncating */
-char sa_logfile[256] = "/var/log/dlmib.log";
-char sa_pidfile[256] = "/var/run/dlmib.pid";
-char sa_sysctlf[256] = "/etc/dlmib.conf";
-int allow_severity = LOG_ERR;
-int deny_severity = LOG_ERR;
+extern int sa_dump;			/* default packet dump */
+extern int sa_debug;			/* default no debug */
+extern int sa_nomead;			/* default daemon mode */
+extern int sa_output;			/* default normal output */
+extern int sa_agentx;			/* default agentx mode */
+extern int sa_alarms;			/* default application alarms */
+extern int sa_logaddr;			/* log addresses */
+extern int sa_logfillog;		/* log to sa_logfile */
+extern int sa_logstderr;		/* log to standard error */
+extern int sa_logstdout;		/* log to standard output */
+extern int sa_logsyslog;		/* log to system logs */
+extern int sa_logcallog;		/* log to callback logs */
+extern int sa_appendlog;		/* append to log file without truncating */
+extern char sa_logfile[256];
+extern char sa_pidfile[256];
+extern char sa_sysctlf[256];
 
 /* file stream for log file */
-FILE *stdlog = NULL;
-
-/* file descriptor for MIB use */
-int sa_fd = 0;
-
-/* indication to reread MIB configuration */
-int sa_changed = 1;
-
-/* indications that statistics, the mib or its tables need to be refreshed */
-int sa_stats_refresh = 1;
+extern FILE *stdlog;
 #endif				/* !defined MODULE */
-/* request number for per-request actions */
-int sa_request = 1;
+extern int sa_fclose;			/* default close files between requests */
+extern int sa_fd;			/* file descriptor for MIB use */
+extern int sa_readfd;			/* file descriptor for autonomnous events */
+extern int sa_changed;			/* indication to reread MIB configuration */
+extern int sa_stats_refresh;		/* indications that statistics, the mib or its tables need to be refreshed */
+extern int sa_request;			/* request number for per-request actions */
 volatile int dlMIB_refresh = 1;
 volatile int communicationsEntityTable_refresh = 1;
 volatile int sap1Table_refresh = 1;
@@ -315,6 +308,8 @@ oid notificationLSPHeader_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
 oid osiObjectGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 1 };
 oid osiNotificationGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 1 };
 oid osiTotalCompliance_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 2 };
+static const oid zeroDotZero_oid[2] = { 0, 0 };
+static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
 /*
  * variable7 dlMIB_variables: tree for dlMIB
@@ -1922,14 +1917,37 @@ struct header_complex_index *destinationSystemTableStorage = NULL;
 struct header_complex_index *destinationAreaTableStorage = NULL;
 struct header_complex_index *reachableAddressTableStorage = NULL;
 
-/*
- * init_dlMIB(): Initialization routine.
- * This is called when the agent starts up.  At a minimum, registration of your variables should
- * take place here.
+#if defined MODULE
+void (*dlMIBold_signal_handler) (int) = NULL;	/* save old signal handler just in case */
+void dlMIB_loop_handler(int);
+void dlMIB_fd_handler(int, void *);
+#endif				/* defined MOUDLE */
+/**
+ * @fn void init_dlMIB(void)
+ * @brief dlMIB initialization routine.
+ *
+ * This is called when the agent starts up.  At a minimum, registration of the MIB variables
+ * structure (dlMIB_variables) should take place here.  By default the function also
+ * registers the configuration handler and configuration store callbacks.
+ *
+ * Additional registrations that may be considered here are calls to regsiter_readfd(),
+ * register_writefd() and register_exceptfd() for hooking into the snmpd event loop, but only when
+ * used as a loadable module.  By default this function establishes a single file descriptor to
+ * read, or upon which to handle exceptions.  Note that the snmpd only supports a maximum of 32
+ * extneral file descriptors, so these should be used sparingly.
+ *
+ * When running as a loadable module, it is also necessary to hook into the snmpd event loop so that
+ * the current request number can be deteremined.  This is accomplished by using a trick of the
+ * external_signal_scheduled and external_signal_handler mechanism which is called on each event
+ * loop when external_signal_scheduled is non-zero.  This is used to increment the sa_request value
+ * on each snmpd event loop interation so that calls to MIB tree functions can determine whether
+ * they belong to a fresh request or not (primarily for cacheing and possibly to clean up non-polled
+ * file descriptors).
  */
 void
 init_dlMIB(void)
 {
+	(void) snmpTrapOID_oid;
 	DEBUGMSGTL(("dlMIB", "initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
 	REGISTER_MIB("dlMIB", dlMIB_variables, variable7, dlMIB_variables_oid);
@@ -2067,18 +2085,46 @@ init_dlMIB(void)
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_reachableAddressTable, NULL);
 
 	/* place any other initialization junk you need here */
+#if defined MODULE
+	if (sa_readfd != 0) {
+		register_readfd(sa_readfd, dlMIB_fd_handler, (void *) 0);
+		register_exceptfd(sa_readfd, dlMIB_fd_handler, (void *) 1);
+	}
+#if defined MASTER
+	dlMIBold_signal_handler = external_signal_handler[0];
+	external_signal_handler[0] = &dlMIB_loop_handler;
+#endif				/* defined MASTER */
+#endif				/* defined MODULE */
 	DEBUGMSGTL(("dlMIB", "done.\n"));
 }
 
-/*
- * deinit_dlMIB(): Deinitialization routine.
- * This is called before the agent is unloaded.  At a minimum, deregistration of your variables
- * should take place here.
+/**
+ * @fn void deinit_dlMIB(void)
+ * @brief deinitialization routine.
+ *
+ * This is called before the agent is unloaded.  At a minimum, deregistration of the MIB variables
+ * structure (dlMIB_variables) should take place here.  By default, the function also
+ * deregisters the the configuration file handlers for the MIB variables and table rows.
+ *
+ * Additional deregistrations that may be required here are calls to unregister_readfd(),
+ * unregister_writefd() and unregsiter_exceptfd() for unhooking from the snmpd event loop, but only
+ * when used as a loadable module.  By default if a read file descriptor exists, it is unregistered.
  */
 void
 deinit_dlMIB(void)
 {
 	DEBUGMSGTL(("dlMIB", "deinitializating...  "));
+#if defined MODULE
+#if defined MASTER
+	external_signal_handler[0] = dlMIBold_signal_handler;
+#endif				/* defined MASTER */
+	if (sa_readfd != 0) {
+		unregister_exceptfd(sa_readfd);
+		unregister_readfd(sa_readfd);
+		close(sa_readfd);
+		sa_readfd = 0;
+	}
+#endif				/* defined MODULE */
 	unregister_mib(dlMIB_variables_oid, sizeof(dlMIB_variables_oid) / sizeof(oid));
 	snmpd_unregister_config_handler("dlMIB");
 	snmpd_unregister_config_handler("communicationsEntityTable");
@@ -2159,6 +2205,7 @@ term_dlMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct dlMIB_data *dlMIB_create(void)
  * @brief create a fresh data structure representing scalars in dlMIB.
+ *
  * Creates a new dlMIB_data structure by allocating dynamic memory for the structure and
  * initializing the default values of scalars in dlMIB.
  */
@@ -2167,10 +2214,10 @@ dlMIB_create(void)
 {
 	struct dlMIB_data *StorageNew = SNMP_MALLOC_STRUCT(dlMIB_data);
 
-	DBUGMSGTL(("dlMIB", "creating scalars...  "));
+	DEBUGMSGTL(("dlMIB", "creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
-		StorageNew->sLPConnectionDefaultInterfaceType = dTE;
+		StorageNew->sLPConnectionDefaultInterfaceType = SLPCONNECTIONDEFAULTINTERFACETYPE_DTE;
 
 	}
 	DEBUGMSGTL(("dlMIB", "done.\n"));
@@ -2179,11 +2226,12 @@ dlMIB_create(void)
 
 /**
  * @fn int dlMIB_destroy(struct dlMIB_data **thedata)
- * @brief delete a scalars structure from dlMIB.
  * @param thedata pointer to the data structure in dlMIB.
+ * @brief delete a scalars structure from dlMIB.
+ *
  * Frees scalars that were previously removed from dlMIB.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -2195,40 +2243,6 @@ dlMIB_destroy(struct dlMIB_data **thedata)
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCConnection2DefaultRoute);
 		StorageDel->lLCConnection2DefaultRouteLen = 0;
-		SNMP_FREE(StorageDel->physicalBitErrorThresholdReached);
-		StorageDel->physicalBitErrorThresholdReachedLen = 0;
-		SNMP_FREE(StorageDel->physicalConnectionError);
-		StorageDel->physicalConnectionErrorLen = 0;
-		SNMP_FREE(StorageDel->phsyicalConnectionEstablished);
-		StorageDel->phsyicalConnectionEstablishedLen = 0;
-		SNMP_FREE(StorageDel->physicalLossOfSignal);
-		StorageDel->physicalLossOfSignalLen = 0;
-		SNMP_FREE(StorageDel->physicalLossOfSynchronization);
-		StorageDel->physicalLossOfSynchronizationLen = 0;
-		SNMP_FREE(StorageDel->fRMR);
-		StorageDel->fRMRLen = 0;
-		SNMP_FREE(StorageDel->notificationPDUHeader);
-		StorageDel->notificationPDUHeaderLen = 0;
-		SNMP_FREE(StorageDel->reachabilityChange);
-		StorageDel->reachabilityChangeLen = 0;
-		SNMP_FREE(StorageDel->notificationData);
-		StorageDel->notificationDataLen = 0;
-		SNMP_FREE(StorageDel->notificationReceivingAdjacency);
-		StorageDel->notificationReceivingAdjacencyLen = 0;
-		SNMP_FREE(StorageDel->notificationAreaAddress);
-		StorageDel->notificationAreaAddressLen = 0;
-		SNMP_FREE(StorageDel->notificationAreaAddresses);
-		StorageDel->notificationAreaAddressesLen = 0;
-		SNMP_FREE(StorageDel->notificationSourceId);
-		StorageDel->notificationSourceIdLen = 0;
-		SNMP_FREE(StorageDel->notificationVirtualLinkAddress);
-		StorageDel->notificationVirtualLinkAddressLen = 0;
-		SNMP_FREE(StorageDel->notificationSystemId);
-		StorageDel->notificationSystemIdLen = 0;
-		SNMP_FREE(StorageDel->notificationVersion);
-		StorageDel->notificationVersionLen = 0;
-		SNMP_FREE(StorageDel->notificationLSPHeader);
-		StorageDel->notificationLSPHeaderLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -2240,6 +2254,7 @@ dlMIB_destroy(struct dlMIB_data **thedata)
  * @fn int dlMIB_add(struct dlMIB_data *thedata)
  * @param thedata the structure representing dlMIB scalars.
  * @brief adds node to the dlMIB scalar data set.
+ *
  * Adds a scalar structure to the dlMIB data set.  Note that this function is necessary even
  * when the scalar values are not peristent.
  */
@@ -2257,6 +2272,7 @@ dlMIB_add(struct dlMIB_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dlMIB entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case dlMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
@@ -2363,6 +2379,7 @@ store_dlMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn void refresh_dlMIB(void)
  * @brief refresh the scalar values of dlMIB.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -2387,21 +2404,22 @@ refresh_dlMIB(void)
 }
 
 /**
-* @fn u_char * var_dlMIB(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
-* @param vp a pointer to the entry in the variables table for the requested variable.
-* @param name the object identifier for which to find.
-* @param length the length of the object identifier.
-* @param exact whether the name is exact.
-* @param var_len a pointer to the length of the representation of the object.
-* @param write_method a pointer to a write method for the object.
-* @brief locate variables in dlMIB.
-* This function returns a pointer to a memory area that is static across the request that contains
-* the UCD-SNMP representation of the scalar (so that it may be used to read from for a GET,
-* GET-NEXT or GET-BULK request).  This returned pointer may be NULL, in which case the function is
-* telling UCD-SNMP that the scalar does not exist for reading; however, if write_method is
-* overwritten with a non-NULL value, the function is telling UCD-SNMP that the scalar exists for
-* writing.  Write-only objects can be effected in this way.
-*/
+ * @fn u_char * var_dlMIB(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
+ * @param vp a pointer to the entry in the variables table for the requested variable.
+ * @param name the object identifier for which to find.
+ * @param length the length of the object identifier.
+ * @param exact whether the name is exact.
+ * @param var_len a pointer to the length of the representation of the object.
+ * @param write_method a pointer to a write method for the object.
+ * @brief locate variables in dlMIB.
+ *
+ * This function returns a pointer to a memory area that is static across the request that contains
+ * the UCD-SNMP representation of the scalar (so that it may be used to read from for a GET,
+ * GET-NEXT or GET-BULK request).  This returned pointer may be NULL, in which case the function is
+ * telling UCD-SNMP that the scalar does not exist for reading; however, if write_method is
+ * overwritten with a non-NULL value, the function is telling UCD-SNMP that the scalar exists for
+ * writing.  Write-only objects can be effected in this way.
+ */
 u_char *
 var_dlMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
@@ -2516,6 +2534,7 @@ var_dlMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *va
 /**
  * @fn struct communicationsEntityTable_data *communicationsEntityTable_create(void)
  * @brief create a fresh data structure representing a new row in the communicationsEntityTable table.
+ *
  * Creates a new communicationsEntityTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -2525,7 +2544,7 @@ communicationsEntityTable_create(void)
 {
 	struct communicationsEntityTable_data *StorageNew = SNMP_MALLOC_STRUCT(communicationsEntityTable_data);
 
-	DBUGMSGTL(("communicationsEntityTable", "creating row...  "));
+	DEBUGMSGTL(("communicationsEntityTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -2535,12 +2554,38 @@ communicationsEntityTable_create(void)
 }
 
 /**
+ * @fn struct communicationsEntityTable_data *communicationsEntityTable_duplicate(struct communicationsEntityTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct communicationsEntityTable_data *
+communicationsEntityTable_duplicate(struct communicationsEntityTable_data *thedata)
+{
+	struct communicationsEntityTable_data *StorageNew = SNMP_MALLOC_STRUCT(communicationsEntityTable_data);
+
+	DEBUGMSGTL(("communicationsEntityTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("communicationsEntityTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	communicationsEntityTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int communicationsEntityTable_destroy(struct communicationsEntityTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -2565,6 +2610,7 @@ communicationsEntityTable_destroy(struct communicationsEntityTable_data **thedat
  * @fn int communicationsEntityTable_add(struct communicationsEntityTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the communicationsEntityTable table data set.
+ *
  * Adds a table row structure to the communicationsEntityTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -2575,8 +2621,7 @@ communicationsEntityTable_add(struct communicationsEntityTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("communicationsEntityTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	header_complex_add_data(&communicationsEntityTableStorage, vars, thedata);
@@ -2587,8 +2632,9 @@ communicationsEntityTable_add(struct communicationsEntityTable_data *thedata)
 
 /**
  * @fn int communicationsEntityTable_del(struct communicationsEntityTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the communicationsEntityTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -2617,6 +2663,7 @@ communicationsEntityTable_del(struct communicationsEntityTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for communicationsEntityTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case communicationsEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -2688,6 +2735,7 @@ store_communicationsEntityTable(int majorID, int minorID, void *serverarg, void 
 /**
  * @fn struct sap1Table_data *sap1Table_create(void)
  * @brief create a fresh data structure representing a new row in the sap1Table table.
+ *
  * Creates a new sap1Table_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -2697,7 +2745,7 @@ sap1Table_create(void)
 {
 	struct sap1Table_data *StorageNew = SNMP_MALLOC_STRUCT(sap1Table_data);
 
-	DBUGMSGTL(("sap1Table", "creating row...  "));
+	DEBUGMSGTL(("sap1Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -2707,12 +2755,38 @@ sap1Table_create(void)
 }
 
 /**
+ * @fn struct sap1Table_data *sap1Table_duplicate(struct sap1Table_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct sap1Table_data *
+sap1Table_duplicate(struct sap1Table_data *thedata)
+{
+	struct sap1Table_data *StorageNew = SNMP_MALLOC_STRUCT(sap1Table_data);
+
+	DEBUGMSGTL(("sap1Table", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("sap1Table", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	sap1Table_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int sap1Table_destroy(struct sap1Table_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -2739,6 +2813,7 @@ sap1Table_destroy(struct sap1Table_data **thedata)
  * @fn int sap1Table_add(struct sap1Table_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the sap1Table table data set.
+ *
  * Adds a table row structure to the sap1Table table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -2749,8 +2824,7 @@ sap1Table_add(struct sap1Table_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("sap1Table", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* sapId */
@@ -2763,8 +2837,9 @@ sap1Table_add(struct sap1Table_data *thedata)
 
 /**
  * @fn int sap1Table_del(struct sap1Table_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the sap1Table table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -2793,6 +2868,7 @@ sap1Table_del(struct sap1Table_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sap1Table entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case sap1Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -2870,6 +2946,7 @@ store_sap1Table(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct sap2Table_data *sap2Table_create(void)
  * @brief create a fresh data structure representing a new row in the sap2Table table.
+ *
  * Creates a new sap2Table_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -2879,7 +2956,7 @@ sap2Table_create(void)
 {
 	struct sap2Table_data *StorageNew = SNMP_MALLOC_STRUCT(sap2Table_data);
 
-	DBUGMSGTL(("sap2Table", "creating row...  "));
+	DEBUGMSGTL(("sap2Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -2889,12 +2966,38 @@ sap2Table_create(void)
 }
 
 /**
+ * @fn struct sap2Table_data *sap2Table_duplicate(struct sap2Table_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct sap2Table_data *
+sap2Table_duplicate(struct sap2Table_data *thedata)
+{
+	struct sap2Table_data *StorageNew = SNMP_MALLOC_STRUCT(sap2Table_data);
+
+	DEBUGMSGTL(("sap2Table", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("sap2Table", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	sap2Table_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int sap2Table_destroy(struct sap2Table_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -2923,6 +3026,7 @@ sap2Table_destroy(struct sap2Table_data **thedata)
  * @fn int sap2Table_add(struct sap2Table_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the sap2Table table data set.
+ *
  * Adds a table row structure to the sap2Table table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -2933,8 +3037,7 @@ sap2Table_add(struct sap2Table_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("sap2Table", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* sapId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sapId, thedata->sapIdLen);
 	header_complex_add_data(&sap2TableStorage, vars, thedata);
@@ -2945,8 +3048,9 @@ sap2Table_add(struct sap2Table_data *thedata)
 
 /**
  * @fn int sap2Table_del(struct sap2Table_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the sap2Table table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -2975,6 +3079,7 @@ sap2Table_del(struct sap2Table_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sap2Table entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case sap2Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -3056,6 +3161,7 @@ store_sap2Table(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct clProtocolMachineTable_data *clProtocolMachineTable_create(void)
  * @brief create a fresh data structure representing a new row in the clProtocolMachineTable table.
+ *
  * Creates a new clProtocolMachineTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -3065,7 +3171,7 @@ clProtocolMachineTable_create(void)
 {
 	struct clProtocolMachineTable_data *StorageNew = SNMP_MALLOC_STRUCT(clProtocolMachineTable_data);
 
-	DBUGMSGTL(("clProtocolMachineTable", "creating row...  "));
+	DEBUGMSGTL(("clProtocolMachineTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -3075,12 +3181,38 @@ clProtocolMachineTable_create(void)
 }
 
 /**
+ * @fn struct clProtocolMachineTable_data *clProtocolMachineTable_duplicate(struct clProtocolMachineTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct clProtocolMachineTable_data *
+clProtocolMachineTable_duplicate(struct clProtocolMachineTable_data *thedata)
+{
+	struct clProtocolMachineTable_data *StorageNew = SNMP_MALLOC_STRUCT(clProtocolMachineTable_data);
+
+	DEBUGMSGTL(("clProtocolMachineTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("clProtocolMachineTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	clProtocolMachineTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int clProtocolMachineTable_destroy(struct clProtocolMachineTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -3105,6 +3237,7 @@ clProtocolMachineTable_destroy(struct clProtocolMachineTable_data **thedata)
  * @fn int clProtocolMachineTable_add(struct clProtocolMachineTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the clProtocolMachineTable table data set.
+ *
  * Adds a table row structure to the clProtocolMachineTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -3115,8 +3248,7 @@ clProtocolMachineTable_add(struct clProtocolMachineTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("clProtocolMachineTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -3129,8 +3261,9 @@ clProtocolMachineTable_add(struct clProtocolMachineTable_data *thedata)
 
 /**
  * @fn int clProtocolMachineTable_del(struct clProtocolMachineTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the clProtocolMachineTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -3159,6 +3292,7 @@ clProtocolMachineTable_del(struct clProtocolMachineTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for clProtocolMachineTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case clProtocolMachineTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -3232,6 +3366,7 @@ store_clProtocolMachineTable(int majorID, int minorID, void *serverarg, void *cl
 /**
  * @fn struct coProtocolMachineTable_data *coProtocolMachineTable_create(void)
  * @brief create a fresh data structure representing a new row in the coProtocolMachineTable table.
+ *
  * Creates a new coProtocolMachineTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -3241,7 +3376,7 @@ coProtocolMachineTable_create(void)
 {
 	struct coProtocolMachineTable_data *StorageNew = SNMP_MALLOC_STRUCT(coProtocolMachineTable_data);
 
-	DBUGMSGTL(("coProtocolMachineTable", "creating row...  "));
+	DEBUGMSGTL(("coProtocolMachineTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -3251,12 +3386,38 @@ coProtocolMachineTable_create(void)
 }
 
 /**
+ * @fn struct coProtocolMachineTable_data *coProtocolMachineTable_duplicate(struct coProtocolMachineTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct coProtocolMachineTable_data *
+coProtocolMachineTable_duplicate(struct coProtocolMachineTable_data *thedata)
+{
+	struct coProtocolMachineTable_data *StorageNew = SNMP_MALLOC_STRUCT(coProtocolMachineTable_data);
+
+	DEBUGMSGTL(("coProtocolMachineTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("coProtocolMachineTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	coProtocolMachineTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int coProtocolMachineTable_destroy(struct coProtocolMachineTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -3281,6 +3442,7 @@ coProtocolMachineTable_destroy(struct coProtocolMachineTable_data **thedata)
  * @fn int coProtocolMachineTable_add(struct coProtocolMachineTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the coProtocolMachineTable table data set.
+ *
  * Adds a table row structure to the coProtocolMachineTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -3291,8 +3453,7 @@ coProtocolMachineTable_add(struct coProtocolMachineTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("coProtocolMachineTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -3305,8 +3466,9 @@ coProtocolMachineTable_add(struct coProtocolMachineTable_data *thedata)
 
 /**
  * @fn int coProtocolMachineTable_del(struct coProtocolMachineTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the coProtocolMachineTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -3335,6 +3497,7 @@ coProtocolMachineTable_del(struct coProtocolMachineTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for coProtocolMachineTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case coProtocolMachineTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -3406,6 +3569,7 @@ store_coProtocolMachineTable(int majorID, int minorID, void *serverarg, void *cl
 /**
  * @fn struct singlePeerConnectionTable_data *singlePeerConnectionTable_create(void)
  * @brief create a fresh data structure representing a new row in the singlePeerConnectionTable table.
+ *
  * Creates a new singlePeerConnectionTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -3415,7 +3579,7 @@ singlePeerConnectionTable_create(void)
 {
 	struct singlePeerConnectionTable_data *StorageNew = SNMP_MALLOC_STRUCT(singlePeerConnectionTable_data);
 
-	DBUGMSGTL(("singlePeerConnectionTable", "creating row...  "));
+	DEBUGMSGTL(("singlePeerConnectionTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -3425,12 +3589,38 @@ singlePeerConnectionTable_create(void)
 }
 
 /**
+ * @fn struct singlePeerConnectionTable_data *singlePeerConnectionTable_duplicate(struct singlePeerConnectionTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct singlePeerConnectionTable_data *
+singlePeerConnectionTable_duplicate(struct singlePeerConnectionTable_data *thedata)
+{
+	struct singlePeerConnectionTable_data *StorageNew = SNMP_MALLOC_STRUCT(singlePeerConnectionTable_data);
+
+	DEBUGMSGTL(("singlePeerConnectionTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("singlePeerConnectionTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	singlePeerConnectionTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int singlePeerConnectionTable_destroy(struct singlePeerConnectionTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -3461,6 +3651,7 @@ singlePeerConnectionTable_destroy(struct singlePeerConnectionTable_data **thedat
  * @fn int singlePeerConnectionTable_add(struct singlePeerConnectionTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the singlePeerConnectionTable table data set.
+ *
  * Adds a table row structure to the singlePeerConnectionTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -3471,8 +3662,7 @@ singlePeerConnectionTable_add(struct singlePeerConnectionTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("singlePeerConnectionTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -3487,8 +3677,9 @@ singlePeerConnectionTable_add(struct singlePeerConnectionTable_data *thedata)
 
 /**
  * @fn int singlePeerConnectionTable_del(struct singlePeerConnectionTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the singlePeerConnectionTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -3517,6 +3708,7 @@ singlePeerConnectionTable_del(struct singlePeerConnectionTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for singlePeerConnectionTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case singlePeerConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -3604,6 +3796,7 @@ store_singlePeerConnectionTable(int majorID, int minorID, void *serverarg, void 
 /**
  * @fn struct physicalEntityTable_data *physicalEntityTable_create(void)
  * @brief create a fresh data structure representing a new row in the physicalEntityTable table.
+ *
  * Creates a new physicalEntityTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -3613,7 +3806,7 @@ physicalEntityTable_create(void)
 {
 	struct physicalEntityTable_data *StorageNew = SNMP_MALLOC_STRUCT(physicalEntityTable_data);
 
-	DBUGMSGTL(("physicalEntityTable", "creating row...  "));
+	DEBUGMSGTL(("physicalEntityTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -3623,12 +3816,38 @@ physicalEntityTable_create(void)
 }
 
 /**
+ * @fn struct physicalEntityTable_data *physicalEntityTable_duplicate(struct physicalEntityTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct physicalEntityTable_data *
+physicalEntityTable_duplicate(struct physicalEntityTable_data *thedata)
+{
+	struct physicalEntityTable_data *StorageNew = SNMP_MALLOC_STRUCT(physicalEntityTable_data);
+
+	DEBUGMSGTL(("physicalEntityTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("physicalEntityTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	physicalEntityTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int physicalEntityTable_destroy(struct physicalEntityTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -3653,6 +3872,7 @@ physicalEntityTable_destroy(struct physicalEntityTable_data **thedata)
  * @fn int physicalEntityTable_add(struct physicalEntityTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the physicalEntityTable table data set.
+ *
  * Adds a table row structure to the physicalEntityTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -3663,8 +3883,7 @@ physicalEntityTable_add(struct physicalEntityTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("physicalEntityTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	header_complex_add_data(&physicalEntityTableStorage, vars, thedata);
@@ -3675,8 +3894,9 @@ physicalEntityTable_add(struct physicalEntityTable_data *thedata)
 
 /**
  * @fn int physicalEntityTable_del(struct physicalEntityTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the physicalEntityTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -3705,6 +3925,7 @@ physicalEntityTable_del(struct physicalEntityTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for physicalEntityTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case physicalEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -3774,6 +3995,7 @@ store_physicalEntityTable(int majorID, int minorID, void *serverarg, void *clien
 /**
  * @fn struct physicalSAPTable_data *physicalSAPTable_create(void)
  * @brief create a fresh data structure representing a new row in the physicalSAPTable table.
+ *
  * Creates a new physicalSAPTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -3783,7 +4005,7 @@ physicalSAPTable_create(void)
 {
 	struct physicalSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(physicalSAPTable_data);
 
-	DBUGMSGTL(("physicalSAPTable", "creating row...  "));
+	DEBUGMSGTL(("physicalSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->physicalSAPRowStatus = RS_NOTREADY;
@@ -3793,12 +4015,38 @@ physicalSAPTable_create(void)
 }
 
 /**
+ * @fn struct physicalSAPTable_data *physicalSAPTable_duplicate(struct physicalSAPTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct physicalSAPTable_data *
+physicalSAPTable_duplicate(struct physicalSAPTable_data *thedata)
+{
+	struct physicalSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(physicalSAPTable_data);
+
+	DEBUGMSGTL(("physicalSAPTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("physicalSAPTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	physicalSAPTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int physicalSAPTable_destroy(struct physicalSAPTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -3823,6 +4071,7 @@ physicalSAPTable_destroy(struct physicalSAPTable_data **thedata)
  * @fn int physicalSAPTable_add(struct physicalSAPTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the physicalSAPTable table data set.
+ *
  * Adds a table row structure to the physicalSAPTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -3833,8 +4082,7 @@ physicalSAPTable_add(struct physicalSAPTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("physicalSAPTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* sapId */
@@ -3847,8 +4095,9 @@ physicalSAPTable_add(struct physicalSAPTable_data *thedata)
 
 /**
  * @fn int physicalSAPTable_del(struct physicalSAPTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the physicalSAPTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -3877,6 +4126,7 @@ physicalSAPTable_del(struct physicalSAPTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for physicalSAPTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case physicalSAPTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -3948,6 +4198,7 @@ store_physicalSAPTable(int majorID, int minorID, void *serverarg, void *clientar
 /**
  * @fn struct dataCircuitTable_data *dataCircuitTable_create(void)
  * @brief create a fresh data structure representing a new row in the dataCircuitTable table.
+ *
  * Creates a new dataCircuitTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -3957,7 +4208,7 @@ dataCircuitTable_create(void)
 {
 	struct dataCircuitTable_data *StorageNew = SNMP_MALLOC_STRUCT(dataCircuitTable_data);
 
-	DBUGMSGTL(("dataCircuitTable", "creating row...  "));
+	DEBUGMSGTL(("dataCircuitTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->dataCircuitRowStatus = RS_NOTREADY;
@@ -3967,12 +4218,38 @@ dataCircuitTable_create(void)
 }
 
 /**
+ * @fn struct dataCircuitTable_data *dataCircuitTable_duplicate(struct dataCircuitTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct dataCircuitTable_data *
+dataCircuitTable_duplicate(struct dataCircuitTable_data *thedata)
+{
+	struct dataCircuitTable_data *StorageNew = SNMP_MALLOC_STRUCT(dataCircuitTable_data);
+
+	DEBUGMSGTL(("dataCircuitTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("dataCircuitTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	dataCircuitTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int dataCircuitTable_destroy(struct dataCircuitTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -4005,6 +4282,7 @@ dataCircuitTable_destroy(struct dataCircuitTable_data **thedata)
  * @fn int dataCircuitTable_add(struct dataCircuitTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the dataCircuitTable table data set.
+ *
  * Adds a table row structure to the dataCircuitTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -4015,8 +4293,7 @@ dataCircuitTable_add(struct dataCircuitTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("dataCircuitTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -4029,8 +4306,9 @@ dataCircuitTable_add(struct dataCircuitTable_data *thedata)
 
 /**
  * @fn int dataCircuitTable_del(struct dataCircuitTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the dataCircuitTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -4059,6 +4337,7 @@ dataCircuitTable_del(struct dataCircuitTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dataCircuitTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case dataCircuitTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -4176,6 +4455,7 @@ store_dataCircuitTable(int majorID, int minorID, void *serverarg, void *clientar
 /**
  * @fn struct physicalConnectionTable_data *physicalConnectionTable_create(void)
  * @brief create a fresh data structure representing a new row in the physicalConnectionTable table.
+ *
  * Creates a new physicalConnectionTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -4185,7 +4465,7 @@ physicalConnectionTable_create(void)
 {
 	struct physicalConnectionTable_data *StorageNew = SNMP_MALLOC_STRUCT(physicalConnectionTable_data);
 
-	DBUGMSGTL(("physicalConnectionTable", "creating row...  "));
+	DEBUGMSGTL(("physicalConnectionTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->physicalConnectionRowStatus = RS_NOTREADY;
@@ -4195,12 +4475,38 @@ physicalConnectionTable_create(void)
 }
 
 /**
+ * @fn struct physicalConnectionTable_data *physicalConnectionTable_duplicate(struct physicalConnectionTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct physicalConnectionTable_data *
+physicalConnectionTable_duplicate(struct physicalConnectionTable_data *thedata)
+{
+	struct physicalConnectionTable_data *StorageNew = SNMP_MALLOC_STRUCT(physicalConnectionTable_data);
+
+	DEBUGMSGTL(("physicalConnectionTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("physicalConnectionTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	physicalConnectionTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int physicalConnectionTable_destroy(struct physicalConnectionTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -4229,6 +4535,7 @@ physicalConnectionTable_destroy(struct physicalConnectionTable_data **thedata)
  * @fn int physicalConnectionTable_add(struct physicalConnectionTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the physicalConnectionTable table data set.
+ *
  * Adds a table row structure to the physicalConnectionTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -4239,8 +4546,7 @@ physicalConnectionTable_add(struct physicalConnectionTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("physicalConnectionTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -4255,8 +4561,9 @@ physicalConnectionTable_add(struct physicalConnectionTable_data *thedata)
 
 /**
  * @fn int physicalConnectionTable_del(struct physicalConnectionTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the physicalConnectionTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -4285,6 +4592,7 @@ physicalConnectionTable_del(struct physicalConnectionTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for physicalConnectionTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case physicalConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -4370,6 +4678,7 @@ store_physicalConnectionTable(int majorID, int minorID, void *serverarg, void *c
 /**
  * @fn struct datalinkEntityTable_data *datalinkEntityTable_create(void)
  * @brief create a fresh data structure representing a new row in the datalinkEntityTable table.
+ *
  * Creates a new datalinkEntityTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -4379,7 +4688,7 @@ datalinkEntityTable_create(void)
 {
 	struct datalinkEntityTable_data *StorageNew = SNMP_MALLOC_STRUCT(datalinkEntityTable_data);
 
-	DBUGMSGTL(("datalinkEntityTable", "creating row...  "));
+	DEBUGMSGTL(("datalinkEntityTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->datalinkEntityRowStatus = RS_NOTREADY;
@@ -4389,12 +4698,38 @@ datalinkEntityTable_create(void)
 }
 
 /**
+ * @fn struct datalinkEntityTable_data *datalinkEntityTable_duplicate(struct datalinkEntityTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct datalinkEntityTable_data *
+datalinkEntityTable_duplicate(struct datalinkEntityTable_data *thedata)
+{
+	struct datalinkEntityTable_data *StorageNew = SNMP_MALLOC_STRUCT(datalinkEntityTable_data);
+
+	DEBUGMSGTL(("datalinkEntityTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("datalinkEntityTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	datalinkEntityTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int datalinkEntityTable_destroy(struct datalinkEntityTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -4419,6 +4754,7 @@ datalinkEntityTable_destroy(struct datalinkEntityTable_data **thedata)
  * @fn int datalinkEntityTable_add(struct datalinkEntityTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the datalinkEntityTable table data set.
+ *
  * Adds a table row structure to the datalinkEntityTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -4429,8 +4765,7 @@ datalinkEntityTable_add(struct datalinkEntityTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("datalinkEntityTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	header_complex_add_data(&datalinkEntityTableStorage, vars, thedata);
@@ -4441,8 +4776,9 @@ datalinkEntityTable_add(struct datalinkEntityTable_data *thedata)
 
 /**
  * @fn int datalinkEntityTable_del(struct datalinkEntityTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the datalinkEntityTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -4471,6 +4807,7 @@ datalinkEntityTable_del(struct datalinkEntityTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for datalinkEntityTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case datalinkEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -4542,6 +4879,7 @@ store_datalinkEntityTable(int majorID, int minorID, void *serverarg, void *clien
 /**
  * @fn struct dLSAPTable_data *dLSAPTable_create(void)
  * @brief create a fresh data structure representing a new row in the dLSAPTable table.
+ *
  * Creates a new dLSAPTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -4551,7 +4889,7 @@ dLSAPTable_create(void)
 {
 	struct dLSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(dLSAPTable_data);
 
-	DBUGMSGTL(("dLSAPTable", "creating row...  "));
+	DEBUGMSGTL(("dLSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->dLSAPRowStatus = RS_NOTREADY;
@@ -4561,12 +4899,38 @@ dLSAPTable_create(void)
 }
 
 /**
+ * @fn struct dLSAPTable_data *dLSAPTable_duplicate(struct dLSAPTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct dLSAPTable_data *
+dLSAPTable_duplicate(struct dLSAPTable_data *thedata)
+{
+	struct dLSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(dLSAPTable_data);
+
+	DEBUGMSGTL(("dLSAPTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	dLSAPTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int dLSAPTable_destroy(struct dLSAPTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -4591,6 +4955,7 @@ dLSAPTable_destroy(struct dLSAPTable_data **thedata)
  * @fn int dLSAPTable_add(struct dLSAPTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the dLSAPTable table data set.
+ *
  * Adds a table row structure to the dLSAPTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -4601,8 +4966,7 @@ dLSAPTable_add(struct dLSAPTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("dLSAPTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* sapId */
@@ -4615,8 +4979,9 @@ dLSAPTable_add(struct dLSAPTable_data *thedata)
 
 /**
  * @fn int dLSAPTable_del(struct dLSAPTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the dLSAPTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -4645,6 +5010,7 @@ dLSAPTable_del(struct dLSAPTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dLSAPTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case dLSAPTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -4716,6 +5082,7 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct lAPBDLETable_data *lAPBDLETable_create(void)
  * @brief create a fresh data structure representing a new row in the lAPBDLETable table.
+ *
  * Creates a new lAPBDLETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -4725,7 +5092,7 @@ lAPBDLETable_create(void)
 {
 	struct lAPBDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(lAPBDLETable_data);
 
-	DBUGMSGTL(("lAPBDLETable", "creating row...  "));
+	DEBUGMSGTL(("lAPBDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->lAPBDLERowStatus = RS_NOTREADY;
@@ -4735,12 +5102,38 @@ lAPBDLETable_create(void)
 }
 
 /**
+ * @fn struct lAPBDLETable_data *lAPBDLETable_duplicate(struct lAPBDLETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lAPBDLETable_data *
+lAPBDLETable_duplicate(struct lAPBDLETable_data *thedata)
+{
+	struct lAPBDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(lAPBDLETable_data);
+
+	DEBUGMSGTL(("lAPBDLETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lAPBDLETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lAPBDLETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lAPBDLETable_destroy(struct lAPBDLETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -4763,6 +5156,7 @@ lAPBDLETable_destroy(struct lAPBDLETable_data **thedata)
  * @fn int lAPBDLETable_add(struct lAPBDLETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lAPBDLETable table data set.
+ *
  * Adds a table row structure to the lAPBDLETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -4773,8 +5167,7 @@ lAPBDLETable_add(struct lAPBDLETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lAPBDLETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	header_complex_add_data(&lAPBDLETableStorage, vars, thedata);
@@ -4785,8 +5178,9 @@ lAPBDLETable_add(struct lAPBDLETable_data *thedata)
 
 /**
  * @fn int lAPBDLETable_del(struct lAPBDLETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lAPBDLETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -4815,6 +5209,7 @@ lAPBDLETable_del(struct lAPBDLETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lAPBDLETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lAPBDLETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -4906,6 +5301,7 @@ store_lAPBDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct sLPPMTable_data *sLPPMTable_create(void)
  * @brief create a fresh data structure representing a new row in the sLPPMTable table.
+ *
  * Creates a new sLPPMTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -4915,7 +5311,7 @@ sLPPMTable_create(void)
 {
 	struct sLPPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(sLPPMTable_data);
 
-	DBUGMSGTL(("sLPPMTable", "creating row...  "));
+	DEBUGMSGTL(("sLPPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->sLPPMRowStatus = RS_NOTREADY;
@@ -4925,12 +5321,38 @@ sLPPMTable_create(void)
 }
 
 /**
+ * @fn struct sLPPMTable_data *sLPPMTable_duplicate(struct sLPPMTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct sLPPMTable_data *
+sLPPMTable_duplicate(struct sLPPMTable_data *thedata)
+{
+	struct sLPPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(sLPPMTable_data);
+
+	DEBUGMSGTL(("sLPPMTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("sLPPMTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	sLPPMTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int sLPPMTable_destroy(struct sLPPMTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -4955,6 +5377,7 @@ sLPPMTable_destroy(struct sLPPMTable_data **thedata)
  * @fn int sLPPMTable_add(struct sLPPMTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the sLPPMTable table data set.
+ *
  * Adds a table row structure to the sLPPMTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -4965,8 +5388,7 @@ sLPPMTable_add(struct sLPPMTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("sLPPMTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -4979,8 +5401,9 @@ sLPPMTable_add(struct sLPPMTable_data *thedata)
 
 /**
  * @fn int sLPPMTable_del(struct sLPPMTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the sLPPMTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -5009,6 +5432,7 @@ sLPPMTable_del(struct sLPPMTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sLPPMTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case sLPPMTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -5082,6 +5506,7 @@ store_sLPPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct sLPConnectionTable_data *sLPConnectionTable_create(void)
  * @brief create a fresh data structure representing a new row in the sLPConnectionTable table.
+ *
  * Creates a new sLPConnectionTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -5091,7 +5516,7 @@ sLPConnectionTable_create(void)
 {
 	struct sLPConnectionTable_data *StorageNew = SNMP_MALLOC_STRUCT(sLPConnectionTable_data);
 
-	DBUGMSGTL(("sLPConnectionTable", "creating row...  "));
+	DEBUGMSGTL(("sLPConnectionTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->sLPConnectionRowStatus = RS_NOTREADY;
@@ -5101,12 +5526,38 @@ sLPConnectionTable_create(void)
 }
 
 /**
+ * @fn struct sLPConnectionTable_data *sLPConnectionTable_duplicate(struct sLPConnectionTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct sLPConnectionTable_data *
+sLPConnectionTable_duplicate(struct sLPConnectionTable_data *thedata)
+{
+	struct sLPConnectionTable_data *StorageNew = SNMP_MALLOC_STRUCT(sLPConnectionTable_data);
+
+	DEBUGMSGTL(("sLPConnectionTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("sLPConnectionTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	sLPConnectionTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int sLPConnectionTable_destroy(struct sLPConnectionTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -5137,6 +5588,7 @@ sLPConnectionTable_destroy(struct sLPConnectionTable_data **thedata)
  * @fn int sLPConnectionTable_add(struct sLPConnectionTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the sLPConnectionTable table data set.
+ *
  * Adds a table row structure to the sLPConnectionTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -5147,8 +5599,7 @@ sLPConnectionTable_add(struct sLPConnectionTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("sLPConnectionTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -5163,8 +5614,9 @@ sLPConnectionTable_add(struct sLPConnectionTable_data *thedata)
 
 /**
  * @fn int sLPConnectionTable_del(struct sLPConnectionTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the sLPConnectionTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -5193,6 +5645,7 @@ sLPConnectionTable_del(struct sLPConnectionTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sLPConnectionTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case sLPConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -5352,6 +5805,7 @@ store_sLPConnectionTable(int majorID, int minorID, void *serverarg, void *client
 /**
  * @fn struct sLPConnectionIVMOTable_data *sLPConnectionIVMOTable_create(void)
  * @brief create a fresh data structure representing a new row in the sLPConnectionIVMOTable table.
+ *
  * Creates a new sLPConnectionIVMOTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -5361,7 +5815,7 @@ sLPConnectionIVMOTable_create(void)
 {
 	struct sLPConnectionIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(sLPConnectionIVMOTable_data);
 
-	DBUGMSGTL(("sLPConnectionIVMOTable", "creating row...  "));
+	DEBUGMSGTL(("sLPConnectionIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->sLPConnectionIVMORowStatus = RS_NOTREADY;
@@ -5371,12 +5825,38 @@ sLPConnectionIVMOTable_create(void)
 }
 
 /**
+ * @fn struct sLPConnectionIVMOTable_data *sLPConnectionIVMOTable_duplicate(struct sLPConnectionIVMOTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct sLPConnectionIVMOTable_data *
+sLPConnectionIVMOTable_duplicate(struct sLPConnectionIVMOTable_data *thedata)
+{
+	struct sLPConnectionIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(sLPConnectionIVMOTable_data);
+
+	DEBUGMSGTL(("sLPConnectionIVMOTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("sLPConnectionIVMOTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	sLPConnectionIVMOTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int sLPConnectionIVMOTable_destroy(struct sLPConnectionIVMOTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -5405,6 +5885,7 @@ sLPConnectionIVMOTable_destroy(struct sLPConnectionIVMOTable_data **thedata)
  * @fn int sLPConnectionIVMOTable_add(struct sLPConnectionIVMOTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the sLPConnectionIVMOTable table data set.
+ *
  * Adds a table row structure to the sLPConnectionIVMOTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -5415,8 +5896,7 @@ sLPConnectionIVMOTable_add(struct sLPConnectionIVMOTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -5431,8 +5911,9 @@ sLPConnectionIVMOTable_add(struct sLPConnectionIVMOTable_data *thedata)
 
 /**
  * @fn int sLPConnectionIVMOTable_del(struct sLPConnectionIVMOTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the sLPConnectionIVMOTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -5461,6 +5942,7 @@ sLPConnectionIVMOTable_del(struct sLPConnectionIVMOTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sLPConnectionIVMOTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case sLPConnectionIVMOTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -5562,6 +6044,7 @@ store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *cl
 /**
  * @fn struct mACDLETable_data *mACDLETable_create(void)
  * @brief create a fresh data structure representing a new row in the mACDLETable table.
+ *
  * Creates a new mACDLETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -5571,7 +6054,7 @@ mACDLETable_create(void)
 {
 	struct mACDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(mACDLETable_data);
 
-	DBUGMSGTL(("mACDLETable", "creating row...  "));
+	DEBUGMSGTL(("mACDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mACDLERowStatus = RS_NOTREADY;
@@ -5581,12 +6064,38 @@ mACDLETable_create(void)
 }
 
 /**
+ * @fn struct mACDLETable_data *mACDLETable_duplicate(struct mACDLETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct mACDLETable_data *
+mACDLETable_duplicate(struct mACDLETable_data *thedata)
+{
+	struct mACDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(mACDLETable_data);
+
+	DEBUGMSGTL(("mACDLETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("mACDLETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	mACDLETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int mACDLETable_destroy(struct mACDLETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -5609,6 +6118,7 @@ mACDLETable_destroy(struct mACDLETable_data **thedata)
  * @fn int mACDLETable_add(struct mACDLETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the mACDLETable table data set.
+ *
  * Adds a table row structure to the mACDLETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -5619,8 +6129,7 @@ mACDLETable_add(struct mACDLETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("mACDLETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	header_complex_add_data(&mACDLETableStorage, vars, thedata);
@@ -5631,8 +6140,9 @@ mACDLETable_add(struct mACDLETable_data *thedata)
 
 /**
  * @fn int mACDLETable_del(struct mACDLETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the mACDLETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -5661,6 +6171,7 @@ mACDLETable_del(struct mACDLETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mACDLETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case mACDLETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -5726,6 +6237,7 @@ store_mACDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct mACTable_data *mACTable_create(void)
  * @brief create a fresh data structure representing a new row in the mACTable table.
+ *
  * Creates a new mACTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -5735,7 +6247,7 @@ mACTable_create(void)
 {
 	struct mACTable_data *StorageNew = SNMP_MALLOC_STRUCT(mACTable_data);
 
-	DBUGMSGTL(("mACTable", "creating row...  "));
+	DEBUGMSGTL(("mACTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mACRowStatus = RS_NOTREADY;
@@ -5745,12 +6257,38 @@ mACTable_create(void)
 }
 
 /**
+ * @fn struct mACTable_data *mACTable_duplicate(struct mACTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct mACTable_data *
+mACTable_duplicate(struct mACTable_data *thedata)
+{
+	struct mACTable_data *StorageNew = SNMP_MALLOC_STRUCT(mACTable_data);
+
+	DEBUGMSGTL(("mACTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("mACTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	mACTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int mACTable_destroy(struct mACTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -5775,6 +6313,7 @@ mACTable_destroy(struct mACTable_data **thedata)
  * @fn int mACTable_add(struct mACTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the mACTable table data set.
+ *
  * Adds a table row structure to the mACTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -5785,8 +6324,7 @@ mACTable_add(struct mACTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("mACTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* mACId */
@@ -5799,8 +6337,9 @@ mACTable_add(struct mACTable_data *thedata)
 
 /**
  * @fn int mACTable_del(struct mACTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the mACTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -5829,6 +6368,7 @@ mACTable_del(struct mACTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mACTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case mACTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -5902,6 +6442,7 @@ store_mACTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct lLCDLETable_data *lLCDLETable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCDLETable table.
+ *
  * Creates a new lLCDLETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -5911,7 +6452,7 @@ lLCDLETable_create(void)
 {
 	struct lLCDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCDLETable_data);
 
-	DBUGMSGTL(("lLCDLETable", "creating row...  "));
+	DEBUGMSGTL(("lLCDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->lLCDLERowStatus = RS_NOTREADY;
@@ -5921,12 +6462,38 @@ lLCDLETable_create(void)
 }
 
 /**
+ * @fn struct lLCDLETable_data *lLCDLETable_duplicate(struct lLCDLETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCDLETable_data *
+lLCDLETable_duplicate(struct lLCDLETable_data *thedata)
+{
+	struct lLCDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCDLETable_data);
+
+	DEBUGMSGTL(("lLCDLETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCDLETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCDLETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCDLETable_destroy(struct lLCDLETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -5949,6 +6516,7 @@ lLCDLETable_destroy(struct lLCDLETable_data **thedata)
  * @fn int lLCDLETable_add(struct lLCDLETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCDLETable table data set.
+ *
  * Adds a table row structure to the lLCDLETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -5959,8 +6527,7 @@ lLCDLETable_add(struct lLCDLETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCDLETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	header_complex_add_data(&lLCDLETableStorage, vars, thedata);
@@ -5971,8 +6538,9 @@ lLCDLETable_add(struct lLCDLETable_data *thedata)
 
 /**
  * @fn int lLCDLETable_del(struct lLCDLETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCDLETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -6001,6 +6569,7 @@ lLCDLETable_del(struct lLCDLETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCDLETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCDLETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -6066,6 +6635,7 @@ store_lLCDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct lLCCLPMTable_data *lLCCLPMTable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCCLPMTable table.
+ *
  * Creates a new lLCCLPMTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -6075,7 +6645,7 @@ lLCCLPMTable_create(void)
 {
 	struct lLCCLPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCCLPMTable_data);
 
-	DBUGMSGTL(("lLCCLPMTable", "creating row...  "));
+	DEBUGMSGTL(("lLCCLPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->lLCCLPMRowStatus = RS_NOTREADY;
@@ -6085,12 +6655,38 @@ lLCCLPMTable_create(void)
 }
 
 /**
+ * @fn struct lLCCLPMTable_data *lLCCLPMTable_duplicate(struct lLCCLPMTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCCLPMTable_data *
+lLCCLPMTable_duplicate(struct lLCCLPMTable_data *thedata)
+{
+	struct lLCCLPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCCLPMTable_data);
+
+	DEBUGMSGTL(("lLCCLPMTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCCLPMTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCCLPMTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCCLPMTable_destroy(struct lLCCLPMTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -6115,6 +6711,7 @@ lLCCLPMTable_destroy(struct lLCCLPMTable_data **thedata)
  * @fn int lLCCLPMTable_add(struct lLCCLPMTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCCLPMTable table data set.
+ *
  * Adds a table row structure to the lLCCLPMTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -6125,8 +6722,7 @@ lLCCLPMTable_add(struct lLCCLPMTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCCLPMTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -6139,8 +6735,9 @@ lLCCLPMTable_add(struct lLCCLPMTable_data *thedata)
 
 /**
  * @fn int lLCCLPMTable_del(struct lLCCLPMTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCCLPMTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -6169,6 +6766,7 @@ lLCCLPMTable_del(struct lLCCLPMTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCCLPMTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCCLPMTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -6240,6 +6838,7 @@ store_lLCCLPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct lLCCOPMTable_data *lLCCOPMTable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCCOPMTable table.
+ *
  * Creates a new lLCCOPMTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -6249,7 +6848,7 @@ lLCCOPMTable_create(void)
 {
 	struct lLCCOPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCCOPMTable_data);
 
-	DBUGMSGTL(("lLCCOPMTable", "creating row...  "));
+	DEBUGMSGTL(("lLCCOPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->lLCCOPMRowStatus = RS_NOTREADY;
@@ -6259,12 +6858,38 @@ lLCCOPMTable_create(void)
 }
 
 /**
+ * @fn struct lLCCOPMTable_data *lLCCOPMTable_duplicate(struct lLCCOPMTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCCOPMTable_data *
+lLCCOPMTable_duplicate(struct lLCCOPMTable_data *thedata)
+{
+	struct lLCCOPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCCOPMTable_data);
+
+	DEBUGMSGTL(("lLCCOPMTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCCOPMTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCCOPMTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCCOPMTable_destroy(struct lLCCOPMTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -6289,6 +6914,7 @@ lLCCOPMTable_destroy(struct lLCCOPMTable_data **thedata)
  * @fn int lLCCOPMTable_add(struct lLCCOPMTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCCOPMTable table data set.
+ *
  * Adds a table row structure to the lLCCOPMTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -6299,8 +6925,7 @@ lLCCOPMTable_add(struct lLCCOPMTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCCOPMTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -6313,8 +6938,9 @@ lLCCOPMTable_add(struct lLCCOPMTable_data *thedata)
 
 /**
  * @fn int lLCCOPMTable_del(struct lLCCOPMTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCCOPMTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -6343,6 +6969,7 @@ lLCCOPMTable_del(struct lLCCOPMTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCCOPMTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCCOPMTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -6414,6 +7041,7 @@ store_lLCCOPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct resourceTypeIdTable_data *resourceTypeIdTable_create(void)
  * @brief create a fresh data structure representing a new row in the resourceTypeIdTable table.
+ *
  * Creates a new resourceTypeIdTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -6423,11 +7051,11 @@ resourceTypeIdTable_create(void)
 {
 	struct resourceTypeIdTable_data *StorageNew = SNMP_MALLOC_STRUCT(resourceTypeIdTable_data);
 
-	DBUGMSGTL(("resourceTypeIdTable", "creating row...  "));
+	DEBUGMSGTL(("resourceTypeIdTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->resourceTypeIdName = strdup("\"RTID\"");
-		StorageNew->resourceTypeIdNameLen = strlen("\"RTID\"");
+		/* StorageNew->resourceTypeIdName = (uint8_t *) strdup(\"RTID\"); *//* DEFVAL \"RTID\" */
+		/* StorageNew->resourceTypeIdNameLen = strlen(\"RTID\"); *//* DEFVAL \"RTID\" */
 
 	}
 	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
@@ -6435,12 +7063,38 @@ resourceTypeIdTable_create(void)
 }
 
 /**
+ * @fn struct resourceTypeIdTable_data *resourceTypeIdTable_duplicate(struct resourceTypeIdTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct resourceTypeIdTable_data *
+resourceTypeIdTable_duplicate(struct resourceTypeIdTable_data *thedata)
+{
+	struct resourceTypeIdTable_data *StorageNew = SNMP_MALLOC_STRUCT(resourceTypeIdTable_data);
+
+	DEBUGMSGTL(("resourceTypeIdTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	resourceTypeIdTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int resourceTypeIdTable_destroy(struct resourceTypeIdTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -6473,6 +7127,7 @@ resourceTypeIdTable_destroy(struct resourceTypeIdTable_data **thedata)
  * @fn int resourceTypeIdTable_add(struct resourceTypeIdTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the resourceTypeIdTable table data set.
+ *
  * Adds a table row structure to the resourceTypeIdTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -6483,8 +7138,7 @@ resourceTypeIdTable_add(struct resourceTypeIdTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("resourceTypeIdTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	header_complex_add_data(&resourceTypeIdTableStorage, vars, thedata);
@@ -6495,8 +7149,9 @@ resourceTypeIdTable_add(struct resourceTypeIdTable_data *thedata)
 
 /**
  * @fn int resourceTypeIdTable_del(struct resourceTypeIdTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the resourceTypeIdTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -6525,6 +7180,7 @@ resourceTypeIdTable_del(struct resourceTypeIdTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for resourceTypeIdTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case resourceTypeIdTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -6618,6 +7274,7 @@ store_resourceTypeIdTable(int majorID, int minorID, void *serverarg, void *clien
 /**
  * @fn struct lLCStationTable_data *lLCStationTable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCStationTable table.
+ *
  * Creates a new lLCStationTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -6627,7 +7284,7 @@ lLCStationTable_create(void)
 {
 	struct lLCStationTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCStationTable_data);
 
-	DBUGMSGTL(("lLCStationTable", "creating row...  "));
+	DEBUGMSGTL(("lLCStationTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -6637,12 +7294,38 @@ lLCStationTable_create(void)
 }
 
 /**
+ * @fn struct lLCStationTable_data *lLCStationTable_duplicate(struct lLCStationTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCStationTable_data *
+lLCStationTable_duplicate(struct lLCStationTable_data *thedata)
+{
+	struct lLCStationTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCStationTable_data);
+
+	DEBUGMSGTL(("lLCStationTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCStationTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCStationTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCStationTable_destroy(struct lLCStationTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -6673,6 +7356,7 @@ lLCStationTable_destroy(struct lLCStationTable_data **thedata)
  * @fn int lLCStationTable_add(struct lLCStationTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCStationTable table data set.
+ *
  * Adds a table row structure to the lLCStationTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -6683,8 +7367,7 @@ lLCStationTable_add(struct lLCStationTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCStationTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* sapId */
@@ -6697,8 +7380,9 @@ lLCStationTable_add(struct lLCStationTable_data *thedata)
 
 /**
  * @fn int lLCStationTable_del(struct lLCStationTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCStationTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -6727,6 +7411,7 @@ lLCStationTable_del(struct lLCStationTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCStationTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCStationTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -6852,6 +7537,7 @@ store_lLCStationTable(int majorID, int minorID, void *serverarg, void *clientarg
 /**
  * @fn struct lLCSAPTable_data *lLCSAPTable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCSAPTable table.
+ *
  * Creates a new lLCSAPTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -6861,7 +7547,7 @@ lLCSAPTable_create(void)
 {
 	struct lLCSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCSAPTable_data);
 
-	DBUGMSGTL(("lLCSAPTable", "creating row...  "));
+	DEBUGMSGTL(("lLCSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -6871,12 +7557,38 @@ lLCSAPTable_create(void)
 }
 
 /**
+ * @fn struct lLCSAPTable_data *lLCSAPTable_duplicate(struct lLCSAPTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCSAPTable_data *
+lLCSAPTable_duplicate(struct lLCSAPTable_data *thedata)
+{
+	struct lLCSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCSAPTable_data);
+
+	DEBUGMSGTL(("lLCSAPTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCSAPTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCSAPTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCSAPTable_destroy(struct lLCSAPTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -6905,6 +7617,7 @@ lLCSAPTable_destroy(struct lLCSAPTable_data **thedata)
  * @fn int lLCSAPTable_add(struct lLCSAPTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCSAPTable table data set.
+ *
  * Adds a table row structure to the lLCSAPTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -6915,8 +7628,7 @@ lLCSAPTable_add(struct lLCSAPTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCSAPTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* sapId */
@@ -6929,8 +7641,9 @@ lLCSAPTable_add(struct lLCSAPTable_data *thedata)
 
 /**
  * @fn int lLCSAPTable_del(struct lLCSAPTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCSAPTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -6959,6 +7672,7 @@ lLCSAPTable_del(struct lLCSAPTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCSAPTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCSAPTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -7042,6 +7756,7 @@ store_lLCSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct rDESetupTable_data *rDESetupTable_create(void)
  * @brief create a fresh data structure representing a new row in the rDESetupTable table.
+ *
  * Creates a new rDESetupTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -7051,7 +7766,7 @@ rDESetupTable_create(void)
 {
 	struct rDESetupTable_data *StorageNew = SNMP_MALLOC_STRUCT(rDESetupTable_data);
 
-	DBUGMSGTL(("rDESetupTable", "creating row...  "));
+	DEBUGMSGTL(("rDESetupTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -7061,12 +7776,38 @@ rDESetupTable_create(void)
 }
 
 /**
+ * @fn struct rDESetupTable_data *rDESetupTable_duplicate(struct rDESetupTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct rDESetupTable_data *
+rDESetupTable_duplicate(struct rDESetupTable_data *thedata)
+{
+	struct rDESetupTable_data *StorageNew = SNMP_MALLOC_STRUCT(rDESetupTable_data);
+
+	DEBUGMSGTL(("rDESetupTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("rDESetupTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	rDESetupTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int rDESetupTable_destroy(struct rDESetupTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -7091,6 +7832,7 @@ rDESetupTable_destroy(struct rDESetupTable_data **thedata)
  * @fn int rDESetupTable_add(struct rDESetupTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the rDESetupTable table data set.
+ *
  * Adds a table row structure to the rDESetupTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -7101,8 +7843,7 @@ rDESetupTable_add(struct rDESetupTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("rDESetupTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* sapId */
@@ -7115,8 +7856,9 @@ rDESetupTable_add(struct rDESetupTable_data *thedata)
 
 /**
  * @fn int rDESetupTable_del(struct rDESetupTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the rDESetupTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -7145,6 +7887,7 @@ rDESetupTable_del(struct rDESetupTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rDESetupTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case rDESetupTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -7234,6 +7977,7 @@ store_rDESetupTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct rDEPairTable_data *rDEPairTable_create(void)
  * @brief create a fresh data structure representing a new row in the rDEPairTable table.
+ *
  * Creates a new rDEPairTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -7243,7 +7987,7 @@ rDEPairTable_create(void)
 {
 	struct rDEPairTable_data *StorageNew = SNMP_MALLOC_STRUCT(rDEPairTable_data);
 
-	DBUGMSGTL(("rDEPairTable", "creating row...  "));
+	DEBUGMSGTL(("rDEPairTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -7253,12 +7997,38 @@ rDEPairTable_create(void)
 }
 
 /**
+ * @fn struct rDEPairTable_data *rDEPairTable_duplicate(struct rDEPairTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct rDEPairTable_data *
+rDEPairTable_duplicate(struct rDEPairTable_data *thedata)
+{
+	struct rDEPairTable_data *StorageNew = SNMP_MALLOC_STRUCT(rDEPairTable_data);
+
+	DEBUGMSGTL(("rDEPairTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("rDEPairTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	rDEPairTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int rDEPairTable_destroy(struct rDEPairTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -7287,6 +8057,7 @@ rDEPairTable_destroy(struct rDEPairTable_data **thedata)
  * @fn int rDEPairTable_add(struct rDEPairTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the rDEPairTable table data set.
+ *
  * Adds a table row structure to the rDEPairTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -7297,8 +8068,7 @@ rDEPairTable_add(struct rDEPairTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("rDEPairTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* sapId */
@@ -7313,8 +8083,9 @@ rDEPairTable_add(struct rDEPairTable_data *thedata)
 
 /**
  * @fn int rDEPairTable_del(struct rDEPairTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the rDEPairTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -7343,6 +8114,7 @@ rDEPairTable_del(struct rDEPairTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rDEPairTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case rDEPairTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -7434,6 +8206,7 @@ store_rDEPairTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct lLCConnectionLessTable_data *lLCConnectionLessTable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCConnectionLessTable table.
+ *
  * Creates a new lLCConnectionLessTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -7443,7 +8216,7 @@ lLCConnectionLessTable_create(void)
 {
 	struct lLCConnectionLessTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionLessTable_data);
 
-	DBUGMSGTL(("lLCConnectionLessTable", "creating row...  "));
+	DEBUGMSGTL(("lLCConnectionLessTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -7453,12 +8226,38 @@ lLCConnectionLessTable_create(void)
 }
 
 /**
+ * @fn struct lLCConnectionLessTable_data *lLCConnectionLessTable_duplicate(struct lLCConnectionLessTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCConnectionLessTable_data *
+lLCConnectionLessTable_duplicate(struct lLCConnectionLessTable_data *thedata)
+{
+	struct lLCConnectionLessTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionLessTable_data);
+
+	DEBUGMSGTL(("lLCConnectionLessTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCConnectionLessTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCConnectionLessTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCConnectionLessTable_destroy(struct lLCConnectionLessTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -7487,6 +8286,7 @@ lLCConnectionLessTable_destroy(struct lLCConnectionLessTable_data **thedata)
  * @fn int lLCConnectionLessTable_add(struct lLCConnectionLessTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCConnectionLessTable table data set.
+ *
  * Adds a table row structure to the lLCConnectionLessTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -7497,8 +8297,7 @@ lLCConnectionLessTable_add(struct lLCConnectionLessTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCConnectionLessTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -7513,8 +8312,9 @@ lLCConnectionLessTable_add(struct lLCConnectionLessTable_data *thedata)
 
 /**
  * @fn int lLCConnectionLessTable_del(struct lLCConnectionLessTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCConnectionLessTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -7543,6 +8343,7 @@ lLCConnectionLessTable_del(struct lLCConnectionLessTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCConnectionLessTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCConnectionLessTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -7650,6 +8451,7 @@ store_lLCConnectionLessTable(int majorID, int minorID, void *serverarg, void *cl
 /**
  * @fn struct lLCConnection2Table_data *lLCConnection2Table_create(void)
  * @brief create a fresh data structure representing a new row in the lLCConnection2Table table.
+ *
  * Creates a new lLCConnection2Table_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -7659,7 +8461,7 @@ lLCConnection2Table_create(void)
 {
 	struct lLCConnection2Table_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnection2Table_data);
 
-	DBUGMSGTL(("lLCConnection2Table", "creating row...  "));
+	DEBUGMSGTL(("lLCConnection2Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -7669,12 +8471,38 @@ lLCConnection2Table_create(void)
 }
 
 /**
+ * @fn struct lLCConnection2Table_data *lLCConnection2Table_duplicate(struct lLCConnection2Table_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCConnection2Table_data *
+lLCConnection2Table_duplicate(struct lLCConnection2Table_data *thedata)
+{
+	struct lLCConnection2Table_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnection2Table_data);
+
+	DEBUGMSGTL(("lLCConnection2Table", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCConnection2Table_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCConnection2Table_destroy(struct lLCConnection2Table_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -7709,6 +8537,7 @@ lLCConnection2Table_destroy(struct lLCConnection2Table_data **thedata)
  * @fn int lLCConnection2Table_add(struct lLCConnection2Table_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCConnection2Table table data set.
+ *
  * Adds a table row structure to the lLCConnection2Table table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -7719,8 +8548,7 @@ lLCConnection2Table_add(struct lLCConnection2Table_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCConnection2Table", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -7735,8 +8563,9 @@ lLCConnection2Table_add(struct lLCConnection2Table_data *thedata)
 
 /**
  * @fn int lLCConnection2Table_del(struct lLCConnection2Table_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCConnection2Table table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -7765,6 +8594,7 @@ lLCConnection2Table_del(struct lLCConnection2Table_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCConnection2Table entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCConnection2Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -7952,6 +8782,7 @@ store_lLCConnection2Table(int majorID, int minorID, void *serverarg, void *clien
 /**
  * @fn struct lLCConnection2IVMOTable_data *lLCConnection2IVMOTable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCConnection2IVMOTable table.
+ *
  * Creates a new lLCConnection2IVMOTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -7961,7 +8792,7 @@ lLCConnection2IVMOTable_create(void)
 {
 	struct lLCConnection2IVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnection2IVMOTable_data);
 
-	DBUGMSGTL(("lLCConnection2IVMOTable", "creating row...  "));
+	DEBUGMSGTL(("lLCConnection2IVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -7971,12 +8802,38 @@ lLCConnection2IVMOTable_create(void)
 }
 
 /**
+ * @fn struct lLCConnection2IVMOTable_data *lLCConnection2IVMOTable_duplicate(struct lLCConnection2IVMOTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCConnection2IVMOTable_data *
+lLCConnection2IVMOTable_duplicate(struct lLCConnection2IVMOTable_data *thedata)
+{
+	struct lLCConnection2IVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnection2IVMOTable_data);
+
+	DEBUGMSGTL(("lLCConnection2IVMOTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCConnection2IVMOTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCConnection2IVMOTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCConnection2IVMOTable_destroy(struct lLCConnection2IVMOTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -8005,6 +8862,7 @@ lLCConnection2IVMOTable_destroy(struct lLCConnection2IVMOTable_data **thedata)
  * @fn int lLCConnection2IVMOTable_add(struct lLCConnection2IVMOTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCConnection2IVMOTable table data set.
+ *
  * Adds a table row structure to the lLCConnection2IVMOTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -8015,8 +8873,7 @@ lLCConnection2IVMOTable_add(struct lLCConnection2IVMOTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCConnection2IVMOTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -8031,8 +8888,9 @@ lLCConnection2IVMOTable_add(struct lLCConnection2IVMOTable_data *thedata)
 
 /**
  * @fn int lLCConnection2IVMOTable_del(struct lLCConnection2IVMOTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCConnection2IVMOTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -8061,6 +8919,7 @@ lLCConnection2IVMOTable_del(struct lLCConnection2IVMOTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCConnection2IVMOTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCConnection2IVMOTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -8164,6 +9023,7 @@ store_lLCConnection2IVMOTable(int majorID, int minorID, void *serverarg, void *c
 /**
  * @fn struct lLCConnectionlessAckTable_data *lLCConnectionlessAckTable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCConnectionlessAckTable table.
+ *
  * Creates a new lLCConnectionlessAckTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -8173,7 +9033,7 @@ lLCConnectionlessAckTable_create(void)
 {
 	struct lLCConnectionlessAckTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionlessAckTable_data);
 
-	DBUGMSGTL(("lLCConnectionlessAckTable", "creating row...  "));
+	DEBUGMSGTL(("lLCConnectionlessAckTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -8183,12 +9043,38 @@ lLCConnectionlessAckTable_create(void)
 }
 
 /**
+ * @fn struct lLCConnectionlessAckTable_data *lLCConnectionlessAckTable_duplicate(struct lLCConnectionlessAckTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCConnectionlessAckTable_data *
+lLCConnectionlessAckTable_duplicate(struct lLCConnectionlessAckTable_data *thedata)
+{
+	struct lLCConnectionlessAckTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionlessAckTable_data);
+
+	DEBUGMSGTL(("lLCConnectionlessAckTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCConnectionlessAckTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCConnectionlessAckTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCConnectionlessAckTable_destroy(struct lLCConnectionlessAckTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -8217,6 +9103,7 @@ lLCConnectionlessAckTable_destroy(struct lLCConnectionlessAckTable_data **thedat
  * @fn int lLCConnectionlessAckTable_add(struct lLCConnectionlessAckTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCConnectionlessAckTable table data set.
+ *
  * Adds a table row structure to the lLCConnectionlessAckTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -8227,8 +9114,7 @@ lLCConnectionlessAckTable_add(struct lLCConnectionlessAckTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCConnectionlessAckTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -8245,8 +9131,9 @@ lLCConnectionlessAckTable_add(struct lLCConnectionlessAckTable_data *thedata)
 
 /**
  * @fn int lLCConnectionlessAckTable_del(struct lLCConnectionlessAckTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCConnectionlessAckTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -8275,6 +9162,7 @@ lLCConnectionlessAckTable_del(struct lLCConnectionlessAckTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCConnectionlessAckTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCConnectionlessAckTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -8426,6 +9314,7 @@ store_lLCConnectionlessAckTable(int majorID, int minorID, void *serverarg, void 
 /**
  * @fn struct lLCConnectionlessAckIVMOTable_data *lLCConnectionlessAckIVMOTable_create(void)
  * @brief create a fresh data structure representing a new row in the lLCConnectionlessAckIVMOTable table.
+ *
  * Creates a new lLCConnectionlessAckIVMOTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -8435,7 +9324,7 @@ lLCConnectionlessAckIVMOTable_create(void)
 {
 	struct lLCConnectionlessAckIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionlessAckIVMOTable_data);
 
-	DBUGMSGTL(("lLCConnectionlessAckIVMOTable", "creating row...  "));
+	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->lLCConnectionlessAckIVMORowStatus = RS_NOTREADY;
@@ -8445,12 +9334,38 @@ lLCConnectionlessAckIVMOTable_create(void)
 }
 
 /**
+ * @fn struct lLCConnectionlessAckIVMOTable_data *lLCConnectionlessAckIVMOTable_duplicate(struct lLCConnectionlessAckIVMOTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct lLCConnectionlessAckIVMOTable_data *
+lLCConnectionlessAckIVMOTable_duplicate(struct lLCConnectionlessAckIVMOTable_data *thedata)
+{
+	struct lLCConnectionlessAckIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionlessAckIVMOTable_data);
+
+	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	lLCConnectionlessAckIVMOTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int lLCConnectionlessAckIVMOTable_destroy(struct lLCConnectionlessAckIVMOTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -8477,6 +9392,7 @@ lLCConnectionlessAckIVMOTable_destroy(struct lLCConnectionlessAckIVMOTable_data 
  * @fn int lLCConnectionlessAckIVMOTable_add(struct lLCConnectionlessAckIVMOTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the lLCConnectionlessAckIVMOTable table data set.
+ *
  * Adds a table row structure to the lLCConnectionlessAckIVMOTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -8487,8 +9403,7 @@ lLCConnectionlessAckIVMOTable_add(struct lLCConnectionlessAckIVMOTable_data *the
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -8503,8 +9418,9 @@ lLCConnectionlessAckIVMOTable_add(struct lLCConnectionlessAckIVMOTable_data *the
 
 /**
  * @fn int lLCConnectionlessAckIVMOTable_del(struct lLCConnectionlessAckIVMOTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the lLCConnectionlessAckIVMOTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -8533,6 +9449,7 @@ lLCConnectionlessAckIVMOTable_del(struct lLCConnectionlessAckIVMOTable_data *the
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for lLCConnectionlessAckIVMOTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case lLCConnectionlessAckIVMOTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -8614,6 +9531,7 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
 /**
  * @fn struct networkEntityTable_data *networkEntityTable_create(void)
  * @brief create a fresh data structure representing a new row in the networkEntityTable table.
+ *
  * Creates a new networkEntityTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -8623,7 +9541,7 @@ networkEntityTable_create(void)
 {
 	struct networkEntityTable_data *StorageNew = SNMP_MALLOC_STRUCT(networkEntityTable_data);
 
-	DBUGMSGTL(("networkEntityTable", "creating row...  "));
+	DEBUGMSGTL(("networkEntityTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->networkEntityRowStatus = RS_NOTREADY;
@@ -8633,12 +9551,38 @@ networkEntityTable_create(void)
 }
 
 /**
+ * @fn struct networkEntityTable_data *networkEntityTable_duplicate(struct networkEntityTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct networkEntityTable_data *
+networkEntityTable_duplicate(struct networkEntityTable_data *thedata)
+{
+	struct networkEntityTable_data *StorageNew = SNMP_MALLOC_STRUCT(networkEntityTable_data);
+
+	DEBUGMSGTL(("networkEntityTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("networkEntityTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	networkEntityTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int networkEntityTable_destroy(struct networkEntityTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -8665,6 +9609,7 @@ networkEntityTable_destroy(struct networkEntityTable_data **thedata)
  * @fn int networkEntityTable_add(struct networkEntityTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the networkEntityTable table data set.
+ *
  * Adds a table row structure to the networkEntityTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -8675,8 +9620,7 @@ networkEntityTable_add(struct networkEntityTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("networkEntityTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	header_complex_add_data(&networkEntityTableStorage, vars, thedata);
@@ -8687,8 +9631,9 @@ networkEntityTable_add(struct networkEntityTable_data *thedata)
 
 /**
  * @fn int networkEntityTable_del(struct networkEntityTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the networkEntityTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -8717,6 +9662,7 @@ networkEntityTable_del(struct networkEntityTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for networkEntityTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case networkEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -8794,6 +9740,7 @@ store_networkEntityTable(int majorID, int minorID, void *serverarg, void *client
 /**
  * @fn struct nSAPTable_data *nSAPTable_create(void)
  * @brief create a fresh data structure representing a new row in the nSAPTable table.
+ *
  * Creates a new nSAPTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -8803,7 +9750,7 @@ nSAPTable_create(void)
 {
 	struct nSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(nSAPTable_data);
 
-	DBUGMSGTL(("nSAPTable", "creating row...  "));
+	DEBUGMSGTL(("nSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->nSAPRowStatus = RS_NOTREADY;
@@ -8813,12 +9760,38 @@ nSAPTable_create(void)
 }
 
 /**
+ * @fn struct nSAPTable_data *nSAPTable_duplicate(struct nSAPTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct nSAPTable_data *
+nSAPTable_duplicate(struct nSAPTable_data *thedata)
+{
+	struct nSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(nSAPTable_data);
+
+	DEBUGMSGTL(("nSAPTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("nSAPTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	nSAPTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int nSAPTable_destroy(struct nSAPTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -8841,6 +9814,7 @@ nSAPTable_destroy(struct nSAPTable_data **thedata)
  * @fn int nSAPTable_add(struct nSAPTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the nSAPTable table data set.
+ *
  * Adds a table row structure to the nSAPTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -8851,8 +9825,7 @@ nSAPTable_add(struct nSAPTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("nSAPTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* sapId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sapId, thedata->sapIdLen);
 	header_complex_add_data(&nSAPTableStorage, vars, thedata);
@@ -8863,8 +9836,9 @@ nSAPTable_add(struct nSAPTable_data *thedata)
 
 /**
  * @fn int nSAPTable_del(struct nSAPTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the nSAPTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -8893,6 +9867,7 @@ nSAPTable_del(struct nSAPTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for nSAPTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case nSAPTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -8958,6 +9933,7 @@ store_nSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct cLNSTable_data *cLNSTable_create(void)
  * @brief create a fresh data structure representing a new row in the cLNSTable table.
+ *
  * Creates a new cLNSTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -8967,10 +9943,10 @@ cLNSTable_create(void)
 {
 	struct cLNSTable_data *StorageNew = SNMP_MALLOC_STRUCT(cLNSTable_data);
 
-	DBUGMSGTL(("cLNSTable", "creating row...  "));
+	DEBUGMSGTL(("cLNSTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->cLNSEnableChecksum = false;
+		StorageNew->cLNSEnableChecksum = TV_FALSE;
 		StorageNew->cLNSRowStatus = RS_NOTREADY;
 	}
 	DEBUGMSGTL(("cLNSTable", "done.\n"));
@@ -8978,12 +9954,38 @@ cLNSTable_create(void)
 }
 
 /**
+ * @fn struct cLNSTable_data *cLNSTable_duplicate(struct cLNSTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct cLNSTable_data *
+cLNSTable_duplicate(struct cLNSTable_data *thedata)
+{
+	struct cLNSTable_data *StorageNew = SNMP_MALLOC_STRUCT(cLNSTable_data);
+
+	DEBUGMSGTL(("cLNSTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("cLNSTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	cLNSTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int cLNSTable_destroy(struct cLNSTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -9012,6 +10014,7 @@ cLNSTable_destroy(struct cLNSTable_data **thedata)
  * @fn int cLNSTable_add(struct cLNSTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the cLNSTable table data set.
+ *
  * Adds a table row structure to the cLNSTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -9022,8 +10025,7 @@ cLNSTable_add(struct cLNSTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("cLNSTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -9036,8 +10038,9 @@ cLNSTable_add(struct cLNSTable_data *thedata)
 
 /**
  * @fn int cLNSTable_del(struct cLNSTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the cLNSTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -9066,6 +10069,7 @@ cLNSTable_del(struct cLNSTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for cLNSTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case cLNSTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -9171,6 +10175,7 @@ store_cLNSTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct cLNSISISTable_data *cLNSISISTable_create(void)
  * @brief create a fresh data structure representing a new row in the cLNSISISTable table.
+ *
  * Creates a new cLNSISISTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -9180,7 +10185,7 @@ cLNSISISTable_create(void)
 {
 	struct cLNSISISTable_data *StorageNew = SNMP_MALLOC_STRUCT(cLNSISISTable_data);
 
-	DBUGMSGTL(("cLNSISISTable", "creating row...  "));
+	DEBUGMSGTL(("cLNSISISTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->cLNSISISRowStatus = RS_NOTREADY;
@@ -9190,12 +10195,38 @@ cLNSISISTable_create(void)
 }
 
 /**
+ * @fn struct cLNSISISTable_data *cLNSISISTable_duplicate(struct cLNSISISTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct cLNSISISTable_data *
+cLNSISISTable_duplicate(struct cLNSISISTable_data *thedata)
+{
+	struct cLNSISISTable_data *StorageNew = SNMP_MALLOC_STRUCT(cLNSISISTable_data);
+
+	DEBUGMSGTL(("cLNSISISTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("cLNSISISTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	cLNSISISTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int cLNSISISTable_destroy(struct cLNSISISTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -9232,6 +10263,7 @@ cLNSISISTable_destroy(struct cLNSISISTable_data **thedata)
  * @fn int cLNSISISTable_add(struct cLNSISISTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the cLNSISISTable table data set.
+ *
  * Adds a table row structure to the cLNSISISTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -9242,8 +10274,7 @@ cLNSISISTable_add(struct cLNSISISTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("cLNSISISTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -9256,8 +10287,9 @@ cLNSISISTable_add(struct cLNSISISTable_data *thedata)
 
 /**
  * @fn int cLNSISISTable_del(struct cLNSISISTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the cLNSISISTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -9286,6 +10318,7 @@ cLNSISISTable_del(struct cLNSISISTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for cLNSISISTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case cLNSISISTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -9443,6 +10476,7 @@ store_cLNSISISTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct cLNSISISLevel2Table_data *cLNSISISLevel2Table_create(void)
  * @brief create a fresh data structure representing a new row in the cLNSISISLevel2Table table.
+ *
  * Creates a new cLNSISISLevel2Table_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -9452,7 +10486,7 @@ cLNSISISLevel2Table_create(void)
 {
 	struct cLNSISISLevel2Table_data *StorageNew = SNMP_MALLOC_STRUCT(cLNSISISLevel2Table_data);
 
-	DBUGMSGTL(("cLNSISISLevel2Table", "creating row...  "));
+	DEBUGMSGTL(("cLNSISISLevel2Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->cLNSISISLevel2RowStatus = RS_NOTREADY;
@@ -9462,12 +10496,38 @@ cLNSISISLevel2Table_create(void)
 }
 
 /**
+ * @fn struct cLNSISISLevel2Table_data *cLNSISISLevel2Table_duplicate(struct cLNSISISLevel2Table_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct cLNSISISLevel2Table_data *
+cLNSISISLevel2Table_duplicate(struct cLNSISISLevel2Table_data *thedata)
+{
+	struct cLNSISISLevel2Table_data *StorageNew = SNMP_MALLOC_STRUCT(cLNSISISLevel2Table_data);
+
+	DEBUGMSGTL(("cLNSISISLevel2Table", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("cLNSISISLevel2Table", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	cLNSISISLevel2Table_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int cLNSISISLevel2Table_destroy(struct cLNSISISLevel2Table_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -9498,6 +10558,7 @@ cLNSISISLevel2Table_destroy(struct cLNSISISLevel2Table_data **thedata)
  * @fn int cLNSISISLevel2Table_add(struct cLNSISISLevel2Table_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the cLNSISISLevel2Table table data set.
+ *
  * Adds a table row structure to the cLNSISISLevel2Table table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -9508,8 +10569,7 @@ cLNSISISLevel2Table_add(struct cLNSISISLevel2Table_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("cLNSISISLevel2Table", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* coProtocolMachineId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->coProtocolMachineId, thedata->coProtocolMachineIdLen);
 	header_complex_add_data(&cLNSISISLevel2TableStorage, vars, thedata);
@@ -9520,8 +10580,9 @@ cLNSISISLevel2Table_add(struct cLNSISISLevel2Table_data *thedata)
 
 /**
  * @fn int cLNSISISLevel2Table_del(struct cLNSISISLevel2Table_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the cLNSISISLevel2Table table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -9550,6 +10611,7 @@ cLNSISISLevel2Table_del(struct cLNSISISLevel2Table_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for cLNSISISLevel2Table entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case cLNSISISLevel2Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -9651,6 +10713,7 @@ store_cLNSISISLevel2Table(int majorID, int minorID, void *serverarg, void *clien
 /**
  * @fn struct linkageTable_data *linkageTable_create(void)
  * @brief create a fresh data structure representing a new row in the linkageTable table.
+ *
  * Creates a new linkageTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -9660,7 +10723,7 @@ linkageTable_create(void)
 {
 	struct linkageTable_data *StorageNew = SNMP_MALLOC_STRUCT(linkageTable_data);
 
-	DBUGMSGTL(("linkageTable", "creating row...  "));
+	DEBUGMSGTL(("linkageTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->linkageRowStatus = RS_NOTREADY;
@@ -9670,12 +10733,38 @@ linkageTable_create(void)
 }
 
 /**
+ * @fn struct linkageTable_data *linkageTable_duplicate(struct linkageTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct linkageTable_data *
+linkageTable_duplicate(struct linkageTable_data *thedata)
+{
+	struct linkageTable_data *StorageNew = SNMP_MALLOC_STRUCT(linkageTable_data);
+
+	DEBUGMSGTL(("linkageTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("linkageTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	linkageTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int linkageTable_destroy(struct linkageTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -9786,6 +10875,7 @@ linkageTable_destroy(struct linkageTable_data **thedata)
  * @fn int linkageTable_add(struct linkageTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the linkageTable table data set.
+ *
  * Adds a table row structure to the linkageTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -9796,8 +10886,7 @@ linkageTable_add(struct linkageTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("linkageTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* protocolMachineId */
@@ -9812,8 +10901,9 @@ linkageTable_add(struct linkageTable_data *thedata)
 
 /**
  * @fn int linkageTable_del(struct linkageTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the linkageTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -9842,6 +10932,7 @@ linkageTable_del(struct linkageTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for linkageTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case linkageTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -10223,6 +11314,7 @@ store_linkageTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct cONSTable_data *cONSTable_create(void)
  * @brief create a fresh data structure representing a new row in the cONSTable table.
+ *
  * Creates a new cONSTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -10232,7 +11324,7 @@ cONSTable_create(void)
 {
 	struct cONSTable_data *StorageNew = SNMP_MALLOC_STRUCT(cONSTable_data);
 
-	DBUGMSGTL(("cONSTable", "creating row...  "));
+	DEBUGMSGTL(("cONSTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->cONSRowStatus = RS_NOTREADY;
@@ -10242,12 +11334,38 @@ cONSTable_create(void)
 }
 
 /**
+ * @fn struct cONSTable_data *cONSTable_duplicate(struct cONSTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct cONSTable_data *
+cONSTable_duplicate(struct cONSTable_data *thedata)
+{
+	struct cONSTable_data *StorageNew = SNMP_MALLOC_STRUCT(cONSTable_data);
+
+	DEBUGMSGTL(("cONSTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("cONSTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	cONSTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int cONSTable_destroy(struct cONSTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -10274,6 +11392,7 @@ cONSTable_destroy(struct cONSTable_data **thedata)
  * @fn int cONSTable_add(struct cONSTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the cONSTable table data set.
+ *
  * Adds a table row structure to the cONSTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -10284,8 +11403,7 @@ cONSTable_add(struct cONSTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("cONSTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -10298,8 +11416,9 @@ cONSTable_add(struct cONSTable_data *thedata)
 
 /**
  * @fn int cONSTable_del(struct cONSTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the cONSTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -10328,6 +11447,7 @@ cONSTable_del(struct cONSTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for cONSTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case cONSTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -10407,6 +11527,7 @@ store_cONSTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct networkConnectionTable_data *networkConnectionTable_create(void)
  * @brief create a fresh data structure representing a new row in the networkConnectionTable table.
+ *
  * Creates a new networkConnectionTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -10416,7 +11537,7 @@ networkConnectionTable_create(void)
 {
 	struct networkConnectionTable_data *StorageNew = SNMP_MALLOC_STRUCT(networkConnectionTable_data);
 
-	DBUGMSGTL(("networkConnectionTable", "creating row...  "));
+	DEBUGMSGTL(("networkConnectionTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->networkConnectionRowStatus = RS_NOTREADY;
@@ -10426,12 +11547,38 @@ networkConnectionTable_create(void)
 }
 
 /**
+ * @fn struct networkConnectionTable_data *networkConnectionTable_duplicate(struct networkConnectionTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct networkConnectionTable_data *
+networkConnectionTable_duplicate(struct networkConnectionTable_data *thedata)
+{
+	struct networkConnectionTable_data *StorageNew = SNMP_MALLOC_STRUCT(networkConnectionTable_data);
+
+	DEBUGMSGTL(("networkConnectionTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("networkConnectionTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	networkConnectionTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int networkConnectionTable_destroy(struct networkConnectionTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -10462,6 +11609,7 @@ networkConnectionTable_destroy(struct networkConnectionTable_data **thedata)
  * @fn int networkConnectionTable_add(struct networkConnectionTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the networkConnectionTable table data set.
+ *
  * Adds a table row structure to the networkConnectionTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -10472,8 +11620,7 @@ networkConnectionTable_add(struct networkConnectionTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("networkConnectionTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* coProtocolMachineId */
@@ -10488,8 +11635,9 @@ networkConnectionTable_add(struct networkConnectionTable_data *thedata)
 
 /**
  * @fn int networkConnectionTable_del(struct networkConnectionTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the networkConnectionTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -10518,6 +11666,7 @@ networkConnectionTable_del(struct networkConnectionTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for networkConnectionTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case networkConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -10607,6 +11756,7 @@ store_networkConnectionTable(int majorID, int minorID, void *serverarg, void *cl
 /**
  * @fn struct x25PLETable_data *x25PLETable_create(void)
  * @brief create a fresh data structure representing a new row in the x25PLETable table.
+ *
  * Creates a new x25PLETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -10616,7 +11766,7 @@ x25PLETable_create(void)
 {
 	struct x25PLETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLETable_data);
 
-	DBUGMSGTL(("x25PLETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLERowStatus = RS_NOTREADY;
@@ -10626,12 +11776,38 @@ x25PLETable_create(void)
 }
 
 /**
+ * @fn struct x25PLETable_data *x25PLETable_duplicate(struct x25PLETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct x25PLETable_data *
+x25PLETable_duplicate(struct x25PLETable_data *thedata)
+{
+	struct x25PLETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLETable_data);
+
+	DEBUGMSGTL(("x25PLETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("x25PLETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	x25PLETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int x25PLETable_destroy(struct x25PLETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -10738,6 +11914,7 @@ x25PLETable_destroy(struct x25PLETable_data **thedata)
  * @fn int x25PLETable_add(struct x25PLETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the x25PLETable table data set.
+ *
  * Adds a table row structure to the x25PLETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -10748,8 +11925,7 @@ x25PLETable_add(struct x25PLETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("x25PLETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	header_complex_add_data(&x25PLETableStorage, vars, thedata);
@@ -10760,8 +11936,9 @@ x25PLETable_add(struct x25PLETable_data *thedata)
 
 /**
  * @fn int x25PLETable_del(struct x25PLETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the x25PLETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -10790,6 +11967,7 @@ x25PLETable_del(struct x25PLETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x25PLETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case x25PLETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -11121,6 +12299,7 @@ store_x25PLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct x25PLE_DTETable_data *x25PLE_DTETable_create(void)
  * @brief create a fresh data structure representing a new row in the x25PLE_DTETable table.
+ *
  * Creates a new x25PLE_DTETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -11130,7 +12309,7 @@ x25PLE_DTETable_create(void)
 {
 	struct x25PLE_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLE_DTETable_data);
 
-	DBUGMSGTL(("x25PLE_DTETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLE_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -11140,12 +12319,38 @@ x25PLE_DTETable_create(void)
 }
 
 /**
+ * @fn struct x25PLE_DTETable_data *x25PLE_DTETable_duplicate(struct x25PLE_DTETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct x25PLE_DTETable_data *
+x25PLE_DTETable_duplicate(struct x25PLE_DTETable_data *thedata)
+{
+	struct x25PLE_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLE_DTETable_data);
+
+	DEBUGMSGTL(("x25PLE_DTETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("x25PLE_DTETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	x25PLE_DTETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int x25PLE_DTETable_destroy(struct x25PLE_DTETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -11204,6 +12409,7 @@ x25PLE_DTETable_destroy(struct x25PLE_DTETable_data **thedata)
  * @fn int x25PLE_DTETable_add(struct x25PLE_DTETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the x25PLE_DTETable table data set.
+ *
  * Adds a table row structure to the x25PLE_DTETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -11214,8 +12420,7 @@ x25PLE_DTETable_add(struct x25PLE_DTETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("x25PLE_DTETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	header_complex_add_data(&x25PLE_DTETableStorage, vars, thedata);
@@ -11226,8 +12431,9 @@ x25PLE_DTETable_add(struct x25PLE_DTETable_data *thedata)
 
 /**
  * @fn int x25PLE_DTETable_del(struct x25PLE_DTETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the x25PLE_DTETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -11256,6 +12462,7 @@ x25PLE_DTETable_del(struct x25PLE_DTETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x25PLE_DTETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case x25PLE_DTETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -11471,6 +12678,7 @@ store_x25PLE_DTETable(int majorID, int minorID, void *serverarg, void *clientarg
 /**
  * @fn struct x25PLE_DCETable_data *x25PLE_DCETable_create(void)
  * @brief create a fresh data structure representing a new row in the x25PLE_DCETable table.
+ *
  * Creates a new x25PLE_DCETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -11480,7 +12688,7 @@ x25PLE_DCETable_create(void)
 {
 	struct x25PLE_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLE_DCETable_data);
 
-	DBUGMSGTL(("x25PLE_DCETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLE_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -11490,12 +12698,38 @@ x25PLE_DCETable_create(void)
 }
 
 /**
+ * @fn struct x25PLE_DCETable_data *x25PLE_DCETable_duplicate(struct x25PLE_DCETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct x25PLE_DCETable_data *
+x25PLE_DCETable_duplicate(struct x25PLE_DCETable_data *thedata)
+{
+	struct x25PLE_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLE_DCETable_data);
+
+	DEBUGMSGTL(("x25PLE_DCETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("x25PLE_DCETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	x25PLE_DCETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int x25PLE_DCETable_destroy(struct x25PLE_DCETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -11532,6 +12766,7 @@ x25PLE_DCETable_destroy(struct x25PLE_DCETable_data **thedata)
  * @fn int x25PLE_DCETable_add(struct x25PLE_DCETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the x25PLE_DCETable table data set.
+ *
  * Adds a table row structure to the x25PLE_DCETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -11542,8 +12777,7 @@ x25PLE_DCETable_add(struct x25PLE_DCETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("x25PLE_DCETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	header_complex_add_data(&x25PLE_DCETableStorage, vars, thedata);
@@ -11554,8 +12788,9 @@ x25PLE_DCETable_add(struct x25PLE_DCETable_data *thedata)
 
 /**
  * @fn int x25PLE_DCETable_del(struct x25PLE_DCETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the x25PLE_DCETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -11584,6 +12819,7 @@ x25PLE_DCETable_del(struct x25PLE_DCETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x25PLE_DCETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case x25PLE_DCETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -11771,6 +13007,7 @@ store_x25PLE_DCETable(int majorID, int minorID, void *serverarg, void *clientarg
 /**
  * @fn struct x25PLEIVMOTable_data *x25PLEIVMOTable_create(void)
  * @brief create a fresh data structure representing a new row in the x25PLEIVMOTable table.
+ *
  * Creates a new x25PLEIVMOTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -11780,7 +13017,7 @@ x25PLEIVMOTable_create(void)
 {
 	struct x25PLEIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMOTable_data);
 
-	DBUGMSGTL(("x25PLEIVMOTable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEIVMORowStatus = RS_NOTREADY;
@@ -11790,12 +13027,38 @@ x25PLEIVMOTable_create(void)
 }
 
 /**
+ * @fn struct x25PLEIVMOTable_data *x25PLEIVMOTable_duplicate(struct x25PLEIVMOTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct x25PLEIVMOTable_data *
+x25PLEIVMOTable_duplicate(struct x25PLEIVMOTable_data *thedata)
+{
+	struct x25PLEIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMOTable_data);
+
+	DEBUGMSGTL(("x25PLEIVMOTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("x25PLEIVMOTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	x25PLEIVMOTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int x25PLEIVMOTable_destroy(struct x25PLEIVMOTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -11858,6 +13121,7 @@ x25PLEIVMOTable_destroy(struct x25PLEIVMOTable_data **thedata)
  * @fn int x25PLEIVMOTable_add(struct x25PLEIVMOTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the x25PLEIVMOTable table data set.
+ *
  * Adds a table row structure to the x25PLEIVMOTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -11868,8 +13132,7 @@ x25PLEIVMOTable_add(struct x25PLEIVMOTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("x25PLEIVMOTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEIVMOId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEIVMOId, thedata->x25PLEIVMOIdLen);
 	header_complex_add_data(&x25PLEIVMOTableStorage, vars, thedata);
@@ -11880,8 +13143,9 @@ x25PLEIVMOTable_add(struct x25PLEIVMOTable_data *thedata)
 
 /**
  * @fn int x25PLEIVMOTable_del(struct x25PLEIVMOTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the x25PLEIVMOTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -11910,6 +13174,7 @@ x25PLEIVMOTable_del(struct x25PLEIVMOTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x25PLEIVMOTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case x25PLEIVMOTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -12101,6 +13366,7 @@ store_x25PLEIVMOTable(int majorID, int minorID, void *serverarg, void *clientarg
 /**
  * @fn struct x25PLEIVMO_DTETable_data *x25PLEIVMO_DTETable_create(void)
  * @brief create a fresh data structure representing a new row in the x25PLEIVMO_DTETable table.
+ *
  * Creates a new x25PLEIVMO_DTETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -12110,7 +13376,7 @@ x25PLEIVMO_DTETable_create(void)
 {
 	struct x25PLEIVMO_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMO_DTETable_data);
 
-	DBUGMSGTL(("x25PLEIVMO_DTETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEIVMO_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEIVMO_DTERowStatus = RS_NOTREADY;
@@ -12120,12 +13386,38 @@ x25PLEIVMO_DTETable_create(void)
 }
 
 /**
+ * @fn struct x25PLEIVMO_DTETable_data *x25PLEIVMO_DTETable_duplicate(struct x25PLEIVMO_DTETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct x25PLEIVMO_DTETable_data *
+x25PLEIVMO_DTETable_duplicate(struct x25PLEIVMO_DTETable_data *thedata)
+{
+	struct x25PLEIVMO_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMO_DTETable_data);
+
+	DEBUGMSGTL(("x25PLEIVMO_DTETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("x25PLEIVMO_DTETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	x25PLEIVMO_DTETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int x25PLEIVMO_DTETable_destroy(struct x25PLEIVMO_DTETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -12192,6 +13484,7 @@ x25PLEIVMO_DTETable_destroy(struct x25PLEIVMO_DTETable_data **thedata)
  * @fn int x25PLEIVMO_DTETable_add(struct x25PLEIVMO_DTETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the x25PLEIVMO_DTETable table data set.
+ *
  * Adds a table row structure to the x25PLEIVMO_DTETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -12202,8 +13495,7 @@ x25PLEIVMO_DTETable_add(struct x25PLEIVMO_DTETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("x25PLEIVMO_DTETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEIVMOId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEIVMOId, thedata->x25PLEIVMOIdLen);
 	header_complex_add_data(&x25PLEIVMO_DTETableStorage, vars, thedata);
@@ -12214,8 +13506,9 @@ x25PLEIVMO_DTETable_add(struct x25PLEIVMO_DTETable_data *thedata)
 
 /**
  * @fn int x25PLEIVMO_DTETable_del(struct x25PLEIVMO_DTETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the x25PLEIVMO_DTETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -12244,6 +13537,7 @@ x25PLEIVMO_DTETable_del(struct x25PLEIVMO_DTETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x25PLEIVMO_DTETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case x25PLEIVMO_DTETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -12480,6 +13774,7 @@ store_x25PLEIVMO_DTETable(int majorID, int minorID, void *serverarg, void *clien
 /**
  * @fn struct x25PLEIVMO_DCETable_data *x25PLEIVMO_DCETable_create(void)
  * @brief create a fresh data structure representing a new row in the x25PLEIVMO_DCETable table.
+ *
  * Creates a new x25PLEIVMO_DCETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -12489,7 +13784,7 @@ x25PLEIVMO_DCETable_create(void)
 {
 	struct x25PLEIVMO_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMO_DCETable_data);
 
-	DBUGMSGTL(("x25PLEIVMO_DCETable", "creating row...  "));
+	DEBUGMSGTL(("x25PLEIVMO_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEIVMO_DCERowStatus = RS_NOTREADY;
@@ -12499,12 +13794,38 @@ x25PLEIVMO_DCETable_create(void)
 }
 
 /**
+ * @fn struct x25PLEIVMO_DCETable_data *x25PLEIVMO_DCETable_duplicate(struct x25PLEIVMO_DCETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct x25PLEIVMO_DCETable_data *
+x25PLEIVMO_DCETable_duplicate(struct x25PLEIVMO_DCETable_data *thedata)
+{
+	struct x25PLEIVMO_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(x25PLEIVMO_DCETable_data);
+
+	DEBUGMSGTL(("x25PLEIVMO_DCETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("x25PLEIVMO_DCETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	x25PLEIVMO_DCETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int x25PLEIVMO_DCETable_destroy(struct x25PLEIVMO_DCETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -12527,6 +13848,7 @@ x25PLEIVMO_DCETable_destroy(struct x25PLEIVMO_DCETable_data **thedata)
  * @fn int x25PLEIVMO_DCETable_add(struct x25PLEIVMO_DCETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the x25PLEIVMO_DCETable table data set.
+ *
  * Adds a table row structure to the x25PLEIVMO_DCETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -12537,8 +13859,7 @@ x25PLEIVMO_DCETable_add(struct x25PLEIVMO_DCETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("x25PLEIVMO_DCETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEIVMOId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEIVMOId, thedata->x25PLEIVMOIdLen);
 	header_complex_add_data(&x25PLEIVMO_DCETableStorage, vars, thedata);
@@ -12549,8 +13870,9 @@ x25PLEIVMO_DCETable_add(struct x25PLEIVMO_DCETable_data *thedata)
 
 /**
  * @fn int x25PLEIVMO_DCETable_del(struct x25PLEIVMO_DCETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the x25PLEIVMO_DCETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -12579,6 +13901,7 @@ x25PLEIVMO_DCETable_del(struct x25PLEIVMO_DCETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x25PLEIVMO_DCETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case x25PLEIVMO_DCETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -12644,6 +13967,7 @@ store_x25PLEIVMO_DCETable(int majorID, int minorID, void *serverarg, void *clien
 /**
  * @fn struct virtualCallTable_data *virtualCallTable_create(void)
  * @brief create a fresh data structure representing a new row in the virtualCallTable table.
+ *
  * Creates a new virtualCallTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -12653,7 +13977,7 @@ virtualCallTable_create(void)
 {
 	struct virtualCallTable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCallTable_data);
 
-	DBUGMSGTL(("virtualCallTable", "creating row...  "));
+	DEBUGMSGTL(("virtualCallTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -12663,12 +13987,38 @@ virtualCallTable_create(void)
 }
 
 /**
+ * @fn struct virtualCallTable_data *virtualCallTable_duplicate(struct virtualCallTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct virtualCallTable_data *
+virtualCallTable_duplicate(struct virtualCallTable_data *thedata)
+{
+	struct virtualCallTable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCallTable_data);
+
+	DEBUGMSGTL(("virtualCallTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("virtualCallTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	virtualCallTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int virtualCallTable_destroy(struct virtualCallTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -12719,6 +14069,7 @@ virtualCallTable_destroy(struct virtualCallTable_data **thedata)
  * @fn int virtualCallTable_add(struct virtualCallTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the virtualCallTable table data set.
+ *
  * Adds a table row structure to the virtualCallTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -12729,8 +14080,7 @@ virtualCallTable_add(struct virtualCallTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("virtualCallTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* virtualCallId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->virtualCallId, thedata->virtualCallIdLen);
 	header_complex_add_data(&virtualCallTableStorage, vars, thedata);
@@ -12741,8 +14091,9 @@ virtualCallTable_add(struct virtualCallTable_data *thedata)
 
 /**
  * @fn int virtualCallTable_del(struct virtualCallTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the virtualCallTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -12771,6 +14122,7 @@ virtualCallTable_del(struct virtualCallTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for virtualCallTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case virtualCallTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -12918,6 +14270,7 @@ store_virtualCallTable(int majorID, int minorID, void *serverarg, void *clientar
 /**
  * @fn struct virtualCircuitTable_data *virtualCircuitTable_create(void)
  * @brief create a fresh data structure representing a new row in the virtualCircuitTable table.
+ *
  * Creates a new virtualCircuitTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -12927,7 +14280,7 @@ virtualCircuitTable_create(void)
 {
 	struct virtualCircuitTable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCircuitTable_data);
 
-	DBUGMSGTL(("virtualCircuitTable", "creating row...  "));
+	DEBUGMSGTL(("virtualCircuitTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -12937,12 +14290,38 @@ virtualCircuitTable_create(void)
 }
 
 /**
+ * @fn struct virtualCircuitTable_data *virtualCircuitTable_duplicate(struct virtualCircuitTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct virtualCircuitTable_data *
+virtualCircuitTable_duplicate(struct virtualCircuitTable_data *thedata)
+{
+	struct virtualCircuitTable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCircuitTable_data);
+
+	DEBUGMSGTL(("virtualCircuitTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("virtualCircuitTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	virtualCircuitTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int virtualCircuitTable_destroy(struct virtualCircuitTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -12973,6 +14352,7 @@ virtualCircuitTable_destroy(struct virtualCircuitTable_data **thedata)
  * @fn int virtualCircuitTable_add(struct virtualCircuitTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the virtualCircuitTable table data set.
+ *
  * Adds a table row structure to the virtualCircuitTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -12983,8 +14363,7 @@ virtualCircuitTable_add(struct virtualCircuitTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("virtualCircuitTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* virtualCircuitId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->virtualCircuitId, thedata->virtualCircuitIdLen);
 	header_complex_add_data(&virtualCircuitTableStorage, vars, thedata);
@@ -12995,8 +14374,9 @@ virtualCircuitTable_add(struct virtualCircuitTable_data *thedata)
 
 /**
  * @fn int virtualCircuitTable_del(struct virtualCircuitTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the virtualCircuitTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -13025,6 +14405,7 @@ virtualCircuitTable_del(struct virtualCircuitTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for virtualCircuitTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case virtualCircuitTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -13112,6 +14493,7 @@ store_virtualCircuitTable(int majorID, int minorID, void *serverarg, void *clien
 /**
  * @fn struct virtualCircuit_DTETable_data *virtualCircuit_DTETable_create(void)
  * @brief create a fresh data structure representing a new row in the virtualCircuit_DTETable table.
+ *
  * Creates a new virtualCircuit_DTETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -13121,7 +14503,7 @@ virtualCircuit_DTETable_create(void)
 {
 	struct virtualCircuit_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCircuit_DTETable_data);
 
-	DBUGMSGTL(("virtualCircuit_DTETable", "creating row...  "));
+	DEBUGMSGTL(("virtualCircuit_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -13131,12 +14513,38 @@ virtualCircuit_DTETable_create(void)
 }
 
 /**
+ * @fn struct virtualCircuit_DTETable_data *virtualCircuit_DTETable_duplicate(struct virtualCircuit_DTETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct virtualCircuit_DTETable_data *
+virtualCircuit_DTETable_duplicate(struct virtualCircuit_DTETable_data *thedata)
+{
+	struct virtualCircuit_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCircuit_DTETable_data);
+
+	DEBUGMSGTL(("virtualCircuit_DTETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("virtualCircuit_DTETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	virtualCircuit_DTETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int virtualCircuit_DTETable_destroy(struct virtualCircuit_DTETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -13159,6 +14567,7 @@ virtualCircuit_DTETable_destroy(struct virtualCircuit_DTETable_data **thedata)
  * @fn int virtualCircuit_DTETable_add(struct virtualCircuit_DTETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the virtualCircuit_DTETable table data set.
+ *
  * Adds a table row structure to the virtualCircuit_DTETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -13169,8 +14578,7 @@ virtualCircuit_DTETable_add(struct virtualCircuit_DTETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("virtualCircuit_DTETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* virtualCircuitId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->virtualCircuitId, thedata->virtualCircuitIdLen);
 	header_complex_add_data(&virtualCircuit_DTETableStorage, vars, thedata);
@@ -13181,8 +14589,9 @@ virtualCircuit_DTETable_add(struct virtualCircuit_DTETable_data *thedata)
 
 /**
  * @fn int virtualCircuit_DTETable_del(struct virtualCircuit_DTETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the virtualCircuit_DTETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -13211,6 +14620,7 @@ virtualCircuit_DTETable_del(struct virtualCircuit_DTETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for virtualCircuit_DTETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case virtualCircuit_DTETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -13296,6 +14706,7 @@ store_virtualCircuit_DTETable(int majorID, int minorID, void *serverarg, void *c
 /**
  * @fn struct virtualCircuit_DCETable_data *virtualCircuit_DCETable_create(void)
  * @brief create a fresh data structure representing a new row in the virtualCircuit_DCETable table.
+ *
  * Creates a new virtualCircuit_DCETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -13305,7 +14716,7 @@ virtualCircuit_DCETable_create(void)
 {
 	struct virtualCircuit_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCircuit_DCETable_data);
 
-	DBUGMSGTL(("virtualCircuit_DCETable", "creating row...  "));
+	DEBUGMSGTL(("virtualCircuit_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -13315,12 +14726,38 @@ virtualCircuit_DCETable_create(void)
 }
 
 /**
+ * @fn struct virtualCircuit_DCETable_data *virtualCircuit_DCETable_duplicate(struct virtualCircuit_DCETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct virtualCircuit_DCETable_data *
+virtualCircuit_DCETable_duplicate(struct virtualCircuit_DCETable_data *thedata)
+{
+	struct virtualCircuit_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCircuit_DCETable_data);
+
+	DEBUGMSGTL(("virtualCircuit_DCETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("virtualCircuit_DCETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	virtualCircuit_DCETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int virtualCircuit_DCETable_destroy(struct virtualCircuit_DCETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -13343,6 +14780,7 @@ virtualCircuit_DCETable_destroy(struct virtualCircuit_DCETable_data **thedata)
  * @fn int virtualCircuit_DCETable_add(struct virtualCircuit_DCETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the virtualCircuit_DCETable table data set.
+ *
  * Adds a table row structure to the virtualCircuit_DCETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -13353,8 +14791,7 @@ virtualCircuit_DCETable_add(struct virtualCircuit_DCETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("virtualCircuit_DCETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* virtualCircuitId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->virtualCircuitId, thedata->virtualCircuitIdLen);
 	header_complex_add_data(&virtualCircuit_DCETableStorage, vars, thedata);
@@ -13365,8 +14802,9 @@ virtualCircuit_DCETable_add(struct virtualCircuit_DCETable_data *thedata)
 
 /**
  * @fn int virtualCircuit_DCETable_del(struct virtualCircuit_DCETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the virtualCircuit_DCETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -13395,6 +14833,7 @@ virtualCircuit_DCETable_del(struct virtualCircuit_DCETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for virtualCircuit_DCETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case virtualCircuit_DCETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -13486,6 +14925,7 @@ store_virtualCircuit_DCETable(int majorID, int minorID, void *serverarg, void *c
 /**
  * @fn struct permanentVirtualCircuitTable_data *permanentVirtualCircuitTable_create(void)
  * @brief create a fresh data structure representing a new row in the permanentVirtualCircuitTable table.
+ *
  * Creates a new permanentVirtualCircuitTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -13495,7 +14935,7 @@ permanentVirtualCircuitTable_create(void)
 {
 	struct permanentVirtualCircuitTable_data *StorageNew = SNMP_MALLOC_STRUCT(permanentVirtualCircuitTable_data);
 
-	DBUGMSGTL(("permanentVirtualCircuitTable", "creating row...  "));
+	DEBUGMSGTL(("permanentVirtualCircuitTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->permanentVirtualCircuitRowStatus = RS_NOTREADY;
@@ -13505,12 +14945,38 @@ permanentVirtualCircuitTable_create(void)
 }
 
 /**
+ * @fn struct permanentVirtualCircuitTable_data *permanentVirtualCircuitTable_duplicate(struct permanentVirtualCircuitTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct permanentVirtualCircuitTable_data *
+permanentVirtualCircuitTable_duplicate(struct permanentVirtualCircuitTable_data *thedata)
+{
+	struct permanentVirtualCircuitTable_data *StorageNew = SNMP_MALLOC_STRUCT(permanentVirtualCircuitTable_data);
+
+	DEBUGMSGTL(("permanentVirtualCircuitTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("permanentVirtualCircuitTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	permanentVirtualCircuitTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int permanentVirtualCircuitTable_destroy(struct permanentVirtualCircuitTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -13537,6 +15003,7 @@ permanentVirtualCircuitTable_destroy(struct permanentVirtualCircuitTable_data **
  * @fn int permanentVirtualCircuitTable_add(struct permanentVirtualCircuitTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the permanentVirtualCircuitTable table data set.
+ *
  * Adds a table row structure to the permanentVirtualCircuitTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -13547,8 +15014,7 @@ permanentVirtualCircuitTable_add(struct permanentVirtualCircuitTable_data *theda
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("permanentVirtualCircuitTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	/* virtualCallId */
@@ -13561,8 +15027,9 @@ permanentVirtualCircuitTable_add(struct permanentVirtualCircuitTable_data *theda
 
 /**
  * @fn int permanentVirtualCircuitTable_del(struct permanentVirtualCircuitTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the permanentVirtualCircuitTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -13591,6 +15058,7 @@ permanentVirtualCircuitTable_del(struct permanentVirtualCircuitTable_data *theda
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for permanentVirtualCircuitTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case permanentVirtualCircuitTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -13668,6 +15136,7 @@ store_permanentVirtualCircuitTable(int majorID, int minorID, void *serverarg, vo
 /**
  * @fn struct permanentVirtualCircuit_DTETable_data *permanentVirtualCircuit_DTETable_create(void)
  * @brief create a fresh data structure representing a new row in the permanentVirtualCircuit_DTETable table.
+ *
  * Creates a new permanentVirtualCircuit_DTETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -13677,7 +15146,7 @@ permanentVirtualCircuit_DTETable_create(void)
 {
 	struct permanentVirtualCircuit_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(permanentVirtualCircuit_DTETable_data);
 
-	DBUGMSGTL(("permanentVirtualCircuit_DTETable", "creating row...  "));
+	DEBUGMSGTL(("permanentVirtualCircuit_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->permanentVirtualCircuit_DTERowStatus = RS_NOTREADY;
@@ -13687,12 +15156,38 @@ permanentVirtualCircuit_DTETable_create(void)
 }
 
 /**
+ * @fn struct permanentVirtualCircuit_DTETable_data *permanentVirtualCircuit_DTETable_duplicate(struct permanentVirtualCircuit_DTETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct permanentVirtualCircuit_DTETable_data *
+permanentVirtualCircuit_DTETable_duplicate(struct permanentVirtualCircuit_DTETable_data *thedata)
+{
+	struct permanentVirtualCircuit_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(permanentVirtualCircuit_DTETable_data);
+
+	DEBUGMSGTL(("permanentVirtualCircuit_DTETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("permanentVirtualCircuit_DTETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	permanentVirtualCircuit_DTETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int permanentVirtualCircuit_DTETable_destroy(struct permanentVirtualCircuit_DTETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -13725,6 +15220,7 @@ permanentVirtualCircuit_DTETable_destroy(struct permanentVirtualCircuit_DTETable
  * @fn int permanentVirtualCircuit_DTETable_add(struct permanentVirtualCircuit_DTETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the permanentVirtualCircuit_DTETable table data set.
+ *
  * Adds a table row structure to the permanentVirtualCircuit_DTETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -13735,8 +15231,7 @@ permanentVirtualCircuit_DTETable_add(struct permanentVirtualCircuit_DTETable_dat
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("permanentVirtualCircuit_DTETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	/* virtualCircuitId */
@@ -13749,8 +15244,9 @@ permanentVirtualCircuit_DTETable_add(struct permanentVirtualCircuit_DTETable_dat
 
 /**
  * @fn int permanentVirtualCircuit_DTETable_del(struct permanentVirtualCircuit_DTETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the permanentVirtualCircuit_DTETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -13779,6 +15275,7 @@ permanentVirtualCircuit_DTETable_del(struct permanentVirtualCircuit_DTETable_dat
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for permanentVirtualCircuit_DTETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case permanentVirtualCircuit_DTETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -13874,6 +15371,7 @@ store_permanentVirtualCircuit_DTETable(int majorID, int minorID, void *serverarg
 /**
  * @fn struct permanentVirtualCircuit_DCETable_data *permanentVirtualCircuit_DCETable_create(void)
  * @brief create a fresh data structure representing a new row in the permanentVirtualCircuit_DCETable table.
+ *
  * Creates a new permanentVirtualCircuit_DCETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -13883,7 +15381,7 @@ permanentVirtualCircuit_DCETable_create(void)
 {
 	struct permanentVirtualCircuit_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(permanentVirtualCircuit_DCETable_data);
 
-	DBUGMSGTL(("permanentVirtualCircuit_DCETable", "creating row...  "));
+	DEBUGMSGTL(("permanentVirtualCircuit_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->permanentVirtualCircuit_DCERowStatus = RS_NOTREADY;
@@ -13893,12 +15391,38 @@ permanentVirtualCircuit_DCETable_create(void)
 }
 
 /**
+ * @fn struct permanentVirtualCircuit_DCETable_data *permanentVirtualCircuit_DCETable_duplicate(struct permanentVirtualCircuit_DCETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct permanentVirtualCircuit_DCETable_data *
+permanentVirtualCircuit_DCETable_duplicate(struct permanentVirtualCircuit_DCETable_data *thedata)
+{
+	struct permanentVirtualCircuit_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(permanentVirtualCircuit_DCETable_data);
+
+	DEBUGMSGTL(("permanentVirtualCircuit_DCETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("permanentVirtualCircuit_DCETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	permanentVirtualCircuit_DCETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int permanentVirtualCircuit_DCETable_destroy(struct permanentVirtualCircuit_DCETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -13937,6 +15461,7 @@ permanentVirtualCircuit_DCETable_destroy(struct permanentVirtualCircuit_DCETable
  * @fn int permanentVirtualCircuit_DCETable_add(struct permanentVirtualCircuit_DCETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the permanentVirtualCircuit_DCETable table data set.
+ *
  * Adds a table row structure to the permanentVirtualCircuit_DCETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -13947,8 +15472,7 @@ permanentVirtualCircuit_DCETable_add(struct permanentVirtualCircuit_DCETable_dat
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("permanentVirtualCircuit_DCETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	/* virtualCircuitId */
@@ -13961,8 +15485,9 @@ permanentVirtualCircuit_DCETable_add(struct permanentVirtualCircuit_DCETable_dat
 
 /**
  * @fn int permanentVirtualCircuit_DCETable_del(struct permanentVirtualCircuit_DCETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the permanentVirtualCircuit_DCETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -13991,6 +15516,7 @@ permanentVirtualCircuit_DCETable_del(struct permanentVirtualCircuit_DCETable_dat
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for permanentVirtualCircuit_DCETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case permanentVirtualCircuit_DCETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -14107,6 +15633,7 @@ store_permanentVirtualCircuit_DCETable(int majorID, int minorID, void *serverarg
 /**
  * @fn struct virtualCallIVMOTable_data *virtualCallIVMOTable_create(void)
  * @brief create a fresh data structure representing a new row in the virtualCallIVMOTable table.
+ *
  * Creates a new virtualCallIVMOTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -14116,7 +15643,7 @@ virtualCallIVMOTable_create(void)
 {
 	struct virtualCallIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCallIVMOTable_data);
 
-	DBUGMSGTL(("virtualCallIVMOTable", "creating row...  "));
+	DEBUGMSGTL(("virtualCallIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->virtualCallIVMORowStatus = RS_NOTREADY;
@@ -14126,12 +15653,38 @@ virtualCallIVMOTable_create(void)
 }
 
 /**
+ * @fn struct virtualCallIVMOTable_data *virtualCallIVMOTable_duplicate(struct virtualCallIVMOTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct virtualCallIVMOTable_data *
+virtualCallIVMOTable_duplicate(struct virtualCallIVMOTable_data *thedata)
+{
+	struct virtualCallIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCallIVMOTable_data);
+
+	DEBUGMSGTL(("virtualCallIVMOTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("virtualCallIVMOTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	virtualCallIVMOTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int virtualCallIVMOTable_destroy(struct virtualCallIVMOTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -14194,6 +15747,7 @@ virtualCallIVMOTable_destroy(struct virtualCallIVMOTable_data **thedata)
  * @fn int virtualCallIVMOTable_add(struct virtualCallIVMOTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the virtualCallIVMOTable table data set.
+ *
  * Adds a table row structure to the virtualCallIVMOTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -14204,8 +15758,7 @@ virtualCallIVMOTable_add(struct virtualCallIVMOTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("virtualCallIVMOTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	/* virtualCallIVMOId */
@@ -14218,8 +15771,9 @@ virtualCallIVMOTable_add(struct virtualCallIVMOTable_data *thedata)
 
 /**
  * @fn int virtualCallIVMOTable_del(struct virtualCallIVMOTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the virtualCallIVMOTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -14248,6 +15802,7 @@ virtualCallIVMOTable_del(struct virtualCallIVMOTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for virtualCallIVMOTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case virtualCallIVMOTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -14435,6 +15990,7 @@ store_virtualCallIVMOTable(int majorID, int minorID, void *serverarg, void *clie
 /**
  * @fn struct switchedVirtualCallTable_data *switchedVirtualCallTable_create(void)
  * @brief create a fresh data structure representing a new row in the switchedVirtualCallTable table.
+ *
  * Creates a new switchedVirtualCallTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -14444,7 +16000,7 @@ switchedVirtualCallTable_create(void)
 {
 	struct switchedVirtualCallTable_data *StorageNew = SNMP_MALLOC_STRUCT(switchedVirtualCallTable_data);
 
-	DBUGMSGTL(("switchedVirtualCallTable", "creating row...  "));
+	DEBUGMSGTL(("switchedVirtualCallTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->switchedVirtualCallRowStatus = RS_NOTREADY;
@@ -14454,12 +16010,38 @@ switchedVirtualCallTable_create(void)
 }
 
 /**
+ * @fn struct switchedVirtualCallTable_data *switchedVirtualCallTable_duplicate(struct switchedVirtualCallTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct switchedVirtualCallTable_data *
+switchedVirtualCallTable_duplicate(struct switchedVirtualCallTable_data *thedata)
+{
+	struct switchedVirtualCallTable_data *StorageNew = SNMP_MALLOC_STRUCT(switchedVirtualCallTable_data);
+
+	DEBUGMSGTL(("switchedVirtualCallTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("switchedVirtualCallTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	switchedVirtualCallTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int switchedVirtualCallTable_destroy(struct switchedVirtualCallTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -14498,6 +16080,7 @@ switchedVirtualCallTable_destroy(struct switchedVirtualCallTable_data **thedata)
  * @fn int switchedVirtualCallTable_add(struct switchedVirtualCallTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the switchedVirtualCallTable table data set.
+ *
  * Adds a table row structure to the switchedVirtualCallTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -14508,8 +16091,7 @@ switchedVirtualCallTable_add(struct switchedVirtualCallTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("switchedVirtualCallTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	/* virtualCallId */
@@ -14522,8 +16104,9 @@ switchedVirtualCallTable_add(struct switchedVirtualCallTable_data *thedata)
 
 /**
  * @fn int switchedVirtualCallTable_del(struct switchedVirtualCallTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the switchedVirtualCallTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -14552,6 +16135,7 @@ switchedVirtualCallTable_del(struct switchedVirtualCallTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for switchedVirtualCallTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case switchedVirtualCallTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -14665,6 +16249,7 @@ store_switchedVirtualCallTable(int majorID, int minorID, void *serverarg, void *
 /**
  * @fn struct virtualCall_DTETable_data *virtualCall_DTETable_create(void)
  * @brief create a fresh data structure representing a new row in the virtualCall_DTETable table.
+ *
  * Creates a new virtualCall_DTETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -14674,7 +16259,7 @@ virtualCall_DTETable_create(void)
 {
 	struct virtualCall_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCall_DTETable_data);
 
-	DBUGMSGTL(("virtualCall_DTETable", "creating row...  "));
+	DEBUGMSGTL(("virtualCall_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->virtualCall_DTERowStatus = RS_NOTREADY;
@@ -14684,12 +16269,38 @@ virtualCall_DTETable_create(void)
 }
 
 /**
+ * @fn struct virtualCall_DTETable_data *virtualCall_DTETable_duplicate(struct virtualCall_DTETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct virtualCall_DTETable_data *
+virtualCall_DTETable_duplicate(struct virtualCall_DTETable_data *thedata)
+{
+	struct virtualCall_DTETable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCall_DTETable_data);
+
+	DEBUGMSGTL(("virtualCall_DTETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("virtualCall_DTETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	virtualCall_DTETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int virtualCall_DTETable_destroy(struct virtualCall_DTETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -14728,6 +16339,7 @@ virtualCall_DTETable_destroy(struct virtualCall_DTETable_data **thedata)
  * @fn int virtualCall_DTETable_add(struct virtualCall_DTETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the virtualCall_DTETable table data set.
+ *
  * Adds a table row structure to the virtualCall_DTETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -14738,8 +16350,7 @@ virtualCall_DTETable_add(struct virtualCall_DTETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("virtualCall_DTETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	/* virtualCircuitId */
@@ -14752,8 +16363,9 @@ virtualCall_DTETable_add(struct virtualCall_DTETable_data *thedata)
 
 /**
  * @fn int virtualCall_DTETable_del(struct virtualCall_DTETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the virtualCall_DTETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -14782,6 +16394,7 @@ virtualCall_DTETable_del(struct virtualCall_DTETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for virtualCall_DTETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case virtualCall_DTETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -14897,6 +16510,7 @@ store_virtualCall_DTETable(int majorID, int minorID, void *serverarg, void *clie
 /**
  * @fn struct virtualCall_DCETable_data *virtualCall_DCETable_create(void)
  * @brief create a fresh data structure representing a new row in the virtualCall_DCETable table.
+ *
  * Creates a new virtualCall_DCETable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -14906,7 +16520,7 @@ virtualCall_DCETable_create(void)
 {
 	struct virtualCall_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCall_DCETable_data);
 
-	DBUGMSGTL(("virtualCall_DCETable", "creating row...  "));
+	DEBUGMSGTL(("virtualCall_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->virtualCall_DCERowStatus = RS_NOTREADY;
@@ -14916,12 +16530,38 @@ virtualCall_DCETable_create(void)
 }
 
 /**
+ * @fn struct virtualCall_DCETable_data *virtualCall_DCETable_duplicate(struct virtualCall_DCETable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct virtualCall_DCETable_data *
+virtualCall_DCETable_duplicate(struct virtualCall_DCETable_data *thedata)
+{
+	struct virtualCall_DCETable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualCall_DCETable_data);
+
+	DEBUGMSGTL(("virtualCall_DCETable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("virtualCall_DCETable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	virtualCall_DCETable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int virtualCall_DCETable_destroy(struct virtualCall_DCETable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -14966,6 +16606,7 @@ virtualCall_DCETable_destroy(struct virtualCall_DCETable_data **thedata)
  * @fn int virtualCall_DCETable_add(struct virtualCall_DCETable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the virtualCall_DCETable table data set.
+ *
  * Adds a table row structure to the virtualCall_DCETable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -14976,8 +16617,7 @@ virtualCall_DCETable_add(struct virtualCall_DCETable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("virtualCall_DCETable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	/* virtualCircuitId */
@@ -14990,8 +16630,9 @@ virtualCall_DCETable_add(struct virtualCall_DCETable_data *thedata)
 
 /**
  * @fn int virtualCall_DCETable_del(struct virtualCall_DCETable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the virtualCall_DCETable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -15020,6 +16661,7 @@ virtualCall_DCETable_del(struct virtualCall_DCETable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for virtualCall_DCETable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case virtualCall_DCETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -15159,6 +16801,7 @@ store_virtualCall_DCETable(int majorID, int minorID, void *serverarg, void *clie
 /**
  * @fn struct dSeriesCountsTable_data *dSeriesCountsTable_create(void)
  * @brief create a fresh data structure representing a new row in the dSeriesCountsTable table.
+ *
  * Creates a new dSeriesCountsTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -15168,7 +16811,7 @@ dSeriesCountsTable_create(void)
 {
 	struct dSeriesCountsTable_data *StorageNew = SNMP_MALLOC_STRUCT(dSeriesCountsTable_data);
 
-	DBUGMSGTL(("dSeriesCountsTable", "creating row...  "));
+	DEBUGMSGTL(("dSeriesCountsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->dSeriesRowStatus = RS_NOTREADY;
@@ -15178,12 +16821,38 @@ dSeriesCountsTable_create(void)
 }
 
 /**
+ * @fn struct dSeriesCountsTable_data *dSeriesCountsTable_duplicate(struct dSeriesCountsTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct dSeriesCountsTable_data *
+dSeriesCountsTable_duplicate(struct dSeriesCountsTable_data *thedata)
+{
+	struct dSeriesCountsTable_data *StorageNew = SNMP_MALLOC_STRUCT(dSeriesCountsTable_data);
+
+	DEBUGMSGTL(("dSeriesCountsTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("dSeriesCountsTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	dSeriesCountsTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int dSeriesCountsTable_destroy(struct dSeriesCountsTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -15210,6 +16879,7 @@ dSeriesCountsTable_destroy(struct dSeriesCountsTable_data **thedata)
  * @fn int dSeriesCountsTable_add(struct dSeriesCountsTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the dSeriesCountsTable table data set.
+ *
  * Adds a table row structure to the dSeriesCountsTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -15220,8 +16890,7 @@ dSeriesCountsTable_add(struct dSeriesCountsTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("dSeriesCountsTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* x25PLEId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->x25PLEId, thedata->x25PLEIdLen);
 	/* virtualCircuitId */
@@ -15236,8 +16905,9 @@ dSeriesCountsTable_add(struct dSeriesCountsTable_data *thedata)
 
 /**
  * @fn int dSeriesCountsTable_del(struct dSeriesCountsTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the dSeriesCountsTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -15266,6 +16936,7 @@ dSeriesCountsTable_del(struct dSeriesCountsTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dSeriesCountsTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case dSeriesCountsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -15349,6 +17020,7 @@ store_dSeriesCountsTable(int majorID, int minorID, void *serverarg, void *client
 /**
  * @fn struct adjacencyTable_data *adjacencyTable_create(void)
  * @brief create a fresh data structure representing a new row in the adjacencyTable table.
+ *
  * Creates a new adjacencyTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -15358,10 +17030,10 @@ adjacencyTable_create(void)
 {
 	struct adjacencyTable_data *StorageNew = SNMP_MALLOC_STRUCT(adjacencyTable_data);
 
-	DBUGMSGTL(("adjacencyTable", "creating row...  "));
+	DEBUGMSGTL(("adjacencyTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->adjacencyUsage = undefined;
+		StorageNew->adjacencyUsage = ADJACENCYUSAGE_UNDEFINED;
 		StorageNew->adjacencyRowStatus = RS_NOTREADY;
 	}
 	DEBUGMSGTL(("adjacencyTable", "done.\n"));
@@ -15369,12 +17041,38 @@ adjacencyTable_create(void)
 }
 
 /**
+ * @fn struct adjacencyTable_data *adjacencyTable_duplicate(struct adjacencyTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct adjacencyTable_data *
+adjacencyTable_duplicate(struct adjacencyTable_data *thedata)
+{
+	struct adjacencyTable_data *StorageNew = SNMP_MALLOC_STRUCT(adjacencyTable_data);
+
+	DEBUGMSGTL(("adjacencyTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("adjacencyTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	adjacencyTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int adjacencyTable_destroy(struct adjacencyTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -15409,6 +17107,7 @@ adjacencyTable_destroy(struct adjacencyTable_data **thedata)
  * @fn int adjacencyTable_add(struct adjacencyTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the adjacencyTable table data set.
+ *
  * Adds a table row structure to the adjacencyTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -15419,8 +17118,7 @@ adjacencyTable_add(struct adjacencyTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("adjacencyTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -15437,8 +17135,9 @@ adjacencyTable_add(struct adjacencyTable_data *thedata)
 
 /**
  * @fn int adjacencyTable_del(struct adjacencyTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the adjacencyTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -15467,6 +17166,7 @@ adjacencyTable_del(struct adjacencyTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for adjacencyTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case adjacencyTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -15578,6 +17278,7 @@ store_adjacencyTable(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct virtualAdjacencyTable_data *virtualAdjacencyTable_create(void)
  * @brief create a fresh data structure representing a new row in the virtualAdjacencyTable table.
+ *
  * Creates a new virtualAdjacencyTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -15587,7 +17288,7 @@ virtualAdjacencyTable_create(void)
 {
 	struct virtualAdjacencyTable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualAdjacencyTable_data);
 
-	DBUGMSGTL(("virtualAdjacencyTable", "creating row...  "));
+	DEBUGMSGTL(("virtualAdjacencyTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -15597,12 +17298,38 @@ virtualAdjacencyTable_create(void)
 }
 
 /**
+ * @fn struct virtualAdjacencyTable_data *virtualAdjacencyTable_duplicate(struct virtualAdjacencyTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct virtualAdjacencyTable_data *
+virtualAdjacencyTable_duplicate(struct virtualAdjacencyTable_data *thedata)
+{
+	struct virtualAdjacencyTable_data *StorageNew = SNMP_MALLOC_STRUCT(virtualAdjacencyTable_data);
+
+	DEBUGMSGTL(("virtualAdjacencyTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("virtualAdjacencyTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	virtualAdjacencyTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int virtualAdjacencyTable_destroy(struct virtualAdjacencyTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -15629,6 +17356,7 @@ virtualAdjacencyTable_destroy(struct virtualAdjacencyTable_data **thedata)
  * @fn int virtualAdjacencyTable_add(struct virtualAdjacencyTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the virtualAdjacencyTable table data set.
+ *
  * Adds a table row structure to the virtualAdjacencyTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -15639,8 +17367,7 @@ virtualAdjacencyTable_add(struct virtualAdjacencyTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("virtualAdjacencyTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -15655,8 +17382,9 @@ virtualAdjacencyTable_add(struct virtualAdjacencyTable_data *thedata)
 
 /**
  * @fn int virtualAdjacencyTable_del(struct virtualAdjacencyTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the virtualAdjacencyTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -15685,6 +17413,7 @@ virtualAdjacencyTable_del(struct virtualAdjacencyTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for virtualAdjacencyTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case virtualAdjacencyTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -15762,6 +17491,7 @@ store_virtualAdjacencyTable(int majorID, int minorID, void *serverarg, void *cli
 /**
  * @fn struct destinationTable_data *destinationTable_create(void)
  * @brief create a fresh data structure representing a new row in the destinationTable table.
+ *
  * Creates a new destinationTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -15771,7 +17501,7 @@ destinationTable_create(void)
 {
 	struct destinationTable_data *StorageNew = SNMP_MALLOC_STRUCT(destinationTable_data);
 
-	DBUGMSGTL(("destinationTable", "creating row...  "));
+	DEBUGMSGTL(("destinationTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -15781,12 +17511,38 @@ destinationTable_create(void)
 }
 
 /**
+ * @fn struct destinationTable_data *destinationTable_duplicate(struct destinationTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct destinationTable_data *
+destinationTable_duplicate(struct destinationTable_data *thedata)
+{
+	struct destinationTable_data *StorageNew = SNMP_MALLOC_STRUCT(destinationTable_data);
+
+	DEBUGMSGTL(("destinationTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("destinationTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	destinationTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int destinationTable_destroy(struct destinationTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -15821,6 +17577,7 @@ destinationTable_destroy(struct destinationTable_data **thedata)
  * @fn int destinationTable_add(struct destinationTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the destinationTable table data set.
+ *
  * Adds a table row structure to the destinationTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -15831,8 +17588,7 @@ destinationTable_add(struct destinationTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("destinationTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -15847,8 +17603,9 @@ destinationTable_add(struct destinationTable_data *thedata)
 
 /**
  * @fn int destinationTable_del(struct destinationTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the destinationTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -15877,6 +17634,7 @@ destinationTable_del(struct destinationTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for destinationTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case destinationTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -15984,6 +17742,7 @@ store_destinationTable(int majorID, int minorID, void *serverarg, void *clientar
 /**
  * @fn struct destinationSystemTable_data *destinationSystemTable_create(void)
  * @brief create a fresh data structure representing a new row in the destinationSystemTable table.
+ *
  * Creates a new destinationSystemTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -15993,7 +17752,7 @@ destinationSystemTable_create(void)
 {
 	struct destinationSystemTable_data *StorageNew = SNMP_MALLOC_STRUCT(destinationSystemTable_data);
 
-	DBUGMSGTL(("destinationSystemTable", "creating row...  "));
+	DEBUGMSGTL(("destinationSystemTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -16003,12 +17762,38 @@ destinationSystemTable_create(void)
 }
 
 /**
+ * @fn struct destinationSystemTable_data *destinationSystemTable_duplicate(struct destinationSystemTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct destinationSystemTable_data *
+destinationSystemTable_duplicate(struct destinationSystemTable_data *thedata)
+{
+	struct destinationSystemTable_data *StorageNew = SNMP_MALLOC_STRUCT(destinationSystemTable_data);
+
+	DEBUGMSGTL(("destinationSystemTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("destinationSystemTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	destinationSystemTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int destinationSystemTable_destroy(struct destinationSystemTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -16037,6 +17822,7 @@ destinationSystemTable_destroy(struct destinationSystemTable_data **thedata)
  * @fn int destinationSystemTable_add(struct destinationSystemTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the destinationSystemTable table data set.
+ *
  * Adds a table row structure to the destinationSystemTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -16047,8 +17833,7 @@ destinationSystemTable_add(struct destinationSystemTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("destinationSystemTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* communicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
 	/* clProtocolMachineId */
@@ -16067,8 +17852,9 @@ destinationSystemTable_add(struct destinationSystemTable_data *thedata)
 
 /**
  * @fn int destinationSystemTable_del(struct destinationSystemTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the destinationSystemTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -16097,6 +17883,7 @@ destinationSystemTable_del(struct destinationSystemTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for destinationSystemTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case destinationSystemTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -16182,6 +17969,7 @@ store_destinationSystemTable(int majorID, int minorID, void *serverarg, void *cl
 /**
  * @fn struct destinationAreaTable_data *destinationAreaTable_create(void)
  * @brief create a fresh data structure representing a new row in the destinationAreaTable table.
+ *
  * Creates a new destinationAreaTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -16191,7 +17979,7 @@ destinationAreaTable_create(void)
 {
 	struct destinationAreaTable_data *StorageNew = SNMP_MALLOC_STRUCT(destinationAreaTable_data);
 
-	DBUGMSGTL(("destinationAreaTable", "creating row...  "));
+	DEBUGMSGTL(("destinationAreaTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 
@@ -16201,12 +17989,38 @@ destinationAreaTable_create(void)
 }
 
 /**
+ * @fn struct destinationAreaTable_data *destinationAreaTable_duplicate(struct destinationAreaTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct destinationAreaTable_data *
+destinationAreaTable_duplicate(struct destinationAreaTable_data *thedata)
+{
+	struct destinationAreaTable_data *StorageNew = SNMP_MALLOC_STRUCT(destinationAreaTable_data);
+
+	DEBUGMSGTL(("destinationAreaTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("destinationAreaTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	destinationAreaTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int destinationAreaTable_destroy(struct destinationAreaTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -16229,6 +18043,7 @@ destinationAreaTable_destroy(struct destinationAreaTable_data **thedata)
  * @fn int destinationAreaTable_add(struct destinationAreaTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the destinationAreaTable table data set.
+ *
  * Adds a table row structure to the destinationAreaTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -16239,8 +18054,7 @@ destinationAreaTable_add(struct destinationAreaTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("destinationAreaTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* destinationAreaId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->destinationAreaId, thedata->destinationAreaIdLen);
 	header_complex_add_data(&destinationAreaTableStorage, vars, thedata);
@@ -16251,8 +18065,9 @@ destinationAreaTable_add(struct destinationAreaTable_data *thedata)
 
 /**
  * @fn int destinationAreaTable_del(struct destinationAreaTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the destinationAreaTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -16281,6 +18096,7 @@ destinationAreaTable_del(struct destinationAreaTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for destinationAreaTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case destinationAreaTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -16344,6 +18160,7 @@ store_destinationAreaTable(int majorID, int minorID, void *serverarg, void *clie
 /**
  * @fn struct reachableAddressTable_data *reachableAddressTable_create(void)
  * @brief create a fresh data structure representing a new row in the reachableAddressTable table.
+ *
  * Creates a new reachableAddressTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -16353,18 +18170,18 @@ reachableAddressTable_create(void)
 {
 	struct reachableAddressTable_data *StorageNew = SNMP_MALLOC_STRUCT(reachableAddressTable_data);
 
-	DBUGMSGTL(("reachableAddressTable", "creating row...  "));
+	DEBUGMSGTL(("reachableAddressTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->reachableAddressDefaultMetric = 20;
-		StorageNew->reachableAddressDefaultMetricType = internal;
-		StorageNew->reachableAddressDelayMetricType = internal;
-		StorageNew->reachableAddressExpenseMetricType = internal;
-		StorageNew->reachableAddressErrorMetricType = internal;
-		StorageNew->reachableAddressSNPAMask = strdup("\"\"");
-		StorageNew->reachableAddressSNPAMaskLen = strlen("\"\"");
-		StorageNew->reachableAddressSNPAPrefix = strdup("\"\"");
-		StorageNew->reachableAddressSNPAPrefixLen = strlen("\"\"");
+		StorageNew->reachableAddressDefaultMetricType = REACHABLEADDRESSDEFAULTMETRICTYPE_INTERNAL;
+		StorageNew->reachableAddressDelayMetricType = REACHABLEADDRESSDELAYMETRICTYPE_INTERNAL;
+		StorageNew->reachableAddressExpenseMetricType = REACHABLEADDRESSEXPENSEMETRICTYPE_INTERNAL;
+		StorageNew->reachableAddressErrorMetricType = REACHABLEADDRESSERRORMETRICTYPE_INTERNAL;
+		/* StorageNew->reachableAddressSNPAMask = (uint8_t *) strdup(\"\"); *//* DEFVAL \"\" */
+		/* StorageNew->reachableAddressSNPAMaskLen = strlen(\"\"); *//* DEFVAL \"\" */
+		/* StorageNew->reachableAddressSNPAPrefix = (uint8_t *) strdup(\"\"); *//* DEFVAL \"\" */
+		/* StorageNew->reachableAddressSNPAPrefixLen = strlen(\"\"); *//* DEFVAL \"\" */
 		StorageNew->reachableAddressRowStatus = RS_NOTREADY;
 	}
 	DEBUGMSGTL(("reachableAddressTable", "done.\n"));
@@ -16372,12 +18189,38 @@ reachableAddressTable_create(void)
 }
 
 /**
+ * @fn struct reachableAddressTable_data *reachableAddressTable_duplicate(struct reachableAddressTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct reachableAddressTable_data *
+reachableAddressTable_duplicate(struct reachableAddressTable_data *thedata)
+{
+	struct reachableAddressTable_data *StorageNew = SNMP_MALLOC_STRUCT(reachableAddressTable_data);
+
+	DEBUGMSGTL(("reachableAddressTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("reachableAddressTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	reachableAddressTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int reachableAddressTable_destroy(struct reachableAddressTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -16408,6 +18251,7 @@ reachableAddressTable_destroy(struct reachableAddressTable_data **thedata)
  * @fn int reachableAddressTable_add(struct reachableAddressTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the reachableAddressTable table data set.
+ *
  * Adds a table row structure to the reachableAddressTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -16418,8 +18262,7 @@ reachableAddressTable_add(struct reachableAddressTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("reachableAddressTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* reachableAddressId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->reachableAddressId, thedata->reachableAddressIdLen);
 	header_complex_add_data(&reachableAddressTableStorage, vars, thedata);
@@ -16430,8 +18273,9 @@ reachableAddressTable_add(struct reachableAddressTable_data *thedata)
 
 /**
  * @fn int reachableAddressTable_del(struct reachableAddressTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the reachableAddressTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -16460,6 +18304,7 @@ reachableAddressTable_del(struct reachableAddressTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for reachableAddressTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case reachableAddressTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -16571,6 +18416,7 @@ store_reachableAddressTable(int majorID, int minorID, void *serverarg, void *cli
 /**
  * @fn void refresh_communicationsEntityTable(void)
  * @brief refresh the scalar values of the communicationsEntityTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -16589,6 +18435,7 @@ refresh_communicationsEntityTable(void)
 /**
  * @fn void refresh_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp)
  * @brief refresh the contents of the communicationsEntityTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -16604,6 +18451,7 @@ refresh_communicationsEntityTable_row(struct communicationsEntityTable_data *Sto
 /**
  * @fn u_char *var_communicationsEntityTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in communicationsEntityTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -16613,11 +18461,9 @@ var_communicationsEntityTable(struct variable *vp, oid * name, size_t *length, i
 	struct communicationsEntityTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_communicationsEntityTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_communicationsEntityTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(communicationsEntityTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_communicationsEntityTable_row(StorageTmp);
@@ -16640,6 +18486,7 @@ var_communicationsEntityTable(struct variable *vp, oid * name, size_t *length, i
 /**
  * @fn void refresh_sap1Table(void)
  * @brief refresh the scalar values of the sap1Table.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -16658,6 +18505,7 @@ refresh_sap1Table(void)
 /**
  * @fn void refresh_sap1Table_row(struct sap1Table_data *StorageTmp)
  * @brief refresh the contents of the sap1Table row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -16673,6 +18521,7 @@ refresh_sap1Table_row(struct sap1Table_data *StorageTmp)
 /**
  * @fn u_char *var_sap1Table(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in sap1Table.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -16682,11 +18531,9 @@ var_sap1Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	struct sap1Table_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_sap1Table: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_sap1Table();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(sap1TableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sap1Table_row(StorageTmp);
@@ -16709,6 +18556,7 @@ var_sap1Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 /**
  * @fn void refresh_sap2Table(void)
  * @brief refresh the scalar values of the sap2Table.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -16727,6 +18575,7 @@ refresh_sap2Table(void)
 /**
  * @fn void refresh_sap2Table_row(struct sap2Table_data *StorageTmp)
  * @brief refresh the contents of the sap2Table row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -16742,6 +18591,7 @@ refresh_sap2Table_row(struct sap2Table_data *StorageTmp)
 /**
  * @fn u_char *var_sap2Table(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in sap2Table.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -16751,11 +18601,9 @@ var_sap2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	struct sap2Table_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_sap2Table: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_sap2Table();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(sap2TableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sap2Table_row(StorageTmp);
@@ -16782,6 +18630,7 @@ var_sap2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 /**
  * @fn void refresh_clProtocolMachineTable(void)
  * @brief refresh the scalar values of the clProtocolMachineTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -16800,6 +18649,7 @@ refresh_clProtocolMachineTable(void)
 /**
  * @fn void refresh_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp)
  * @brief refresh the contents of the clProtocolMachineTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -16815,6 +18665,7 @@ refresh_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTm
 /**
  * @fn u_char *var_clProtocolMachineTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in clProtocolMachineTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -16824,11 +18675,9 @@ var_clProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 	struct clProtocolMachineTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_clProtocolMachineTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_clProtocolMachineTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(clProtocolMachineTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_clProtocolMachineTable_row(StorageTmp);
@@ -16851,6 +18700,7 @@ var_clProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 /**
  * @fn void refresh_coProtocolMachineTable(void)
  * @brief refresh the scalar values of the coProtocolMachineTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -16869,6 +18719,7 @@ refresh_coProtocolMachineTable(void)
 /**
  * @fn void refresh_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp)
  * @brief refresh the contents of the coProtocolMachineTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -16884,6 +18735,7 @@ refresh_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTm
 /**
  * @fn u_char *var_coProtocolMachineTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in coProtocolMachineTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -16893,11 +18745,9 @@ var_coProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 	struct coProtocolMachineTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_coProtocolMachineTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_coProtocolMachineTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(coProtocolMachineTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_coProtocolMachineTable_row(StorageTmp);
@@ -16916,6 +18766,7 @@ var_coProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 /**
  * @fn void refresh_singlePeerConnectionTable(void)
  * @brief refresh the scalar values of the singlePeerConnectionTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -16934,6 +18785,7 @@ refresh_singlePeerConnectionTable(void)
 /**
  * @fn void refresh_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp)
  * @brief refresh the contents of the singlePeerConnectionTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -16949,6 +18801,7 @@ refresh_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *Sto
 /**
  * @fn u_char *var_singlePeerConnectionTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in singlePeerConnectionTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -16958,11 +18811,9 @@ var_singlePeerConnectionTable(struct variable *vp, oid * name, size_t *length, i
 	struct singlePeerConnectionTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_singlePeerConnectionTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_singlePeerConnectionTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(singlePeerConnectionTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_singlePeerConnectionTable_row(StorageTmp);
@@ -16985,6 +18836,7 @@ var_singlePeerConnectionTable(struct variable *vp, oid * name, size_t *length, i
 /**
  * @fn void refresh_physicalEntityTable(void)
  * @brief refresh the scalar values of the physicalEntityTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17003,6 +18855,7 @@ refresh_physicalEntityTable(void)
 /**
  * @fn void refresh_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp)
  * @brief refresh the contents of the physicalEntityTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17018,6 +18871,7 @@ refresh_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp)
 /**
  * @fn u_char *var_physicalEntityTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in physicalEntityTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17027,11 +18881,9 @@ var_physicalEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 	struct physicalEntityTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_physicalEntityTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_physicalEntityTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(physicalEntityTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_physicalEntityTable_row(StorageTmp);
@@ -17050,6 +18902,7 @@ var_physicalEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * @fn void refresh_physicalSAPTable(void)
  * @brief refresh the scalar values of the physicalSAPTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17068,6 +18921,7 @@ refresh_physicalSAPTable(void)
 /**
  * @fn void refresh_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
  * @brief refresh the contents of the physicalSAPTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17083,6 +18937,7 @@ refresh_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 /**
  * @fn u_char *var_physicalSAPTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in physicalSAPTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17092,11 +18947,9 @@ var_physicalSAPTable(struct variable *vp, oid * name, size_t *length, int exact,
 	struct physicalSAPTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_physicalSAPTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_physicalSAPTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(physicalSAPTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_physicalSAPTable_row(StorageTmp);
@@ -17111,6 +18964,7 @@ var_physicalSAPTable(struct variable *vp, oid * name, size_t *length, int exact,
 /**
  * @fn void refresh_dataCircuitTable(void)
  * @brief refresh the scalar values of the dataCircuitTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17129,6 +18983,7 @@ refresh_dataCircuitTable(void)
 /**
  * @fn void refresh_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
  * @brief refresh the contents of the dataCircuitTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17144,6 +18999,7 @@ refresh_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 /**
  * @fn u_char *var_dataCircuitTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in dataCircuitTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17153,11 +19009,9 @@ var_dataCircuitTable(struct variable *vp, oid * name, size_t *length, int exact,
 	struct dataCircuitTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_dataCircuitTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_dataCircuitTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(dataCircuitTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_dataCircuitTable_row(StorageTmp);
@@ -17220,6 +19074,7 @@ var_dataCircuitTable(struct variable *vp, oid * name, size_t *length, int exact,
 /**
  * @fn void refresh_physicalConnectionTable(void)
  * @brief refresh the scalar values of the physicalConnectionTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17238,6 +19093,7 @@ refresh_physicalConnectionTable(void)
 /**
  * @fn void refresh_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
  * @brief refresh the contents of the physicalConnectionTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17253,6 +19109,7 @@ refresh_physicalConnectionTable_row(struct physicalConnectionTable_data *Storage
 /**
  * @fn u_char *var_physicalConnectionTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in physicalConnectionTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17262,11 +19119,9 @@ var_physicalConnectionTable(struct variable *vp, oid * name, size_t *length, int
 	struct physicalConnectionTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_physicalConnectionTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_physicalConnectionTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(physicalConnectionTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_physicalConnectionTable_row(StorageTmp);
@@ -17293,6 +19148,7 @@ var_physicalConnectionTable(struct variable *vp, oid * name, size_t *length, int
 /**
  * @fn void refresh_datalinkEntityTable(void)
  * @brief refresh the scalar values of the datalinkEntityTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17311,6 +19167,7 @@ refresh_datalinkEntityTable(void)
 /**
  * @fn void refresh_datalinkEntityTable_row(struct datalinkEntityTable_data *StorageTmp)
  * @brief refresh the contents of the datalinkEntityTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17326,6 +19183,7 @@ refresh_datalinkEntityTable_row(struct datalinkEntityTable_data *StorageTmp)
 /**
  * @fn u_char *var_datalinkEntityTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in datalinkEntityTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17335,11 +19193,9 @@ var_datalinkEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 	struct datalinkEntityTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_datalinkEntityTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_datalinkEntityTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(datalinkEntityTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_datalinkEntityTable_row(StorageTmp);
@@ -17362,6 +19218,7 @@ var_datalinkEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * @fn void refresh_dLSAPTable(void)
  * @brief refresh the scalar values of the dLSAPTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17380,6 +19237,7 @@ refresh_dLSAPTable(void)
 /**
  * @fn void refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
  * @brief refresh the contents of the dLSAPTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17395,6 +19253,7 @@ refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
 /**
  * @fn u_char *var_dLSAPTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in dLSAPTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17404,11 +19263,9 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 	struct dLSAPTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_dLSAPTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_dLSAPTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(dLSAPTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_dLSAPTable_row(StorageTmp);
@@ -17427,6 +19284,7 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 /**
  * @fn void refresh_lAPBDLETable(void)
  * @brief refresh the scalar values of the lAPBDLETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17445,6 +19303,7 @@ refresh_lAPBDLETable(void)
 /**
  * @fn void refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp)
  * @brief refresh the contents of the lAPBDLETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17460,6 +19319,7 @@ refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp)
 /**
  * @fn u_char *var_lAPBDLETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lAPBDLETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17469,11 +19329,9 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	struct lAPBDLETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lAPBDLETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lAPBDLETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lAPBDLETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lAPBDLETable_row(StorageTmp);
@@ -17544,6 +19402,7 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 /**
  * @fn void refresh_sLPPMTable(void)
  * @brief refresh the scalar values of the sLPPMTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17562,6 +19421,7 @@ refresh_sLPPMTable(void)
 /**
  * @fn void refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp)
  * @brief refresh the contents of the sLPPMTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17577,6 +19437,7 @@ refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp)
 /**
  * @fn u_char *var_sLPPMTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in sLPPMTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17586,11 +19447,9 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 	struct sLPPMTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_sLPPMTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_sLPPMTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(sLPPMTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sLPPMTable_row(StorageTmp);
@@ -17613,6 +19472,7 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 /**
  * @fn void refresh_sLPConnectionTable(void)
  * @brief refresh the scalar values of the sLPConnectionTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17631,6 +19491,7 @@ refresh_sLPConnectionTable(void)
 /**
  * @fn void refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp)
  * @brief refresh the contents of the sLPConnectionTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17646,6 +19507,7 @@ refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp)
 /**
  * @fn u_char *var_sLPConnectionTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in sLPConnectionTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17655,11 +19517,9 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 	struct sLPConnectionTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_sLPConnectionTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_sLPConnectionTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(sLPConnectionTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sLPConnectionTable_row(StorageTmp);
@@ -17826,6 +19686,7 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 /**
  * @fn void refresh_sLPConnectionIVMOTable(void)
  * @brief refresh the scalar values of the sLPConnectionIVMOTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17844,6 +19705,7 @@ refresh_sLPConnectionIVMOTable(void)
 /**
  * @fn void refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp)
  * @brief refresh the contents of the sLPConnectionIVMOTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17859,6 +19721,7 @@ refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTm
 /**
  * @fn u_char *var_sLPConnectionIVMOTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in sLPConnectionIVMOTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17868,11 +19731,9 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 	struct sLPConnectionIVMOTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_sLPConnectionIVMOTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_sLPConnectionIVMOTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sLPConnectionIVMOTable_row(StorageTmp);
@@ -17931,6 +19792,7 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 /**
  * @fn void refresh_mACDLETable(void)
  * @brief refresh the scalar values of the mACDLETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -17949,6 +19811,7 @@ refresh_mACDLETable(void)
 /**
  * @fn void refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp)
  * @brief refresh the contents of the mACDLETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -17964,6 +19827,7 @@ refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp)
 /**
  * @fn u_char *var_mACDLETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in mACDLETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -17973,11 +19837,9 @@ var_mACDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 	struct mACDLETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_mACDLETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_mACDLETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(mACDLETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_mACDLETable_row(StorageTmp);
@@ -17996,6 +19858,7 @@ var_mACDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 /**
  * @fn void refresh_mACTable(void)
  * @brief refresh the scalar values of the mACTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18014,6 +19877,7 @@ refresh_mACTable(void)
 /**
  * @fn void refresh_mACTable_row(struct mACTable_data *StorageTmp)
  * @brief refresh the contents of the mACTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18029,6 +19893,7 @@ refresh_mACTable_row(struct mACTable_data *StorageTmp)
 /**
  * @fn u_char *var_mACTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in mACTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18038,11 +19903,9 @@ var_mACTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 	struct mACTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_mACTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_mACTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(mACTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_mACTable_row(StorageTmp);
@@ -18065,6 +19928,7 @@ var_mACTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 /**
  * @fn void refresh_lLCDLETable(void)
  * @brief refresh the scalar values of the lLCDLETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18083,6 +19947,7 @@ refresh_lLCDLETable(void)
 /**
  * @fn void refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp)
  * @brief refresh the contents of the lLCDLETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18098,6 +19963,7 @@ refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp)
 /**
  * @fn u_char *var_lLCDLETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCDLETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18107,11 +19973,9 @@ var_lLCDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 	struct lLCDLETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCDLETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCDLETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCDLETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCDLETable_row(StorageTmp);
@@ -18130,6 +19994,7 @@ var_lLCDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 /**
  * @fn void refresh_lLCCLPMTable(void)
  * @brief refresh the scalar values of the lLCCLPMTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18148,6 +20013,7 @@ refresh_lLCCLPMTable(void)
 /**
  * @fn void refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp)
  * @brief refresh the contents of the lLCCLPMTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18163,6 +20029,7 @@ refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp)
 /**
  * @fn u_char *var_lLCCLPMTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCCLPMTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18172,11 +20039,9 @@ var_lLCCLPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	struct lLCCLPMTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCCLPMTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCCLPMTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCCLPMTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCCLPMTable_row(StorageTmp);
@@ -18195,6 +20060,7 @@ var_lLCCLPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 /**
  * @fn void refresh_lLCCOPMTable(void)
  * @brief refresh the scalar values of the lLCCOPMTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18213,6 +20079,7 @@ refresh_lLCCOPMTable(void)
 /**
  * @fn void refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp)
  * @brief refresh the contents of the lLCCOPMTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18228,6 +20095,7 @@ refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp)
 /**
  * @fn u_char *var_lLCCOPMTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCCOPMTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18237,11 +20105,9 @@ var_lLCCOPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	struct lLCCOPMTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCCOPMTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCCOPMTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCCOPMTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCCOPMTable_row(StorageTmp);
@@ -18260,6 +20126,7 @@ var_lLCCOPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 /**
  * @fn void refresh_resourceTypeIdTable(void)
  * @brief refresh the scalar values of the resourceTypeIdTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18278,6 +20145,7 @@ refresh_resourceTypeIdTable(void)
 /**
  * @fn void refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp)
  * @brief refresh the contents of the resourceTypeIdTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18293,6 +20161,7 @@ refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp)
 /**
  * @fn u_char *var_resourceTypeIdTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in resourceTypeIdTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18302,11 +20171,9 @@ var_resourceTypeIdTable(struct variable *vp, oid * name, size_t *length, int exa
 	struct resourceTypeIdTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_resourceTypeIdTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_resourceTypeIdTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(resourceTypeIdTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_resourceTypeIdTable_row(StorageTmp);
@@ -18341,6 +20208,7 @@ var_resourceTypeIdTable(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * @fn void refresh_lLCStationTable(void)
  * @brief refresh the scalar values of the lLCStationTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18359,6 +20227,7 @@ refresh_lLCStationTable(void)
 /**
  * @fn void refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp)
  * @brief refresh the contents of the lLCStationTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18374,6 +20243,7 @@ refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp)
 /**
  * @fn u_char *var_lLCStationTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCStationTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18383,11 +20253,9 @@ var_lLCStationTable(struct variable *vp, oid * name, size_t *length, int exact, 
 	struct lLCStationTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCStationTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCStationTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCStationTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCStationTable_row(StorageTmp);
@@ -18490,6 +20358,7 @@ var_lLCStationTable(struct variable *vp, oid * name, size_t *length, int exact, 
 /**
  * @fn void refresh_lLCSAPTable(void)
  * @brief refresh the scalar values of the lLCSAPTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18508,6 +20377,7 @@ refresh_lLCSAPTable(void)
 /**
  * @fn void refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp)
  * @brief refresh the contents of the lLCSAPTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18523,6 +20393,7 @@ refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp)
 /**
  * @fn u_char *var_lLCSAPTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCSAPTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18532,11 +20403,9 @@ var_lLCSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size
 	struct lLCSAPTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCSAPTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCSAPTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCSAPTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCSAPTable_row(StorageTmp);
@@ -18559,6 +20428,7 @@ var_lLCSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size
 /**
  * @fn void refresh_rDESetupTable(void)
  * @brief refresh the scalar values of the rDESetupTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18577,6 +20447,7 @@ refresh_rDESetupTable(void)
 /**
  * @fn void refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp)
  * @brief refresh the contents of the rDESetupTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18592,6 +20463,7 @@ refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp)
 /**
  * @fn u_char *var_rDESetupTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in rDESetupTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18601,11 +20473,9 @@ var_rDESetupTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	struct rDESetupTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_rDESetupTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_rDESetupTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(rDESetupTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_rDESetupTable_row(StorageTmp);
@@ -18660,6 +20530,7 @@ var_rDESetupTable(struct variable *vp, oid * name, size_t *length, int exact, si
 /**
  * @fn void refresh_rDEPairTable(void)
  * @brief refresh the scalar values of the rDEPairTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18678,6 +20549,7 @@ refresh_rDEPairTable(void)
 /**
  * @fn void refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp)
  * @brief refresh the contents of the rDEPairTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18693,6 +20565,7 @@ refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp)
 /**
  * @fn u_char *var_rDEPairTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in rDEPairTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18702,11 +20575,9 @@ var_rDEPairTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	struct rDEPairTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_rDEPairTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_rDEPairTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(rDEPairTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_rDEPairTable_row(StorageTmp);
@@ -18745,6 +20616,7 @@ var_rDEPairTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 /**
  * @fn void refresh_lLCConnectionLessTable(void)
  * @brief refresh the scalar values of the lLCConnectionLessTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18763,6 +20635,7 @@ refresh_lLCConnectionLessTable(void)
 /**
  * @fn void refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp)
  * @brief refresh the contents of the lLCConnectionLessTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18778,6 +20651,7 @@ refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTm
 /**
  * @fn u_char *var_lLCConnectionLessTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCConnectionLessTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18787,11 +20661,9 @@ var_lLCConnectionLessTable(struct variable *vp, oid * name, size_t *length, int 
 	struct lLCConnectionLessTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnectionLessTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCConnectionLessTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCConnectionLessTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCConnectionLessTable_row(StorageTmp);
@@ -18862,6 +20734,7 @@ var_lLCConnectionLessTable(struct variable *vp, oid * name, size_t *length, int 
 /**
  * @fn void refresh_lLCConnection2Table(void)
  * @brief refresh the scalar values of the lLCConnection2Table.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -18880,6 +20753,7 @@ refresh_lLCConnection2Table(void)
 /**
  * @fn void refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp)
  * @brief refresh the contents of the lLCConnection2Table row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -18895,6 +20769,7 @@ refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp)
 /**
  * @fn u_char *var_lLCConnection2Table(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCConnection2Table.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -18904,11 +20779,9 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 	struct lLCConnection2Table_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnection2Table: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCConnection2Table();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCConnection2TableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCConnection2Table_row(StorageTmp);
@@ -19115,6 +20988,7 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * @fn void refresh_lLCConnection2IVMOTable(void)
  * @brief refresh the scalar values of the lLCConnection2IVMOTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -19133,6 +21007,7 @@ refresh_lLCConnection2IVMOTable(void)
 /**
  * @fn void refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp)
  * @brief refresh the contents of the lLCConnection2IVMOTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -19148,6 +21023,7 @@ refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *Storage
 /**
  * @fn u_char *var_lLCConnection2IVMOTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCConnection2IVMOTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -19157,11 +21033,9 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
 	struct lLCConnection2IVMOTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnection2IVMOTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCConnection2IVMOTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCConnection2IVMOTable_row(StorageTmp);
@@ -19220,6 +21094,7 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
 /**
  * @fn void refresh_lLCConnectionlessAckTable(void)
  * @brief refresh the scalar values of the lLCConnectionlessAckTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -19238,6 +21113,7 @@ refresh_lLCConnectionlessAckTable(void)
 /**
  * @fn void refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp)
  * @brief refresh the contents of the lLCConnectionlessAckTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -19253,6 +21129,7 @@ refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *Sto
 /**
  * @fn u_char *var_lLCConnectionlessAckTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCConnectionlessAckTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -19262,11 +21139,9 @@ var_lLCConnectionlessAckTable(struct variable *vp, oid * name, size_t *length, i
 	struct lLCConnectionlessAckTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnectionlessAckTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCConnectionlessAckTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCConnectionlessAckTable_row(StorageTmp);
@@ -19421,6 +21296,7 @@ var_lLCConnectionlessAckTable(struct variable *vp, oid * name, size_t *length, i
 /**
  * @fn void refresh_lLCConnectionlessAckIVMOTable(void)
  * @brief refresh the scalar values of the lLCConnectionlessAckIVMOTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -19439,6 +21315,7 @@ refresh_lLCConnectionlessAckIVMOTable(void)
 /**
  * @fn void refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp)
  * @brief refresh the contents of the lLCConnectionlessAckIVMOTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -19454,6 +21331,7 @@ refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_d
 /**
  * @fn u_char *var_lLCConnectionlessAckIVMOTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in lLCConnectionlessAckIVMOTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -19463,11 +21341,9 @@ var_lLCConnectionlessAckIVMOTable(struct variable *vp, oid * name, size_t *lengt
 	struct lLCConnectionlessAckIVMOTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnectionlessAckIVMOTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_lLCConnectionlessAckIVMOTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_lLCConnectionlessAckIVMOTable_row(StorageTmp);
@@ -19494,6 +21370,7 @@ var_lLCConnectionlessAckIVMOTable(struct variable *vp, oid * name, size_t *lengt
 /**
  * @fn void refresh_networkEntityTable(void)
  * @brief refresh the scalar values of the networkEntityTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -19512,6 +21389,7 @@ refresh_networkEntityTable(void)
 /**
  * @fn void refresh_networkEntityTable_row(struct networkEntityTable_data *StorageTmp)
  * @brief refresh the contents of the networkEntityTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -19527,6 +21405,7 @@ refresh_networkEntityTable_row(struct networkEntityTable_data *StorageTmp)
 /**
  * @fn u_char *var_networkEntityTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in networkEntityTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -19536,11 +21415,9 @@ var_networkEntityTable(struct variable *vp, oid * name, size_t *length, int exac
 	struct networkEntityTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_networkEntityTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_networkEntityTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(networkEntityTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_networkEntityTable_row(StorageTmp);
@@ -19567,6 +21444,7 @@ var_networkEntityTable(struct variable *vp, oid * name, size_t *length, int exac
 /**
  * @fn void refresh_nSAPTable(void)
  * @brief refresh the scalar values of the nSAPTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -19585,6 +21463,7 @@ refresh_nSAPTable(void)
 /**
  * @fn void refresh_nSAPTable_row(struct nSAPTable_data *StorageTmp)
  * @brief refresh the contents of the nSAPTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -19600,6 +21479,7 @@ refresh_nSAPTable_row(struct nSAPTable_data *StorageTmp)
 /**
  * @fn u_char *var_nSAPTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in nSAPTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -19609,11 +21489,9 @@ var_nSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	struct nSAPTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_nSAPTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_nSAPTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(nSAPTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_nSAPTable_row(StorageTmp);
@@ -19632,6 +21510,7 @@ var_nSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 /**
  * @fn void refresh_cLNSTable(void)
  * @brief refresh the scalar values of the cLNSTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -19650,6 +21529,7 @@ refresh_cLNSTable(void)
 /**
  * @fn void refresh_cLNSTable_row(struct cLNSTable_data *StorageTmp)
  * @brief refresh the contents of the cLNSTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -19665,6 +21545,7 @@ refresh_cLNSTable_row(struct cLNSTable_data *StorageTmp)
 /**
  * @fn u_char *var_cLNSTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in cLNSTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -19674,11 +21555,9 @@ var_cLNSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	struct cLNSTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_cLNSTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_cLNSTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(cLNSTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_cLNSTable_row(StorageTmp);
@@ -19749,6 +21628,7 @@ var_cLNSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 /**
  * @fn void refresh_cLNSISISTable(void)
  * @brief refresh the scalar values of the cLNSISISTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -19767,6 +21647,7 @@ refresh_cLNSISISTable(void)
 /**
  * @fn void refresh_cLNSISISTable_row(struct cLNSISISTable_data *StorageTmp)
  * @brief refresh the contents of the cLNSISISTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -19782,6 +21663,7 @@ refresh_cLNSISISTable_row(struct cLNSISISTable_data *StorageTmp)
 /**
  * @fn u_char *var_cLNSISISTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in cLNSISISTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -19791,11 +21673,9 @@ var_cLNSISISTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	struct cLNSISISTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_cLNSISISTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_cLNSISISTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(cLNSISISTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_cLNSISISTable_row(StorageTmp);
@@ -19938,6 +21818,7 @@ var_cLNSISISTable(struct variable *vp, oid * name, size_t *length, int exact, si
 /**
  * @fn void refresh_cLNSISISLevel2Table(void)
  * @brief refresh the scalar values of the cLNSISISLevel2Table.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -19956,6 +21837,7 @@ refresh_cLNSISISLevel2Table(void)
 /**
  * @fn void refresh_cLNSISISLevel2Table_row(struct cLNSISISLevel2Table_data *StorageTmp)
  * @brief refresh the contents of the cLNSISISLevel2Table row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -19971,6 +21853,7 @@ refresh_cLNSISISLevel2Table_row(struct cLNSISISLevel2Table_data *StorageTmp)
 /**
  * @fn u_char *var_cLNSISISLevel2Table(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in cLNSISISLevel2Table.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -19980,11 +21863,9 @@ var_cLNSISISLevel2Table(struct variable *vp, oid * name, size_t *length, int exa
 	struct cLNSISISLevel2Table_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_cLNSISISLevel2Table: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_cLNSISISLevel2Table();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(cLNSISISLevel2TableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_cLNSISISLevel2Table_row(StorageTmp);
@@ -20039,6 +21920,7 @@ var_cLNSISISLevel2Table(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * @fn void refresh_linkageTable(void)
  * @brief refresh the scalar values of the linkageTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -20057,6 +21939,7 @@ refresh_linkageTable(void)
 /**
  * @fn void refresh_linkageTable_row(struct linkageTable_data *StorageTmp)
  * @brief refresh the contents of the linkageTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -20072,6 +21955,7 @@ refresh_linkageTable_row(struct linkageTable_data *StorageTmp)
 /**
  * @fn u_char *var_linkageTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in linkageTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -20081,11 +21965,9 @@ var_linkageTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	struct linkageTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_linkageTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_linkageTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(linkageTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_linkageTable_row(StorageTmp);
@@ -20360,6 +22242,7 @@ var_linkageTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 /**
  * @fn void refresh_cONSTable(void)
  * @brief refresh the scalar values of the cONSTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -20378,6 +22261,7 @@ refresh_cONSTable(void)
 /**
  * @fn void refresh_cONSTable_row(struct cONSTable_data *StorageTmp)
  * @brief refresh the contents of the cONSTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -20393,6 +22277,7 @@ refresh_cONSTable_row(struct cONSTable_data *StorageTmp)
 /**
  * @fn u_char *var_cONSTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in cONSTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -20402,11 +22287,9 @@ var_cONSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	struct cONSTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_cONSTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_cONSTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(cONSTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_cONSTable_row(StorageTmp);
@@ -20433,6 +22316,7 @@ var_cONSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 /**
  * @fn void refresh_networkConnectionTable(void)
  * @brief refresh the scalar values of the networkConnectionTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -20451,6 +22335,7 @@ refresh_networkConnectionTable(void)
 /**
  * @fn void refresh_networkConnectionTable_row(struct networkConnectionTable_data *StorageTmp)
  * @brief refresh the contents of the networkConnectionTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -20466,6 +22351,7 @@ refresh_networkConnectionTable_row(struct networkConnectionTable_data *StorageTm
 /**
  * @fn u_char *var_networkConnectionTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in networkConnectionTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -20475,11 +22361,9 @@ var_networkConnectionTable(struct variable *vp, oid * name, size_t *length, int 
 	struct networkConnectionTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_networkConnectionTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_networkConnectionTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(networkConnectionTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_networkConnectionTable_row(StorageTmp);
@@ -20506,6 +22390,7 @@ var_networkConnectionTable(struct variable *vp, oid * name, size_t *length, int 
 /**
  * @fn void refresh_x25PLETable(void)
  * @brief refresh the scalar values of the x25PLETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -20524,6 +22409,7 @@ refresh_x25PLETable(void)
 /**
  * @fn void refresh_x25PLETable_row(struct x25PLETable_data *StorageTmp)
  * @brief refresh the contents of the x25PLETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -20539,6 +22425,7 @@ refresh_x25PLETable_row(struct x25PLETable_data *StorageTmp)
 /**
  * @fn u_char *var_x25PLETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in x25PLETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -20548,11 +22435,9 @@ var_x25PLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 	struct x25PLETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_x25PLETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(x25PLETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_x25PLETable_row(StorageTmp);
@@ -20767,6 +22652,7 @@ var_x25PLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 /**
  * @fn void refresh_x25PLE_DTETable(void)
  * @brief refresh the scalar values of the x25PLE_DTETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -20785,6 +22671,7 @@ refresh_x25PLE_DTETable(void)
 /**
  * @fn void refresh_x25PLE_DTETable_row(struct x25PLE_DTETable_data *StorageTmp)
  * @brief refresh the contents of the x25PLE_DTETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -20800,6 +22687,7 @@ refresh_x25PLE_DTETable_row(struct x25PLE_DTETable_data *StorageTmp)
 /**
  * @fn u_char *var_x25PLE_DTETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in x25PLE_DTETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -20809,11 +22697,9 @@ var_x25PLE_DTETable(struct variable *vp, oid * name, size_t *length, int exact, 
 	struct x25PLE_DTETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLE_DTETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_x25PLE_DTETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(x25PLE_DTETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_x25PLE_DTETable_row(StorageTmp);
@@ -20984,6 +22870,7 @@ var_x25PLE_DTETable(struct variable *vp, oid * name, size_t *length, int exact, 
 /**
  * @fn void refresh_x25PLE_DCETable(void)
  * @brief refresh the scalar values of the x25PLE_DCETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -21002,6 +22889,7 @@ refresh_x25PLE_DCETable(void)
 /**
  * @fn void refresh_x25PLE_DCETable_row(struct x25PLE_DCETable_data *StorageTmp)
  * @brief refresh the contents of the x25PLE_DCETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -21017,6 +22905,7 @@ refresh_x25PLE_DCETable_row(struct x25PLE_DCETable_data *StorageTmp)
 /**
  * @fn u_char *var_x25PLE_DCETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in x25PLE_DCETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -21026,11 +22915,9 @@ var_x25PLE_DCETable(struct variable *vp, oid * name, size_t *length, int exact, 
 	struct x25PLE_DCETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLE_DCETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_x25PLE_DCETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(x25PLE_DCETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_x25PLE_DCETable_row(StorageTmp);
@@ -21237,6 +23124,7 @@ var_x25PLE_DCETable(struct variable *vp, oid * name, size_t *length, int exact, 
 /**
  * @fn void refresh_x25PLEIVMOTable(void)
  * @brief refresh the scalar values of the x25PLEIVMOTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -21255,6 +23143,7 @@ refresh_x25PLEIVMOTable(void)
 /**
  * @fn void refresh_x25PLEIVMOTable_row(struct x25PLEIVMOTable_data *StorageTmp)
  * @brief refresh the contents of the x25PLEIVMOTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -21270,6 +23159,7 @@ refresh_x25PLEIVMOTable_row(struct x25PLEIVMOTable_data *StorageTmp)
 /**
  * @fn u_char *var_x25PLEIVMOTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in x25PLEIVMOTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -21279,11 +23169,9 @@ var_x25PLEIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, 
 	struct x25PLEIVMOTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLEIVMOTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_x25PLEIVMOTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(x25PLEIVMOTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_x25PLEIVMOTable_row(StorageTmp);
@@ -21394,6 +23282,7 @@ var_x25PLEIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, 
 /**
  * @fn void refresh_x25PLEIVMO_DTETable(void)
  * @brief refresh the scalar values of the x25PLEIVMO_DTETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -21412,6 +23301,7 @@ refresh_x25PLEIVMO_DTETable(void)
 /**
  * @fn void refresh_x25PLEIVMO_DTETable_row(struct x25PLEIVMO_DTETable_data *StorageTmp)
  * @brief refresh the contents of the x25PLEIVMO_DTETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -21427,6 +23317,7 @@ refresh_x25PLEIVMO_DTETable_row(struct x25PLEIVMO_DTETable_data *StorageTmp)
 /**
  * @fn u_char *var_x25PLEIVMO_DTETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in x25PLEIVMO_DTETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -21436,11 +23327,9 @@ var_x25PLEIVMO_DTETable(struct variable *vp, oid * name, size_t *length, int exa
 	struct x25PLEIVMO_DTETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLEIVMO_DTETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_x25PLEIVMO_DTETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(x25PLEIVMO_DTETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_x25PLEIVMO_DTETable_row(StorageTmp);
@@ -21615,6 +23504,7 @@ var_x25PLEIVMO_DTETable(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * @fn void refresh_x25PLEIVMO_DCETable(void)
  * @brief refresh the scalar values of the x25PLEIVMO_DCETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -21633,6 +23523,7 @@ refresh_x25PLEIVMO_DCETable(void)
 /**
  * @fn void refresh_x25PLEIVMO_DCETable_row(struct x25PLEIVMO_DCETable_data *StorageTmp)
  * @brief refresh the contents of the x25PLEIVMO_DCETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -21648,6 +23539,7 @@ refresh_x25PLEIVMO_DCETable_row(struct x25PLEIVMO_DCETable_data *StorageTmp)
 /**
  * @fn u_char *var_x25PLEIVMO_DCETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in x25PLEIVMO_DCETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -21657,11 +23549,9 @@ var_x25PLEIVMO_DCETable(struct variable *vp, oid * name, size_t *length, int exa
 	struct x25PLEIVMO_DCETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLEIVMO_DCETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_x25PLEIVMO_DCETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(x25PLEIVMO_DCETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_x25PLEIVMO_DCETable_row(StorageTmp);
@@ -21680,6 +23570,7 @@ var_x25PLEIVMO_DCETable(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * @fn void refresh_virtualCallTable(void)
  * @brief refresh the scalar values of the virtualCallTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -21698,6 +23589,7 @@ refresh_virtualCallTable(void)
 /**
  * @fn void refresh_virtualCallTable_row(struct virtualCallTable_data *StorageTmp)
  * @brief refresh the contents of the virtualCallTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -21713,6 +23605,7 @@ refresh_virtualCallTable_row(struct virtualCallTable_data *StorageTmp)
 /**
  * @fn u_char *var_virtualCallTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in virtualCallTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -21722,11 +23615,9 @@ var_virtualCallTable(struct variable *vp, oid * name, size_t *length, int exact,
 	struct virtualCallTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCallTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_virtualCallTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(virtualCallTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_virtualCallTable_row(StorageTmp);
@@ -21797,6 +23688,7 @@ var_virtualCallTable(struct variable *vp, oid * name, size_t *length, int exact,
 /**
  * @fn void refresh_virtualCircuitTable(void)
  * @brief refresh the scalar values of the virtualCircuitTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -21815,6 +23707,7 @@ refresh_virtualCircuitTable(void)
 /**
  * @fn void refresh_virtualCircuitTable_row(struct virtualCircuitTable_data *StorageTmp)
  * @brief refresh the contents of the virtualCircuitTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -21830,6 +23723,7 @@ refresh_virtualCircuitTable_row(struct virtualCircuitTable_data *StorageTmp)
 /**
  * @fn u_char *var_virtualCircuitTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in virtualCircuitTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -21839,11 +23733,9 @@ var_virtualCircuitTable(struct variable *vp, oid * name, size_t *length, int exa
 	struct virtualCircuitTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCircuitTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_virtualCircuitTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(virtualCircuitTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_virtualCircuitTable_row(StorageTmp);
@@ -21874,6 +23766,7 @@ var_virtualCircuitTable(struct variable *vp, oid * name, size_t *length, int exa
 /**
  * @fn void refresh_virtualCircuit_DTETable(void)
  * @brief refresh the scalar values of the virtualCircuit_DTETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -21892,6 +23785,7 @@ refresh_virtualCircuit_DTETable(void)
 /**
  * @fn void refresh_virtualCircuit_DTETable_row(struct virtualCircuit_DTETable_data *StorageTmp)
  * @brief refresh the contents of the virtualCircuit_DTETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -21907,6 +23801,7 @@ refresh_virtualCircuit_DTETable_row(struct virtualCircuit_DTETable_data *Storage
 /**
  * @fn u_char *var_virtualCircuit_DTETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in virtualCircuit_DTETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -21916,11 +23811,9 @@ var_virtualCircuit_DTETable(struct variable *vp, oid * name, size_t *length, int
 	struct virtualCircuit_DTETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCircuit_DTETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_virtualCircuit_DTETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(virtualCircuit_DTETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_virtualCircuit_DTETable_row(StorageTmp);
@@ -21979,6 +23872,7 @@ var_virtualCircuit_DTETable(struct variable *vp, oid * name, size_t *length, int
 /**
  * @fn void refresh_virtualCircuit_DCETable(void)
  * @brief refresh the scalar values of the virtualCircuit_DCETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -21997,6 +23891,7 @@ refresh_virtualCircuit_DCETable(void)
 /**
  * @fn void refresh_virtualCircuit_DCETable_row(struct virtualCircuit_DCETable_data *StorageTmp)
  * @brief refresh the contents of the virtualCircuit_DCETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22012,6 +23907,7 @@ refresh_virtualCircuit_DCETable_row(struct virtualCircuit_DCETable_data *Storage
 /**
  * @fn u_char *var_virtualCircuit_DCETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in virtualCircuit_DCETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22021,11 +23917,9 @@ var_virtualCircuit_DCETable(struct variable *vp, oid * name, size_t *length, int
 	struct virtualCircuit_DCETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCircuit_DCETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_virtualCircuit_DCETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(virtualCircuit_DCETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_virtualCircuit_DCETable_row(StorageTmp);
@@ -22096,6 +23990,7 @@ var_virtualCircuit_DCETable(struct variable *vp, oid * name, size_t *length, int
 /**
  * @fn void refresh_permanentVirtualCircuitTable(void)
  * @brief refresh the scalar values of the permanentVirtualCircuitTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22114,6 +24009,7 @@ refresh_permanentVirtualCircuitTable(void)
 /**
  * @fn void refresh_permanentVirtualCircuitTable_row(struct permanentVirtualCircuitTable_data *StorageTmp)
  * @brief refresh the contents of the permanentVirtualCircuitTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22129,6 +24025,7 @@ refresh_permanentVirtualCircuitTable_row(struct permanentVirtualCircuitTable_dat
 /**
  * @fn u_char *var_permanentVirtualCircuitTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in permanentVirtualCircuitTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22138,11 +24035,9 @@ var_permanentVirtualCircuitTable(struct variable *vp, oid * name, size_t *length
 	struct permanentVirtualCircuitTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_permanentVirtualCircuitTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_permanentVirtualCircuitTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(permanentVirtualCircuitTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_permanentVirtualCircuitTable_row(StorageTmp);
@@ -22165,6 +24060,7 @@ var_permanentVirtualCircuitTable(struct variable *vp, oid * name, size_t *length
 /**
  * @fn void refresh_permanentVirtualCircuit_DTETable(void)
  * @brief refresh the scalar values of the permanentVirtualCircuit_DTETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22183,6 +24079,7 @@ refresh_permanentVirtualCircuit_DTETable(void)
 /**
  * @fn void refresh_permanentVirtualCircuit_DTETable_row(struct permanentVirtualCircuit_DTETable_data *StorageTmp)
  * @brief refresh the contents of the permanentVirtualCircuit_DTETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22198,6 +24095,7 @@ refresh_permanentVirtualCircuit_DTETable_row(struct permanentVirtualCircuit_DTET
 /**
  * @fn u_char *var_permanentVirtualCircuit_DTETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in permanentVirtualCircuit_DTETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22207,11 +24105,9 @@ var_permanentVirtualCircuit_DTETable(struct variable *vp, oid * name, size_t *le
 	struct permanentVirtualCircuit_DTETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_permanentVirtualCircuit_DTETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_permanentVirtualCircuit_DTETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(permanentVirtualCircuit_DTETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_permanentVirtualCircuit_DTETable_row(StorageTmp);
@@ -22246,6 +24142,7 @@ var_permanentVirtualCircuit_DTETable(struct variable *vp, oid * name, size_t *le
 /**
  * @fn void refresh_permanentVirtualCircuit_DCETable(void)
  * @brief refresh the scalar values of the permanentVirtualCircuit_DCETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22264,6 +24161,7 @@ refresh_permanentVirtualCircuit_DCETable(void)
 /**
  * @fn void refresh_permanentVirtualCircuit_DCETable_row(struct permanentVirtualCircuit_DCETable_data *StorageTmp)
  * @brief refresh the contents of the permanentVirtualCircuit_DCETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22279,6 +24177,7 @@ refresh_permanentVirtualCircuit_DCETable_row(struct permanentVirtualCircuit_DCET
 /**
  * @fn u_char *var_permanentVirtualCircuit_DCETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in permanentVirtualCircuit_DCETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22288,11 +24187,9 @@ var_permanentVirtualCircuit_DCETable(struct variable *vp, oid * name, size_t *le
 	struct permanentVirtualCircuit_DCETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_permanentVirtualCircuit_DCETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_permanentVirtualCircuit_DCETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(permanentVirtualCircuit_DCETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_permanentVirtualCircuit_DCETable_row(StorageTmp);
@@ -22343,6 +24240,7 @@ var_permanentVirtualCircuit_DCETable(struct variable *vp, oid * name, size_t *le
 /**
  * @fn void refresh_virtualCallIVMOTable(void)
  * @brief refresh the scalar values of the virtualCallIVMOTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22361,6 +24259,7 @@ refresh_virtualCallIVMOTable(void)
 /**
  * @fn void refresh_virtualCallIVMOTable_row(struct virtualCallIVMOTable_data *StorageTmp)
  * @brief refresh the contents of the virtualCallIVMOTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22376,6 +24275,7 @@ refresh_virtualCallIVMOTable_row(struct virtualCallIVMOTable_data *StorageTmp)
 /**
  * @fn u_char *var_virtualCallIVMOTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in virtualCallIVMOTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22385,11 +24285,9 @@ var_virtualCallIVMOTable(struct variable *vp, oid * name, size_t *length, int ex
 	struct virtualCallIVMOTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCallIVMOTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_virtualCallIVMOTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(virtualCallIVMOTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_virtualCallIVMOTable_row(StorageTmp);
@@ -22488,6 +24386,7 @@ var_virtualCallIVMOTable(struct variable *vp, oid * name, size_t *length, int ex
 /**
  * @fn void refresh_switchedVirtualCallTable(void)
  * @brief refresh the scalar values of the switchedVirtualCallTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22506,6 +24405,7 @@ refresh_switchedVirtualCallTable(void)
 /**
  * @fn void refresh_switchedVirtualCallTable_row(struct switchedVirtualCallTable_data *StorageTmp)
  * @brief refresh the contents of the switchedVirtualCallTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22521,6 +24421,7 @@ refresh_switchedVirtualCallTable_row(struct switchedVirtualCallTable_data *Stora
 /**
  * @fn u_char *var_switchedVirtualCallTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in switchedVirtualCallTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22530,11 +24431,9 @@ var_switchedVirtualCallTable(struct variable *vp, oid * name, size_t *length, in
 	struct switchedVirtualCallTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_switchedVirtualCallTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_switchedVirtualCallTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(switchedVirtualCallTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_switchedVirtualCallTable_row(StorageTmp);
@@ -22581,6 +24480,7 @@ var_switchedVirtualCallTable(struct variable *vp, oid * name, size_t *length, in
 /**
  * @fn void refresh_virtualCall_DTETable(void)
  * @brief refresh the scalar values of the virtualCall_DTETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22599,6 +24499,7 @@ refresh_virtualCall_DTETable(void)
 /**
  * @fn void refresh_virtualCall_DTETable_row(struct virtualCall_DTETable_data *StorageTmp)
  * @brief refresh the contents of the virtualCall_DTETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22614,6 +24515,7 @@ refresh_virtualCall_DTETable_row(struct virtualCall_DTETable_data *StorageTmp)
 /**
  * @fn u_char *var_virtualCall_DTETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in virtualCall_DTETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22623,11 +24525,9 @@ var_virtualCall_DTETable(struct variable *vp, oid * name, size_t *length, int ex
 	struct virtualCall_DTETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCall_DTETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_virtualCall_DTETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(virtualCall_DTETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_virtualCall_DTETable_row(StorageTmp);
@@ -22678,6 +24578,7 @@ var_virtualCall_DTETable(struct variable *vp, oid * name, size_t *length, int ex
 /**
  * @fn void refresh_virtualCall_DCETable(void)
  * @brief refresh the scalar values of the virtualCall_DCETable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22696,6 +24597,7 @@ refresh_virtualCall_DCETable(void)
 /**
  * @fn void refresh_virtualCall_DCETable_row(struct virtualCall_DCETable_data *StorageTmp)
  * @brief refresh the contents of the virtualCall_DCETable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22711,6 +24613,7 @@ refresh_virtualCall_DCETable_row(struct virtualCall_DCETable_data *StorageTmp)
 /**
  * @fn u_char *var_virtualCall_DCETable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in virtualCall_DCETable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22720,11 +24623,9 @@ var_virtualCall_DCETable(struct variable *vp, oid * name, size_t *length, int ex
 	struct virtualCall_DCETable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCall_DCETable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_virtualCall_DCETable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(virtualCall_DCETableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_virtualCall_DCETable_row(StorageTmp);
@@ -22795,6 +24696,7 @@ var_virtualCall_DCETable(struct variable *vp, oid * name, size_t *length, int ex
 /**
  * @fn void refresh_dSeriesCountsTable(void)
  * @brief refresh the scalar values of the dSeriesCountsTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22813,6 +24715,7 @@ refresh_dSeriesCountsTable(void)
 /**
  * @fn void refresh_dSeriesCountsTable_row(struct dSeriesCountsTable_data *StorageTmp)
  * @brief refresh the contents of the dSeriesCountsTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22828,6 +24731,7 @@ refresh_dSeriesCountsTable_row(struct dSeriesCountsTable_data *StorageTmp)
 /**
  * @fn u_char *var_dSeriesCountsTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in dSeriesCountsTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22837,11 +24741,9 @@ var_dSeriesCountsTable(struct variable *vp, oid * name, size_t *length, int exac
 	struct dSeriesCountsTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_dSeriesCountsTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_dSeriesCountsTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(dSeriesCountsTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_dSeriesCountsTable_row(StorageTmp);
@@ -22872,6 +24774,7 @@ var_dSeriesCountsTable(struct variable *vp, oid * name, size_t *length, int exac
 /**
  * @fn void refresh_adjacencyTable(void)
  * @brief refresh the scalar values of the adjacencyTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22890,6 +24793,7 @@ refresh_adjacencyTable(void)
 /**
  * @fn void refresh_adjacencyTable_row(struct adjacencyTable_data *StorageTmp)
  * @brief refresh the contents of the adjacencyTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -22905,6 +24809,7 @@ refresh_adjacencyTable_row(struct adjacencyTable_data *StorageTmp)
 /**
  * @fn u_char *var_adjacencyTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in adjacencyTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -22914,11 +24819,9 @@ var_adjacencyTable(struct variable *vp, oid * name, size_t *length, int exact, s
 	struct adjacencyTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_adjacencyTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_adjacencyTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(adjacencyTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_adjacencyTable_row(StorageTmp);
@@ -22969,6 +24872,7 @@ var_adjacencyTable(struct variable *vp, oid * name, size_t *length, int exact, s
 /**
  * @fn void refresh_virtualAdjacencyTable(void)
  * @brief refresh the scalar values of the virtualAdjacencyTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -22987,6 +24891,7 @@ refresh_virtualAdjacencyTable(void)
 /**
  * @fn void refresh_virtualAdjacencyTable_row(struct virtualAdjacencyTable_data *StorageTmp)
  * @brief refresh the contents of the virtualAdjacencyTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -23002,6 +24907,7 @@ refresh_virtualAdjacencyTable_row(struct virtualAdjacencyTable_data *StorageTmp)
 /**
  * @fn u_char *var_virtualAdjacencyTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in virtualAdjacencyTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -23011,11 +24917,9 @@ var_virtualAdjacencyTable(struct variable *vp, oid * name, size_t *length, int e
 	struct virtualAdjacencyTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_virtualAdjacencyTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_virtualAdjacencyTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(virtualAdjacencyTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_virtualAdjacencyTable_row(StorageTmp);
@@ -23034,6 +24938,7 @@ var_virtualAdjacencyTable(struct variable *vp, oid * name, size_t *length, int e
 /**
  * @fn void refresh_destinationTable(void)
  * @brief refresh the scalar values of the destinationTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -23052,6 +24957,7 @@ refresh_destinationTable(void)
 /**
  * @fn void refresh_destinationTable_row(struct destinationTable_data *StorageTmp)
  * @brief refresh the contents of the destinationTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -23067,6 +24973,7 @@ refresh_destinationTable_row(struct destinationTable_data *StorageTmp)
 /**
  * @fn u_char *var_destinationTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in destinationTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -23076,11 +24983,9 @@ var_destinationTable(struct variable *vp, oid * name, size_t *length, int exact,
 	struct destinationTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_destinationTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_destinationTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(destinationTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_destinationTable_row(StorageTmp);
@@ -23127,6 +25032,7 @@ var_destinationTable(struct variable *vp, oid * name, size_t *length, int exact,
 /**
  * @fn void refresh_destinationSystemTable(void)
  * @brief refresh the scalar values of the destinationSystemTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -23145,6 +25051,7 @@ refresh_destinationSystemTable(void)
 /**
  * @fn void refresh_destinationSystemTable_row(struct destinationSystemTable_data *StorageTmp)
  * @brief refresh the contents of the destinationSystemTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -23160,6 +25067,7 @@ refresh_destinationSystemTable_row(struct destinationSystemTable_data *StorageTm
 /**
  * @fn u_char *var_destinationSystemTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in destinationSystemTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -23169,11 +25077,9 @@ var_destinationSystemTable(struct variable *vp, oid * name, size_t *length, int 
 	struct destinationSystemTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_destinationSystemTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_destinationSystemTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(destinationSystemTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_destinationSystemTable_row(StorageTmp);
@@ -23192,6 +25098,7 @@ var_destinationSystemTable(struct variable *vp, oid * name, size_t *length, int 
 /**
  * @fn void refresh_destinationAreaTable(void)
  * @brief refresh the scalar values of the destinationAreaTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -23210,6 +25117,7 @@ refresh_destinationAreaTable(void)
 /**
  * @fn void refresh_destinationAreaTable_row(struct destinationAreaTable_data *StorageTmp)
  * @brief refresh the contents of the destinationAreaTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -23225,6 +25133,7 @@ refresh_destinationAreaTable_row(struct destinationAreaTable_data *StorageTmp)
 /**
  * @fn u_char *var_destinationAreaTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in destinationAreaTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -23234,11 +25143,9 @@ var_destinationAreaTable(struct variable *vp, oid * name, size_t *length, int ex
 	struct destinationAreaTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_destinationAreaTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_destinationAreaTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(destinationAreaTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_destinationAreaTable_row(StorageTmp);
@@ -23257,6 +25164,7 @@ var_destinationAreaTable(struct variable *vp, oid * name, size_t *length, int ex
 /**
  * @fn void refresh_reachableAddressTable(void)
  * @brief refresh the scalar values of the reachableAddressTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -23275,6 +25183,7 @@ refresh_reachableAddressTable(void)
 /**
  * @fn void refresh_reachableAddressTable_row(struct reachableAddressTable_data *StorageTmp)
  * @brief refresh the contents of the reachableAddressTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -23290,6 +25199,7 @@ refresh_reachableAddressTable_row(struct reachableAddressTable_data *StorageTmp)
 /**
  * @fn u_char *var_reachableAddressTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in reachableAddressTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_dlMIB above.
  */
@@ -23299,11 +25209,9 @@ var_reachableAddressTable(struct variable *vp, oid * name, size_t *length, int e
 	struct reachableAddressTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("dlMIB", "var_reachableAddressTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_reachableAddressTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(reachableAddressTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_reachableAddressTable_row(StorageTmp);
@@ -23420,9 +25328,8 @@ write_physicalEntityPhysicalEntityTitles(int action, u_char *var_val, u_char var
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(objid);
 		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
+				   UNDO case */
 		old_value = StorageTmp->physicalEntityPhysicalEntityTitles;
 		old_length = StorageTmp->physicalEntityPhysicalEntityTitlesLen;
 		StorageTmp->physicalEntityPhysicalEntityTitles = objid;
@@ -23432,8 +25339,7 @@ write_physicalEntityPhysicalEntityTitles(int action, u_char *var_val, u_char var
 		StorageTmp->physicalEntityPhysicalEntityTitles = old_value;
 		StorageTmp->physicalEntityPhysicalEntityTitlesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
@@ -23502,9 +25408,8 @@ write_dataCircuitBitErrorsThreshold(int action, u_char *var_val, u_char var_val_
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->dataCircuitBitErrorsThreshold;
 		old_length = StorageTmp->dataCircuitBitErrorsThresholdLen;
 		StorageTmp->dataCircuitBitErrorsThreshold = string;
@@ -23514,8 +25419,7 @@ write_dataCircuitBitErrorsThreshold(int action, u_char *var_val, u_char var_val_
 		StorageTmp->dataCircuitBitErrorsThreshold = old_value;
 		StorageTmp->dataCircuitBitErrorsThresholdLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -23582,17 +25486,15 @@ write_dataCircuitType(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->dataCircuitType;
 		StorageTmp->dataCircuitType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->dataCircuitType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -23653,9 +25555,8 @@ write_dataCircuitPhysicalMediaNames(int action, u_char *var_val, u_char var_val_
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->dataCircuitPhysicalMediaNames;
 		old_length = StorageTmp->dataCircuitPhysicalMediaNamesLen;
 		StorageTmp->dataCircuitPhysicalMediaNames = string;
@@ -23665,8 +25566,7 @@ write_dataCircuitPhysicalMediaNames(int action, u_char *var_val, u_char var_val_
 		StorageTmp->dataCircuitPhysicalMediaNames = old_value;
 		StorageTmp->dataCircuitPhysicalMediaNamesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -23730,9 +25630,8 @@ write_dataCircuitPhysicalInterfaceType(int action, u_char *var_val, u_char var_v
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->dataCircuitPhysicalInterfaceType;
 		old_length = StorageTmp->dataCircuitPhysicalInterfaceTypeLen;
 		StorageTmp->dataCircuitPhysicalInterfaceType = string;
@@ -23742,8 +25641,7 @@ write_dataCircuitPhysicalInterfaceType(int action, u_char *var_val, u_char var_v
 		StorageTmp->dataCircuitPhysicalInterfaceType = old_value;
 		StorageTmp->dataCircuitPhysicalInterfaceTypeLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -23807,9 +25705,8 @@ write_dataCircuitPhysicalInterfaceStandard(int action, u_char *var_val, u_char v
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->dataCircuitPhysicalInterfaceStandard;
 		old_length = StorageTmp->dataCircuitPhysicalInterfaceStandardLen;
 		StorageTmp->dataCircuitPhysicalInterfaceStandard = string;
@@ -23819,8 +25716,7 @@ write_dataCircuitPhysicalInterfaceStandard(int action, u_char *var_val, u_char v
 		StorageTmp->dataCircuitPhysicalInterfaceStandard = old_value;
 		StorageTmp->dataCircuitPhysicalInterfaceStandardLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -23887,17 +25783,15 @@ write_dataCircuitSynchronizationMode(int action, u_char *var_val, u_char var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->dataCircuitSynchronizationMode;
 		StorageTmp->dataCircuitSynchronizationMode = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->dataCircuitSynchronizationMode = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -23958,9 +25852,8 @@ write_dataCircuitTransmissionCoding(int action, u_char *var_val, u_char var_val_
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->dataCircuitTransmissionCoding;
 		old_length = StorageTmp->dataCircuitTransmissionCodingLen;
 		StorageTmp->dataCircuitTransmissionCoding = string;
@@ -23970,8 +25863,7 @@ write_dataCircuitTransmissionCoding(int action, u_char *var_val, u_char var_val_
 		StorageTmp->dataCircuitTransmissionCoding = old_value;
 		StorageTmp->dataCircuitTransmissionCodingLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -24039,17 +25931,15 @@ write_dataCircuitTransmissionMode(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->dataCircuitTransmissionMode;
 		StorageTmp->dataCircuitTransmissionMode = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->dataCircuitTransmissionMode = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24115,9 +26005,8 @@ write_dataCircuitTransmissionRate(int action, u_char *var_val, u_char var_val_ty
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->dataCircuitTransmissionRate;
 		old_length = StorageTmp->dataCircuitTransmissionRateLen;
 		StorageTmp->dataCircuitTransmissionRate = string;
@@ -24127,8 +26016,7 @@ write_dataCircuitTransmissionRate(int action, u_char *var_val, u_char var_val_ty
 		StorageTmp->dataCircuitTransmissionRate = old_value;
 		StorageTmp->dataCircuitTransmissionRateLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -24192,9 +26080,8 @@ write_physicalConnectionEndpointIdentifier(int action, u_char *var_val, u_char v
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->physicalConnectionEndpointIdentifier;
 		old_length = StorageTmp->physicalConnectionEndpointIdentifierLen;
 		StorageTmp->physicalConnectionEndpointIdentifier = string;
@@ -24204,8 +26091,7 @@ write_physicalConnectionEndpointIdentifier(int action, u_char *var_val, u_char v
 		StorageTmp->physicalConnectionEndpointIdentifier = old_value;
 		StorageTmp->physicalConnectionEndpointIdentifierLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -24264,17 +26150,15 @@ write_physicalConnectionPortNumber(int action, u_char *var_val, u_char var_val_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->physicalConnectionPortNumber;
 		StorageTmp->physicalConnectionPortNumber = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->physicalConnectionPortNumber = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24334,9 +26218,8 @@ write_datalinkEntityProviderEntityNames(int action, u_char *var_val, u_char var_
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(objid);
 		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
+				   UNDO case */
 		old_value = StorageTmp->datalinkEntityProviderEntityNames;
 		old_length = StorageTmp->datalinkEntityProviderEntityNamesLen;
 		StorageTmp->datalinkEntityProviderEntityNames = objid;
@@ -24346,8 +26229,7 @@ write_datalinkEntityProviderEntityNames(int action, u_char *var_val, u_char var_
 		StorageTmp->datalinkEntityProviderEntityNames = old_value;
 		StorageTmp->datalinkEntityProviderEntityNamesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
@@ -24411,17 +26293,15 @@ write_lAPBDLEmT1Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lAPBDLEmT1Timer;
 		StorageTmp->lAPBDLEmT1Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lAPBDLEmT1Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24482,17 +26362,15 @@ write_lAPBDLEmT3Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lAPBDLEmT3Timer;
 		StorageTmp->lAPBDLEmT3Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lAPBDLEmT3Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24548,17 +26426,15 @@ write_lAPBDLEmW(int action, u_char *var_val, u_char var_val_type, size_t var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lAPBDLEmW;
 		StorageTmp->lAPBDLEmW = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lAPBDLEmW = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24614,17 +26490,15 @@ write_lAPBDLEmXSend(int action, u_char *var_val, u_char var_val_type, size_t var
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lAPBDLEmXSend;
 		StorageTmp->lAPBDLEmXSend = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lAPBDLEmXSend = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24680,17 +26554,15 @@ write_lAPBDLEmXReceive(int action, u_char *var_val, u_char var_val_type, size_t 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lAPBDLEmXReceive;
 		StorageTmp->lAPBDLEmXReceive = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lAPBDLEmXReceive = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24751,17 +26623,15 @@ write_lAPBDLEmT2Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lAPBDLEmT2Timer;
 		StorageTmp->lAPBDLEmT2Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lAPBDLEmT2Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24826,17 +26696,15 @@ write_sLPPMadministrativeState(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPPMadministrativeState;
 		StorageTmp->sLPPMadministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPPMadministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24900,17 +26768,15 @@ write_sLPConnectionInterfaceType(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionInterfaceType;
 		StorageTmp->sLPConnectionInterfaceType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionInterfaceType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -24966,17 +26832,15 @@ write_sLPConnectionK(int action, u_char *var_val, u_char var_val_type, size_t va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionK;
 		StorageTmp->sLPConnectionK = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionK = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25032,17 +26896,15 @@ write_sLPConnectionN1(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionN1;
 		StorageTmp->sLPConnectionN1 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionN1 = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25098,17 +26960,15 @@ write_sLPConnectionN2(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionN2;
 		StorageTmp->sLPConnectionN2 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionN2 = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25169,17 +27029,15 @@ write_sLPConnectionSequenceModulus(int action, u_char *var_val, u_char var_val_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionSequenceModulus;
 		StorageTmp->sLPConnectionSequenceModulus = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionSequenceModulus = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25240,17 +27098,15 @@ write_sLPConnectionT1Timer(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionT1Timer;
 		StorageTmp->sLPConnectionT1Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionT1Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25311,17 +27167,15 @@ write_sLPConnectionT2Timer(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionT2Timer;
 		StorageTmp->sLPConnectionT2Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionT2Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25382,17 +27236,15 @@ write_sLPConnectionT3Timer(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionT3Timer;
 		StorageTmp->sLPConnectionT3Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionT3Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25453,17 +27305,15 @@ write_sLPConnectionT4Timer(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionT4Timer;
 		StorageTmp->sLPConnectionT4Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionT4Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25528,17 +27378,15 @@ write_sLPConnectionAdministrativeState(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionAdministrativeState;
 		StorageTmp->sLPConnectionAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25602,17 +27450,15 @@ write_sLPConnectionIVMOinterfaceType(int action, u_char *var_val, u_char var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOinterfaceType;
 		StorageTmp->sLPConnectionIVMOinterfaceType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOinterfaceType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25668,17 +27514,15 @@ write_sLPConnectionIVMOk(int action, u_char *var_val, u_char var_val_type, size_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOk;
 		StorageTmp->sLPConnectionIVMOk = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOk = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25734,17 +27578,15 @@ write_sLPConnectionIVMOn1(int action, u_char *var_val, u_char var_val_type, size
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOn1;
 		StorageTmp->sLPConnectionIVMOn1 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOn1 = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25800,17 +27642,15 @@ write_sLPConnectionIVMOn2(int action, u_char *var_val, u_char var_val_type, size
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOn2;
 		StorageTmp->sLPConnectionIVMOn2 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOn2 = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25871,17 +27711,15 @@ write_sLPConnectionIVMOsequenceModulus(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOsequenceModulus;
 		StorageTmp->sLPConnectionIVMOsequenceModulus = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOsequenceModulus = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -25942,17 +27780,15 @@ write_sLPConnectionIVMOt1Timer(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOt1Timer;
 		StorageTmp->sLPConnectionIVMOt1Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOt1Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26013,17 +27849,15 @@ write_sLPConnectionIVMOt2Timer(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOt2Timer;
 		StorageTmp->sLPConnectionIVMOt2Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOt2Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26084,17 +27918,15 @@ write_sLPConnectionIVMOt3Timer(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOt3Timer;
 		StorageTmp->sLPConnectionIVMOt3Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOt3Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26155,17 +27987,15 @@ write_sLPConnectionIVMOt4Timer(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionIVMOt4Timer;
 		StorageTmp->sLPConnectionIVMOt4Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionIVMOt4Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26214,9 +28044,8 @@ write_lLCStationLLCName(int action, u_char *var_val, u_char var_val_type, size_t
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->lLCStationLLCName;
 		old_length = StorageTmp->lLCStationLLCNameLen;
 		StorageTmp->lLCStationLLCName = string;
@@ -26226,8 +28055,7 @@ write_lLCStationLLCName(int action, u_char *var_val, u_char var_val_type, size_t
 		StorageTmp->lLCStationLLCName = old_value;
 		StorageTmp->lLCStationLLCNameLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -26282,9 +28110,8 @@ write_lLCStationSupportedServicesTypes(int action, u_char *var_val, u_char var_v
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->lLCStationSupportedServicesTypes;
 		old_length = StorageTmp->lLCStationSupportedServicesTypesLen;
 		StorageTmp->lLCStationSupportedServicesTypes = string;
@@ -26294,8 +28121,7 @@ write_lLCStationSupportedServicesTypes(int action, u_char *var_val, u_char var_v
 		StorageTmp->lLCStationSupportedServicesTypes = old_value;
 		StorageTmp->lLCStationSupportedServicesTypesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -26346,17 +28172,15 @@ write_lLCStationType1AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationType1AcknowledgeTimeoutValue;
 		StorageTmp->lLCStationType1AcknowledgeTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationType1AcknowledgeTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26399,17 +28223,15 @@ write_lLCStationType1MaximumRetryCount(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationType1MaximumRetryCount;
 		StorageTmp->lLCStationType1MaximumRetryCount = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationType1MaximumRetryCount = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26452,17 +28274,15 @@ write_lLCStationMaximumPDUN3(int action, u_char *var_val, u_char var_val_type, s
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationMaximumPDUN3;
 		StorageTmp->lLCStationMaximumPDUN3 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationMaximumPDUN3 = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26505,17 +28325,15 @@ write_lLCStationMaximumRetransmissions4(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationMaximumRetransmissions4;
 		StorageTmp->lLCStationMaximumRetransmissions4 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationMaximumRetransmissions4 = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26563,17 +28381,15 @@ write_lLCStationReceiveVariableLifetime(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationReceiveVariableLifetime;
 		StorageTmp->lLCStationReceiveVariableLifetime = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationReceiveVariableLifetime = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26621,17 +28437,15 @@ write_lLCStationTransmitVariableLifetime(int action, u_char *var_val, u_char var
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationTransmitVariableLifetime;
 		StorageTmp->lLCStationTransmitVariableLifetime = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationTransmitVariableLifetime = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26679,17 +28493,15 @@ write_lLCStationType3AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationType3AcknowledgeTimeoutValue;
 		StorageTmp->lLCStationType3AcknowledgeTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationType3AcknowledgeTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26732,17 +28544,15 @@ write_lLCStationBufferSize(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationBufferSize;
 		StorageTmp->lLCStationBufferSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationBufferSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26794,9 +28604,8 @@ write_lLCStationSTRIndicator(int action, u_char *var_val, u_char var_val_type, s
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->lLCStationSTRIndicator;
 		old_length = StorageTmp->lLCStationSTRIndicatorLen;
 		StorageTmp->lLCStationSTRIndicator = string;
@@ -26806,8 +28615,7 @@ write_lLCStationSTRIndicator(int action, u_char *var_val, u_char var_val_type, s
 		StorageTmp->lLCStationSTRIndicator = old_value;
 		StorageTmp->lLCStationSTRIndicatorLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -26853,17 +28661,15 @@ write_lLCStationVersionNumber(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCStationVersionNumber;
 		StorageTmp->lLCStationVersionNumber = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationVersionNumber = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26914,17 +28720,15 @@ write_rDESetupAgingEnabled(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupAgingEnabled;
 		StorageTmp->rDESetupAgingEnabled = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupAgingEnabled = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -26967,17 +28771,15 @@ write_rDESetupAgingValue(int action, u_char *var_val, u_char var_val_type, size_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupAgingValue;
 		StorageTmp->rDESetupAgingValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupAgingValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27020,17 +28822,15 @@ write_rDESetupEnableType2Reset(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupEnableType2Reset;
 		StorageTmp->rDESetupEnableType2Reset = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupEnableType2Reset = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27073,17 +28873,15 @@ write_rDESetupMaximumRouteDescriptors(int action, u_char *var_val, u_char var_va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupMaximumRouteDescriptors;
 		StorageTmp->rDESetupMaximumRouteDescriptors = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupMaximumRouteDescriptors = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27131,17 +28929,15 @@ write_rDESetupMaximumResponseTime(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupMaximumResponseTime;
 		StorageTmp->rDESetupMaximumResponseTime = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupMaximumResponseTime = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27184,17 +28980,15 @@ write_rDESetupMinimumPDUSize(int action, u_char *var_val, u_char var_val_type, s
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupMinimumPDUSize;
 		StorageTmp->rDESetupMinimumPDUSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupMinimumPDUSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27245,17 +29039,15 @@ write_rDESetupRDEHold(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupRDEHold;
 		StorageTmp->rDESetupRDEHold = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupRDEHold = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27306,17 +29098,15 @@ write_rDESetupRDEReplace(int action, u_char *var_val, u_char var_val_type, size_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupRDEReplace;
 		StorageTmp->rDESetupRDEReplace = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupRDEReplace = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27367,17 +29157,15 @@ write_rDESetupResetOnTestEnabled(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->rDESetupResetOnTestEnabled;
 		StorageTmp->rDESetupResetOnTestEnabled = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupResetOnTestEnabled = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27426,9 +29214,8 @@ write_lLCConnectionlessName(int action, u_char *var_val, u_char var_val_type, si
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->lLCConnectionlessName;
 		old_length = StorageTmp->lLCConnectionlessNameLen;
 		StorageTmp->lLCConnectionlessName = string;
@@ -27438,8 +29225,7 @@ write_lLCConnectionlessName(int action, u_char *var_val, u_char var_val_type, si
 		StorageTmp->lLCConnectionlessName = old_value;
 		StorageTmp->lLCConnectionlessNameLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -27485,17 +29271,15 @@ write_lLCConnectionlessMaximumLLCInformationFieldSize(int action, u_char *var_va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessMaximumLLCInformationFieldSize;
 		StorageTmp->lLCConnectionlessMaximumLLCInformationFieldSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessMaximumLLCInformationFieldSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27544,9 +29328,8 @@ write_lLCConnection2Name(int action, u_char *var_val, u_char var_val_type, size_
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->lLCConnection2Name;
 		old_length = StorageTmp->lLCConnection2NameLen;
 		StorageTmp->lLCConnection2Name = string;
@@ -27556,8 +29339,7 @@ write_lLCConnection2Name(int action, u_char *var_val, u_char var_val_type, size_
 		StorageTmp->lLCConnection2Name = old_value;
 		StorageTmp->lLCConnection2NameLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -27603,17 +29385,15 @@ write_lLCConnection2MaximumRetransmissions(int action, u_char *var_val, u_char v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2MaximumRetransmissions;
 		StorageTmp->lLCConnection2MaximumRetransmissions = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2MaximumRetransmissions = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27656,17 +29436,15 @@ write_lLCConnection2ReceivedWindowSize(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2ReceivedWindowSize;
 		StorageTmp->lLCConnection2ReceivedWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2ReceivedWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27709,17 +29487,15 @@ write_lLCConnection2SendWindowSize(int action, u_char *var_val, u_char var_val_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2SendWindowSize;
 		StorageTmp->lLCConnection2SendWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2SendWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27767,17 +29543,15 @@ write_lLCConnection2AcknowledgeTimeoutValue(int action, u_char *var_val, u_char 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2AcknowledgeTimeoutValue;
 		StorageTmp->lLCConnection2AcknowledgeTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2AcknowledgeTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27825,17 +29599,15 @@ write_lLCConnection2BusyStateTimeoutValue(int action, u_char *var_val, u_char va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2BusyStateTimeoutValue;
 		StorageTmp->lLCConnection2BusyStateTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2BusyStateTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27883,17 +29655,15 @@ write_lLCConnection2PBitTimeoutValue(int action, u_char *var_val, u_char var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2PBitTimeoutValue;
 		StorageTmp->lLCConnection2PBitTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2PBitTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -27941,17 +29711,15 @@ write_lLCConnection2RejectTimeoutValue(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2RejectTimeoutValue;
 		StorageTmp->lLCConnection2RejectTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2RejectTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28000,9 +29768,8 @@ write_lLCConnection2Route(int action, u_char *var_val, u_char var_val_type, size
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->lLCConnection2Route;
 		old_length = StorageTmp->lLCConnection2RouteLen;
 		StorageTmp->lLCConnection2Route = string;
@@ -28012,8 +29779,7 @@ write_lLCConnection2Route(int action, u_char *var_val, u_char var_val_type, size
 		StorageTmp->lLCConnection2Route = old_value;
 		StorageTmp->lLCConnection2RouteLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -28059,17 +29825,15 @@ write_lLCConnection2KStep(int action, u_char *var_val, u_char var_val_type, size
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2KStep;
 		StorageTmp->lLCConnection2KStep = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2KStep = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28112,17 +29876,15 @@ write_lLCConnection2MaxSendWindowSize(int action, u_char *var_val, u_char var_va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2MaxSendWindowSize;
 		StorageTmp->lLCConnection2MaxSendWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2MaxSendWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28173,17 +29935,15 @@ write_lLCConnection2OptionalTolerationIPDUs(int action, u_char *var_val, u_char 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2OptionalTolerationIPDUs;
 		StorageTmp->lLCConnection2OptionalTolerationIPDUs = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2OptionalTolerationIPDUs = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28235,17 +29995,15 @@ write_lLCConnection2AdministrativeState(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2AdministrativeState;
 		StorageTmp->lLCConnection2AdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2AdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28297,9 +30055,8 @@ write_lLCConnection2AlarmStatus(int action, u_char *var_val, u_char var_val_type
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->lLCConnection2AlarmStatus;
 		old_length = StorageTmp->lLCConnection2AlarmStatusLen;
 		StorageTmp->lLCConnection2AlarmStatus = string;
@@ -28309,8 +30066,7 @@ write_lLCConnection2AlarmStatus(int action, u_char *var_val, u_char var_val_type
 		StorageTmp->lLCConnection2AlarmStatus = old_value;
 		StorageTmp->lLCConnection2AlarmStatusLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -28356,17 +30112,15 @@ write_lLCConnection2IVMOMaximumRetransmissions(int action, u_char *var_val, u_ch
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOMaximumRetransmissions;
 		StorageTmp->lLCConnection2IVMOMaximumRetransmissions = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOMaximumRetransmissions = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28409,17 +30163,15 @@ write_lLCConnection2IVMOReceivedWindowSize(int action, u_char *var_val, u_char v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOReceivedWindowSize;
 		StorageTmp->lLCConnection2IVMOReceivedWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOReceivedWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28462,17 +30214,15 @@ write_lLCConnection2IVMOSendWindowSize(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOSendWindowSize;
 		StorageTmp->lLCConnection2IVMOSendWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOSendWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28520,17 +30270,15 @@ write_lLCConnection2IVMOAcknowledgeTimeoutValue(int action, u_char *var_val, u_c
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOAcknowledgeTimeoutValue;
 		StorageTmp->lLCConnection2IVMOAcknowledgeTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOAcknowledgeTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28578,17 +30326,15 @@ write_lLCConnection2IVMOBusyStateTimeoutValue(int action, u_char *var_val, u_cha
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue;
 		StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28636,17 +30382,15 @@ write_lLCConnection2IVMOBitTimeoutValue(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOBitTimeoutValue;
 		StorageTmp->lLCConnection2IVMOBitTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOBitTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28694,17 +30438,15 @@ write_lLCConnection2IVMORejectTimeoutValue(int action, u_char *var_val, u_char v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMORejectTimeoutValue;
 		StorageTmp->lLCConnection2IVMORejectTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMORejectTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28747,17 +30489,15 @@ write_lLCConnection2IVMORoute(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMORoute;
 		StorageTmp->lLCConnection2IVMORoute = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMORoute = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28800,17 +30540,15 @@ write_lLCConnection2IVMOKStep(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOKStep;
 		StorageTmp->lLCConnection2IVMOKStep = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOKStep = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28853,17 +30591,15 @@ write_lLCConnection2IVMOMaxSendWindowSize(int action, u_char *var_val, u_char va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOMaxSendWindowSize;
 		StorageTmp->lLCConnection2IVMOMaxSendWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOMaxSendWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28914,17 +30650,15 @@ write_lLCConnection2IVMOOptionalTolerationIPDUs(int action, u_char *var_val, u_c
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs;
 		StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -28967,17 +30701,15 @@ write_lLCConnectionlessAckMaximumLLCInformationFieldSize(int action, u_char *var
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckMaximumLLCInformationFieldSize;
 		StorageTmp->lLCConnectionlessAckMaximumLLCInformationFieldSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckMaximumLLCInformationFieldSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29020,17 +30752,15 @@ write_lLCConnectionlessAckMaximumRetransmissions(int action, u_char *var_val, u_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckMaximumRetransmissions;
 		StorageTmp->lLCConnectionlessAckMaximumRetransmissions = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckMaximumRetransmissions = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29081,17 +30811,15 @@ write_lLCConnectionlessAckReceiveResources(int action, u_char *var_val, u_char v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckReceiveResources;
 		StorageTmp->lLCConnectionlessAckReceiveResources = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckReceiveResources = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29147,17 +30875,15 @@ write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize(int action, u_char 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize;
 		StorageTmp->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29213,17 +30939,15 @@ write_lLCConnectionlessAckIVMOMaximumRetransmissions(int action, u_char *var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckIVMOMaximumRetransmissions;
 		StorageTmp->lLCConnectionlessAckIVMOMaximumRetransmissions = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckIVMOMaximumRetransmissions = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29284,9 +31008,8 @@ write_networkEntityTitles(int action, u_char *var_val, u_char var_val_type, size
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->networkEntityTitles;
 		old_length = StorageTmp->networkEntityTitlesLen;
 		StorageTmp->networkEntityTitles = string;
@@ -29296,8 +31019,7 @@ write_networkEntityTitles(int action, u_char *var_val, u_char var_val_type, size
 		StorageTmp->networkEntityTitles = old_value;
 		StorageTmp->networkEntityTitlesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -29365,9 +31087,8 @@ write_networkEntitySystemTypes(int action, u_char *var_val, u_char var_val_type,
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->networkEntitySystemTypes;
 		old_length = StorageTmp->networkEntitySystemTypesLen;
 		StorageTmp->networkEntitySystemTypes = string;
@@ -29377,8 +31098,7 @@ write_networkEntitySystemTypes(int action, u_char *var_val, u_char var_val_type,
 		StorageTmp->networkEntitySystemTypes = old_value;
 		StorageTmp->networkEntitySystemTypesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -29446,17 +31166,15 @@ write_cLNSAdministrativeState(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->cLNSAdministrativeState;
 		StorageTmp->cLNSAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->cLNSAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29517,9 +31235,8 @@ write_cLNSSupportedProtocols(int action, u_char *var_val, u_char var_val_type, s
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->cLNSSupportedProtocols;
 		old_length = StorageTmp->cLNSSupportedProtocolsLen;
 		StorageTmp->cLNSSupportedProtocols = string;
@@ -29529,8 +31246,7 @@ write_cLNSSupportedProtocols(int action, u_char *var_val, u_char var_val_type, s
 		StorageTmp->cLNSSupportedProtocols = old_value;
 		StorageTmp->cLNSSupportedProtocolsLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -29598,9 +31314,8 @@ write_cLNSOperationalSystemType(int action, u_char *var_val, u_char var_val_type
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->cLNSOperationalSystemType;
 		old_length = StorageTmp->cLNSOperationalSystemTypeLen;
 		StorageTmp->cLNSOperationalSystemType = string;
@@ -29610,8 +31325,7 @@ write_cLNSOperationalSystemType(int action, u_char *var_val, u_char var_val_type
 		StorageTmp->cLNSOperationalSystemType = old_value;
 		StorageTmp->cLNSOperationalSystemTypeLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -29675,17 +31389,15 @@ write_cLNSMaximumLifetime(int action, u_char *var_val, u_char var_val_type, size
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->cLNSMaximumLifetime;
 		StorageTmp->cLNSMaximumLifetime = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->cLNSMaximumLifetime = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29750,17 +31462,15 @@ write_cLNSEnableChecksum(int action, u_char *var_val, u_char var_val_type, size_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->cLNSEnableChecksum;
 		StorageTmp->cLNSEnableChecksum = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->cLNSEnableChecksum = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29825,17 +31535,15 @@ write_cONSAdministrativeState(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->cONSAdministrativeState;
 		StorageTmp->cONSAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->cONSAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -29900,9 +31608,8 @@ write_cONSOperationalSystemType(int action, u_char *var_val, u_char var_val_type
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->cONSOperationalSystemType;
 		old_length = StorageTmp->cONSOperationalSystemTypeLen;
 		StorageTmp->cONSOperationalSystemType = string;
@@ -29912,8 +31619,7 @@ write_cONSOperationalSystemType(int action, u_char *var_val, u_char var_val_type
 		StorageTmp->cONSOperationalSystemType = old_value;
 		StorageTmp->cONSOperationalSystemTypeLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -29978,9 +31684,8 @@ write_neighbourSNPAAddress(int action, u_char *var_val, u_char var_val_type, siz
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->neighbourSNPAAddress;
 		old_length = StorageTmp->neighbourSNPAAddressLen;
 		StorageTmp->neighbourSNPAAddress = string;
@@ -29990,8 +31695,7 @@ write_neighbourSNPAAddress(int action, u_char *var_val, u_char var_val_type, siz
 		StorageTmp->neighbourSNPAAddress = old_value;
 		StorageTmp->neighbourSNPAAddressLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -30055,9 +31759,8 @@ write_neighbourSystemIds(int action, u_char *var_val, u_char var_val_type, size_
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->neighbourSystemIds;
 		old_length = StorageTmp->neighbourSystemIdsLen;
 		StorageTmp->neighbourSystemIds = string;
@@ -30067,8 +31770,7 @@ write_neighbourSystemIds(int action, u_char *var_val, u_char var_val_type, size_
 		StorageTmp->neighbourSystemIds = old_value;
 		StorageTmp->neighbourSystemIdsLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -30119,17 +31821,15 @@ write_destinationDefaultMetricPathCost(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->destinationDefaultMetricPathCost;
 		StorageTmp->destinationDefaultMetricPathCost = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->destinationDefaultMetricPathCost = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -30177,9 +31877,8 @@ write_destinationDefaultMetricOutputAdjacencies(int action, u_char *var_val, u_c
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->destinationDefaultMetricOutputAdjacencies;
 		old_length = StorageTmp->destinationDefaultMetricOutputAdjacenciesLen;
 		StorageTmp->destinationDefaultMetricOutputAdjacencies = string;
@@ -30189,8 +31888,7 @@ write_destinationDefaultMetricOutputAdjacencies(int action, u_char *var_val, u_c
 		StorageTmp->destinationDefaultMetricOutputAdjacencies = old_value;
 		StorageTmp->destinationDefaultMetricOutputAdjacenciesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -30241,17 +31939,15 @@ write_destinationDelayMetricPathCost(int action, u_char *var_val, u_char var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->destinationDelayMetricPathCost;
 		StorageTmp->destinationDelayMetricPathCost = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->destinationDelayMetricPathCost = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -30299,9 +31995,8 @@ write_destinationDelayMetricOutputAdjacencies(int action, u_char *var_val, u_cha
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->destinationDelayMetricOutputAdjacencies;
 		old_length = StorageTmp->destinationDelayMetricOutputAdjacenciesLen;
 		StorageTmp->destinationDelayMetricOutputAdjacencies = string;
@@ -30311,8 +32006,7 @@ write_destinationDelayMetricOutputAdjacencies(int action, u_char *var_val, u_cha
 		StorageTmp->destinationDelayMetricOutputAdjacencies = old_value;
 		StorageTmp->destinationDelayMetricOutputAdjacenciesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -30363,17 +32057,15 @@ write_destinationExpenseMetricPathCost(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->destinationExpenseMetricPathCost;
 		StorageTmp->destinationExpenseMetricPathCost = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->destinationExpenseMetricPathCost = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -30421,9 +32113,8 @@ write_destinationExpenseMetricOutputAdjacencies(int action, u_char *var_val, u_c
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->destinationExpenseMetricOutputAdjacencies;
 		old_length = StorageTmp->destinationExpenseMetricOutputAdjacenciesLen;
 		StorageTmp->destinationExpenseMetricOutputAdjacencies = string;
@@ -30433,8 +32124,7 @@ write_destinationExpenseMetricOutputAdjacencies(int action, u_char *var_val, u_c
 		StorageTmp->destinationExpenseMetricOutputAdjacencies = old_value;
 		StorageTmp->destinationExpenseMetricOutputAdjacenciesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -30485,17 +32175,15 @@ write_destinationErrorMetricPathCost(int action, u_char *var_val, u_char var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->destinationErrorMetricPathCost;
 		StorageTmp->destinationErrorMetricPathCost = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->destinationErrorMetricPathCost = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -30543,9 +32231,8 @@ write_destinationErrorMetricOutputAdjacencies(int action, u_char *var_val, u_cha
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->destinationErrorMetricOutputAdjacencies;
 		old_length = StorageTmp->destinationErrorMetricOutputAdjacenciesLen;
 		StorageTmp->destinationErrorMetricOutputAdjacencies = string;
@@ -30555,8 +32242,7 @@ write_destinationErrorMetricOutputAdjacencies(int action, u_char *var_val, u_cha
 		StorageTmp->destinationErrorMetricOutputAdjacencies = old_value;
 		StorageTmp->destinationErrorMetricOutputAdjacenciesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -30621,9 +32307,8 @@ write_reachableAddressPrefix(int action, u_char *var_val, u_char var_val_type, s
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->reachableAddressPrefix;
 		old_length = StorageTmp->reachableAddressPrefixLen;
 		StorageTmp->reachableAddressPrefix = string;
@@ -30633,8 +32318,7 @@ write_reachableAddressPrefix(int action, u_char *var_val, u_char var_val_type, s
 		StorageTmp->reachableAddressPrefix = old_value;
 		StorageTmp->reachableAddressPrefixLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -30703,17 +32387,15 @@ write_reachableAddressMappingType(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressMappingType;
 		StorageTmp->reachableAddressMappingType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressMappingType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -30775,17 +32457,15 @@ write_reachableAddressDefaultMetric(int action, u_char *var_val, u_char var_val_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressDefaultMetric;
 		StorageTmp->reachableAddressDefaultMetric = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressDefaultMetric = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -30847,17 +32527,15 @@ write_reachableAddressDelayMetric(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressDelayMetric;
 		StorageTmp->reachableAddressDelayMetric = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressDelayMetric = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -30919,17 +32597,15 @@ write_reachableAddressExpenseMetric(int action, u_char *var_val, u_char var_val_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressExpenseMetric;
 		StorageTmp->reachableAddressExpenseMetric = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressExpenseMetric = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -30991,17 +32667,15 @@ write_reachableAddressErrorMetric(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressErrorMetric;
 		StorageTmp->reachableAddressErrorMetric = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressErrorMetric = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31066,17 +32740,15 @@ write_reachableAddressDefaultMetricType(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressDefaultMetricType;
 		StorageTmp->reachableAddressDefaultMetricType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressDefaultMetricType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31141,17 +32813,15 @@ write_reachableAddressDelayMetricType(int action, u_char *var_val, u_char var_va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressDelayMetricType;
 		StorageTmp->reachableAddressDelayMetricType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressDelayMetricType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31216,17 +32886,15 @@ write_reachableAddressExpenseMetricType(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressExpenseMetricType;
 		StorageTmp->reachableAddressExpenseMetricType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressExpenseMetricType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31291,17 +32959,15 @@ write_reachableAddressErrorMetricType(int action, u_char *var_val, u_char var_va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressErrorMetricType;
 		StorageTmp->reachableAddressErrorMetricType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressErrorMetricType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31366,17 +33032,15 @@ write_reachableAddressAdministrativeState(int action, u_char *var_val, u_char va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->reachableAddressAdministrativeState;
 		StorageTmp->reachableAddressAdministrativeState = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->reachableAddressAdministrativeState = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31437,9 +33101,8 @@ write_reachableAddressSNPAAddresses(int action, u_char *var_val, u_char var_val_
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->reachableAddressSNPAAddresses;
 		old_length = StorageTmp->reachableAddressSNPAAddressesLen;
 		StorageTmp->reachableAddressSNPAAddresses = string;
@@ -31449,8 +33112,7 @@ write_reachableAddressSNPAAddresses(int action, u_char *var_val, u_char var_val_
 		StorageTmp->reachableAddressSNPAAddresses = old_value;
 		StorageTmp->reachableAddressSNPAAddressesLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -31516,9 +33178,8 @@ write_reachableAddressSNPAMask(int action, u_char *var_val, u_char var_val_type,
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->reachableAddressSNPAMask;
 		old_length = StorageTmp->reachableAddressSNPAMaskLen;
 		StorageTmp->reachableAddressSNPAMask = string;
@@ -31528,8 +33189,7 @@ write_reachableAddressSNPAMask(int action, u_char *var_val, u_char var_val_type,
 		StorageTmp->reachableAddressSNPAMask = old_value;
 		StorageTmp->reachableAddressSNPAMaskLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -31595,9 +33255,8 @@ write_reachableAddressSNPAPrefix(int action, u_char *var_val, u_char var_val_typ
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->reachableAddressSNPAPrefix;
 		old_length = StorageTmp->reachableAddressSNPAPrefixLen;
 		StorageTmp->reachableAddressSNPAPrefix = string;
@@ -31607,8 +33266,7 @@ write_reachableAddressSNPAPrefix(int action, u_char *var_val, u_char var_val_typ
 		StorageTmp->reachableAddressSNPAPrefix = old_value;
 		StorageTmp->reachableAddressSNPAPrefixLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -31662,17 +33320,15 @@ write_sLPConnectionDefaultInterfaceType(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultInterfaceType;
 		StorageTmp->sLPConnectionDefaultInterfaceType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultInterfaceType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31714,17 +33370,15 @@ write_sLPConnectionDefaultK(int action, u_char *var_val, u_char var_val_type, si
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultK;
 		StorageTmp->sLPConnectionDefaultK = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultK = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31766,17 +33420,15 @@ write_sLPConnectionDefaultN1(int action, u_char *var_val, u_char var_val_type, s
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultN1;
 		StorageTmp->sLPConnectionDefaultN1 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultN1 = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31818,17 +33470,15 @@ write_sLPConnectionDefaultN2(int action, u_char *var_val, u_char var_val_type, s
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultN2;
 		StorageTmp->sLPConnectionDefaultN2 = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultN2 = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31875,17 +33525,15 @@ write_sLPConnectionDefaultSequenceModulus(int action, u_char *var_val, u_char va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultSequenceModulus;
 		StorageTmp->sLPConnectionDefaultSequenceModulus = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultSequenceModulus = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31932,17 +33580,15 @@ write_sLPConnectionDefaultT1Timer(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultT1Timer;
 		StorageTmp->sLPConnectionDefaultT1Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultT1Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -31989,17 +33635,15 @@ write_sLPConnectionDefaultT2Timer(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultT2Timer;
 		StorageTmp->sLPConnectionDefaultT2Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultT2Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32046,17 +33690,15 @@ write_sLPConnectionDefaultT3Timer(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultT3Timer;
 		StorageTmp->sLPConnectionDefaultT3Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultT3Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32103,17 +33745,15 @@ write_sLPConnectionDefaultT4Timer(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sLPConnectionDefaultT4Timer;
 		StorageTmp->sLPConnectionDefaultT4Timer = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sLPConnectionDefaultT4Timer = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32155,17 +33795,15 @@ write_lLCConnection2DefaultMaximumRetransmissions(int action, u_char *var_val, u
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultMaximumRetransmissions;
 		StorageTmp->lLCConnection2DefaultMaximumRetransmissions = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultMaximumRetransmissions = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32207,17 +33845,15 @@ write_lLCConnection2DefaultReceivedWindowSize(int action, u_char *var_val, u_cha
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultReceivedWindowSize;
 		StorageTmp->lLCConnection2DefaultReceivedWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultReceivedWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32259,17 +33895,15 @@ write_lLCConnection2DefaultSendWindowSize(int action, u_char *var_val, u_char va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultSendWindowSize;
 		StorageTmp->lLCConnection2DefaultSendWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultSendWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32316,17 +33950,15 @@ write_lLCConnection2DefaultAcknowledgeTimeoutValue(int action, u_char *var_val, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultAcknowledgeTimeoutValue;
 		StorageTmp->lLCConnection2DefaultAcknowledgeTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultAcknowledgeTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32373,17 +34005,15 @@ write_lLCConnection2DefaultBusyStateTimeoutValue(int action, u_char *var_val, u_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultBusyStateTimeoutValue;
 		StorageTmp->lLCConnection2DefaultBusyStateTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultBusyStateTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32430,17 +34060,15 @@ write_lLCConnection2DefaultPBitTimeoutValue(int action, u_char *var_val, u_char 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultPBitTimeoutValue;
 		StorageTmp->lLCConnection2DefaultPBitTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultPBitTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32487,17 +34115,15 @@ write_lLCConnection2DefaultRejectTimeoutValue(int action, u_char *var_val, u_cha
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultRejectTimeoutValue;
 		StorageTmp->lLCConnection2DefaultRejectTimeoutValue = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultRejectTimeoutValue = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32544,9 +34170,8 @@ write_lLCConnection2DefaultRoute(int action, u_char *var_val, u_char var_val_typ
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultRoute;
 		old_length = StorageTmp->lLCConnection2DefaultRouteLen;
 		StorageTmp->lLCConnection2DefaultRoute = string;
@@ -32556,8 +34181,7 @@ write_lLCConnection2DefaultRoute(int action, u_char *var_val, u_char var_val_typ
 		StorageTmp->lLCConnection2DefaultRoute = old_value;
 		StorageTmp->lLCConnection2DefaultRouteLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -32602,17 +34226,15 @@ write_lLCConnection2DefaultKStep(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultKStep;
 		StorageTmp->lLCConnection2DefaultKStep = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultKStep = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32654,17 +34276,15 @@ write_lLCConnection2DefaultMaxSendWindowSize(int action, u_char *var_val, u_char
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultMaxSendWindowSize;
 		StorageTmp->lLCConnection2DefaultMaxSendWindowSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultMaxSendWindowSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32714,17 +34334,15 @@ write_lLCConnection2DefaultOptionalTolerationIPDUs(int action, u_char *var_val, 
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultOptionalTolerationIPDUs;
 		StorageTmp->lLCConnection2DefaultOptionalTolerationIPDUs = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultOptionalTolerationIPDUs = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32766,17 +34384,15 @@ write_lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize(int action, u_ch
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize;
 		StorageTmp->lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32818,17 +34434,15 @@ write_lLCConnectionlessAckDefaultMaximumRetransmissions(int action, u_char *var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckDefaultMaximumRetransmissions;
 		StorageTmp->lLCConnectionlessAckDefaultMaximumRetransmissions = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckDefaultMaximumRetransmissions = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -32946,9 +34560,7 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -32993,8 +34605,7 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -33133,9 +34744,7 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -33180,8 +34789,7 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -33325,9 +34933,7 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -33372,8 +34978,7 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -33507,9 +35112,7 @@ write_datalinkEntityRowStatus(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -33554,8 +35157,7 @@ write_datalinkEntityRowStatus(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -33694,9 +35296,7 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -33741,8 +35341,7 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -33876,9 +35475,7 @@ write_lAPBDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -33923,8 +35520,7 @@ write_lAPBDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -34063,9 +35659,7 @@ write_sLPPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -34110,8 +35704,7 @@ write_sLPPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -34255,9 +35848,7 @@ write_sLPConnectionRowStatus(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -34302,8 +35893,7 @@ write_sLPConnectionRowStatus(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -34447,9 +36037,7 @@ write_sLPConnectionIVMORowStatus(int action, u_char *var_val, u_char var_val_typ
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -34494,8 +36082,7 @@ write_sLPConnectionIVMORowStatus(int action, u_char *var_val, u_char var_val_typ
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -34629,9 +36216,7 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -34676,8 +36261,7 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -34816,9 +36400,7 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -34863,8 +36445,7 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -34998,9 +36579,7 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -35045,8 +36624,7 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -35185,9 +36763,7 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -35232,8 +36808,7 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -35372,9 +36947,7 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -35419,8 +36992,7 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -35564,9 +37136,7 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -35611,8 +37181,7 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -35746,9 +37315,7 @@ write_networkEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -35793,8 +37360,7 @@ write_networkEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -35928,9 +37494,7 @@ write_nSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -35975,8 +37539,7 @@ write_nSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -36115,9 +37678,7 @@ write_cLNSRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -36162,8 +37723,7 @@ write_cLNSRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -36302,9 +37862,7 @@ write_cLNSISISRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -36349,8 +37907,7 @@ write_cLNSISISRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -36484,9 +38041,7 @@ write_cLNSISISLevel2RowStatus(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -36531,8 +38086,7 @@ write_cLNSISISLevel2RowStatus(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -36676,9 +38230,7 @@ write_linkageRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -36723,8 +38275,7 @@ write_linkageRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -36863,9 +38414,7 @@ write_cONSRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -36910,8 +38459,7 @@ write_cONSRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -37055,9 +38603,7 @@ write_networkConnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -37102,8 +38648,7 @@ write_networkConnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -37237,9 +38782,7 @@ write_x25PLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -37284,8 +38827,7 @@ write_x25PLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -37419,9 +38961,7 @@ write_x25PLEIVMORowStatus(int action, u_char *var_val, u_char var_val_type, size
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -37466,8 +39006,7 @@ write_x25PLEIVMORowStatus(int action, u_char *var_val, u_char var_val_type, size
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -37601,9 +39140,7 @@ write_x25PLEIVMO_DTERowStatus(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -37648,8 +39185,7 @@ write_x25PLEIVMO_DTERowStatus(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -37783,9 +39319,7 @@ write_x25PLEIVMO_DCERowStatus(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -37830,8 +39364,7 @@ write_x25PLEIVMO_DCERowStatus(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -37970,9 +39503,7 @@ write_permanentVirtualCircuitRowStatus(int action, u_char *var_val, u_char var_v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -38017,8 +39548,7 @@ write_permanentVirtualCircuitRowStatus(int action, u_char *var_val, u_char var_v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -38157,9 +39687,7 @@ write_permanentVirtualCircuit_DTERowStatus(int action, u_char *var_val, u_char v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -38204,8 +39732,7 @@ write_permanentVirtualCircuit_DTERowStatus(int action, u_char *var_val, u_char v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -38344,9 +39871,7 @@ write_permanentVirtualCircuit_DCERowStatus(int action, u_char *var_val, u_char v
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -38391,8 +39916,7 @@ write_permanentVirtualCircuit_DCERowStatus(int action, u_char *var_val, u_char v
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -38531,9 +40055,7 @@ write_virtualCallIVMORowStatus(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -38578,8 +40100,7 @@ write_virtualCallIVMORowStatus(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -38718,9 +40239,7 @@ write_switchedVirtualCallRowStatus(int action, u_char *var_val, u_char var_val_t
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -38765,8 +40284,7 @@ write_switchedVirtualCallRowStatus(int action, u_char *var_val, u_char var_val_t
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -38905,9 +40423,7 @@ write_virtualCall_DTERowStatus(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -38952,8 +40468,7 @@ write_virtualCall_DTERowStatus(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -39092,9 +40607,7 @@ write_virtualCall_DCERowStatus(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -39139,8 +40652,7 @@ write_virtualCall_DCERowStatus(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -39284,9 +40796,7 @@ write_dSeriesRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -39331,8 +40841,7 @@ write_dSeriesRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -39481,9 +40990,7 @@ write_adjacencyRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -39528,8 +41035,7 @@ write_adjacencyRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -39663,9 +41169,7 @@ write_reachableAddressRowStatus(int action, u_char *var_val, u_char var_val_type
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -39710,8 +41214,7 @@ write_reachableAddressRowStatus(int action, u_char *var_val, u_char var_val_type
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -39738,7 +41241,133 @@ write_reachableAddressRowStatus(int action, u_char *var_val, u_char var_val_type
 	return SNMP_ERR_NOERROR;
 }
 
+void
+send_lLCConnection2Event_v2trap(struct variable_list *vars)
+{
+	struct variable_list trap;
+
+	trap.next_variable = vars;
+	trap.name = snmpTrapOID_oid;
+	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
+	trap.type = ASN_OBJECT_ID;
+	trap.val.objid = lLCConnection2Event_oid;
+	trap.val_len = sizeof(lLCConnection2Event_oid);
+	trap.index = 0;
+	send_v2trap(&trap);
+}
+
+void
+send_lLCClessACKEvent_v2trap(struct variable_list *vars)
+{
+	struct variable_list trap;
+
+	trap.next_variable = vars;
+	trap.name = snmpTrapOID_oid;
+	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
+	trap.type = ASN_OBJECT_ID;
+	trap.val.objid = lLCClessACKEvent_oid;
+	trap.val_len = sizeof(lLCClessACKEvent_oid);
+	trap.index = 0;
+	send_v2trap(&trap);
+}
+
+void
+send_lLCStationEvent_v2trap(struct variable_list *vars)
+{
+	struct variable_list trap;
+
+	trap.next_variable = vars;
+	trap.name = snmpTrapOID_oid;
+	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
+	trap.type = ASN_OBJECT_ID;
+	trap.val.objid = lLCStationEvent_oid;
+	trap.val_len = sizeof(lLCStationEvent_oid);
+	trap.index = 0;
+	send_v2trap(&trap);
+}
+
+#if defined MODULE
+#if defined MASTER
+/**
+ * @fn void dlMIB_loop_handler(int dummy)
+ * @param dummy signal number (always zero (0))
+ * @brief handle event loop interation.
+ *
+ * This function is registered so that, when operating as a module, snmpd will call it one per event
+ * loop interation.  This function is called before the next requst is processed and after the
+ * previous request is processed.  Two things are done here:  1) The file descriptor that is used to
+ * synchronize the agent with (pseudo-)device drivers is closed.  (Another approach, instead of
+ * closing each time, would be to restart a timer each time that a request is made (loop is
+ * performed) and if it expires, close the file descriptor).  2) The request number is incremented.
+ * Although a request is not generated for each loop of the snmp event loop, it is true that a new
+ * request cannot be generated without performing a loop.  Therefore, the sa_request is not the
+ * request number but it is a temporally unique identifier for a request.
+ */
+void
+dlMIB_loop_handler(int dummy)
+{
+	if (external_signal_scheduled[dummy] == 0)
+		external_signal_scheduled[dummy]--;
+	/* close files after each request */
+	if (sa_fclose && sa_fd != 0) {
+		close(sa_fd);
+		sa_fd = 0;
+	}
+	/* prepare for next request */
+	sa_request++;
+}
+#endif				/* defined MASTER */
+/**
+ * @fn void dlMIB_readfd_handler(int fd, void *dummy)
+ * @param fd file descriptor to read.
+ * @param dummy client data passed to registration function (always NULL).
+ * @brief handle read event on file descriptor.
+ *
+ * This read file descriptor handler is normally used for (pseudo-)device drivers that generate
+ * statistical collection interval events, alarm events, or other operational measurement events, by
+ * placing a message on the read queue of the "event handling" Stream.  Normally this routine
+ * would adjust counts in some table or scalars, generate SNMP traps representing on-occurence
+ * events, first and interval events, and alarm indications.
+ */
+void
+dlMIB_readfd_handler(int fd, void *dummy)
+{
+	/* XXX: place actions to handle sa_readfd here... */
+	return;
+}
+#endif				/* defined MOUDLE */
+#if defined MASTER
+const char sa_program[] = "dlmib";
+int sa_fclose = 1;			/* default close files between requests */
+int sa_fd = 0;				/* file descriptor for MIB use */
+int sa_readfd = 0;			/* file descriptor for autonomnous events */
+int sa_changed = 1;			/* indication to reread MIB configuration */
+int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
+int sa_request = 1;			/* request number for per-request actions */
+#endif				/* defined MASTER */
+#if defined MASTER
 #if !defined MODULE
+int sa_dump = 0;			/* default packet dump */
+int sa_debug = 0;			/* default no debug */
+int sa_nomead = 1;			/* default daemon mode */
+int sa_output = 1;			/* default normal output */
+int sa_agentx = 1;			/* default agentx mode */
+int sa_alarms = 1;			/* default application alarms */
+int sa_logaddr = 0;			/* log addresses */
+int sa_logfillog = 0;			/* log to sa_logfile */
+int sa_logstderr = 0;			/* log to standard error */
+int sa_logstdout = 0;			/* log to standard output */
+int sa_logsyslog = 0;			/* log to system logs */
+int sa_logcallog = 0;			/* log to callback logs */
+int sa_appendlog = 0;			/* append to log file without truncating */
+char sa_logfile[256] = "/var/log/dlmib.log";
+char sa_pidfile[256] = "/var/run/dlmib.pid";
+char sa_sysctlf[256] = "/etc/dlmib.conf";
+int allow_severity = LOG_ERR;
+int deny_severity = LOG_ERR;
+
+/* file stream for log file */
+FILE *stdlog = NULL;
 static void
 sa_version(int argc, char *argv[])
 {
@@ -39911,8 +41540,7 @@ sa_help_directives(int argc, char *argv[])
 	init_mib();
 	init_snmp("dlMIB");
 	snmp_log(MY_FACILITY(LOG_INFO), "Configuration directives understood:\n");
-	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be
-	   writen to standard error and not standard output. */
+	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be writen to standard error and not standard output. */
 	read_config_print_usage("    ");
 }
 static int
@@ -40049,8 +41677,7 @@ sa_hup_block(void)
 static int
 sa_hup_action(void)
 {
-	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by
-	   logrotate asking us to close and reopen our log files. */
+	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by logrotate asking us to close and reopen our log files. */
 	sa_hup_signal = 0;
 	snmp_log(MY_FACILITY(LOG_WARNING), "Caught SIGHUP, reopening files.");
 	if (sa_output > 1)
@@ -40183,10 +41810,8 @@ sa_init_logging(int argc, char *argv[])
 {
 	static char progname[256];
 
-	/* The purpose of this function is to bring logging up before forking (and while still in
-	   the foreground) so that we can use the snmp_log() function before and during forking if
-	   necessary.  Note that the default configuration for snmp_log() is to send all logs to
-	   standard error. */
+	/* The purpose of this function is to bring logging up before forking (and while still in the foreground) so that we can use the snmp_log() function before and during forking if necessary.
+	   Note that the default configuration for snmp_log() is to send all logs to standard error. */
 	strncpy(progname, basename(argv[0]), sizeof(progname));
 	snmp_disable_log();
 	if (sa_logfillog) {
@@ -40194,9 +41819,8 @@ sa_init_logging(int argc, char *argv[])
 	}
 	if (sa_logstderr | sa_logstdout) {
 #if defined LOG_PERROR
-		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr,
-		   it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as
-		   the former is better formated. */
+		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better 
+		   formated. */
 		if (!sa_logsyslog)
 			snmp_enable_stderrlog();
 #else				/* defined LOG_PERROR */
@@ -40209,8 +41833,7 @@ sa_init_logging(int argc, char *argv[])
 #else				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
 		snmp_enable_syslog_ident("dlMIB", LOG_DAEMON);
 #endif				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		/* Note that the way that snmp sets up the logger is not really the way we want it,
-		   so close the log and reopen it the way we want. */
+		/* Note that the way that snmp sets up the logger is not really the way we want it, so close the log and reopen it the way we want. */
 		closelog();
 #if defined LOG_PERROR
 		openlog("dlMIB", LOG_PID | LOG_CONS | LOG_NDELAY | (sa_logstderr ? LOG_PERROR : 0), MY_FACILITY(0));
@@ -40318,8 +41941,7 @@ sa_mloop(int argc, char *argv[])
 	for (;;) {
 		int retval;
 
-		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of
-		   the agentx socket and add it to the fdset. */
+		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of the agentx socket and add it to the fdset. */
 		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
 #if 0
 		if (snmp_select() == 0) {
@@ -40579,11 +42201,8 @@ main(int argc, char *argv[])
 			sa_logfillog = 1;
 			break;
 		case 'L':	/* -L, --log-stderr, -Le, -LE p1[-p2] */
-			/* Note that the recent NET-SNMP version of this option is far more
-			   complicated: -Le is the same as the old version of the option; -Lf
-			   LOGFILE is like the -l option; -Ls is like the -s option; -Lo logs
-			   messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or
-			   O, logs priority p1 and above to X, or p1 thru p2 to X. */
+			/* Note that the recent NET-SNMP version of this option is far more complicated: -Le is the same as the old version of the option; -Lf LOGFILE is like the -l option; -Ls is
+			   like the -s option; -Lo logs messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or O, logs priority p1 and above to X, or p1 thru p2 to X. */
 			if (sa_debug)
 				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to standard error\n", argv[0]);
 			sa_logstderr = 1;
@@ -40798,3 +42417,4 @@ main(int argc, char *argv[])
 	exit(0);
 }
 #endif				/* !defined MODULE */
+#endif				/* defined MASTER */

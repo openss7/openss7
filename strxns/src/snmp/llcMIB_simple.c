@@ -1926,9 +1926,7 @@ write_mACDLELocalSapNames(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in objid for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1936,8 +1934,7 @@ write_mACDLELocalSapNames(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1972,9 +1969,7 @@ write_mACDLEProviderEntityNames(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in objid for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1982,8 +1977,7 @@ write_mACDLEProviderEntityNames(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2018,9 +2012,7 @@ write_mACDLERowStatus(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2028,8 +2020,7 @@ write_mACDLERowStatus(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2064,9 +2055,7 @@ write_mACRowStatus(int action, unsigned char *var_val, unsigned char var_val_typ
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2074,8 +2063,7 @@ write_mACRowStatus(int action, unsigned char *var_val, unsigned char var_val_typ
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2110,9 +2098,7 @@ write_dLSAPSap1Address(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2120,8 +2106,7 @@ write_dLSAPSap1Address(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2156,9 +2141,7 @@ write_dLSAPUserEntityNames(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in objid for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2166,8 +2149,7 @@ write_dLSAPUserEntityNames(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2202,9 +2184,7 @@ write_dLSAPRowStatus(int action, unsigned char *var_val, unsigned char var_val_t
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2212,8 +2192,7 @@ write_dLSAPRowStatus(int action, unsigned char *var_val, unsigned char var_val_t
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2248,9 +2227,7 @@ write_lLCDLELocalSapNames(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in objid for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2258,8 +2235,7 @@ write_lLCDLELocalSapNames(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2294,9 +2270,7 @@ write_lLCDLEProviderEntityNames(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in objid for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2304,8 +2278,7 @@ write_lLCDLEProviderEntityNames(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2340,9 +2313,7 @@ write_lLCDLERowStatus(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2350,8 +2321,7 @@ write_lLCDLERowStatus(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2386,9 +2356,7 @@ write_lLCStationLLCName(int action, unsigned char *var_val, unsigned char var_va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2396,8 +2364,7 @@ write_lLCStationLLCName(int action, unsigned char *var_val, unsigned char var_va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2432,9 +2399,7 @@ write_lLCStationSupportedServicesTypes(int action, unsigned char *var_val, unsig
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2442,8 +2407,7 @@ write_lLCStationSupportedServicesTypes(int action, unsigned char *var_val, unsig
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2478,9 +2442,7 @@ write_lLCStationType1AcknowledgeTimeoutValue(int action, unsigned char *var_val,
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2488,8 +2450,7 @@ write_lLCStationType1AcknowledgeTimeoutValue(int action, unsigned char *var_val,
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2524,9 +2485,7 @@ write_lLCStationType1MaximumRetryCount(int action, unsigned char *var_val, unsig
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2534,8 +2493,7 @@ write_lLCStationType1MaximumRetryCount(int action, unsigned char *var_val, unsig
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2570,9 +2528,7 @@ write_lLCStationMaximumPDUN3(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2580,8 +2536,7 @@ write_lLCStationMaximumPDUN3(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2616,9 +2571,7 @@ write_lLCStationMaximumRetransmissions4(int action, unsigned char *var_val, unsi
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2626,8 +2579,7 @@ write_lLCStationMaximumRetransmissions4(int action, unsigned char *var_val, unsi
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2662,9 +2614,7 @@ write_lLCStationReceiveVariableLifetime(int action, unsigned char *var_val, unsi
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2672,8 +2622,7 @@ write_lLCStationReceiveVariableLifetime(int action, unsigned char *var_val, unsi
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2708,9 +2657,7 @@ write_lLCStationTransmitVariableLifetime(int action, unsigned char *var_val, uns
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2718,8 +2665,7 @@ write_lLCStationTransmitVariableLifetime(int action, unsigned char *var_val, uns
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2754,9 +2700,7 @@ write_lLCStationType3AcknowledgeTimeoutValue(int action, unsigned char *var_val,
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2764,8 +2708,7 @@ write_lLCStationType3AcknowledgeTimeoutValue(int action, unsigned char *var_val,
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2800,9 +2743,7 @@ write_lLCStationBufferSize(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2810,8 +2751,7 @@ write_lLCStationBufferSize(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2846,9 +2786,7 @@ write_lLCStationSTRIndicator(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2856,8 +2794,7 @@ write_lLCStationSTRIndicator(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2892,9 +2829,7 @@ write_lLCStationVersionNumber(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2902,8 +2837,7 @@ write_lLCStationVersionNumber(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2938,9 +2872,7 @@ write_rDESetupAgingEnabled(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2948,8 +2880,7 @@ write_rDESetupAgingEnabled(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2984,9 +2915,7 @@ write_rDESetupAgingValue(int action, unsigned char *var_val, unsigned char var_v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2994,8 +2923,7 @@ write_rDESetupAgingValue(int action, unsigned char *var_val, unsigned char var_v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3030,9 +2958,7 @@ write_rDESetupEnableType2Reset(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3040,8 +2966,7 @@ write_rDESetupEnableType2Reset(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3076,9 +3001,7 @@ write_rDESetupMaximumRouteDescriptors(int action, unsigned char *var_val, unsign
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3086,8 +3009,7 @@ write_rDESetupMaximumRouteDescriptors(int action, unsigned char *var_val, unsign
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3122,9 +3044,7 @@ write_rDESetupMaximumResponseTime(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3132,8 +3052,7 @@ write_rDESetupMaximumResponseTime(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3168,9 +3087,7 @@ write_rDESetupMinimumPDUSize(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3178,8 +3095,7 @@ write_rDESetupMinimumPDUSize(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3214,9 +3130,7 @@ write_rDESetupRDEHold(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3224,8 +3138,7 @@ write_rDESetupRDEHold(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3260,9 +3173,7 @@ write_rDESetupRDEReplace(int action, unsigned char *var_val, unsigned char var_v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3270,8 +3181,7 @@ write_rDESetupRDEReplace(int action, unsigned char *var_val, unsigned char var_v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3306,9 +3216,7 @@ write_rDESetupResetOnTestEnabled(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3316,8 +3224,7 @@ write_rDESetupResetOnTestEnabled(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3352,9 +3259,7 @@ write_lLCCLPMRowStatus(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3362,8 +3267,7 @@ write_lLCCLPMRowStatus(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3398,9 +3302,7 @@ write_lLCConnectionlessName(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3408,8 +3310,7 @@ write_lLCConnectionlessName(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3444,9 +3345,7 @@ write_lLCConnectionlessMaximumLLCInformationFieldSize(int action, unsigned char 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3454,8 +3353,7 @@ write_lLCConnectionlessMaximumLLCInformationFieldSize(int action, unsigned char 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3490,9 +3388,7 @@ write_lLCCOPMRowStatus(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3500,8 +3396,7 @@ write_lLCCOPMRowStatus(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3536,9 +3431,7 @@ write_lLCConnection2Name(int action, unsigned char *var_val, unsigned char var_v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3546,8 +3439,7 @@ write_lLCConnection2Name(int action, unsigned char *var_val, unsigned char var_v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3582,9 +3474,7 @@ write_lLCConnection2MaximumRetransmissions(int action, unsigned char *var_val, u
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3592,8 +3482,7 @@ write_lLCConnection2MaximumRetransmissions(int action, unsigned char *var_val, u
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3628,9 +3517,7 @@ write_lLCConnection2ReceivedWindowSize(int action, unsigned char *var_val, unsig
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3638,8 +3525,7 @@ write_lLCConnection2ReceivedWindowSize(int action, unsigned char *var_val, unsig
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3674,9 +3560,7 @@ write_lLCConnection2SendWindowSize(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3684,8 +3568,7 @@ write_lLCConnection2SendWindowSize(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3720,9 +3603,7 @@ write_lLCConnection2AcknowledgeTimeoutValue(int action, unsigned char *var_val, 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3730,8 +3611,7 @@ write_lLCConnection2AcknowledgeTimeoutValue(int action, unsigned char *var_val, 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3766,9 +3646,7 @@ write_lLCConnection2BusyStateTimeoutValue(int action, unsigned char *var_val, un
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3776,8 +3654,7 @@ write_lLCConnection2BusyStateTimeoutValue(int action, unsigned char *var_val, un
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3812,9 +3689,7 @@ write_lLCConnection2PBitTimeoutValue(int action, unsigned char *var_val, unsigne
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3822,8 +3697,7 @@ write_lLCConnection2PBitTimeoutValue(int action, unsigned char *var_val, unsigne
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3858,9 +3732,7 @@ write_lLCConnection2RejectTimeoutValue(int action, unsigned char *var_val, unsig
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3868,8 +3740,7 @@ write_lLCConnection2RejectTimeoutValue(int action, unsigned char *var_val, unsig
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3904,9 +3775,7 @@ write_lLCConnection2RemoteBusy(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3914,8 +3783,7 @@ write_lLCConnection2RemoteBusy(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3950,9 +3818,7 @@ write_lLCConnection2RemoteReset(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -3960,8 +3826,7 @@ write_lLCConnection2RemoteReset(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3996,9 +3861,7 @@ write_lLCConnection2LocalReset(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4006,8 +3869,7 @@ write_lLCConnection2LocalReset(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4042,9 +3904,7 @@ write_lLCConnection2ProviderReset(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4052,8 +3912,7 @@ write_lLCConnection2ProviderReset(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4088,9 +3947,7 @@ write_lLCConnection2Route(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4098,8 +3955,7 @@ write_lLCConnection2Route(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4134,9 +3990,7 @@ write_lLCConnection2KStep(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4144,8 +3998,7 @@ write_lLCConnection2KStep(int action, unsigned char *var_val, unsigned char var_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4180,9 +4033,7 @@ write_lLCConnection2MaxSendWindowSize(int action, unsigned char *var_val, unsign
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4190,8 +4041,7 @@ write_lLCConnection2MaxSendWindowSize(int action, unsigned char *var_val, unsign
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4226,9 +4076,7 @@ write_lLCConnection2SentAcks(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4236,8 +4084,7 @@ write_lLCConnection2SentAcks(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4272,9 +4119,7 @@ write_lLCConnection2ReceivedAcks(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4282,8 +4127,7 @@ write_lLCConnection2ReceivedAcks(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4318,9 +4162,7 @@ write_lLCConnection2ReceivedFRMR(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4328,8 +4170,7 @@ write_lLCConnection2ReceivedFRMR(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4364,9 +4205,7 @@ write_lLCConnection2SentFRMR(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4374,8 +4213,7 @@ write_lLCConnection2SentFRMR(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4410,9 +4248,7 @@ write_lLCConnection2ReceivedRR(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4420,8 +4256,7 @@ write_lLCConnection2ReceivedRR(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4456,9 +4291,7 @@ write_lLCConnection2SentRR(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4466,8 +4299,7 @@ write_lLCConnection2SentRR(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4502,9 +4334,7 @@ write_lLCConnection2ReceivedRNR(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4512,8 +4342,7 @@ write_lLCConnection2ReceivedRNR(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4548,9 +4377,7 @@ write_lLCConnection2SentRNR(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4558,8 +4385,7 @@ write_lLCConnection2SentRNR(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4594,9 +4420,7 @@ write_lLCConnection2ReceivedREJ(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4604,8 +4428,7 @@ write_lLCConnection2ReceivedREJ(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4640,9 +4463,7 @@ write_lLCConnection2SentREJ(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4650,8 +4471,7 @@ write_lLCConnection2SentREJ(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4686,9 +4506,7 @@ write_lLCConnection2ReceivedSABME(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4696,8 +4514,7 @@ write_lLCConnection2ReceivedSABME(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4732,9 +4549,7 @@ write_lLCConnection2SentSABME(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4742,8 +4557,7 @@ write_lLCConnection2SentSABME(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4778,9 +4592,7 @@ write_lLCConnection2ReceivedUA(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4788,8 +4600,7 @@ write_lLCConnection2ReceivedUA(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4824,9 +4635,7 @@ write_lLCConnection2SentUA(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4834,8 +4643,7 @@ write_lLCConnection2SentUA(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4870,9 +4678,7 @@ write_lLCConnection2ReceivedDISC(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4880,8 +4686,7 @@ write_lLCConnection2ReceivedDISC(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4916,9 +4721,7 @@ write_lLCConnection2SentDISC(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4926,8 +4729,7 @@ write_lLCConnection2SentDISC(int action, unsigned char *var_val, unsigned char v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4962,9 +4764,7 @@ write_lLCConnection2ReceivedDM(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -4972,8 +4772,7 @@ write_lLCConnection2ReceivedDM(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5008,9 +4807,7 @@ write_lLCConnection2SentDM(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5018,8 +4815,7 @@ write_lLCConnection2SentDM(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5054,9 +4850,7 @@ write_lLCConnection2PDUsDiscarded1(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5064,8 +4858,7 @@ write_lLCConnection2PDUsDiscarded1(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5100,9 +4893,7 @@ write_lLCConnection2PDUsDiscarded2(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5110,8 +4901,7 @@ write_lLCConnection2PDUsDiscarded2(int action, unsigned char *var_val, unsigned 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5146,9 +4936,7 @@ write_lLCConnection2PDURetransmissions(int action, unsigned char *var_val, unsig
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5156,8 +4944,7 @@ write_lLCConnection2PDURetransmissions(int action, unsigned char *var_val, unsig
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5192,9 +4979,7 @@ write_lLCConnection2OptionalTolerationIPDUs(int action, unsigned char *var_val, 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5202,8 +4987,7 @@ write_lLCConnection2OptionalTolerationIPDUs(int action, unsigned char *var_val, 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5238,9 +5022,7 @@ write_lLCConnection2DuplicateIPDUsReceived(int action, unsigned char *var_val, u
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5248,8 +5030,7 @@ write_lLCConnection2DuplicateIPDUsReceived(int action, unsigned char *var_val, u
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5284,9 +5065,7 @@ write_lLCConnection2Violation(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5294,8 +5073,7 @@ write_lLCConnection2Violation(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5330,9 +5108,7 @@ write_lLCConnection2AdministrativeState(int action, unsigned char *var_val, unsi
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5340,8 +5116,7 @@ write_lLCConnection2AdministrativeState(int action, unsigned char *var_val, unsi
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5376,9 +5151,7 @@ write_lLCConnection2AlarmStatus(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5386,8 +5159,7 @@ write_lLCConnection2AlarmStatus(int action, unsigned char *var_val, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5422,9 +5194,7 @@ write_lLCConnection2IVMOMaximumRetransmissions(int action, unsigned char *var_va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5432,8 +5202,7 @@ write_lLCConnection2IVMOMaximumRetransmissions(int action, unsigned char *var_va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5468,9 +5237,7 @@ write_lLCConnection2IVMOReceivedWindowSize(int action, unsigned char *var_val, u
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5478,8 +5245,7 @@ write_lLCConnection2IVMOReceivedWindowSize(int action, unsigned char *var_val, u
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5514,9 +5280,7 @@ write_lLCConnection2IVMOSendWindowSize(int action, unsigned char *var_val, unsig
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5524,8 +5288,7 @@ write_lLCConnection2IVMOSendWindowSize(int action, unsigned char *var_val, unsig
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5560,9 +5323,7 @@ write_lLCConnection2IVMOAcknowledgeTimeoutValue(int action, unsigned char *var_v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5570,8 +5331,7 @@ write_lLCConnection2IVMOAcknowledgeTimeoutValue(int action, unsigned char *var_v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5606,9 +5366,7 @@ write_lLCConnection2IVMOBusyStateTimeoutValue(int action, unsigned char *var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5616,8 +5374,7 @@ write_lLCConnection2IVMOBusyStateTimeoutValue(int action, unsigned char *var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5652,9 +5409,7 @@ write_lLCConnection2IVMOBitTimeoutValue(int action, unsigned char *var_val, unsi
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5662,8 +5417,7 @@ write_lLCConnection2IVMOBitTimeoutValue(int action, unsigned char *var_val, unsi
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5698,9 +5452,7 @@ write_lLCConnection2IVMORejectTimeoutValue(int action, unsigned char *var_val, u
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5708,8 +5460,7 @@ write_lLCConnection2IVMORejectTimeoutValue(int action, unsigned char *var_val, u
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5744,9 +5495,7 @@ write_lLCConnection2IVMORoute(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5754,8 +5503,7 @@ write_lLCConnection2IVMORoute(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5790,9 +5538,7 @@ write_lLCConnection2IVMOKStep(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5800,8 +5546,7 @@ write_lLCConnection2IVMOKStep(int action, unsigned char *var_val, unsigned char 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5836,9 +5581,7 @@ write_lLCConnection2IVMOMaxSendWindowSize(int action, unsigned char *var_val, un
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5846,8 +5589,7 @@ write_lLCConnection2IVMOMaxSendWindowSize(int action, unsigned char *var_val, un
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5882,9 +5624,7 @@ write_lLCConnection2IVMOOptionalTolerationIPDUs(int action, unsigned char *var_v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5892,8 +5632,7 @@ write_lLCConnection2IVMOOptionalTolerationIPDUs(int action, unsigned char *var_v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5928,9 +5667,7 @@ write_lLCConnectionlessAckMaximumLLCInformationFieldSize(int action, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5938,8 +5675,7 @@ write_lLCConnectionlessAckMaximumLLCInformationFieldSize(int action, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5974,9 +5710,7 @@ write_lLCConnectionlessAckMaximumRetransmissions(int action, unsigned char *var_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -5984,8 +5718,7 @@ write_lLCConnectionlessAckMaximumRetransmissions(int action, unsigned char *var_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6020,9 +5753,7 @@ write_lLCConnectionlessAckReceiveResources(int action, unsigned char *var_val, u
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6030,8 +5761,7 @@ write_lLCConnectionlessAckReceiveResources(int action, unsigned char *var_val, u
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6066,9 +5796,7 @@ write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize(int action, unsigne
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6076,8 +5804,7 @@ write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize(int action, unsigne
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6112,9 +5839,7 @@ write_lLCConnectionlessAckIVMOMaximumRetransmissions(int action, unsigned char *
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6122,8 +5847,7 @@ write_lLCConnectionlessAckIVMOMaximumRetransmissions(int action, unsigned char *
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6158,9 +5882,7 @@ write_lLCConnectionlessAckIVMORowStatus(int action, unsigned char *var_val, unsi
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6168,8 +5890,7 @@ write_lLCConnectionlessAckIVMORowStatus(int action, unsigned char *var_val, unsi
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6204,9 +5925,7 @@ write_lLCConnection2DefaultMaximumRetransmissions(int action, unsigned char *var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6214,8 +5933,7 @@ write_lLCConnection2DefaultMaximumRetransmissions(int action, unsigned char *var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6250,9 +5968,7 @@ write_lLCConnection2DefaultReceivedWindowSize(int action, unsigned char *var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6260,8 +5976,7 @@ write_lLCConnection2DefaultReceivedWindowSize(int action, unsigned char *var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6296,9 +6011,7 @@ write_lLCConnection2DefaultSendWindowSize(int action, unsigned char *var_val, un
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6306,8 +6019,7 @@ write_lLCConnection2DefaultSendWindowSize(int action, unsigned char *var_val, un
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6342,9 +6054,7 @@ write_lLCConnection2DefaultAcknowledgeTimeoutValue(int action, unsigned char *va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6352,8 +6062,7 @@ write_lLCConnection2DefaultAcknowledgeTimeoutValue(int action, unsigned char *va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6388,9 +6097,7 @@ write_lLCConnection2DefaultBusyStateTimeoutValue(int action, unsigned char *var_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6398,8 +6105,7 @@ write_lLCConnection2DefaultBusyStateTimeoutValue(int action, unsigned char *var_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6434,9 +6140,7 @@ write_lLCConnection2DefaultPBitTimeoutValue(int action, unsigned char *var_val, 
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6444,8 +6148,7 @@ write_lLCConnection2DefaultPBitTimeoutValue(int action, unsigned char *var_val, 
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6480,9 +6183,7 @@ write_lLCConnection2DefaultRejectTimeoutValue(int action, unsigned char *var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6490,8 +6191,7 @@ write_lLCConnection2DefaultRejectTimeoutValue(int action, unsigned char *var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6526,9 +6226,7 @@ write_lLCConnection2DefaultRoute(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6536,8 +6234,7 @@ write_lLCConnection2DefaultRoute(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6572,9 +6269,7 @@ write_lLCConnection2DefaultKStep(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6582,8 +6277,7 @@ write_lLCConnection2DefaultKStep(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6618,9 +6312,7 @@ write_lLCConnection2DefaultMaxSendWindowSize(int action, unsigned char *var_val,
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6628,8 +6320,7 @@ write_lLCConnection2DefaultMaxSendWindowSize(int action, unsigned char *var_val,
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6664,9 +6355,7 @@ write_lLCConnection2DefaultOptionalTolerationIPDUs(int action, unsigned char *va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6674,8 +6363,7 @@ write_lLCConnection2DefaultOptionalTolerationIPDUs(int action, unsigned char *va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6710,9 +6398,7 @@ write_lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize(int action, unsi
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6720,8 +6406,7 @@ write_lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize(int action, unsi
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6756,9 +6441,7 @@ write_lLCConnectionlessAckDefaultMaximumRetransmissions(int action, unsigned cha
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -6766,8 +6449,7 @@ write_lLCConnectionlessAckDefaultMaximumRetransmissions(int action, unsigned cha
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;

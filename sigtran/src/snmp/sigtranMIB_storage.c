@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "ds_agent.h"
 #ifdef HAVE_UCD_SNMP_UTIL_FUNCS_H
 #include <ucd-snmp/util_funcs.h>
-/* Many recent net-snmp UCD compatible headers do not declard header_generic. */
+/* Many recent net-snmp UCD compatible headers do not declare header_generic. */
 int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMethod **);
 #else				/* HAVE_UCD_SNMP_UTIL_FUNCS_H */
 #include "util_funcs.h"
@@ -113,10 +113,11 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
-#include "sigtranMIB_storage.h"
+#include "sigtranMIB.h"
 extern const char sa_program[];
 
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
+#undef MASTER
 #if !defined MODULE
 extern int sa_dump;			/* default packet dump */
 extern int sa_debug;			/* default no debug */
@@ -124,7 +125,6 @@ extern int sa_nomead;			/* default daemon mode */
 extern int sa_output;			/* default normal output */
 extern int sa_agentx;			/* default agentx mode */
 extern int sa_alarms;			/* default application alarms */
-extern int sa_fclose;			/* default close files between requests */
 extern int sa_logaddr;			/* log addresses */
 extern int sa_logfillog;		/* log to sa_logfile */
 extern int sa_logstderr;		/* log to standard error */
@@ -138,18 +138,13 @@ extern char sa_sysctlf[256];
 
 /* file stream for log file */
 extern FILE *stdlog;
-
-/* file descriptor for MIB use */
-extern int sa_fd;
-
-/* indication to reread MIB configuration */
-extern int sa_changed;
-
-/* indications that statistics, the mib or its tables need to be refreshed */
-extern int sa_stats_refresh;
 #endif				/* !defined MODULE */
-/* request number for per-request actions */
-extern int sa_request;
+extern int sa_fclose;			/* default close files between requests */
+extern int sa_fd;			/* file descriptor for MIB use */
+extern int sa_readfd;			/* file descriptor for autonomnous events */
+extern int sa_changed;			/* indication to reread MIB configuration */
+extern int sa_stats_refresh;		/* indications that statistics, the mib or its tables need to be refreshed */
+extern int sa_request;			/* request number for per-request actions */
 volatile int sigtranMIB_refresh = 1;
 volatile int sigtranSctpProfileTable_refresh = 1;
 
@@ -172,6 +167,9 @@ oid sigtranSctpProfileTable_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 15, 
 /*
  * Other oids defined in this MIB.
  */
+
+static const oid zeroDotZero_oid[2] = { 0, 0 };
+static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
 /*
  * variable7 sigtranMIB_variables: tree for sigtranMIB
@@ -233,14 +231,37 @@ struct sigtranMIB_data *sigtranMIBStorage = NULL;
 /* global storage of our data, saved in and configured by header_complex() */
 struct header_complex_index *sigtranSctpProfileTableStorage = NULL;
 
-/*
- * init_sigtranMIB(): Initialization routine.
- * This is called when the agent starts up.  At a minimum, registration of your variables should
- * take place here.
+#if defined MODULE
+void (*sigtranMIBold_signal_handler) (int) = NULL;	/* save old signal handler just in case */
+void sigtranMIB_loop_handler(int);
+void sigtranMIB_fd_handler(int, void *);
+#endif				/* defined MOUDLE */
+/**
+ * @fn void init_sigtranMIB(void)
+ * @brief sigtranMIB initialization routine.
+ *
+ * This is called when the agent starts up.  At a minimum, registration of the MIB variables
+ * structure (sigtranMIB_variables) should take place here.  By default the function also
+ * registers the configuration handler and configuration store callbacks.
+ *
+ * Additional registrations that may be considered here are calls to regsiter_readfd(),
+ * register_writefd() and register_exceptfd() for hooking into the snmpd event loop, but only when
+ * used as a loadable module.  By default this function establishes a single file descriptor to
+ * read, or upon which to handle exceptions.  Note that the snmpd only supports a maximum of 32
+ * extneral file descriptors, so these should be used sparingly.
+ *
+ * When running as a loadable module, it is also necessary to hook into the snmpd event loop so that
+ * the current request number can be deteremined.  This is accomplished by using a trick of the
+ * external_signal_scheduled and external_signal_handler mechanism which is called on each event
+ * loop when external_signal_scheduled is non-zero.  This is used to increment the sa_request value
+ * on each snmpd event loop interation so that calls to MIB tree functions can determine whether
+ * they belong to a fresh request or not (primarily for cacheing and possibly to clean up non-polled
+ * file descriptors).
  */
 void
 init_sigtranMIB(void)
 {
+	(void) snmpTrapOID_oid;
 	DEBUGMSGTL(("sigtranMIB", "initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
 	REGISTER_MIB("sigtranMIB", sigtranMIB_variables, variable7, sigtranMIB_variables_oid);
@@ -254,18 +275,46 @@ init_sigtranMIB(void)
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sigtranSctpProfileTable, NULL);
 
 	/* place any other initialization junk you need here */
+#if defined MODULE
+	if (sa_readfd != 0) {
+		register_readfd(sa_readfd, sigtranMIB_fd_handler, (void *) 0);
+		register_exceptfd(sa_readfd, sigtranMIB_fd_handler, (void *) 1);
+	}
+#if defined MASTER
+	sigtranMIBold_signal_handler = external_signal_handler[0];
+	external_signal_handler[0] = &sigtranMIB_loop_handler;
+#endif				/* defined MASTER */
+#endif				/* defined MODULE */
 	DEBUGMSGTL(("sigtranMIB", "done.\n"));
 }
 
-/*
- * deinit_sigtranMIB(): Deinitialization routine.
- * This is called before the agent is unloaded.  At a minimum, deregistration of your variables
- * should take place here.
+/**
+ * @fn void deinit_sigtranMIB(void)
+ * @brief deinitialization routine.
+ *
+ * This is called before the agent is unloaded.  At a minimum, deregistration of the MIB variables
+ * structure (sigtranMIB_variables) should take place here.  By default, the function also
+ * deregisters the the configuration file handlers for the MIB variables and table rows.
+ *
+ * Additional deregistrations that may be required here are calls to unregister_readfd(),
+ * unregister_writefd() and unregsiter_exceptfd() for unhooking from the snmpd event loop, but only
+ * when used as a loadable module.  By default if a read file descriptor exists, it is unregistered.
  */
 void
 deinit_sigtranMIB(void)
 {
 	DEBUGMSGTL(("sigtranMIB", "deinitializating...  "));
+#if defined MODULE
+#if defined MASTER
+	external_signal_handler[0] = sigtranMIBold_signal_handler;
+#endif				/* defined MASTER */
+	if (sa_readfd != 0) {
+		unregister_exceptfd(sa_readfd);
+		unregister_readfd(sa_readfd);
+		close(sa_readfd);
+		sa_readfd = 0;
+	}
+#endif				/* defined MODULE */
 	unregister_mib(sigtranMIB_variables_oid, sizeof(sigtranMIB_variables_oid) / sizeof(oid));
 	snmpd_unregister_config_handler("sigtranMIB");
 	snmpd_unregister_config_handler("sigtranSctpProfileTable");
@@ -284,6 +333,7 @@ term_sigtranMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn struct sigtranMIB_data *sigtranMIB_create(void)
  * @brief create a fresh data structure representing scalars in sigtranMIB.
+ *
  * Creates a new sigtranMIB_data structure by allocating dynamic memory for the structure and
  * initializing the default values of scalars in sigtranMIB.
  */
@@ -292,7 +342,7 @@ sigtranMIB_create(void)
 {
 	struct sigtranMIB_data *StorageNew = SNMP_MALLOC_STRUCT(sigtranMIB_data);
 
-	DBUGMSGTL(("sigtranMIB", "creating scalars...  "));
+	DEBUGMSGTL(("sigtranMIB", "creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
 
@@ -303,11 +353,12 @@ sigtranMIB_create(void)
 
 /**
  * @fn int sigtranMIB_destroy(struct sigtranMIB_data **thedata)
- * @brief delete a scalars structure from sigtranMIB.
  * @param thedata pointer to the data structure in sigtranMIB.
+ * @brief delete a scalars structure from sigtranMIB.
+ *
  * Frees scalars that were previously removed from sigtranMIB.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -328,6 +379,7 @@ sigtranMIB_destroy(struct sigtranMIB_data **thedata)
  * @fn int sigtranMIB_add(struct sigtranMIB_data *thedata)
  * @param thedata the structure representing sigtranMIB scalars.
  * @brief adds node to the sigtranMIB scalar data set.
+ *
  * Adds a scalar structure to the sigtranMIB data set.  Note that this function is necessary even
  * when the scalar values are not peristent.
  */
@@ -345,6 +397,7 @@ sigtranMIB_add(struct sigtranMIB_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sigtranMIB entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case sigtranMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
@@ -403,6 +456,7 @@ store_sigtranMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 /**
  * @fn void refresh_sigtranMIB(void)
  * @brief refresh the scalar values of sigtranMIB.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -427,21 +481,22 @@ refresh_sigtranMIB(void)
 }
 
 /**
-* @fn u_char * var_sigtranMIB(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
-* @param vp a pointer to the entry in the variables table for the requested variable.
-* @param name the object identifier for which to find.
-* @param length the length of the object identifier.
-* @param exact whether the name is exact.
-* @param var_len a pointer to the length of the representation of the object.
-* @param write_method a pointer to a write method for the object.
-* @brief locate variables in sigtranMIB.
-* This function returns a pointer to a memory area that is static across the request that contains
-* the UCD-SNMP representation of the scalar (so that it may be used to read from for a GET,
-* GET-NEXT or GET-BULK request).  This returned pointer may be NULL, in which case the function is
-* telling UCD-SNMP that the scalar does not exist for reading; however, if write_method is
-* overwritten with a non-NULL value, the function is telling UCD-SNMP that the scalar exists for
-* writing.  Write-only objects can be effected in this way.
-*/
+ * @fn u_char * var_sigtranMIB(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
+ * @param vp a pointer to the entry in the variables table for the requested variable.
+ * @param name the object identifier for which to find.
+ * @param length the length of the object identifier.
+ * @param exact whether the name is exact.
+ * @param var_len a pointer to the length of the representation of the object.
+ * @param write_method a pointer to a write method for the object.
+ * @brief locate variables in sigtranMIB.
+ *
+ * This function returns a pointer to a memory area that is static across the request that contains
+ * the UCD-SNMP representation of the scalar (so that it may be used to read from for a GET,
+ * GET-NEXT or GET-BULK request).  This returned pointer may be NULL, in which case the function is
+ * telling UCD-SNMP that the scalar does not exist for reading; however, if write_method is
+ * overwritten with a non-NULL value, the function is telling UCD-SNMP that the scalar exists for
+ * writing.  Write-only objects can be effected in this way.
+ */
 u_char *
 var_sigtranMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
@@ -468,6 +523,7 @@ var_sigtranMIB(struct variable *vp, oid * name, size_t *length, int exact, size_
 /**
  * @fn struct sigtranSctpProfileTable_data *sigtranSctpProfileTable_create(void)
  * @brief create a fresh data structure representing a new row in the sigtranSctpProfileTable table.
+ *
  * Creates a new sigtranSctpProfileTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
@@ -477,7 +533,7 @@ sigtranSctpProfileTable_create(void)
 {
 	struct sigtranSctpProfileTable_data *StorageNew = SNMP_MALLOC_STRUCT(sigtranSctpProfileTable_data);
 
-	DBUGMSGTL(("sigtranSctpProfileTable", "creating row...  "));
+	DEBUGMSGTL(("sigtranSctpProfileTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->sigtranSctpProfileNodelay = 2;
@@ -504,12 +560,38 @@ sigtranSctpProfileTable_create(void)
 }
 
 /**
+ * @fn struct sigtranSctpProfileTable_data *sigtranSctpProfileTable_duplicate(struct sigtranSctpProfileTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct sigtranSctpProfileTable_data *
+sigtranSctpProfileTable_duplicate(struct sigtranSctpProfileTable_data *thedata)
+{
+	struct sigtranSctpProfileTable_data *StorageNew = SNMP_MALLOC_STRUCT(sigtranSctpProfileTable_data);
+
+	DEBUGMSGTL(("sigtranSctpProfileTable", "duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("sigtranSctpProfileTable", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	sigtranSctpProfileTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int sigtranSctpProfileTable_destroy(struct sigtranSctpProfileTable_data **thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Frees a table row that was previously removed from a table.  Note that the strings associated
  * with octet strings, object identifiers and bit strings still attached to the structure will also
- * be freed.  The pointer that was passed in  thedata will be set to NULL if it is not already
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
  * NULL.
  */
 int
@@ -532,6 +614,7 @@ sigtranSctpProfileTable_destroy(struct sigtranSctpProfileTable_data **thedata)
  * @fn int sigtranSctpProfileTable_add(struct sigtranSctpProfileTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
  * @brief adds a row to the sigtranSctpProfileTable table data set.
+ *
  * Adds a table row structure to the sigtranSctpProfileTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
@@ -542,8 +625,7 @@ sigtranSctpProfileTable_add(struct sigtranSctpProfileTable_data *thedata)
 	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("sigtranSctpProfileTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index
-	   the data */
+	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* sigtranSctpProfileIndex */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sigtranSctpProfileIndex, sizeof(thedata->sigtranSctpProfileIndex));
 	header_complex_add_data(&sigtranSctpProfileTableStorage, vars, thedata);
@@ -554,8 +636,9 @@ sigtranSctpProfileTable_add(struct sigtranSctpProfileTable_data *thedata)
 
 /**
  * @fn int sigtranSctpProfileTable_del(struct sigtranSctpProfileTable_data *thedata)
- * @brief delete a row structure from a table.
  * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
  * Deletes a table row structure from the sigtranSctpProfileTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
@@ -584,6 +667,7 @@ sigtranSctpProfileTable_del(struct sigtranSctpProfileTable_data *thedata)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sigtranSctpProfileTable entries.
+ *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
  * file line for the registsred token (in this case sigtranSctpProfileTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
@@ -691,6 +775,7 @@ store_sigtranSctpProfileTable(int majorID, int minorID, void *serverarg, void *c
 /**
  * @fn void refresh_sigtranSctpProfileTable(void)
  * @brief refresh the scalar values of the sigtranSctpProfileTable.
+ *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
  * indicates to the agent that the cache has been invalidated and that it should reread scalars and
@@ -709,6 +794,7 @@ refresh_sigtranSctpProfileTable(void)
 /**
  * @fn void refresh_sigtranSctpProfileTable_row(struct sigtranSctpProfileTable_data *StorageTmp)
  * @brief refresh the contents of the sigtranSctpProfileTable row.
+ *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
@@ -724,6 +810,7 @@ refresh_sigtranSctpProfileTable_row(struct sigtranSctpProfileTable_data *Storage
 /**
  * @fn u_char *var_sigtranSctpProfileTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
  * @brief locate variables in sigtranSctpProfileTable.
+ *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_sigtranMIB above.
  */
@@ -733,11 +820,9 @@ var_sigtranSctpProfileTable(struct variable *vp, oid * name, size_t *length, int
 	struct sigtranSctpProfileTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("sigtranMIB", "var_sigtranSctpProfileTable: Entering...  \n"));
-	/* Make sure that the storage data does not need to be refreshed before checking the
-	   header. */
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_sigtranSctpProfileTable();
-	/* This assumes you have registered all your data properly with header_complex_add()
-	   somewhere before this. */
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
 	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
 		return NULL;
 	refresh_sigtranSctpProfileTable_row(StorageTmp);
@@ -893,9 +978,8 @@ write_sigtranSctpProfileName(int action, u_char *var_val, u_char var_val_type, s
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you
-				   have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
+				   UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileName;
 		old_length = StorageTmp->sigtranSctpProfileNameLen;
 		StorageTmp->sigtranSctpProfileName = string;
@@ -905,8 +989,7 @@ write_sigtranSctpProfileName(int action, u_char *var_val, u_char var_val_type, s
 		StorageTmp->sigtranSctpProfileName = old_value;
 		StorageTmp->sigtranSctpProfileNameLen = old_length;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
@@ -974,17 +1057,15 @@ write_sigtranSctpProfileNodelay(int action, u_char *var_val, u_char var_val_type
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileNodelay;
 		StorageTmp->sigtranSctpProfileNodelay = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileNodelay = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1041,17 +1122,15 @@ write_sigtranSctpPayloadProtocolId(int action, u_char *var_val, u_char var_val_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpPayloadProtocolId;
 		StorageTmp->sigtranSctpPayloadProtocolId = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpPayloadProtocolId = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1112,17 +1191,15 @@ write_sigtranSctpLifetime(int action, u_char *var_val, u_char var_val_type, size
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpLifetime;
 		StorageTmp->sigtranSctpLifetime = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpLifetime = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1190,17 +1267,15 @@ write_sigtranSctpProfileCsumType(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileCsumType;
 		StorageTmp->sigtranSctpProfileCsumType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileCsumType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1267,17 +1342,15 @@ write_sigtranSctpProfileMacType(int action, u_char *var_val, u_char var_val_type
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileMacType;
 		StorageTmp->sigtranSctpProfileMacType = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileMacType = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1339,17 +1412,15 @@ write_sigtranSctpProfileValidCookieLife(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileValidCookieLife;
 		StorageTmp->sigtranSctpProfileValidCookieLife = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileValidCookieLife = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1411,17 +1482,15 @@ write_sigtranSctpProfileCookieInc(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileCookieInc;
 		StorageTmp->sigtranSctpProfileCookieInc = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileCookieInc = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1483,17 +1552,15 @@ write_sigtranSctpProfileMaxIstreams(int action, u_char *var_val, u_char var_val_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileMaxIstreams;
 		StorageTmp->sigtranSctpProfileMaxIstreams = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileMaxIstreams = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1555,17 +1622,15 @@ write_sigtranSctpProfileReqOstreams(int action, u_char *var_val, u_char var_val_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileReqOstreams;
 		StorageTmp->sigtranSctpProfileReqOstreams = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileReqOstreams = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1630,17 +1695,15 @@ write_sigtranSctpEcn(int action, u_char *var_val, u_char var_val_type, size_t va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpEcn;
 		StorageTmp->sigtranSctpEcn = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpEcn = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1697,17 +1760,15 @@ write_sigtranSctpAdaptationLayerInfo(int action, u_char *var_val, u_char var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpAdaptationLayerInfo;
 		StorageTmp->sigtranSctpAdaptationLayerInfo = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpAdaptationLayerInfo = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1764,17 +1825,15 @@ write_sigtranSctpProfileMaxInitRetries(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileMaxInitRetries;
 		StorageTmp->sigtranSctpProfileMaxInitRetries = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileMaxInitRetries = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1836,17 +1895,15 @@ write_sigtranSctpProfileMaxBurst(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileMaxBurst;
 		StorageTmp->sigtranSctpProfileMaxBurst = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileMaxBurst = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1903,17 +1960,15 @@ write_sigtranSctpProfileAssocMaxRetrans(int action, u_char *var_val, u_char var_
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileAssocMaxRetrans;
 		StorageTmp->sigtranSctpProfileAssocMaxRetrans = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileAssocMaxRetrans = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1975,17 +2030,15 @@ write_sigtranSctpProfileMaxSackDelay(int action, u_char *var_val, u_char var_val
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileMaxSackDelay;
 		StorageTmp->sigtranSctpProfileMaxSackDelay = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileMaxSackDelay = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2047,17 +2100,15 @@ write_sigtranSctpProfileRtoMin(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileRtoMin;
 		StorageTmp->sigtranSctpProfileRtoMin = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileRtoMin = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2119,17 +2170,15 @@ write_sigtranSctpProfileRtoInitial(int action, u_char *var_val, u_char var_val_t
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileRtoInitial;
 		StorageTmp->sigtranSctpProfileRtoInitial = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileRtoInitial = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2191,17 +2240,15 @@ write_sigtranSctpProfileRtoMax(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileRtoMax;
 		StorageTmp->sigtranSctpProfileRtoMax = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileRtoMax = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2258,17 +2305,15 @@ write_sigtranSctpProfilePathMaxRetrans(int action, u_char *var_val, u_char var_v
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfilePathMaxRetrans;
 		StorageTmp->sigtranSctpProfilePathMaxRetrans = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfilePathMaxRetrans = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2330,17 +2375,15 @@ write_sigtranSctpProfileHeartbeatItvl(int action, u_char *var_val, u_char var_va
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and
-				   you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
 		old_value = StorageTmp->sigtranSctpProfileHeartbeatItvl;
 		StorageTmp->sigtranSctpProfileHeartbeatItvl = set_value;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sigtranSctpProfileHeartbeatItvl = old_value;
 		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change
-				   permanently.  Make sure that anything done here can't fail! */
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2452,9 +2495,7 @@ write_sigtranSctpProfileStatus(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -2499,8 +2540,7 @@ write_sigtranSctpProfileStatus(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
@@ -2526,3 +2566,1136 @@ write_sigtranSctpProfileStatus(int action, u_char *var_val, u_char var_val_type,
 	}
 	return SNMP_ERR_NOERROR;
 }
+
+#if defined MODULE
+#if defined MASTER
+/**
+ * @fn void sigtranMIB_loop_handler(int dummy)
+ * @param dummy signal number (always zero (0))
+ * @brief handle event loop interation.
+ *
+ * This function is registered so that, when operating as a module, snmpd will call it one per event
+ * loop interation.  This function is called before the next requst is processed and after the
+ * previous request is processed.  Two things are done here:  1) The file descriptor that is used to
+ * synchronize the agent with (pseudo-)device drivers is closed.  (Another approach, instead of
+ * closing each time, would be to restart a timer each time that a request is made (loop is
+ * performed) and if it expires, close the file descriptor).  2) The request number is incremented.
+ * Although a request is not generated for each loop of the snmp event loop, it is true that a new
+ * request cannot be generated without performing a loop.  Therefore, the sa_request is not the
+ * request number but it is a temporally unique identifier for a request.
+ */
+void
+sigtranMIB_loop_handler(int dummy)
+{
+	if (external_signal_scheduled[dummy] == 0)
+		external_signal_scheduled[dummy]--;
+	/* close files after each request */
+	if (sa_fclose && sa_fd != 0) {
+		close(sa_fd);
+		sa_fd = 0;
+	}
+	/* prepare for next request */
+	sa_request++;
+}
+#endif				/* defined MASTER */
+/**
+ * @fn void sigtranMIB_readfd_handler(int fd, void *dummy)
+ * @param fd file descriptor to read.
+ * @param dummy client data passed to registration function (always NULL).
+ * @brief handle read event on file descriptor.
+ *
+ * This read file descriptor handler is normally used for (pseudo-)device drivers that generate
+ * statistical collection interval events, alarm events, or other operational measurement events, by
+ * placing a message on the read queue of the "event handling" Stream.  Normally this routine
+ * would adjust counts in some table or scalars, generate SNMP traps representing on-occurence
+ * events, first and interval events, and alarm indications.
+ */
+void
+sigtranMIB_readfd_handler(int fd, void *dummy)
+{
+	/* XXX: place actions to handle sa_readfd here... */
+	return;
+}
+#endif				/* defined MOUDLE */
+#if defined MASTER
+const char sa_program[] = "sigtranmib";
+int sa_fclose = 1;			/* default close files between requests */
+int sa_fd = 0;				/* file descriptor for MIB use */
+int sa_readfd = 0;			/* file descriptor for autonomnous events */
+int sa_changed = 1;			/* indication to reread MIB configuration */
+int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
+int sa_request = 1;			/* request number for per-request actions */
+#endif				/* defined MASTER */
+#if defined MASTER
+#if !defined MODULE
+int sa_dump = 0;			/* default packet dump */
+int sa_debug = 0;			/* default no debug */
+int sa_nomead = 1;			/* default daemon mode */
+int sa_output = 1;			/* default normal output */
+int sa_agentx = 1;			/* default agentx mode */
+int sa_alarms = 1;			/* default application alarms */
+int sa_logaddr = 0;			/* log addresses */
+int sa_logfillog = 0;			/* log to sa_logfile */
+int sa_logstderr = 0;			/* log to standard error */
+int sa_logstdout = 0;			/* log to standard output */
+int sa_logsyslog = 0;			/* log to system logs */
+int sa_logcallog = 0;			/* log to callback logs */
+int sa_appendlog = 0;			/* append to log file without truncating */
+char sa_logfile[256] = "/var/log/sigtranmib.log";
+char sa_pidfile[256] = "/var/run/sigtranmib.pid";
+char sa_sysctlf[256] = "/etc/sigtranmib.conf";
+int allow_severity = LOG_ERR;
+int deny_severity = LOG_ERR;
+
+/* file stream for log file */
+FILE *stdlog = NULL;
+static void
+sa_version(int argc, char *argv[])
+{
+	if (!sa_output && !sa_debug)
+		return;
+	fprintf(stdout, "\
+%2$s\n\
+Copyright (c) 2008-2009  Monavacom Limited.  All Rights Reserved.\n\
+Distributed under Affero GPL Version 3, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
+", argv[0], ident);
+}
+static void
+sa_usage(int argc, char *argv[])
+{
+	if (!sa_output && !sa_debug)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [general-options] [options] [arguments]\n\
+    %1$s {-H|--help-directives}\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
+", argv[0]);
+}
+static void
+sa_help(int argc, char *argv[])
+{
+	if (!sa_output && !sa_debug)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [general-options] [options] [arguments]\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
+Arguments:\n\
+    None.\n\
+Options:\n\
+    -a, --log-addresses\n\
+        log addresses of connecting management stations.\n\
+    -A, --append\n\
+        append to logfiles without truncating.\n\
+    -c, --config-file CONFIGFILE\n\
+        use configuration file CONFIGFILE.\n\
+    -C, --config-only\n\
+        only load configuration given by -c option.\n\
+    -d, --dump\n\
+        dump sent and received PDUs.\n\
+    -D, --debug [LEVEL]\n\
+        set debugging verbosity to LEVEL.\n\
+    -D, --debug-tokens [TOKEN[,TOKEN]*]\n\
+        debug specified TOKEN's.\n\
+    -f, --dont-fork\n\
+        run in the foreground.\n\
+    -g, --gid, --groupid GID\n\
+        become group GID after listening.\n\
+    -h, --help, -?, --?\n\
+        print usage information and exit.\n\
+    -H, --help-directives\n\
+        print config directives and exit.\n\
+    -I, --initialize [-]MODULE[,MODULE]*\n\
+        initialize (or not, '-') these MODULE's.\n\
+    -k, --keep-open\n\
+        keep system files open between requests.\n\
+    -l, --log-file [LOGFILE]\n\
+        log to log file name LOGFILE.  [default: /var/log/sigtranmib.log]\n\
+    -L, --log-stderr\n\
+        log to controlling terminal standard error.\n\
+    -m, --mibs [+]MIB[,MIB]*\n\
+        load these (additional '+') MIBs.\n\
+    -M, --master\n\
+        run as SNMP master instead of AgentX sub-agent.\n\
+    -M, --mibdirs [+]MIBDIR[:MIBDIR]*\n\
+        search these (additional, '+') colon separated directories for MIBs.\n\
+    -n, --nodaemon\n\
+        run in the foreground.\n\
+    -n, --name NAME\n\
+        use NAME for configuration file base.  [default: sigtranmib]\n\
+    -p, --port PORTNUM\n\
+        listen on port number PORTNUM.  [default: 161]\n\
+    -p, --pidfile PIDFILE\n\
+        write daemon pid to PIDFILE.  [default: /var/run/sigtranmib.pid]\n\
+    -P, --pidfile PIDFILE\n\
+        write daemon pid to PIDFILE.  [default: /var/run/sigtranmib.pid]\n\
+    -q, --quiet\n\
+        suppress normal output.\n\
+    -q, --quick\n\
+        abbreviate output for machine readability.\n\
+    -r, --noroot\n\
+        do not require root privilege.\n\
+    -s, --log-syslog\n\
+        log to system logs.\n\
+    -S, --sysctl-file FILENAME\n\
+        write sysctl config file FILENAME.  [default: /etc/streams.conf]\n\
+    -t, --agent-alarms\n\
+        agent blocks {SIGALARM}.\n\
+    -T, --transport [TRANSPORT]\n\
+        default transport TRANSPORT.  [default: udp]\n\
+    -u, --uid, --userid UID\n\
+        become user UID after listening.\n\
+    -U, --dont-remove-pidfile\n\
+        do not remove PIDFILE when shutting down.\n\
+    -v, --version\n\
+        print version information and exit.\n\
+    -V, --verbose [LEVEL]\n\
+        be verbose to LEVEL.  [default: 1]\n\
+    -x, --agentx-socket [SOCKET]\n\
+        master AgentX on SOCKET.  [default: /var/agentx/master]\n\
+    -X, --agentx\n\
+        run as AgentX sub-agent instead of master (the default).\n\
+    -y, --copying\n\
+        print copying information and exit.\n\
+", argv[0]);
+}
+static void
+sa_copying(int argc, char *argv[])
+{
+	if (!sa_output && !sa_debug)
+		return;
+	fprintf(stdout, "\
+--------------------------------------------------------------------------------\n\
+%1$s\n\
+--------------------------------------------------------------------------------\n\
+Copyright (c) 2008-2009  Monavacom Limited <http://www.monavacom.com>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+--------------------------------------------------------------------------------\n\
+This program is free software; you can  redistribute  it and/or modify  it under\n\
+the terms of the GNU Affero General Public License as published by the Free\n\
+Software Foundation; Version 3 of the License.\n\
+\n\
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\
+\n\
+You should have received a copy of the GNU  Affero  General Public License along\n\
+with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the\n\
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
+--------------------------------------------------------------------------------\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
+the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
+as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the  license rights granted\n\
+herein (the license rights customarily provided to non-Government users). If the\n\
+Software is supplied to any unit or agency of the Government  other than DoD, it\n\
+is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
+Regulations (\"FAR\")  (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
+regulations).\n\
+--------------------------------------------------------------------------------\n\
+Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
+Corporation at a fee.  See http://www.openss7.com/\n\
+--------------------------------------------------------------------------------\n\
+", ident);
+}
+
+void
+sa_help_directives(int argc, char *argv[])
+{
+	ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
+	init_agent("sigtranMIB");
+	// init_mib_modules();
+	init_mib();
+	init_snmp("sigtranMIB");
+	snmp_log(MY_FACILITY(LOG_INFO), "Configuration directives understood:\n");
+	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be writen to standard error and not standard output. */
+	read_config_print_usage("    ");
+}
+static int
+sa_sig_register(int signum, RETSIGTYPE(*handler) (int))
+{
+	sigset_t mask;
+	struct sigaction act;
+
+	act.sa_handler = handler ? handler : SIG_DFL;
+	act.sa_flags = handler ? SA_RESTART : 0;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(signum, &act, NULL))
+		return (-1);
+	sigemptyset(&mask);
+	sigaddset(&mask, signum);
+	sigprocmask(handler ? SIG_UNBLOCK : SIG_BLOCK, &mask, NULL);
+	return (0);
+}
+static int sa_alm_signal = 0;
+static int sa_pol_signal = 0;
+static int sa_hup_signal = 0;
+static int sa_int_signal = 0;
+static int sa_trm_signal = 0;
+static int sa_alm_handle = 0;
+void
+sa_alm_callback(uint req, void *arg)
+{
+	if (req == sa_alm_handle)
+		sa_alm_handle = 0;
+	sa_alm_signal = 1;
+	return;
+}
+
+static RETSIGTYPE
+sa_alm_handler(int signum)
+{
+	sa_alm_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+static void
+sa_snmp_alm_handler(uint reg, void *clientarg)
+{
+	sa_alm_signal = 1;
+	return;
+}
+static int
+sa_alm_catch(void)
+{
+	if (sa_alarms)
+		return sa_sig_register(SIGALRM, &sa_alm_handler);
+	return (-1);
+}
+static int
+sa_alm_block(void)
+{
+	if (sa_alarms)
+		return sa_sig_register(SIGALRM, NULL);
+	if (sa_alm_handle) {
+		uint handle = sa_alm_handle;
+
+		sa_alm_handle = 0;
+		snmp_alarm_unregister(handle);
+	}
+	return (0);
+}
+static int
+sa_alm_action(void)
+{
+	sa_alm_signal = 0;
+	return (0);
+}
+
+static RETSIGTYPE
+sa_pol_handler(int signum)
+{
+	sa_pol_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+static int
+sa_pol_catch(void)
+{
+	return sa_sig_register(SIGPOLL, &sa_pol_handler);
+}
+static int
+sa_pol_block(void)
+{
+	return sa_sig_register(SIGPOLL, NULL);
+}
+
+/*
+ * Both the sc(4) module and sad(4) driver issue an M_PCSIG message with
+ * SIGPOLL to the stream head whenever the STREAMS configuration or autopush
+ * configuration changes, indicating to the agent which has the sc(4) or
+ * sad(4) Stream open that it is necessary to reread information from the
+ * kernel.  This fact is merely recorded, as this information is not read each
+ * time that a configuration change occurs, but only after a request from some
+ * portion of that information occurs. This condition is also set when the
+ * sc(4) and sad(4) Streams are first opened. The SIGPOLL will also deliver in
+ * siginfo the file descriptor issuing the signal, so we could distiguish
+ * between sc(4) and sad(4) signals, but since one can be pushed over the
+ * other, there is little point in distinguishing.
+ *
+ * sc(4) or sad(4) also should be modified to provide the general streams
+ * statistics supported here; even though they are available through the /proc
+ * filesystem on Linux Fast-STREAMS.
+ */
+static int
+sa_pol_action(void)
+{
+	sa_pol_signal = 0;
+	snmp_log(MY_FACILITY(LOG_INFO), "%s: Caught SIGPOLL, will re-read data structures", sa_program);
+	sa_changed = 1;
+	return (0);
+}
+
+static RETSIGTYPE
+sa_hup_handler(int signum)
+{
+	sa_hup_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+static int
+sa_hup_catch(void)
+{
+	if (sa_agentx)
+		return sa_sig_register(SIGHUP, &sa_hup_handler);
+	return (-1);
+}
+static int
+sa_hup_block(void)
+{
+	return sa_sig_register(SIGHUP, NULL);
+}
+static int
+sa_hup_action(void)
+{
+	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by logrotate asking us to close and reopen our log files. */
+	sa_hup_signal = 0;
+	snmp_log(MY_FACILITY(LOG_WARNING), "Caught SIGHUP, reopening files.");
+	if (sa_output > 1)
+		snmp_log(MY_FACILITY(LOG_NOTICE), "Reopening output file %s", sa_logfile);
+	if (sa_logfillog != 0) {
+		fflush(stdlog);
+		fclose(stdlog);
+		snmp_disable_filelog();
+		if ((stdlog = freopen(sa_logfile, sa_appendlog ? "a" : "w", stdlog)) == NULL) {
+			/* I hope we have another log sink. */
+			snmp_log(MY_FACILITY(LOG_ERR), "%s", strerror(errno));
+			snmp_log(MY_FACILITY(LOG_ERR), "Could not reopen log file %s", sa_logfile);
+		}
+		snmp_enable_filelog(sa_logfile, sa_appendlog);
+	}
+	return (0);
+}
+
+static RETSIGTYPE
+sa_int_handler(int signum)
+{
+	sa_int_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+static int
+sa_int_catch(void)
+{
+	return sa_sig_register(SIGINT, &sa_int_handler);
+}
+static int
+sa_int_block(void)
+{
+	return sa_sig_register(SIGINT, NULL);
+}
+static void sa_exit(int retval);
+static int
+sa_int_action(void)
+{
+	sa_int_signal = 0;
+	snmp_log(MY_FACILITY(LOG_WARNING), "%s: Caught SIGINT, shutting down", sa_program);
+	sa_exit(0);
+	return (0);		/* should be no return */
+}
+
+static RETSIGTYPE
+sa_trm_handler(int signum)
+{
+	sa_trm_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+static int
+sa_trm_catch(void)
+{
+	return sa_sig_register(SIGTERM, &sa_trm_handler);
+}
+static int
+sa_trm_block(void)
+{
+	return sa_sig_register(SIGTERM, NULL);
+}
+static void sa_exit(int retval);
+static int
+sa_trm_action(void)
+{
+	sa_trm_signal = 0;
+	snmp_log(MY_FACILITY(LOG_WARNING), "%s: Caught SIGTERM, shutting down", sa_program);
+	sa_exit(0);
+	return (0);		/* should be no return */
+}
+static void
+sa_sig_catch(void)
+{
+	sa_alm_catch();
+	sa_pol_catch();
+	sa_hup_catch();
+	sa_int_catch();
+	sa_trm_catch();
+}
+static void
+sa_sig_block(void)
+{
+	sa_alm_block();
+	sa_pol_block();
+	sa_hup_block();
+	sa_int_block();
+	sa_trm_block();
+}
+
+int
+sa_start_timer(long duration)
+{
+	if (sa_alarms) {
+		struct itimerval setting = {
+			{0, 0},
+			{duration / 1000, (duration % 1000) * 1000}
+		};
+		if (sa_alm_catch())
+			return (-1);
+		if (setitimer(ITIMER_REAL, &setting, NULL))
+			return (-1);
+		sa_alm_signal = 0;
+		return (0);
+	} else {
+#if defined NETSNMP_DS_APPLICATION_ID
+		struct timeval setting = {
+			duration / 1000, (duration % 1000) * 1000
+		};
+		sa_alm_handle = snmp_alarm_register_hr(setting, 0, sa_snmp_alm_handler, NULL);
+#else
+		sa_alm_handle = snmp_alarm_register((duration + 999) / 1000, 0, sa_snmp_alm_handler, NULL);
+#endif
+		return (sa_alm_handle ? 0 : -1);
+	}
+}
+static void
+sa_exit(int retval)
+{
+	if (retval)
+		snmp_log(MY_FACILITY(LOG_ERR), "%s: Exiting %d", sa_program, retval);
+	else
+		snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Exiting %d", sa_program, retval);
+	fflush(stdout);
+	fflush(stderr);
+	sa_sig_block();
+	closelog();
+	exit(retval);
+}
+static void
+sa_init_logging(int argc, char *argv[])
+{
+	static char progname[256];
+
+	/* The purpose of this function is to bring logging up before forking (and while still in the foreground) so that we can use the snmp_log() function before and during forking if necessary.
+	   Note that the default configuration for snmp_log() is to send all logs to standard error. */
+	strncpy(progname, basename(argv[0]), sizeof(progname));
+	snmp_disable_log();
+	if (sa_logfillog) {
+		snmp_enable_filelog(sa_logfile, sa_appendlog);
+	}
+	if (sa_logstderr | sa_logstdout) {
+#if defined LOG_PERROR
+		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better 
+		   formated. */
+		if (!sa_logsyslog)
+			snmp_enable_stderrlog();
+#else				/* defined LOG_PERROR */
+		snmp_enable_stderrlog();
+#endif				/* defined LOG_PERROR */
+	}
+	if (sa_logsyslog) {
+#if !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT
+		snmp_enable_syslog();
+#else				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
+		snmp_enable_syslog_ident("sigtranMIB", LOG_DAEMON);
+#endif				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
+		/* Note that the way that snmp sets up the logger is not really the way we want it, so close the log and reopen it the way we want. */
+		closelog();
+#if defined LOG_PERROR
+		openlog("sigtranMIB", LOG_PID | LOG_CONS | LOG_NDELAY | (sa_logstderr ? LOG_PERROR : 0), MY_FACILITY(0));
+#else				/* defined LOG_PERROR */
+		openlog("sigtranMIB", LOG_PID | LOG_CONS | LOG_NDELAY, MY_FACILITY(0));
+#endif				/* defined LOG_PERROR */
+	}
+	if (sa_logcallog) {
+		snmp_enable_calllog();
+	}
+}
+static void
+sa_enter(int argc, char *argv[])
+{
+	if (sa_nomead) {
+		pid_t pid;
+
+		if ((pid = fork()) < 0) {
+			perror(argv[0]);
+			exit(2);
+		} else if (pid != 0) {
+			/* parent exits */
+			exit(0);
+		}
+		setsid();	/* become a session leader */
+		/* fork once more for SVR4 */
+		if ((pid = fork()) < 0) {
+			perror(argv[0]);
+			exit(2);
+		} else if (pid != 0) {
+			/* parent responsible for writing pid file */
+			if (sa_nomead || sa_pidfile[0] != '\0') {
+				FILE *pidf;
+
+				/* initialize default filename */
+				if (sa_pidfile[0] == '\0')
+					snprintf(sa_pidfile, sizeof(sa_pidfile), "/var/run/%s.pid", sa_program);
+				if (sa_output > 1) {
+					snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Writing daemon pid to file %s", sa_program, sa_pidfile);
+				}
+				if ((pidf = fopen(sa_pidfile, "w+"))) {
+					fprintf(pidf, "%d", (int) pid);
+					fflush(pidf);
+					fclose(pidf);
+				} else {
+					snmp_log(MY_FACILITY(LOG_ERR), "%s: %m", sa_program);
+					snmp_log(MY_FACILITY(LOG_ERR), "%s: Could not write pid to file %s", sa_program, sa_pidfile);
+					sa_exit(2);
+					/* no return */
+				}
+			}
+			/* parent exits */
+			exit(0);
+		}
+		/* child continues */
+		/* release current directory */
+		if (chdir("/") < 0) {
+			perror(argv[0]);
+			exit(2);
+		}
+		umask(0);	/* clear file creation mask */
+		/* rearrange file streams */
+		fclose(stdin);
+	}
+	/* continue as foreground or background */
+	sa_init_logging(argc, argv);
+	sa_sig_catch();
+	snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Startup complete.", sa_program);
+}
+static void
+sa_mloop(int argc, char *argv[])
+{
+	if (sa_agentx) {
+		if (sa_debug)
+			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as AgentX client\n", argv[0]);
+		/* run as an AgentX client */
+		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
+	} else {
+		if (sa_debug)
+			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as SNMP master agent\n", argv[0]);
+		/* run as SNMP master */
+		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
+	}
+	if (sa_alarms) {
+		if (sa_debug)
+			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using application alarms\n", argv[0]);
+		/* use application alarms */
+		ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
+	}
+	/* initialize agent */
+	init_agent("sigtranMIB");
+	/* initialize MIB */
+	init_sigtranMIB();
+	/* initialize SNMP */
+	init_snmp("sigtranMIB");
+	if (!sa_agentx) {
+		if (sa_debug)
+			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as SNMP master\n", argv[0]);
+#if !defined NETSNMP_DS_APPLICATION_ID
+		init_master_agent(710, NULL, NULL);
+#else
+		init_master_agent();
+#endif
+	}
+	for (;;) {
+		int retval;
+
+		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of the agentx socket and add it to the fdset. */
+		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
+#if 0
+		if (snmp_select() == 0) {
+			if (sa_alarms == 0)
+				run_alarms();
+		}
+#endif
+		retval = agent_check_and_process(1);	/* 0 == don't block */
+		if (retval == 0) {
+			/* alarm occurred, alarm conditions checked */
+		} else if (retval == -1) {
+			/* error (or signal) ocurred */
+			if (sa_alm_signal) {
+				sa_alm_action();
+			}
+			if (sa_pol_signal) {
+				sa_pol_action();
+			}
+			if (sa_hup_signal) {
+				sa_hup_action();
+			}
+			if (sa_int_signal) {
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
+				snmp_shutdown("sigtranMIB");
+				sa_int_action();	/* no return */
+			}
+			if (sa_trm_signal) {
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
+				snmp_shutdown("sigtranMIB");
+				sa_trm_action();	/* no return */
+			}
+		} else if (retval > 0) {
+			/* processed packets */
+			if (sa_fclose) {
+				/* close files after each request */
+				if (sa_fd != 0) {
+					int fd = sa_fd;
+
+					sa_fd = 0;
+					close(fd);
+				}
+			}
+			sa_stats_refresh = 1;
+			sa_request++;
+		}
+	}
+	if (sa_debug)
+		snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
+	snmp_shutdown("sigtranMIB");
+}
+
+int
+main(int argc, char *argv[])
+{
+	for (;;) {
+		int c, val, fd;
+		char *cptr;
+		struct passwd *pw;
+		struct group *gr;
+		struct stat st;
+
+#if defined _GNU_SOURCE
+		int option_index = 0;
+                /* *INDENT-OFF* */
+                static struct option long_options[] = {
+                        {"log-addresses",	no_argument,		NULL, 'a'},
+                        {"append",		no_argument,		NULL, 'A'},
+                        {"config-file",		required_argument,	NULL, 'c'},
+                        {"no-configs",		no_argument,		NULL, 'C'},
+                        {"dump",		no_argument,		NULL, 'd'},
+                        {"debug",		optional_argument,	NULL, 'D'},
+                        {"debug-tokens",	optional_argument,	NULL, 'D'},
+                        {"dont-fork",		no_argument,		NULL, 'f'},
+                        {"gid",			required_argument,	NULL, 'g'},
+                        {"groupid",		required_argument,	NULL, 'g'},
+                        {"help",		no_argument,		NULL, 'h'},
+                        {"?",			no_argument,		NULL, 'h'},
+                        {"help-directives",	no_argument,		NULL, 'H'},
+                        {"initialize",		required_argument,	NULL, 'I'},
+                        {"init-modules",	required_argument,	NULL, 'I'},
+                        {"keep-open",		no_argument,		NULL, 'k'},
+                        {"log-file",		optional_argument,	NULL, 'l'},
+                        {"logfile",		optional_argument,	NULL, 'l'},
+                        {"Lf",			optional_argument,	NULL, 'l'},
+                        {"LF",			required_argument,	NULL, 'l'},
+                        {"log-stderr",		no_argument,		NULL, 'L'},
+                        {"Le",			no_argument,		NULL, 'L'},
+                        {"LE",			required_argument,	NULL, 'L'},
+                        {"mibs",		required_argument,	NULL, 'm'},
+                        {"master",		no_argument,		NULL, 'M'},
+                        {"mibdirs",		required_argument,	NULL, 'M'},
+                        {"nodaemon",		no_argument,		NULL, 'n'},
+                        {"name",		required_argument,	NULL, 'n'},
+                        {"dry-run",		no_argument,		NULL, 'N'},
+                        {"log-stdout",		no_argument,		NULL, 'o'},
+                        {"Lo",			no_argument,		NULL, 'o'},
+                        {"LO",			required_argument,	NULL, 'o'},
+                        {"port",		required_argument,	NULL, 'p'},
+                        {"pidfile",		required_argument,	NULL, 'P'},
+                        {"quiet",		no_argument,		NULL, 'q'},
+                        {"quick",		no_argument,		NULL, 'q'},
+                        {"noroot",		no_argument,		NULL, 'r'},
+                        {"log-syslog",		no_argument,		NULL, 's'},
+                        {"Ls",			no_argument,		NULL, 's'},
+                        {"LS",			required_argument,	NULL, 's'},
+                        {"syslog",		no_argument,		NULL, 's'},
+                        {"sysctl-file",		required_argument,	NULL, 'S'},
+                        {"agent-alarms",	no_argument,		NULL, 't'},
+                        {"transport",		optional_argument,	NULL, 'T'},
+                        {"uid",			required_argument,	NULL, 'u'},
+                        {"userid",		required_argument,	NULL, 'u'},
+                        {"dont-remove-pidfile",	no_argument,		NULL, 'U'},
+                        {"leave-pidfile",	no_argument,		NULL, 'U'},
+                        {"version",		no_argument,		NULL, 'v'},
+                        {"verbose",		optional_argument,	NULL, 'V'},
+                        {"agentx-socket",	required_argument,	NULL, 'x'},
+                        {"agentx",		no_argument,		NULL, 'X'},
+                        {"copying",		no_argument,		NULL, 'y'},
+#if 0
+                        {"directory",		required_argument,	NULL, 'd'},
+                        {"basename",		required_argument,	NULL, 'b'},
+                        {"outfile",		required_argument,	NULL, 'o'},
+                        {"errfile",		required_argument,	NULL, 'e'},
+#endif
+                        { 0, }
+                };
+                /* *INDENT-ON* */
+
+		c = getopt_long_only(argc, argv, ":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, ":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1) {
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: done options processing\n", argv[0]);
+			break;
+		}
+		switch (c) {
+		case 0:
+			goto bad_usage;
+		case 'a':	/* -a, --log-addresses */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging addresses\n", argv[0]);
+			sa_logaddr++;
+			break;
+		case 'A':	/* -A, --append */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will not truncate logfile\n", argv[0]);
+#if defined NETSNMP_DS_LIB_APPEND_LOGFILES
+			ds_set_boolean(DS_LIBRARY_ID, NETSNMP_DS_LIB_APPEND_LOGFILES, 1);
+#endif				/* defined NETSNMP_DS_LIB_APPEND_LOGFILES */
+			sa_appendlog = 1;
+			break;
+		case 'c':	/* -c, --config-file CONFIGFILE */
+			if (optarg == NULL)
+				goto bad_option;
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using configuration file %s\n", argv[0], optarg);
+			ds_set_string(DS_LIBRARY_ID, DS_LIB_OPTIONALCONFIG, optarg);
+			break;
+		case 'C':	/* -C, --no-configs */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: not reading default config files\n", argv[0]);
+			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DONT_READ_CONFIGS, 1);
+			break;
+		case 'd':	/* -d, --dump */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting packet dump\n", argv[0]);
+			sa_dump = 1;
+			// snmp_set_dump_packet(sa_dump);
+			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DUMP_PACKET, sa_dump);
+			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, sa_dump);
+			break;
+		case 'D':	/* -D, --debug [LEVEL], --debug-tokens [TOKENS] */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: increasing debug verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				/* no option: must be -D, --debug */
+				sa_debug++;
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debug level is now %d\n", argv[0], sa_debug);
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debugging all tokens\n", argv[0]);
+				if (sa_debug)
+					debug_register_tokens("ALL");
+			} else {
+				cptr = optarg;
+				if ((val = strtol(optarg, &cptr, 0)) < 0)
+					goto bad_option;
+				if (*cptr == '\0') {
+					/* it is just a number, must be -D, --debug [LEVEL] */
+					sa_debug = val;
+					if (sa_debug)
+						snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debug level is now %d\n", argv[0], sa_debug);
+				} else {
+					/* not a number, must be -D, --debug-tokens TOKENS */
+					if (sa_debug)
+						snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debugging tokens %s\n", argv[0], optarg);
+					debug_register_tokens(optarg);
+				}
+			}
+			break;
+		case 'f':	/* -f, --dont-fork */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing daemon mode\n", argv[0]);
+			sa_nomead = 0;
+			break;
+		case 'u':	/* -u, --uid, --userid UID */
+			cptr = optarg;
+			if ((val = strtol(optarg, &cptr, 0)) < 0)
+				goto bad_option;
+			/* UID can be name or number */
+			if ((pw = (*cptr == '\0') ? getpwuid((uid_t) val) : getpwnam(optarg)) == NULL)
+				goto bad_option;
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will run as uid %s(%d)\n", argv[0], pw->pw_name, pw->pw_uid);
+			ds_set_int(DS_APPLICATION_ID, DS_AGENT_USERID, pw->pw_uid);
+			break;
+		case 'g':	/* -g, --gid, --groupdid GID */
+			cptr = optarg;
+			if ((val = strtol(optarg, &cptr, 0)) < 0)
+				goto bad_option;
+			/* GID can be name or number */
+			if ((gr = (*cptr == '\0') ? getgrgid((gid_t) val) : getgrnam(optarg)) == NULL)
+				goto bad_option;
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will run as gid %s(%d)\n", argv[0], gr->gr_name, gr->gr_gid);
+			ds_set_int(DS_APPLICATION_ID, DS_AGENT_GROUPID, gr->gr_gid);
+			break;
+		case 'h':	/* -h, --help, -?, --? */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing help message\n", argv[0]);
+			sa_help(argc, argv);
+			exit(0);
+		case 'H':	/* -H, --help-directives */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing config directives\n", argv[0]);
+			sa_help_directives(argc, argv);
+			exit(0);
+		case 'I':	/* -I, --init-modules, --initialize MODULE[{,| |:}MODULE]* */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will initialize modules: %s\n", argv[0], optarg);
+			add_to_init_list(optarg);
+			break;
+		case 'k':	/* -k, --keep-open */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: keeping files open\n", argv[0]);
+			sa_fclose = 0;
+			break;
+		case 'l':	/* -l, --log-file, --logfile, -Lf, -LF p1[-p2] [LOGFILE] */
+			if (optarg != NULL)
+				strncpy(sa_logfile, optarg, sizeof(sa_logfile));
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will log to file %s\n", argv[0], sa_logfile);
+			sa_logfillog = 1;
+			break;
+		case 'L':	/* -L, --log-stderr, -Le, -LE p1[-p2] */
+			/* Note that the recent NET-SNMP version of this option is far more complicated: -Le is the same as the old version of the option; -Lf LOGFILE is like the -l option; -Ls is
+			   like the -s option; -Lo logs messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or O, logs priority p1 and above to X, or p1 thru p2 to X. */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to standard error\n", argv[0]);
+			sa_logstderr = 1;
+			break;
+		case 'm':	/* -m, --mibs MIBS */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using MIBS %s\n", argv[0], optarg);
+			break;
+		case 'M':	/* -M, --master or -M, --mibdirs MIBDIRS */
+			if (optarg) {
+				/* -M, --mibdirs MIBDIRS */
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using MIBDIRS %s\n", argv[0], optarg);
+			} else {
+				/* -M, --master */
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting SNMP master\n", argv[0]);
+				sa_agentx = 0;
+				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
+			}
+			break;
+		case 'n':	/* -n, --nodaemon or -n, --name NAME */
+			if (optarg) {
+				/* -n, --name NAME */
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using name %s\n", argv[0], optarg);
+				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, optarg);
+			} else {
+				/* -n, --nodaemon */
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing deamon mode\n", argv[0]);
+				sa_nomead = 0;
+				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, basename(argv[0]));
+			}
+			break;
+		case 'N':	/* -N, --dry-run */
+#if defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting for dry-runs startup\n", argv[0]);
+			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_QUIT_IMMEDIATELY, 1);
+			break;
+#else				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
+			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: -N option not supported\n", argv[0]);
+			goto bad_option;
+#endif				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
+		case 'o':	/* -o, --log-stdout, -Lo, -LO p1[-p2] */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to stdout\n", argv[0]);
+			sa_logstdout = 1;
+			break;
+		case 'p':	/* -p, --port PORTNUM or -p, --pidfile PIDFILE */
+			cptr = optarg;
+			if ((val = strtol(optarg, &cptr, 0)) < 0 || val > 16383)
+				goto bad_option;
+			if (*cptr == '\0') {
+				char buf[4096];
+
+				/* -p, --port PORTNUM */
+				if ((cptr = ds_get_string(DS_APPLICATION_ID, DS_AGENT_PORTS)))
+					snprintf(buf, sizeof(buf), "%s,%s", cptr, optarg);
+				else
+					strncpy(buf, optarg, sizeof(buf));
+				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PORTS, buf);
+				break;
+			}
+			/* fall through */
+		case 'P':	/* -p, -P, --pidfile PIDFILE */
+			if (optarg) {
+				/* either it exists */
+				if (stat(optarg, &st) == -1) {
+					/* or we can create it */
+					if ((fd = open(optarg, O_CREAT, 0600)) == -1) {
+						perror(argv[0]);
+						goto bad_option;
+					}
+					close(fd);
+				}
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting pid file to %s\n", argv[0], optarg);
+				strncpy(sa_pidfile, optarg, sizeof(sa_pidfile));
+			}
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using pidfile %s\n", argv[0], sa_pidfile);
+			break;
+		case 'q':	/* -q, --quiet, --quick */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing normal output\n", argv[0]);
+			sa_debug = 0;
+			sa_output = 0;
+			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
+			// snmp_set_quick_print();
+			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_QUICK_PRINT, 1);
+			break;
+		case 'r':	/* -r, --noroot */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting for non-root access\n", argv[0]);
+			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
+			break;
+		case 's':	/* -s, --log-syslog, -Ls, -LS p1[-p2] */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to system logs\n", argv[0]);
+			sa_logsyslog = 1;
+			break;
+		case 'S':	/* -S, -sysctl-file FILENAME */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using %s for backing\n", argv[0], optarg);
+			strncpy(sa_sysctlf, optarg, sizeof(sa_sysctlf));
+			break;
+		case 't':	/* -t, --agent-alarms */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting agent alarms\n", argv[0]);
+			sa_alarms = 0;
+			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
+			break;
+		case 'T':	/* -T, --transport [TRANSPORT] */
+			if (optarg == NULL)
+				goto udp_transport;
+			if (!strcasecmp("TCP", optarg)) {
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting default transport to TCP\n", argv[0]);
+				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
+				val |= SNMP_FLAGS_STREAM_SOCKET;
+				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
+			} else if (!strcasecmp("UDP", optarg)) {
+			      udp_transport:
+				if (sa_debug)
+					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting default transport to UDP\n", argv[0]);
+				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
+				val &= ~SNMP_FLAGS_STREAM_SOCKET;
+				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
+			} else
+				goto bad_option;
+			break;
+		case 'U':
+#if defined NETSNMP_DS_AGENT_LEAVE_PIDFILE
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will leave pidfile after shutdown\n", argv[0]);
+			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_LEAVE_PIDFILE, 1);
+#else
+			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: -U option not supported\n");
+			goto bad_option;
+#endif				/* defined NETSNMP_DS_AGENT_LEAVE_PIDFILE */
+			break;
+		case 'v':	/* -v, --version */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing version message\n", argv[0]);
+			sa_version(argc, argv);
+			exit(0);
+		case 'V':	/* -V, --verbose [LEVEL] */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: increasing output verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				sa_output++;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				sa_output = val;
+			}
+			if (sa_output > 1)
+				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 1);
+			else
+				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
+			break;
+		case 'x':	/* -x, --agentx-socket SOCKET */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting AgentX socket to %s\n", argv[0], optarg);
+			ds_set_string(DS_APPLICATION_ID, DS_AGENT_X_SOCKET, optarg);
+			// ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_AGENTX_MASTER, 1);
+			break;
+		case 'X':	/* -X, --agentx */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting AgentX sub-agent\n", argv[0]);
+			sa_agentx = 1;
+			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
+			break;
+		case 'y':	/* -y, --copying */
+			if (sa_debug)
+				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing copying message\n", argv[0]);
+			sa_copying(argc, argv);
+			exit(0);
+		case '?':
+		case ':':
+		default:
+		      bad_option:
+			optind--;
+			goto bad_nonopt;
+		      bad_nonopt:
+			if (sa_output || sa_debug) {
+				if (optind < argc) {
+					fprintf(stderr, "%s: syntax error near '", argv[0]);
+					while (optind < argc)
+						fprintf(stderr, "%s ", argv[optind++]);
+					fprintf(stderr, "'\n");
+				} else {
+					fprintf(stderr, "%s: missing option or argument", argv[0]);
+					fprintf(stderr, "\n");
+				}
+				fflush(stderr);
+			      bad_usage:
+				sa_usage(argc, argv);
+			}
+			exit(2);
+		}
+	}
+	if (optind < argc) {
+		if (sa_debug)
+			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: excess non-option arguments\n", argv[0]);
+		goto bad_nonopt;
+	}
+	sa_enter(argc, argv);	/* daemonize if necessary */
+	sa_mloop(argc, argv);	/* execute main loop */
+	exit(0);
+}
+#endif				/* !defined MODULE */
+#endif				/* defined MASTER */

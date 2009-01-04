@@ -127,6 +127,9 @@ extern struct header_complex_index *sigtranSctpProfileTableStorage;
 /* object id definitions */
 
 /* function prototypes */
+/* trap function prototypes */
+
+/* variable function prototypes */
 void init_sigtranMIB(void);
 void deinit_sigtranMIB(void);
 int term_sigtranMIB(int majorID, int minorID, void *serverarg, void *clientarg);
@@ -136,6 +139,7 @@ SNMPCallback store_sigtranMIB;
 void refresh_sigtranMIB(void);
 FindVarMethod var_sigtranSctpProfileTable;
 struct sigtranSctpProfileTable_data *sigtranSctpProfileTable_create(void);
+struct sigtranSctpProfileTable_data *sigtranSctpProfileTable_duplicate(struct sigtranSctpProfileTable_data *);
 int sigtranSctpProfileTable_destroy(struct sigtranSctpProfileTable_data **);
 int sigtranSctpProfileTable_add(struct sigtranSctpProfileTable_data *);
 int sigtranSctpProfileTable_del(struct sigtranSctpProfileTable_data *);

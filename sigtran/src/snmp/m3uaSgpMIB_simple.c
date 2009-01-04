@@ -86,22 +86,22 @@ struct variable7 m3uaSgpMIB_simple_variables[] = {
 	{M3UASGPASPASPSTATE, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 9}},
 #define   M3UASGPASPSCTPPROFILE  34
 	{M3UASGPASPSCTPPROFILE, ASN_OBJECT_ID, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 10}},
-#define   M3UASGPASPSCTPPROFILE  35
-	{M3UASGPASPSCTPPROFILE, ASN_OBJECT_ID, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 10}},
+#define   M3UASGPASPMAXINITRETRIES  35
+	{M3UASGPASPMAXINITRETRIES, ASN_UNSIGNED, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 11}},
 #define   M3UASGPASPMAXPATHRETRANS  36
-	{M3UASGPASPMAXPATHRETRANS, ASN_UNSIGNED, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 11}},
+	{M3UASGPASPMAXPATHRETRANS, ASN_UNSIGNED, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 12}},
 #define   M3UASGPASPRTOMIN      37
-	{M3UASGPASPRTOMIN, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 12}},
-#define   M3UASGPASPRTOMIN      38
-	{M3UASGPASPRTOMIN, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 12}},
-#define   M3UASGPASPRTOMIN      39
-	{M3UASGPASPRTOMIN, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 12}},
+	{M3UASGPASPRTOMIN, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 13}},
+#define   M3UASGPASPRTOMAX      38
+	{M3UASGPASPRTOMAX, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 14}},
+#define   M3UASGPASPHEARTBEATINTERVAL  39
+	{M3UASGPASPHEARTBEATINTERVAL, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 15}},
 #define   M3UASGPASPMAXLIFETIME  40
-	{M3UASGPASPMAXLIFETIME, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 13}},
+	{M3UASGPASPMAXLIFETIME, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 16}},
 #define   M3UASGPASPTIMERDIVERT  41
-	{M3UASGPASPTIMERDIVERT, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 14}},
+	{M3UASGPASPTIMERDIVERT, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 17}},
 #define   M3UASGPASPSTATUS      42
-	{M3UASGPASPSTATUS, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 15}},
+	{M3UASGPASPSTATUS, ASN_INTEGER, RWRITE, var_m3uaSgpAspTable, 6, {1, 2, 4, 1, 1, 18}},
 #define   M3UASGPNEXTINDEX      43
 	{M3UASGPNEXTINDEX, ASN_UNSIGNED, RONLY, var_m3uaSgpMIB, 4, {1, 2, 5, 1}},
 };
@@ -375,12 +375,10 @@ var_m3uaSgpAspTable(struct variable *vp, oid * name, size_t *length, int exact, 
 		objid[1] = 0;
 		*var_len = 2 * sizeof(oid);
 		return (u_char *) objid;
-	case M3UASGPASPSCTPPROFILE:
-		*write_method = write_m3uaSgpAspSctpProfile;
-		objid[0] = 0;
-		objid[1] = 0;
-		*var_len = 2 * sizeof(oid);
-		return (u_char *) objid;
+	case M3UASGPASPMAXINITRETRIES:
+		*write_method = write_m3uaSgpAspMaxInitRetries;
+		ulong_ret = 0;
+		return (u_char *) &ulong_ret;
 	case M3UASGPASPMAXPATHRETRANS:
 		*write_method = write_m3uaSgpAspMaxPathRetrans;
 		ulong_ret = 0;
@@ -389,12 +387,12 @@ var_m3uaSgpAspTable(struct variable *vp, oid * name, size_t *length, int exact, 
 		*write_method = write_m3uaSgpAspRtoMin;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-	case M3UASGPASPRTOMIN:
-		*write_method = write_m3uaSgpAspRtoMin;
+	case M3UASGPASPRTOMAX:
+		*write_method = write_m3uaSgpAspRtoMax;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-	case M3UASGPASPRTOMIN:
-		*write_method = write_m3uaSgpAspRtoMin;
+	case M3UASGPASPHEARTBEATINTERVAL:
+		*write_method = write_m3uaSgpAspHeartbeatInterval;
 		long_ret = 0;
 		return (u_char *) &long_ret;
 	case M3UASGPASPMAXLIFETIME:
@@ -486,9 +484,7 @@ write_m3uaSgpAgName(int action, unsigned char *var_val, unsigned char var_val_ty
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -496,8 +492,7 @@ write_m3uaSgpAgName(int action, unsigned char *var_val, unsigned char var_val_ty
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -532,9 +527,7 @@ write_m3uaSgpAgProtocolVersion(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in objid for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -542,8 +535,7 @@ write_m3uaSgpAgProtocolVersion(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -578,9 +570,7 @@ write_m3uaSgpAgOptions(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -588,8 +578,7 @@ write_m3uaSgpAgOptions(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -624,9 +613,7 @@ write_m3uaSgpAgRegistrationPolicy(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -634,8 +621,7 @@ write_m3uaSgpAgRegistrationPolicy(int action, unsigned char *var_val, unsigned c
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -670,9 +656,7 @@ write_m3uaSgpAgAspIdPolicy(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -680,8 +664,7 @@ write_m3uaSgpAgAspIdPolicy(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -716,9 +699,7 @@ write_m3uaSgpAgProtocolPayloadId(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -726,8 +707,7 @@ write_m3uaSgpAgProtocolPayloadId(int action, unsigned char *var_val, unsigned ch
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -762,9 +742,7 @@ write_m3uaSgpAgIpPort(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -772,8 +750,7 @@ write_m3uaSgpAgIpPort(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -808,9 +785,7 @@ write_m3uaSgpAgMinOstreams(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -818,8 +793,7 @@ write_m3uaSgpAgMinOstreams(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -854,9 +828,7 @@ write_m3uaSgpAgMaxIstreams(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -864,8 +836,7 @@ write_m3uaSgpAgMaxIstreams(int action, unsigned char *var_val, unsigned char var
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -900,9 +871,7 @@ write_m3uaSgpAgStatus(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -910,8 +879,7 @@ write_m3uaSgpAgStatus(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -946,9 +914,7 @@ write_m3uaSgpSgName(int action, unsigned char *var_val, unsigned char var_val_ty
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -956,8 +922,7 @@ write_m3uaSgpSgName(int action, unsigned char *var_val, unsigned char var_val_ty
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -992,9 +957,7 @@ write_m3uaSgpSgStatus(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1002,8 +965,7 @@ write_m3uaSgpSgStatus(int action, unsigned char *var_val, unsigned char var_val_
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1038,9 +1000,7 @@ write_m3uaSgpAspName(int action, unsigned char *var_val, unsigned char var_val_t
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1048,8 +1008,7 @@ write_m3uaSgpAspName(int action, unsigned char *var_val, unsigned char var_val_t
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1084,9 +1043,7 @@ write_m3uaSgpAspAdministrativeState(int action, unsigned char *var_val, unsigned
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1094,8 +1051,7 @@ write_m3uaSgpAspAdministrativeState(int action, unsigned char *var_val, unsigned
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1130,9 +1086,7 @@ write_m3uaSgpAspAlarmStatus(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1140,8 +1094,7 @@ write_m3uaSgpAspAlarmStatus(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1176,9 +1129,7 @@ write_m3uaSgpAspAspState(int action, unsigned char *var_val, unsigned char var_v
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1186,8 +1137,7 @@ write_m3uaSgpAspAspState(int action, unsigned char *var_val, unsigned char var_v
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1222,9 +1172,7 @@ write_m3uaSgpAspSctpProfile(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in objid for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1232,34 +1180,33 @@ write_m3uaSgpAspSctpProfile(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_m3uaSgpAspSctpProfile(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_m3uaSgpAspMaxInitRetries(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static oid *objid;
+	static unsigned long *ulong_ret;
 	int size;
 
 	switch (action) {
 	case RESERVE1:
-		if (var_val_type != ASN_OBJECT_ID) {
-			fprintf(stderr, "write to m3uaSgpAspSctpProfile not ASN_OBJECT_ID\n");
+		if (var_val_type != ASN_UNSIGNED) {
+			fprintf(stderr, "write to m3uaSgpAspMaxInitRetries not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > sizeof(objid)) {
-			fprintf(stderr, "write to m3uaSgpAspSctpProfile: bad length\n");
+		if (var_val_len > sizeof(ulong_ret)) {
+			fprintf(stderr, "write to m3uaSgpAspMaxInitRetries: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 
 	case RESERVE2:
 		size = var_val_len;
-		objid = (oid *) var_val;
+		ulong_ret = (unsigned long *) var_val;
 
 		break;
 
@@ -1268,9 +1215,7 @@ write_m3uaSgpAspSctpProfile(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in objid for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1278,8 +1223,7 @@ write_m3uaSgpAspSctpProfile(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1314,9 +1258,7 @@ write_m3uaSgpAspMaxPathRetrans(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1324,8 +1266,7 @@ write_m3uaSgpAspMaxPathRetrans(int action, unsigned char *var_val, unsigned char
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1360,9 +1301,7 @@ write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1370,15 +1309,14 @@ write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_m3uaSgpAspRtoMax(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1386,11 +1324,11 @@ write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr, "write to m3uaSgpAspRtoMin not ASN_INTEGER\n");
+			fprintf(stderr, "write to m3uaSgpAspRtoMax not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(long_ret)) {
-			fprintf(stderr, "write to m3uaSgpAspRtoMin: bad length\n");
+			fprintf(stderr, "write to m3uaSgpAspRtoMax: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -1406,9 +1344,7 @@ write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1416,15 +1352,14 @@ write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 int
-write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_m3uaSgpAspHeartbeatInterval(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -1432,11 +1367,11 @@ write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr, "write to m3uaSgpAspRtoMin not ASN_INTEGER\n");
+			fprintf(stderr, "write to m3uaSgpAspHeartbeatInterval not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(long_ret)) {
-			fprintf(stderr, "write to m3uaSgpAspRtoMin: bad length\n");
+			fprintf(stderr, "write to m3uaSgpAspHeartbeatInterval: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -1452,9 +1387,7 @@ write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1462,8 +1395,7 @@ write_m3uaSgpAspRtoMin(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1498,9 +1430,7 @@ write_m3uaSgpAspMaxLifeTime(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1508,8 +1438,7 @@ write_m3uaSgpAspMaxLifeTime(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1544,9 +1473,7 @@ write_m3uaSgpAspTimerDivert(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1554,8 +1481,7 @@ write_m3uaSgpAspTimerDivert(int action, unsigned char *var_val, unsigned char va
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1590,9 +1516,7 @@ write_m3uaSgpAspStatus(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -1600,8 +1524,7 @@ write_m3uaSgpAspStatus(int action, unsigned char *var_val, unsigned char var_val
 		break;
 
 	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
