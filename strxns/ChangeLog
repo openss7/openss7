@@ -1,3 +1,13 @@
+2009-01-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/dlMIB.c: agent updates
+	* src/snmp/dlMIB.h: agent updates
+	* src/snmp/lapbMIB.c: agent updates
+	* src/snmp/lapbMIB.h: agent updates
+	* src/snmp/llcMIB.c: agent updates
+	* src/snmp/llcMIB.h: agent updates
+	* src/snmp/mibs/OPENSS7-LLC2-MIB.mib: agent updates
+
 2009-01-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/dlMIB.c: updated agents

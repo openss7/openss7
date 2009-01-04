@@ -1,3 +1,34 @@
+2009-01-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/cdr2MIB.c: agent updates
+	* src/snmp/cdr2MIB.h: agent updates
+	* src/snmp/makestubs: agent updates
+	* src/snmp/mtpMIB.c: agent updates
+	* src/snmp/mtpMIB.h: agent updates
+	* src/snmp/mtpOmMIB.c: agent updates
+	* src/snmp/mtpOmMIB.h: agent updates
+	* src/snmp/sccpMIB.c: agent updates
+	* src/snmp/sccpMIB.h: agent updates
+	* src/snmp/sccpOmMIB.c: agent updates
+	* src/snmp/sccpOmMIB.h: agent updates
+	* src/snmp/slMIB.c: agent updates
+	* src/snmp/slMIB.h: agent updates
+	* src/snmp/ss7MIB.c: agent updates
+	* src/snmp/ss7MIB.h: agent updates
+	* src/snmp/ss7OmMIB.c: agent updates
+	* src/snmp/ss7OmMIB.h: agent updates
+	* src/snmp/tcapMIB.c: agent updates
+	* src/snmp/tcapMIB.h: agent updates
+	* src/snmp/tcapOmMIB.c: agent updates
+	* src/snmp/tcapOmMIB.h: agent updates
+	* src/snmp/x400pMIB.c: agent updates
+	* src/snmp/x400pMIB.h: agent updates
+
+	* src/snmp/gmiMIB.c: new agents
+	* src/snmp/gmiMIB.h: new agents
+	* src/snmp/smiMIB.c: new agents
+	* src/snmp/smiMIB.h: new agents
+
 2009-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/cdr2MIB.c: updated agent
