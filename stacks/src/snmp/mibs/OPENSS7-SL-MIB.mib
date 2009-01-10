@@ -1,12 +1,13 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SL-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-03 10:51:09 $
+-- @(#) $RCSfile: OPENSS7-SL-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-01-10 17:09:26 $
 --
 -- -----------------------------------------------------------------------------
 --
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
--- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
 -- All Rights Reserved.
 --
@@ -23,6 +24,13 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
 -- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
 -- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-03 10:51:09 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-10 17:09:26 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SL-MIB.mib,v $
+-- Revision 0.9.2.4  2009-01-10 17:09:26  brian
+-- - updated agents
+--
 -- Revision 0.9.2.3  2009-01-03 10:51:09  brian
 -- - updated agent
 --
@@ -406,84 +417,45 @@ slProfileEntry OBJECT-TYPE
     ::= { slProfileTable 1 }
 
 SlProfileEntry ::= SEQUENCE {
-    slProfileId
-	SimpleNameType,
-    slProfileTransmissionRate
-	MtpTransmissionRate,
-    slProfileErrorCorrectionMethod
-	INTEGER,
-    slProfileProtocolVariant
-	Ss7ProtocolVariant,
-    slProfileTimerT1
-	TimeInterval,
-    slProfileTimerT2
-	TimeInterval,
-    slProfileTimerT2L
-	TimeInterval,
-    slProfileTimerT2H
-	TimeInterval,
-    slProfileTimerT3
-	TimeInterval,
-    slProfileTimerT4N
-	TimeInterval,
-    slProfileTimerT4E
-	TimeInterval,
-    slProfileTimerT5
-	TimeInterval,
-    slProfileTimerT6
-	TimeInterval,
-    slProfileTimerT7
-	TimeInterval,
-    slProfileTbOnset1
-	Unsigned32,
-    slProfileTbAbate1
-	Unsigned32,
-    slProfileNumberOfThresholdLevels
-	Unsigned32,
-    slProfileCongestionCounting
-	INTEGER,
-    slProfileCongestionReportingBaseObject
-	INTEGER,
-    slProfileLoopDelay
-	MilliSeconds,
-    slProfileName
-	SimpleNameType,
-    slProfileTbOnset2
-	Unsigned32,
-    slProfileTbAbate2
-	Unsigned32,
-    slProfileTbOnset3
-	Unsigned32,
-    slProfileTbAbate3
-	Unsigned32,
-    slProfileTbDiscard1
-	Unsigned32,
-    slProfileTbDiscard2
-	Unsigned32,
-    slProfileTbDiscard3
-	Unsigned32,
-    slProfileTimerTx
-	TimeInterval,
-    slProfileTimerTy
-	TimeInterval,
-    slProfileNumberOfCongestionStates
-	Unsigned32,
-    slProfileInitialLevelOfCongestion
-	Unsigned32,
-    slProfileMaxMSUsRetransN1
-	Unsigned32,
-    slProfileMaxOctRetransN2
-	Unsigned32,
-    slProfileReceiveCongestionThresholdOnset
-	Unsigned32,
-    slProfileReceiveCongestionThresholdAbate
-	Unsigned32,
-    slProfileReceiveCongestionThresholdDiscard
-	Unsigned32,
-    slProfileM
-	Unsigned32,
-    slProfileRowStatus
-	RowStatus
+    slProfileId					SimpleNameType,
+    slProfileTransmissionRate			MtpTransmissionRate,
+    slProfileErrorCorrectionMethod		INTEGER,
+    slProfileProtocolVariant			Ss7ProtocolVariant,
+    slProfileTimerT1				TimeInterval,
+    slProfileTimerT2				TimeInterval,
+    slProfileTimerT2L				TimeInterval,
+    slProfileTimerT2H				TimeInterval,
+    slProfileTimerT3				TimeInterval,
+    slProfileTimerT4N				TimeInterval,
+    slProfileTimerT4E				TimeInterval,
+    slProfileTimerT5				TimeInterval,
+    slProfileTimerT6				TimeInterval,
+    slProfileTimerT7				TimeInterval,
+    slProfileTbOnset1				Unsigned32,
+    slProfileTbAbate1				Unsigned32,
+    slProfileNumberOfThresholdLevels		Unsigned32,
+    slProfileCongestionCounting			INTEGER,
+    slProfileCongestionReportingBaseObject	INTEGER,
+    slProfileLoopDelay				MilliSeconds,
+    slProfileName				SimpleNameType,
+    slProfileTbOnset2				Unsigned32,
+    slProfileTbAbate2				Unsigned32,
+    slProfileTbOnset3				Unsigned32,
+    slProfileTbAbate3				Unsigned32,
+    slProfileTbDiscard1				Unsigned32,
+    slProfileTbDiscard2				Unsigned32,
+    slProfileTbDiscard3				Unsigned32,
+    slProfileTimerTx				TimeInterval,
+    slProfileTimerTy				TimeInterval,
+    slProfileNumberOfCongestionStates		Unsigned32,
+    slProfileInitialLevelOfCongestion		Unsigned32,
+    slProfileMaxMSUsRetransN1			Unsigned32,
+    slProfileMaxOctRetransN2			Unsigned32,
+    slProfileReceiveCongestionThresholdOnset	Unsigned32,
+    slProfileReceiveCongestionThresholdAbate	Unsigned32,
+    slProfileReceiveCongestionThresholdDiscard	Unsigned32,
+    slProfileM					Unsigned32,
+    slProfileRowStatus				RowStatus
 }
 
 slProfileId OBJECT-TYPE
@@ -535,7 +507,7 @@ slProfileErrorCorrectionMethod OBJECT-TYPE
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 errorCorrectionMethod attribute."
-    DEFVAL	{ 0 } -- basicRetr
+    DEFVAL	{ basicRetr }
     ::= { slProfileEntry 3 }
 
 slProfileProtocolVariant OBJECT-TYPE
@@ -851,7 +823,7 @@ slProfileTbOnset1 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionCongestionThresholdOnsetLevel1 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 256 * 272 } -- octets
+    DEFVAL	{ 69632 } -- 256 * 272 octets
     ::= { slProfileEntry 15 }
 
 slProfileTbAbate1 OBJECT-TYPE
@@ -872,7 +844,7 @@ slProfileTbAbate1 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transCongThreshAbatementLevel1 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 128 * 272 } -- octets
+    DEFVAL	{ 34816 } -- 128 * 272 octets
     ::= { slProfileEntry 16 }
 
 slProfileNumberOfThresholdLevels OBJECT-TYPE
@@ -885,6 +857,7 @@ slProfileNumberOfThresholdLevels OBJECT-TYPE
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 numberOfThresholdLevels attribute."
+    DEFVAL { 1 }
     ::= { slProfileEntry 17 }
 
 slProfileCongestionCounting OBJECT-TYPE
@@ -898,6 +871,7 @@ slProfileCongestionCounting OBJECT-TYPE
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 congestionCounting attribute."
+    DEFVAL { octet }
     ::= { slProfileEntry 18 }
 
 slProfileCongestionReportingBaseObject OBJECT-TYPE
@@ -912,6 +886,7 @@ slProfileCongestionReportingBaseObject OBJECT-TYPE
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 congestionReportingBaseObject attribute."
+    DEFVAL { routeSet }
     ::= { slProfileEntry 19 }
 
 slProfileLoopDelay OBJECT-TYPE
@@ -960,7 +935,7 @@ slProfileTbOnset2 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionCongestionThresholdOnsetLevel2 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 640 * 272 }
+    DEFVAL	{ 174080 } -- 640 * 272  octets
     ::= { slProfileEntry 22 }
 
 slProfileTbAbate2 OBJECT-TYPE
@@ -982,7 +957,7 @@ slProfileTbAbate2 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionCongestionThresholdAbatementLevel2 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 512 * 272 }
+    DEFVAL	{ 139264 } -- 512 * 272 octets
     ::= { slProfileEntry 23 }
 
 slProfileTbOnset3 OBJECT-TYPE
@@ -1004,7 +979,7 @@ slProfileTbOnset3 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionCongestionThresholdOnsetLevel3 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 1024 * 272 }
+    DEFVAL	{ 278528 } -- 1024 * 272 octets
     ::= { slProfileEntry 24 }
 
 slProfileTbAbate3 OBJECT-TYPE
@@ -1026,7 +1001,7 @@ slProfileTbAbate3 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionCongestionThresholdAbatementLevel3 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 896 * 272 }
+    DEFVAL	{ 243712 } -- 896 * 272 octets
     ::= { slProfileEntry 25 }
 
 slProfileTbDiscard1 OBJECT-TYPE
@@ -1048,7 +1023,7 @@ slProfileTbDiscard1 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionCongestionThresholdDiscardLevel1 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 384 * 272 }
+    DEFVAL	{ 104448 } -- 384 * 272 octets
     ::= { slProfileEntry 26 }
 
 slProfileTbDiscard2 OBJECT-TYPE
@@ -1070,7 +1045,7 @@ slProfileTbDiscard2 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionCongestionThresholdDiscardLevel2 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 768 * 272 }
+    DEFVAL	{ 208896 } -- 768 * 272 octets
     ::= { slProfileEntry 27 }
 
 slProfileTbDiscard3 OBJECT-TYPE
@@ -1092,7 +1067,7 @@ slProfileTbDiscard3 OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionCongestionThresholdDiscardLevel3 attribute.
 	 ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
-    DEFVAL	{ 1152 * 272 }
+    DEFVAL	{ 313344 } -- 1152 * 272 octets
     ::= { slProfileEntry 28 }
 
 slProfileTimerTx OBJECT-TYPE
@@ -1106,7 +1081,7 @@ slProfileTimerTx OBJECT-TYPE
 	 as described in 3.8.2.3/T1.111.4 or 3.8.2.3/Q.704."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), timerTx 
-	 attribute."
+	     attribute."
     ::= { slProfileEntry 29 }
 
 slProfileTimerTy OBJECT-TYPE
@@ -1120,7 +1095,7 @@ slProfileTimerTy OBJECT-TYPE
 	 as described in 3.8.2.3/T1.111.4 or 3.8.2.3/Q.704."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), timerTy 
-	 attribute."
+	     attribute."
     ::= { slProfileEntry 30 }
 
 slProfileNumberOfCongestionStates OBJECT-TYPE
@@ -1134,7 +1109,7 @@ slProfileNumberOfCongestionStates OBJECT-TYPE
 	 3.8.2.3/Q.704."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 numberOfCongestionStates attribute."
+	     numberOfCongestionStates attribute."
     ::= { slProfileEntry 31 }
 
 slProfileInitialLevelOfCongestion OBJECT-TYPE
@@ -1145,7 +1120,7 @@ slProfileInitialLevelOfCongestion OBJECT-TYPE
 	"This attribute represents the initial level of congestion."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 initialLevelOfCongestion attribute."
+	     initialLevelOfCongestion attribute."
     ::= { slProfileEntry 32 }
 
 slProfileMaxMSUsRetransN1 OBJECT-TYPE
@@ -1534,32 +1509,19 @@ slEntry OBJECT-TYPE
     ::= { slTable 1 }
 
 SlEntry ::= SEQUENCE {
-    slId
-	Unsigned32,
-    slMaxCapacitySL
-	Unsigned32,
-    slProceduralStatus
-	ProceduralStatus,
-    slProfilePointer
-	SimpleNameType,
-    slSignTermPointer
-	SimpleNameType,
-    slSignDataLinkTpPointer
-	SimpleNameType,
-    slReplaceSt
-	MtpResultOfAction,
-    slCongestionLevel
-	MtpCongestionLevel,
-    slRelatedLinkGroupNumber
-	Unsigned32,
-    slSdlList
-	Unsigned32,
-    slName
-	CommonLanguageName,
-    slSdtList
-	Unsigned32,
-    slRowStatus
-	RowStatus
+    slId					Unsigned32,
+    slMaxCapacitySL				Unsigned32,
+    slProceduralStatus				ProceduralStatus,
+    slProfilePointer				SimpleNameType,
+    slSignTermPointer				SimpleNameType,
+    slSignDataLinkTpPointer			SimpleNameType,
+    slReplaceSt					MtpResultOfAction,
+    slCongestionLevel				MtpCongestionLevel,
+    slRelatedLinkGroupNumber			Unsigned32,
+    slSdlList					Unsigned32,
+    slName					CommonLanguageName,
+    slSdtList					Unsigned32,
+    slRowStatus					RowStatus
 }
 
 slId OBJECT-TYPE
@@ -1625,7 +1587,7 @@ slProceduralStatus OBJECT-TYPE
 	     attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
 	     proceduralStatus attribute."
-    DEFVAL { 0 } -- initializationRequired
+    DEFVAL { { initializationRequired } }
     ::= { slEntry 3 }
 
 slProfilePointer OBJECT-TYPE
@@ -1647,7 +1609,7 @@ slSignTermPointer OBJECT-TYPE
 	"This attribute identifies a particular signTerm instance."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 signTermPointer attribute."
+	     signTermPointer attribute."
     ::= { slEntry 5 }
 
 slSignDataLinkTpPointer OBJECT-TYPE
@@ -1661,7 +1623,7 @@ slSignDataLinkTpPointer OBJECT-TYPE
 	 instance that contains this attribute is 'locked'."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 signDataLinkTpPointer attribute."
+	     signDataLinkTpPointer attribute."
     ::= { slEntry 6 }
 
 slReplaceSt OBJECT-TYPE
@@ -1683,7 +1645,7 @@ slReplaceSt OBJECT-TYPE
 	 otherwise the pointer value remains unchanged."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 replaceSignTerm action."
+	     replaceSignTerm action."
     ::= { slEntry 7 }
 
 slCongestionLevel OBJECT-TYPE
@@ -1825,12 +1787,9 @@ slSdlListEntry OBJECT-TYPE
     ::= { slSdlListTable 1 }
 
 SlSdlListEntry ::= SEQUENCE {
-    slSdlListId
-	Unsigned32,
-    slSdlListPointer
-	SimpleNameType,
-    slSdlListRowStatus
-	RowStatus
+    slSdlListId					Unsigned32,
+    slSdlListPointer				SimpleNameType,
+    slSdlListRowStatus				RowStatus
 }
 
 slSdlListId OBJECT-TYPE
@@ -1904,12 +1863,9 @@ slSdtListEntry OBJECT-TYPE
     ::= { slSdtListTable 1 }
 
 SlSdtListEntry ::= SEQUENCE {
-    slSdtListId
-	Unsigned32,
-    slSdtListPointer
-	SimpleNameType,
-    slSdtListRowStatus
-	RowStatus
+    slSdtListId					Unsigned32,
+    slSdtListPointer				SimpleNameType,
+    slSdtListRowStatus				RowStatus
 }
 
 slSdtListId OBJECT-TYPE
@@ -1975,36 +1931,21 @@ slNbEntry OBJECT-TYPE
     ::= { slNbTable 1 }
 
 SlNbEntry ::= SEQUENCE {
-    slSdtProfileId
-	SimpleNameType,
-    slNbTransmissionRate
-	MtpTransmissionRate,
-    slNbTimerT8
-	MilliSeconds,
-    slNbTin
-	Unsigned32,
-    slNbTie
-	Unsigned32,
-    slNbT
-	Unsigned32,
-    slNbD
-	Unsigned32,
-    slNbTe
-	Unsigned32,
-    slNbDe
-	Unsigned32,
-    slNbUe
-	Unsigned32,
-    slNbN
-	Unsigned32,
-    slNbm
-	Unsigned32,
-    slNbb
-	Unsigned32,
-    slNbf
-	INTEGER,
-    slNbRowStatus
-	RowStatus
+    slSdtProfileId				SimpleNameType,
+    slNbTransmissionRate			MtpTransmissionRate,
+    slNbTimerT8					MilliSeconds,
+    slNbTin					Unsigned32,
+    slNbTie					Unsigned32,
+    slNbT					Unsigned32,
+    slNbD					Unsigned32,
+    slNbTe					Unsigned32,
+    slNbDe					Unsigned32,
+    slNbUe					Unsigned32,
+    slNbN					Unsigned32,
+    slNbm					Unsigned32,
+    slNbb					Unsigned32,
+    slNbf					INTEGER,
+    slNbRowStatus				RowStatus
 }
 
 slSdtProfileId OBJECT-TYPE
@@ -2044,7 +1985,7 @@ slNbTransmissionRate OBJECT-TYPE
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     transmissionRate attribute."
-    DEFVAL	{ 2 } -- kbits64
+    DEFVAL	{ kbits64 }
     ::= { slNbEntry 2 }
 
 slNbTimerT8 OBJECT-TYPE
@@ -2135,6 +2076,7 @@ slNbTe OBJECT-TYPE
 	 digital an analog signalling terminals."
     REFERENCE	
 	"ITU-T Rec. Q.703 (07/96) Annex A, Table A.1, Parameter Te."
+    DEFVAL { 793544 }
     ::= { slNbEntry 8 }
 
 slNbDe OBJECT-TYPE
@@ -2150,6 +2092,7 @@ slNbDe OBJECT-TYPE
 	 digital an analog signalling terminals."
     REFERENCE	
 	"ITU-T Rec. Q.703 (07/96) Annex A, Table A.1, Parameter De."
+    DEFVAL { 11328 }
     ::= { slNbEntry 9 }
 
 slNbUe OBJECT-TYPE
@@ -2165,6 +2108,7 @@ slNbUe OBJECT-TYPE
 	 low-speed digital an analog signalling terminals."
     REFERENCE	
 	"ITU-T Rec. Q.703 (07/96) Annex A, Table A.1, Parameter Ue."
+    DEFVAL { 198384 }
     ::= { slNbEntry 10 }
 
 slNbN OBJECT-TYPE
@@ -2242,7 +2186,7 @@ slNbf OBJECT-TYPE
 	 signalling link and should not be used.  This value should be 
 	 set to the lowest value that the remote signalling terminal can 
 	 handle."
-    DEFVAL { 0 } -- one
+    DEFVAL { one }
     ::= { slNbEntry 14 }
 
 slNbRowStatus OBJECT-TYPE
@@ -2291,58 +2235,32 @@ slSaalEntry OBJECT-TYPE
     ::= { slSaalTable 1 }
 
 SlSaalEntry ::= SEQUENCE {
-    slSaalBufferRelease
-	TruthValue,
-    slSaalMaxCc
-	Unsigned32,
-    slSaalMaxNrp
-	Unsigned32,
-    slSaalMaxInformationFieldLength
-	Unsigned32,
-    slSaalMaxLengthSscopUuField
-	Unsigned32,
-    slSaalMaxPd
-	Unsigned32,
-    slSaalMaxSscopCreditToPeer
-	Unsigned32,
-    slSaalMaxStat
-	Unsigned32,
-    slSaalN1
-	Unsigned32,
-    slSaalNniLayerManagementProvingState
-	INTEGER,
-    slSaalNniLayerManagementTimerNoCredit
-	TimeInterval,
-    slSaalNniLayerManagementTimerRepeatSrec
-	TimeInterval,
-    slSaalNniTimerT1
-	TimeInterval,
-    slSaalNniTimerT2
-	TimeInterval,
-    slSaalNniTimerT3
-	TimeInterval,
-    slSaalSscopTimerCc
-	TimeInterval,
-    slSaalSscopTimerIdle
-	TimeInterval,
-    slSaalSscopTimerKeepAlive
-	TimeInterval,
-    slSaalSscopTimerNoResponse
-	TimeInterval,
-    slSaalSscopTimerPoll
-	TimeInterval,
-    slSaalTransmissionRateIntervalLower
-	Unsigned32,
-    slSaalTransmissionRateIntervalUpper
-	Unsigned32,
-    slSaalEgressTransmissionRateIntervalLower
-	Unsigned32,
-    slSaalEgressTransmissionRateIntervalUpper
-	Unsigned32,
-    slSaalPollAfterRetransmission
-	TruthValue,
-    slSaalRowStatus
-	RowStatus
+    slSaalBufferRelease				TruthValue,
+    slSaalMaxCc					Unsigned32,
+    slSaalMaxNrp				Unsigned32,
+    slSaalMaxInformationFieldLength		Unsigned32,
+    slSaalMaxLengthSscopUuField			Unsigned32,
+    slSaalMaxPd					Unsigned32,
+    slSaalMaxSscopCreditToPeer			Unsigned32,
+    slSaalMaxStat				Unsigned32,
+    slSaalN1					Unsigned32,
+    slSaalNniLayerManagementProvingState	INTEGER,
+    slSaalNniLayerManagementTimerNoCredit	TimeInterval,
+    slSaalNniLayerManagementTimerRepeatSrec	TimeInterval,
+    slSaalNniTimerT1				TimeInterval,
+    slSaalNniTimerT2				TimeInterval,
+    slSaalNniTimerT3				TimeInterval,
+    slSaalSscopTimerCc				TimeInterval,
+    slSaalSscopTimerIdle			TimeInterval,
+    slSaalSscopTimerKeepAlive			TimeInterval,
+    slSaalSscopTimerNoResponse			TimeInterval,
+    slSaalSscopTimerPoll			TimeInterval,
+    slSaalTransmissionRateIntervalLower		Unsigned32,
+    slSaalTransmissionRateIntervalUpper		Unsigned32,
+    slSaalEgressTransmissionRateIntervalLower	Unsigned32,
+    slSaalEgressTransmissionRateIntervalUpper	Unsigned32,
+    slSaalPollAfterRetransmission		TruthValue,
+    slSaalRowStatus				RowStatus
 }
 
 slSaalBufferRelease OBJECT-TYPE
@@ -2356,7 +2274,7 @@ slSaalBufferRelease OBJECT-TYPE
 	 transmission buffer when older messages are still outstanding."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), bufferRelease 
-	 attribute."
+	     attribute."
     ::= { slSaalEntry 1 }
 
 slSaalMaxCc OBJECT-TYPE
@@ -2370,7 +2288,7 @@ slSaalMaxCc OBJECT-TYPE
 	 transmissions of BGN, END, ER or RS PDUs."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxCc 
-	 attribute."
+	     attribute."
     DEFVAL { 4 }
     ::= { slSaalEntry 2 }
 
@@ -2384,7 +2302,7 @@ slSaalMaxNrp OBJECT-TYPE
 	 allowed during proving."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxNrp 
-	 attribute."
+	     attribute."
     ::= { slSaalEntry 3 }
 
 slSaalMaxInformationFieldLength OBJECT-TYPE
@@ -2398,7 +2316,7 @@ slSaalMaxInformationFieldLength OBJECT-TYPE
 	 value is octets."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 maxInformationFieldLength attribute."
+	     maxInformationFieldLength attribute."
     DEFVAL { 4096 }
     ::= { slSaalEntry 4 }
 
@@ -2414,7 +2332,7 @@ slSaalMaxLengthSscopUuField OBJECT-TYPE
 	 the INTEGER value is octets."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 maxLengthSscopUuField attribute."
+	     maxLengthSscopUuField attribute."
     DEFVAL { 4 }
     ::= { slSaalEntry 5 }
 
@@ -2430,7 +2348,7 @@ slSaalMaxPd OBJECT-TYPE
 	 an SD PDU is transmitted."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxPd 
-	 attribute."
+	     attribute."
     DEFVAL { 500 }
     ::= { slSaalEntry 6 }
 
@@ -2447,7 +2365,7 @@ slSaalMaxSscopCreditToPeer OBJECT-TYPE
 	 PDUs."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 maxSscopCreditToPeer attribute."
+	     maxSscopCreditToPeer attribute."
     ::= { slSaalEntry 7 }
 
 slSaalMaxStat OBJECT-TYPE
@@ -2460,7 +2378,7 @@ slSaalMaxStat OBJECT-TYPE
 	 placed in a STAT PDU."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), maxStat 
-	 attribute."
+	     attribute."
     DEFVAL { 67 }
     ::= { slSaalEntry 8 }
 
@@ -2489,7 +2407,7 @@ slSaalNniLayerManagementProvingState OBJECT-TYPE
 	 the values: Normal, emergency neutral."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 nniLayerManagementProvingState attribute."
+	     nniLayerManagementProvingState attribute."
     ::= { slSaalEntry 10 }
 
 slSaalNniLayerManagementTimerNoCredit OBJECT-TYPE
@@ -2504,7 +2422,7 @@ slSaalNniLayerManagementTimerNoCredit OBJECT-TYPE
 	 milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 nniLayerManagementTimerNoCredit attribute."
+	     nniLayerManagementTimerNoCredit attribute."
     ::= { slSaalEntry 11 }
 
 slSaalNniLayerManagementTimerRepeatSrec OBJECT-TYPE
@@ -2518,7 +2436,7 @@ slSaalNniLayerManagementTimerRepeatSrec OBJECT-TYPE
 	 connection.  The unit for the INTEGER value is milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 nniLayerManagementTimerRepeatSrec attribute."
+	     nniLayerManagementTimerRepeatSrec attribute."
     ::= { slSaalEntry 12 }
 
 slSaalNniTimerT1 OBJECT-TYPE
@@ -2532,7 +2450,7 @@ slSaalNniTimerT1 OBJECT-TYPE
 	 for the INTEGER value is milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), nniTimerT1 
-	 attribute."
+	     attribute."
     DEFVAL { 500 } -- 5 seconds
     ::= { slSaalEntry 13 }
 
@@ -2547,7 +2465,7 @@ slSaalNniTimerT2 OBJECT-TYPE
 	 milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), nniTimerT2 
-	 attribute."
+	     attribute."
     DEFVAL { 3000 } -- 30 seconds
     ::= { slSaalEntry 14 }
 
@@ -2562,7 +2480,7 @@ slSaalNniTimerT3 OBJECT-TYPE
 	 the INTEGER value is microseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), nniTimerT3 
-	 attribute."
+	     attribute."
     ::= { slSaalEntry 15 }
 
 slSaalSscopTimerCc OBJECT-TYPE
@@ -2577,7 +2495,7 @@ slSaalSscopTimerCc OBJECT-TYPE
 	 milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), sscopTimerCc 
-	 attribute."
+	     attribute."
     DEFVAL { 20 } -- 200 milliseconds
     ::= { slSaalEntry 16 }
 
@@ -2594,7 +2512,7 @@ slSaalSscopTimerIdle OBJECT-TYPE
 	 the INTEGER value is milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), sscopTimerIdle 
-	 attribute."
+	     attribute."
     DEFVAL { 10 } -- 100 milliseconds
     ::= { slSaalEntry 17 }
 
@@ -2611,7 +2529,7 @@ slSaalSscopTimerKeepAlive OBJECT-TYPE
 	 The unit for the INTEGER value is milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 sscopTimerKeepAlive attribute."
+	     sscopTimerKeepAlive attribute."
     DEFVAL { 10 } -- 100 milliseconds
     ::= { slSaalEntry 18 }
 
@@ -2627,7 +2545,7 @@ slSaalSscopTimerNoResponse OBJECT-TYPE
 	 for the INTEGER value is milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 sscopTimerNoResponse attribute."
+	     sscopTimerNoResponse attribute."
     DEFVAL { 150 } -- 1.5 seconds
     ::= { slSaalEntry 19 }
 
@@ -2644,7 +2562,7 @@ slSaalSscopTimerPoll OBJECT-TYPE
 	 the INTEGER value is milliseconds."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), sscopTimerPoll 
-	 attribute."
+	     attribute."
     DEFVAL { 10 } -- 100 milliseconds
     ::= { slSaalEntry 20 }
 
@@ -2669,7 +2587,7 @@ slSaalTransmissionRateIntervalLower OBJECT-TYPE
 	 several slSaalProfile instances."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 transmissionRateInterval attribute."
+	     transmissionRateInterval attribute."
     DEFVAL { 129 }
     ::= { slSaalEntry 21 }
 
@@ -2694,7 +2612,7 @@ slSaalTransmissionRateIntervalUpper OBJECT-TYPE
 	 several slSaalProfile instances."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 transmissionRateInterval attribute."
+	     transmissionRateInterval attribute."
     DEFVAL { 256 }
     ::= { slSaalEntry 22 }
 
@@ -2713,7 +2631,7 @@ slSaalEgressTransmissionRateIntervalLower OBJECT-TYPE
 	 instances."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 egressTransmissionRateInterval attribute."
+	     egressTransmissionRateInterval attribute."
     ::= { slSaalEntry 23 }
 
 slSaalEgressTransmissionRateIntervalUpper OBJECT-TYPE
@@ -2731,7 +2649,7 @@ slSaalEgressTransmissionRateIntervalUpper OBJECT-TYPE
 	 instances."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 egressTransmissionRateInterval attribute."
+	     egressTransmissionRateInterval attribute."
     ::= { slSaalEntry 24 }
 
 slSaalPollAfterRetransmission OBJECT-TYPE
@@ -2743,7 +2661,7 @@ slSaalPollAfterRetransmission OBJECT-TYPE
 	 retransmission queue is emptied."
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 pollAfterRetransmission attribute."
+	     pollAfterRetransmission attribute."
     ::= { slSaalEntry 25 }
 
 slSaalRowStatus OBJECT-TYPE
@@ -2802,54 +2720,30 @@ slM2paEntry OBJECT-TYPE
     ::= { slM2paTable 1 }
 
 SlM2paEntry ::= SEQUENCE {
-    slM2paN1
-	Unsigned32,
-    slM2paProving
-	TruthValue,
-    slM2paManagementProvingState
-	INTEGER,
-    slM2paLoopDelayLower
-	MilliSeconds,
-    slM2paLoopDelayUpper
-	MilliSeconds,
-    slM2paTransmissionRateIntervalLower
-	Unsigned32,
-    slM2paTransmissionRateIntervalUpper
-	Unsigned32,
-    slM2paSctpNoDelay
-	TruthValue,
-    slM2paSctpMaxseg
-	Unsigned32,
-    slM2paSctpHeartbeatItvl
-	MilliSeconds,
-    slM2paSctpHeartbeat
-	TruthValue,
-    slM2paSctpRtoInitial
-	MilliSeconds,
-    slM2paSctpRtoMin
-	MilliSeconds,
-    slM2paSctpRtoMax
-	MilliSeconds,
-    slM2paSctpPathMaxRetrans
-	Unsigned32,
-    slM2paSctpCookieLife
-	MilliSeconds,
-    slM2paSctpCookieInc
-	MilliSeconds,
-    slM2paSctpMaxInitRetries
-	Unsigned32,
-    slM2paSctpMaxBurst
-	Unsigned32,
-    slM2paSctpAssocMaxRetrans
-	Unsigned32,
-    slM2paSctpSackDelay
-	MilliSeconds,
-    slM2paSctpLifetime
-	MilliSeconds,
-    slM2paProvingAttempts
-	Unsigned32,
-    slM2paRowStatus
-	RowStatus
+    slM2paN1					Unsigned32,
+    slM2paProving				TruthValue,
+    slM2paManagementProvingState		INTEGER,
+    slM2paLoopDelayLower			MilliSeconds,
+    slM2paLoopDelayUpper			MilliSeconds,
+    slM2paTransmissionRateIntervalLower		Unsigned32,
+    slM2paTransmissionRateIntervalUpper		Unsigned32,
+    slM2paSctpNoDelay				TruthValue,
+    slM2paSctpMaxseg				Unsigned32,
+    slM2paSctpHeartbeatItvl			MilliSeconds,
+    slM2paSctpHeartbeat				TruthValue,
+    slM2paSctpRtoInitial			MilliSeconds,
+    slM2paSctpRtoMin				MilliSeconds,
+    slM2paSctpRtoMax				MilliSeconds,
+    slM2paSctpPathMaxRetrans			Unsigned32,
+    slM2paSctpCookieLife			MilliSeconds,
+    slM2paSctpCookieInc				MilliSeconds,
+    slM2paSctpMaxInitRetries			Unsigned32,
+    slM2paSctpMaxBurst				Unsigned32,
+    slM2paSctpAssocMaxRetrans			Unsigned32,
+    slM2paSctpSackDelay				MilliSeconds,
+    slM2paSctpLifetime				MilliSeconds,
+    slM2paProvingAttempts			Unsigned32,
+    slM2paRowStatus				RowStatus
 }
 
 slM2paN1 OBJECT-TYPE
@@ -2876,7 +2770,7 @@ slM2paProving OBJECT-TYPE
 	 false(2), forego proving althogether."
     REFERENCE	
 	""
-    DEFVAL { 1 } -- true(1)
+    DEFVAL { true }
     ::= { slM2paEntry 2 }
 
 slM2paManagementProvingState OBJECT-TYPE
@@ -3378,26 +3272,16 @@ slSdtEntry OBJECT-TYPE
     ::= { slSdtTable 1 }
 
 SlSdtEntry ::= SEQUENCE {
-    slSdtId
-	Unsigned32,
-    slSdtAdministrativeState
-	AdministrativeState,
-    slSdtOperationalState
-	OperationalState,
-    slSdtUsageState
-	UsageState,
-    slSdtProceduralStatus
-	ProceduralStatus,
-    slSdtAvailabilityStatus
-	AvailabilityStatus,
-    slSdtEquipmentPointer
-	RowPointer,
-    slSdtName
-	CommonLanguageName,
-    slSdtProfilePointer
-	SimpleNameType,
-    slSdtRowStatus
-	RowStatus
+    slSdtId					Unsigned32,
+    slSdtAdministrativeState			AdministrativeState,
+    slSdtOperationalState			OperationalState,
+    slSdtUsageState				UsageState,
+    slSdtProceduralStatus			ProceduralStatus,
+    slSdtAvailabilityStatus			AvailabilityStatus,
+    slSdtEquipmentPointer			RowPointer,
+    slSdtName					CommonLanguageName,
+    slSdtProfilePointer				SimpleNameType,
+    slSdtRowStatus				RowStatus
 }
 
 slSdtId OBJECT-TYPE
@@ -3429,7 +3313,7 @@ slSdtAdministrativeState OBJECT-TYPE
 	     administrativeState attribute.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
 	     administrativeState attribute."
-    DEFVAL { 0 } -- locked
+    DEFVAL { locked }
     ::= { slSdtEntry 2 }
 
 slSdtOperationalState OBJECT-TYPE
@@ -3451,7 +3335,7 @@ slSdtOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    DEFVAL { disabled }
     ::= { slSdtEntry 3 }
 
 slSdtUsageState OBJECT-TYPE
@@ -3470,7 +3354,7 @@ slSdtUsageState OBJECT-TYPE
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), usageState 
 	     attribute."
-    DEFVAL { 0 } -- idle
+    DEFVAL { idle }
     ::= { slSdtEntry 4 }
 
 slSdtProceduralStatus OBJECT-TYPE
@@ -3491,6 +3375,7 @@ slSdtProceduralStatus OBJECT-TYPE
     REFERENCE	
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	 proceduralStatus attribute."
+    DEFVAL { { initializationRequired } }
     ::= { slSdtEntry 5 }
 
 slSdtAvailabilityStatus OBJECT-TYPE
@@ -3627,28 +3512,17 @@ slSdlEntry OBJECT-TYPE
     ::= { slSdlTable 1 }
 
 SlSdlEntry ::= SEQUENCE {
-    slSdlId
-	Unsigned32,
-    slSdlAdjPc
-	NetworkPointCode,
-    slSdlTransmissionRate
-	MtpTransmissionRate,
-    slSdlLoopDelay
-	MilliSeconds,
-    slSdlOperationalState
-	OperationalState,
-    slSdlEquipmentPointer
-	RowPointer,
-    slSdlCIC
-	CircuitIdentificationCode,
-    slSdlName
-	CommonLanguageName,
-    slSdlStmChannel
-	CircuitCode,
-    slSdlVcTTpPointer
-	RowPointer,
-    slSdlRowStatus
-	RowStatus
+    slSdlId					Unsigned32,
+    slSdlAdjPc					NetworkPointCode,
+    slSdlTransmissionRate			MtpTransmissionRate,
+    slSdlLoopDelay				MilliSeconds,
+    slSdlOperationalState			OperationalState,
+    slSdlEquipmentPointer			RowPointer,
+    slSdlCIC					CircuitIdentificationCode,
+    slSdlName					CommonLanguageName,
+    slSdlStmChannel				CircuitCode,
+    slSdlVcTTpPointer				RowPointer,
+    slSdlRowStatus				RowStatus
 }
 
 slSdlId OBJECT-TYPE
@@ -3720,7 +3594,7 @@ slSdlOperationalState OBJECT-TYPE
 	     Section 8.1.1.1.
 	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
 	     operationalState attribute."
-    DEFVAL { 0 } -- disabled
+    DEFVAL { disabled }
     ::= { slSdlEntry 5 }
 
 slSdlEquipmentPointer OBJECT-TYPE
