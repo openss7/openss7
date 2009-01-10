@@ -2,11 +2,11 @@
 #!/usr/bin/perl -w
 # =============================================================================
 #
-# @(#) $RCSfile: mib2c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.16 $) $Date: 2009-01-04 08:12:36 $
+# @(#) $RCSfile: mib2c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-01-10 17:09:13 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacom Limited <http://www.monavacom.com/>
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,11 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-04 08:12:36 $ by $Author: brian $
+# Last Modified $Date: 2009-01-10 17:09:13 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: mib2c,v $
+# Revision 0.9.2.19  2009-01-10 17:09:13  brian
+# - updated agents
+#
+# Revision 0.9.2.18  2009-01-07 05:40:21  brian
+# - more mib2c finalization
+#
+# Revision 0.9.2.17  2009-01-06 11:15:26  brian
+# - more corrections and tested table row handling
+#
 # Revision 0.9.2.16  2009-01-04 08:12:36  brian
 # - some corrections
 #
@@ -187,7 +196,6 @@ sub countsubs {
 
 sub defval {
     my $mib = shift;
-    return "" unless $mib->{'defaultValue'};
     print "processing DEFVAL $mib->{'defaultValue'}:\n" if $debug;
     my $name = $mib->{'label'};
     $name =~ s/-/_/g;
@@ -200,7 +208,9 @@ sub defval {
 	$ret = "/* StorageNew->${name} = $defval; */ /* DEFVAL $mib->{'defaultValue'} */\n";
 	$defval =~ s/\s*\(\s*/(/g;
 	$defval =~ s/\s*\)/)/g;
-	if ($defval =~ /^[-+]?[0-9]+$/) {
+	if ($defval =~ /^$/) {
+	    $ret = "StorageNew->${name} = 0;\n";
+	} elsif ($defval =~ /^[-+]?[0-9]+$/) {
 	    $ret = "StorageNew->${name} = $defval;\n";
 	} elsif ($defval =~ /^'([0-9a-fA-F]*)'X$/) {
 	    $ret = "StorageNew->${name} = 0x$1;\n";
@@ -233,8 +243,11 @@ sub defval {
 	}
     } elsif ($mib->{'type'} =~ /OCTETSTR|OPAQUE/) {
 	$ret = "/* StorageNew->${name} = NULL; */ /* DEFVAL $mib->{'defaultValue'} */\n";
-	$ret .= "/* StorageNew->${name} = 0; */ /* DEFVAL $mib->{'defaultValue'} */\n";
-	if ($defval =~ /^'[0-9a-fA-F]+'X$/) {
+	$ret .= "/* StorageNew->${name}Len = 0; */ /* DEFVAL $mib->{'defaultValue'} */\n";
+	if ($defval =~ /^$/) {
+	    $ret = "if ((StorageNew->${name} = (uint8_t *) strdup(\"\")) != NULL) {\n";
+	    $ret .= "StorageNew->${name}Len = strlen(\"\");\n}\n";
+	} elsif ($defval =~ /^'[0-9a-fA-F]+'X$/) {
 	    my $value;
 	    $len = ((length($defval) - 3) % 2) * 4;
 	    while ($defval =~ s/^'([0-9a-fA-F])/'/) {
@@ -287,7 +300,11 @@ sub defval {
 	$defval =~ s/\s*:\s*/:/g;
 	$defval =~ s/\s*\(\s*/(/g;
 	$defval =~ s/\s*\)/)/g;
-	if ($defval =~ /^{( ([a-zA-Z][a-zA-Z0-9_:-]*(\([0-9]+\))?|[0-9]+))+ }$/) {
+	if ($defval =~ /^$/) {
+	    $len = 2;
+	    $ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len))) {\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	} elsif ($defval =~ /^{( ([a-zA-Z][a-zA-Z0-9_:-]*(\([0-9]+\))?|[0-9]+))+ }$/) {
 	    $defval =~ s/^{ //;
 	    $defval =~ s/ }$//;
 	    my @elements = split(/ /,$defval);
@@ -316,11 +333,11 @@ sub defval {
 	    $val = "{ $val }";
 	    if ($val eq "{ 0,0 }") {
 		$ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len))) {\n";
-		$ret .= "StorageNew->${name}Len = sizeof(zeroDotZero_oid);\n}\n";
+		$ret .= "StorageNew->${name}Len = $len;\n}\n";
 	    } else {
 		$ret = "{\nstatic const oid tmpoid[$len] = $val;\n";
 		$ret .= "if ((StorageNew->${name} = snmp_duplicate_objid(tmpoid, $len))) {\n";
-		$ret .= "StorageNew->${name}Len = $len * sizeof(oid);\n}\n}\n";
+		$ret .= "StorageNew->${name}Len = $len;\n}\n}\n";
 	    }
 	}
     } elsif ($mib->{'type'} =~ /BITS/) {
@@ -328,7 +345,20 @@ sub defval {
 	$ret .= "/* StorageNew->${name} = 0; */ /* DEFVAL $mib->{'defaultValue'} */\n";
 	$defval =~ s/\s*\(\s*/(/g;
 	$defval =~ s/\s*\)/)/g;
-	if ($defval =~ /^[0-9]+$/) {
+	if ($defval =~ /^$/) {
+	    foreach my $k (keys(%{$mib->{'enums'}})) {
+		if ($len < $mib->{'enums'}{$k}) {
+		    $len = $mib->{'enums'}{$k};
+		}
+	    }
+	    $len += 1;
+	    $len = (($len + 7) >> 3);
+	    for (my $i = 0; $i < $len; $i++) {
+		$val .= sprintf("\\x%02X", 0);
+	    }
+	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	} elsif ($defval =~ /^[0-9]+$/) {
 	    my $value = $defval;
 	    foreach my $k (keys(%{$mib->{'enums'}})) {
 		if ($len < $mib->{'enums'}{$k}) {
@@ -336,13 +366,11 @@ sub defval {
 		}
 	    }
 	    $len += 1;
-	    my $unused = 8 - ($len % 8);
-	    $len = (($len + 7) >> 3) + 1;
-	    for (my $i = 1; $i < $len; $i++) {
+	    $len = (($len + 7) >> 3);
+	    for (my $i = 0; $i < $len; $i++) {
 		$val .= sprintf("\\x%02X", ($value & 0xff));
 		$value >>= 8;
 	    }
-	    $val = sprintf("\\x%02X", $unused) . $val;
 	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
 	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
 	} elsif ($defval =~ /^'[01]*'B$/) {
@@ -376,12 +404,14 @@ sub defval {
 		}
 	    }
 	    if (($len % 8) != 0) {
+		while (($len % 8) != 0) {
+		    $value <<= 1;
+		    $len += 1;
+		}
 		$val .= sprintf("\\x%02X", ($value & 0xff));
 		$value = 0;
 	    }
-	    my $unused = 8 - ($len % 8);
-	    $len = (($len + 7) >> 3) + 1;
-	    $val = sprintf("\\x%02X", $unused) . $val;
+	    $len = (($len + 7) >> 3);
 	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
 	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
 	} elsif ($defval =~ /^'([0-9a-fA-f]*)'X$/) {
@@ -421,12 +451,14 @@ sub defval {
 		}
 	    }
 	    if (($len % 8) != 0) {
+		while (($len % 8) != 0) {
+		    $value <<= 1;
+		    $len += 1;
+		}
 		$val .= sprintf("\\x%02X", ($value & 0xff));
 		$value = 0;
 	    }
-	    my $unused = 8 - ($len % 8);
-	    $len = (($len + 7) >> 3) + 1;
-	    $val = sprintf("\\x%02X", $unused) . $val;
+	    $len = (($len + 7) >> 3);
 	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
 	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
 	} elsif ($defval =~ /^{ ([a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?|[0-9]+)(\s*,\s*([a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?|[0-9]+))* }$/) {
@@ -447,23 +479,23 @@ sub defval {
 		}
 	    }
 	    $len += 1;
-	    my $unused = 8 - ($len % 8);
-	    $len = (($len + 7) >> 3) + 1;
+	    $len = (($len + 7) >> 3);
 	    my $value = 0;
 	    foreach my $b (@bits) {
-		$value += (1 << $b);
+		$value += (1 << (($len * 8) - 1 - $b));
 	    }
-	    for (my $i = 1; $i < $len; $i++) {
+	    for (my $i = 0; $i < $len; $i++) {
 		$val .= sprintf("\\x%02X", ($value & 0xff));
 		$value >>= 8;
 	    }
-	    $val = sprintf("\\x%02X", $unused) . $val;
 	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
 	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
 	}
     } elsif ($mib->{'type'} =~ /NETADDR|IPADDR/) {
 	$ret = "/* StorageNew->${name} = $defval; */ /* DEFVAL $mib->{'defaultValue'} */\n";
-	if ($defval =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/) {
+	if ($defval =~ /^$/) {
+	    $ret = "StorageNew->${name} = 0x00000000;\n";
+	} elsif ($defval =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/) {
 	    $val = ($1 << 24) + ($2 << 16) + ($3 << 8) + $4;
 	    $val = sprintf("0x%08X", $val);
 	    $ret = "StorageNew->${name} = $val;\n";
@@ -604,8 +636,11 @@ sub loadMib {
     $name =~ s/-/_/g;
     my $NAME = uc($name);
     print "doing $mib->{label} : $mib->{objectID}\n" if $debug;
+    $variables{$name}{'oidlen'} = (scalar split(/\./,$mib->{'objectID'})) - 1;
     if (defined($mib->{'access'})) {
-	$count = $count + 1;
+	if ($mib->{'access'} =~ /Read|Write|Create/) {
+	    $count = $count + 1;
+        }
 	$subid = $mib->{'objectID'};
 	if  ( $subid =~ s/$fulloid\.// ) {
 	    $variables{$name}{'myoid'} = 1;

@@ -1,3 +1,70 @@
+2009-01-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: agent updates
+	* src/include/ss7/mtp2_ioctl.h: agent updates
+	* src/snmp/cdr2MIB.c: agent updates
+	* src/snmp/cdr2MIB.h: agent updates
+	* src/snmp/gmiMIB.c: agent updates
+	* src/snmp/gmiMIB.h: agent updates
+	* src/snmp/makestubs: agent updates
+	* src/snmp/mib2c: agent updates
+	* src/snmp/mib2c.main.conf: agent updates
+	* src/snmp/mib2c.openss7.conf: agent updates
+	* src/snmp/mib2c.storage.conf: agent updates
+	* src/snmp/mtpMIB.c: agent updates
+	* src/snmp/mtpMIB.h: agent updates
+	* src/snmp/mtpOmMIB.c: agent updates
+	* src/snmp/mtpOmMIB.h: agent updates
+	* src/snmp/sccpMIB.c: agent updates
+	* src/snmp/sccpMIB.h: agent updates
+	* src/snmp/sccpOmMIB.c: agent updates
+	* src/snmp/sccpOmMIB.h: agent updates
+	* src/snmp/slMIB.c: agent updates
+	* src/snmp/slMIB.h: agent updates
+	* src/snmp/smiMIB.c: agent updates
+	* src/snmp/smiMIB.h: agent updates
+	* src/snmp/ss7MIB.c: agent updates
+	* src/snmp/ss7MIB.h: agent updates
+	* src/snmp/ss7OmMIB.c: agent updates
+	* src/snmp/ss7OmMIB.h: agent updates
+	* src/snmp/tcapMIB.c: agent updates
+	* src/snmp/tcapMIB.h: agent updates
+	* src/snmp/tcapOmMIB.c: agent updates
+	* src/snmp/tcapOmMIB.h: agent updates
+	* src/snmp/x400pMIB.c: agent updates
+	* src/snmp/x400pMIB.h: agent updates
+	* src/snmp/mibs/OPENSS7-CDR-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-CDR2-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-CLNS-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-CONS-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-GMI-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-ISUP-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-ISUP-OM-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-METRIC-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-MTP-OM-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-MTP-OM-MIB2.mib: agent updates
+	* src/snmp/mibs/OPENSS7-MTP-TC.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SCCP-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SCCP-OM-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SL-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SL-MUX-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SMI-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SMI.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SS7-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SS7-OM-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-SS7-TC.mib: agent updates
+	* src/snmp/mibs/OPENSS7-TC.mib: agent updates
+	* src/snmp/mibs/OPENSS7-TCAP-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-TCAP-OM-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-TMN-SMI.mib: agent updates
+	* src/snmp/mibs/OPENSS7-TMN-TC.mib: agent updates
+	* src/snmp/mibs/OPENSS7-UMC-MIB.mib: agent updates
+	* src/snmp/mibs/OPENSS7-X400P-MIB.mib: agent updates
+	* src/util/sysconfig/README: agent updates
+	* src/util/sysconfig/snmp: agent updates
+
 2009-01-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/cdr2MIB.c: agent updates

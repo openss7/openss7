@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-12-31 16:04:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2009-01-10 17:09:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-31 16:04:42 $ by $Author: brian $
+# Last Modified $Date: 2009-01-10 17:09:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1487,6 +1487,45 @@ dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 ## INSTALL_INITSCRIPTS
 endif
 
+dist_snmpmib_DATA		=
+
+if WITH_SNMP_AGENT
+## WITH_SNMP_AGENT
+dist_snmpmib_DATA		+= \
+				src/snmp/mibs/HC-PerfHist-TC-MIB.mib \
+				src/snmp/mibs/PerfHist-TC-MIB.mib \
+				src/snmp/mibs/OPENSS7-MIB.mib \
+				src/snmp/mibs/OPENSS7-SMI.mib \
+				src/snmp/mibs/OPENSS7-TC.mib \
+				src/snmp/mibs/OPENSS7-TMN-SMI.mib \
+				src/snmp/mibs/OPENSS7-TMN-TC.mib \
+				src/snmp/mibs/OPENSS7-GMI-MIB.mib \
+				src/snmp/mibs/OPENSS7-SMI-MIB.mib \
+				src/snmp/mibs/OPENSS7-CLNS-MIB.mib \
+				src/snmp/mibs/OPENSS7-CONS-MIB.mib \
+				src/snmp/mibs/OPENSS7-METRIC-MIB.mib \
+				src/snmp/mibs/OPENSS7-UMC-MIB.mib \
+				src/snmp/mibs/OPENSS7-SS7-MIB.mib \
+				src/snmp/mibs/OPENSS7-SS7-TC.mib \
+				src/snmp/mibs/OPENSS7-X400P-MIB.mib \
+				src/snmp/mibs/OPENSS7-SL-MIB.mib \
+				src/snmp/mibs/OPENSS7-SL-MUX-MIB.mib \
+				src/snmp/mibs/OPENSS7-SS7-OM-MIB.mib \
+				src/snmp/mibs/OPENSS7-MTP-MIB.mib \
+				src/snmp/mibs/OPENSS7-MTP-TC.mib \
+				src/snmp/mibs/OPENSS7-MTP-OM-MIB.mib \
+				src/snmp/mibs/OPENSS7-MTP-OM-MIB2.mib \
+				src/snmp/mibs/OPENSS7-SCCP-MIB.mib \
+				src/snmp/mibs/OPENSS7-SCCP-OM-MIB.mib \
+				src/snmp/mibs/OPENSS7-TCAP-MIB.mib \
+				src/snmp/mibs/OPENSS7-TCAP-OM-MIB.mib \
+				src/snmp/mibs/OPENSS7-ISUP-MIB.mib \
+				src/snmp/mibs/OPENSS7-ISUP-OM-MIB.mib \
+				src/snmp/mibs/OPENSS7-CDR-MIB.mib \
+				src/snmp/mibs/OPENSS7-CDR2-MIB.mib
+## WITH_SNMP_AGENT
+endif
+
 ## PKG_BUILD_INDEP
 endif
 
@@ -1561,6 +1600,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.112  2009-01-10 17:09:11  brian
+## - updated agents
+##
 ## Revision 0.9.2.111  2008-12-31 16:04:42  brian
 ## - updated mibs
 ##
