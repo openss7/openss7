@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-09-22 20:31:25 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2009-01-14 14:29:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:25 $ by $Author: brian $
+ Last Modified $Date: 2009-01-14 14:29:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.55  2009-01-14 14:29:57  brian
+ - working up agents
+
  Revision 0.9.2.54  2008-09-22 20:31:25  brian
  - added module version and truncated logs
 
@@ -65,10 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-09-22 20:31:25 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2009-01-14 14:29:57 $"
 
-static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-09-22 20:31:25 $";
+static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2009-01-14 14:29:57 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -112,6 +114,8 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
+#include <sys/mxi.h>
+#include <ss7/x400p_ioctl.h>
 
 #ifdef X400P_DOWNLOAD_FIRMWARE
 #include "v400pfw.h"
@@ -120,7 +124,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-09-22 20:31:25 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2009-01-14 14:29:57 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -145,8 +149,7 @@ MODULE_LICENSE(SL_X400P_LICENSE);
 MODULE_ALIAS("streams-sl_x400p");
 #endif
 #if defined MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-		PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 
@@ -195,12 +198,12 @@ MODULE_ALIAS("/dev/x400p-sl");
 #endif				/* MODULE */
 
 STATIC struct module_info xp_minfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
-	.mi_idname = DRV_NAME,		/* Module name */
-	.mi_minpsz = 1,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 1024,		/* Hi water mark */
-	.mi_lowat = 0,			/* Lo water mark */
+	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idname = DRV_NAME,	/* Module name */
+	.mi_minpsz = 1,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
+	.mi_hiwat = 1024,	/* Hi water mark */
+	.mi_lowat = 0,		/* Lo water mark */
 };
 
 STATIC struct module_stat xp_mstat = { 0, };
@@ -209,24 +212,24 @@ STATIC streamscall int xp_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int xp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit xp_rinit = {
-	.qi_putp = ss7_oput,		/* Read put (message from below) */
-	.qi_srvp = ss7_osrv,		/* Read queue service */
-	.qi_qopen = xp_open,		/* Each open */
-	.qi_qclose = xp_close,		/* Last close */
-	.qi_minfo = &xp_minfo,		/* Information */
-	.qi_mstat = &xp_mstat,		/* Statistics */
+	.qi_putp = ss7_oput,	/* Read put (message from below) */
+	.qi_srvp = ss7_osrv,	/* Read queue service */
+	.qi_qopen = xp_open,	/* Each open */
+	.qi_qclose = xp_close,	/* Last close */
+	.qi_minfo = &xp_minfo,	/* Information */
+	.qi_mstat = &xp_mstat,	/* Statistics */
 };
 
 STATIC struct qinit xp_winit = {
-	.qi_putp = ss7_iput,		/* Write put (message from above) */
-	.qi_srvp = ss7_isrv,		/* Write queue service */
-	.qi_minfo = &xp_minfo,		/* Information */
-	.qi_mstat = &xp_mstat,		/* Statistics */
+	.qi_putp = ss7_iput,	/* Write put (message from above) */
+	.qi_srvp = ss7_isrv,	/* Write queue service */
+	.qi_minfo = &xp_minfo,	/* Information */
+	.qi_mstat = &xp_mstat,	/* Statistics */
 };
 
 STATIC struct streamtab sl_x400pinfo = {
-	.st_rdinit = &xp_rinit,		/* Upper read queue */
-	.st_wrinit = &xp_winit,		/* Upper write queue */
+	.st_rdinit = &xp_rinit,	/* Upper read queue */
+	.st_wrinit = &xp_winit,	/* Upper write queue */
 };
 
 /*
@@ -305,6 +308,7 @@ STATIC struct xp *xp_alloc_priv(queue_t *, struct xp **, dev_t *, cred_t *);
 STATIC void xp_free_priv(struct xp *);
 STATIC struct xp *xp_get(struct xp *);
 STATIC void xp_put(struct xp *);
+STATIC struct xp *xp_find(uint);
 
 typedef struct sp {
 	HEAD_DECLARATION (struct sp);	/* head declaration */
@@ -321,6 +325,7 @@ STATIC struct sp *xp_alloc_sp(struct cd *, uint8_t);
 STATIC void xp_free_sp(struct sp *);
 STATIC struct sp *sp_get(struct sp *);
 STATIC void sp_put(struct sp *);
+STATIC struct sp *sp_find(uint);
 
 typedef struct cd {
 	HEAD_DECLARATION (struct cd);	/* head declaration */
@@ -347,12 +352,14 @@ typedef struct cd {
 	int devrev;			/* device hardware revision */
 	int hw_flags;			/* board and device hardware flags */
 	ulong irq;			/* card irq */
+	ulong bus;			/* card pci bus number */
+	ulong slot;			/* card pci slot number */
 	ulong iobase;			/* card iobase */
 	struct tasklet_struct tasklet;	/* card tasklet */
 #ifdef HAVE_KTYPE_IRQ_HANDLER_T
 	irq_handler_t isr;		/* interrupt service routine */
 #else
-	irqreturn_t (*isr) (int, void *, struct pt_regs *);	/* interrupt service routine */
+	 irqreturn_t(*isr) (int, void *, struct pt_regs *);	/* interrupt service routine */
 #endif
 	sdl_config_t config;		/* card configuration */
 } cd_t;
@@ -361,6 +368,7 @@ STATIC struct cd *xp_alloc_cd(void);
 STATIC void xp_free_cd(struct cd *);
 STATIC struct cd *cd_get(struct cd *);
 STATIC void cd_put(struct cd *);
+STATIC struct cd *cd_find(uint);
 
 #ifdef _MPS_SOURCE
 #define ss7_fast_allocb(__bufpoolp, __size, __priority)	allocb(__size, __priority)
@@ -567,13 +575,13 @@ STATIC int xp_resume(struct pci_dev *pdev);
 #endif
 
 STATIC struct pci_driver xp_driver = {
-	name:DRV_NAME,
-	probe:xp_probe,
-	remove:__devexit_p(xp_remove),
-	id_table:xp_pci_tbl,
+      name:DRV_NAME,
+      probe:xp_probe,
+      remove:__devexit_p(xp_remove),
+      id_table:xp_pci_tbl,
 #ifdef CONFIG_PM
-	suspend:xp_suspend,
-	resume:xp_resume,
+      suspend:xp_suspend,
+      resume:xp_resume,
 #endif
 };
 
@@ -1320,8 +1328,7 @@ lmi_ok_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim)
  *  -----------------------------------
  */
 STATIC noinline fastcall __unlikely int
-lmi_error_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim, sl_ulong errno,
-	      sl_ulong reason)
+lmi_error_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim, sl_ulong errno, sl_ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
@@ -1860,6 +1867,46 @@ STATIC sdl_config_t sdl_default_j1_chan = {
 	,
 };
 
+/**
+ * xp_card_reconfig: - perform reconfiguration of a running card
+ * @cd: card structure
+ */
+STATIC noinline __unlikely void
+xp_card_reconfig(struct cd *cd)
+{
+	uint8_t ctlreg = INTENA;
+
+	if (cd->config.ifgmode & SDL_GMODE_LOC_LB)
+		ctlreg |= LSERLB;
+	if (cd->config.ifgmode & SDL_GMODE_REM_LB)
+		ctlreg |= RSERLB;
+
+	switch (cd->config.ifgtype) {
+	case SDL_GTYPE_E1:
+		ctlreg |= E1DIV;
+		break;
+	}
+	switch (cd->config.ifclock) {
+	case SDL_CLOCK_MASTER:
+		ctlreg |= MASTER;
+		break;
+	}
+
+	cd->plx[INTCSR] = 0;	/* disable interrupts */
+	cd->xlb[CTLREG] = (ctlreg & (~INTENA & E1DIV));	/* disable interrupts default mode */
+	cd->xlb[SYNREG] = cd->config.ifsync;
+	cd->eval_syncsrc = 1;	/* reevaluate syncrhonization source */
+	cd->xlb[LEDREG] = 0xff;	/* turn off leds */
+	cd->xlb[CTLREG] = (ctlreg | INTENA);	/* enable interrupts and full mode */
+	cd->plx[INTCSR] = PLX_INTENA;	/* enable interrupts */
+}
+
+/**
+ * xp_span_config: - perform initial configuration on a span
+ * @cd: card structure owning span
+ * @span: span number
+ * @timeouts: perform initial boot timeouts
+ */
 STATIC noinline __unlikely int
 xp_span_config(struct cd *cd, int span, bool timeouts)
 {
@@ -1966,13 +2013,13 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 	{
 		u_char reg33, reg35, reg40, reg78, reg7a;
 
-		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK 
-		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
-		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
+		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK if TCLK fails, 0x04 
+		   external clock, 0x06 loop.  And then 0x80 selects the TSYSCLK pin instead of the MCLK pin when in
+		   external clock mode. */
 		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
 		xlb[0x70] = 0x02;	/* LOTCMC into TCSS0 */
-		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 
-		   RSYNC is an input (elastic store). */
+		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 RSYNC is an input
+		   (elastic store). */
 		xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
 		xlb[0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
 		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
@@ -2016,17 +2063,16 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		default:
 			break;
 		}
-		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic
-		   AIS generation (0x02) (E1). */
+		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic AIS generation (0x02) 
+		   (E1). */
 		xlb[0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from O14.6) */
 		xlb[0x36] = 0x04;	/* AEBE 36.2 */
 		xlb[0x34] = 0x01;	/* RCL (1ms) */
 		xlb[0x40] = reg40;	/* RCCS, TCCS */
 		xlb[0x33] = reg33 | 0x01;	/* RCR4, RHDB3, RSM, SYNCE, RESYNC */
 		xlb[0x33] = reg33 | 0x00;	/* RCR4, RHDB3, RSM, SYNCE */
-		/* This is a little peculiar: the host should be using Method 3 in section 22.3 of
-		   the DS2155 manual instead of this method that only permits 250us to read or
-		   write the bits. */
+		/* This is a little peculiar: the host should be using Method 3 in section 22.3 of the DS2155 manual
+		   instead of this method that only permits 250us to read or write the bits. */
 		xlb[0xd0] = 0x1b;	/* TAFR */
 		xlb[0xd1] = 0x5f;	/* TNAFR */
 
@@ -2042,21 +2088,18 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 			break;
 		}
 
-		/* We use TX levels to determine LBO, impedance, CSU operation, or monitoring
-		   operation.  During monitoring operation, the transmitters are powered off. */
-		/* For E1, LBO is: 000XXXXX 75 Ohm normal 001XXXXX 120 Ohm normal 100XXXXX 75 Ohm
-		   high return loss 101XXXXX 120 Ohm high return loss For T1, LBO is: 000XXXXX
-		   DSX-1 ( 0ft - 133ft) / 0dB CSU 001XXXXX DSX-1 (133ft - 266ft) 010XXXXX DSX-1
-		   (266ft - 399ft) 011XXXXX DSX-1 (399ft - 533ft) 100XXXXX DSX-1 (533ft - 666ft)
-		   101XXXXX -7.5dB CSU 110XXXXX -15.0dB CSU 111XXXXX -22.5dB CSU txlevel 0000 TX on 
-		   DSX-1 ( 0ft - 133ft) / 0dB CSU or 75 Ohm normal 0001 TX on DSX-1 (133ft - 266ft) 
-		   or 120 Ohm normal 0010 TX on DSX-1 (266ft - 399ft) or (invalid) 0011 TX on DSX-1 
-		   (399ft - 533ft) or (invalid) 0100 TX on DSX-1 (533ft - 666ft) or 75 Ohm high RL
-		   0101 TX on -7.5dB CSU or 120 Ohm high RL 0110 TX on -15.0dB CSU or (invalid)
-		   0111 TX on -22.5dB CSU or (invalid) 1000 TX off 0dB Gain monitoring mode 1001 TX 
-		   off 20dB Gain monitoring mode 1010 TX off 26dB Gain monitoring mode 1011 TX off
-		   32dB Gain monitoring mode 1100 (invalid) 1101 (invalid) 1110 (invalid) 1111
-		   (invalid) */
+		/* We use TX levels to determine LBO, impedance, CSU operation, or monitoring operation.  During
+		   monitoring operation, the transmitters are powered off. */
+		/* For E1, LBO is: 000XXXXX 75 Ohm normal 001XXXXX 120 Ohm normal 100XXXXX 75 Ohm high return loss
+		   101XXXXX 120 Ohm high return loss For T1, LBO is: 000XXXXX DSX-1 ( 0ft - 133ft) / 0dB CSU 001XXXXX
+		   DSX-1 (133ft - 266ft) 010XXXXX DSX-1 (266ft - 399ft) 011XXXXX DSX-1 (399ft - 533ft) 100XXXXX DSX-1
+		   (533ft - 666ft) 101XXXXX -7.5dB CSU 110XXXXX -15.0dB CSU 111XXXXX -22.5dB CSU txlevel 0000 TX on
+		   DSX-1 ( 0ft - 133ft) / 0dB CSU or 75 Ohm normal 0001 TX on DSX-1 (133ft - 266ft) or 120 Ohm normal
+		   0010 TX on DSX-1 (266ft - 399ft) or (invalid) 0011 TX on DSX-1 (399ft - 533ft) or (invalid) 0100 TX
+		   on DSX-1 (533ft - 666ft) or 75 Ohm high RL 0101 TX on -7.5dB CSU or 120 Ohm high RL 0110 TX on
+		   -15.0dB CSU or (invalid) 0111 TX on -22.5dB CSU or (invalid) 1000 TX off 0dB Gain monitoring mode
+		   1001 TX off 20dB Gain monitoring mode 1010 TX off 26dB Gain monitoring mode 1011 TX off 32dB Gain
+		   monitoring mode 1100 (invalid) 1101 (invalid) 1110 (invalid) 1111 (invalid) */
 
 		if (sp->config.iftxlevel < 8) {
 			reg7a = 0x00;	/* no gain */
@@ -2085,8 +2128,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		xlb[0x2c] = 0x08;	/* RSYNC is an input (RCR2) */
 		xlb[0x35] = 0x10;	/* RBS enable (TCR1) */
 		xlb[0x36] = 0x04;	/* TSYNC to be output (TCR2) */
-		xlb[0x37] = 0x9c;	/* Tx & Rx Elastic stor, sysclk(s) = 2.048 mhz, loopback
-					   controls (CCR1) */
+		xlb[0x37] = 0x9c;	/* Tx & Rx Elastic stor, sysclk(s) = 2.048 mhz, loopback controls (CCR1) */
 
 		xlb[0x12] = 0x22;	/* IBCC 5-bit loop up, 3-bit loop down code */
 		xlb[0x13] = 0x80;	/* TCD - 10000 */
@@ -2159,8 +2201,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 
 				byte = c >> 3;
 				if (!cd->spans[sp->span]->slots[slot]
-				    || cd->spans[sp->span]->slots[slot]->sdl.config.
-				    iftype != SDL_TYPE_DS0A)
+				    || cd->spans[sp->span]->slots[slot]->sdl.config.iftype != SDL_TYPE_DS0A)
 					mask |= 1 << (c % 8);
 				if ((c % 8) == 7) {
 					xlb[0x39 + byte] = mask;
@@ -2174,13 +2215,13 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 	{
 		unsigned char reg04, reg05, reg06, reg07, reg78, reg7a;
 
-		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK 
-		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
-		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
+		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK if TCLK fails, 0x04 
+		   external clock, 0x06 loop.  And then 0x80 selects the TSYSCLK pin instead of the MCLK pin when in
+		   external clock mode. */
 		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
 		xlb[0x70] = 0x06;	/* LOTCMC into TCSS0 */
-		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 
-		   RSYNC is an input (elastic store). */
+		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 RSYNC is an input
+		   (elastic store). */
 		xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
 		xlb[0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
 		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
@@ -2306,6 +2347,11 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 	return (0);
 }
 
+/**
+ * xp_span_reconfig: perform reconfiguration of a running span
+ * @cd: card structure owning span
+ * @span: span number
+ */
 STATIC noinline __unlikely int
 xp_span_reconfig(struct cd *cd, int span)
 {
@@ -2382,29 +2428,29 @@ xp_span_reconfig(struct cd *cd, int span)
 		default:
 			sp->config.ifclock = SDL_CLOCK_LOOP;
 		case SDL_CLOCK_LOOP:
-			reg70 = 0x06;	/* Use the signal present at RCLK as the transmit clokc.
-					   The TCLK pin is ignored. */
+			reg70 = 0x06;	/* Use the signal present at RCLK as the transmit clokc. The TCLK pin is
+					   ignored. */
 			break;
 		case SDL_CLOCK_INT:
 			reg70 = 0x00;	/* The TCLK pin is always the source of transmit clock. */
 			break;
 		case SDL_CLOCK_MASTER:
-			reg70 = 0x04;	/* Use the scaled signal present at MCLK as the transmit
-					   clock.  The TCLK pin is ignored. */
+			reg70 = 0x04;	/* Use the scaled signal present at MCLK as the transmit clock.  The TCLK pin
+					   is ignored. */
 			break;
 		case SDL_CLOCK_EXT:
-			reg70 = 0x84;	/* Use the scaled signal present at TSYSCLK as the transmit
-					   clock.  The TCLK pin is ignored. */
+			reg70 = 0x84;	/* Use the scaled signal present at TSYSCLK as the transmit clock.  The TCLK
+					   pin is ignored. */
 			break;
 		case SDL_CLOCK_SLAVE:
-			reg70 = 0x02;	/* Switch to the clock present at RCLK when the signal at
-					   the TCLK pin fails to transition after 1 channel time. */
+			reg70 = 0x02;	/* Switch to the clock present at RCLK when the signal at the TCLK pin fails to 
+					   transition after 1 channel time. */
 			break;
 		}
 
-		/* There are four synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK if
-		   TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the TSYSCLK
-		   pin instead of the MCLK pin when in external clock mode. */
+		/* There are four synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK if TCLK fails, 0x04
+		   external clock, 0x06 loop.  And then 0x80 selects the TSYSCLK pin instead of the MCLK pin when in
+		   external clock mode. */
 		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
 		xlb[0x70] = reg70;	/* LOTCMC into TCSS0 */
 
@@ -2440,8 +2486,8 @@ xp_span_reconfig(struct cd *cd, int span)
 		default:
 			break;
 		}
-		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic
-		   AIS generation (0x02) (E1). */
+		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic AIS generation (0x02) 
+		   (E1). */
 		xlb[0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from O14.6) */
 		xlb[0x40] = reg40;	/* RCCS, TCCS */
 		xlb[0x33] = reg33 | 0x01;	/* RCR4, RHDB3, RSM, SYNCE, RESYNC */
@@ -2539,23 +2585,23 @@ xp_span_reconfig(struct cd *cd, int span)
 		default:
 			sp->config.ifclock = SDL_CLOCK_LOOP;
 		case SDL_CLOCK_LOOP:
-			reg70 = 0x06;	/* Use the signal present at RCLK as the transmit clokc.
-					   The TCLK pin is ignored. */
+			reg70 = 0x06;	/* Use the signal present at RCLK as the transmit clokc. The TCLK pin is
+					   ignored. */
 			break;
 		case SDL_CLOCK_INT:
 			reg70 = 0x00;	/* The TCLK pin is always the source of transmit clock. */
 			break;
 		case SDL_CLOCK_MASTER:
-			reg70 = 0x04;	/* Use the scaled signal present at MCLK as the transmit
-					   clock.  The TCLK pin is ignored. */
+			reg70 = 0x04;	/* Use the scaled signal present at MCLK as the transmit clock.  The TCLK pin
+					   is ignored. */
 			break;
 		case SDL_CLOCK_EXT:
-			reg70 = 0x84;	/* Use the scaled signal present at TSYSCLK as the transmit
-					   clock.  The TCLK pin is ignored. */
+			reg70 = 0x84;	/* Use the scaled signal present at TSYSCLK as the transmit clock.  The TCLK
+					   pin is ignored. */
 			break;
 		case SDL_CLOCK_SLAVE:
-			reg70 = 0x02;	/* Switch to the clock present at RCLK when the signal at
-					   the TCLK pin fails to transition after 1 channel time. */
+			reg70 = 0x02;	/* Switch to the clock present at RCLK when the signal at the TCLK pin fails to 
+					   transition after 1 channel time. */
 			break;
 		}
 		xlb[0x70] = reg70;
@@ -2662,8 +2708,7 @@ xp_stop_timer_t1(struct xp *xp)
 static noinline fastcall void
 xp_start_timer_t1(struct xp *xp)
 {
-	printd(("%s: %p: -> T1 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sl.config.t1), xp->sl.config.t1, (uint) HZ));
+	printd(("%s: %p: -> T1 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sl.config.t1), xp->sl.config.t1, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t1, xp->sl.config.t1);
 }
 static noinline fastcall void
@@ -2675,8 +2720,7 @@ xp_stop_timer_t2(struct xp *xp)
 static noinline fastcall void
 xp_start_timer_t2(struct xp *xp)
 {
-	printd(("%s: %p: -> T2 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sl.config.t2), xp->sl.config.t2, (uint) HZ));
+	printd(("%s: %p: -> T2 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sl.config.t2), xp->sl.config.t2, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t2, xp->sl.config.t2);
 }
 static noinline fastcall void
@@ -2688,8 +2732,7 @@ xp_stop_timer_t3(struct xp *xp)
 static noinline fastcall void
 xp_start_timer_t3(struct xp *xp)
 {
-	printd(("%s: %p: -> T3 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sl.config.t3), xp->sl.config.t3, (uint) HZ));
+	printd(("%s: %p: -> T3 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sl.config.t3), xp->sl.config.t3, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t3, xp->sl.config.t3);
 }
 static noinline fastcall void
@@ -2701,8 +2744,7 @@ xp_stop_timer_t4(struct xp *xp)
 static noinline fastcall void
 xp_start_timer_t4(struct xp *xp)
 {
-	printd(("%s: %p: -> T4 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sl.statem.t4v), xp->sl.statem.t4v, (uint) HZ));
+	printd(("%s: %p: -> T4 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sl.statem.t4v), xp->sl.statem.t4v, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t4, xp->sl.statem.t4v);
 }
 static inline fastcall __hot_out void
@@ -2714,8 +2756,7 @@ xp_stop_timer_t5(struct xp *xp)
 static inline fastcall __hot_out void
 xp_start_timer_t5(struct xp *xp)
 {
-	printd(("%s: %p: -> T5 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sl.config.t5), xp->sl.config.t5, (uint) HZ));
+	printd(("%s: %p: -> T5 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sl.config.t5), xp->sl.config.t5, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t5, xp->sl.config.t5);
 }
 static inline fastcall __hot_in void
@@ -2727,8 +2768,7 @@ xp_stop_timer_t6(struct xp *xp)
 static inline fastcall __hot_in void
 xp_start_timer_t6(struct xp *xp)
 {
-	printd(("%s: %p: -> T6 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sl.config.t6), xp->sl.config.t6, (uint) HZ));
+	printd(("%s: %p: -> T6 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sl.config.t6), xp->sl.config.t6, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t6, xp->sl.config.t6);
 }
 static inline fastcall __hot_in void
@@ -2740,8 +2780,7 @@ xp_stop_timer_t7(struct xp *xp)
 static inline fastcall __hot_in void
 xp_start_timer_t7(struct xp *xp)
 {
-	printd(("%s: %p: -> T7 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sl.config.t7), xp->sl.config.t7, (uint) HZ));
+	printd(("%s: %p: -> T7 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sl.config.t7), xp->sl.config.t7, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t7, xp->sl.config.t7);
 }
 static inline fastcall __hot_in void
@@ -2753,8 +2792,7 @@ xp_stop_timer_t8(struct xp *xp)
 static inline fastcall __hot_in void
 xp_start_timer_t8(struct xp *xp)
 {
-	printd(("%s: %p: -> T8 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sdt.config.t8), xp->sdt.config.t8, (uint) HZ));
+	printd(("%s: %p: -> T8 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sdt.config.t8), xp->sdt.config.t8, (uint) HZ));
 	mi_timer_MAC(xp->sdt.timers.t8, xp->sdt.config.t8);
 }
 
@@ -2768,8 +2806,7 @@ xp_stop_timer_t9(struct xp *xp)
 static void
 xp_start_timer_t9(struct xp *xp)
 {
-	printd(("%s: %p: -> T9 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
-		drv_msectohz(xp->sdl.config.t9), xp->sdl.config.t9, (uint) HZ));
+	printd(("%s: %p: -> T9 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp, drv_msectohz(xp->sdl.config.t9), xp->sdl.config.t9, (uint) HZ));
 	mi_timer_MAC(xp->sdl.timers.t9, xp->sdl.config.t9);
 }
 #endif
@@ -2961,11 +2998,9 @@ sl_is_stats(queue_t *q)
 	if (xp->sl.stamp.sl_dur_unavail)
 		xp->sl.stats.sl_dur_unavail += jiffies - xchg(&xp->sl.stamp.sl_dur_unavail, 0);
 	if (xp->sl.stamp.sl_dur_unavail_rpo)
-		xp->sl.stats.sl_dur_unavail_rpo +=
-		    jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_rpo, 0);
+		xp->sl.stats.sl_dur_unavail_rpo += jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_rpo, 0);
 	if (xp->sl.stamp.sl_dur_unavail_failed)
-		xp->sl.stats.sl_dur_unavail_failed +=
-		    jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_failed, 0);
+		xp->sl.stats.sl_dur_unavail_failed += jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_failed, 0);
 	xp->sl.stamp.sl_dur_in_service = jiffies;
 }
 STATIC noinline fastcall __unlikely void
@@ -2974,14 +3009,11 @@ sl_oos_stats(queue_t *q)
 	struct xp *xp = XP_PRIV(q);
 
 	if (xp->sl.stamp.sl_dur_in_service)
-		xp->sl.stats.sl_dur_in_service +=
-		    jiffies - xchg(&xp->sl.stamp.sl_dur_in_service, 0);
+		xp->sl.stats.sl_dur_in_service += jiffies - xchg(&xp->sl.stamp.sl_dur_in_service, 0);
 	if (xp->sl.stamp.sl_dur_unavail_rpo)
-		xp->sl.stats.sl_dur_unavail_rpo +=
-		    jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_rpo, 0);
+		xp->sl.stats.sl_dur_unavail_rpo += jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_rpo, 0);
 	if (xp->sl.stamp.sl_dur_unavail_failed)
-		xp->sl.stats.sl_dur_unavail_failed +=
-		    jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_failed, 0);
+		xp->sl.stats.sl_dur_unavail_failed += jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_failed, 0);
 	xp->sl.stamp.sl_dur_unavail = jiffies;
 }
 STATIC noinline fastcall __unlikely void
@@ -2990,8 +3022,7 @@ sl_rpo_stats(queue_t *q)
 	struct xp *xp = XP_PRIV(q);
 
 	if (xp->sl.stamp.sl_dur_unavail_rpo)
-		xp->sl.stats.sl_dur_unavail_rpo +=
-		    jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_rpo, 0);
+		xp->sl.stats.sl_dur_unavail_rpo += jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_rpo, 0);
 }
 STATIC noinline fastcall __unlikely void
 sl_rpr_stats(queue_t *q)
@@ -2999,8 +3030,7 @@ sl_rpr_stats(queue_t *q)
 	struct xp *xp = XP_PRIV(q);
 
 	if (xp->sl.stamp.sl_dur_unavail_rpo)
-		xp->sl.stats.sl_dur_unavail_rpo +=
-		    jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_rpo, 0);
+		xp->sl.stats.sl_dur_unavail_rpo += jiffies - xchg(&xp->sl.stamp.sl_dur_unavail_rpo, 0);
 }
 #endif
 
@@ -3244,19 +3274,15 @@ sl_txc_bsnr_and_bibr(struct xp *xp, queue_t *q)
 		do {
 			freemsg(bufq_dequeue(&xp->sl.rtb));
 			xp->sl.statem.Ct--;
-			xp->sl.statem.tx.F.fsn =
-			    (xp->sl.statem.tx.F.fsn + 1) & xp->sl.statem.sn_mask;
-		} while (xp->sl.statem.tx.F.fsn !=
-			 ((xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask));
+			xp->sl.statem.tx.F.fsn = (xp->sl.statem.tx.F.fsn + 1) & xp->sl.statem.sn_mask;
+		} while (xp->sl.statem.tx.F.fsn != ((xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask));
 		sl_check_congestion(xp, q);
 		if (xp->sl.rtb.q_count == 0) {
 			xp_timer_stop(xp, t7);
 		} else {
 			xp_timer_start(xp, t7);
 		}
-		if (!pcr
-		    || (xp->sl.rtb.q_msgs < xp->sl.config.N1
-			&& xp->sl.rtb.q_count < xp->sl.config.N2))
+		if (!pcr || (xp->sl.rtb.q_msgs < xp->sl.config.N1 && xp->sl.rtb.q_count < xp->sl.config.N2))
 			xp->sl.statem.rtb_full = 0;
 		if (SN_OUTSIDE(xp->sl.statem.tx.F.fsn, xp->sl.statem.Z, xp->sl.statem.tx.L.fsn)
 		    || !xp->sl.rtb.q_count) {
@@ -3304,8 +3330,7 @@ sl_txc_clear_rtb(struct xp *xp, queue_t *q)
 	xp->sl.statem.Ct = 0;
 	xp->sl.statem.clear_rtb = 1;
 	xp->sl.statem.rtb_full = 0;	/* added */
-	/* FIXME: should probably follow more of the ITUT flush_buffers stuff like reseting Z and
-	   FSNF, FSNL, FSNT. */
+	/* FIXME: should probably follow more of the ITUT flush_buffers stuff like reseting Z and FSNF, FSNL, FSNT. */
 	sl_check_congestion(xp, q);
 }
 
@@ -3330,8 +3355,7 @@ sl_txc_flush_buffers(struct xp *xp, queue_t *q)
 	xp->sl.statem.Z = 0;
 	xp->sl.statem.z_ptr = NULL;
 	/* Z =0 error in ITUT 93 and ANSI */
-	xp->sl.statem.Z = xp->sl.statem.tx.F.fsn =
-	    (xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask;
+	xp->sl.statem.Z = xp->sl.statem.tx.F.fsn = (xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask;
 	xp->sl.statem.tx.L.fsn = xp->sl.statem.rx.R.bsn;
 	xp->sl.statem.rx.T.fsn = xp->sl.statem.rx.R.bsn;
 	xp_timer_stop(xp, t7);
@@ -3375,8 +3399,7 @@ sl_txc_retrieval_request_and_fsnc(struct xp *xp, queue_t *q, sl_ulong fsnc)
 		if (!xp->sl.statem.Cm)
 			qenable(xp->iq);
 	}
-	xp->sl.statem.Z = xp->sl.statem.tx.F.fsn =
-	    (xp->sl.statem.tx.C.fsn + 1) & xp->sl.statem.sn_mask;
+	xp->sl.statem.Z = xp->sl.statem.tx.F.fsn = (xp->sl.statem.tx.C.fsn + 1) & xp->sl.statem.sn_mask;
 	while ((mp = bufq_dequeue(&xp->sl.rtb))) {
 		xp->sl.statem.Ct--;
 		if ((err = sl_retrieved_message_ind(xp, q, mp)))
@@ -3439,10 +3462,8 @@ sl_daedt_msu(struct xp *xp, queue_t *q, mblk_t *mp)
 	int len = msgdsize(mp);
 
 	if (xp->option.popt & SS7_POPT_XSN) {
-		((sl_ushort *) mp->b_rptr)[0] =
-		    htons(xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
-		((sl_ushort *) mp->b_rptr)[1] =
-		    htons(xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
+		((sl_ushort *) mp->b_rptr)[0] = htons(xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
+		((sl_ushort *) mp->b_rptr)[1] = htons(xp->sl.statem.tx.N.fsn | xp->sl.statem.tx.N.fib);
 		((sl_ushort *) mp->b_rptr)[2] = htons(len - 6 < 512 ? len - 6 : 511);
 	} else {
 		((sl_uchar *) mp->b_rptr)[0] = (xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
@@ -3466,8 +3487,7 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 				xp->sl.statem.lssu_available = 0;
 			xp->sl.statem.tx.N.fsn = xp->sl.statem.tx.L.fsn;
 			xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib;
-			xp->sl.statem.tx.N.bsn =
-			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
+			xp->sl.statem.tx.N.bsn = (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
 			sl_daedt_lssu(xp, q, mp);
 		}
@@ -3477,8 +3497,7 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 		if ((mp = ss7_fast_allocb(&xp_bufpool, 6, BPRI_HI))) {
 			xp->sl.statem.tx.N.fsn = xp->sl.statem.tx.L.fsn;
 			xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib;
-			xp->sl.statem.tx.N.bsn =
-			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
+			xp->sl.statem.tx.N.bsn = (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
 			sl_daedt_fisu(xp, q, mp);
 		}
@@ -3495,9 +3514,7 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 		}
 	}
 	if ((!pcr && xp->sl.statem.retrans_cycle)
-	    || (pcr
-		&& (xp->sl.statem.forced_retransmission
-		    || (!xp->sl.tb.q_count && xp->sl.rtb.q_count)))) {
+	    || (pcr && (xp->sl.statem.forced_retransmission || (!xp->sl.tb.q_count && xp->sl.rtb.q_count)))) {
 		mblk_t *bp;
 
 		if ((bp = xp->sl.statem.z_ptr) && !(mp = dupmsg(bp)))
@@ -3512,21 +3529,17 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 			if (pcr) {
 				xp->sl.statem.tx.N.fsn = xp->sl.statem.Z;
 				xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
-				xp->sl.statem.tx.N.bsn =
-				    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
+				xp->sl.statem.tx.N.bsn = (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 				xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib;
 				xp->sl.statem.Z = (xp->sl.statem.Z + 1) & xp->sl.statem.sn_mask;
 			} else {
-				xp->sl.statem.tx.N.fsn =
-				    (xp->sl.statem.tx.N.fsn + 1) & xp->sl.statem.sn_mask;
+				xp->sl.statem.tx.N.fsn = (xp->sl.statem.tx.N.fsn + 1) & xp->sl.statem.sn_mask;
 				xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
-				xp->sl.statem.tx.N.bsn =
-				    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
+				xp->sl.statem.tx.N.bsn = (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 				xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib;
 			}
 			ctrace(sl_daedt_msu(xp, q, mp));
-			if (xp->sl.statem.tx.N.fsn == xp->sl.statem.tx.L.fsn
-			    || xp->sl.statem.z_ptr == NULL)
+			if (xp->sl.statem.tx.N.fsn == xp->sl.statem.tx.L.fsn || xp->sl.statem.z_ptr == NULL)
 				xp->sl.statem.retrans_cycle = 0;
 		}
 		return (mp);
@@ -3536,8 +3549,7 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 		if ((mp = ss7_fast_allocb(&xp_bufpool, 6, BPRI_HI))) {
 			xp->sl.statem.tx.N.fsn = xp->sl.statem.tx.L.fsn;
 			xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib;
-			xp->sl.statem.tx.N.bsn =
-			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
+			xp->sl.statem.tx.N.bsn = (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
 			sl_daedt_fisu(xp, q, mp);
 		}
@@ -3551,8 +3563,7 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 			xp->sl.statem.Cm--;
 			if (!xp->sl.statem.Cm)
 				qenable(xp->iq);
-			xp->sl.statem.tx.L.fsn =
-			    (xp->sl.statem.tx.L.fsn + 1) & xp->sl.statem.sn_mask;
+			xp->sl.statem.tx.L.fsn = (xp->sl.statem.tx.L.fsn + 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fsn = xp->sl.statem.tx.L.fsn;
 			if (!xp->sl.rtb.q_count)
 				xp_timer_start(xp, t7);
@@ -3568,13 +3579,11 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 			} else {
 				if ((xp->sl.rtb.q_msgs >= xp->sl.config.N1)
 				    || (xp->sl.rtb.q_count >= xp->sl.config.N2)
-				    || (xp->sl.statem.tx.L.fsn ==
-					((xp->sl.statem.tx.F.fsn - 2) & xp->sl.statem.sn_mask)))
+				    || (xp->sl.statem.tx.L.fsn == ((xp->sl.statem.tx.F.fsn - 2) & xp->sl.statem.sn_mask)))
 					xp->sl.statem.rtb_full = 1;
 			}
 			xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib;
-			xp->sl.statem.tx.N.bsn =
-			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
+			xp->sl.statem.tx.N.bsn = (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
 			ctrace(sl_daedt_msu(xp, q, mp));
 		} else
@@ -3851,16 +3860,14 @@ sl_poc_remote_processor_recovered(struct xp *xp, queue_t *q)
 
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_REMOTE_PROCESSOR_OUTAGE:
-		/* Indication moved from caller to remove spurious remote processor recovered
-		   indications. */
+		/* Indication moved from caller to remove spurious remote processor recovered indications. */
 		if ((err = sl_remote_processor_recovered_ind(xp, q)))
 			return (err);
 		sl_lsc_no_processor_outage(xp, q);
 		xp->sl.statem.poc_state = SL_STATE_IDLE;
 		break;
 	case SL_STATE_BOTH_PROCESSORS_OUT:
-		/* Indication moved from caller to remove spurious remote processor recovered
-		   indications. */
+		/* Indication moved from caller to remove spurious remote processor recovered indications. */
 		if ((err = sl_remote_processor_recovered_ind(xp, q)))
 			return (err);
 		xp->sl.statem.poc_state = SL_STATE_LOCAL_PROCESSOR_OUTAGE;
@@ -3919,15 +3926,13 @@ sl_poc_remote_processor_outage(struct xp *xp, queue_t *q)
 
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_IDLE:
-		/* Moved here from caller to limit the number of remote processor outage
-		   indications delivered to L3. */
+		/* Moved here from caller to limit the number of remote processor outage indications delivered to L3. */
 		if ((err = sl_remote_processor_outage_ind(xp, q)))
 			return (err);
 		xp->sl.statem.poc_state = SL_STATE_REMOTE_PROCESSOR_OUTAGE;
 		break;
 	case SL_STATE_LOCAL_PROCESSOR_OUTAGE:
-		/* Moved here from caller to limit the number of remote processor outage
-		   indications delivered to L3. */
+		/* Moved here from caller to limit the number of remote processor outage indications delivered to L3. */
 		if ((err = sl_remote_processor_outage_ind(xp, q)))
 			return (err);
 		xp->sl.statem.poc_state = SL_STATE_BOTH_PROCESSORS_OUT;
@@ -4254,8 +4259,7 @@ sl_rb_congestion_function(struct xp *xp, queue_t *q)
 			if (xp->sl.statem.Cr >= xp->sl.config.rb_discard || !canput(RD(q))) {
 				sl_rc_congestion_discard(xp, q);
 				xp->sl.statem.l2_congestion_detect = 1;
-			} else if (xp->sl.statem.Cr >= xp->sl.config.rb_accept
-				   || !canputnext(RD(q))) {
+			} else if (xp->sl.statem.Cr >= xp->sl.config.rb_accept || !canputnext(RD(q))) {
 				sl_rc_congestion_accept(xp, q);
 				xp->sl.statem.l2_congestion_detect = 1;
 			}
@@ -4299,8 +4303,7 @@ sl_rc_signal_unit(struct xp *xp, queue_t *q, mblk_t *mp)
 	}
 #if 0
 	ptrace(("rx: bsn=%x, bib=%x, fsn=%x, fib=%x, len=%d, sio=%d\n", xp->sl.statem.rx.R.bsn,
-		xp->sl.statem.rx.R.bib, xp->sl.statem.rx.R.fsn, xp->sl.statem.rx.R.fib,
-		xp->sl.statem.rx.len, xp->sl.statem.rx.sio));
+		xp->sl.statem.rx.R.bib, xp->sl.statem.rx.R.fsn, xp->sl.statem.rx.R.fib, xp->sl.statem.rx.len, xp->sl.statem.rx.sio));
 #endif
 	if (((xp->sl.statem.rx.len) == 1) || ((xp->sl.statem.rx.len) == 2)) {
 		switch (xp->sl.statem.rx.sio) {
@@ -4336,9 +4339,7 @@ sl_rc_signal_unit(struct xp *xp, queue_t *q, mblk_t *mp)
 		freemsg(mp);
 		return;
 	}
-	if (SN_OUTSIDE
-	    (((xp->sl.statem.rx.F.fsn - 1) & xp->sl.statem.sn_mask), xp->sl.statem.rx.R.bsn,
-	     xp->sl.statem.rx.T.fsn)) {
+	if (SN_OUTSIDE(((xp->sl.statem.rx.F.fsn - 1) & xp->sl.statem.sn_mask), xp->sl.statem.rx.R.bsn, xp->sl.statem.rx.T.fsn)) {
 		if (xp->sl.statem.abnormal_bsnr) {
 			sl_lsc_link_failure(xp, q, SL_FAIL_ABNORMAL_BSNR);
 			xp->sl.statem.rc_state = SL_STATE_IDLE;
@@ -4376,8 +4377,7 @@ sl_rc_signal_unit(struct xp *xp, queue_t *q, mblk_t *mp)
 		}
 		if ((xp->sl.statem.rx.R.fsn == xp->sl.statem.rx.X.fsn)
 		    && (xp->sl.statem.rx.len > 2)) {
-			xp->sl.statem.rx.X.fsn =
-			    (xp->sl.statem.rx.X.fsn + 1) & xp->sl.statem.sn_mask;
+			xp->sl.statem.rx.X.fsn = (xp->sl.statem.rx.X.fsn + 1) & xp->sl.statem.sn_mask;
 			putq(q, mp);
 			xp->sl.statem.Cr++;
 			if (xp->sl.statem.congestion_accept)
@@ -4417,8 +4417,7 @@ sl_rc_signal_unit(struct xp *xp, queue_t *q, mblk_t *mp)
 		}
 		if ((xp->sl.statem.rx.R.fsn == xp->sl.statem.rx.X.fsn)
 		    && (xp->sl.statem.rx.len > 2)) {
-			xp->sl.statem.rx.X.fsn =
-			    (xp->sl.statem.rx.X.fsn + 1) & xp->sl.statem.sn_mask;
+			xp->sl.statem.rx.X.fsn = (xp->sl.statem.rx.X.fsn + 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.rtr = 0;
 			putq(q, mp);
 			xp->sl.statem.Cr++;
@@ -4428,8 +4427,7 @@ sl_rc_signal_unit(struct xp *xp, queue_t *q, mblk_t *mp)
 				sl_txc_fsnx_value(xp, q);
 			return;
 		}
-		if ((xp->sl.statem.rx.R.fsn ==
-		     ((xp->sl.statem.rx.X.fsn - 1) & xp->sl.statem.sn_mask))) {
+		if ((xp->sl.statem.rx.R.fsn == ((xp->sl.statem.rx.X.fsn - 1) & xp->sl.statem.sn_mask))) {
 			freemsg(mp);
 			return;
 		} else {
@@ -4441,8 +4439,7 @@ sl_rc_signal_unit(struct xp *xp, queue_t *q, mblk_t *mp)
 			} else {
 				sl_txc_nack_to_be_sent(xp, q);
 				xp->sl.statem.rtr = 1;
-				xp->sl.statem.rx.X.fib =
-				    xp->sl.statem.rx.X.fib ? 0 : xp->sl.statem.ib_mask;
+				xp->sl.statem.rx.X.fib = xp->sl.statem.rx.X.fib ? 0 : xp->sl.statem.ib_mask;
 				freemsg(mp);
 				return;
 			}
@@ -4455,8 +4452,7 @@ sl_rc_signal_unit(struct xp *xp, queue_t *q, mblk_t *mp)
 		}
 		if (xp->sl.statem.rtr == 1) {
 			sl_txc_bsnr_and_bibr(xp, q);
-			xp->sl.statem.rx.F.fsn =
-			    (xp->sl.statem.rx.R.bsn + 1) & xp->sl.statem.sn_mask;
+			xp->sl.statem.rx.F.fsn = (xp->sl.statem.rx.R.bsn + 1) & xp->sl.statem.sn_mask;
 			freemsg(mp);
 			return;
 		}
@@ -4983,29 +4979,22 @@ sl_check_congestion(struct xp *xp, queue_t *q)
 		}
 		break;
 	}
-	if (xp->sl.statem.cong_status != old_cong_status
-	    || xp->sl.statem.disc_status != old_disc_status) {
+	if (xp->sl.statem.cong_status != old_cong_status || xp->sl.statem.disc_status != old_disc_status) {
 		if (xp->sl.statem.cong_status < old_cong_status)
-			sl_link_congestion_ceased_ind(xp, q, xp->sl.statem.cong_status,
-						      xp->sl.statem.disc_status);
+			sl_link_congestion_ceased_ind(xp, q, xp->sl.statem.cong_status, xp->sl.statem.disc_status);
 		else {
 			if (xp->sl.statem.cong_status > old_cong_status) {
-				if (xp->sl.notify.events & SL_EVT_CONGEST_ONSET_IND &&
-				    !xp->sl.stats.sl_cong_onset_ind[xp->sl.statem.cong_status]++) {
-					sl_link_congested_ind(xp, q, xp->sl.statem.cong_status,
-							      xp->sl.statem.disc_status);
+				if (xp->sl.notify.events & SL_EVT_CONGEST_ONSET_IND && !xp->sl.stats.sl_cong_onset_ind[xp->sl.statem.cong_status]++) {
+					sl_link_congested_ind(xp, q, xp->sl.statem.cong_status, xp->sl.statem.disc_status);
 					return;
 				}
 			} else {
-				if (xp->sl.notify.events & SL_EVT_CONGEST_DISCD_IND &&
-				    !xp->sl.stats.sl_cong_discd_ind[xp->sl.statem.disc_status]++) {
-					sl_link_congested_ind(xp, q, xp->sl.statem.cong_status,
-							      xp->sl.statem.disc_status);
+				if (xp->sl.notify.events & SL_EVT_CONGEST_DISCD_IND && !xp->sl.stats.sl_cong_discd_ind[xp->sl.statem.disc_status]++) {
+					sl_link_congested_ind(xp, q, xp->sl.statem.cong_status, xp->sl.statem.disc_status);
 					return;
 				}
 			}
-			sl_link_congested_ind(xp, q, xp->sl.statem.cong_status,
-					      xp->sl.statem.disc_status);
+			sl_link_congested_ind(xp, q, xp->sl.statem.cong_status, xp->sl.statem.disc_status);
 		}
 	}
 }
@@ -5191,8 +5180,7 @@ sl_daedr_received_bits(struct xp *xp, queue_t *q, mblk_t *mp)
 				}
 			}
 			if (len <= mlen) {
-				if (xp->rx.cmp
-				    || (xp->rx.cmp = ss7_fast_allocb(&xp_bufpool, mlen, BPRI_HI))) {
+				if (xp->rx.cmp || (xp->rx.cmp = ss7_fast_allocb(&xp_bufpool, mlen, BPRI_HI))) {
 					bcopy(mp->b_rptr, xp->rx.cmp->b_rptr, len);
 					xp->rx.cmp->b_wptr = xp->rx.cmp->b_rptr + len;
 					xp->rx.repeat = 0;
@@ -5250,8 +5238,7 @@ sl_daedt_transmission_request(struct xp *xp, queue_t *q)
 					goto dont_repeat;
 				}
 			}
-			if (xp->tx.cmp
-			    || (xp->tx.cmp = ss7_fast_allocb(&xp_bufpool, mlen, BPRI_HI))) {
+			if (xp->tx.cmp || (xp->tx.cmp = ss7_fast_allocb(&xp_bufpool, mlen, BPRI_HI))) {
 				mblk_t *cd = xp->tx.cmp;
 
 				if (len > mlen)
@@ -5490,8 +5477,7 @@ xp_t8_timeout(struct xp *xp, queue_t *q)
 
 typedef struct tx_entry {
 	uint bit_string:10 __attribute__ ((packed));	/* the output string */
-	uint bit_length:2 __attribute__ ((packed));	/* length in excess of 8 bits of output
-							   string */
+	uint bit_length:2 __attribute__ ((packed));	/* length in excess of 8 bits of output string */
 	uint state:3 __attribute__ ((packed));	/* new state */
 } tx_entry_t;
 
@@ -5598,14 +5584,12 @@ xp_tx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 					break;
 				case SDL_TYPE_T1:
 				case SDL_TYPE_J1:
-					*(bp + (xp_t1_chan_map[chan] << 2)) =
-					    tx->residue >> tx->rbits;
+					*(bp + (xp_t1_chan_map[chan] << 2)) = tx->residue >> tx->rbits;
 					if (++chan > 23)
 						chan = 0;
 					break;
 				case SDL_TYPE_E1:
-					*(bp + (xp_e1_chan_map[chan] << 2)) =
-					    tx->residue >> tx->rbits;
+					*(bp + (xp_e1_chan_map[chan] << 2)) = tx->residue >> tx->rbits;
 					if (++chan > 30)
 						chan = 0;
 					break;
@@ -5657,13 +5641,11 @@ xp_tx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 				tx->mode = TX_MODE_MOF;
 				goto drain_rbits;
 			case TX_MODE_MOF:	/* transmit frame bytes */
-				if (tx->nxt->b_rptr < tx->nxt->b_wptr
-				    || (tx->nxt = tx->nxt->b_cont)) {
+				if (tx->nxt->b_rptr < tx->nxt->b_wptr || (tx->nxt = tx->nxt->b_cont)) {
 					/* continuing in message */
 					uint byte = *tx->nxt->b_rptr++;
 
-					tx->bcc =
-					    (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte) & 0x00ff];
+					tx->bcc = (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte) & 0x00ff];
 					xp_tx_bitstuff(tx, byte);
 					stats->tx_bytes++;
 					goto drain_rbits;
@@ -5902,13 +5884,9 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 					if (r->hunt || r->idle)
 						goto aborted;
 					while (rx->rbits > 16) {
-						if (rx->nxt
-						    && rx->nxt->b_wptr >= rx->nxt->b_datap->db_lim)
+						if (rx->nxt && rx->nxt->b_wptr >= rx->nxt->b_datap->db_lim)
 							xp_rx_linkb(rx);
-						if (!rx->nxt &&
-						    !(rx->nxt =
-						      ss7_fast_allocb(&xp_bufpool, FASTBUF,
-								      BPRI_HI)))
+						if (!rx->nxt && !(rx->nxt = ss7_fast_allocb(&xp_bufpool, FASTBUF, BPRI_HI)))
 							goto buffer_overflow;
 						rx->bcc = (rx->bcc >> 8)
 						    ^ bc_table[(rx->bcc ^ rx->residue) & 0x00ff];
@@ -5933,8 +5911,7 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 					if (!xsn)
 						li = rx->msg->b_rptr[2] & mlen;
 					else
-						li = ((rx->msg->b_rptr[5] << 8) | rx->msg->
-						      b_rptr[4]) & mlen;
+						li = ((rx->msg->b_rptr[5] << 8) | rx->msg->b_rptr[4]) & mlen;
 					len = rx->bytes - hlen;
 					if (len != li && (li != mlen || len <= li))
 						goto length_error;
@@ -6033,8 +6010,7 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 		for (; bp < be; bp += 128) {
 			do {
 				if (rx->nxt) {
-					if (rx->nxt->b_wptr <
-					    rx->nxt->b_rptr + xp->sdl.config.ifblksize)
+					if (rx->nxt->b_wptr < rx->nxt->b_rptr + xp->sdl.config.ifblksize)
 						goto rx_process_block;
 					if (sdl_received_bits_ind(xp, q, rx->nxt) != QR_ABSORBED)
 						goto rx_process_block;
@@ -7285,9 +7261,8 @@ lmi_info_req(queue_t *q, mblk_t *mp)
 		struct cd *cd;
 
 		if ((sp = xp->sp) && (cd = sp->cd)) {
-			uint16_t ppa =
-			    (xp->
-			     chan & 0xff) | ((sp->span & 0x0f) << 8) | ((cd->card & 0x0f) << 12);
+			uint16_t ppa = (xp->chan & 0xff) | ((sp->span & 0x0f) << 8) | ((cd->card & 0x0f) << 12);
+
 			return lmi_info_ack(xp, q, (caddr_t) &ppa, sizeof(ppa));
 		}
 	}
@@ -7311,8 +7286,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
 
 	if (!MBLKIN(mp, 0, sizeof(*p))) {
-		ptrace(("%s: ERROR: primitive too small = %ld bytes\n", DRV_NAME,
-			(long) (mp->b_wptr - mp->b_rptr)));
+		ptrace(("%s: ERROR: primitive too small = %ld bytes\n", DRV_NAME, (long) (mp->b_wptr - mp->b_rptr)));
 		goto lmi_badprim;
 	}
 	if (xp->i_state != LMI_UNATTACHED) {
@@ -7342,8 +7316,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		ptrace(("%s: ERROR: unallocated span %d\n", DRV_NAME, span));
 		goto lmi_badppa;
 	}
-	if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.ifgtype != SDL_GTYPE_T1
-	    && sp->config.ifgtype != SDL_GTYPE_J1) {
+	if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.ifgtype != SDL_GTYPE_T1 && sp->config.ifgtype != SDL_GTYPE_J1) {
 		swerr();
 		goto efault;
 	}
@@ -7365,8 +7338,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
-			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
-				DRV_NAME, card, span, chan, slot));
+			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n", DRV_NAME, card, span, chan, slot));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				sp->slots[slot] = xp_get(xp);
@@ -7408,8 +7380,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
-			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
-				DRV_NAME, card, span, chan, slot));
+			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n", DRV_NAME, card, span, chan, slot));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				sp->slots[slot] = xp_get(xp);
@@ -7451,8 +7422,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
-			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
-				DRV_NAME, card, span, chan, slot));
+			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n", DRV_NAME, card, span, chan, slot));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				sp->slots[slot] = xp_get(xp);
@@ -7490,8 +7460,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_E1:
 			for (c = 0; c < sizeof(xp_e1_chan_map) / sizeof(xp_e1_chan_map[0]); c++)
 				if (sp->slots[xp_e1_chan_map[c]]) {
-					ptrace(("%s: ERROR: slot in use for chan %d\n",
-						DRV_NAME, c));
+					ptrace(("%s: ERROR: slot in use for chan %d\n", DRV_NAME, c));
 					goto lmi_badppa;
 				}
 			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
@@ -7500,8 +7469,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			printd(("%s: attaching card %d, entire span %d\n", DRV_NAME, card, span));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
-				for (c = 0; c < sizeof(xp_e1_chan_map) / sizeof(xp_e1_chan_map[0]);
-				     c++) {
+				for (c = 0; c < sizeof(xp_e1_chan_map) / sizeof(xp_e1_chan_map[0]); c++) {
 					slot = xp_e1_chan_map[c];
 					sp->slots[slot] = xp_get(xp);
 				}
@@ -7533,8 +7501,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_T1:
 			for (c = 0; c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0])); c++)
 				if (sp->slots[xp_t1_chan_map[c]]) {
-					ptrace(("%s: ERROR: slot in use for chan %d\n",
-						DRV_NAME, c));
+					ptrace(("%s: ERROR: slot in use for chan %d\n", DRV_NAME, c));
 					goto lmi_badppa;
 				}
 			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
@@ -7542,11 +7509,8 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			/* commit attach */
 			spin_lock_irqsave(&xp->lock, flags);
 			{
-				printd(("%s: attaching card %d, entire span %d\n",
-					DRV_NAME, card, span));
-				for (c = 0;
-				     c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0]));
-				     c++) {
+				printd(("%s: attaching card %d, entire span %d\n", DRV_NAME, card, span));
+				for (c = 0; c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0])); c++) {
 					slot = xp_t1_chan_map[c];
 					sp->slots[slot] = xp_get(xp);
 				}
@@ -7578,8 +7542,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_J1:
 			for (c = 0; c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0])); c++)
 				if (sp->slots[xp_t1_chan_map[c]]) {
-					ptrace(("%s: ERROR: slot in use for chan %d\n",
-						DRV_NAME, c));
+					ptrace(("%s: ERROR: slot in use for chan %d\n", DRV_NAME, c));
 					goto lmi_badppa;
 				}
 			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
@@ -7587,11 +7550,8 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			/* commit attach */
 			spin_lock_irqsave(&xp->lock, flags);
 			{
-				printd(("%s: attaching card %d, entire span %d\n",
-					DRV_NAME, card, span));
-				for (c = 0;
-				     c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0]));
-				     c++) {
+				printd(("%s: attaching card %d, entire span %d\n", DRV_NAME, card, span));
+				for (c = 0; c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0])); c++) {
 					slot = xp_t1_chan_map[c];
 					sp->slots[slot] = xp_get(xp);
 				}
@@ -7709,8 +7669,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		goto lmi_outstate;
 	}
 #ifdef _DEBUG
-	if (cd->config.ifgtype != SDL_GTYPE_E1 && cd->config.ifgtype != SDL_GTYPE_T1
-	    && cd->config.ifgtype != SDL_GTYPE_J1) {
+	if (cd->config.ifgtype != SDL_GTYPE_E1 && cd->config.ifgtype != SDL_GTYPE_T1 && cd->config.ifgtype != SDL_GTYPE_J1) {
 		ptrace(("%s: ERROR: card group type = %u\n", DRV_NAME, cd->config.ifgtype));
 		return m_error(xp, q, EFAULT);
 	}
@@ -7791,8 +7750,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_T1:
 		case SDL_GTYPE_J1:
 		{
-			printd(("%s: performing enable on %s span %d\n", DRV_NAME,
-				(cd->config.ifgtype == SDL_GTYPE_J1) ? "J1" : "T1", sp->span));
+			printd(("%s: performing enable on %s span %d\n", DRV_NAME, (cd->config.ifgtype == SDL_GTYPE_J1) ? "J1" : "T1", sp->span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
@@ -7918,6 +7876,3265 @@ lmi_optmgmt_req(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
+STATIC noinline __unlikely int
+mx_iocginfo_dflt(queue_t *q, mblk_t *mp, mx_info_t * arg)
+{
+	struct mx_info_dflt *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (arg->id != 0)
+		goto esrch;
+	val->mxDrivIdnum = DRV_ID;
+	val->mxDrivMajor = CMAJOR_0;
+	strncpy(val->mxDrivDescription, SL_X400P_DESCRIP, sizeof(val->mxDrivDescription));
+	strncpy(val->mxDrivRevision, SL_X400P_REVISION, sizeof(val->mxDrivRevision));
+	strncpy(val->mxDrivCopyright, SL_X400P_COPYRIGHT, sizeof(val->mxDrivCopyright));
+	strncpy(val->mxDrivSupportedDevice, SL_X400P_DEVICE, sizeof(val->mxDrivSupportedDevice));
+	strncpy(val->mxDrivContact, SL_X400P_CONTACT, sizeof(val->mxDrivContact));
+	val->mxDrivLicense = MXDRIVLICENSE_GPL;
+	memcpy(val->mxDrivDate,  "\x07\xd9\x01\x0e\x0c\x21\x08\x00\x00\x00\x00\x00", 12);
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocginfo_card(queue_t *q, mblk_t *mp, mx_info_t * arg)
+{
+	struct cd *cd;
+	struct mx_info_card *val;
+
+	val = (typeof(val)) (arg + 1);
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (!(cd = cd_find(arg->id)))
+		goto esrch;
+	/* FIXME: complete this */
+	switch (cd->board) {
+	case PLX9030:
+		val->mxCardType = X400PCARDTYPE_PLX9030;
+		break;
+	case PLXDEVBRD:
+		val->mxCardType = X400PCARDTYPE_PLXDEVBRD;
+		break;
+	case X400P:
+		val->mxCardType = X400PCARDTYPE_X400P;
+		break;
+	case E400P:
+		val->mxCardType = X400PCARDTYPE_E400P;
+		break;
+	case T400P:
+		val->mxCardType = X400PCARDTYPE_T400P;
+		break;
+	case X400PSS7:
+		val->mxCardType = X400PCARDTYPE_X400PSS7;
+		break;
+	case E400PSS7:
+		val->mxCardType = X400PCARDTYPE_E400PSS7;
+		break;
+	case T400PSS7:
+		val->mxCardType = X400PCARDTYPE_T400PSS7;
+		break;
+	case V400P:
+		val->mxCardType = X400PCARDTYPE_V400P;
+		break;
+	case V400PE:
+		val->mxCardType = X400PCARDTYPE_V400PE;
+		break;
+	case V400PT:
+		val->mxCardType = X400PCARDTYPE_V400PT;
+		break;
+	case V401PE:
+		val->mxCardType = X400PCARDTYPE_V401PE;
+		break;
+	case V401PT:
+		val->mxCardType = X400PCARDTYPE_V401PT;
+		break;
+	default:
+		val->mxCardType = X400PCARDTYPE_NONE;
+		break;
+	}
+	/* this driver does not support board indexes yet */
+	val->mxCardIdentifier = 0;
+	/* this driver does not support board revision yet */
+	val->mxCardRevision = 0;
+	switch (cd->device) {
+	case XP_DEV_DS2152:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS2152;
+		break;
+	case XP_DEV_DS21352:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS21352;
+		break;
+	case XP_DEV_DS21552:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS21552;
+		break;
+	case XP_DEV_DS2154:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS2154;
+		break;
+	case XP_DEV_DS21354:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS21354;
+		break;
+	case XP_DEV_DS21554:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS21554;
+		break;
+	case XP_DEV_DS2155:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS2155;
+		break;
+	case XP_DEV_DS2156:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS2156;
+		break;
+	default:
+		val->mxCardChipType = X400PCARDCHIPTYPE_NONE;
+		break;
+	}
+	val->mxCardChipRevision = cd->devrev;
+	val->mxCardPciBus = cd->bus;
+	val->mxCardPciSlot = cd->slot;
+	val->mxCardPciIrq = cd->irq;
+	val->mxCardName[0] = '\0';
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocginfo_span(queue_t *q, mblk_t *mp, mx_info_t * arg)
+{
+	struct sp *sp;
+
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	/* there is no span information */
+	mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocginfo_chan(queue_t *q, mblk_t *mp, mx_info_t * arg)
+{
+	struct xp *xp;
+
+	if (IS_ERR((xp = xp_find(arg->id))))
+		goto esrch;
+	/* there is no channel information */
+	mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocginfo(queue_t *q, mblk_t *mp)
+{
+	mx_info_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return mx_iocginfo_dflt(q, mp, arg);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* this driver does not support synchronization groups */
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:	/* card */
+		return mx_iocginfo_card(q, mp, arg);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		return mx_iocginfo_span(q, mp, arg);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return mx_iocginfo_chan(q, mp, arg);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* this driver does not support fractionals */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* this driver does not support cross-connects */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* this driver does not support bert */
+		goto esrch;
+	default:
+		goto einval;
+	}
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_iocgoption_dflt(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	if (arg->id != 0)
+		goto esrch;
+	/* this is no default options */
+	mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocgoption_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct cd *cd;
+	struct mx_opt_conf_card *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (!(cd = cd_find(arg->id)))
+		goto esrch;
+	val->mxCardMode = 0;
+	if (cd->config.ifgmode & SDL_GMODE_LOC_LB)
+		val->mxCardMode |= (1 << MXCARDMODE_LOCALLOOPBACK);
+	if (cd->config.ifgmode & SDL_GMODE_REM_LB)
+		val->mxCardMode |= (1 << MXCARDMODE_REMOTELOOPBACK);
+	if (cd->config.ifclock == SDL_CLOCK_MASTER)
+		val->mxCardSyncMaster = MXCARDSYNCMASTER_MASTER;
+	else
+		val->mxCardSyncMaster = MXCARDSYNCMASTER_SLAVE;
+	switch (cd->config.ifsync) {
+	default:
+	case SYNCSELF:
+		val->mxCardSyncSource = MXCARDSYNCSOURCE_SYNCSELF;
+		break;
+	case SYNC1:
+		val->mxCardSyncSource = MXCARDSYNCSOURCE_SYNC1;
+		break;
+	case SYNC2:
+		val->mxCardSyncSource = MXCARDSYNCSOURCE_SYNC2;
+		break;
+	case SYNC3:
+		val->mxCardSyncSource = MXCARDSYNCSOURCE_SYNC3;
+		break;
+	case SYNC4:
+		val->mxCardSyncSource = MXCARDSYNCSOURCE_SYNC4;
+		break;
+	}
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocgoption_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct sp *sp;
+	struct mx_opt_conf_span *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	switch (sp->config.ifgmode) {
+	case SDL_GMODE_LOC_LB:
+		val->mxSpanMode = (1 << MXSPANMODE_LOCAL);
+		break;
+	case SDL_GMODE_REM_LB:
+		val->mxSpanMode = (1 << MXSPANMODE_REMOTE);
+		break;
+	case SDL_GMODE_BOTH_LB:
+		val->mxSpanMode = (1 << MXSPANMODE_LOCAL) | (1 << MXSPANMODE_REMOTE);
+	default:
+	case SDL_GMODE_NONE:
+		val->mxSpanMode = 0;
+		break;
+	}
+	switch (sp->config.ifclock) {
+	case SDL_CLOCK_INT:
+		val->mxSpanClocking = MXSPANCLOCKING_INTERNAL;
+		break;
+	case SDL_CLOCK_EXT:
+		val->mxSpanClocking = MXSPANCLOCKING_EXTERNAL;
+		break;
+	case SDL_CLOCK_LOOP:
+		val->mxSpanClocking = MXSPANCLOCKING_LOOP;
+		break;
+	case SDL_CLOCK_MASTER:
+		val->mxSpanClocking = MXSPANCLOCKING_INTERNAL;
+		break;
+	case SDL_CLOCK_SLAVE:
+		val->mxSpanClocking = MXSPANCLOCKING_EXTERNAL;
+		break;
+	default:
+	case SDL_CLOCK_DPLL:
+	case SDL_CLOCK_ABR:
+	case SDL_CLOCK_SHAPER:
+	case SDL_CLOCK_TICK:
+	case SDL_CLOCK_NONE:
+		val->mxSpanClocking = MXSPANCLOCKING_NONE;
+		break;
+	}
+	if (sp->config.iftxlevel & ~0x7) {
+		/* monitoring mode */
+		val->mxSpanLineMode = MXSPANLINEMODE_MONITOR;
+		val->mxSpanLineLength = MXSPANLINELENGTH_NONE;
+		val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_NONE;
+		val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED120OHM;
+		switch (sp->cd->device) {
+		case XP_DEV_DS2155:
+		case XP_DEV_DS2156:
+		default:
+			switch (sp->config.iftxlevel & 0x3) {
+			case 0:	/* 0 */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON0DB;
+				break;
+			case 1:	/* 20 dB */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
+				break;
+			case 2:	/* 26 dB */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON26DB;
+				break;
+			case 3:	/* 32 dB */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON32DB;
+				break;
+			}
+			break;
+		case XP_DEV_DS2152:
+		case XP_DEV_DS21352:
+		case XP_DEV_DS21552:
+			switch (sp->config.iftxlevel & 0x3) {
+			case 0:	/* 0 */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON0DB;
+				break;
+			case 1:	/* 12 dB */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON12DB;
+				break;
+			case 2:
+			case 3:	/* 20 dB */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
+				break;
+			}
+			break;
+		case XP_DEV_DS2154:
+		case XP_DEV_DS21354:
+		case XP_DEV_DS21554:
+			switch (sp->config.iftxlevel & 0x3) {
+			case 0:	/* 0 */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON0DB;
+				break;
+			case 1:	/* 12 dB */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON12DB;
+				break;
+			case 2:
+			case 3:	/* 30 dB */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON30DB;
+				break;
+			}
+			break;
+		}
+	} else {
+		/* normal DSU/CSU mode */
+		val->mxSpanLineGain = MXSPANLINEGAIN_NONE;
+		if (sp->config.ifgtype == SDL_GTYPE_E1) {
+			val->mxSpanLineLength = MXSPANLINELENGTH_NONE;
+			val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_NONE;
+			switch (sp->config.iftxlevel & 0x7) {
+			case SDL_TXLEVEL_75OHM_NM:	/* 1 */
+				val->mxSpanLineMode = MXSPANLINEMODE_DSU;
+				val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_UNBALANCED75OHM;
+				break;
+			case SDL_TXLEVEL_75OHM_PR:	/* 3 */
+			case SDL_TXLEVEL_75OHM_HRL:	/* 5 */
+			case 7:
+				val->mxSpanLineMode = MXSPANLINEMODE_CSU;
+				val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_UNBALANCED75OHM;
+				break;
+			case 0:
+			case SDL_TXLEVEL_120OHM_NM:	/* 2 */
+				val->mxSpanLineMode = MXSPANLINEMODE_DSU;
+				val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED120OHM;
+				break;
+			case SDL_TXLEVEL_120OHM_PR:	/* 4 */
+			case SDL_TXLEVEL_120OHM_HRL:	/* 6 */
+				val->mxSpanLineMode = MXSPANLINEMODE_CSU;
+				val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED120OHM;
+				break;
+			}
+		} else {
+			val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED100OHM;
+			switch (sp->config.iftxlevel & 0x7) {
+			case 0:
+				val->mxSpanLineMode = MXSPANLINEMODE_CSU;
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX133FT;
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU0DB;
+				break;
+			case 1:
+				val->mxSpanLineMode = MXSPANLINEMODE_DSU;
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX266FT;
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU0DB;
+				break;
+			case 2:
+				val->mxSpanLineMode = MXSPANLINEMODE_DSU;
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX399FT;
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU0DB;
+				break;
+			case 3:
+				val->mxSpanLineMode = MXSPANLINEMODE_DSU;
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX533FT;
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU0DB;
+				break;
+			case 4:
+				val->mxSpanLineMode = MXSPANLINEMODE_DSU;
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX666FT;
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU0DB;
+				break;
+			case 5:
+				val->mxSpanLineMode = MXSPANLINEMODE_CSU;
+				val->mxSpanLineLength = MXSPANLINELENGTH_NONE;
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU8DB;
+				break;
+			case 6:
+				val->mxSpanLineMode = MXSPANLINEMODE_CSU;
+				val->mxSpanLineLength = MXSPANLINELENGTH_NONE;
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU15DB;
+				break;
+			case 7:
+				val->mxSpanLineMode = MXSPANLINEMODE_CSU;
+				val->mxSpanLineLength = MXSPANLINELENGTH_NONE;
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU23DB;
+				break;
+			}
+		}
+	}
+	val->mxSpanLineDelay = 0;	/* not measured this driver */
+	val->mxSpanTxLevel = MXSPANTXLEVEL_ON;
+	val->mxSpanRxLevel = MXSPANRXLEVEL_ON;
+	val->mxSpanAlarmSettleTime = 5000;	/* always 5 seconds for this driver */
+	val->mxSpanLineCodeTime = 5000;	/* always 5 seconds for this driver */
+	val->mxSpanLineCode = MXSPANLINECODE_NOCODE;	/* not supported this driver */
+	val->mxSpanReceiveThreshold = 0;	/* not supported this driver */
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocgoption_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct sp *sp;
+	struct xp *xp;
+	struct mx_opt_conf_chan *val;
+	sdl_config_t *config;
+
+	val = (typeof(val)) (arg + 1);
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	if (IS_ERR((xp = xp_find(arg->id))))
+		goto esrch;
+	config = xp ? &xp->sdl.config : &sp->config;
+	switch (config->iftype) {
+	case SDL_TYPE_DS0:	/* DS0 channel */
+		val->mxChanType = (config->ifframing == SDL_FRAMING_CAS) ? MXCHANTYPE_CAS : MXCHANTYPE_CCS;
+		val->mxChanFormat = MXCHANFORMAT_DS0;
+		val->mxChanRate = MXCHANRATE_KBITS64;
+		val->mxChanMode = 0;	/* no loopback supported */
+		break;
+	case SDL_TYPE_DS0A:	/* DS0A channel */
+		val->mxChanType = (config->ifgtype == SDL_GTYPE_E1 && config->ifframing != MXCHANTYPE_CAS) ? MXCHANTYPE_CCS : MXCHANTYPE_CAS;
+		val->mxChanFormat = MXCHANFORMAT_DS0A;
+		val->mxChanRate = MXCHANRATE_KBITS56;
+		val->mxChanMode = 0;	/* no loopback supported */
+		break;
+	case SDL_TYPE_E1:	/* full E1 span */
+		val->mxChanType = (config->ifframing == SDL_FRAMING_CAS) ? MXCHANTYPE_CAS : MXCHANTYPE_CCS;
+		val->mxChanFormat = MXCHANFORMAT_E1;
+		val->mxChanRate = MXCHANRATE_KBITS1984;
+		val->mxChanMode = 0;	/* no loopback supported */
+		break;
+	case SDL_TYPE_T1:	/* full T1 span */
+		val->mxChanType = MXCHANTYPE_CCS;
+		val->mxChanFormat = MXCHANFORMAT_T1;
+		val->mxChanRate = MXCHANRATE_KBITS1536;
+		val->mxChanMode = 0;	/* no loopback supported */
+		break;
+	case SDL_TYPE_J1:	/* full J1 span */
+		val->mxChanType = MXCHANTYPE_CCS;
+		val->mxChanFormat = MXCHANFORMAT_J1;
+		val->mxChanRate = MXCHANRATE_KBITS1536;
+		val->mxChanMode = 0;	/* no loopback supported */
+		break;
+	default:
+		val->mxChanType = MXCHANTYPE_NONE;
+		val->mxChanFormat = MXCHANFORMAT_NONE;
+		val->mxChanRate = MXCHANRATE_VARIABLE;
+		val->mxChanMode = 0;	/* no loopback supported */
+		break;
+	}
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocgoption(queue_t *q, mblk_t *mp)
+{
+	mx_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return mx_iocgoption_dflt(q, mp, arg);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* this driver does not support synchronization groups */
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:	/* card */
+		return mx_iocgoption_card(q, mp, arg);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		return mx_iocgoption_span(q, mp, arg);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return mx_iocgoption_chan(q, mp, arg);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* this driver does not support fractionals */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* this driver does not support cross-connect */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* this driver does not support bert */
+		goto esrch;
+	default:
+		goto einval;
+	}
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+STATIC noinline __unlikely int
+mx_test_options_dflt(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	if (arg->id != 0)
+		goto esrch;
+	/* there are no default options yet */
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_test_options_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct cd *cd;
+	struct mx_opt_conf_card *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (!(cd = cd_find(arg->id)))
+		goto esrch;
+	/* check validity of arguments */
+	if (val->mxCardMode & ~((1 << MXCARDMODE_LOCALLOOPBACK) | (1 << MXCARDMODE_REMOTELOOPBACK)))
+		goto einval;
+	switch (val->mxCardSyncMaster) {
+	case MXCARDSYNCMASTER_MASTER:
+	case MXCARDSYNCMASTER_SLAVE:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxCardSyncSource) {
+	case MXCARDSYNCSOURCE_SYNCSELF:
+	case MXCARDSYNCSOURCE_SYNC1:
+	case MXCARDSYNCSOURCE_SYNC2:
+	case MXCARDSYNCSOURCE_SYNC3:
+	case MXCARDSYNCSOURCE_SYNC4:
+		break;
+	default:
+	case MXCARDSYNCSOURCE_SYNCEXTERN:
+	case MXCARDSYNCSOURCE_SYNCAUTO:
+		goto einval;
+	}
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_test_options_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct sp *sp;
+	struct mx_opt_conf_span *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	/* check validity of values */
+	if (val->mxSpanMode & ~((1 << MXSPANMODE_LOCAL) | (1 << MXSPANMODE_REMOTE)))
+		goto einval;
+	switch (val->mxSpanClocking) {
+	case MXSPANCLOCKING_INTERNAL:
+	case MXSPANCLOCKING_EXTERNAL:
+	case MXSPANCLOCKING_LOOP:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanLineMode) {
+	case MXSPANLINEMODE_NONE:
+		/* set to whatever it is */
+		if (sp->config.iftxlevel & ~0x7) {
+			val->mxSpanLineMode = MXSPANLINEMODE_MONITOR;
+		} else if (sp->config.ifgtype == SDL_GTYPE_E1) {
+			if (sp->config.iftxlevel & 0x6)
+				val->mxSpanLineMode = MXSPANLINEMODE_CSU;
+			else
+				val->mxSpanLineMode = MXSPANLINEMODE_DSU;
+		} else {
+			if (sp->config.iftxlevel == 0 || sp->config.iftxlevel > 4)
+				val->mxSpanLineMode = MXSPANLINEMODE_CSU;
+			else
+				val->mxSpanLineMode = MXSPANLINEMODE_DSU;
+		}
+		break;
+	case MXSPANLINEMODE_DSU:
+	case MXSPANLINEMODE_CSU:
+	case MXSPANLINEMODE_MONITOR:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanLineLength) {
+	case MXSPANLINELENGTH_NONE:
+		/* set to whatever it is */
+		if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.iftxlevel < 5) {
+			switch (sp->config.iftxlevel) {
+			case 0:
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX133FT;
+				break;
+			case 1:
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX266FT;
+				break;
+			case 2:
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX399FT;
+				break;
+			case 3:
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX533FT;
+				break;
+			case 4:
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX666FT;
+				break;
+			}
+		}
+		break;
+	case MXSPANLINELENGTH_DSX133FT:
+	case MXSPANLINELENGTH_DSX266FT:
+	case MXSPANLINELENGTH_DSX399FT:
+	case MXSPANLINELENGTH_DSX533FT:
+	case MXSPANLINELENGTH_DSX666FT:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanLineAttenuation) {
+	case MXSPANLINEATTENUATION_NONE:
+		/* set it to whatever it is */
+		if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.iftxlevel < 8) {
+			switch (sp->config.iftxlevel) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU0DB;
+				break;
+			case 5:
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU8DB;
+				break;
+			case 6:
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU15DB;
+				break;
+			case 7:
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU23DB;
+				break;
+			}
+		}
+		break;
+	case MXSPANLINEATTENUATION_CSU0DB:
+	case MXSPANLINEATTENUATION_CSU8DB:
+	case MXSPANLINEATTENUATION_CSU15DB:
+	case MXSPANLINEATTENUATION_CSU23DB:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanLineGain) {
+	case MXSPANLINEGAIN_NONE:
+		/* set it to whatever it is */
+		if (sp->config.iftxlevel >= 8) {
+			switch (sp->cd->device) {
+			case XP_DEV_DS2155:
+			case XP_DEV_DS2156:
+			default:
+				switch (sp->config.iftxlevel & 0x3) {
+				case 0:	/* 0 */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON0DB;
+					break;
+				case 1:	/* 20 dB */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
+					break;
+				case 2:	/* 26 dB */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON26DB;
+					break;
+				case 3:	/* 32 dB */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON32DB;
+					break;
+				}
+				break;
+			case XP_DEV_DS2152:
+			case XP_DEV_DS21352:
+			case XP_DEV_DS21552:
+				switch (sp->config.iftxlevel & 0x3) {
+				case 0:	/* 0 */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON0DB;
+					break;
+				case 1:	/* 12 dB */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON12DB;
+					break;
+				case 2:
+				case 3:	/* 20 dB */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
+					break;
+				}
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				switch (sp->config.iftxlevel & 0x3) {
+				case 0:	/* 0 */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON0DB;
+					break;
+				case 1:	/* 12 dB */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON12DB;
+					break;
+				case 2:
+				case 3:	/* 30 dB */
+					val->mxSpanLineGain = MXSPANLINEGAIN_MON30DB;
+					break;
+				}
+				break;
+			}
+		}
+		break;
+	case MXSPANLINEGAIN_MON0DB:
+	case MXSPANLINEGAIN_MON12DB:
+	case MXSPANLINEGAIN_MON20DB:
+	case MXSPANLINEGAIN_MON26DB:
+	case MXSPANLINEGAIN_MON30DB:
+	case MXSPANLINEGAIN_MON32DB:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanLineImpedance) {
+	case MXSPANLINEIMPEDANCE_NONE:
+		/* set it to whatever it is */
+		if (sp->config.ifgtype == SDL_GTYPE_E1) {
+			if (sp->config.iftxlevel & 0x1)
+				val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_UNBALANCED75OHM;
+			else
+				val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED120OHM;
+		} else {
+			val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED100OHM;
+		}
+		break;
+	case MXSPANLINEIMPEDANCE_UNBALANCED75OHM:
+	case MXSPANLINEIMPEDANCE_BALANCED100OHM:
+	case MXSPANLINEIMPEDANCE_BALANCED120OHM:
+		break;
+	default:
+		goto einval;
+	}
+	if (val->mxSpanLineDelay != 0)
+		goto einval;
+	switch (val->mxSpanTxLevel) {
+	case MXSPANTXLEVEL_OFF:
+	case MXSPANTXLEVEL_ON:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanRxLevel) {
+	case MXSPANRXLEVEL_OFF:
+	case MXSPANRXLEVEL_ON:
+		break;
+	default:
+		goto einval;
+	}
+	if (val->mxSpanAlarmSettleTime != 5000)
+		val->mxSpanAlarmSettleTime = 5000;
+	if (val->mxSpanLineCodeTime != 5000)
+		val->mxSpanLineCodeTime = 5000;
+	switch (val->mxSpanLineCode) {
+	case MXSPANLINECODE_NOCODE:
+		break;
+	default:
+	case MXSPANLINECODE_LINECODE:
+	case MXSPANLINECODE_PAYLOADCODE:
+	case MXSPANLINECODE_RESETCODE:
+	case MXSPANLINECODE_TESTCODE:
+	case MXSPANLINECODE_UNFRAMEDALLONES:
+	case MXSPANLINECODE_UNFRAMEDONEANDZERO:
+		goto einval;
+	}
+	if (val->mxSpanReceiveThreshold != 0)
+		goto einval;
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_test_options_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct xp *xp;
+	struct mx_opt_conf_chan *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (IS_ERR((xp = xp_find(arg->id))) || xp == NULL)
+		goto esrch;
+	/* check validity of values */
+	switch (val->mxChanType) {
+	case MXCHANTYPE_NONE:
+		val->mxChanType = MXCHANTYPE_CCS;
+	case MXCHANTYPE_CCS:
+		break;
+	case MXCHANTYPE_CAS:
+	default:
+		goto einval;
+	}
+	switch (val->mxChanFormat) {
+	case MXCHANFORMAT_NONE:
+		/* set to what it is */
+		switch (xp->sdl.config.iftype) {
+		case SDL_TYPE_DS0:
+			val->mxChanFormat = MXCHANFORMAT_DS0;
+			break;
+		case SDL_TYPE_DS0A:
+			val->mxChanFormat = MXCHANFORMAT_DS0A;
+			break;
+		case SDL_TYPE_E1:
+			val->mxChanFormat = MXCHANFORMAT_E1;
+			break;
+		case SDL_TYPE_T1:
+			val->mxChanFormat = MXCHANFORMAT_T1;
+			break;
+		case SDL_TYPE_J1:
+			val->mxChanFormat = MXCHANFORMAT_J1;
+			break;
+		}
+		break;
+	case MXCHANFORMAT_DS0:
+	case MXCHANFORMAT_DS0A:
+		break;
+	case MXCHANFORMAT_E1:
+		if (xp->sdl.config.ifgtype != SDL_GTYPE_E1)
+			goto einval;
+		break;
+	case MXCHANFORMAT_T1:
+		if (xp->sdl.config.ifgtype != SDL_GTYPE_T1)
+			goto einval;
+		break;
+	case MXCHANFORMAT_J1:
+		if (xp->sdl.config.ifgtype != SDL_GTYPE_J1)
+			goto einval;
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxChanRate) {
+	case MXCHANRATE_VARIABLE:
+		/* set it to what it will be */
+		switch (val->mxChanFormat) {
+		case MXCHANFORMAT_DS0:
+			val->mxChanRate = MXCHANRATE_KBITS64;
+			break;
+		case MXCHANFORMAT_DS0A:
+			val->mxChanRate = MXCHANRATE_KBITS56;
+			break;
+		case MXCHANFORMAT_E1:
+			val->mxChanRate = MXCHANRATE_KBITS1984;
+			break;
+		case MXCHANFORMAT_T1:
+			val->mxChanRate = MXCHANRATE_KBITS1536;
+			break;
+		case MXCHANFORMAT_J1:
+			val->mxChanRate = MXCHANRATE_KBITS1536;
+			break;
+		}
+		break;
+	case MXCHANRATE_KBITS56:
+	case MXCHANRATE_KBITS64:
+		break;
+	case MXCHANRATE_KBITS1536:
+		if (xp->sdl.config.ifgtype == SDL_GTYPE_E1)
+			goto einval;
+		break;
+	case MXCHANRATE_KBITS1984:
+		if (xp->sdl.config.ifgtype != SDL_GTYPE_E1)
+			goto einval;
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxChanMode) {
+	case (1 << MXCHANMODE_REMOTELOOPBACK):
+	case (1 << MXCHANMODE_LOCALLOOPBACK):
+	case (1 << MXCHANMODE_TEST):
+	case (1 << MXCHANMODE_LOOPBACKECHO):
+		break;
+	default:
+		goto einval;
+	}
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+STATIC noinline __unlikely int
+mx_test_options(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return mx_test_options_dflt(q, mp, arg);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:	/* card */
+		return mx_test_options_card(q, mp, arg);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		return mx_test_options_span(q, mp, arg);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return mx_test_options_chan(q, mp, arg);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		goto esrch;
+	default:
+		goto einval;
+	}
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+STATIC noinline __unlikely int
+mx_set_options_dflt(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	if (arg->id != 0)
+		goto esrch;
+	/* there are no default options yet */
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_set_options_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct cd *cd;
+	struct mx_opt_conf_card *val = (typeof(val)) (arg + 1);
+	uint card_reconfig = 0;
+
+	if (!(cd = cd_find(arg->id)))
+		goto esrch;
+	/* validity of options already checked */
+	if (val->mxCardMode & (1 << MXCARDMODE_LOCALLOOPBACK)) {
+		if (!(cd->config.ifgmode & SDL_GMODE_LOC_LB)) {
+			card_reconfig = 1;
+			cd->config.ifgmode |= SDL_GMODE_LOC_LB;
+		}
+	}
+	if (val->mxCardMode & (1 << MXCARDMODE_REMOTELOOPBACK)) {
+		if (!(cd->config.ifgmode & SDL_GMODE_REM_LB)) {
+			card_reconfig = 1;
+			cd->config.ifgmode |= SDL_GMODE_REM_LB;
+		}
+	}
+	switch (val->mxCardSyncMaster) {
+	case MXCARDSYNCMASTER_MASTER:
+		if (cd->config.ifclock != SDL_CLOCK_MASTER) {
+			card_reconfig = 1;
+			cd->config.ifclock = SDL_CLOCK_MASTER;
+		}
+		break;
+	case MXCARDSYNCMASTER_SLAVE:
+		if (cd->config.ifclock != SDL_CLOCK_SLAVE) {
+			card_reconfig = 1;
+			cd->config.ifclock = SDL_CLOCK_SLAVE;
+		}
+		break;
+	}
+	switch (val->mxCardSyncSource) {
+	case MXCARDSYNCSOURCE_SYNCSELF:
+		if (cd->config.ifsync != SYNCSELF) {
+			card_reconfig = 1;
+			cd->config.ifsync = SYNCSELF;
+		}
+		break;
+	case MXCARDSYNCSOURCE_SYNC1:
+		if (cd->config.ifsync != SYNC1) {
+			card_reconfig = 1;
+			cd->config.ifsync = SYNC1;
+		}
+		break;
+	case MXCARDSYNCSOURCE_SYNC2:
+		if (cd->config.ifsync != SYNC2) {
+			card_reconfig = 1;
+			cd->config.ifsync = SYNC2;
+		}
+		break;
+	case MXCARDSYNCSOURCE_SYNC3:
+		if (cd->config.ifsync != SYNC3) {
+			card_reconfig = 1;
+			cd->config.ifsync = SYNC3;
+		}
+		break;
+	case MXCARDSYNCSOURCE_SYNC4:
+		if (cd->config.ifsync != SYNC4) {
+			card_reconfig = 1;
+			cd->config.ifsync = SYNC4;
+		}
+		break;
+	}
+	if (card_reconfig && (cd->config.ifflags & SDL_IF_UP))
+		xp_card_reconfig(cd);
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_set_options_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct sp *sp;
+	struct mx_opt_conf_span *val = (typeof(val)) (arg + 1);
+	uint txlevel = 0, span_reconfig = 0;
+
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	/* mxSpanMode */
+	if (val->mxSpanMode & (1 << MXSPANMODE_LOCAL)) {
+		if (!(sp->config.ifgmode & SDL_GMODE_LOC_LB)) {
+			span_reconfig = 1;
+			sp->config.ifgmode |= SDL_GMODE_LOC_LB;
+		}
+	} else {
+		if (sp->config.ifgmode & SDL_GMODE_LOC_LB) {
+			span_reconfig = 1;
+			sp->config.ifgmode &= ~SDL_GMODE_LOC_LB;
+		}
+	}
+	if (val->mxSpanMode & (1 << MXSPANMODE_REMOTE)) {
+		if (!(sp->config.ifgmode & SDL_GMODE_REM_LB)) {
+			span_reconfig = 1;
+			sp->config.ifgmode |= SDL_GMODE_REM_LB;
+		}
+	} else {
+		if (sp->config.ifgmode & SDL_GMODE_REM_LB) {
+			span_reconfig = 1;
+			sp->config.ifgmode &= ~SDL_GMODE_REM_LB;
+		}
+	}
+	/* mxSpanClocking */
+	switch (val->mxSpanClocking) {
+	case MXSPANCLOCKING_INTERNAL:
+		if (sp->config.ifclock != SDL_CLOCK_INT) {
+			span_reconfig = 1;
+			sp->config.ifclock = SDL_CLOCK_INT;
+		}
+		break;
+	case MXSPANCLOCKING_EXTERNAL:
+		if (sp->config.ifclock != SDL_CLOCK_EXT) {
+			span_reconfig = 1;
+			sp->config.ifclock = SDL_CLOCK_EXT;
+		}
+		break;
+	case MXSPANCLOCKING_LOOP:
+		if (sp->config.ifclock != SDL_CLOCK_LOOP) {
+			span_reconfig = 1;
+			sp->config.ifclock = SDL_CLOCK_LOOP;
+		}
+		break;
+	}
+	/* mxSpanLineMode */
+	/* mxSpanLineImpedance */
+	/* mxSpanLineLength */
+	/* mxSpanLineAttenuation */
+	/* mxSpanLineGain */
+	switch (val->mxSpanLineMode) {
+	case MXSPANLINEMODE_MONITOR:
+		val->mxSpanLineLength = MXSPANLINELENGTH_NONE;
+		val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_NONE;
+		val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_NONE;
+		txlevel = 8;
+		switch (val->mxSpanLineGain) {
+		case MXSPANLINEGAIN_NONE:
+		case MXSPANLINEGAIN_MON0DB:
+			break;
+		case MXSPANLINEGAIN_MON12DB:
+			switch (sp->cd->device) {
+			case XP_DEV_DS2155:
+			case XP_DEV_DS2156:
+				txlevel += 0;
+				/* nearest lower */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON0DB;
+				break;
+			default:
+				txlevel += 1;
+				break;
+			}
+			break;
+		case MXSPANLINEGAIN_MON20DB:
+			switch (sp->cd->device) {
+			case XP_DEV_DS2155:
+			case XP_DEV_DS2156:
+				txlevel += 1;
+				break;
+			case XP_DEV_DS2152:
+			case XP_DEV_DS21352:
+			case XP_DEV_DS21552:
+				txlevel += 2;
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				txlevel += 1;
+				/* nearest lower */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON12DB;
+				break;
+			}
+			break;
+		case MXSPANLINEGAIN_MON26DB:
+			switch (sp->cd->device) {
+			case XP_DEV_DS2155:
+			case XP_DEV_DS2156:
+				txlevel += 2;
+				break;
+			case XP_DEV_DS2152:
+			case XP_DEV_DS21352:
+			case XP_DEV_DS21552:
+				txlevel += 2;
+				/* nearest lower */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				txlevel += 1;
+				/* nearest lower */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON12DB;
+				break;
+			}
+			break;
+		case MXSPANLINEGAIN_MON30DB:
+			switch (sp->cd->device) {
+			case XP_DEV_DS2155:
+			case XP_DEV_DS2156:
+				txlevel += 2;
+				/* nearest lower */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON26DB;
+				break;
+			case XP_DEV_DS2152:
+			case XP_DEV_DS21352:
+			case XP_DEV_DS21552:
+				txlevel += 2;
+				/* nearest lower */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				txlevel += 2;
+				break;
+			}
+			break;
+		case MXSPANLINEGAIN_MON32DB:
+			switch (sp->cd->device) {
+			case XP_DEV_DS2155:
+			case XP_DEV_DS2156:
+				txlevel += 3;
+				break;
+			case XP_DEV_DS2152:
+			case XP_DEV_DS21352:
+			case XP_DEV_DS21552:
+				txlevel += 2;
+				/* nearest lower */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				txlevel += 2;
+				/* nearest lower */
+				val->mxSpanLineGain = MXSPANLINEGAIN_MON30DB;
+				break;
+			}
+			break;
+		}
+		break;
+	case MXSPANLINEMODE_DSU:
+		val->mxSpanLineGain = MXSPANLINEGAIN_NONE;
+		val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_NONE;
+		if (sp->config.ifgtype == SDL_GTYPE_E1) {
+			val->mxSpanLineLength = MXSPANLINELENGTH_NONE;
+			val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_UNBALANCED75OHM;
+			txlevel = 1;
+		} else {
+			val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED100OHM;
+			switch (val->mxSpanLineLength) {
+			case MXSPANLINELENGTH_NONE:
+				val->mxSpanLineLength = MXSPANLINELENGTH_DSX133FT;
+				/* fall through */
+			case MXSPANLINELENGTH_DSX133FT:
+				txlevel = 0;
+				break;
+			case MXSPANLINELENGTH_DSX266FT:
+				txlevel = 1;
+				break;
+			case MXSPANLINELENGTH_DSX399FT:
+				txlevel = 2;
+				break;
+			case MXSPANLINELENGTH_DSX533FT:
+				txlevel = 3;
+				break;
+			case MXSPANLINELENGTH_DSX666FT:
+				txlevel = 4;
+				break;
+			}
+		}
+		break;
+	case MXSPANLINEMODE_CSU:
+		val->mxSpanLineGain = MXSPANLINEGAIN_NONE;
+		val->mxSpanLineLength = MXSPANLINELENGTH_NONE;
+		if (sp->config.ifgtype == SDL_GTYPE_E1) {
+			val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED120OHM;
+			val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_NONE;
+			txlevel = 2;
+		} else {
+			val->mxSpanLineImpedance = MXSPANLINEIMPEDANCE_BALANCED100OHM;
+			switch (val->mxSpanLineAttenuation) {
+			case MXSPANLINEATTENUATION_NONE:
+				val->mxSpanLineAttenuation = MXSPANLINEATTENUATION_CSU0DB;
+				/* fall through */
+			case MXSPANLINEATTENUATION_CSU0DB:
+				txlevel = 0;
+				break;
+			case MXSPANLINEATTENUATION_CSU8DB:
+				txlevel = 5;
+				break;
+			case MXSPANLINEATTENUATION_CSU15DB:
+				txlevel = 6;
+				break;
+			case MXSPANLINEATTENUATION_CSU23DB:
+				txlevel = 7;
+				break;
+			}
+		}
+		break;
+	}
+	if (sp->config.iftxlevel != txlevel) {
+		span_reconfig = 1;
+		sp->config.iftxlevel = txlevel;
+	}
+	/* mxSpanLineDelay */
+	/* mxSpanTxLevel */
+	switch (val->mxSpanTxLevel) {
+	case MXSPANTXLEVEL_ON:
+		if (!(sp->config.ifflags & SDL_IF_TX_RUNNING)) {
+			span_reconfig = 1;
+			sp->config.ifflags |= SDL_IF_TX_RUNNING;
+		}
+		break;
+	case MXSPANTXLEVEL_OFF:
+	case MXSPANTXLEVEL_OPEN:
+		if (sp->config.ifflags & SDL_IF_TX_RUNNING) {
+			span_reconfig = 1;
+			sp->config.ifflags &= ~SDL_IF_TX_RUNNING;
+		}
+		break;
+	}
+	/* mxSpanRxLevel */
+	switch (val->mxSpanRxLevel) {
+	case MXSPANRXLEVEL_ON:
+		if (!(sp->config.ifflags & SDL_IF_RX_RUNNING)) {
+			span_reconfig = 1;
+			sp->config.ifflags |= SDL_IF_RX_RUNNING;
+		}
+		break;
+	case MXSPANRXLEVEL_OFF:
+	case MXSPANRXLEVEL_OPEN:
+		if (sp->config.ifflags & SDL_IF_RX_RUNNING) {
+			span_reconfig = 1;
+			sp->config.ifflags &= ~SDL_IF_RX_RUNNING;
+		}
+		break;
+	}
+	/* mxSpanLineAlarmSettleTime */
+	/* mxSpanLineCodeTime */
+	/* mxSpanLineCode */
+	/* mxSpanReceiveThreshold */
+	if (span_reconfig && (sp->config.ifflags & SDL_IF_UP))
+		xp_span_reconfig(sp->cd, sp->span);
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_set_options_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	struct xp *xp;
+	struct mx_opt_conf_chan *val = (typeof(val)) (arg + 1);
+	uint chan_reconfig = 0;
+
+	if (IS_ERR((xp = xp_find(arg->id))) || (xp == NULL))
+		goto esrch;
+	/* mxChanType */
+	/* always MXCHANTYPE_CCS for this driver */
+	/* mxChanFormat */
+	switch (val->mxChanFormat) {
+	case MXCHANFORMAT_DS0A:
+		if (xp->sdl.config.iftype != SDL_TYPE_DS0A) {
+			chan_reconfig = 1;
+			xp->sdl.config.iftype = SDL_TYPE_DS0A;
+		}
+		break;
+	case MXCHANFORMAT_DS0:
+		if (xp->sdl.config.iftype != SDL_TYPE_DS0) {
+			chan_reconfig = 1;
+			xp->sdl.config.iftype = SDL_TYPE_DS0;
+		}
+		break;
+	case MXCHANFORMAT_E1:
+		if (xp->sdl.config.iftype != SDL_TYPE_E1) {
+			chan_reconfig = 1;
+			xp->sdl.config.iftype = SDL_TYPE_E1;
+		}
+		break;
+	case MXCHANFORMAT_T1:
+		if (xp->sdl.config.iftype != SDL_TYPE_T1) {
+			chan_reconfig = 1;
+			xp->sdl.config.iftype = SDL_TYPE_T1;
+		}
+		break;
+	case MXCHANFORMAT_J1:
+		if (xp->sdl.config.iftype != SDL_TYPE_J1) {
+			chan_reconfig = 1;
+			xp->sdl.config.iftype = SDL_TYPE_J1;
+		}
+		break;
+	}
+	switch (val->mxChanRate) {
+	case MXCHANRATE_KBITS56:
+		if (xp->sdl.config.ifrate != SDL_RATE_DS0A) {
+			chan_reconfig = 1;
+			xp->sdl.config.ifrate = SDL_RATE_DS0A;
+		}
+		break;
+	case MXCHANRATE_KBITS64:
+		if (xp->sdl.config.ifrate != SDL_RATE_DS0) {
+			chan_reconfig = 1;
+			xp->sdl.config.ifrate = SDL_RATE_DS0;
+		}
+		break;
+	case MXCHANRATE_KBITS1536:
+		if (xp->sdl.config.ifrate != SDL_RATE_T1) {
+			chan_reconfig = 1;
+			xp->sdl.config.ifrate = SDL_RATE_T1;
+		}
+		break;
+	case MXCHANRATE_KBITS1984:
+		if (xp->sdl.config.ifrate != SDL_RATE_E1) {
+			chan_reconfig = 1;
+			xp->sdl.config.ifrate = SDL_RATE_E1;
+		}
+		break;
+	}
+	switch (val->mxChanMode) {
+	case (1 << MXCHANMODE_REMOTELOOPBACK):
+		if (xp->sdl.config.ifmode != SDL_MODE_REM_LB) {
+			chan_reconfig = 1;
+			xp->sdl.config.ifmode = SDL_MODE_REM_LB;
+		}
+		break;
+	case (1 << MXCHANMODE_LOCALLOOPBACK):
+		if (xp->sdl.config.ifmode != SDL_MODE_LOC_LB) {
+			chan_reconfig = 1;
+			xp->sdl.config.ifmode = SDL_MODE_LOC_LB;
+		}
+		break;
+	case (1 << MXCHANMODE_TEST):
+		if (xp->sdl.config.ifmode != SDL_MODE_TEST) {
+			chan_reconfig = 1;
+			xp->sdl.config.ifmode = SDL_MODE_TEST;
+		}
+		break;
+	case (1 << MXCHANMODE_LOOPBACKECHO):
+		if (xp->sdl.config.ifmode != SDL_MODE_LB_ECHO) {
+			chan_reconfig = 1;
+			xp->sdl.config.ifmode = SDL_MODE_LB_ECHO;
+		}
+		break;
+	}
+	if (chan_reconfig && (xp->sdl.config.ifflags & SDL_IF_UP))
+		/* FIXME */ ;
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+
+STATIC noinline __unlikely int
+mx_set_options(queue_t *q, mblk_t *mp, mx_option_t * arg)
+{
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return mx_set_options_dflt(q, mp, arg);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:	/* card */
+		return mx_set_options_card(q, mp, arg);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		return mx_set_options_span(q, mp, arg);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return mx_set_options_chan(q, mp, arg);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		goto esrch;
+	default:
+		goto einval;
+	}
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+/**
+ * mx_iocsoption: - set options
+ * @q: active queue (management stream write queue)
+ * @mp: the input-output control
+ */
+STATIC noinline __unlikely int
+mx_iocsoption(queue_t *q, mblk_t *mp)
+{
+	mx_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
+
+	if ((ret = mx_test_options(q, mp, arg)))
+		return (ret);
+	return mx_set_options(q, mp, arg);
+}
+
+/**
+ * mx_ioclconfig: - list configuration input-output control
+ * @q: active queue (management stream write queue)
+ * @mp: the input-output control
+ *
+ * Lists as a number of unsigned integers the identifiers of all of the elements of a type that will
+ * fit into the buffer area.  When successful, returns the number of elements (whether they would
+ * fit into the buffer or not).
+ */
+STATIC noinline __unlikely int
+mx_ioclconfig(queue_t *q, mblk_t *mp)
+{
+	mx_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	uint num = 0, *val = (typeof(val)) (arg + 1);
+	struct cd *cd;
+	struct sp *sp;
+	uint span, chan;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		/* list all default objects: there is always only one */
+		if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+			*val = 0;
+		val++;
+		num++;
+		break;
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* list all existing syncrhonization groups: this driver does not support syncrhonization groups, so
+		   the list is always empty? XXX */
+		break;
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* list all equipped card ids */
+		for (cd = x400p_cards; cd; cd = cd->next, num++, val++)
+			if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+				*val = (cd->card << 12);
+		break;
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* list all equipped span ids */
+		for (cd = x400p_cards; cd; cd = cd->next) {
+			for (span = 0; span < X400_SPANS; span++, val++, num++)
+				if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+					*val = (cd->card << 12) | (span << 8);
+		}
+		break;
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		/* list all equipped channel ids */
+		for (cd = x400p_cards; cd; cd = cd->next) {
+			for (span = 0; span < X400_SPANS; span++) {
+				if ((sp = cd->spans[span])) {
+					switch (sp->config.ifgtype) {
+					case SDL_GTYPE_E1:
+						for (chan = 1; chan <= 31; chan++, val++, num++)
+							if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+								*val = (cd->card << 12) | (span << 8) | (chan << 0);
+						break;
+					case SDL_GTYPE_T1:
+						for (chan = 1; chan <= 24; chan++, val++, num++)
+							if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+								*val = (cd->card << 12) | (span << 8) | (chan << 0);
+						break;
+					case SDL_GTYPE_J1:
+						for (chan = 1; chan <= 24; chan++, val++, num++)
+							if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+								*val = (cd->card << 12) | (span << 8) | (chan << 0);
+						break;
+					}
+				}
+			}
+		}
+		break;
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* list all existing fractional ids: this driver does not support fractional, so the list is always
+		   empty */
+		break;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* list all existing cross connects: this driver does not support cross-connect, so the list is always
+		   empty */
+		break;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* list all equipped span ids capable of bert testing: this driver does not support bert, so the list
+		   is always empty */
+		break;
+	default:
+		goto einval;
+	}
+	mp->b_cont->b_wptr = (unsigned char *) val;
+	return (num);
+      einval:
+	return (-EINVAL);
+}
+
+/**
+ * mx_iocgconfig_card: - get configuration information for a card
+ * @q: active queue (management stream write queue)
+ * @mp: the input-output control
+ * @arg; the configuration structure
+ */
+STATIC noinline __unlikely int
+mx_iocgconfig_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct cd *cd;
+	struct mx_conf_card *val;
+
+	val = (typeof(val)) (arg + 1);
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if ((cd = cd_find(arg->id)) == NULL)
+		goto esrch;
+	val->mxCardIndex = cd->card;
+	switch (cd->config.ifgtype) {
+	case SDL_GTYPE_E1:
+		val->mxCardSpanType = MXCARDSPANTYPE_E1;
+		break;
+	case SDL_GTYPE_T1:
+		val->mxCardSpanType = MXCARDSPANTYPE_T1;
+		break;
+	case SDL_GTYPE_J1:
+		val->mxCardSpanType = MXCARDSPANTYPE_J1;
+		break;
+	default:
+		val->mxCardSpanType = MXCARDSPANTYPE_NONE;
+		break;
+	}
+	val->mxCardSyncGroup = 0;
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+
+/**
+ * mx_iocgconfig_span: - get configuration information for a span
+ * @q: active queue (management stream write queue)
+ * @mp: the input-output control
+ * @arg; the configuration structure
+ */
+STATIC noinline __unlikely int
+mx_iocgconfig_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct sp *sp;
+	struct mx_conf_span *val;
+
+	val = (typeof(val)) (arg + 1);
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		return (-EMSGSIZE);
+	if ((sp = sp_find(arg->id)) == NULL)
+		return (-ESRCH);
+	val->mxCardIndex = (arg->id >> 12) & 0xf;
+	val->mxSpanIndex = (arg->id >> 8) & 0xf;
+	val->mxSpanName[0] = '\0';
+	switch (sp->config.ifgtype) {
+	case SDL_GTYPE_E1:
+		val->mxSpanType = MXSPANTYPE_E1;
+		break;
+	case SDL_GTYPE_T1:
+		val->mxSpanType = MXSPANTYPE_T1;
+		break;
+	case SDL_GTYPE_J1:
+		val->mxSpanType = MXSPANTYPE_J1;
+		break;
+	case SDL_GTYPE_E2:
+		val->mxSpanType = MXSPANTYPE_E2;
+		break;
+	case SDL_GTYPE_E3:
+		val->mxSpanType = MXSPANTYPE_E3;
+		break;
+	case SDL_GTYPE_T3:
+		val->mxSpanType = MXSPANTYPE_T3;
+		break;
+	default:
+		val->mxSpanType = MXSPANTYPE_NONE;
+		break;
+	}
+	switch (sp->config.ifgcrc) {
+	case SDL_GCRC_CRC4:
+		val->mxSpanCrc = MXSPANCRC_CRC4;
+		break;
+	case SDL_GCRC_CRC5:
+		val->mxSpanCrc = MXSPANCRC_CRC5;
+		break;
+	case SDL_GCRC_CRC6:
+		val->mxSpanCrc = MXSPANCRC_CRC6;
+		break;
+	case SDL_GCRC_CRC6J:
+		val->mxSpanCrc = MXSPANCRC_CRC6J;
+		break;
+	default:
+	case SDL_GCRC_NONE:
+		val->mxSpanCrc = MXSPANCRC_NONE;
+		break;
+	}
+	switch (sp->config.ifcoding) {
+	case SDL_CODING_AMI:
+		val->mxSpanCoding = MXSPANCODING_AMI;
+		break;
+	case SDL_CODING_B6ZS:
+		val->mxSpanCoding = MXSPANCODING_B6ZS;
+		break;
+	case SDL_CODING_B8ZS:
+		val->mxSpanCoding = MXSPANCODING_B8ZS;
+		break;
+	case SDL_CODING_HDB3:
+		val->mxSpanCoding = MXSPANCODING_HDB3;
+		break;
+	default:
+	case SDL_CODING_NONE:
+	case SDL_CODING_NRZ:
+	case SDL_CODING_NRZI:
+	case SDL_CODING_AAL1:
+	case SDL_CODING_AAL2:
+	case SDL_CODING_AAL5:
+		val->mxSpanCoding = MXSPANCODING_NONE;
+		break;
+	}
+	switch (sp->config.ifframing) {
+	case SDL_FRAMING_CCS:
+		val->mxSpanFraming = MXSPANFRAMING_CCS;
+		break;
+	case SDL_FRAMING_CAS:
+		val->mxSpanFraming = MXSPANFRAMING_CAS;
+		break;
+	case SDL_FRAMING_SF: /* Same as D4 */
+		val->mxSpanFraming = MXSPANFRAMING_SF;
+		break;
+	case SDL_FRAMING_ESF:
+		val->mxSpanFraming = MXSPANFRAMING_ESF;
+		break;
+	default:
+	case SDL_FRAMING_NONE:
+		val->mxSpanFraming = MXSPANFRAMING_NONE;
+		break;
+	}
+	switch (sp->config.ifgtype) {
+	case SDL_GTYPE_E1:
+		val->mxSpanDataLink = MXSPANDATALINK_OTHER;
+		break;
+	case SDL_GTYPE_T1:
+		val->mxSpanDataLink = MXSPANDATALINK_ANSIT1403;
+		break;
+	case SDL_GTYPE_J1:
+		val->mxSpanDataLink = MXSPANDATALINK_OTHER;
+		break;
+	}
+	val->mxSpanPriority = 0;
+	val->mxSpanPrimary = 0;
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+}
+
+/**
+ * mx_iocgconfig_chan: - get configuration information for a channel
+ * @q: active queue (management stream write queue)
+ * @mp: the input-output control
+ * @arg; the configuration structure
+ */
+STATIC noinline __unlikely int
+mx_iocgconfig_chan(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct xp *xp;
+	struct mx_conf_chan *val;
+
+	val = (typeof(val)) (arg + 1);
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (IS_ERR((xp = xp_find(arg->id))))
+		goto esrch;
+	val->mxCardIndex = (arg->id >> 12) & 0x0f;
+	val->mxSpanIndex = (arg->id >> 8) & 0x0f;
+	val->mxChanIndex = (arg->id >> 0) & 0xff;
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+
+/**
+ * mx_iocgconfig: - get configuration information for an object
+ * @q: active queue (management stream write queue)
+ * @mp: the input-output control
+ * @arg; the configuration structure
+ */
+STATIC noinline __unlikely int
+mx_iocgconfig(queue_t *q, mblk_t *mp)
+{
+	mx_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	arg->cmd = MX_GET;
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		if (arg->id != 0)
+			return (-ESRCH);
+		/* there is no configuration for default */
+		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* this driver does not support synchronization groups */
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:	/* card */
+		return mx_iocgconfig_card(q, mp, arg);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		return mx_iocgconfig_span(q, mp, arg);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return mx_iocgconfig_chan(q, mp, arg);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* this driver does not support fractionals */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* this driver does not support cross-connect */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* this driver does not support bert testing */
+		goto esrch;
+	default:
+		goto einval;
+	}
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+STATIC noinline __unlikely int
+mx_test_config_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct cd *cd;
+	struct mx_conf_card *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		return (-EMSGSIZE);
+	if ((cd = cd_find(arg->id)) == NULL)
+		goto esrch;
+	if (val->mxCardIndex != cd->card)
+		goto einval;
+	switch (val->mxCardSpanType) {
+	case MXSPANTYPE_E1:
+		switch (cd->device) {
+		case XP_DEV_DS2152:
+		case XP_DEV_DS21352:
+		case XP_DEV_DS21552:
+			/* These chips do not support E1. */
+			goto einval;
+		}
+		/* These cards do not support E1. */
+		switch (cd->board) {
+		case PLX9030:
+		case PLXDEVBRD:
+		case T400P:
+		case T400PSS7:
+		case V400PT:
+		case V401PT:	/* XXX? */
+			goto einval;
+		}
+		break;
+	case MXSPANTYPE_T1:
+	case MXSPANTYPE_J1:
+		switch (cd->device) {
+		case XP_DEV_DS2152:
+			/* This chip does not support J1. */
+			if (val->mxCardSpanType == MXSPANTYPE_J1)
+				goto einval;
+			break;
+		case XP_DEV_DS2154:
+		case XP_DEV_DS21354:
+		case XP_DEV_DS21554:
+			/* These chips do not support T1 or J1. */
+			goto einval;
+		}
+		/* These cards do not support T1 or J1. */
+		switch (cd->board) {
+		case E400P:
+		case E400PSS7:
+		case V400PE:
+		case V401PE:	/* XXX? */
+			goto einval;
+		}
+		break;
+		break;
+	default:
+	case MXSPANTYPE_E2:
+	case MXSPANTYPE_E3:
+	case MXSPANTYPE_T3:
+		/* these are not applicable */
+		goto einval;
+	case MXSPANTYPE_NONE:
+		/* don't change modes at all */
+		switch (cd->config.ifgtype) {
+		case SDL_GTYPE_E1:
+			val->mxCardSpanType = MXCARDSPANTYPE_E1;
+			break;
+		case SDL_GTYPE_T1:
+			val->mxCardSpanType = MXCARDSPANTYPE_T1;
+			break;
+		case SDL_GTYPE_J1:
+			val->mxCardSpanType = MXCARDSPANTYPE_J1;
+			break;
+		case SDL_GTYPE_E2:
+			val->mxCardSpanType = MXCARDSPANTYPE_E1;
+			break;
+		case SDL_GTYPE_E3:
+			val->mxCardSpanType = MXCARDSPANTYPE_E1;
+			break;
+		case SDL_GTYPE_T3:
+			val->mxCardSpanType = MXCARDSPANTYPE_T1;
+			break;
+		default:
+			val->mxCardSpanType = MXCARDSPANTYPE_NONE;
+			break;
+		}
+		break;
+	}
+	/* the driver only supports one large default synchronization group */
+	if (val->mxCardSyncGroup != 0)
+		goto einval;
+	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
+	return (0);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+STATIC noinline __unlikely int
+mx_test_config_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct sp *sp;
+	struct cd *cd;
+	struct mx_conf_span *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if ((sp = sp_find(arg->id)) == NULL)
+		goto esrch;
+	cd = sp->cd;
+	if (val->mxCardIndex != cd->card)
+		goto einval;
+	if (val->mxSpanIndex != sp->span)
+		goto einval;
+	switch (val->mxSpanType) {
+		/* affects configuration of channels */
+	case MXSPANTYPE_NONE:
+		/* leave it at whatever it is already set to */
+		switch (sp->config.ifgtype) {
+		case SDL_GTYPE_E1:
+			val->mxSpanType = MXSPANTYPE_E1;
+			break;
+		case SDL_GTYPE_T1:
+			val->mxSpanType = MXSPANTYPE_T1;
+			break;
+		case SDL_GTYPE_J1:
+			val->mxSpanType = MXSPANTYPE_J1;
+			break;
+		}
+		break;
+	case MXSPANTYPE_T1:
+	case MXSPANTYPE_J1:
+		/* span cannot be different from board mode unless it is just the difference between T1 and J1: is this 
+		   really true? I think that the card's internal clock and external bus clock is either E1 or T1 rate,
+		   however, there is nothing really stopping using self timing.  There is even a way of using the
+		   jitter attenuator to run T1 off of an E1 clock, but simplify things for now. */
+		if (cd->config.ifgtype == SDL_GTYPE_E1)
+			goto einval;
+		break;
+	case MXSPANTYPE_E1:
+		/* span cannot be different from board mode unless it is just the difference between T1 and J1: is this 
+		   really true? I think that the card's internal clock and external bus clock is either E1 or T1 rate,
+		   however, there is nothing really stopping using self timing.  There is even a way of using the
+		   jitter attenuator to run T1 off of an E1 clock, but simplify things for now. */
+		if (cd->config.ifgtype != SDL_GTYPE_E1)
+			goto einval;
+		break;
+	default:
+	case MXSPANTYPE_E2:
+	case MXSPANTYPE_E3:
+	case MXSPANTYPE_T3:
+		goto einval;
+	}
+	if (val->mxSpanCrc == MXSPANCRC_NONE) {
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			val->mxSpanCrc = MXSPANCRC_CRC4;
+			break;
+		case SDL_GCRC_CRC5:
+			val->mxSpanCrc = MXSPANCRC_CRC5;
+			break;
+		case SDL_GCRC_CRC6:
+			val->mxSpanCrc = MXSPANCRC_CRC6;
+			break;
+		case SDL_GCRC_CRC6J:
+			val->mxSpanCrc = MXSPANCRC_CRC6J;
+			break;
+		}
+	}
+	if (val->mxSpanCoding == MXSPANCODING_NONE) {
+		switch (sp->config.ifcoding) {
+		case SDL_CODING_AMI:
+			val->mxSpanCoding = MXSPANCODING_AMI;
+			break;
+		case SDL_CODING_B6ZS:
+			val->mxSpanCoding = MXSPANCODING_B6ZS;
+			break;
+		case SDL_CODING_B8ZS:
+			val->mxSpanCoding = MXSPANCODING_B8ZS;
+			break;
+		case SDL_CODING_HDB3:
+			val->mxSpanCoding = MXSPANCODING_HDB3;
+			break;
+		}
+	}
+	if (val->mxSpanFraming == MXSPANFRAMING_NONE) {
+		switch (sp->config.ifframing) {
+		case SDL_FRAMING_CCS:
+			val->mxSpanFraming = MXSPANFRAMING_CCS;
+			break;
+		case SDL_FRAMING_CAS:
+			val->mxSpanFraming = MXSPANFRAMING_CAS;
+			break;
+		case SDL_FRAMING_SF: /* SDL_FRAMING_D4 is the same */
+			val->mxSpanFraming = MXSPANFRAMING_SF;
+			break;
+		case SDL_FRAMING_ESF:
+			val->mxSpanFraming = MXSPANFRAMING_ESF;
+			break;
+		}
+	}
+	/* the setting of CRC must be consistent with mode and framing */
+	switch (val->mxSpanCrc) {
+	case MXSPANCRC_NONE:
+		break;
+	case MXSPANCRC_CRC4:	/* E1 CAS */
+		if (val->mxSpanType != MXSPANTYPE_E1)
+			goto einval;
+		if (val->mxSpanFraming != MXSPANFRAMING_CAS)
+			goto einval;
+		break;
+	case MXSPANCRC_CRC5:	/* E1 CCS */
+		if (val->mxSpanType != MXSPANTYPE_E1)
+			goto einval;
+		if (val->mxSpanFraming != MXSPANFRAMING_CCS)
+			goto einval;
+		break;
+	case MXSPANCRC_CRC6:	/* T1 */
+		if (val->mxSpanType != MXSPANTYPE_T1)
+			goto einval;
+		break;
+	case MXSPANCRC_CRC6J:	/* J1 */
+		if (val->mxSpanType != MXSPANTYPE_J1)
+			goto einval;
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanCoding) {
+	case MXSPANCODING_NONE:
+		break;
+	case MXSPANCODING_AMI:
+		/* ok for all modes and framing */
+		break;
+	case MXSPANCODING_B6ZS:
+	case MXSPANCODING_B8ZS:
+		if (val->mxSpanType == MXSPANTYPE_E1)
+			goto einval;
+		break;
+	case MXSPANCODING_HDB3:
+		if (val->mxSpanType != MXSPANTYPE_E1)
+			goto einval;
+		break;
+	case MXSPANCODING_JBZS:
+	case MXSPANCODING_ZBTSI:
+		/* not supported by driver */
+		goto einval;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanFraming) {
+	case MXSPANFRAMING_NONE:
+		break;
+	case MXSPANFRAMING_CCS:
+		if (val->mxSpanType != MXSPANTYPE_E1)
+			goto einval;
+		if (val->mxSpanCrc != MXSPANCRC_CRC5)
+			goto einval;
+		break;
+	case MXSPANFRAMING_CAS:
+		if (val->mxSpanType != MXSPANTYPE_E1)
+			goto einval;
+		if (val->mxSpanCrc != MXSPANCRC_CRC4)
+			goto einval;
+		break;
+	case MXSPANFRAMING_SF:
+		if (val->mxSpanType != MXSPANTYPE_T1)
+			goto einval;
+		if (val->mxSpanCrc != MXSPANCRC_CRC6)
+			goto einval;
+		break;
+	case MXSPANFRAMING_D4:
+		if (val->mxSpanType != MXSPANTYPE_T1)
+			goto einval;
+		if (val->mxSpanCrc != MXSPANCRC_CRC6)
+			goto einval;
+		break;
+	case MXSPANFRAMING_ESF:
+		if (val->mxSpanType != MXSPANTYPE_T1 && val->mxSpanType != MXSPANTYPE_J1)
+			goto einval;
+		if (val->mxSpanCrc != MXSPANCRC_CRC6 && val->mxSpanCrc != MXSPANCRC_CRC6J)
+			goto einval;
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->mxSpanDataLink) {
+	case MXSPANDATALINK_ANSIT1403:
+		if (val->mxSpanType != MXSPANTYPE_T1 && val->mxSpanType != MXSPANTYPE_J1)
+			goto einval;
+		break;
+	case MXSPANDATALINK_ATT54016:
+		if (val->mxSpanType != MXSPANTYPE_T1)
+			goto einval;
+		break;
+	case MXSPANDATALINK_OTHER:
+		break;
+	default:
+		goto einval;
+	}
+	if (val->mxSpanPriority != 0) {
+		if (1 > val->mxSpanPriority || val->mxSpanPriority > 4)
+			goto einval;
+	}
+	/* this driver does not support primary backup */
+	if (val->mxSpanPrimary != 0)
+		goto einval;
+	return (0);
+emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+STATIC noinline __unlikely int
+mx_test_config_chan(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct cd *cd;
+	struct sp *sp;
+	struct xp *xp;
+	struct mx_conf_chan *val = (typeof(val)) (arg + 1);
+	uint chan;
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (!(cd = cd_find(arg->id)))
+		goto esrch;
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	if (IS_ERR((xp = xp_find(arg->id))))
+		goto esrch;
+	chan = (arg->id >> 0) & 0xff;
+	if (val->mxCardIndex != cd->card)
+		goto einval;
+	if (val->mxSpanIndex != sp->span)
+		goto einval;
+	switch (sp->config.ifgtype) {
+	default:
+	case SDL_GTYPE_E1:
+		if (1 > chan || chan > 31)
+			goto einval;
+		break;
+	case SDL_GTYPE_T1:
+	case SDL_GTYPE_J1:
+		if (1 > chan || chan > 24)
+			goto einval;
+		break;
+	}
+	return (0);
+emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+/**
+ * mx_test_config: - test MX configuration request for consistency
+ * @q: active queue (management stream write queue)
+ * @mp: the message (M_IOCTL)
+ * @arg: pointer to input-output control argument
+ *
+ * Tests a configuration.  This is particularly useful for interfacing with SNMP agents.
+ */
+STATIC noinline __unlikely int
+mx_test_config(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	switch (arg->cmd) {
+	case MX_CHA:
+	case MX_TST:
+	case MX_COM:
+		break;
+	default:
+	case MX_ADD:
+	case MX_DEL:
+		/* cannot add or delete entries */
+		goto einval;
+	case MX_GET:
+		/* wrong way to get entries */
+		goto einval;
+	}
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:
+		if (arg->id != 0)
+			goto esrch;
+		break;
+	case MX_OBJ_TYPE_SYNC:
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:
+		return mx_test_config_card(q, mp, arg);
+	case MX_OBJ_TYPE_SPAN:
+		return mx_test_config_span(q, mp, arg);
+	case MX_OBJ_TYPE_CHAN:
+		return mx_test_config_chan(q, mp, arg);
+	case MX_OBJ_TYPE_FRAC:
+		/* fractionals not supported by this driver */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:
+		/* cross-connect not supported by this driver */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:
+		/* bert not supported by this driver */
+		goto esrch;
+	default:
+		goto einval;
+	}
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+
+static noinline __unlikely int
+mx_commit_config_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct cd *cd;
+	struct sp *sp;
+	struct xp *xp;
+	struct mx_conf_card *val = (typeof(val)) (arg + 1);
+	uint span, chan, slot;
+	uint card_reconfig = 0, span_reconfig = 0, chan_reconfig = 0;
+
+	if (!(cd = cd_find(arg->id)))
+		goto esrch;
+	switch (val->mxCardSpanType) {
+	case MXCARDSPANTYPE_NONE:
+		break;
+	case MXCARDSPANTYPE_E1:
+		if (cd->config.ifgtype != SDL_GTYPE_E1) {
+			card_reconfig |= (1 << cd->card);
+			cd->config.ifgtype = SDL_GTYPE_E1;
+			for (span = 0; span < X400_SPANS; span++) {
+				if ((sp = cd->spans[span])) {
+					if (sp->config.ifgtype != SDL_GTYPE_E1) {
+						span_reconfig |= (1 << sp->span);
+						sp->config.ifgtype = SDL_GTYPE_E1;
+						sp->config.ifgcrc = SDL_GCRC_CRC5;
+						sp->config.ifcoding = SDL_CODING_HDB3;
+						sp->config.ifframing = SDL_FRAMING_CCS;
+						for (chan = 1; chan <= 31; chan++) {
+							slot = xp_e1_chan_map[chan - 1];
+							if ((xp = sp->slots[slot])) {
+								chan_reconfig |= (1 << (chan - 1));
+								xp->sdl.config.ifgtype = SDL_GTYPE_E1;
+								xp->sdl.config.ifgcrc = SDL_GCRC_CRC5;
+								xp->sdl.config.ifcoding = SDL_CODING_HDB3;
+								xp->sdl.config.ifframing = SDL_FRAMING_CCS;
+								switch (xp->sdl.config.iftype) {
+								case SDL_TYPE_T1:
+								case SDL_TYPE_J1:
+									xp->sdl.config.iftype = SDL_TYPE_E1;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		break;
+	case MXCARDSPANTYPE_T1:
+		if (cd->config.ifgtype != SDL_GTYPE_T1) {
+			card_reconfig |= (1 << cd->card);
+			cd->config.ifgtype = SDL_GTYPE_T1;
+			for (span = 0; span < X400_SPANS; span++) {
+				if ((sp = cd->spans[span])) {
+					if (sp->config.ifgtype != SDL_GTYPE_T1) {
+						span_reconfig |= (1 << sp->span);
+						switch (sp->config.ifgtype) {
+						case SDL_GTYPE_J1:
+							sp->config.ifgtype = SDL_GTYPE_T1;
+							sp->config.ifgcrc = SDL_GCRC_CRC6;
+							for (chan = 1; chan <= 24; chan++) {
+								slot = xp_t1_chan_map[chan - 1];
+								if ((xp = sp->slots[slot])) {
+									chan_reconfig |= (1 << (chan - 1));
+									xp->sdl.config.ifgtype = SDL_GTYPE_T1;
+									xp->sdl.config.ifgcrc = SDL_GCRC_CRC6;
+									switch (xp->sdl.config.iftype) {
+									case SDL_TYPE_J1:
+										xp->sdl.config.iftype = SDL_TYPE_T1;
+									}
+								}
+							}
+							break;
+						case SDL_GTYPE_E1:
+							sp->config.ifgtype = SDL_GTYPE_T1;
+							sp->config.ifgcrc = SDL_GCRC_CRC6;
+							sp->config.ifcoding = SDL_CODING_B8ZS;
+							sp->config.ifframing = SDL_FRAMING_ESF;
+							for (chan = 1; chan <= 24; chan++) {
+								slot = xp_t1_chan_map[chan - 1];
+								if ((xp = sp->slots[slot])) {
+									chan_reconfig |= (1 << (chan - 1));
+									xp->sdl.config.ifgtype = SDL_GTYPE_T1;
+									xp->sdl.config.ifgcrc = SDL_GCRC_CRC6;
+									xp->sdl.config.ifcoding = SDL_CODING_B8ZS;
+									xp->sdl.config.ifframing = SDL_FRAMING_ESF;
+									switch (xp->sdl.config.iftype) {
+									case SDL_TYPE_E1:
+										xp->sdl.config.iftype = SDL_TYPE_T1;
+									}
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+		break;
+	case MXCARDSPANTYPE_J1:
+		if (cd->config.ifgtype != SDL_GTYPE_J1) {
+			card_reconfig |= (1 << cd->card);
+			cd->config.ifgtype = SDL_GTYPE_J1;
+			for (span = 0; span < X400_SPANS; span++) {
+				if ((sp = cd->spans[span])) {
+					if (sp->config.ifgtype != SDL_GTYPE_J1) {
+						span_reconfig |= (1 << sp->span);
+						switch (sp->config.ifgtype) {
+						case SDL_GTYPE_T1:
+							sp->config.ifgtype = SDL_GTYPE_J1;
+							sp->config.ifgcrc = SDL_GCRC_CRC6J;
+							for (chan = 1; chan <= 24; chan++) {
+								slot = xp_t1_chan_map[chan - 1];
+								if ((xp = sp->slots[slot])) {
+									chan_reconfig |= (1 << (chan - 1));
+									xp->sdl.config.ifgtype = SDL_GTYPE_J1;
+									xp->sdl.config.ifgcrc = SDL_GCRC_CRC6J;
+									switch (xp->sdl.config.iftype) {
+									case SDL_TYPE_T1:
+										xp->sdl.config.iftype = SDL_TYPE_J1;
+									}
+								}
+							}
+							break;
+						case SDL_GTYPE_E1:
+							sp->config.ifgtype = SDL_GTYPE_J1;
+							sp->config.ifgcrc = SDL_GCRC_CRC6J;
+							sp->config.ifcoding = SDL_CODING_B8ZS;
+							sp->config.ifframing = SDL_FRAMING_ESF;
+							for (chan = 1; chan <= 24; chan++) {
+								slot = xp_t1_chan_map[chan - 1];
+								if ((xp = sp->slots[slot])) {
+									chan_reconfig |= (1 << (chan - 1));
+									xp->sdl.config.ifgtype = SDL_GTYPE_J1;
+									xp->sdl.config.ifgcrc = SDL_GCRC_CRC6J;
+									xp->sdl.config.ifcoding = SDL_CODING_B8ZS;
+									xp->sdl.config.ifframing = SDL_FRAMING_ESF;
+									switch (xp->sdl.config.iftype) {
+									case SDL_TYPE_E1:
+										xp->sdl.config.iftype = SDL_TYPE_J1;
+									}
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+		break;
+	}
+	if (card_reconfig && (cd->config.ifflags & SDL_IF_UP)) {
+		xp_card_reconfig(cd);
+		for (span = 0; span < X400_SPANS; span++) {
+			if ((sp = cd->spans[span])) {
+				if ((span_reconfig & (1 << span)) && (sp->config.ifflags & SDL_IF_UP)) {
+					xp_span_reconfig(cd, span);
+					switch (sp->config.ifgtype) {
+					case SDL_GTYPE_E1:
+						for (chan = 1; chan <= 31; chan++) {
+							slot = xp_e1_chan_map[chan - 1];
+							if ((xp = sp->slots[slot])) {
+								if ((chan_reconfig & (1 << (chan - 1))) && xp->sdl.config.ifflags & SDL_IF_UP) {
+									/* xp_chan_reconfig(xp); */
+								}
+							}
+						}
+						break;
+					case SDL_GTYPE_T1:
+					case SDL_GTYPE_J1:
+						for (chan = 1; chan <= 24; chan++) {
+							slot = xp_t1_chan_map[chan - 1];
+							if ((xp = sp->slots[slot])) {
+								if ((chan_reconfig & (1 << (chan - 1))) && xp->sdl.config.ifflags & SDL_IF_UP) {
+									/* xp_chan_reconfig(xp); */
+								}
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+
+static noinline __unlikely int
+mx_commit_config_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct sp *sp;
+
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+
+static noinline __unlikely int
+mx_commit_config_chan(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	struct xp *xp;
+
+	if (IS_ERR((xp = xp_find(arg->id))))
+		goto esrch;
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+
+/**
+ * mx_commit_config: - test and commit MX configuration request
+ * @q: active queue (management stream write queue)
+ * @mp: the message (M_IOCTL)
+ * @arg: pointer to input-output control argument
+ *
+ * Commits a configuration.  It can be assumed that mx_test_config() has already passed and the
+ * request is internally consistent.  This is particularly useful for interfacing with SNMP agents.
+ */
+static noinline __unlikely int
+mx_commit_config(queue_t *q, mblk_t *mp, mx_config_t * arg)
+{
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		if (arg->id != 0)
+			goto esrch;
+		/* not configuration to commit */
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* syncrhonization groups not supported by driver */
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:	/* card */
+		return mx_commit_config_card(q, mp, arg);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		return mx_commit_config_span(q, mp, arg);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return mx_commit_config_chan(q, mp, arg);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* fractionals not supported by driver */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* cross-connect not supported by driver */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* bert not supported by driver */
+		goto esrch;
+	}
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocsconfig(queue_t *q, mblk_t *mp)
+{
+	mx_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
+
+	switch (arg->cmd) {
+	case MX_ADD:
+	case MX_CHA:
+	case MX_DEL:
+		break;
+	default:
+		return (-EINVAL);
+	}
+	if ((ret = mx_test_config(q, mp, arg)))
+		return (ret);
+	return mx_commit_config(q, mp, arg);
+}
+STATIC noinline __unlikely int
+mx_ioctconfig(queue_t *q, mblk_t *mp)
+{
+	mx_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	arg->cmd = MX_TST;
+	return mx_test_config(q, mp, arg);
+}
+STATIC noinline __unlikely int
+mx_ioccconfig(queue_t *q, mblk_t *mp)
+{
+	mx_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	arg->cmd = MX_COM;
+	return mx_commit_config(q, mp, arg);
+}
+STATIC noinline __unlikely int
+mx_iocgstatem(queue_t *q, mblk_t *mp)
+{
+	mx_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		if (arg->id != 0)
+			return (-ESRCH);
+		/* no state information for default */
+		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+	{
+		/* this driver does not support synchronization groups */
+		return (-ESRCH);
+	}
+	case MX_OBJ_TYPE_CARD:	/* card */
+	{
+		struct cd *cd;
+
+		if ((cd = cd_find(arg->id)) == NULL)
+			return (-ESRCH);
+		/* no state information for cards */
+		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
+		return (0);
+	}
+	case MX_OBJ_TYPE_SPAN:	/* span */
+	{
+		struct sp *sp;
+
+		if ((sp = sp_find(arg->id)) == NULL)
+			return (-ESRCH);
+		/* no state information for spans */
+		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
+		return (0);
+	}
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+	{
+		struct sp *sp;
+		uint chan;
+
+		if ((sp = sp_find(arg->id)) == NULL)
+			return (-ESRCH);
+		chan = arg->id & 0xff;
+		switch (sp->config.ifgtype) {
+		case SDL_GTYPE_E1:
+			if (1 > chan || chan > 31)
+				return (-ESRCH);
+			break;
+		case SDL_GTYPE_T1:
+		case SDL_GTYPE_J1:
+			if (1 > chan || chan > 24)
+				return (-ESRCH);
+			break;
+		default:
+			return (-ESRCH);
+		}
+		/* no state information for channels */
+		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
+		return (0);
+	}
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+	{
+		/* this driver does not support fractionals */
+		return (-ESRCH);
+	}
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+	{
+		/* this driver does not support cross-connect */
+		return (-ESRCH);
+	}
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+	{
+		/* this driver does not support bert */
+		return (-ESRCH);
+	}
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_ioccmreset(queue_t *q, mblk_t *mp)
+{
+	mx_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+	case MX_OBJ_TYPE_CARD:	/* card */
+	case MX_OBJ_TYPE_SPAN:	/* span */
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		return (0);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+
+STATIC noinline __unlikely int
+mx_iocgstatus_card(queue_t *q, mblk_t *mp, mx_status_t * arg)
+{
+	struct cd *cd;
+	struct mx_status_card *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if ((cd = cd_find(arg->id)) == NULL)
+		goto esrch;
+	/* mxCardAdministrativeState */
+	if (cd->config.ifflags & SDL_IF_UP)
+		val->mxCardAdministrativeState = X721_ADMINISTRATIVESTATE_UNLOCKED;
+	else
+		val->mxCardAdministrativeState = X721_ADMINISTRATIVESTATE_LOCKED;
+	/* mxCardOperationalState */
+	/* mxCardUsageState */
+	if (!(cd->config.ifflags & SDL_IF_UP)) {
+		val->mxCardOperationalState = X721_OPERATIONALSTATE_DISABLED;
+		val->mxCardUsageState = X721_USAGESTATE_IDLE;
+		val->mxCardAvailabilityStatus = 0;
+		val->mxCardAlarmStatus = 0;
+	} else {
+		uint span, used = 0, busy = 1, depend = 0, alarms = 0;
+
+		val->mxCardOperationalState = X721_OPERATIONALSTATE_ENABLED;
+		for (span = 0; span < X400_SPANS; span++) {
+			struct sp *sp;
+
+			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
+				if (sp->config.ifgtype == SDL_GTYPE_E1) {
+					uint chan;
+
+					for (chan = 1; chan <= 31; chan++) {
+						struct xp *xp;
+
+						if ((xp = sp->slots[xp_e1_chan_map[chan - 1]])) {
+							used = 1;
+						} else {
+							busy = 0;
+						}
+					}
+				} else {
+					uint chan;
+
+					for (chan = 1; chan <= 24; chan++) {
+						struct xp *xp;
+
+						if ((xp = sp->slots[xp_t1_chan_map[chan - 1]])) {
+							used = 1;
+						} else {
+							busy = 0;
+						}
+					}
+				}
+				alarms |= sp->config.ifalarms;
+			} else {
+				depend = 1;
+			}
+		}
+		if (busy) {
+			val->mxCardUsageState = X721_USAGESTATE_BUSY;
+		} else if (used) {
+			val->mxCardUsageState = X721_USAGESTATE_ACTIVE;
+		} else {
+			val->mxCardUsageState = X721_USAGESTATE_IDLE;
+		}
+		if (depend) {
+			val->mxCardAvailabilityStatus = (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
+		} else {
+			val->mxCardAvailabilityStatus = 0;
+		}
+		val->mxCardAlarmStatus = 0;
+		if (alarms & SDL_ALARM_YEL) {
+			val->mxCardAlarmStatus |= X721_ALARMSTATUS_MINOR;
+			val->mxCardAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEGRADED);
+		}
+		if (alarms & SDL_ALARM_RED) {
+			val->mxCardAlarmStatus |= X721_ALARMSTATUS_MAJOR;
+			val->mxCardAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_FAILED);
+		}
+		if (alarms & SDL_ALARM_BLU) {
+			val->mxCardAlarmStatus |= X721_ALARMSTATUS_ALARMOUTSTANDING;
+			val->mxCardAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
+		}
+	}
+	/* mxCardAlarmStatus */
+	/* mxCardProceduralStatus */
+	val->mxCardProceduralStatus = 0;
+	if (!(cd->config.ifflags & SDL_IF_UP))
+		val->mxCardProceduralStatus |= (1 << X721_PROCEDURALSTATUS_INITIALIZATIONREQUIRED);
+	if (!(cd->config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING)))
+		val->mxCardProceduralStatus |= (1 << X721_PROCEDURALSTATUS_NOTINITIALIZED);
+	/* mxCardAvailabilityStatus */
+	/* mxCardControlStatus */
+	val->mxCardControlStatus = 0;
+	if (!(cd->config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING))
+	    && (val->mxCardUsageState != X721_USAGESTATE_IDLE))
+		val->mxCardControlStatus |= (1 << X721_CONTROLSTATUS_SUSPENDED);
+	/* mxCardUnknownStatus */
+	val->mxCardUnknownStatus = X721_UNKNOWNSTATUS_FALSE;
+	/* mxCardStandbyStatus */
+	val->mxCardStandbyStatus = X721_STANDBYSTATUS_PROVIDINGSERVICE;
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocgstatus_span(queue_t *q, mblk_t *mp, mx_status_t * arg)
+{
+	struct sp *sp;
+	struct mx_status_span *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	/* mxSpanAdministrativeState */
+	if (sp->config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING))
+		val->mxSpanAdministrativeState = X721_ADMINISTRATIVESTATE_UNLOCKED;
+	else
+		val->mxSpanAdministrativeState = X721_ADMINISTRATIVESTATE_LOCKED;
+	/* mxSpanOperationalState */
+	if (!(sp->config.ifflags & SDL_IF_UP)) {
+		val->mxSpanOperationalState = X721_OPERATIONALSTATE_DISABLED;
+		val->mxSpanUsageState = X721_USAGESTATE_IDLE;
+		val->mxSpanAvailabilityStatus = 0;
+		val->mxSpanAlarmStatus = 0;
+		val->mxSpanAlarms = 0;
+	} else {
+		uint used = 0, busy = 1;
+
+		val->mxSpanOperationalState = X721_OPERATIONALSTATE_ENABLED;
+
+		if (sp->config.ifgtype == SDL_GTYPE_E1) {
+			uint chan;
+
+			for (chan = 1; chan <= 31; chan++) {
+				struct xp *xp;
+
+				if ((xp = sp->slots[xp_e1_chan_map[chan - 1]])) {
+					used = 1;
+				} else {
+					busy = 0;
+				}
+			}
+		} else {
+			uint chan;
+
+			for (chan = 1; chan <= 24; chan++) {
+				struct xp *xp;
+
+				if ((xp = sp->slots[xp_t1_chan_map[chan - 1]])) {
+					used = 1;
+				} else {
+					busy = 0;
+				}
+			}
+		}
+		if (busy) {
+			val->mxSpanUsageState = X721_USAGESTATE_BUSY;
+		} else if (used) {
+			val->mxSpanUsageState = X721_USAGESTATE_ACTIVE;
+		} else {
+			val->mxSpanUsageState = X721_USAGESTATE_IDLE;
+		}
+		if (!(sp->cd->config.ifflags & SDL_IF_UP) || !(sp->cd->config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING)))
+			val->mxSpanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
+		else
+			val->mxSpanAvailabilityStatus = 0;
+		/* mxSpanAlarms */
+		val->mxSpanAlarms = 0;
+		if (sp->config.ifalarms & SDL_ALARM_YEL) {
+			val->mxSpanAlarms |= (1 << MXSPANALARMS_YELLOW);
+			val->mxSpanAlarmStatus |= X721_ALARMSTATUS_MINOR;
+			val->mxSpanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEGRADED);
+		}
+		if (sp->config.ifalarms & SDL_ALARM_RED) {
+			val->mxSpanAlarms |= (1 << MXSPANALARMS_RED);
+			val->mxSpanAlarmStatus |= X721_ALARMSTATUS_MAJOR;
+			val->mxSpanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_FAILED);
+		}
+		if (sp->config.ifalarms & SDL_ALARM_BLU) {
+			val->mxSpanAlarms |= (1 << MXSPANALARMS_BLUE);
+			val->mxSpanAlarmStatus |= X721_ALARMSTATUS_ALARMOUTSTANDING;
+			val->mxSpanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
+		}
+		if (sp->config.ifalarms & SDL_ALARM_REC) {
+			val->mxSpanAlarms |= (1 << MXSPANALARMS_RECOVERY);
+		}
+	}
+	/* mxSpanUsageState */
+	/* mxSpanAlarmStatus */
+	/* mxSpanProceduralStatus */
+	val->mxSpanProceduralStatus = 0;
+	if (!(sp->config.ifflags & SDL_IF_UP))
+		val->mxSpanProceduralStatus |= (1 << X721_PROCEDURALSTATUS_INITIALIZATIONREQUIRED);
+	if (!(sp->config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING)))
+		val->mxSpanProceduralStatus |= (1 << X721_PROCEDURALSTATUS_NOTINITIALIZED);
+	/* mxSpanAvailabilityStatus */
+	/* mxSpanControlStatus */
+	val->mxSpanControlStatus = 0;
+	if (!(sp->config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING))
+	    && (val->mxSpanUsageState != X721_USAGESTATE_IDLE))
+		val->mxSpanControlStatus |= (1 << X721_CONTROLSTATUS_SUSPENDED);
+	/* mxSpanStandbyStatus */
+	val->mxSpanStandbyStatus = X721_STANDBYSTATUS_PROVIDINGSERVICE;
+	/* mxSpanUnknownStatus */
+	val->mxSpanUnknownStatus = X721_UNKNOWNSTATUS_FALSE;
+	/* mxSpanLoopbackStatus */
+	val->mxSpanLoopbackStatus = 0;	/* for now */
+	/* mxSpanLineStatus */
+	val->mxSpanLineStatus = (1 << MXSPANLINESTATUS_NONE);	/* for now */
+	/* mxSpanEvents */
+	val->mxSpanEvents = 0;	/* for now */
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocgstatus_chan(queue_t *q, mblk_t *mp, mx_status_t * arg)
+{
+	struct xp *xp;
+	struct mx_status_chan *val = (typeof(val)) (arg + 1);
+
+	if ((unsigned char *) val + sizeof(val) > mp->b_cont->b_wptr)
+		goto emsgsize;
+	if (IS_ERR((xp = xp_find(arg->id))))
+		goto esrch;
+	/* mxChanAdministrativeState */
+	if (!xp || xp->sdl.config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING))
+		val->mxChanAdministrativeState = X721_ADMINISTRATIVESTATE_UNLOCKED;
+	else
+		val->mxChanAdministrativeState = X721_ADMINISTRATIVESTATE_LOCKED;
+	val->mxChanAlarmStatus = 0;
+	/* mxChanOperationalState */
+	if (!xp || !(xp->sdl.config.ifflags & SDL_IF_UP)) {
+		val->mxChanOperationalState = X721_OPERATIONALSTATE_DISABLED;
+		val->mxChanUsageState = X721_USAGESTATE_IDLE;
+		val->mxChanAvailabilityStatus = 0;
+	} else {
+		val->mxChanOperationalState = X721_OPERATIONALSTATE_ENABLED;
+		val->mxChanUsageState = X721_USAGESTATE_BUSY;
+		if (!xp || !(xp->sp->config.ifflags & SDL_IF_UP) || !(xp->sp->config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING)))
+			val->mxChanAvailabilityStatus = (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
+		else
+			val->mxChanAvailabilityStatus = 0;
+		if (xp) {
+			if (xp->sp->config.ifalarms & SDL_ALARM_YEL) {
+				val->mxChanAlarmStatus |= X721_ALARMSTATUS_MINOR;
+				val->mxChanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEGRADED);
+			}
+			if (xp->sp->config.ifalarms & SDL_ALARM_RED) {
+				val->mxChanAlarmStatus |= X721_ALARMSTATUS_MAJOR;
+				val->mxChanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_FAILED);
+			}
+			if (xp->sp->config.ifalarms & SDL_ALARM_BLU) {
+				val->mxChanAlarmStatus |= X721_ALARMSTATUS_ALARMOUTSTANDING;
+				val->mxChanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
+			}
+		}
+	}
+	/* mxChanUsageState */
+	/* mxChanAvailabilityStatus */
+	/* mxChanControlStatus */
+	val->mxChanControlStatus = 0;
+	if (!(xp->sdl.config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING))
+	    && (val->mxChanUsageState != X721_USAGESTATE_IDLE))
+		val->mxChanControlStatus |= (1 << X721_CONTROLSTATUS_SUSPENDED);
+	/* mxChanProceduralStatus */
+	val->mxChanProceduralStatus = 0;
+	if (!(xp->sdl.config.ifflags & SDL_IF_UP))
+		val->mxChanProceduralStatus |= (1 << X721_PROCEDURALSTATUS_INITIALIZATIONREQUIRED);
+	if (!(xp->sdl.config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING)))
+		val->mxChanProceduralStatus |= (1 << X721_PROCEDURALSTATUS_NOTINITIALIZED);
+	/* mxChanAlarmStatus */
+	/* mxChanStandbyStatus */
+	val->mxChanStandbyStatus = X721_STANDBYSTATUS_PROVIDINGSERVICE;
+	return (0);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+mx_iocgstatus(queue_t *q, mblk_t *mp)
+{
+	mx_status_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:	/* card */
+		return mx_iocgstatus_card(q, mp, arg);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		return mx_iocgstatus_span(q, mp, arg);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return mx_iocgstatus_chan(q, mp, arg);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		goto esrch;
+	default:
+		goto einval;
+	}
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_iocsstatus(queue_t *q, mblk_t *mp)
+{
+	mx_status_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		return (0);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		return (0);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		return (0);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_ioccstatus(queue_t *q, mblk_t *mp)
+{
+	mx_status_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		return (0);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		return (0);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		return (0);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_iocgstatsp(queue_t *q, mblk_t *mp)
+{
+	mx_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		return (0);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return (0);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		return (0);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		return (0);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_iocsstatsp(queue_t *q, mblk_t *mp)
+{
+	mx_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		return (0);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return (0);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		return (0);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		return (0);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_iocgstats(queue_t *q, mblk_t *mp)
+{
+	mx_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		return (0);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return (0);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		return (0);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		return (0);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_ioccstats(queue_t *q, mblk_t *mp)
+{
+	mx_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		return (0);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		return (0);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		return (0);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		return (0);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		return (0);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_iocgnotify(queue_t *q, mblk_t *mp)
+{
+	mx_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_iocsnotify(queue_t *q, mblk_t *mp)
+{
+	mx_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_ioccnotify(queue_t *q, mblk_t *mp)
+{
+	mx_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_ioccmgmt(queue_t *q, mblk_t *mp)
+{
+	mx_mgmt_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CARD:	/* card */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_SPAN:	/* span */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		/* FIXME: complete this */
+		return (-EOPNOTSUPP);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_ioccpass(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -8592,8 +11809,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 			}
 			break;
 		case SDL_TYPE_J1:	/* full J1 span */
-			if (xp->sp->config.ifgtype != SDL_GTYPE_T1 &&
-			    xp->sp->config.ifgtype != SDL_GTYPE_J1) {
+			if (xp->sp->config.ifgtype != SDL_GTYPE_T1 && xp->sp->config.ifgtype != SDL_GTYPE_J1) {
 				trace();
 				ret = (-EINVAL);
 				break;
@@ -8896,24 +12112,21 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 			if (sp->config.ifcoding != arg->ifcoding) {
 				for (slot = 0; slot < 32; slot++)
 					if (sp->slots[slot])
-						sp->slots[slot]->sdl.config.ifcoding =
-						    arg->ifcoding;
+						sp->slots[slot]->sdl.config.ifcoding = arg->ifcoding;
 				sp->config.ifcoding = arg->ifcoding;
 				span_reconfig = 1;
 			}
 			if (sp->config.ifframing != arg->ifframing) {
 				for (slot = 0; slot < 32; slot++)
 					if (sp->slots[slot])
-						sp->slots[slot]->sdl.config.ifframing =
-						    arg->ifframing;
+						sp->slots[slot]->sdl.config.ifframing = arg->ifframing;
 				sp->config.ifframing = arg->ifframing;
 				span_reconfig = 1;
 			}
 			if (sp->config.iftxlevel != arg->iftxlevel) {
 				for (slot = 0; slot < 32; slot++)
 					if (sp->slots[slot])
-						sp->slots[slot]->sdl.config.iftxlevel =
-						    arg->iftxlevel;
+						sp->slots[slot]->sdl.config.iftxlevel = arg->iftxlevel;
 				sp->config.iftxlevel = arg->iftxlevel;
 				span_reconfig = 1;
 			}
@@ -8925,14 +12138,8 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 						for (span = 0; span < X400_SPANS; span++)
 							if (cd->spans[span])
 								for (slot = 0; slot < 32; slot++)
-									if (cd->spans[span]->
-									    slots[slot])
-										cd->spans[span]->
-										    slots[slot]->
-										    sdl.config.
-										    ifsyncsrc[src] =
-										    arg->
-										    ifsyncsrc[src];
+									if (cd->spans[span]->slots[slot])
+										cd->spans[span]->slots[slot]->sdl.config.ifsyncsrc[src] = arg->ifsyncsrc[src];
 						cd->config.ifsyncsrc[src] = arg->ifsyncsrc[src];
 						card_reconfig = 1;
 					}
@@ -8969,8 +12176,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 			switch (cd->config.ifgtype) {
 			case SDL_GTYPE_E1:
 			{
-				printd(("%s: performing reconfiguration of E1 span %d\n",
-					DRV_NAME, sp->span));
+				printd(("%s: performing reconfiguration of E1 span %d\n", DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
 				xp_span_reconfig(cd, sp->span);
@@ -8978,8 +12184,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 			}
 			case SDL_GTYPE_T1:
 			{
-				printd(("%s: performing reconfiguration of T1 span %d\n",
-					DRV_NAME, sp->span));
+				printd(("%s: performing reconfiguration of T1 span %d\n", DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
 				xp_span_reconfig(cd, sp->span);
@@ -8987,8 +12192,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 			}
 			case SDL_GTYPE_J1:
 			{
-				printd(("%s: performing reconfiguration of J1 span %d\n",
-					DRV_NAME, sp->span));
+				printd(("%s: performing reconfiguration of J1 span %d\n", DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
 				xp_span_reconfig(cd, sp->span);
@@ -9506,11 +12710,9 @@ xp_e1_card_tasklet(unsigned long data)
 					int soff = span_to_byte(span);
 
 					if (sp->config.iftype == SDL_TYPE_E1)
-						xp_e1_process(sp, wbeg + soff, rbeg + soff, wend,
-							      rend);
+						xp_e1_process(sp, wbeg + soff, rbeg + soff, wend, rend);
 					else
-						xp_e1c_process(sp, wbeg + soff, rbeg + soff, wend,
-							       rend);
+						xp_e1c_process(sp, wbeg + soff, rbeg + soff, wend, rend);
 				}
 			}
 			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
@@ -9627,11 +12829,9 @@ xp_t1_card_tasklet(unsigned long data)
 					int soff = span_to_byte(span);
 
 					if (sp->config.iftype == SDL_TYPE_T1)
-						xp_t1_process(sp, wbeg + soff, rbeg + soff, wend,
-							      rend);
+						xp_t1_process(sp, wbeg + soff, rbeg + soff, wend, rend);
 					else
-						xp_t1c_process(sp, wbeg + soff, rbeg + soff, wend,
-							       rend);
+						xp_t1c_process(sp, wbeg + soff, rbeg + soff, wend, rend);
 				}
 			}
 			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
@@ -9749,11 +12949,9 @@ xp_j1_card_tasklet(unsigned long data)
 					int soff = span_to_byte(span);
 
 					if (sp->config.iftype == SDL_TYPE_J1)
-						xp_j1_process(sp, wbeg + soff, rbeg + soff, wend,
-							      rend);
+						xp_j1_process(sp, wbeg + soff, rbeg + soff, wend, rend);
 					else
-						xp_j1c_process(sp, wbeg + soff, rbeg + soff, wend,
-							       rend);
+						xp_j1c_process(sp, wbeg + soff, rbeg + soff, wend, rend);
 				}
 			}
 			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
@@ -9851,28 +13049,26 @@ xp_e1_txrx_burst(struct cd *cd)
 		register int slot;
 		register volatile uint32_t *xll;
 
-		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
-		   working in parallel.  We only lead by one word to avoid a worse condition: cache
-		   ping-pong.  These prefetches are for read. */
+		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine working in parallel. 
+		   We only lead by one word to avoid a worse condition: cache ping-pong.  These prefetches are for
+		   read. */
 		{
 			register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
 
-			for (xll = cd->xll, wbuf = cd->wbuf + (lebno << 8);
-			     wbuf < cd->wbuf + (lebno << 8) + 256;) {
+			for (xll = cd->xll, wbuf = cd->wbuf + (lebno << 8); wbuf < cd->wbuf + (lebno << 8) + 256;) {
 				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++) {
 					prefetch(wbuf + 1);
 					*xll = *wbuf;
 				}
 			}
 		}
-		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
-		   working in parallel.  We only lead by one word to avoid a worse condition: cache
-		   ping-pong.  These prefetches are for read. */
+		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine working in parallel. 
+		   We only lead by one word to avoid a worse condition: cache ping-pong.  These prefetches are for
+		   read. */
 		{
 			register uint32_t *rbuf = cd->rbuf + (lebno << 8);
 
-			for (xll = cd->xll, rbuf = cd->rbuf + (lebno << 8);
-			     rbuf < cd->rbuf + (lebno << 8) + 256;)
+			for (xll = cd->xll, rbuf = cd->rbuf + (lebno << 8); rbuf < cd->rbuf + (lebno << 8) + 256;)
 				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++) {
 					prefetchw(rbuf + 1);
 					*rbuf = *xll;
@@ -9931,8 +13127,7 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			}
 		}
 		/* process status span 1 frame 400/512, span 2 frame 408/512, ... */
-		if ((span = ((cd->frame >> 3) & 0x3f) - 50) >= 0 && span < X400_SPANS
-		    && (sp = cd->spans[span])
+		if ((span = ((cd->frame >> 3) & 0x3f) - 50) >= 0 && span < X400_SPANS && (sp = cd->spans[span])
 		    && (sp->config.ifflags & SDL_IF_UP)) {
 			int status, alarms = 0, leds = 0, all_leds;
 			volatile uint8_t *xlb = &cd->xlb[span << 8];
@@ -9996,8 +13191,7 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 				    && cd->spans[span]
 				    && (cd->spans[span]->config.ifflags & SDL_IF_UP)
 				    && !(cd->spans[span]->config.ifclock == SDL_CLOCK_LOOP)
-				    && !(cd->spans[span]->config.
-					 ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
+				    && !(cd->spans[span]->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
 					syncsrc = cd->config.ifsyncsrc[src];
 					break;
 				}
@@ -10057,8 +13251,7 @@ xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 			}
 		}
 		/* process status span 1 frame 400/512, span 2 frame 408/512, ... */
-		if ((span = ((cd->frame >> 3) & 0x3f) - 50) >= 0 && span < X400_SPANS
-		    && (sp = cd->spans[span])
+		if ((span = ((cd->frame >> 3) & 0x3f) - 50) >= 0 && span < X400_SPANS && (sp = cd->spans[span])
 		    && (sp->config.ifflags & SDL_IF_UP)) {
 			int status, alarms = 0, leds = 0, all_leds;
 			volatile uint8_t *xlb = &cd->xlb[span << 8];
@@ -10131,8 +13324,7 @@ xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				    && cd->spans[span]
 				    && (cd->spans[span]->config.ifflags & SDL_IF_UP)
 				    && !(cd->spans[span]->config.ifclock == SDL_CLOCK_LOOP)
-				    && !(cd->spans[span]->config.
-					 ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
+				    && !(cd->spans[span]->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
 					syncsrc = cd->config.ifsyncsrc[src];
 					break;
 				}
@@ -10158,14 +13350,13 @@ xp_t1_txrx_burst(struct cd *cd)
 		register int slot;
 		register volatile uint32_t *xll;
 
-		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
-		   working in parallel.  We only lead by two words to avoid a worse condition:
-		   cache ping-pong.  These prefetches are for read. */
+		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine working in parallel. 
+		   We only lead by two words to avoid a worse condition: cache ping-pong.  These prefetches are for
+		   read. */
 		{
 			register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
 
-			for (xll = cd->xll, wbuf = cd->wbuf + (lebno << 8);
-			     wbuf < cd->wbuf + (lebno << 8) + 256;) {
+			for (xll = cd->xll, wbuf = cd->wbuf + (lebno << 8); wbuf < cd->wbuf + (lebno << 8) + 256;) {
 				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++)
 					if (slot & 0x3) {
 						prefetch(wbuf + 2);
@@ -10173,14 +13364,13 @@ xp_t1_txrx_burst(struct cd *cd)
 					}
 			}
 		}
-		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
-		   working in parallel.  We only lead by two words to avoid a worse condition:
-		   cache ping-pong.  These prefetches are for read. */
+		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine working in parallel. 
+		   We only lead by two words to avoid a worse condition: cache ping-pong.  These prefetches are for
+		   read. */
 		{
 			register uint32_t *rbuf = cd->rbuf + (lebno << 8);
 
-			for (xll = cd->xll, rbuf = cd->rbuf + (lebno << 8);
-			     rbuf < cd->rbuf + (lebno << 8) + 256;)
+			for (xll = cd->xll, rbuf = cd->rbuf + (lebno << 8); rbuf < cd->rbuf + (lebno << 8) + 256;)
 				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++)
 					if (slot & 0x3) {
 						prefetchw(rbuf + 2);
@@ -10241,8 +13431,7 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			}
 		}
 		/* process status span 1 frame 400/512, span 2 frame 408/512, ... */
-		if ((span = ((cd->frame >> 3) & 0x3f) - 50) >= 0 && span < X400_SPANS
-		    && (sp = cd->spans[span])
+		if ((span = ((cd->frame >> 3) & 0x3f) - 50) >= 0 && span < X400_SPANS && (sp = cd->spans[span])
 		    && (sp->config.ifflags & SDL_IF_UP)) {
 			int status, alarms = 0, leds = 0, all_leds;
 			volatile uint8_t *xlb = &cd->xlb[span << 8];
@@ -10339,8 +13528,7 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 				    && cd->spans[span]
 				    && (cd->spans[span]->config.ifflags & SDL_IF_UP)
 				    && !(cd->spans[span]->config.ifclock == SDL_CLOCK_LOOP)
-				    && !(cd->spans[span]->config.
-					 ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
+				    && !(cd->spans[span]->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
 					syncsrc = cd->config.ifsyncsrc[src];
 					break;
 				}
@@ -10392,8 +13580,8 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				volatile uint8_t *xlb = &cd->xlb[span << 8];
 
 				if (sp->recovertime && !--sp->recovertime) {
-					u_char japan =
-					    (sp->config.ifgcrc == SDL_GCRC_CRC6J) ? 0x80 : 0x00;
+					u_char japan = (sp->config.ifgcrc == SDL_GCRC_CRC6J) ? 0x80 : 0x00;
+
 					printd(("%s: alarm recovery complete\n", __FUNCTION__));
 					sp->config.ifalarms &= ~SDL_ALARM_REC;
 					xlb[0x05] = 0x10 | japan;	/* TSSE, turn off yellow */
@@ -10402,8 +13590,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 			}
 		}
 		/* process status span 1 frame 400/512, span 2 frame 408/512, ... */
-		if ((span = ((cd->frame >> 3) & 0x3f) - 50) >= 0 && span < X400_SPANS
-		    && (sp = cd->spans[span])
+		if ((span = ((cd->frame >> 3) & 0x3f) - 50) >= 0 && span < X400_SPANS && (sp = cd->spans[span])
 		    && (sp->config.ifflags & SDL_IF_UP)) {
 			int status, alarms = 0, leds = 0, all_leds;
 			volatile uint8_t *xlb = &cd->xlb[span << 8];
@@ -10448,8 +13635,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				alarms |= SDL_ALARM_BLU;
 			if (alarms) {
 				if (!(sp->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
-					u_char japan =
-					    (sp->config.ifgcrc == SDL_GCRC_CRC6J) ? 0x80 : 0x00;
+					u_char japan = (sp->config.ifgcrc == SDL_GCRC_CRC6J) ? 0x80 : 0x00;
 
 					/* alarms have just begun */
 					xlb[0x05] = 0x11 | japan;	/* TSSE, set yellow alarm */
@@ -10499,8 +13685,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				    && cd->spans[span]
 				    && (cd->spans[span]->config.ifflags & SDL_IF_UP)
 				    && !(cd->spans[span]->config.ifclock == SDL_CLOCK_LOOP)
-				    && !(cd->spans[span]->config.
-					 ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
+				    && !(cd->spans[span]->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
 					syncsrc = cd->config.ifsyncsrc[src];
 					break;
 				}
@@ -10570,6 +13755,82 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 		ptrace(("%s: ERROR: Unsupported STREAMS ioctl\n", DRV_NAME));
 		ret = -EOPNOTSUPP;
 		break;
+	}
+	case MX_IOC_MAGIC:
+	{
+		if (count < size || mp->b_cont == NULL)
+			return (-EINVAL);
+		switch (cmd) {
+		case MX_IOCGINFO:	/* mx_info_t */
+			ret = mx_iocginfo(q, mp);
+			break;
+		case MX_IOCGOPTION:	/* mx_option_t */
+			ret = mx_iocgoption(q, mp);
+			break;
+		case MX_IOCSOPTION:	/* mx_option_t */
+			ret = mx_iocsoption(q, mp);
+			break;
+		case MX_IOCLCONFIG:	/* mx_config_t */
+			ret = mx_ioclconfig(q, mp);
+			break;
+		case MX_IOCGCONFIG:	/* mx_config_t */
+			ret = mx_iocgconfig(q, mp);
+			break;
+		case MX_IOCSCONFIG:	/* mx_config_t */
+			ret = mx_iocsconfig(q, mp);
+			break;
+		case MX_IOCTCONFIG:	/* mx_config_t */
+			ret = mx_ioctconfig(q, mp);
+			break;
+		case MX_IOCCCONFIG:	/* mx_config_t */
+			ret = mx_ioccconfig(q, mp);
+			break;
+		case MX_IOCGSTATEM:	/* mx_statem_t */
+			ret = mx_iocgstatem(q, mp);
+			break;
+		case MX_IOCCMRESET:	/* mx_statem_t */
+			ret = mx_ioccmreset(q, mp);
+			break;
+		case MX_IOCGSTATUS:	/* mx_status_t */
+			ret = mx_iocgstatus(q, mp);
+			break;
+		case MX_IOCSSTATUS:	/* mx_status_t */
+			ret = mx_iocsstatus(q, mp);
+			break;
+		case MX_IOCCSTATUS:	/* mx_status_t */
+			ret = mx_ioccstatus(q, mp);
+			break;
+		case MX_IOCGSTATSP:	/* mx_stats_t */
+			ret = mx_iocgstatsp(q, mp);
+			break;
+		case MX_IOCSSTATSP:	/* mx_stats_t */
+			ret = mx_iocsstatsp(q, mp);
+			break;
+		case MX_IOCGSTATS:	/* mx_stats_t */
+			ret = mx_iocgstats(q, mp);
+			break;
+		case MX_IOCCSTATS:	/* mx_stats_t */
+			ret = mx_ioccstats(q, mp);
+			break;
+		case MX_IOCGNOTIFY:	/* mx_notify_t */
+			ret = mx_iocgnotify(q, mp);
+			break;
+		case MX_IOCSNOTIFY:	/* mx_notify_t */
+			ret = mx_iocsnotify(q, mp);
+			break;
+		case MX_IOCCNOTIFY:	/* mx_notify_t */
+			ret = mx_ioccnotify(q, mp);
+			break;
+		case MX_IOCCMGMT:	/* mx_mgmt_t */
+			ret = mx_ioccmgmt(q, mp);
+			break;
+		case MX_IOCCPASS:	/* mx_pass_t */
+			ret = mx_ioccpass(q, mp);
+			break;
+		default:
+			ret = -EOPNOTSUPP;
+			break;
+		}
 	}
 	case SL_IOC_MAGIC:
 	{
@@ -10693,8 +13954,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	case SDL_IOC_MAGIC:
 	{
 		if (count < size || xp->i_state == LMI_UNATTACHED) {
-			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %ld\n",
-				DRV_NAME, count, size, xp->i_state));
+			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %ld\n", DRV_NAME, count, size, xp->i_state));
 			ret = -EINVAL;
 			break;
 		}
@@ -11224,8 +14484,7 @@ xp_close(queue_t *q, int flag, cred_t *crp)
 	(void) flag;
 	(void) crp;
 	(void) xp;
-	printd(("%s: closing character device %hu:%hu\n", DRV_NAME, xp->u.dev.cmajor,
-		xp->u.dev.cminor));
+	printd(("%s: closing character device %hu:%hu\n", DRV_NAME, xp->u.dev.cmajor, xp->u.dev.cminor));
 	spin_lock_irqsave(&xp_lock, flags);
 	xp_free_priv(xp);
 	spin_unlock_irqrestore(&xp_lock, flags);
@@ -11305,34 +14564,22 @@ xp_term_caches(void)
 STATIC noinline __devinit int
 xp_init_caches(void)
 {
-	if (!xp_priv_cachep
-	    && !(xp_priv_cachep =
-		 kmem_create_cache("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!xp_priv_cachep && !(xp_priv_cachep = kmem_create_cache("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
 		goto error;
 	} else
 		printd(("%s: initialized device private structure cache\n", DRV_NAME));
-	if (!xp_span_cachep
-	    && !(xp_span_cachep =
-		 kmem_create_cache("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!xp_span_cachep && !(xp_span_cachep = kmem_create_cache("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
 		goto error;
 	} else
 		printd(("%s: initialized span private structure cache\n", DRV_NAME));
-	if (!xp_card_cachep
-	    && !(xp_card_cachep =
-		 kmem_create_cache("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!xp_card_cachep && !(xp_card_cachep = kmem_create_cache("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
 		goto error;
 	} else
 		printd(("%s: initialized card private structure cache\n", DRV_NAME));
-	if (!xp_xbuf_cachep
-	    && !(xp_xbuf_cachep =
-		 kmem_create_cache("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN,
-				   NULL, NULL))) {
+	if (!xp_xbuf_cachep && !(xp_xbuf_cachep = kmem_create_cache("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
 		goto error;
 	} else
@@ -11421,8 +14668,7 @@ xp_free_priv(struct xp *xp)
 				spin_lock(&cd->lock);
 				{
 					int slot;
-					uchar idle =
-					    (cd->config.ifgtype == SDL_GTYPE_T1) ? 0x7f : 0xff;
+					uchar idle = (cd->config.ifgtype == SDL_GTYPE_T1) ? 0x7f : 0xff;
 					uchar *base = (uchar *) cd->wbuf + span_to_byte(sp->span);
 
 					for (slot = 0; slot < 32; slot++) {
@@ -11431,8 +14677,7 @@ xp_free_priv(struct xp *xp)
 
 							xp_put(xchg(&sp->slots[slot], NULL));
 							for (boff = 0; boff < X400P_EBUFNO; boff++)
-								*(base + (boff << 10) +
-								  (slot << 2)) = idle;
+								*(base + (boff << 10) + (slot << 2)) = idle;
 						}
 					}
 				}
@@ -11495,6 +14740,32 @@ xp_put(struct xp *xp)
 		kmem_cache_free(xp_priv_cachep, xp);
 		printd(("%s: freed device private structure\n", DRV_NAME));
 	}
+}
+STATIC struct xp *
+xp_find(uint ppa)
+{
+	struct sp *sp;
+	uint chan, slot;
+
+	if ((sp = sp_find(ppa)) == NULL)
+		return ERR_PTR(-ESRCH);
+	chan = (ppa >> 0) & 0xff;
+	switch (sp->config.ifgtype) {
+	case SDL_GTYPE_E1:
+		if (1 > chan || chan > 31)
+			return ERR_PTR(-ESRCH);
+		slot = xp_e1_chan_map[chan - 1];
+		break;
+	case SDL_GTYPE_T1:
+	case SDL_GTYPE_J1:
+		if (1 > chan || chan > 24)
+			return ERR_PTR(-ESRCH);
+		slot = xp_t1_chan_map[chan - 1];
+		break;
+	default:
+		return ERR_PTR(-ESRCH);
+	}
+	return (sp->slots[slot]);
 }
 
 /*
@@ -11572,6 +14843,17 @@ sp_put(struct sp *sp)
 		printd(("%s: freed span private structure\n", DRV_NAME));
 		kmem_cache_free(xp_span_cachep, sp);
 	}
+}
+STATIC struct sp *
+sp_find(uint ppa)
+{
+	struct cd *cd;
+	struct sp *sp = NULL;
+	uint span = (ppa >> 8) & 0x0f;
+
+	if (span < X400_SPANS && (cd = cd_find(ppa)) != NULL)
+		sp = cd->spans[span];
+	return (sp);
 }
 
 /*
@@ -11667,6 +14949,15 @@ cd_put(struct cd *cd)
 		printd(("%s: freed card private structure\n", DRV_NAME));
 	}
 }
+STATIC struct cd *
+cd_find(uint ppa)
+{
+	struct cd *cd;
+	uint card = (ppa >> 12) & 0x0f;
+
+	for (cd = x400p_cards; cd && cd->card != card; cd = cd->next) ;
+	return (cd);
+}
 
 /*
  *  =========================================================================
@@ -11694,7 +14985,7 @@ xp_remove(struct pci_dev *dev)
 		cd->plx[INTCSR] = 0;	/* disable interrupts */
 	}
 	if (cd->xlb) {
-		cd->xlb[SYNREG] = 0;
+		cd->xlb[SYNREG] = SYNCSELF;
 		cd->xlb[CTLREG] = 0;
 		cd->xlb[LEDREG] = 0;
 	}
@@ -11704,18 +14995,15 @@ xp_remove(struct pci_dev *dev)
 	}
 	if (cd->xlb_region) {
 		release_mem_region(cd->xlb_region, cd->xlb_length);
-		printd(("%s: released xlb region %lx length %ld\n", DRV_NAME,
-			cd->xlb_region, cd->xlb_length));
+		printd(("%s: released xlb region %lx length %ld\n", DRV_NAME, cd->xlb_region, cd->xlb_length));
 	}
 	if (cd->xll_region) {
 		release_mem_region(cd->xll_region, cd->xll_length);
-		printd(("%s: released xll region %lx length %ld\n", DRV_NAME,
-			cd->xll_region, cd->xll_length));
+		printd(("%s: released xll region %lx length %ld\n", DRV_NAME, cd->xll_region, cd->xll_length));
 	}
 	if (cd->plx_region) {
 		release_mem_region(cd->plx_region, cd->plx_length);
-		printd(("%s: released plx region %lx length %ld\n", DRV_NAME,
-			cd->plx_region, cd->plx_length));
+		printd(("%s: released plx region %lx length %ld\n", DRV_NAME, cd->plx_region, cd->plx_length));
 	}
 	if (cd->xlb) {
 		iounmap((void *) cd->xlb);
@@ -11811,7 +15099,6 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 #define SA_SHIRQ IRQF_SHARED
 #endif
 
-
 /*
  *  X400P-SS7 Probe
  *  -----------------------------------
@@ -11858,8 +15145,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cmn_err(CE_WARN, "%s: ERROR: Invalid PLX 9030 base resource", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->plx_length,
-		cd->plx_region, cd->plx));
+	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->plx_length, cd->plx_region, cd->plx));
 	if ((pci_resource_flags(dev, 2) & IORESOURCE_IO)
 	    || !(cd->xll_region = pci_resource_start(dev, 2))
 	    || !(cd->xll_length = pci_resource_len(dev, 2))
@@ -11867,8 +15153,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cmn_err(CE_WARN, "%s: ERROR: Invalid Xilinx 32-bit base resource", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xll_length,
-		cd->xll_region, cd->xll));
+	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xll_length, cd->xll_region, cd->xll));
 	if ((pci_resource_flags(dev, 3) & IORESOURCE_IO)
 	    || !(cd->xlb_region = pci_resource_start(dev, 3))
 	    || !(cd->xlb_length = pci_resource_len(dev, 3))
@@ -11876,29 +15161,24 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cmn_err(CE_WARN, "%s: ERROR: Invalid Xilinx 8-bit base resource", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xlb_length,
-		cd->xlb_region, cd->xlb));
+	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xlb_length, cd->xlb_region, cd->xlb));
 	cd->config.ifname = xp_board_info[id->driver_data].name;
 	if (!request_mem_region(cd->plx_region, cd->plx_length, cd->config.ifname)) {
 		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve PLX memory", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: plx region %lx reserved %ld bytes\n", DRV_NAME, cd->plx_region,
-		cd->plx_length));
+	printd(("%s: plx region %lx reserved %ld bytes\n", DRV_NAME, cd->plx_region, cd->plx_length));
 	if (!request_mem_region(cd->xll_region, cd->xll_length, cd->config.ifname)) {
 		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve Xilinx 32-bit memory", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME, cd->xll_region,
-		cd->xll_length));
+	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME, cd->xll_region, cd->xll_length));
 	if (!request_mem_region(cd->xlb_region, cd->xlb_length, cd->config.ifname)) {
 		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve Xilinx 8-bit memory", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: xlb region %lx reserved %ld bytes\n", DRV_NAME, cd->xlb_region,
-		cd->xlb_length));
-	cmn_err(CE_NOTE, "%s: card detected %s at 0x%lx/0x%lx irq %d", DRV_NAME,
-		cd->config.ifname, cd->xll_region, cd->xlb_region, dev->irq);
+	printd(("%s: xlb region %lx reserved %ld bytes\n", DRV_NAME, cd->xlb_region, cd->xlb_length));
+	cmn_err(CE_NOTE, "%s: card detected %s at 0x%lx/0x%lx irq %d", DRV_NAME, cd->config.ifname, cd->xll_region, cd->xlb_region, dev->irq);
 #ifdef X400P_DOWNLOAD_FIRMWARE
 	if (xp_download_fw(cd, board) != 0)
 		goto error_remove;
@@ -11918,8 +15198,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->devrev &= XP_DEV_REVMASK;
 
 	if (!(xp_device_info[cd->device].hw_flags & XPF_SUPPORTED)) {
-		cmn_err(CE_WARN, "%s: Usupported framer device %s", DRV_NAME,
-			xp_device_info[cd->device].name);
+		cmn_err(CE_WARN, "%s: Usupported framer device %s", DRV_NAME, xp_device_info[cd->device].name);
 		goto error_remove;
 	}
 	switch (cd->device) {
@@ -11975,16 +15254,13 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		break;
 	}
 	if (cd->board == -1) {
-		cmn_err(CE_WARN, "%s: Device %s not supported for card %s", DRV_NAME,
-			xp_device_info[cd->device].name, xp_board_info[board].name);
+		cmn_err(CE_WARN, "%s: Device %s not supported for card %s", DRV_NAME, xp_device_info[cd->device].name, xp_board_info[board].name);
 		goto error_remove;
 	}
 	cd->hw_flags = xp_board_info[cd->board].hw_flags;
 	cd->hw_flags |= xp_device_info[cd->device].hw_flags;
 
-	cmn_err(CE_NOTE, "%s: %s (%s Rev. %c)", DRV_NAME,
-		xp_board_info[cd->board].name,
-		xp_device_info[cd->device].name, (char) (cd->devrev + 65));
+	cmn_err(CE_NOTE, "%s: %s (%s Rev. %c)", DRV_NAME, xp_board_info[cd->board].name, xp_device_info[cd->device].name, (char) (cd->devrev + 65));
 
 	{
 		int word, idle_word = xp_board_info[cd->board].idle_word;
@@ -12143,8 +15419,9 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		goto error_remove;
 	}
 	cd->irq = dev->irq;
-	printd(("%s: acquired IRQ %ld for %s card\n", DRV_NAME, cd->irq,
-		xp_board_info[cd->board].name));
+	cd->bus = dev->bus->number;
+	cd->slot = PCI_SLOT(dev->devfn);
+	printd(("%s: acquired IRQ %ld for %s card\n", DRV_NAME, cd->irq, xp_board_info[cd->board].name));
 
 	cd->config.ifflags = (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 
@@ -12347,8 +15624,7 @@ sl_x400pterminate(void)
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (xp_majors[mindex]) {
 			if ((err = xp_unregister_strdev(xp_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
-					xp_majors[mindex]);
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME, xp_majors[mindex]);
 			if (mindex)
 				xp_majors[mindex] = 0;
 		}
@@ -12388,12 +15664,10 @@ sl_x400pinit(void)
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
 		if ((err = xp_register_strdev(xp_majors[mindex])) < 0) {
 			if (mindex) {
-				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
-					xp_majors[mindex]);
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME, xp_majors[mindex]);
 				continue;
 			} else {
-				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
-					DRV_NAME, err);
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d", DRV_NAME, err);
 				sl_x400pterminate();
 				return (err);
 			}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdli_ioctl.h,v 0.9.2.15 2008-04-29 07:10:44 brian Exp $
+ @(#) $Id: sdli_ioctl.h,v 0.9.2.16 2009-01-14 14:29:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:44 $ by $Author: brian $
+ Last Modified $Date: 2009-01-14 14:29:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdli_ioctl.h,v $
+ Revision 0.9.2.16  2009-01-14 14:29:56  brian
+ - working up agents
+
  Revision 0.9.2.15  2008-04-29 07:10:44  brian
  - updating headers for release
 
@@ -71,7 +74,7 @@
 #ifndef __SDLI_IOCTL_H__
 #define __SDLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -182,6 +185,7 @@ typedef struct sdl_config {
 #	define	SDL_GMODE_NONE		0	/* no loopback */
 #	define	SDL_GMODE_LOC_LB	1	/* loopback locally asserted */
 #	define	SDL_GMODE_REM_LB	2	/* loopback remotely asserted */
+#	define	SDL_GMODE_BOTH_LB	3	/* loopback locally and remotely asserted */
 	sdl_ulong ifgcrc;		/* group CRC type */
 #	define	SDL_GCRC_NONE		0	/* */
 #	define	SDL_GCRC_CRC4		1	/* */

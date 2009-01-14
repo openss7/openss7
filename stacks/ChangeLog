@@ -1,3 +1,47 @@
+2009-01-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: working up agents
+	* src/include/ss7/sdli_ioctl.h: working up agents
+	* src/modules/x400p-ss7/sl_x400p.c: working up agents
+	* src/snmp/cdr2MIB.c: working up agents
+	* src/snmp/cdr2MIB.h: working up agents
+	* src/snmp/ds1EXT.c: working up agents
+	* src/snmp/ds1EXT.h: working up agents
+	* src/snmp/gmiMIB.c: working up agents
+	* src/snmp/gmiMIB.h: working up agents
+	* src/snmp/makestubs: working up agents
+	* src/snmp/mib2c: working up agents
+	* src/snmp/mib2c.openss7.conf: working up agents
+	* src/snmp/mib2c.storage.conf: working up agents
+	* src/snmp/mtpMIB.c: working up agents
+	* src/snmp/mtpMIB.h: working up agents
+	* src/snmp/mtpOmMIB.c: working up agents
+	* src/snmp/mtpOmMIB.h: working up agents
+	* src/snmp/sccpMIB.c: working up agents
+	* src/snmp/sccpMIB.h: working up agents
+	* src/snmp/sccpOmMIB.c: working up agents
+	* src/snmp/sccpOmMIB.h: working up agents
+	* src/snmp/slMIB.c: working up agents
+	* src/snmp/slMIB.h: working up agents
+	* src/snmp/smiMIB.c: working up agents
+	* src/snmp/smiMIB.h: working up agents
+	* src/snmp/ss7MIB.c: working up agents
+	* src/snmp/ss7MIB.h: working up agents
+	* src/snmp/ss7OmMIB.c: working up agents
+	* src/snmp/ss7OmMIB.h: working up agents
+	* src/snmp/tcapMIB.c: working up agents
+	* src/snmp/tcapMIB.h: working up agents
+	* src/snmp/tcapOmMIB.c: working up agents
+	* src/snmp/tcapOmMIB.h: working up agents
+	* src/snmp/x400pMIB.c: working up agents
+	* src/snmp/x400pMIB.h: working up agents
+	* src/snmp/mibs/OPENSS7-MX-MIB.mib: working up agents
+	* src/snmp/mibs/OPENSS7-X400P-MIB.mib: working up agents
+
+	* src/include/ss7/x400p_ioctl.h: added mx header
+	* src/snmp/mxMIB.c: added MX agent
+	* src/snmp/mxMIB.h: added MX agent
+
 2009-01-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: agent updates

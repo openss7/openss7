@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2009-01-10 17:09:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2009-01-14 14:29:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-10 17:09:11 $ by $Author: brian $
+# Last Modified $Date: 2009-01-14 14:29:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -167,6 +167,10 @@ endif
 
 ss7confd_SOURCES		= src/snmp/ss7MIB.c \
 				  src/snmp/ss7MIB.h \
+				  src/snmp/ds1EXT.c \
+				  src/snmp/ds1EXT.h \
+				  src/snmp/mxMIB.c \
+				  src/snmp/mxMIB.h \
 				  src/snmp/x400pMIB.c \
 				  src/snmp/x400pMIB.h \
 				  src/snmp/mtpMIB.c \
@@ -181,6 +185,7 @@ ss7confd_SOURCES		= src/snmp/ss7MIB.c \
 				  src/snmp/tcapMIB.h \
 				  src/snmp/tcapOmMIB.c \
 				  src/snmp/tcapOmMIB.h \
+				  src/snmp/ds_agent.h \
 				  src/snmp/header_complex.h \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
@@ -1053,9 +1058,12 @@ endif
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-ss7MIB_la_SOURCES		= \
-				  src/snmp/ss7MIB.c \
+ss7MIB_la_SOURCES		= src/snmp/ss7MIB.c \
 				  src/snmp/ss7MIB.h \
+				  src/snmp/ds1EXT.c \
+				  src/snmp/ds1EXT.h \
+				  src/snmp/mxMIB.c \
+				  src/snmp/mxMIB.h \
 				  src/snmp/x400pMIB.c \
 				  src/snmp/x400pMIB.h \
 				  src/snmp/mtpMIB.c \
@@ -1507,6 +1515,7 @@ dist_snmpmib_DATA		+= \
 				src/snmp/mibs/OPENSS7-UMC-MIB.mib \
 				src/snmp/mibs/OPENSS7-SS7-MIB.mib \
 				src/snmp/mibs/OPENSS7-SS7-TC.mib \
+				src/snmp/mibs/OPENSS7-MX-MIB.mib \
 				src/snmp/mibs/OPENSS7-X400P-MIB.mib \
 				src/snmp/mibs/OPENSS7-SL-MIB.mib \
 				src/snmp/mibs/OPENSS7-SL-MUX-MIB.mib \
@@ -1600,6 +1609,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.113  2009-01-14 14:29:56  brian
+## - working up agents
+##
 ## Revision 0.9.2.112  2009-01-10 17:09:11  brian
 ## - updated agents
 ##
