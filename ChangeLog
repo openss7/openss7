@@ -1,3 +1,8 @@
+2009-01-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* mibs/RFC3877-MIB.txt: added standard MIBs
+	* mibs/RFC3878-MIB.txt: added standard MIBs
+
 2008-12-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* netperf/netperf.refs: update references
