@@ -1,3 +1,18 @@
+2009-01-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/ds1.c: working up agents
+	* src/snmp/ds1.h: working up agents
+	* src/snmp/ds1EXT.c: working up agents
+	* src/snmp/ds1EXT.h: working up agents
+	* src/snmp/mxMIB.c: working up agents
+	* src/snmp/mxMIB.h: working up agents
+	* src/snmp/phyMIB.c: working up agents
+	* src/snmp/phyMIB.h: working up agents
+	* src/snmp/x400pMIB.c: working up agents
+	* src/snmp/x400pMIB.h: working up agents
+
+	* src/include/sys/smi_ioctl.h: add new header
+
 2009-01-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/ds1.c: agent updates
