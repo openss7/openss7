@@ -2,7 +2,7 @@
 #!/usr/bin/perl -w
 # =============================================================================
 #
-# @(#) $RCSfile: mib2c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-01-10 17:09:13 $
+# @(#) $RCSfile: mib2c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2009-01-14 14:29:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-10 17:09:13 $ by $Author: brian $
+# Last Modified $Date: 2009-01-14 14:29:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: mib2c,v $
+# Revision 0.9.2.21  2009-01-14 14:29:58  brian
+# - working up agents
+#
+# Revision 0.9.2.20  2009-01-10 18:12:26  brian
+# - corrections
+#
 # Revision 0.9.2.19  2009-01-10 17:09:13  brian
 # - updated agents
 #
@@ -204,7 +210,7 @@ sub defval {
     $defval =~ s/^\s*//;
     $defval =~ s/\s*$//;
     my ($val, $len, $ret);
-    if ($mib->{'type'} =~ /INTEGER|INTEGER32|UNSIGNED32|COUNTER64|COUNTER|UINTEGER|GAUGE|TICKS/) {
+    if ($mib->{'type'} =~ /INTEGER|INTEGER32|UNSIGNED32|COUNTER$|UINTEGER|GAUGE|TICKS/) {
 	$ret = "/* StorageNew->${name} = $defval; */ /* DEFVAL $mib->{'defaultValue'} */\n";
 	$defval =~ s/\s*\(\s*/(/g;
 	$defval =~ s/\s*\)/)/g;
@@ -241,12 +247,69 @@ sub defval {
 		$ret = "StorageNew->${name} = $val;\n";
 	    }
 	}
+    } elsif ($mib->{'type'} =~ /COUNTER64/) {
+	$ret = "/* StorageNew->${name} = $defval; */ /* DEFVAL $mib->{'defaultValue'} */\n";
+	$defval =~ s/\s*\(\s*/(/g;
+	$defval =~ s/\s*\)/)/g;
+	if ($defval =~ /^$/) {
+	    $ret = "StorageNew->${name} = (struct counter64) { 0, 0 };\n";
+	} elsif ($defval =~ /^[-+]?[0-9]+$/) {
+	    $ret = "StorageNew->${name} = (struct counter64) { (long) ((uint64_t) $defval >> 32), (long) ($defval) };\n";
+	} elsif ($defval =~ /^'([0-9a-fA-F]*)'X$/) {
+	    $ret = "StorageNew->${name} = 0x$1;\n";
+	    $ret = "StorageNew->${name} = (struct counter64) { (long) ((uint64_t) 0x$1 >> 32), (long) (0x$1) };\n";
+	} elsif ($defval =~ /^'[01]+'B$/) {
+	    $ret = "StorageNew->${name} = (struct counter64) { ";
+	    while ($defval =~ s/^'([01])/'/) {
+		$val <<= 1; $val += $1; $len += 1;
+		if ($len % 64) {
+		    $ret .= "$val };\n";
+		    last;
+		}
+		if ($len % 32) {
+		    $ret .= "$val, ";
+		    $val = 0;
+		}
+	    }
+	    while ($len < 64) {
+		$val <<= 1; $len += 1;
+		if ($len % 64) {
+		    $ret .= "$val };\n";
+		    last;
+		}
+		if ($len % 32) {
+		    $ret .= "$val, ";
+		    $val = 0;
+		}
+	    }
+	} elsif ($defval =~ /^[a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?$/) {
+	    if ($defval =~ /\(([0-9]+)\)$/) {
+		$ret = "StorageNew->${name} = $1;\n";
+	    } else {
+		foreach my $k (keys %{$mib->{'enums'}}) {
+		    if ($k eq $defval) {
+			$val = $mib->{'enums'}{$k};
+			if ($mib->{'textualConvention'} eq "TruthValue") {
+			    $val = sprintf("%-40s", "TV_".uc($k));
+			} elsif ($mib->{'textualConvention'} eq "StorageType") {
+			    $val = sprintf("%-40s", "ST_".uc($k));
+			} elsif ($mib->{'textualConvention'} eq "RowStatus") {
+			    $val = sprintf("%-40s", "RS_".uc($k));
+			} else {
+			    $val = sprintf("%-40s", uc($name)."_".uc($k));
+			}
+			last;
+		    }
+		}
+		$ret = "StorageNew->${name} = $val;\n";
+	    }
+	}
     } elsif ($mib->{'type'} =~ /OCTETSTR|OPAQUE/) {
 	$ret = "/* StorageNew->${name} = NULL; */ /* DEFVAL $mib->{'defaultValue'} */\n";
 	$ret .= "/* StorageNew->${name}Len = 0; */ /* DEFVAL $mib->{'defaultValue'} */\n";
 	if ($defval =~ /^$/) {
-	    $ret = "if ((StorageNew->${name} = (uint8_t *) strdup(\"\")) != NULL) {\n";
-	    $ret .= "StorageNew->${name}Len = strlen(\"\");\n}\n";
+	    $ret = "if ((StorageNew->${name} = (uint8_t *) strdup(\"\")) != NULL)\n";
+	    $ret .= "StorageNew->${name}Len = strlen(\"\");\n";
 	} elsif ($defval =~ /^'[0-9a-fA-F]+'X$/) {
 	    my $value;
 	    $len = ((length($defval) - 3) % 2) * 4;
@@ -267,8 +330,8 @@ sub defval {
 		}
 	    }
 	    $len = ($len + 7) >> 3;
-	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
-	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n";
 	} elsif ($defval =~ /^'[01]+'B$/) {
 	    my $value;
 	    $len = (8 - ((length($defval) - 3) % 8)) % 8;
@@ -282,8 +345,8 @@ sub defval {
 		}
 	    }
 	    $len = ($len + 7) >> 3;
-	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
-	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n";
 	} elsif ($defval =~ /^\"[^"]*\"$/) {
 	    $ret = "StorageNew->${name} = (uint8_t *) strdup($defval);\n";
 	    $ret .= "StorageNew->${name}Len = strlen($defval);\n";
@@ -302,8 +365,8 @@ sub defval {
 	$defval =~ s/\s*\)/)/g;
 	if ($defval =~ /^$/) {
 	    $len = 2;
-	    $ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len))) {\n";
-	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    $ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len)))\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n";
 	} elsif ($defval =~ /^{( ([a-zA-Z][a-zA-Z0-9_:-]*(\([0-9]+\))?|[0-9]+))+ }$/) {
 	    $defval =~ s/^{ //;
 	    $defval =~ s/ }$//;
@@ -332,12 +395,12 @@ sub defval {
 	    $val = join(",", @subids);
 	    $val = "{ $val }";
 	    if ($val eq "{ 0,0 }") {
-		$ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len))) {\n";
-		$ret .= "StorageNew->${name}Len = $len;\n}\n";
+		$ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len)))\n";
+		$ret .= "StorageNew->${name}Len = $len;\n";
 	    } else {
 		$ret = "{\nstatic const oid tmpoid[$len] = $val;\n";
-		$ret .= "if ((StorageNew->${name} = snmp_duplicate_objid(tmpoid, $len))) {\n";
-		$ret .= "StorageNew->${name}Len = $len;\n}\n}\n";
+		$ret .= "if ((StorageNew->${name} = snmp_duplicate_objid(tmpoid, $len)))\n";
+		$ret .= "StorageNew->${name}Len = $len;\n}\n";
 	    }
 	}
     } elsif ($mib->{'type'} =~ /BITS/) {
@@ -356,8 +419,8 @@ sub defval {
 	    for (my $i = 0; $i < $len; $i++) {
 		$val .= sprintf("\\x%02X", 0);
 	    }
-	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
-	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n";
 	} elsif ($defval =~ /^[0-9]+$/) {
 	    my $value = $defval;
 	    foreach my $k (keys(%{$mib->{'enums'}})) {
@@ -371,8 +434,8 @@ sub defval {
 		$val .= sprintf("\\x%02X", ($value & 0xff));
 		$value >>= 8;
 	    }
-	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
-	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n";
 	} elsif ($defval =~ /^'[01]*'B$/) {
 	    my $value;
 	    my $length;
@@ -412,8 +475,8 @@ sub defval {
 		$value = 0;
 	    }
 	    $len = (($len + 7) >> 3);
-	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
-	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n";
 	} elsif ($defval =~ /^'([0-9a-fA-f]*)'X$/) {
 	    my $value;
 	    my $length;
@@ -459,8 +522,8 @@ sub defval {
 		$value = 0;
 	    }
 	    $len = (($len + 7) >> 3);
-	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
-	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n";
 	} elsif ($defval =~ /^{ ([a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?|[0-9]+)(\s*,\s*([a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?|[0-9]+))* }$/) {
 	    $defval =~ s/^{ //;
 	    $defval =~ s/ }$//;
@@ -488,17 +551,19 @@ sub defval {
 		$val .= sprintf("\\x%02X", ($value & 0xff));
 		$value >>= 8;
 	    }
-	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS) {\n";
-	    $ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+	    $ret .= "StorageNew->${name}Len = $len;\n";
 	}
     } elsif ($mib->{'type'} =~ /NETADDR|IPADDR/) {
-	$ret = "/* StorageNew->${name} = $defval; */ /* DEFVAL $mib->{'defaultValue'} */\n";
+	$ret = "/* StorageNew->${name} = NULL; */ /* DEFVAL $mib->{'defaultValue'} */\n";
+	$ret .= "/* StorageNew->${name} = 0; */ /* DEFVAL $mib->{'defaultValue'} */\n";
 	if ($defval =~ /^$/) {
-	    $ret = "StorageNew->${name} = 0x00000000;\n";
+	    $ret = "StorageNew->${name} = (u_char *) \"\\x00\\x00\\x00\\x00\";\n";
+	    $ret .= "StorageNew->${name}Len = 4;\n";
 	} elsif ($defval =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/) {
-	    $val = ($1 << 24) + ($2 << 16) + ($3 << 8) + $4;
-	    $val = sprintf("0x%08X", $val);
-	    $ret = "StorageNew->${name} = $val;\n";
+	    $val = sprintf("\"\\x%02x\\x%02x\\x%02x\\x%02x\"", $1, $2, $3, $4);
+	    $ret = "StorageNew->${name} = (u_char *) $val;\n";
+	    $ret .= "StorageNew->${name}Len = 4;\n";
 	}
     }
     print "...done.   DEFVAL $mib->{'defaultValue'}:\n" if $debug;

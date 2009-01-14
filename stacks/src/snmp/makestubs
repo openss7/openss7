@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2009-01-10 17:09:13 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-01-14 14:29:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-10 17:09:13 $ by $Author: brian $
+# Last Modified $Date: 2009-01-14 14:29:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.12  2009-01-14 14:29:58  brian
+# - working up agents
+#
+# Revision 0.9.2.11  2009-01-12 12:09:08  brian
+# - add mx mib
+#
 # Revision 0.9.2.10  2009-01-10 17:09:13  brian
 # - updated agents
 #
@@ -93,7 +99,7 @@
 # =============================================================================
 
 MIBS=
-MIBDIRS=./mibs:../../../sigtran/src/snmp/mibs:/usr/share/snmp/mibs
+MIBDIRS=./mibs:../../../streams/src/snmp/mibs:../../../sigtran/src/snmp/mibs:/usr/share/snmp/mibs
 MIBFILES=
 
 export MIBS
@@ -106,6 +112,7 @@ check: \
 	smiMIB.tree \
 	gmiMIB.tree \
 	cdr2MIB.tree \
+	mxMIB.tree \
 	x400pMIB.tree \
 	ss7MIB.tree \
 	ss7OmMIB.tree \
@@ -115,7 +122,8 @@ check: \
 	sccpMIB.tree \
 	sccpOmMIB.tree \
 	tcapMIB.tree \
-	tcapOmMIB.tree
+	tcapOmMIB.tree \
+	ds1EXT.tree
 
 smiMIB.tree: MIBS+=OPENSS7-SMI-MIB:OPENSS7-TC
 smiMIB.tree: mibs/OPENSS7-SMI-MIB.mib
@@ -128,6 +136,10 @@ gmiMIB.tree: mibs/OPENSS7-GMI-MIB.mib
 cdr2MIB.tree: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
 cdr2MIB.tree: mibs/OPENSS7-CDR2-MIB.mib
 	snmptranslate -Tp OPENSS7-CDR2-MIB::cdr2MIB >cdr2MIB.tree
+
+mxMIB.tree: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+mxMIB.tree: mibs/OPENSS7-MX-MIB.mib
+	snmptranslate -Tp OPENSS7-MX-MIB::mxMIB >mxMIB.tree
 
 x400pMIB.tree: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
 x400pMIB.tree: mibs/OPENSS7-X400P-MIB.mib
@@ -169,8 +181,13 @@ tcapOmMIB.tree: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
 tcapOmMIB.tree: mibs/OPENSS7-TCAP-OM-MIB.mib
 	snmptranslate -Tp OPENSS7-TCAP-OM-MIB::tcapOmMIB >tcapOmMIB.tree
 
+ds1EXT.tree: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+ds1EXT.tree: mibs/RFC4805-MIB.txt
+	snmptranslate -Tp DS1-EXT-MIB::ds1EXT >ds1EXT.tree
+
 basic: \
 	cdr2MIB_simple.c cdr2MIB_simple.h \
+	mxMIB_simple.c mxMIB_simple.h \
 	x400pMIB_simple.c x400pMIB_simple.h \
 	ss7MIB_simple.c ss7MIB_simple.h \
 	ss7OmMIB_simple.c ss7OmMIB_simple.h \
@@ -180,12 +197,18 @@ basic: \
 	sccpMIB_simple.c sccpMIB_simple.h \
 	sccpOmMIB_simple.c sccpOmMIB_simple.h \
 	tcapMIB_simple.c tcapMIB_simple.h \
-	tcapOmMIB_simple.c tcapOmMIB_simple.h
+	tcapOmMIB_simple.c tcapOmMIB_simple.h \
+	ds1EXT_simple.c ds1EXT_simple.h
 
 cdr2MIB_simple.c cdr2MIB_simple.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
 cdr2MIB_simple.c cdr2MIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-CDR2-MIB.mib
 	./mib2c -c ./mib2c.conf -f cdr2MIB_simple cdr2MIB
 	indent -nhnl cdr2MIB_simple.[ch]
+
+mxMIB_simple.c mxMIB_simple.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+mxMIB_simple.c mxMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MX-MIB.mib
+	./mib2c -c ./mib2c.conf -f mxMIB_simple mxMIB
+	indent -nhnl mxMIB_simple.[ch]
 
 x400pMIB_simple.c x400pMIB_simple.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
 x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-X400P-MIB.mib
@@ -237,9 +260,15 @@ tcapOmMIB_simple.c tcapOmMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-TCAP-OM-MIB
 	./mib2c -c ./mib2c.conf -f tcapOmMIB_simple tcapOmMIB
 	indent -nhnl tcapOmMIB_simple.[ch]
 
+ds1EXT_simple.c ds1EXT_simple.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+ds1EXT_simple.c ds1EXT_simple.h: mib2c mib2c.conf mibs/RFC4805-EXT-MIB.mib
+	./mib2c -c ./mib2c.conf -f ds1EXT_simple ds1EXT
+	indent -nhnl ds1EXT_simple.[ch]
+
 storage: \
 	smiMIB_storage.c smiMIB_storage.h \
 	gmiMIB_storage.c gmiMIB_storage.h \
+	mxMIB_storage.c mxMIB_storage.h \
 	x400pMIB_storage.c x400pMIB_storage.h \
 	ss7OmMIB_storage.c ss7OmMIB_storage.h \
 	slMIB_storage.c slMIB_storage.h \
@@ -248,7 +277,8 @@ storage: \
 	sccpMIB_storage.c sccpMIB_storage.h \
 	sccpOmMIB_storage.c sccpOmMIB_storage.h \
 	tcapOmMIB_storage.c tcapOmMIB_storage.h \
-	tcapMIB_storage.c tcapMIB_storage.h
+	tcapMIB_storage.c tcapMIB_storage.h \
+	ds1EXT_storage.c ds1EXT_storage.h
 
 smiMIB_storage.c smiMIB_storage.h: MIBS+=OPENSS7-SMI-MIB:OPENSS7-TC
 smiMIB_storage.c smiMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-SMI-MIB.mib
@@ -264,6 +294,11 @@ cdr2MIB_storage.c cdr2MIB_storage.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
 cdr2MIB_storage.c cdr2MIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-CDR2-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f cdr2MIB_storage cdr2MIB
 	indent -nhnl cdr2MIB_storage.[ch]
+
+mxMIB_storage.c mxMIB_storage.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+mxMIB_storage.c mxMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-MX-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f mxMIB_storage mxMIB
+	indent -nhnl mxMIB_storage.[ch]
 
 x400pMIB_storage.c x400pMIB_storage.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
 x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-X400P-MIB.mib
@@ -295,9 +330,9 @@ mtpOmMIB_storage.c mtpOmMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-MTP-
 	./mib2c -c ./mib2c.storage.conf -f mtpOmMIB_storage mtpOmMIB
 	indent -nhnl mtpOmMIB_storage.[ch]
 
-sccpMIB_storage.c sccpMIB_storage.h: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-TC
+sccpMIB_storage.c sccpMIB_storage.h: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
 sccpMIB_storage.c sccpMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-SCCP-MIB.mib
-	./mib2c -c ./mib2c.storage.conf -f sccpMIB_storage sccpMIB
+	./mib2c -c ./mib2c.storage.conf -f sccpMIB_storage OPENSS7-SCCP-MIB::sccpMIB
 	indent -nhnl sccpMIB_storage.[ch]
 
 sccpOmMIB_storage.c sccpOmMIB_storage.h: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
@@ -315,6 +350,11 @@ tcapOmMIB_storage.c tcapOmMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-T
 	./mib2c -c ./mib2c.storage.conf -f tcapOmMIB_storage tcapOmMIB
 	indent -nhnl tcapOmMIB_storage.[ch]
 
+ds1EXT_storage.c ds1EXT_storage.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+ds1EXT_storage.c ds1EXT_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-EXT-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f ds1EXT_storage ds1EXT
+	indent -nhnl ds1EXT_storage.[ch]
+
 openss7: \
 	cdr2MIB_openss7.c cdr2MIB_openss7.h \
 	ss7MIB_openss7.c ss7MIB_openss7.h
@@ -323,6 +363,11 @@ cdr2MIB_openss7.c cdr2MIB_openss7.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
 cdr2MIB_openss7.c cdr2MIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-CDR2-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f cdr2MIB_openss7 cdr2MIB
 	indent -nhnl cdr2MIB_openss7.[ch]
+
+mxMIB_openss7.c mxMIB_openss7.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+mxMIB_openss7.c mxMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-MX-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f mxMIB_openss7 mxMIB
+	indent -nhnl mxMIB_openss7.[ch]
 
 x400pMIB_openss7.c x400pMIB_openss7.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
 x400pMIB_openss7.c x400pMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-X400P-MIB.mib
@@ -374,6 +419,11 @@ tcapOmMIB_openss7.c tcapOmMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-T
 	./mib2c -c ./mib2c.openss7.conf -f tcapOmMIB_openss7 tcapOmMIB
 	indent -nhnl tcapOmMIB_openss7.[ch]
 
+ds1EXT_openss7.c ds1EXT_openss7.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+ds1EXT_openss7.c ds1EXT_openss7.h: mib2c mib2c.openss7.conf mibs/RFC4805-EXT-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f ds1EXT_openss7 ds1EXT
+	indent -nhnl ds1EXT_openss7.[ch]
+
 tables:
 	./mib2c -c ./mib2c.storage.conf x400pSyncTable
 	./mib2c -c ./mib2c.storage.conf x400pCardTable
@@ -387,6 +437,13 @@ x400pCardTable.c x400pCardTable.h: mib2c mib2c.openss7.conf mibs/OPENSS7-X400P-M
 	indent -nhnl x400pCardTable.[ch]
 
 clean:
+	rm -f smiMIB.tree
+	rm -f smiMIB_simple.[ch]
+	rm -f smiMIB_simple.[ch]~
+	rm -f smiMIB_storage.[ch]
+	rm -f smiMIB_storage.[ch]~
+	rm -f smiMIB_openss7.[ch]
+	rm -f smiMIB_openss7.[ch]~
 	rm -f gmiMIB.tree
 	rm -f gmiMIB_simple.[ch]
 	rm -f gmiMIB_simple.[ch]~
@@ -401,6 +458,13 @@ clean:
 	rm -f cdr2MIB_storage.[ch]~
 	rm -f cdr2MIB_openss7.[ch]
 	rm -f cdr2MIB_openss7.[ch]~
+	rm -f mxMIB.tree
+	rm -f mxMIB_simple.[ch]
+	rm -f mxMIB_simple.[ch]~
+	rm -f mxMIB_storage.[ch]
+	rm -f mxMIB_storage.[ch]~
+	rm -f mxMIB_openss7.[ch]
+	rm -f mxMIB_openss7.[ch]~
 	rm -f x400pMIB.tree
 	rm -f x400pMIB_simple.[ch]
 	rm -f x400pMIB_simple.[ch]~
@@ -480,3 +544,10 @@ clean:
 	rm -f x400pSpanTable.[ch]~
 	rm -f x400pChanTable.[ch]
 	rm -f x400pChanTable.[ch]~
+	rm -f ds1EXT.tree
+	rm -f ds1EXT_simple.[ch]
+	rm -f ds1EXT_storage.[ch]
+	rm -f ds1EXT_openss7.[ch]
+	rm -f ds1EXT_simple.[ch]~
+	rm -f ds1EXT_storage.[ch]~
+	rm -f ds1EXT_openss7.[ch]~

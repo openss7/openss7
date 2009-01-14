@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-X400P-MIB.mib,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2009-01-14 14:30:09 $
+-- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-01-14 14:30:09 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -59,58 +59,49 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- $Log: OPENSS7-X400P-MIB.mib,v $
--- Revision 0.9.2.17  2009-01-14 14:30:09  brian
+-- $Log: OPENSS7-MX-MIB.mib,v $
+-- Revision 0.9.2.13  2009-01-14 14:30:09  brian
 -- - working up agents
 --
--- Revision 0.9.2.16  2009-01-14 09:38:25  brian
--- - typos
+-- Revision 0.9.2.12  2009-01-14 10:13:34  brian
+-- - fix errors
 --
--- Revision 0.9.2.15  2009-01-14 09:08:46  brian
+-- Revision 0.9.2.11  2009-01-14 09:08:46  brian
 -- - mib updates
 --
--- Revision 0.9.2.14  2009-01-12 12:09:48  brian
+-- Revision 0.9.2.10  2009-01-12 12:09:48  brian
 -- - mib updates
 --
--- Revision 0.9.2.13  2009-01-11 11:46:38  brian
--- - updates
---
--- Revision 0.9.2.12  2009-01-10 17:09:28  brian
--- - updated agents
---
--- Revision 0.9.2.11  2008-12-24 13:08:29  brian
--- - building ss7confd
---
--- Revision 0.9.2.10  2008-12-14 12:55:57  brian
--- - working up mibs
---
--- Revision 0.9.2.9  2008-10-11 04:34:40  brian
--- - cleanup MIBs
---
--- Revision 0.9.2.8  2008-04-29 07:11:23  brian
--- - updating headers for release
---
--- Revision 0.9.2.6  2008/01/10 19:55:44  brian
--- - updating mibs
---
--- Revision 0.9.2.5  2007/12/29 21:57:41  brian
--- - updates
---
--- Revision 0.9.2.4  2007/12/15 20:19:14  brian
--- - updates
---
--- Revision 0.9.2.3  2007/11/06 09:47:06  brian
+-- Revision 0.9.2.9  2009-01-11 18:42:58  brian
 -- - updated mibs
 --
--- Revision 0.9.2.2  2007/10/15 01:14:28  brian
--- - updated MIBs
+-- Revision 0.9.2.8  2009-01-10 17:46:47  brian
+-- - updated agents and mibs
 --
--- Revision 0.9.2.1  2007/09/29 14:31:39  brian
--- - added new mib files
+-- Revision 0.9.2.7  2009-01-03 10:51:12  brian
+-- - updated agent
+--
+-- Revision 0.9.2.6  2008-12-27 15:35:03  brian
+-- - correct default values
+--
+-- Revision 0.9.2.5  2008-12-20 12:48:40  brian
+-- - added manpages and mibs
+--
+-- Revision 0.9.2.4  2008-12-02 06:51:28  brian
+-- - document CHI
+--
+-- Revision 0.9.2.3  2008/01/14 19:47:06  brian
+-- - updated and corrected mibs
+--
+-- Revision 0.9.2.2  2008/01/03 12:46:02  brian
+-- - updates for new mib2c
+--
+-- Revision 0.9.2.1  2008/01/01 13:59:39  brian
+-- - added new mibs
 --
 -- =============================================================================
 
-OPENSS7-X400P-MIB DEFINITIONS ::= BEGIN
+OPENSS7-MX-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Counter32, Integer32, 
@@ -141,7 +132,7 @@ IMPORTS
     openss7Modules
 	FROM OPENSS7-SMI;
 
-x400pMIB MODULE-IDENTITY
+mxMIB MODULE-IDENTITY
     LAST-UPDATED	"200901141143Z"
     ORGANIZATION
 	"The OpenSS7 Project"
@@ -156,24 +147,15 @@ x400pMIB MODULE-IDENTITY
 	 Mob: +1 780 953 0557
 	 E-Mail: bidulock@openss7.org"
     DESCRIPTION	
-	"MIB Module for the X400P Drivers and Cards.  Note that, unlike 
-	 the OPENSS7-X400P-MX-MIB module, this module includes span and 
-	 channel configuration and is intended on being used with the 
-	 older X400P-SL SS7 drivers."
+	"MIB Module for the MX multiplexing driver.  In the OpenSS7 
+	 system the MX multiplexing driver is a TDM switching module."
     REVISION	"200901141143Z"
     DESCRIPTION
 	"Added driver table to the MIB."
-    REVISION	"200901111019Z"
-    DESCRIPTION	
-	"Latest update of this module, mostly comments and file 
-	 formatting."
-    REVISION	"200812222303Z"
-    DESCRIPTION	
-	"Rationalized to OPENSS7-X400P-MX-MIB."
-    REVISION	"200709290553Z"
+    REVISION	"200801011353Z"
     DESCRIPTION	
 	"First release of this module."
-    ::= { openss7Modules 400 }
+    ::= { openss7Modules 11 }
 
 -- ====================================================================
 -- TEXUTAL CONVENTIONS
@@ -189,7 +171,7 @@ SpanIdentity ::= TEXTUAL-CONVENTION
 	 identity number of the device driver, most significant octet 
 	 first, the third octet is the card number; and the fourth octet 
 	 is the span number on the card."
-    SYNTAX	OCTET STRING (SIZE(0 | 4))
+    SYNTAX	OCTET STRING (SIZE(0 | 2))
 
 SpanNumber ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-0"
@@ -237,34 +219,34 @@ PhysicalPointOfAppearance ::= TEXTUAL-CONVENTION
 	 bits of the PPA."
     SYNTAX	OCTET STRING (SIZE(2))
 
-x400pNotifications OBJECT IDENTIFIER
-    ::= { x400pMIB 0 }
+mxNotifications OBJECT IDENTIFIER
+    ::= { mxMIB 0 }
 
-x400pObjects OBJECT IDENTIFIER
-    ::= { x400pMIB 1 }
+mxObjects OBJECT IDENTIFIER
+    ::= { mxMIB 1 }
 
 -- ====================================================================
 -- TABLES
 -- ====================================================================
 
-x400pTables OBJECT IDENTIFIER
-    ::= { x400pObjects 1 }
+mxTables OBJECT IDENTIFIER
+    ::= { mxObjects 1 }
 
-x400pSync OBJECT IDENTIFIER
-    ::= { x400pTables 1 }
+mxSync OBJECT IDENTIFIER
+    ::= { mxTables 1 }
 
-x400pSyncTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pSyncEntry
+mxSyncTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxSyncEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"The synchronization table is a table of synchronization groups.  
 	 Equipped cards that are configured for automatic synchronzation 
 	 are assigned to a synchronization group."
-    ::= { x400pSync 1 }
+    ::= { mxSync 1 }
 
-x400pSyncEntry OBJECT-TYPE
-    SYNTAX	X400pSyncEntry
+mxSyncEntry OBJECT-TYPE
+    SYNTAX	MxSyncEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -275,19 +257,19 @@ x400pSyncEntry OBJECT-TYPE
 	 may be deleted implicitly as a part of system operation when a 
 	 card is disassociated with a synchroniation group."
     INDEX	{
-	x400pSyncGroup,
-	x400pSyncIndex
+	mxSyncGroup,
+	mxSyncIndex
     }
-    ::= { x400pSyncTable 1 }
+    ::= { mxSyncTable 1 }
 
-X400pSyncEntry ::= SEQUENCE {
-    x400pSyncGroup				Unsigned32,
-    x400pSyncIndex				Unsigned32,
-    x400pSyncSpanId				SpanIdentity,
-    x400pSyncRowStatus				RowStatus
+MxSyncEntry ::= SEQUENCE {
+    mxSyncGroup					Unsigned32,
+    mxSyncIndex					Unsigned32,
+    mxSyncSpanId				SpanIdentity,
+    mxSyncRowStatus				RowStatus
 }
 
-x400pSyncGroup OBJECT-TYPE
+mxSyncGroup OBJECT-TYPE
     SYNTAX	Unsigned32 (1..16)
     MAX-ACCESS	not-accessible
     STATUS	current
@@ -297,9 +279,9 @@ x400pSyncGroup OBJECT-TYPE
 	 Membership in the group is the cards which have an 
 	 synchronization group value equal to this index and a 
 	 synchronization source setting of syncAuto(6)."
-    ::= { x400pSyncEntry 1 }
+    ::= { mxSyncEntry 1 }
 
-x400pSyncIndex OBJECT-TYPE
+mxSyncIndex OBJECT-TYPE
     SYNTAX	Unsigned32 (1..8)
     MAX-ACCESS	not-accessible
     STATUS	current
@@ -308,9 +290,9 @@ x400pSyncIndex OBJECT-TYPE
 	 entry will be used for synchronization of the card.  Index 
 	 value 1 is the highest priority and index value 8 is the lowest 
 	 priority."
-    ::= { x400pSyncEntry 2 }
+    ::= { mxSyncEntry 2 }
 
-x400pSyncSpanId OBJECT-TYPE
+mxSyncSpanId OBJECT-TYPE
     SYNTAX	SpanIdentity
     MAX-ACCESS	read-create
     STATUS	current
@@ -324,9 +306,9 @@ x400pSyncSpanId OBJECT-TYPE
 	 must have its synchronization group set to the index of this 
 	 entry, and the card synchronization source must be set to 
 	 syncAuto(6)."
-    ::= { x400pSyncEntry 3 }
+    ::= { mxSyncEntry 3 }
 
-x400pSyncRowStatus OBJECT-TYPE
+mxSyncRowStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -342,24 +324,24 @@ x400pSyncRowStatus OBJECT-TYPE
 	 system may automatically delete rows from this table."
     REFERENCE	
 	"STD 58, SNMPv2-TC RowStatus."
-    ::= { x400pSyncEntry 4 }
+    ::= { mxSyncEntry 4 }
 
 
-x400pDriv OBJECT IDENTIFIER
-    ::= { x400pTables 2 }
+mxDriv OBJECT IDENTIFIER
+    ::= { mxTables 2 }
 
-x400pDrivTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pDrivEntry
+mxDrivTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxDrivEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"The driver table is a table of device drivers.  Each driver 
 	 that provides support for hardware cards is represented in this 
 	 table."
-    ::= { x400pDriv 1 }
+    ::= { mxDriv 1 }
 
-x400pDrivEntry OBJECT-TYPE
-    SYNTAX	X400pDrivEntry
+mxDrivEntry OBJECT-TYPE
+    SYNTAX	MxDrivEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -368,25 +350,25 @@ x400pDrivEntry OBJECT-TYPE
 	 are generated automatically by the agent.  Additional rows may 
 	 be added (but not removed) by a management station."
     INDEX	{
-	x400pDrivName
+	mxDrivName
     }
-    ::= { x400pDrivTable 1 }
+    ::= { mxDrivTable 1 }
 
-X400pDrivEntry ::= SEQUENCE {
-    x400pDrivName				StreamsModuleName,
-    x400pDrivIdnum				Unsigned32,
-    x400pDrivMajor				Unsigned32,
-    x400pDrivDescription			SnmpAdminString,
-    x400pDrivRevision				SnmpAdminString,
-    x400pDrivCopyright				SnmpAdminString,
-    x400pDrivSupportedDevice			SnmpAdminString,
-    x400pDrivContact				SnmpAdminString,
-    x400pDrivLicense				INTEGER,
-    x400pDrivDate				DateAndTime,
-    x400pDrivRowStatus				RowStatus
+MxDrivEntry ::= SEQUENCE {
+    mxDrivName					StreamsModuleName,
+    mxDrivIdnum					Unsigned32,
+    mxDrivMajor					Unsigned32,
+    mxDrivDescription				SnmpAdminString,
+    mxDrivRevision				SnmpAdminString,
+    mxDrivCopyright				SnmpAdminString,
+    mxDrivSupportedDevice			SnmpAdminString,
+    mxDrivContact				SnmpAdminString,
+    mxDrivLicense				INTEGER,
+    mxDrivDate					DateAndTime,
+    mxDrivRowStatus				RowStatus
 }
 
-x400pDrivName OBJECT-TYPE
+mxDrivName OBJECT-TYPE
     SYNTAX	StreamsModuleName
     MAX-ACCESS	not-accessible
     STATUS	current
@@ -396,9 +378,9 @@ x400pDrivName OBJECT-TYPE
 	 OPENSS7-STREAMS-MIB.  This driver name also describes the path 
 	 to the device driver for the agent to use in accessing the 
 	 driver (e.g. /dev/streams/mxDrivName/0)."
-    ::= { x400pDrivEntry 1 }
+    ::= { mxDrivEntry 1 }
 
-x400pDrivIdnum OBJECT-TYPE
+mxDrivIdnum OBJECT-TYPE
     SYNTAX	Unsigned32 (0..16383)
     MAX-ACCESS	read-only
     STATUS	current
@@ -406,9 +388,9 @@ x400pDrivIdnum OBJECT-TYPE
 	"Provides the STREAMS module identification number associated 
 	 with the device driver.  This is equivalent to the strModIdnum  
 	 entry in the OPENSS7-STREAMS-MIB."
-    ::= { x400pDrivEntry 2 }
+    ::= { mxDrivEntry 2 }
 
-x400pDrivMajor OBJECT-TYPE
+mxDrivMajor OBJECT-TYPE
     SYNTAX	Unsigned32 (0..16383)
     MAX-ACCESS	read-only
     STATUS	current
@@ -416,34 +398,34 @@ x400pDrivMajor OBJECT-TYPE
 	"Provides the STREAMS driver major device number associated with 
 	 the device driver.  This is equivalent to the strModMajor entry 
 	 in the OPENSS7-STREAMS-MIB."
-    ::= { x400pDrivEntry 3 }
+    ::= { mxDrivEntry 3 }
 
-x400pDrivDescription OBJECT-TYPE
+mxDrivDescription OBJECT-TYPE
     SYNTAX	SnmpAdminString
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Provides a brief one line description of the device driver."
-    ::= { x400pDrivEntry 4 }
+    ::= { mxDrivEntry 4 }
 
-x400pDrivRevision OBJECT-TYPE
+mxDrivRevision OBJECT-TYPE
     SYNTAX	SnmpAdminString
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Provides a brief one line description of the device driver 
 	 version and revision."
-    ::= { x400pDrivEntry 5 }
+    ::= { mxDrivEntry 5 }
 
-x400pDrivCopyright OBJECT-TYPE
+mxDrivCopyright OBJECT-TYPE
     SYNTAX	SnmpAdminString
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Provides a brief one line copyright statement."
-    ::= { x400pDrivEntry 6 }
+    ::= { mxDrivEntry 6 }
 
-x400pDrivSupportedDevice OBJECT-TYPE
+mxDrivSupportedDevice OBJECT-TYPE
     SYNTAX	SnmpAdminString
     MAX-ACCESS	read-only
     STATUS	current
@@ -451,9 +433,9 @@ x400pDrivSupportedDevice OBJECT-TYPE
 	"Provides a brief one line text description of the supported 
 	 devices.  This is the MODULE_SUPPORTED_DEVICE() field 
 	 associated with the kernel module."
-    ::= { x400pDrivEntry 7 }
+    ::= { mxDrivEntry 7 }
 
-x400pDrivContact OBJECT-TYPE
+mxDrivContact OBJECT-TYPE
     SYNTAX	SnmpAdminString
     MAX-ACCESS	read-only
     STATUS	current
@@ -461,9 +443,9 @@ x400pDrivContact OBJECT-TYPE
 	"Provides the contact information (e.g. email address) of the 
 	 author or other contact for the device driver.  This is the 
 	 MODULE_AUTHOR() field associated with the kernel module."
-    ::= { x400pDrivEntry 8 }
+    ::= { mxDrivEntry 8 }
 
-x400pDrivLicense OBJECT-TYPE
+mxDrivLicense OBJECT-TYPE
     SYNTAX	INTEGER {
 	proprietary(0), gpl(1), gplV2(2), gplPlus(3), dualBsdGpl(4), 
 	dualMitGpl(5), dualMplGpl(6) }
@@ -484,17 +466,17 @@ x400pDrivLicense OBJECT-TYPE
 	 
 	 This is the MODULE_LICENSE() field associated with the kernel 
 	 module."
-    ::= { x400pDrivEntry 9 }
+    ::= { mxDrivEntry 9 }
 
-x400pDrivDate OBJECT-TYPE
+mxDrivDate OBJECT-TYPE
     SYNTAX	DateAndTime
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Provides the date of the device driver."
-    ::= { x400pDrivEntry 10 }
+    ::= { mxDrivEntry 10 }
 
-x400pDrivRowStatus OBJECT-TYPE
+mxDrivRowStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -502,42 +484,42 @@ x400pDrivRowStatus OBJECT-TYPE
 	"Provides a mechanism whereby management stations may create or 
 	 delete rows in this table.  Rows added by management stations 
 	 persist across an agent reboot.  Management stations must 
-	 provide a valid value for the x400pDrivName field that corresponds 
+	 provide a valid value for the mxDrivName field that corresponds 
 	 to a device driver in the managed system.  The agent will 
 	 populate other fields accordingly.  Invalid, unsupported or 
 	 non-existent device drivers will cause the row creation request 
 	 to be rejected with an inconsistent name.  Requests to destroy 
 	 rows in this table that are referenced in other tables will be 
 	 likewise refused."
-    ::= { x400pDrivEntry 11 }
+    ::= { mxDrivEntry 11 }
 
 
-x400pCard OBJECT IDENTIFIER
-    ::= { x400pTables 3 }
+mxCard OBJECT IDENTIFIER
+    ::= { mxTables 3 }
 
-x400pCardNextIndex OBJECT-TYPE
+mxCardNextIndex OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
-	"Provides the next available index into the x400pCardTable for 
+	"Provides the next available index into the mxCardTable for 
 	 use by management stations when adding rows to the table."
     REFERENCE	
 	"STD 58"
-    ::= { x400pCard 1 }
+    ::= { mxCard 1 }
 
-x400pCardTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pCardEntry
+mxCardTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxCardEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
-	"Provides the card table which indexes each card in the managed 
+	"Provides the table which indexes each card in the managed 
 	 element.  The Card Table provides an entry for each of the 
 	 equipped cards in the system."
-    ::= { x400pCard 2 }
+    ::= { mxCard 2 }
 
-x400pCardEntry OBJECT-TYPE
-    SYNTAX	X400pCardEntry
+mxCardEntry OBJECT-TYPE
+    SYNTAX	MxCardEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -555,42 +537,42 @@ x400pCardEntry OBJECT-TYPE
 	 operation.  Each entry in the table corresponds to an existing 
 	 and installed card."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex
+	mxDrivName,	-- shared index
+	mxCardIndex
     }
-    ::= { x400pCardTable 1 }
+    ::= { mxCardTable 1 }
 
-X400pCardEntry ::= SEQUENCE {
-    x400pCardIndex				Unsigned32,
-    x400pCardType				AutonomousType,
-    x400pCardIdentifier				INTEGER,
-    x400pCardRevision				DisplayString,
-    x400pCardChipType				AutonomousType,
-    x400pCardChipRevision			DisplayString,
-    x400pCardPciBus				Unsigned32,
-    x400pCardPciSlot				Unsigned32,
-    x400pCardPciIrq				Unsigned32,
-    x400pCardSpanType				INTEGER,
-    x400pCardMode				BITS,
-    x400pCardSyncMaster				INTEGER,
-    x400pCardSyncSource				INTEGER,
-    x400pCardSyncGroup				Unsigned32,
-    x400pCardAdministrativeState		AdministrativeState,
-    x400pCardOperationalState			OperationalState,
-    x400pCardUsageState				UsageState,
-    x400pCardAlarmStatus			AlarmStatus,
-    x400pCardProceduralStatus			ProceduralStatus,
-    x400pCardAvailabilityStatus			AvailabilityStatus,
-    x400pCardControlStatus			ControlStatus,
-    x400pCardUnknownStatus			UnknownStatus,
-    x400pCardStandbyStatus			StandbyStatus,
-    x400pCardSyncSpanId				SpanIdentity,
-    x400pCardSyncTransitions			Counter32,
-    x400pCardName				CommonLanguageName,
-    x400pCardStatus				RowStatus
+MxCardEntry ::= SEQUENCE {
+    mxCardIndex					Unsigned32,
+    mxCardType					AutonomousType,
+    mxCardIdentifier				INTEGER,
+    mxCardRevision				DisplayString,
+    mxCardChipType				AutonomousType,
+    mxCardChipRevision				DisplayString,
+    mxCardPciBus				Unsigned32,
+    mxCardPciSlot				Unsigned32,
+    mxCardPciIrq				Unsigned32,
+    mxCardSpanType				INTEGER,
+    mxCardMode					BITS,
+    mxCardSyncMaster				INTEGER,
+    mxCardSyncSource				INTEGER,
+    mxCardSyncGroup				Unsigned32,
+    mxCardAdministrativeState			AdministrativeState,
+    mxCardOperationalState			OperationalState,
+    mxCardUsageState				UsageState,
+    mxCardAlarmStatus				AlarmStatus,
+    mxCardProceduralStatus			ProceduralStatus,
+    mxCardAvailabilityStatus			AvailabilityStatus,
+    mxCardControlStatus				ControlStatus,
+    mxCardUnknownStatus				UnknownStatus,
+    mxCardStandbyStatus				StandbyStatus,
+    mxCardSyncSpanId				SpanIdentity,
+    mxCardSyncTransitions			Counter32,
+    mxCardName					CommonLanguageName,
+    mxCardStatus				RowStatus
 }
 
-x400pCardIndex OBJECT-TYPE
+mxCardIndex OBJECT-TYPE
     SYNTAX	Unsigned32 (1..16)
     MAX-ACCESS	not-accessible -- index
     STATUS	current
@@ -599,9 +581,9 @@ x400pCardIndex OBJECT-TYPE
 	 the ordinal value of the card number and is used as a handle to 
 	 refer to this card.  This is a small ordinal number beginning 
 	 with a 1 and enumerating as many as 16 cards."
-    ::= { x400pCardEntry 1 }
+    ::= { mxCardEntry 1 }
 
-x400pCardType OBJECT-TYPE
+mxCardType OBJECT-TYPE
     SYNTAX	AutonomousType
     MAX-ACCESS	read-only
     STATUS	current
@@ -611,31 +593,31 @@ x400pCardType OBJECT-TYPE
 	 are obsolete):
 	 
 	 - zeroDotZero,
-	 - x400pCardTypePLX9030,
-	 - x400pCardTypePLXDevelopmentBoard,
-	 - x400pCardTypeX400P,
-	 - x400pCardTypeE400P,
-	 - x400pCardTypeT400P,
-	 - x400pCardTypeX400P-SS7,
-	 - x400pCardTypeE400P-SS7,
-	 - x400pCardTypeT400P-SS7,
-	 - x400pCardTypeV400PE,
-	 - x400pCardTypeV400PT,
-	 - x400pCardTypeV401PE,
-	 - x400pCardTypeV401PT,
+	 - mxCardTypePLX9030,
+	 - mxCardTypePLXDevelopmentBoard,
+	 - mxCardTypeX400P,
+	 - mxCardTypeE400P,
+	 - mxCardTypeT400P,
+	 - mxCardTypeX400P-SS7,
+	 - mxCardTypeE400P-SS7,
+	 - mxCardTypeT400P-SS7,
+	 - mxCardTypeV400PE,
+	 - mxCardTypeV400PT,
+	 - mxCardTypeV401PE,
+	 - mxCardTypeV401PT,
 	"
-    ::= { x400pCardEntry 2 }
+    ::= { mxCardEntry 2 }
 
-x400pCardIdentifier OBJECT-TYPE
+mxCardIdentifier OBJECT-TYPE
     SYNTAX	INTEGER (SIZE(2))
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"This is a 2 octet card identifier that is written to the card 
 	 to identify it regardless of the slot position."
-    ::= { x400pCardEntry 3 }
+    ::= { mxCardEntry 3 }
 
-x400pCardRevision OBJECT-TYPE
+mxCardRevision OBJECT-TYPE
     SYNTAX	DisplayString (SIZE(1))
     MAX-ACCESS	read-only
     STATUS	current
@@ -644,9 +626,9 @@ x400pCardRevision OBJECT-TYPE
 	 the board revision number.  It is typically a single character 
 	 beginning an A and working up.  That is, the first revision of 
 	 a board is Rev. A, the second revision, Rev. B, an so on."
-    ::= { x400pCardEntry 4 }
+    ::= { mxCardEntry 4 }
 
-x400pCardChipType OBJECT-TYPE
+mxCardChipType OBJECT-TYPE
     SYNTAX	AutonomousType
     MAX-ACCESS	read-only
     STATUS	current
@@ -658,23 +640,23 @@ x400pCardChipType OBJECT-TYPE
 	 - zeroDotZero, indicates that the equipment is either absent, 
 	   not configured or failed.
 	 
-	 - x400pChipTypeDS2152, the DS2152 T1 chip.
-	 - x400pChipTypeDS21352, the DS21352 T1 chip.
-	 - x400pChipTypeDS21552, the DS21552 T1 chip.
+	 - mxChipTypeDS2152, the DS2152 T1 chip.
+	 - mxChipTypeDS21352, the DS21352 T1 chip.
+	 - mxChipTypeDS21552, the DS21552 T1 chip.
 	 
-	 - x400pChipTypeDS2154, the DS2154 E1 chip.
-	 - x400pChipTypeDS21354, the DS21354 E1 chip.
-	 - x400pChipTypeDS21554, the DS21554 E1 chip.
+	 - mxChipTypeDS2154, the DS2154 E1 chip.
+	 - mxChipTypeDS21354, the DS21354 E1 chip.
+	 - mxChipTypeDS21554, the DS21554 E1 chip.
 	 
-	 - x400pChipTypeDS2155, the DS2155 E1/T1/J1 chip.
-	 - x400pChipTypeDS2156, the DS2156 E1/T1/J1 chip.
+	 - mxChipTypeDS2155, the DS2155 E1/T1/J1 chip.
+	 - mxChipTypeDS2156, the DS2156 E1/T1/J1 chip.
 	 
 	 The DS2152, DS21352, DS21552 are T1-only chips; the DS2154, 
 	 DS21354, DS21554 are E1-only chips; the DS2155 and DS2156 are 
 	 E1/T1/J1 chips."
-    ::= { x400pCardEntry 5 }
+    ::= { mxCardEntry 5 }
 
-x400pCardChipRevision OBJECT-TYPE
+mxCardChipRevision OBJECT-TYPE
     SYNTAX	DisplayString (SIZE(1))
     MAX-ACCESS	read-only
     STATUS	current
@@ -684,9 +666,9 @@ x400pCardChipRevision OBJECT-TYPE
 	 character beginning at A and working up.  That is, the first 
 	 revision of a chipset is Rev. A, the second revision, Rev. B, 
 	 and so on."
-    ::= { x400pCardEntry 6 }
+    ::= { mxCardEntry 6 }
 
-x400pCardPciBus OBJECT-TYPE
+mxCardPciBus OBJECT-TYPE
     SYNTAX	Unsigned32 (0..16)
     MAX-ACCESS	read-only
     STATUS	current
@@ -694,9 +676,9 @@ x400pCardPciBus OBJECT-TYPE
 	"Indicates the PCI bus number for the PCI bus on which the card 
 	 is located.  The value zero (0) means that the card is not on a 
 	 bus (i.e. the card is unequiped)."
-    ::= { x400pCardEntry 7 }
+    ::= { mxCardEntry 7 }
 
-x400pCardPciSlot OBJECT-TYPE
+mxCardPciSlot OBJECT-TYPE
     SYNTAX	Unsigned32 (0..16)
     MAX-ACCESS	read-only
     STATUS	current
@@ -704,9 +686,9 @@ x400pCardPciSlot OBJECT-TYPE
 	"Indicates the PCI bus slot number in which the card is located.  
 	 The value zero (0) means that the card is not in a slot (i.e. 
 	 the card is unequipped)."
-    ::= { x400pCardEntry 8 }
+    ::= { mxCardEntry 8 }
 
-x400pCardPciIrq OBJECT-TYPE
+mxCardPciIrq OBJECT-TYPE
     SYNTAX	Unsigned32 (0..1024)
     MAX-ACCESS	read-only
     STATUS	current
@@ -714,9 +696,9 @@ x400pCardPciIrq OBJECT-TYPE
 	"Indicates the PCI IRQ that is assigned to the card.  The value 
 	 zero (0) means that no IRQ is currently assigned (i.e. the card 
 	 is unequipped or is not configured at the system level)."
-    ::= { x400pCardEntry 9 }
+    ::= { mxCardEntry 9 }
 
-x400pCardSpanType OBJECT-TYPE
+mxCardSpanType OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(1), t1(2), e1(3), j1(4) }
     MAX-ACCESS	read-create
@@ -744,9 +726,9 @@ x400pCardSpanType OBJECT-TYPE
 	 Note that not all values are applicable to all card types and 
 	 chipsets.  Also, not all cards or chipsets will allow all 
 	 values to be set."
-    ::= { x400pCardEntry 10 }
+    ::= { mxCardEntry 10 }
 
-x400pCardMode OBJECT-TYPE
+mxCardMode OBJECT-TYPE
     SYNTAX	BITS { remoteLoopback(0), localLoopback(1) }
     MAX-ACCESS	read-create
     STATUS	current
@@ -768,9 +750,9 @@ x400pCardMode OBJECT-TYPE
 	 card must have a control status of subjectToTest(0) or 
 	 reservedForTest(2) before either of these values may be added 
 	 to the set."
-    ::= { x400pCardEntry 11 }
+    ::= { mxCardEntry 11 }
 
-x400pCardSyncMaster OBJECT-TYPE
+mxCardSyncMaster OBJECT-TYPE
     SYNTAX	INTEGER { slave(0), master(1) }
     MAX-ACCESS	read-create
     STATUS	current
@@ -786,9 +768,9 @@ x400pCardSyncMaster OBJECT-TYPE
 	 
 	 - master(1), the card drives the external timing bus and the 
 	   synchronization source may not also be set to syncExtern(5)."
-    ::= { x400pCardEntry 12 }
+    ::= { mxCardEntry 12 }
 
-x400pCardSyncSource OBJECT-TYPE
+mxCardSyncSource OBJECT-TYPE
     SYNTAX	INTEGER {
 	syncSelf(0), sync1(1), sync2(2), sync3(3), sync4(4), 
 	syncExtern(5), syncAuto(6) }
@@ -810,14 +792,14 @@ x400pCardSyncSource OBJECT-TYPE
 	   from the external timing bus.
 	 
 	 - syncAuto(6), the driver will use the spans specified in the 
-	   x400pSyncTable side-table for the card as synchronization 
+	   mxSyncTable side-table for the card as synchronization 
 	   sources.
 	 
 	 Note that the card synchronization source only affects spans 
 	 that are set for internal(2) or slave(6) span clocking."
-    ::= { x400pCardEntry 13 }
+    ::= { mxCardEntry 13 }
 
-x400pCardSyncGroup OBJECT-TYPE
+mxCardSyncGroup OBJECT-TYPE
     SYNTAX	Unsigned32 (1..16)
     MAX-ACCESS	read-create
     STATUS	current
@@ -830,9 +812,9 @@ x400pCardSyncGroup OBJECT-TYPE
 	 same timing bus.  The order of cards and spans that will be 
 	 used for timing are specified against the synchronization group 
 	 that has an group index of the same value as this column."
-    ::= { x400pCardEntry 14 }
+    ::= { mxCardEntry 14 }
 
-x400pCardAdministrativeState OBJECT-TYPE
+mxCardAdministrativeState OBJECT-TYPE
     SYNTAX	AdministrativeState
     MAX-ACCESS	read-create
     STATUS	current
@@ -862,9 +844,9 @@ x400pCardAdministrativeState OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     administrativeState."
     DEFVAL	{ locked }
-    ::= { x400pCardEntry 15 }
+    ::= { mxCardEntry 15 }
 
-x400pCardOperationalState OBJECT-TYPE
+mxCardOperationalState OBJECT-TYPE
     SYNTAX	OperationalState
     MAX-ACCESS	read-only
     STATUS	current
@@ -884,9 +866,9 @@ x400pCardOperationalState OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     operationalState."
     DEFVAL	{ disabled }
-    ::= { x400pCardEntry 16 }
+    ::= { mxCardEntry 16 }
 
-x400pCardUsageState OBJECT-TYPE
+mxCardUsageState OBJECT-TYPE
     SYNTAX	UsageState
     MAX-ACCESS	read-only
     STATUS	current
@@ -912,9 +894,9 @@ x400pCardUsageState OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     usageState."
     DEFVAL	{ idle }
-    ::= { x400pCardEntry 17 }
+    ::= { mxCardEntry 17 }
 
-x400pCardAlarmStatus OBJECT-TYPE
+mxCardAlarmStatus OBJECT-TYPE
     SYNTAX	AlarmStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -959,9 +941,9 @@ x400pCardAlarmStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     alarmStatus."
     DEFVAL	{ '00000'B }
-    ::= { x400pCardEntry 18 }
+    ::= { mxCardEntry 18 }
 
-x400pCardProceduralStatus OBJECT-TYPE
+mxCardProceduralStatus OBJECT-TYPE
     SYNTAX	ProceduralStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -1009,9 +991,9 @@ x400pCardProceduralStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     proceduralStatus."
     DEFVAL	{ '00000'B }
-    ::= { x400pCardEntry 19 }
+    ::= { mxCardEntry 19 }
 
-x400pCardAvailabilityStatus OBJECT-TYPE
+mxCardAvailabilityStatus OBJECT-TYPE
     SYNTAX	AvailabilityStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -1075,9 +1057,9 @@ x400pCardAvailabilityStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     availabilityStatus."
     DEFVAL	{ '000000000'B }
-    ::= { x400pCardEntry 20 }
+    ::= { mxCardEntry 20 }
 
-x400pCardControlStatus OBJECT-TYPE
+mxCardControlStatus OBJECT-TYPE
     SYNTAX	ControlStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -1107,9 +1089,9 @@ x400pCardControlStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     controlStatus."
     DEFVAL	{ '0000'B }
-    ::= { x400pCardEntry 21 }
+    ::= { mxCardEntry 21 }
 
-x400pCardUnknownStatus OBJECT-TYPE
+mxCardUnknownStatus OBJECT-TYPE
     SYNTAX	UnknownStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -1127,9 +1109,9 @@ x400pCardUnknownStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     unknownStatus."
     DEFVAL	{ false }
-    ::= { x400pCardEntry 22 }
+    ::= { mxCardEntry 22 }
 
-x400pCardStandbyStatus OBJECT-TYPE
+mxCardStandbyStatus OBJECT-TYPE
     SYNTAX	StandbyStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -1164,9 +1146,9 @@ x400pCardStandbyStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     standbyStatus."
     DEFVAL	{ providingService }
-    ::= { x400pCardEntry 23 }
+    ::= { mxCardEntry 23 }
 
-x400pCardSyncSpanId OBJECT-TYPE
+mxCardSyncSpanId OBJECT-TYPE
     SYNTAX	SpanIdentity
     MAX-ACCESS	read-only
     STATUS	current
@@ -1182,18 +1164,18 @@ x400pCardSyncSpanId OBJECT-TYPE
 	 the value reflectes the identifier of the span currently 
 	 providing the synchronization source, or the null octet string 
 	 if no span is providing the synchroniation source."
-    ::= { x400pCardEntry 24 }
+    ::= { mxCardEntry 24 }
 
-x400pCardSyncTransitions OBJECT-TYPE
+mxCardSyncTransitions OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Indicates the number of times since the last discontinuity that 
 	 the synchronization span has transitioned."
-    ::= { x400pCardEntry 25 }
+    ::= { mxCardEntry 25 }
 
-x400pCardName OBJECT-TYPE
+mxCardName OBJECT-TYPE
     SYNTAX	CommonLanguageName
     MAX-ACCESS	read-only
     STATUS	current
@@ -1202,15 +1184,15 @@ x400pCardName OBJECT-TYPE
 	 and the CommonLanguageName textual convention."
     REFERENCE	
 	"OPENSS7-TC"
-    ::= { x400pCardEntry 26 }
+    ::= { mxCardEntry 26 }
 
-x400pCardStatus OBJECT-TYPE
+mxCardStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Provides management stations with the ability to add and delete 
-	 rows from the x400pCardTable.  All written columns in all rows 
+	 rows from the mxCardTable.  All written columns in all rows 
 	 are persistent across agent reboot.  Management stations may 
 	 add to this table but may not add to the subordinate tables.  
 	 Entries in subordinate tables are established automatically by 
@@ -1221,23 +1203,23 @@ x400pCardStatus OBJECT-TYPE
 	 that have not yet been installed in the system.
 	 
 	 Rows cannot be deleted that correspond to physical cards."
-    ::= { x400pCardEntry 27 }
+    ::= { mxCardEntry 27 }
 
 
-x400pSpan OBJECT IDENTIFIER
-    ::= { x400pTables 4 }
+mxSpan OBJECT IDENTIFIER
+    ::= { mxTables 4 }
 
-x400pSpanTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pSpanEntry
+mxSpanTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxSpanEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"The Span Table provides an entry for each of the equipped spans 
 	 in the system."
-    ::= { x400pSpan 1 }
+    ::= { mxSpan 1 }
 
-x400pSpanEntry OBJECT-TYPE
-    SYNTAX	X400pSpanEntry
+mxSpanEntry OBJECT-TYPE
+    SYNTAX	MxSpanEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -1246,75 +1228,75 @@ x400pSpanEntry OBJECT-TYPE
 	 operation.  Each entry in the table corresponds to a equipped 
 	 and installed span."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex
     }
-    ::= { x400pSpanTable 1 }
+    ::= { mxSpanTable 1 }
 
-X400pSpanEntry ::= SEQUENCE {
-    x400pSpanIndex				Unsigned32,
-    x400pSpanName				CommonLanguageName,
-    x400pSpanDevice				RowPointer,
-    x400pSpanEquipmentId			PhysicalPointOfAppearance,
-    x400pSpanType				INTEGER,
-    x400pSpanNumber				SpanNumber,
-    x400pSpanRate				INTEGER,
-    x400pSpanMode				BITS,
-    x400pSpanCrc				INTEGER,
-    x400pSpanClocking				INTEGER,
-    x400pSpanPriority				Unsigned32,
-    x400pSpanCoding				INTEGER,
-    x400pSpanFraming				INTEGER,
-    x400pSpanLineImpedance			INTEGER,
-    x400pSpanLineMode				INTEGER,
-    x400pSpanLineLength				INTEGER,
-    x400pSpanLineAttenuation			INTEGER,
-    x400pSpanLineGain				INTEGER,
-    x400pSpanLineDelay				Unsigned32,
-    x400pSpanTxLevel				INTEGER,
-    x400pSpanRxLevel				INTEGER,
-    x400pSpanAlarmSettleTime			TimeInterval,
-    x400pSpanLineCodeTime			TimeInterval,
-    x400pSpanPrimary				Unsigned32,
-    x400pSpanDataLink				BITS,
-    x400pSpanLineCode				INTEGER,
-    x400pSpanAlarmSeverityMappingProfile	RowPointer,
-    x400pSpanAdministrativeState		AdministrativeState,
-    x400pSpanOperationalState			OperationalState,
-    x400pSpanUsageState				UsageState,
-    x400pSpanAlarmStatus			AlarmStatus,
-    x400pSpanProceduralStatus			ProceduralStatus,
-    x400pSpanAvailabilityStatus			AvailabilityStatus,
-    x400pSpanControlStatus			ControlStatus,
-    x400pSpanStandbyStatus			StandbyStatus,
-    x400pSpanUnknownStatus			UnknownStatus,
-    x400pSpanSap				RowPointer,
-    x400pSpanLoopbackStatus			BITS,
-    x400pSpanLineStatus				BITS,
-    x400pSpanAlarms				BITS,
-    x400pSpanEvents				BITS,
-    x400pSpanReceiveLevel			Unsigned32,
-    x400pSpanReceiveThreshold			Unsigned32,
-    x400pSpanRowStatus				RowStatus
+MxSpanEntry ::= SEQUENCE {
+    mxSpanIndex					Unsigned32,
+    mxSpanName					CommonLanguageName,
+    mxSpanDevice				RowPointer,
+    mxSpanEquipmentId				PhysicalPointOfAppearance,
+    mxSpanType					INTEGER,
+    mxSpanNumber				SpanNumber,
+    mxSpanRate					INTEGER,
+    mxSpanMode					BITS,
+    mxSpanCrc					INTEGER,
+    mxSpanClocking				INTEGER,
+    mxSpanPriority				Unsigned32,
+    mxSpanCoding				INTEGER,
+    mxSpanFraming				INTEGER,
+    mxSpanLineImpedance				INTEGER,
+    mxSpanLineMode				INTEGER,
+    mxSpanLineLength				INTEGER,
+    mxSpanLineAttenuation			INTEGER,
+    mxSpanLineGain				INTEGER,
+    mxSpanLineDelay				Unsigned32,
+    mxSpanTxLevel				INTEGER,
+    mxSpanRxLevel				INTEGER,
+    mxSpanAlarmSettleTime			TimeInterval,
+    mxSpanLineCodeTime				TimeInterval,
+    mxSpanPrimary				Unsigned32,
+    mxSpanDataLink				BITS,
+    mxSpanLineCode				INTEGER,
+    mxSpanAlarmSeverityMappingProfile		RowPointer,
+    mxSpanAdministrativeState			AdministrativeState,
+    mxSpanOperationalState			OperationalState,
+    mxSpanUsageState				UsageState,
+    mxSpanAlarmStatus				AlarmStatus,
+    mxSpanProceduralStatus			ProceduralStatus,
+    mxSpanAvailabilityStatus			AvailabilityStatus,
+    mxSpanControlStatus				ControlStatus,
+    mxSpanStandbyStatus				StandbyStatus,
+    mxSpanUnknownStatus				UnknownStatus,
+    mxSpanSap					RowPointer,
+    mxSpanLoopbackStatus			BITS,
+    mxSpanLineStatus				BITS,
+    mxSpanAlarms				BITS,
+    mxSpanEvents				BITS,
+    mxSpanReceiveLevel				Unsigned32,
+    mxSpanReceiveThreshold			Unsigned32,
+    mxSpanRowStatus				RowStatus
 }
 
-x400pSpanIndex OBJECT-TYPE
-    SYNTAX	Unsigned32 (0..4)
+mxSpanIndex OBJECT-TYPE
+    SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"Provides and index by card of the span.  This is a small 
-	 integer from (0..4), where 1 through 4 indicates spans 1 
-	 through 4 on the card, and the special index 0 indicates 
+	 integer from (0..32), where 1 through 32 indicates spans 1 
+	 through 32 on the card, and the special index 0 indicates 
 	 defaults or settings for the entire card.  Active rows 
 	 corresponding to spans can only be added to this table by the 
 	 agent.  Management stations can add notinservice rows and 
 	 control or configure the span by accessing the read-create 
 	 columns for each span entry."
-    ::= { x400pSpanEntry 1 }
+    ::= { mxSpanEntry 1 }
 
-x400pSpanName OBJECT-TYPE
+mxSpanName OBJECT-TYPE
     SYNTAX	CommonLanguageName
     MAX-ACCESS	read-create
     STATUS	current
@@ -1327,9 +1309,9 @@ x400pSpanName OBJECT-TYPE
 	 have already been assigned to an existing row will be refused 
 	 as having an inconsistent value."
     DEFVAL	{ '' }
-    ::= { x400pSpanEntry 2 }
+    ::= { mxSpanEntry 2 }
 
-x400pSpanDevice OBJECT-TYPE
+mxSpanDevice OBJECT-TYPE
     SYNTAX	RowPointer
     MAX-ACCESS	read-create
     STATUS	current
@@ -1344,9 +1326,9 @@ x400pSpanDevice OBJECT-TYPE
 	 RowPointer to the x400pCardEntry in the x400pCardTable that 
 	 corresponds to the hardware card that provides the span."
     DEFVAL	{ { zeroDotZero } }
-    ::= { x400pSpanEntry 3 }
+    ::= { mxSpanEntry 3 }
 
-x400pSpanEquipmentId OBJECT-TYPE
+mxSpanEquipmentId OBJECT-TYPE
     SYNTAX	PhysicalPointOfAppearance
     MAX-ACCESS	read-create
     STATUS	current
@@ -1355,9 +1337,9 @@ x400pSpanEquipmentId OBJECT-TYPE
 	 within the device, driver or system.  This equipment identifier 
 	 must be specified on row creation and must be a valid equipment 
 	 identifier."
-    ::= { x400pSpanEntry 4 }
+    ::= { mxSpanEntry 4 }
 
-x400pSpanType OBJECT-TYPE
+mxSpanType OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), t1(1), e1(2), j1(3), e2(4), e3(5), t3(6) }
     MAX-ACCESS	read-create
@@ -1391,20 +1373,20 @@ x400pSpanType OBJECT-TYPE
 	 default value if unspecified on row creation is implementation 
 	 specific."
     DEFVAL	{ none }
-    ::= { x400pSpanEntry 5 }
+    ::= { mxSpanEntry 5 }
 
-x400pSpanNumber OBJECT-TYPE
+mxSpanNumber OBJECT-TYPE
     SYNTAX	SpanNumber
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
 	"Specifies the span number within an E2, E3 or T3 facility.  For 
 	 simple span types this value is zero.  The agent may supply a 
-	 default based on the x400pSpanEquipmentId, or may require that 
+	 default based on the mxSpanEquipmentId, or may require that 
 	 this value be set upon creation."
-    ::= { x400pSpanEntry 6 }
+    ::= { mxSpanEntry 6 }
 
-x400pSpanRate OBJECT-TYPE
+mxSpanRate OBJECT-TYPE
     SYNTAX	INTEGER (0|1544|2048)
     UNITS	"kilobits per second"
     MAX-ACCESS	read-only
@@ -1416,12 +1398,12 @@ x400pSpanRate OBJECT-TYPE
 	 Returns zero (0) when the hardware has not yet been configured 
 	 for any interface type."
     DEFVAL	{ 0 }
-    ::= { x400pSpanEntry 7 }
+    ::= { mxSpanEntry 7 }
 
-x400pSpanMode OBJECT-TYPE
+mxSpanMode OBJECT-TYPE
     SYNTAX	BITS {
 	local(0), remote(1), framer(2), payload(3) }
-    MAX-ACCESS	read-only
+    MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
 	"Specifies the loopback to apply.  This object may include the 
@@ -1457,14 +1439,14 @@ x400pSpanMode OBJECT-TYPE
 	 These values represent the loopback condition that has been set 
 	 by a management station or locallly as a part of system 
 	 operations.  The current loppback condition is reported in the 
-	 x400pSpanLoopbackStatus object.
+	 mxSpanLoopbackStatus object.
 	 
 	 To request or remote a loopback at the far end, use the 
-	 x400pSpanLineCode object."
+	 mxSpanLineCode object."
     DEFVAL	{ '0000'B }
-    ::= { x400pSpanEntry 8 }
+    ::= { mxSpanEntry 8 }
 
-x400pSpanCrc OBJECT-TYPE
+mxSpanCrc OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), crc4(1), crc5(2), crc6(3), crc6j(4) }
     MAX-ACCESS	read-create
@@ -1504,9 +1486,9 @@ x400pSpanCrc OBJECT-TYPE
 	 value none(0) indicates that the equipment is either absent, 
 	 not configured, or failed."
     DEFVAL	{ none }
-    ::= { x400pSpanEntry 9 }
+    ::= { mxSpanEntry 9 }
 
-x400pSpanClocking OBJECT-TYPE
+mxSpanClocking OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), loop(1), local(2), internal(3), external(4), 
 	adaptive(5) }
@@ -1547,9 +1529,9 @@ x400pSpanClocking OBJECT-TYPE
 	 The value none(0) can be read but not written.  When read, the 
 	 value none(0) indicates that the equipment is either absent, 
 	 not configured, or failed."
-    ::= { x400pSpanEntry 10 }
+    ::= { mxSpanEntry 10 }
 
-x400pSpanPriority OBJECT-TYPE
+mxSpanPriority OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	read-create
     STATUS	current
@@ -1559,9 +1541,9 @@ x400pSpanPriority OBJECT-TYPE
 	 source.  When non-zero, the recovered receive clock of this 
 	 span will be used as the timing source with the priority 
 	 given."
-    ::= { x400pSpanEntry 11 }
+    ::= { mxSpanEntry 11 }
 
-x400pSpanCoding OBJECT-TYPE
+mxSpanCoding OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), ami(1), b6zs(2), b8zs(3), hdb3(4), jbzs(5), zbtsi(6) }
     MAX-ACCESS	read-create
@@ -1598,9 +1580,9 @@ x400pSpanCoding OBJECT-TYPE
 	 The value none(0) can be read but not written.  When read, the 
 	 value none(0), indicates that the equipment is either absent, 
 	 not configured, or failed."
-    ::= { x400pSpanEntry 12 }
+    ::= { mxSpanEntry 12 }
 
-x400pSpanFraming OBJECT-TYPE
+mxSpanFraming OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), ccs(1), cas(2), sf(3), d4(4), esf(5) }
     MAX-ACCESS	read-create
@@ -1633,9 +1615,9 @@ x400pSpanFraming OBJECT-TYPE
 	 The value none(0) can be read but not written.  When read, the 
 	 value none(0) indicates that the equipment is either absent, 
 	 not configured, or failed."
-    ::= { x400pSpanEntry 13 }
+    ::= { mxSpanEntry 13 }
 
-x400pSpanLineImpedance OBJECT-TYPE
+mxSpanLineImpedance OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), unbalanced75ohm(1), balanced100ohm(2), 
 	balanced120ohm(3) }
@@ -1656,9 +1638,9 @@ x400pSpanLineImpedance OBJECT-TYPE
 	 The value none(0) can be read but not written.  When read, the 
 	 value none(0) indicates that the equipment is either absent, 
 	 not configured, or failed."
-    ::= { x400pSpanEntry 14 }
+    ::= { mxSpanEntry 14 }
 
-x400pSpanLineMode OBJECT-TYPE
+mxSpanLineMode OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), dsu(1), csu(2), monitor(3) }
     MAX-ACCESS	read-create
@@ -1681,9 +1663,9 @@ x400pSpanLineMode OBJECT-TYPE
 	 value none(0) indicates that the equipment is either absent, 
 	 not configured, or failed."
     DEFVAL	{ none }
-    ::= { x400pSpanEntry 15 }
+    ::= { mxSpanEntry 15 }
 
-x400pSpanLineLength OBJECT-TYPE
+mxSpanLineLength OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), dsx133ft(1), dsx266ft(2), dsx399ft(3), dsx533ft(4), 
 	dsx666ft(5) }
@@ -1709,12 +1691,12 @@ x400pSpanLineLength OBJECT-TYPE
 	 value none(0) indicates that the span is either absent, not 
 	 configured or failed.
 	 
-	 The value is only significant when x400pSpanLineMode is set to 
+	 The value is only significant when mxSpanLineMode is set to 
 	 dsu(1) for T1 spans."
     DEFVAL	{ dsx133ft }
-    ::= { x400pSpanEntry 16 }
+    ::= { mxSpanEntry 16 }
 
-x400pSpanLineAttenuation OBJECT-TYPE
+mxSpanLineAttenuation OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), csu0dB(1), csu8dB(2), csu15dB(3), csu23db(4) }
     MAX-ACCESS	read-create
@@ -1737,12 +1719,12 @@ x400pSpanLineAttenuation OBJECT-TYPE
 	 value none(0) indicates that the span is either absent, not 
 	 configured, or failed.
 	 
-	 The value is only significant when x400pSpanLineMode is set to 
+	 The value is only significant when mxSpanLineMode is set to 
 	 csu(2) for T1 spans."
     DEFVAL	{ none }
-    ::= { x400pSpanEntry 17 }
+    ::= { mxSpanEntry 17 }
 
-x400pSpanLineGain OBJECT-TYPE
+mxSpanLineGain OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), mon0dB(1), mon12dB(2), mon20dB(3), mon26dB(4), 
 	mon30dB(5), mon32dB(6) }
@@ -1770,12 +1752,12 @@ x400pSpanLineGain OBJECT-TYPE
 	 value none(0) indicates that the span is either absent, not 
 	 configured, or failed.
 	 
-	 The value is only significant when x400pSpanLineMode is set to 
+	 The value is only significant when mxSpanLineMode is set to 
 	 monitor(3)."
     DEFVAL	{ none }
-    ::= { x400pSpanEntry 18 }
+    ::= { mxSpanEntry 18 }
 
-x400pSpanLineDelay OBJECT-TYPE
+mxSpanLineDelay OBJECT-TYPE
     SYNTAX	Unsigned32
     UNITS	"microseconds"
     MAX-ACCESS	read-create
@@ -1788,9 +1770,9 @@ x400pSpanLineDelay OBJECT-TYPE
 	 When the value is zero (0) it indicates that the loop delay is 
 	 unknown."
     DEFVAL	{ 0 }
-    ::= { x400pSpanEntry 19 }
+    ::= { mxSpanEntry 19 }
 
-x400pSpanTxLevel OBJECT-TYPE
+mxSpanTxLevel OBJECT-TYPE
     SYNTAX	INTEGER {
 	open(0), off(1), on(2) }
     MAX-ACCESS	read-create
@@ -1814,9 +1796,9 @@ x400pSpanTxLevel OBJECT-TYPE
 	 
 	 All chip sets are capable of disabling the transmitters."
     DEFVAL	{ open }
-    ::= { x400pSpanEntry 20 }
+    ::= { mxSpanEntry 20 }
 
-x400pSpanRxLevel OBJECT-TYPE
+mxSpanRxLevel OBJECT-TYPE
     SYNTAX	INTEGER {
 	open(0), off(1), on(2) }
     MAX-ACCESS	read-create
@@ -1836,9 +1818,9 @@ x400pSpanRxLevel OBJECT-TYPE
 	 
 	 All chip sets are capable of disabling the receivers."
     DEFVAL	{ open }
-    ::= { x400pSpanEntry 21 }
+    ::= { mxSpanEntry 21 }
 
-x400pSpanAlarmSettleTime OBJECT-TYPE
+mxSpanAlarmSettleTime OBJECT-TYPE
     SYNTAX	TimeInterval
     UNITS	"centiseconds"
     MAX-ACCESS	read-create
@@ -1850,9 +1832,9 @@ x400pSpanAlarmSettleTime OBJECT-TYPE
 	 for this period of time.  The default is 5 seconds (500 
 	 centiseconds).  This column may be read-only for some systems."
     DEFVAL	{ 500 } -- 5 seconds
-    ::= { x400pSpanEntry 22 }
+    ::= { mxSpanEntry 22 }
 
-x400pSpanLineCodeTime OBJECT-TYPE
+mxSpanLineCodeTime OBJECT-TYPE
     SYNTAX	TimeInterval
     UNITS	"centiseconds"
     MAX-ACCESS	read-create
@@ -1864,9 +1846,9 @@ x400pSpanLineCodeTime OBJECT-TYPE
 	 seconds (500 centiseconds).  This column may be read-only for 
 	 some systems."
     DEFVAL	{ 500 } -- 5 seconds
-    ::= { x400pSpanEntry 23 }
+    ::= { mxSpanEntry 23 }
 
-x400pSpanPrimary OBJECT-TYPE
+mxSpanPrimary OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	read-create
     STATUS	current
@@ -1884,9 +1866,9 @@ x400pSpanPrimary OBJECT-TYPE
 	 The state of the backup span is indicated by the standby status 
 	 of the span.  Only the primary span index can be referenced 
 	 directly by a service access point."
-    ::= { x400pSpanEntry 24 }
+    ::= { mxSpanEntry 24 }
 
-x400pSpanDataLink OBJECT-TYPE
+mxSpanDataLink OBJECT-TYPE
     SYNTAX	BITS {
 	ansiT1403(0), aTT54016(1), other(2) }
     MAX-ACCESS	read-create
@@ -1904,9 +1886,9 @@ x400pSpanDataLink OBJECT-TYPE
 	 - other(2), present when another protocol is used.
 	  
 	 When the set is empty, no FDL is used."
-    ::= { x400pSpanEntry 25 }
+    ::= { mxSpanEntry 25 }
 
-x400pSpanLineCode OBJECT-TYPE
+mxSpanLineCode OBJECT-TYPE
     SYNTAX	INTEGER {
 	noCode(1), lineCode(2), payloadCode(3), resetCode(4), 
 	testCode(5), unframedAllOnes(6), unframedOneAndZero(7) }
@@ -1940,9 +1922,9 @@ x400pSpanLineCode OBJECT-TYPE
 	 only persist for 5 seconds.  Other settings will persist until 
 	 reset."
     DEFVAL	{ noCode }
-    ::= { x400pSpanEntry 26 }
+    ::= { mxSpanEntry 26 }
 
-x400pSpanAlarmSeverityMappingProfile OBJECT-TYPE
+mxSpanAlarmSeverityMappingProfile OBJECT-TYPE
     SYNTAX	RowPointer
     MAX-ACCESS	read-create
     STATUS	current
@@ -1952,9 +1934,9 @@ x400pSpanAlarmSeverityMappingProfile OBJECT-TYPE
 	 null string, or when a mapping does not exist, the default 
 	 values will be used."
     DEFVAL	{ { zeroDotZero } }
-    ::= { x400pSpanEntry 27 }
+    ::= { mxSpanEntry 27 }
 
-x400pSpanAdministrativeState OBJECT-TYPE
+mxSpanAdministrativeState OBJECT-TYPE
     SYNTAX	AdministrativeState
     MAX-ACCESS	read-create
     STATUS	current
@@ -1980,9 +1962,9 @@ x400pSpanAdministrativeState OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     administrativeState."
     DEFVAL	{ locked }
-    ::= { x400pSpanEntry 28 }
+    ::= { mxSpanEntry 28 }
 
-x400pSpanOperationalState OBJECT-TYPE
+mxSpanOperationalState OBJECT-TYPE
     SYNTAX	OperationalState
     MAX-ACCESS	read-only
     STATUS	current
@@ -2003,9 +1985,9 @@ x400pSpanOperationalState OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     operationalState."
-    ::= { x400pSpanEntry 29 }
+    ::= { mxSpanEntry 29 }
 
-x400pSpanUsageState OBJECT-TYPE
+mxSpanUsageState OBJECT-TYPE
     SYNTAX	UsageState
     MAX-ACCESS	read-only
     STATUS	current
@@ -2032,9 +2014,9 @@ x400pSpanUsageState OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     usageState."
-    ::= { x400pSpanEntry 30 }
+    ::= { mxSpanEntry 30 }
 
-x400pSpanAlarmStatus OBJECT-TYPE
+mxSpanAlarmStatus OBJECT-TYPE
     SYNTAX	AlarmStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -2074,9 +2056,9 @@ x400pSpanAlarmStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     alarmStatus."
     DEFVAL	{ '00000'B }
-    ::= { x400pSpanEntry 31 }
+    ::= { mxSpanEntry 31 }
 
-x400pSpanProceduralStatus OBJECT-TYPE
+mxSpanProceduralStatus OBJECT-TYPE
     SYNTAX	ProceduralStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -2114,9 +2096,9 @@ x400pSpanProceduralStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     proceduralStatus."
-    ::= { x400pSpanEntry 32 }
+    ::= { mxSpanEntry 32 }
 
-x400pSpanAvailabilityStatus OBJECT-TYPE
+mxSpanAvailabilityStatus OBJECT-TYPE
     SYNTAX	AvailabilityStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -2180,9 +2162,9 @@ x400pSpanAvailabilityStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     availabilityStatus."
-    ::= { x400pSpanEntry 33 }
+    ::= { mxSpanEntry 33 }
 
-x400pSpanControlStatus OBJECT-TYPE
+mxSpanControlStatus OBJECT-TYPE
     SYNTAX	ControlStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -2213,11 +2195,11 @@ x400pSpanControlStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     controlStatus."
-    ::= { x400pSpanEntry 34 }
+    ::= { mxSpanEntry 34 }
 
-x400pSpanStandbyStatus OBJECT-TYPE
+mxSpanStandbyStatus OBJECT-TYPE
     SYNTAX	StandbyStatus
-    MAX-ACCESS	read-only
+    MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
 	"Provides the standby status of the span following the 
@@ -2259,9 +2241,9 @@ x400pSpanStandbyStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     standbyStatus."
     DEFVAL	{ providingService }
-    ::= { x400pSpanEntry 35 }
+    ::= { mxSpanEntry 35 }
 
-x400pSpanUnknownStatus OBJECT-TYPE
+mxSpanUnknownStatus OBJECT-TYPE
     SYNTAX	UnknownStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -2282,9 +2264,9 @@ x400pSpanUnknownStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     unknownStatus."
-    ::= { x400pSpanEntry 36 }
+    ::= { mxSpanEntry 36 }
 
-x400pSpanSap OBJECT-TYPE
+mxSpanSap OBJECT-TYPE
     SYNTAX	RowPointer
     MAX-ACCESS	read-only
     STATUS	current
@@ -2292,9 +2274,9 @@ x400pSpanSap OBJECT-TYPE
 	"Indicates the name of the service access point that represents 
 	 the user of the entire span.   When the value is the null 
 	 string, it indicates that there is no user of the entire span."
-    ::= { x400pSpanEntry 37 }
+    ::= { mxSpanEntry 37 }
 
-x400pSpanLoopbackStatus OBJECT-TYPE
+mxSpanLoopbackStatus OBJECT-TYPE
     SYNTAX	BITS {
 	nearEndInward(0), nearEndLine(1), nearEndFramer(2), 
 	nearEndPayload(3), farEndLine(4), farEndPayload(5) }
@@ -2322,11 +2304,11 @@ x400pSpanLoopbackStatus OBJECT-TYPE
 	 
 	 When the object contains no values, the loopback status is 
 	 either unknown or no loopback is present.  The two conditions 
-	 can be distinguished using the x400pSpanUnknownStatus object in 
+	 can be distinguished using the mxSpanUnknownStatus object in 
 	 the same row."
-    ::= { x400pSpanEntry 38 }
+    ::= { mxSpanEntry 38 }
 
-x400pSpanLineStatus OBJECT-TYPE
+mxSpanLineStatus OBJECT-TYPE
     SYNTAX	BITS {
 	none(0), rcvFarEndLOF(1), xmtFarEndLOF(2), rcvAIS(3), xmtAIS(4), 
 	lossOfFrame(5), lossOfSignal(6), loopbackState(7), t16AIS(8), 
@@ -2383,9 +2365,9 @@ x400pSpanLineStatus OBJECT-TYPE
 	 
 	 - perfThreshold(16), performance threshold exceeded."
     DEFVAL	{ '00000000000000000'B }
-    ::= { x400pSpanEntry 39 }
+    ::= { mxSpanEntry 39 }
 
-x400pSpanAlarms OBJECT-TYPE
+mxSpanAlarms OBJECT-TYPE
     SYNTAX	BITS {
 	yellow(0), red(1), blue(2), recovery(3) }
     MAX-ACCESS	read-only
@@ -2406,14 +2388,14 @@ x400pSpanAlarms OBJECT-TYPE
 	 
 	 - recovery(3), after a read or blue/AIS alarm condition has 
 	   cleared, the driver waits for an alarm recovery period 
-	   (x400pSpanAlarmSettleTime) before clearing the sending of yellow 
+	   (mxSpanAlarmSettleTime) before clearing the sending of yellow 
 	   alarm (T1/J1) or RAI condition (E1), present after the red or 
 	   blue/AIS alarms clear while waiting for the alarm recovery 
 	   period."
     DEFVAL	{ '0000'B }
-    ::= { x400pSpanEntry 40 }
+    ::= { mxSpanEntry 40 }
 
-x400pSpanEvents OBJECT-TYPE
+mxSpanEvents OBJECT-TYPE
     SYNTAX	BITS {
 	rlos(0), frcl(1), rual(2), ryel(3), rra(4), rdma(5), v52lnk(6), 
 	lorc(7), lotc(8), lup(9), ldn(10), lspare(11), tocd(12), 
@@ -2472,9 +2454,9 @@ x400pSpanEvents OBJECT-TYPE
 	 all devices will report all conditions.  Some conditions may 
 	 also cause alarm conditions and notifications."
     DEFVAL	{ '0000000000000'B }
-    ::= { x400pSpanEntry 41 }
+    ::= { mxSpanEntry 41 }
 
-x400pSpanReceiveLevel OBJECT-TYPE
+mxSpanReceiveLevel OBJECT-TYPE
     SYNTAX	Unsigned32 (0..600)
     UNITS	"negative tenths of a decibel"
     MAX-ACCESS	read-only
@@ -2483,9 +2465,9 @@ x400pSpanReceiveLevel OBJECT-TYPE
 	"Indicates the receive level in increments of -0.1 dB.  
 	 The level indicated is only within the range detected 
 	 by the device."
-    ::= { x400pSpanEntry 42 }
+    ::= { mxSpanEntry 42 }
 
-x400pSpanReceiveThreshold OBJECT-TYPE
+mxSpanReceiveThreshold OBJECT-TYPE
     SYNTAX	Unsigned32 (0..600)
     UNITS	"negative tenths of a decibel"
     MAX-ACCESS	read-create
@@ -2493,12 +2475,12 @@ x400pSpanReceiveThreshold OBJECT-TYPE
     DESCRIPTION	
 	"Specifies or indicates the lowest receive level threshold in 
 	 increments of -0.1 dB.  The level indicated by the 
-	 x400pSpanReceiveLevel is only within the range from 0 to this 
+	 mxSpanReceiveLevel is only within the range from 0 to this 
 	 value.  When this value returns zero (0), the device is 
 	 incapable of providing the receive level."
-    ::= { x400pSpanEntry 43 }
+    ::= { mxSpanEntry 43 }
 
-x400pSpanRowStatus OBJECT-TYPE
+mxSpanRowStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -2512,23 +2494,23 @@ x400pSpanRowStatus OBJECT-TYPE
 	 agent.  Management stations may not delete rows that correspond 
 	 to installed equipment.  Management stations may not activate 
 	 rows that do not correspond to installed equipment."
-    ::= { x400pSpanEntry 44 }
+    ::= { mxSpanEntry 44 }
 
 
-x400pBert OBJECT IDENTIFIER
-    ::= { x400pTables 5 }
+mxBert OBJECT IDENTIFIER
+    ::= { mxTables 5 }
 
-x400pBertTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pBertEntry
+mxBertTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxBertEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
-	"The X400P BERT table provides a mechanism whereby BERT testing  
+	"The MX BERT table provides a mechanism whereby BERT teseting 
 	 can be performed on a span by span basis."
-    ::= { x400pBert 1 }
+    ::= { mxBert 1 }
 
-x400pBertEntry OBJECT-TYPE
-    SYNTAX	X400pBertEntry
+mxBertEntry OBJECT-TYPE
+    SYNTAX	MxBertEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -2538,23 +2520,23 @@ x400pBertEntry OBJECT-TYPE
 	 support any BERT testing will not have a corresponding entry in 
 	 this table."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex	-- shared index
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex	-- shared index
     }
-    ::= { x400pBertTable 1 }
+    ::= { mxBertTable 1 }
 
-X400pBertEntry ::= SEQUENCE {
-    x400pBertMode				INTEGER,
-    x400pBertSelect				INTEGER,
-    x400pBertPattern				OCTET STRING,
-    x400pBertOperationalState			OperationalState,
-    x400pBertProceduralStatus			ProceduralStatus,
-    x400pBertBitCount				Counter32,
-    x400pBertErrorCount				Counter32
+MxBertEntry ::= SEQUENCE {
+    mxBertMode					INTEGER,
+    mxBertSelect				INTEGER,
+    mxBertPattern				OCTET STRING,
+    mxBertOperationalState			OperationalState,
+    mxBertProceduralStatus			ProceduralStatus,
+    mxBertBitCount				Counter32,
+    mxBertErrorCount				Counter32
 }
 
-x400pBertMode OBJECT-TYPE
+mxBertMode OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), span(1), channel(2), fbit(3) }
     MAX-ACCESS	read-write
@@ -2582,9 +2564,9 @@ x400pBertMode OBJECT-TYPE
 	 Not all values are supported by all spans, and not all values 
 	 are supported by all span equipment."
     DEFVAL	{ none }
-    ::= { x400pBertEntry 1 }
+    ::= { mxBertEntry 1 }
 
-x400pBertSelect OBJECT-TYPE
+mxBertSelect OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), pre2E7minus1(1), pre2E9minus1(2), pre2E11minus1(3), 
 	pre2E15minus1(4), qrss(5), daly(6), repeating(7), alternating(8) 
@@ -2619,9 +2601,9 @@ x400pBertSelect OBJECT-TYPE
 	 Not all values are supported by all span types and not all 
 	 values are supported by all span equipment."
     DEFVAL	{ none }
-    ::= { x400pBertEntry 2 }
+    ::= { mxBertEntry 2 }
 
-x400pBertPattern OBJECT-TYPE
+mxBertPattern OBJECT-TYPE
     SYNTAX	OCTET STRING (SIZE(0..33))
     MAX-ACCESS	read-write
     STATUS	current
@@ -2648,9 +2630,9 @@ x400pBertPattern OBJECT-TYPE
 	 Note that this value is of no significance when the BERT 
 	 pattern selected is other than repeating(7) or alternating(8)."
     DEFVAL	{ '10FFFFFFFF'X }
-    ::= { x400pBertEntry 3 }
+    ::= { mxBertEntry 3 }
 
-x400pBertOperationalState OBJECT-TYPE
+mxBertOperationalState OBJECT-TYPE
     SYNTAX	OperationalState
     MAX-ACCESS	read-only
     STATUS	current
@@ -2669,9 +2651,9 @@ x400pBertOperationalState OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 	 operationalState."
-    ::= { x400pBertEntry 4 }
+    ::= { mxBertEntry 4 }
 
-x400pBertProceduralStatus OBJECT-TYPE
+mxBertProceduralStatus OBJECT-TYPE
     SYNTAX	ProceduralStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -2711,9 +2693,9 @@ x400pBertProceduralStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 	 proceduralStatus."
-    ::= { x400pBertEntry 5 }
+    ::= { mxBertEntry 5 }
 
-x400pBertBitCount OBJECT-TYPE
+mxBertBitCount OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2722,9 +2704,9 @@ x400pBertBitCount OBJECT-TYPE
 	 minimum, this counter will wrap every 30 minutes.  This counter 
 	 only increments while the BERT receiver is synchronized on the 
 	 test pattern."
-    ::= { x400pBertEntry 6 }
+    ::= { mxBertEntry 6 }
 
-x400pBertErrorCount OBJECT-TYPE
+mxBertErrorCount OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
     STATUS	current
@@ -2733,22 +2715,22 @@ x400pBertErrorCount OBJECT-TYPE
 	 minimum, this counter will wrap every 30 minutes.  This counter 
 	 only increments while the BERT receiver is synchronized on the 
 	 test pattern."
-    ::= { x400pBertEntry 7 }
+    ::= { mxBertEntry 7 }
 
-x400pChan OBJECT IDENTIFIER
-    ::= { x400pTables 6 }
+mxChan OBJECT IDENTIFIER
+    ::= { mxTables 6 }
 
-x400pChanTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pChanEntry
+mxChanTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxChanEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"The channel table provides an entry for each of the channels 
 	 for each card and span in the system."
-    ::= { x400pChan 1 }
+    ::= { mxChan 1 }
 
-x400pChanEntry OBJECT-TYPE
-    SYNTAX	X400pChanEntry
+mxChanEntry OBJECT-TYPE
+    SYNTAX	MxChanEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -2762,32 +2744,32 @@ x400pChanEntry OBJECT-TYPE
 	 operation.  Each entry in the table corresponds to a channel of 
 	 an equipped span."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex,	-- shared index
-	x400pChanIndex
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex,	-- shared index
+	mxChanIndex
     }
-    ::= { x400pChanTable 1 }
+    ::= { mxChanTable 1 }
 
-X400pChanEntry ::= SEQUENCE {
-    x400pChanIndex				Unsigned32,
-    x400pChanType				INTEGER,
-    x400pChanFormat				INTEGER,
-    x400pChanRate				INTEGER,
-    x400pChanMode				BITS,
-    x400pChanSap				RowPointer,
-    x400pChanAdministrativeState		AdministrativeState,
-    x400pChanOperationalState			OperationalState,
-    x400pChanUsageState				UsageState,
-    x400pChanAvailabilityStatus			AvailabilityStatus,
-    x400pChanControlStatus			ControlStatus,
-    x400pChanProceduralStatus			ProceduralStatus,
-    x400pChanAlarmStatus			AlarmStatus,
-    x400pChanStandbyStatus			StandbyStatus
+MxChanEntry ::= SEQUENCE {
+    mxChanIndex					Unsigned32,
+    mxChanType					INTEGER,
+    mxChanFormat				INTEGER,
+    mxChanRate					INTEGER,
+    mxChanMode					BITS,
+    mxChanSap					RowPointer,
+    mxChanAdministrativeState			AdministrativeState,
+    mxChanOperationalState			OperationalState,
+    mxChanUsageState				UsageState,
+    mxChanAvailabilityStatus			AvailabilityStatus,
+    mxChanControlStatus				ControlStatus,
+    mxChanProceduralStatus			ProceduralStatus,
+    mxChanAlarmStatus				AlarmStatus,
+    mxChanStandbyStatus				StandbyStatus
 }
 
-x400pChanIndex OBJECT-TYPE
-    SYNTAX	Unsigned32 (0..31)
+mxChanIndex OBJECT-TYPE
+    SYNTAX	Unsigned32 (1..31)
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -2806,9 +2788,9 @@ x400pChanIndex OBJECT-TYPE
 	 
 	 Management stations do not add or delete rows from this table, 
 	 only agents, and then only at boot time."
-    ::= { x400pChanEntry 1 }
+    ::= { mxChanEntry 1 }
 
-x400pChanType OBJECT-TYPE
+mxChanType OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(0), cas(1), ccs(2) }
     MAX-ACCESS	read-write
@@ -2821,9 +2803,9 @@ x400pChanType OBJECT-TYPE
 	 indicated.  The default is ccs(1).  For E1 CAS operation, 
 	 channel 17 (timeslot 16) is unavailable for use."
     DEFVAL	{ ccs }
-    ::= { x400pChanEntry 2 }
+    ::= { mxChanEntry 2 }
 
-x400pChanFormat OBJECT-TYPE
+mxChanFormat OBJECT-TYPE
     SYNTAX	INTEGER {
 	none(1), ds0a(2), ds0(3), t1(4), j1(5), e1(6) }
     MAX-ACCESS	read-write
@@ -2837,9 +2819,9 @@ x400pChanFormat OBJECT-TYPE
 	 - j1(5), the channel is a full J1 span;
 	 - e1(6), the channel is a full E1 span.
 	"
-    ::= { x400pChanEntry 3 }
+    ::= { mxChanEntry 3 }
 
-x400pChanRate OBJECT-TYPE
+mxChanRate OBJECT-TYPE
     SYNTAX	INTEGER {
 	variable(0), kbits56(56), kbits64(64), kbits1536(1536), kbits1984(1984) }
     UNITS	"kilobits per second"
@@ -2864,9 +2846,9 @@ x400pChanRate OBJECT-TYPE
 	 - kbits1984(1984000), the channel bit rate is 1984 kbits per 
 	   second.
 	"
-    ::= { x400pChanEntry 4 }
+    ::= { mxChanEntry 4 }
 
-x400pChanMode OBJECT-TYPE
+mxChanMode OBJECT-TYPE
     SYNTAX	BITS {
 	remoteLoopback(0), localLoopback(1), test(2), loopbackEcho(3) }
     MAX-ACCESS	read-write
@@ -2897,9 +2879,9 @@ x400pChanMode OBJECT-TYPE
 	 Because these tests are disruptive, no value can be added to 
 	 this set unless the channel has a control status of 
 	 subjectToTest(0) or reservedForTest(2)."
-    ::= { x400pChanEntry 5 }
+    ::= { mxChanEntry 5 }
 
-x400pChanSap OBJECT-TYPE
+mxChanSap OBJECT-TYPE
     SYNTAX	RowPointer
     MAX-ACCESS	read-only
     STATUS	current
@@ -2907,9 +2889,9 @@ x400pChanSap OBJECT-TYPE
 	"Indicates the name of the service access point that represents 
 	 the user of the channel.  When the value is the null string, it 
 	 indicates that there is no user of the channel."
-    ::= { x400pChanEntry 6 }
+    ::= { mxChanEntry 6 }
 
-x400pChanAdministrativeState OBJECT-TYPE
+mxChanAdministrativeState OBJECT-TYPE
     SYNTAX	AdministrativeState
     MAX-ACCESS	read-write
     STATUS	current
@@ -2938,9 +2920,9 @@ x400pChanAdministrativeState OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     administrativeState."
     DEFVAL	{ locked }
-    ::= { x400pChanEntry 7 }
+    ::= { mxChanEntry 7 }
 
-x400pChanOperationalState OBJECT-TYPE
+mxChanOperationalState OBJECT-TYPE
     SYNTAX	OperationalState
     MAX-ACCESS	read-only
     STATUS	current
@@ -2959,9 +2941,9 @@ x400pChanOperationalState OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	 operationalState."
     DEFVAL	{ 0 } -- disabled
-    ::= { x400pChanEntry 8 }
+    ::= { mxChanEntry 8 }
 
-x400pChanUsageState OBJECT-TYPE
+mxChanUsageState OBJECT-TYPE
     SYNTAX	UsageState
     MAX-ACCESS	read-only
     STATUS	current
@@ -2988,9 +2970,9 @@ x400pChanUsageState OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     usageState."
-    ::= { x400pChanEntry 9 }
+    ::= { mxChanEntry 9 }
 
-x400pChanAvailabilityStatus OBJECT-TYPE
+mxChanAvailabilityStatus OBJECT-TYPE
     SYNTAX	AvailabilityStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -3045,9 +3027,9 @@ x400pChanAvailabilityStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     availabilityStatus."
-    ::= { x400pChanEntry 10 }
+    ::= { mxChanEntry 10 }
 
-x400pChanControlStatus OBJECT-TYPE
+mxChanControlStatus OBJECT-TYPE
     SYNTAX	ControlStatus
     MAX-ACCESS	read-write
     STATUS	current
@@ -3084,9 +3066,9 @@ x400pChanControlStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     controlStatus."
-    ::= { x400pChanEntry 11 }
+    ::= { mxChanEntry 11 }
 
-x400pChanProceduralStatus OBJECT-TYPE
+mxChanProceduralStatus OBJECT-TYPE
     SYNTAX	ProceduralStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -3107,9 +3089,9 @@ x400pChanProceduralStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     proceduralStatus."
-    ::= { x400pChanEntry 12 }
+    ::= { mxChanEntry 12 }
 
-x400pChanAlarmStatus OBJECT-TYPE
+mxChanAlarmStatus OBJECT-TYPE
     SYNTAX	AlarmStatus
     MAX-ACCESS	read-write
     STATUS	current
@@ -3129,9 +3111,9 @@ x400pChanAlarmStatus OBJECT-TYPE
     REFERENCE	
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     alarmStatus."
-    ::= { x400pChanEntry 13 }
+    ::= { mxChanEntry 13 }
 
-x400pChanStandbyStatus OBJECT-TYPE
+mxChanStandbyStatus OBJECT-TYPE
     SYNTAX	StandbyStatus
     MAX-ACCESS	read-only
     STATUS	current
@@ -3145,22 +3127,22 @@ x400pChanStandbyStatus OBJECT-TYPE
 	"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 	     standbyStatus."
     DEFVAL	{ providingService }
-    ::= { x400pChanEntry 14 }
+    ::= { mxChanEntry 14 }
 
-x400pXcon OBJECT IDENTIFIER
-    ::= { x400pTables 7 }
+mxXcon OBJECT IDENTIFIER
+    ::= { mxTables 7 }
 
-x400pXconTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pXconEntry
+mxXconTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxXconEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"The cross-connect table provides a 1-1 and 0-0 cross connect 
 	 capability."
-    ::= { x400pXcon 1 }
+    ::= { mxXcon 1 }
 
-x400pXconEntry OBJECT-TYPE
-    SYNTAX	X400pXconEntry
+mxXconEntry OBJECT-TYPE
+    SYNTAX	MxXconEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -3183,50 +3165,50 @@ x400pXconEntry OBJECT-TYPE
 	 survive an agent and system reboot, however, the storage type 
 	 can be used to alter this behaviour."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex,	-- shared index
-	x400pChanIndex	-- shared index
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex,	-- shared index
+	mxChanIndex	-- shared index
     }
-    ::= { x400pXconTable 1 }
+    ::= { mxXconTable 1 }
 
-X400pXconEntry ::= SEQUENCE {
-    x400pXconCardIndex				Unsigned32,
-    x400pXconSpanIndex				Unsigned32,
-    x400pXconChanIndex				Unsigned32,
-    x400pXconType				INTEGER,
-    x400pXconStorageType			StorageType,
-    x400pXconRowStatus				RowStatus
+MxXconEntry ::= SEQUENCE {
+    mxXconCardIndex				Unsigned32,
+    mxXconSpanIndex				Unsigned32,
+    mxXconChanIndex				Unsigned32,
+    mxXconType					INTEGER,
+    mxXconStorageType				StorageType,
+    mxXconRowStatus				RowStatus
 }
 
-x400pXconCardIndex OBJECT-TYPE
-    SYNTAX	Unsigned32 (1..16)
+mxXconCardIndex OBJECT-TYPE
+    SYNTAX	Unsigned32
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
 	"Provides the index of the card to which the cross-connected 
 	 span belongs."
-    ::= { x400pXconEntry 1 }
+    ::= { mxXconEntry 1 }
 
-x400pXconSpanIndex OBJECT-TYPE
-    SYNTAX	Unsigned32 (1..4)
+mxXconSpanIndex OBJECT-TYPE
+    SYNTAX	Unsigned32
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
 	"Provides the index of the span which is cross-connected to the 
 	 indexed span."
-    ::= { x400pXconEntry 2 }
+    ::= { mxXconEntry 2 }
 
-x400pXconChanIndex OBJECT-TYPE
+mxXconChanIndex OBJECT-TYPE
     SYNTAX	Unsigned32 (0..31)
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION	
 	"Provides the channel number of the channel to which the indexed 
 	 span and channel is cross-connected."
-    ::= { x400pXconEntry 3 }
+    ::= { mxXconEntry 3 }
 
-x400pXconType OBJECT-TYPE
+mxXconType OBJECT-TYPE
     SYNTAX	INTEGER {
 	switched(1), semiPermanent(2), permanent(3) }
     MAX-ACCESS	read-create
@@ -3246,9 +3228,9 @@ x400pXconType OBJECT-TYPE
 	 switch connections).  Management stations may create and delete 
 	 semi-permanent and permanent connections."
     DEFVAL	{ permanent }
-    ::= { x400pXconEntry 4 }
+    ::= { mxXconEntry 4 }
 
-x400pXconStorageType OBJECT-TYPE
+mxXconStorageType OBJECT-TYPE
     SYNTAX	StorageType
     MAX-ACCESS	read-create
     STATUS	current
@@ -3262,9 +3244,9 @@ x400pXconStorageType OBJECT-TYPE
 	 - nonVolatile(3), the row is not lost upon reboot, applicable 
 	   to semi-permanent and permanent connections."
     DEFVAL	{ nonVolatile }
-    ::= { x400pXconEntry 5 }
+    ::= { mxXconEntry 5 }
 
-x400pXconRowStatus OBJECT-TYPE
+mxXconRowStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -3278,30 +3260,30 @@ x400pXconRowStatus OBJECT-TYPE
 	 which is already engaged in another connection, the other 
 	 connection must first be deleted.  Rows may not be taken out of 
 	 service."
-    ::= { x400pXconEntry 6 }
+    ::= { mxXconEntry 6 }
 
 
 -- ====================================================================
 -- SCALARS
 -- ====================================================================
 
-x400pScalars OBJECT IDENTIFIER
-    ::= { x400pObjects 2 }
+mxScalars OBJECT IDENTIFIER
+    ::= { mxObjects 2 }
 
-x400pDiscontinuityTime OBJECT-TYPE
+mxDiscontinuityTime OBJECT-TYPE
     SYNTAX	TimeStamp
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Provides the uptime of the last discontinuity."
-    ::= { x400pScalars 1 }
+    ::= { mxScalars 1 }
 
 
-x400pNotifs OBJECT IDENTIFIER
-    ::= { x400pObjects 3 }
+mxNotifs OBJECT IDENTIFIER
+    ::= { mxObjects 3 }
 
-x400pOids OBJECT IDENTIFIER
-    ::= { x400pObjects 4 }
+mxOids OBJECT IDENTIFIER
+    ::= { mxObjects 4 }
 
 -- ====================================================================
 -- CARD TYPES
@@ -3312,25 +3294,25 @@ x400pOids OBJECT IDENTIFIER
 -- be extended without changing it when a new card comes along.
 --
 
-x400pCardTypes OBJECT IDENTIFIER
-    ::= { x400pOids 1 }
+mxCardTypes OBJECT IDENTIFIER
+    ::= { mxOids 1 }
 
-x400pCardTypePLX9030 OBJECT-IDENTITY
+mxCardTypePLX9030 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This the the PLX 90303 board resulting from finding '9030'X in 
 	 the PCI id.  This is a card that has not has the correct PCI Id 
 	 burnt into it."
-    ::= { x400pCardTypes 1 }
+    ::= { mxCardTypes 1 }
 
-x400pCardTypePLXDevelopmentBoard OBJECT-IDENTITY
+mxCardTypePLXDevelopmentBoard OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is a PLX development board as identified by the PCI Id 
 	 '3001'X."
-    ::= { x400pCardTypes 2 }
+    ::= { mxCardTypes 2 }
 
-x400pCardTypeX400P OBJECT-IDENTITY
+mxCardTypeX400P OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is an old Digium X400P card as identified by its PCI Id 
@@ -3339,9 +3321,9 @@ x400pCardTypeX400P OBJECT-IDENTITY
 	 arc, the card supports both E1 and T1 modes.  These cards were 
 	 discontinued when Digium decided to force upgrade everyone to a 
 	 TE410 card."
-    ::= { x400pCardTypes 3 }
+    ::= { mxCardTypes 3 }
 
-x400pCardTypeE400P OBJECT-IDENTITY
+mxCardTypeE400P OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is an old Digium E400P card as identifier by its PCI Id 
@@ -3350,9 +3332,9 @@ x400pCardTypeE400P OBJECT-IDENTITY
 	 support a T1 mode. It also does not support some of the 
 	 snazzier features.  These cards were discontinued when Digium 
 	 decided to force upgrade everyone to a TE410 card."
-    ::= { x400pCardTypeX400P 1 }
+    ::= { mxCardTypeX400P 1 }
 
-x400pCardTypeT400P OBJECT-IDENTITY
+mxCardTypeT400P OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is the old Digium T400P card as identified by its PCI Id 
@@ -3361,9 +3343,9 @@ x400pCardTypeT400P OBJECT-IDENTITY
 	 support an E1 mode. It also does not support some of the 
 	 snazzier features.  These cards were discontinued when Digium 
 	 decided to force upgrade everyone to a TE410 card."
-    ::= { x400pCardTypeX400P 2 }
+    ::= { mxCardTypeX400P 2 }
 
-x400pCardTypeX400P-SS7 OBJECT-IDENTITY
+mxCardTypeX400P-SS7 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is an old OpenSS7 X400P-SS7 card as identified by its PCI 
@@ -3372,9 +3354,9 @@ x400pCardTypeX400P-SS7 OBJECT-IDENTITY
 	 this arc, the card supports both E1 and T1.  These cards were 
 	 discontinued when Digium decided to force upgrade everyone to a 
 	 TE410 card."
-    ::= { x400pCardTypes 4 }
+    ::= { mxCardTypes 4 }
 
-x400pCardTypeE400P-SS7 OBJECT-IDENTITY
+mxCardTypeE400P-SS7 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is an old OpenSS7 E400P-SS7 card as identified by its PCI 
@@ -3384,9 +3366,9 @@ x400pCardTypeE400P-SS7 OBJECT-IDENTITY
 	 support a T1 mode.  It also does not support some othe snazzier 
 	 features.  These cards were discontinued when Digium decided to 
 	 force upgrade everyone to a TE410 card."
-    ::= { x400pCardTypeX400P-SS7 1 }
+    ::= { mxCardTypeX400P-SS7 1 }
 
-x400pCardTypeT400P-SS7 OBJECT-IDENTITY
+mxCardTypeT400P-SS7 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is an old OpenSS7 T400P-SS7 card as identified by its PCI 
@@ -3396,9 +3378,9 @@ x400pCardTypeT400P-SS7 OBJECT-IDENTITY
 	 support an E1 mode.  It also does not support some othe 
 	 snazzier features.  These cards were discontinued when Digium 
 	 decided to force upgrade everyone to a TE410 card."
-    ::= { x400pCardTypeX400P-SS7 2 }
+    ::= { mxCardTypeX400P-SS7 2 }
 
-x400pCardTypeV400P OBJECT-IDENTITY
+mxCardTypeV400P OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is a old Varion V400P card as identified by its PCI id 
@@ -3407,9 +3389,9 @@ x400pCardTypeV400P OBJECT-IDENTITY
 	 this arc, the card supports both E1 and T1.  These cards were 
 	 discontinued by Varion due to excessive lead content compared 
 	 to newer European standards."
-    ::= { x400pCardTypes 5 }
+    ::= { mxCardTypes 5 }
 
-x400pCardTypeV400PE OBJECT-IDENTITY
+mxCardTypeV400PE OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is an old Varion V400PE card as identified by its PCI id 
@@ -3418,9 +3400,9 @@ x400pCardTypeV400PE OBJECT-IDENTITY
 	 E1/T1 chips can be configured for J1.  These cards are treated 
 	 as E1 only.  These cards were discontinued by Varion due to 
 	 excessive lead content compared to newer European standards."
-    ::= { x400pCardTypeV400P 1 }
+    ::= { mxCardTypeV400P 1 }
 
-x400pCardTypeV400PT OBJECT-IDENTITY
+mxCardTypeV400PT OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is an old Varion V400PT card as identified by its PCI id 
@@ -3429,9 +3411,9 @@ x400pCardTypeV400PT OBJECT-IDENTITY
 	 E1/T1 chips can be configured for J1.  These cards are treated 
 	 as T1 only.  These cards were discontinued by Varion due to 
 	 excessive lead content compared to newer European standards."
-    ::= { x400pCardTypeV400P 2 }
+    ::= { mxCardTypeV400P 2 }
 
-x400pCardTypeV401PE OBJECT-IDENTITY
+mxCardTypeV401PE OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is a current Varion V401PE card as identified by its PCI 
@@ -3441,9 +3423,9 @@ x400pCardTypeV401PE OBJECT-IDENTITY
 	 E1/T1/J1 and can be configured for any mode of operation, 
 	 typically on a card by card basis and sometimes on a span by 
 	 span basis."
-    ::= { x400pCardTypes 6 }
+    ::= { mxCardTypes 6 }
 
-x400pCardTypeV401PT OBJECT-IDENTITY
+mxCardTypeV401PT OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"This is a current Varion V401PT card as identified by its PCI 
@@ -3453,83 +3435,83 @@ x400pCardTypeV401PT OBJECT-IDENTITY
 	 E1/T1/J1 and can be configured for any mode of operation, 
 	 typically on a card by card basis and sometimes on a span by 
 	 span basis."
-    ::= { x400pCardTypes 7 }
+    ::= { mxCardTypes 7 }
 
 -- ====================================================================
 -- CHIP TYPES
 -- ====================================================================
 
-x400pChipTypes OBJECT IDENTIFIER
-    ::= { x400pOids 2 }
+mxChipTypes OBJECT IDENTIFIER
+    ::= { mxOids 2 }
 
-x400pChipTypeDS2152 OBJECT-IDENTITY
+mxChipTypeDS2152 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"The Dallas DS2152 T1 framer chip."
-    ::= { x400pChipTypes 1 }
+    ::= { mxChipTypes 1 }
 
-x400pChipTypeDS21352 OBJECT-IDENTITY
+mxChipTypeDS21352 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"The Dallas DS21352 Quad T1 framer chip."
-    ::= { x400pChipTypes 2 }
+    ::= { mxChipTypes 2 }
 
-x400pChipTypeDS21552 OBJECT-IDENTITY
+mxChipTypeDS21552 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"The Dallas DS21552 Quad T1 framer chip."
-    ::= { x400pChipTypes 3 }
+    ::= { mxChipTypes 3 }
 
-x400pChipTypeDS2154 OBJECT-IDENTITY
+mxChipTypeDS2154 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"The Dallas DS2154 E1 framer chip."
-    ::= { x400pChipTypes 4 }
+    ::= { mxChipTypes 4 }
 
-x400pChipTypeDS21354 OBJECT-IDENTITY
+mxChipTypeDS21354 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"The Dallas DS21354 Quad T1 framer chip."
-    ::= { x400pChipTypes 5 }
+    ::= { mxChipTypes 5 }
 
-x400pChipTypeDS21554 OBJECT-IDENTITY
+mxChipTypeDS21554 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"The Dallas DS21554 Quad T1 framer chip."
-    ::= { x400pChipTypes 6 }
+    ::= { mxChipTypes 6 }
 
-x400pChipTypeDS2155 OBJECT-IDENTITY
+mxChipTypeDS2155 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"The Dallas DS2155 E1/T1/J1 framer chip."
-    ::= { x400pChipTypes 7 }
+    ::= { mxChipTypes 7 }
 
-x400pChipTypeDS2156 OBJECT-IDENTITY
+mxChipTypeDS2156 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION	
 	"The Dallas DS2156 E1/T1/J1 framer chip."
-    ::= { x400pChipTypes 8 }
+    ::= { mxChipTypes 8 }
 
 
-x400pStats OBJECT IDENTIFIER
-    ::= { x400pObjects 5 }
+mxStats OBJECT IDENTIFIER
+    ::= { mxObjects 5 }
 
-x400pNearEndStats OBJECT IDENTIFIER
-    ::= { x400pStats 1 }
+mxNearEndStats OBJECT IDENTIFIER
+    ::= { mxStats 1 }
 
-x400pNearEndCurrent OBJECT IDENTIFIER
-    ::= { x400pNearEndStats 1 }
+mxNearEndCurrent OBJECT IDENTIFIER
+    ::= { mxNearEndStats 1 }
 
-x400pNearEndCurrentTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pNearEndCurrentEntry
+mxNearEndCurrentTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxNearEndCurrentEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"Provides a table of near end current statistic."
-    ::= { x400pNearEndCurrent 1 }
+    ::= { mxNearEndCurrent 1 }
 
-x400pNearEndCurrentEntry OBJECT-TYPE
-    SYNTAX	X400pNearEndCurrentEntry
+mxNearEndCurrentEntry OBJECT-TYPE
+    SYNTAX	MxNearEndCurrentEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -3538,27 +3520,27 @@ x400pNearEndCurrentEntry OBJECT-TYPE
 	 do not support the far end reporting of performance 
 	 measurements will not have an associated entry in this table."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex	-- shared index
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex	-- shared index
     }
-    ::= { x400pNearEndCurrentTable 1 }
+    ::= { mxNearEndCurrentTable 1 }
 
-X400pNearEndCurrentEntry ::= SEQUENCE {
-    x400pNearEndCurrentTimeElapsed		HCPerfTimeElapsed,
-    x400pNearEndCurrentESs			PerfCurrentCount,
-    x400pNearEndCurrentSESs			PerfCurrentCount,
-    x400pNearEndCurrentSEFSs			PerfCurrentCount,
-    x400pNearEndCurrentUASs			PerfCurrentCount,
-    x400pNearEndCurrentCSSs			PerfCurrentCount,
-    x400pNearEndCurrentPCVs			PerfCurrentCount,
-    x400pNearEndCurrentLESs			PerfCurrentCount,
-    x400pNearEndCurrentBESs			PerfCurrentCount,
-    x400pNearEndCurrentDMs			PerfCurrentCount,
-    x400pNearEndCurrentLCVs			PerfCurrentCount
+MxNearEndCurrentEntry ::= SEQUENCE {
+    mxNearEndCurrentTimeElapsed			HCPerfTimeElapsed,
+    mxNearEndCurrentESs				PerfCurrentCount,
+    mxNearEndCurrentSESs			PerfCurrentCount,
+    mxNearEndCurrentSEFSs			PerfCurrentCount,
+    mxNearEndCurrentUASs			PerfCurrentCount,
+    mxNearEndCurrentCSSs			PerfCurrentCount,
+    mxNearEndCurrentPCVs			PerfCurrentCount,
+    mxNearEndCurrentLESs			PerfCurrentCount,
+    mxNearEndCurrentBESs			PerfCurrentCount,
+    mxNearEndCurrentDMs				PerfCurrentCount,
+    mxNearEndCurrentLCVs			PerfCurrentCount
 }
 
-x400pNearEndCurrentTimeElapsed OBJECT-TYPE
+mxNearEndCurrentTimeElapsed OBJECT-TYPE
     SYNTAX	HCPerfTimeElapsed
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3566,9 +3548,9 @@ x400pNearEndCurrentTimeElapsed OBJECT-TYPE
     DESCRIPTION	
 	"The number of seconds that have elapsed in the current 
 	 measurement period."
-    ::= { x400pNearEndCurrentEntry 1 }
+    ::= { mxNearEndCurrentEntry 1 }
 
-x400pNearEndCurrentESs OBJECT-TYPE
+mxNearEndCurrentESs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3578,9 +3560,9 @@ x400pNearEndCurrentESs OBJECT-TYPE
 	 An Errored Second has one or more Path Code Violations, one or 
 	 more Out of Frame defects, one or more Controlled Slip events, 
 	 or a detected Alarm Indication Signal (AIS) defect."
-    ::= { x400pNearEndCurrentEntry 2 }
+    ::= { mxNearEndCurrentEntry 2 }
 
-x400pNearEndCurrentSESs OBJECT-TYPE
+mxNearEndCurrentSESs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3588,9 +3570,9 @@ x400pNearEndCurrentSESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Severely Errored Seconds (SESs) in the current 
 	 interval.  A Severely Errored Second ...."
-    ::= { x400pNearEndCurrentEntry 3 }
+    ::= { mxNearEndCurrentEntry 3 }
 
-x400pNearEndCurrentSEFSs OBJECT-TYPE
+mxNearEndCurrentSEFSs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3599,9 +3581,9 @@ x400pNearEndCurrentSEFSs OBJECT-TYPE
 	"The number of Severely Errored Framing Seconds (SEFSs) in the 
 	 current interval.  A Severely Errored Frame Second has one or 
 	 more Out of Frame defects or a detected AIS defect."
-    ::= { x400pNearEndCurrentEntry 4 }
+    ::= { mxNearEndCurrentEntry 4 }
 
-x400pNearEndCurrentUASs OBJECT-TYPE
+mxNearEndCurrentUASs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3609,9 +3591,9 @@ x400pNearEndCurrentUASs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Unavailable Seconds (UASs) in the current 
 	 interval."
-    ::= { x400pNearEndCurrentEntry 5 }
+    ::= { mxNearEndCurrentEntry 5 }
 
-x400pNearEndCurrentCSSs OBJECT-TYPE
+mxNearEndCurrentCSSs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3619,9 +3601,9 @@ x400pNearEndCurrentCSSs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Controlled Slip Seconds (CSSs) in the current 
 	 interval."
-    ::= { x400pNearEndCurrentEntry 6 }
+    ::= { mxNearEndCurrentEntry 6 }
 
-x400pNearEndCurrentPCVs OBJECT-TYPE
+mxNearEndCurrentPCVs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -3631,9 +3613,9 @@ x400pNearEndCurrentPCVs OBJECT-TYPE
 	 interval.  A Path Coding Violation is a frame syncrhonization 
 	 bit error in the D4 and E1 no-CRC4 formats, or a CRC or frame 
 	 syncrhonization bit error in the ESF and E1 CRC4 formats."
-    ::= { x400pNearEndCurrentEntry 7 }
+    ::= { mxNearEndCurrentEntry 7 }
 
-x400pNearEndCurrentLESs OBJECT-TYPE
+mxNearEndCurrentLESs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3642,9 +3624,9 @@ x400pNearEndCurrentLESs OBJECT-TYPE
 	"The number of Line Errored Seconds (LESs) in the current 
 	 interval.  A Line Errored Second is a second in which one or 
 	 more Line Code Violation error events are detected."
-    ::= { x400pNearEndCurrentEntry 8 }
+    ::= { mxNearEndCurrentEntry 8 }
 
-x400pNearEndCurrentBESs OBJECT-TYPE
+mxNearEndCurrentBESs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3654,18 +3636,18 @@ x400pNearEndCurrentBESs OBJECT-TYPE
 	 interval.  A Bursty Errored Second has 2 to 319 Path Coding 
 	 Violation error events, no Severely Errored Frame defects, and 
 	 no detected incoming AIS defects."
-    ::= { x400pNearEndCurrentEntry 9 }
+    ::= { mxNearEndCurrentEntry 9 }
 
-x400pNearEndCurrentDMs OBJECT-TYPE
+mxNearEndCurrentDMs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"minutes"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of Degraded Minutes (DMs) in the current interval."
-    ::= { x400pNearEndCurrentEntry 10 }
+    ::= { mxNearEndCurrentEntry 10 }
 
-x400pNearEndCurrentLCVs OBJECT-TYPE
+mxNearEndCurrentLCVs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -3674,24 +3656,24 @@ x400pNearEndCurrentLCVs OBJECT-TYPE
 	"The number of Line Coding Violations (LCVs) in the current 
 	 interval.  An LCV is the occurence of a Bipolar Violation (BPV) 
 	 or Excessive Zeroes (EXZ) error event."
-    ::= { x400pNearEndCurrentEntry 11 }
+    ::= { mxNearEndCurrentEntry 11 }
 
 
-x400pNearEndInterval OBJECT IDENTIFIER
-    ::= { x400pNearEndStats 2 }
+mxNearEndInterval OBJECT IDENTIFIER
+    ::= { mxNearEndStats 2 }
 
-x400pNearEndIntervalTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pNearEndIntervalEntry
+mxNearEndIntervalTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxNearEndIntervalEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"Provides a table of near end performance interval measurements 
 	 for a given span.  Entries exist the previous 96 intervals 
 	 associated with each span."
-    ::= { x400pSpan 4 }
+    ::= { mxNearEndInterval 1 }
 
-x400pNearEndIntervalEntry OBJECT-TYPE
-    SYNTAX	X400pNearEndIntervalEntry
+mxNearEndIntervalEntry OBJECT-TYPE
+    SYNTAX	MxNearEndIntervalEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -3700,31 +3682,31 @@ x400pNearEndIntervalEntry OBJECT-TYPE
 	 associated span does not support the reporting of near end 
 	 performance measurements, there may be no intervals in this 
 	 table for the associated span; or the intervals may have the 
-	 x400pNearEndIntervalValidData column set to false(2)."
+	 mxNearEndIntervalValidData column set to false(2)."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex,	-- shared index
-	x400pNearEndIntervalIndex
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex,	-- shared index
+	mxNearEndIntervalIndex
     }
-    ::= { x400pNearEndIntervalTable 1 }
+    ::= { mxNearEndIntervalTable 1 }
 
-X400pNearEndIntervalEntry ::= SEQUENCE {
-    x400pNearEndIntervalIndex			Unsigned32,
-    x400pNearEndIntervalESs			PerfIntervalCount,
-    x400pNearEndIntervalSESs			PerfIntervalCount,
-    x400pNearEndIntervalSEFSs			PerfIntervalCount,
-    x400pNearEndIntervalUASs			PerfIntervalCount,
-    x400pNearEndIntervalCSSs			PerfIntervalCount,
-    x400pNearEndIntervalPCVs			PerfIntervalCount,
-    x400pNearEndIntervalLESs			PerfIntervalCount,
-    x400pNearEndIntervalBESs			PerfIntervalCount,
-    x400pNearEndIntervalDMs			PerfIntervalCount,
-    x400pNearEndIntervalLCVs			PerfIntervalCount,
-    x400pNearEndIntervalValidData		TruthValue
+MxNearEndIntervalEntry ::= SEQUENCE {
+    mxNearEndIntervalIndex			Unsigned32,
+    mxNearEndIntervalESs			PerfIntervalCount,
+    mxNearEndIntervalSESs			PerfIntervalCount,
+    mxNearEndIntervalSEFSs			PerfIntervalCount,
+    mxNearEndIntervalUASs			PerfIntervalCount,
+    mxNearEndIntervalCSSs			PerfIntervalCount,
+    mxNearEndIntervalPCVs			PerfIntervalCount,
+    mxNearEndIntervalLESs			PerfIntervalCount,
+    mxNearEndIntervalBESs			PerfIntervalCount,
+    mxNearEndIntervalDMs			PerfIntervalCount,
+    mxNearEndIntervalLCVs			PerfIntervalCount,
+    mxNearEndIntervalValidData			TruthValue
 }
 
-x400pNearEndIntervalIndex OBJECT-TYPE
+mxNearEndIntervalIndex OBJECT-TYPE
     SYNTAX	Unsigned32 (1..96)
     MAX-ACCESS	not-accessible
     STATUS	current
@@ -3732,18 +3714,18 @@ x400pNearEndIntervalIndex OBJECT-TYPE
 	"Provides an index into the interval table.  Each interval 
 	 represents 15 minute increments in the past with the lowest 
 	 index value being most recent."
-    ::= { x400pNearEndIntervalEntry 1 }
+    ::= { mxNearEndIntervalEntry 1 }
 
-x400pNearEndIntervalESs OBJECT-TYPE
+mxNearEndIntervalESs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of Errored Seconds (ESs) in the indexed interval."
-    ::= { x400pNearEndIntervalEntry 2 }
+    ::= { mxNearEndIntervalEntry 2 }
 
-x400pNearEndIntervalSESs OBJECT-TYPE
+mxNearEndIntervalSESs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3751,9 +3733,9 @@ x400pNearEndIntervalSESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Severely Errored Seconds (SESs) in the indexed 
 	 interval."
-    ::= { x400pNearEndIntervalEntry 3 }
+    ::= { mxNearEndIntervalEntry 3 }
 
-x400pNearEndIntervalSEFSs OBJECT-TYPE
+mxNearEndIntervalSEFSs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3761,9 +3743,9 @@ x400pNearEndIntervalSEFSs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Severely Errored Framing Seconds (SEFSs) in the 
 	 indexed interval."
-    ::= { x400pNearEndIntervalEntry 4 }
+    ::= { mxNearEndIntervalEntry 4 }
 
-x400pNearEndIntervalUASs OBJECT-TYPE
+mxNearEndIntervalUASs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3771,9 +3753,9 @@ x400pNearEndIntervalUASs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Unavailable Seconds (UASs) in the indexed 
 	 interval."
-    ::= { x400pNearEndIntervalEntry 5 }
+    ::= { mxNearEndIntervalEntry 5 }
 
-x400pNearEndIntervalCSSs OBJECT-TYPE
+mxNearEndIntervalCSSs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3781,9 +3763,9 @@ x400pNearEndIntervalCSSs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Controlled Slip Seconds (CSSs) in the indexed 
 	 interval."
-    ::= { x400pNearEndIntervalEntry 6 }
+    ::= { mxNearEndIntervalEntry 6 }
 
-x400pNearEndIntervalPCVs OBJECT-TYPE
+mxNearEndIntervalPCVs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -3791,9 +3773,9 @@ x400pNearEndIntervalPCVs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Path Coding Violations (PCVs) in the indexed 
 	 interval."
-    ::= { x400pNearEndIntervalEntry 7 }
+    ::= { mxNearEndIntervalEntry 7 }
 
-x400pNearEndIntervalLESs OBJECT-TYPE
+mxNearEndIntervalLESs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3801,9 +3783,9 @@ x400pNearEndIntervalLESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Line Errored Seconds (LESs) in the indexed 
 	 interval."
-    ::= { x400pNearEndIntervalEntry 8 }
+    ::= { mxNearEndIntervalEntry 8 }
 
-x400pNearEndIntervalBESs OBJECT-TYPE
+mxNearEndIntervalBESs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3811,18 +3793,18 @@ x400pNearEndIntervalBESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Bursty Errored Seconds (BESs) in the indexed 
 	 interval."
-    ::= { x400pNearEndIntervalEntry 9 }
+    ::= { mxNearEndIntervalEntry 9 }
 
-x400pNearEndIntervalDMs OBJECT-TYPE
+mxNearEndIntervalDMs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"minutes"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of Degraded Minutes (DMs) in the indexed interval."
-    ::= { x400pNearEndIntervalEntry 10 }
+    ::= { mxNearEndIntervalEntry 10 }
 
-x400pNearEndIntervalLCVs OBJECT-TYPE
+mxNearEndIntervalLCVs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -3830,31 +3812,31 @@ x400pNearEndIntervalLCVs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Line Coding Violations (LCVs) in the indexed 
 	 interval."
-    ::= { x400pNearEndIntervalEntry 11 }
+    ::= { mxNearEndIntervalEntry 11 }
 
-x400pNearEndIntervalValidData OBJECT-TYPE
+mxNearEndIntervalValidData OBJECT-TYPE
     SYNTAX	TruthValue
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Indicates whether the performance interval counts are valid for 
 	 the indexed interval."
-    ::= { x400pNearEndIntervalEntry 12 }
+    ::= { mxNearEndIntervalEntry 12 }
 
 
-x400pNearEndTotal OBJECT IDENTIFIER
-    ::= { x400pNearEndStats 3 }
+mxNearEndTotal OBJECT IDENTIFIER
+    ::= { mxNearEndStats 3 }
 
-x400pNearEndTotalTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pNearEndTotalEntry
+mxNearEndTotalTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxNearEndTotalEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"Provides a table of near end performance measurement totals."
-    ::= { x400pSpan 5 }
+    ::= { mxNearEndTotal 1 }
 
-x400pNearEndTotalEntry OBJECT-TYPE
-    SYNTAX	X400pNearEndTotalEntry
+mxNearEndTotalEntry OBJECT-TYPE
+    SYNTAX	MxNearEndTotalEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -3862,48 +3844,48 @@ x400pNearEndTotalEntry OBJECT-TYPE
 	 statistics for a given span.  Spans whose drivers or equipment 
 	 does not support the reporting of near end performance 
 	 measurements will not have an entry in this table, or may have 
-	 an entry where the x400pNearEndTotalValidIntervals is zero (0)."
+	 an entry where the mxNearEndTotalValidIntervals is zero (0)."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex	-- shared index
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex	-- shared index
     }
-    ::= { x400pNearEndTotalTable 1 }
+    ::= { mxNearEndTotalTable 1 }
 
-X400pNearEndTotalEntry ::= SEQUENCE {
-    x400pNearEndTotalValidIntervals		HCPerfValidIntervals,
-    x400pNearEndTotalInvalidIntervals		HCPerfInvalidIntervals,
-    x400pNearEndTotalESs			PerfTotalCount,
-    x400pNearEndTotalSESs			PerfTotalCount,
-    x400pNearEndTotalSEFSs			PerfTotalCount,
-    x400pNearEndTotalUASs			PerfTotalCount,
-    x400pNearEndTotalCSSs			PerfTotalCount,
-    x400pNearEndTotalPCVs			PerfTotalCount,
-    x400pNearEndTotalLESs			PerfTotalCount,
-    x400pNearEndTotalBESs			PerfTotalCount,
-    x400pNearEndTotalDMs			PerfTotalCount,
-    x400pNearEndTotalLCVs			PerfTotalCount
+MxNearEndTotalEntry ::= SEQUENCE {
+    mxNearEndTotalValidIntervals		HCPerfValidIntervals,
+    mxNearEndTotalInvalidIntervals		HCPerfInvalidIntervals,
+    mxNearEndTotalESs				PerfTotalCount,
+    mxNearEndTotalSESs				PerfTotalCount,
+    mxNearEndTotalSEFSs				PerfTotalCount,
+    mxNearEndTotalUASs				PerfTotalCount,
+    mxNearEndTotalCSSs				PerfTotalCount,
+    mxNearEndTotalPCVs				PerfTotalCount,
+    mxNearEndTotalLESs				PerfTotalCount,
+    mxNearEndTotalBESs				PerfTotalCount,
+    mxNearEndTotalDMs				PerfTotalCount,
+    mxNearEndTotalLCVs				PerfTotalCount
 }
 
-x400pNearEndTotalValidIntervals OBJECT-TYPE
+mxNearEndTotalValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of intervals for which data was collected."
-    ::= { x400pNearEndTotalEntry 1 }
+    ::= { mxNearEndTotalEntry 1 }
 
-x400pNearEndTotalInvalidIntervals OBJECT-TYPE
+mxNearEndTotalInvalidIntervals OBJECT-TYPE
     SYNTAX	HCPerfInvalidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of intervals in the range from 0 to 
-	 x400pNearEndTotalValidIntervals for which data is invalid 
+	 mxNearEndTotalValidIntervals for which data is invalid 
 	 (missing)."
-    ::= { x400pNearEndTotalEntry 2 }
+    ::= { mxNearEndTotalEntry 2 }
 
-x400pNearEndTotalESs OBJECT-TYPE
+mxNearEndTotalESs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3911,9 +3893,9 @@ x400pNearEndTotalESs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Errored Seconds (ESs) in all available 
 	 intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 3 }
+    ::= { mxNearEndTotalEntry 3 }
 
-x400pNearEndTotalSESs OBJECT-TYPE
+mxNearEndTotalSESs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3921,9 +3903,9 @@ x400pNearEndTotalSESs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Severly Errored Seconds (SESs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 4 }
+    ::= { mxNearEndTotalEntry 4 }
 
-x400pNearEndTotalSEFSs OBJECT-TYPE
+mxNearEndTotalSEFSs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3931,9 +3913,9 @@ x400pNearEndTotalSEFSs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Severely Errored Framing Seconds (SEFSs) in 
 	 all available intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 5 }
+    ::= { mxNearEndTotalEntry 5 }
 
-x400pNearEndTotalUASs OBJECT-TYPE
+mxNearEndTotalUASs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3941,9 +3923,9 @@ x400pNearEndTotalUASs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Unavailable Seconds (UASs) in all available 
 	 intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 6 }
+    ::= { mxNearEndTotalEntry 6 }
 
-x400pNearEndTotalCSSs OBJECT-TYPE
+mxNearEndTotalCSSs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3951,9 +3933,9 @@ x400pNearEndTotalCSSs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Controlled Slip Seconds (CSSs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 7 }
+    ::= { mxNearEndTotalEntry 7 }
 
-x400pNearEndTotalPCVs OBJECT-TYPE
+mxNearEndTotalPCVs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -3961,9 +3943,9 @@ x400pNearEndTotalPCVs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Path Coding Violations (PCVs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 8 }
+    ::= { mxNearEndTotalEntry 8 }
 
-x400pNearEndTotalLESs OBJECT-TYPE
+mxNearEndTotalLESs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3971,9 +3953,9 @@ x400pNearEndTotalLESs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Line Errored Seconds (LESs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 9 }
+    ::= { mxNearEndTotalEntry 9 }
 
-x400pNearEndTotalBESs OBJECT-TYPE
+mxNearEndTotalBESs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -3981,9 +3963,9 @@ x400pNearEndTotalBESs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Bursty Errored Seconds (BESs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 10 }
+    ::= { mxNearEndTotalEntry 10 }
 
-x400pNearEndTotalDMs OBJECT-TYPE
+mxNearEndTotalDMs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"minutes"
     MAX-ACCESS	read-only
@@ -3991,9 +3973,9 @@ x400pNearEndTotalDMs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Degraded Minutes (DMs) in all available 
 	 intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 11 }
+    ::= { mxNearEndTotalEntry 11 }
 
-x400pNearEndTotalLCVs OBJECT-TYPE
+mxNearEndTotalLCVs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -4001,25 +3983,25 @@ x400pNearEndTotalLCVs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Line Coding Violations (LCVs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pNearEndTotalEntry 12 }
+    ::= { mxNearEndTotalEntry 12 }
 
 
-x400pFarEndStats OBJECT IDENTIFIER
-    ::= { x400pStats 2 }
+mxFarEndStats OBJECT IDENTIFIER
+    ::= { mxStats 2 }
 
-x400pFarEndCurrent OBJECT IDENTIFIER
-    ::= { x400pFarEndStats 1 }
+mxFarEndCurrent OBJECT IDENTIFIER
+    ::= { mxFarEndStats 1 }
 
-x400pFarEndCurrentTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pFarEndCurrentEntry
+mxFarEndCurrentTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxFarEndCurrentEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"Provides a table of far end current statistic."
-    ::= { x400pFarEndCurrent 1 }
+    ::= { mxFarEndCurrent 1 }
 
-x400pFarEndCurrentEntry OBJECT-TYPE
-    SYNTAX	X400pFarEndCurrentEntry
+mxFarEndCurrentEntry OBJECT-TYPE
+    SYNTAX	MxFarEndCurrentEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -4028,26 +4010,26 @@ x400pFarEndCurrentEntry OBJECT-TYPE
 	 not support the far end reporting of performance measurements 
 	 will not have an associated entry in this table."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex	-- shared index
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex	-- shared index
     }
-    ::= { x400pFarEndCurrentTable 1 }
+    ::= { mxFarEndCurrentTable 1 }
 
-X400pFarEndCurrentEntry ::= SEQUENCE {
-    x400pFarEndCurrentTimeElapsed		HCPerfTimeElapsed,
-    x400pFarEndCurrentESs			PerfCurrentCount,
-    x400pFarEndCurrentSESs			PerfCurrentCount,
-    x400pFarEndCurrentSEFSs			PerfCurrentCount,
-    x400pFarEndCurrentUASs			PerfCurrentCount,
-    x400pFarEndCurrentCSSs			PerfCurrentCount,
-    x400pFarEndCurrentPCVs			PerfCurrentCount,
-    x400pFarEndCurrentLESs			PerfCurrentCount,
-    x400pFarEndCurrentBESs			PerfCurrentCount,
-    x400pFarEndCurrentDMs			PerfCurrentCount
+MxFarEndCurrentEntry ::= SEQUENCE {
+    mxFarEndCurrentTimeElapsed			HCPerfTimeElapsed,
+    mxFarEndCurrentESs				PerfCurrentCount,
+    mxFarEndCurrentSESs				PerfCurrentCount,
+    mxFarEndCurrentSEFSs			PerfCurrentCount,
+    mxFarEndCurrentUASs				PerfCurrentCount,
+    mxFarEndCurrentCSSs				PerfCurrentCount,
+    mxFarEndCurrentPCVs				PerfCurrentCount,
+    mxFarEndCurrentLESs				PerfCurrentCount,
+    mxFarEndCurrentBESs				PerfCurrentCount,
+    mxFarEndCurrentDMs				PerfCurrentCount
 }
 
-x400pFarEndCurrentTimeElapsed OBJECT-TYPE
+mxFarEndCurrentTimeElapsed OBJECT-TYPE
     SYNTAX	HCPerfTimeElapsed
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4055,18 +4037,18 @@ x400pFarEndCurrentTimeElapsed OBJECT-TYPE
     DESCRIPTION	
 	"The number of seconds that have elapsed in the current 
 	 measurement period."
-    ::= { x400pFarEndCurrentEntry 1 }
+    ::= { mxFarEndCurrentEntry 1 }
 
-x400pFarEndCurrentESs OBJECT-TYPE
+mxFarEndCurrentESs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of Errored Seconds (ESs) in the current interval."
-    ::= { x400pFarEndCurrentEntry 2 }
+    ::= { mxFarEndCurrentEntry 2 }
 
-x400pFarEndCurrentSESs OBJECT-TYPE
+mxFarEndCurrentSESs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4074,9 +4056,9 @@ x400pFarEndCurrentSESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Severely Errored Seconds (SESs) in the current 
 	 interval."
-    ::= { x400pFarEndCurrentEntry 3 }
+    ::= { mxFarEndCurrentEntry 3 }
 
-x400pFarEndCurrentSEFSs OBJECT-TYPE
+mxFarEndCurrentSEFSs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4084,9 +4066,9 @@ x400pFarEndCurrentSEFSs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Severely Errored Framing Seconds (SEFSs) in the 
 	 current interval."
-    ::= { x400pFarEndCurrentEntry 4 }
+    ::= { mxFarEndCurrentEntry 4 }
 
-x400pFarEndCurrentUASs OBJECT-TYPE
+mxFarEndCurrentUASs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4094,9 +4076,9 @@ x400pFarEndCurrentUASs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Unavailable Seconds (UASs) in the current 
 	 interval."
-    ::= { x400pFarEndCurrentEntry 5 }
+    ::= { mxFarEndCurrentEntry 5 }
 
-x400pFarEndCurrentCSSs OBJECT-TYPE
+mxFarEndCurrentCSSs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4104,9 +4086,9 @@ x400pFarEndCurrentCSSs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Controlled Slip Seconds (CSSs) in the current 
 	 interval."
-    ::= { x400pFarEndCurrentEntry 6 }
+    ::= { mxFarEndCurrentEntry 6 }
 
-x400pFarEndCurrentPCVs OBJECT-TYPE
+mxFarEndCurrentPCVs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -4114,9 +4096,9 @@ x400pFarEndCurrentPCVs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Path Coding Violations (PCVs) in the current 
 	 interval."
-    ::= { x400pFarEndCurrentEntry 7 }
+    ::= { mxFarEndCurrentEntry 7 }
 
-x400pFarEndCurrentLESs OBJECT-TYPE
+mxFarEndCurrentLESs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4124,9 +4106,9 @@ x400pFarEndCurrentLESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Line Errored Seconds (LESs) in the current 
 	 interval."
-    ::= { x400pFarEndCurrentEntry 8 }
+    ::= { mxFarEndCurrentEntry 8 }
 
-x400pFarEndCurrentBESs OBJECT-TYPE
+mxFarEndCurrentBESs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4134,33 +4116,33 @@ x400pFarEndCurrentBESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Bursty Errored Seconds (BESs) in the current 
 	 interval."
-    ::= { x400pFarEndCurrentEntry 9 }
+    ::= { mxFarEndCurrentEntry 9 }
 
-x400pFarEndCurrentDMs OBJECT-TYPE
+mxFarEndCurrentDMs OBJECT-TYPE
     SYNTAX	PerfCurrentCount
     UNITS	"minutes"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of Degraded Minutes (DMs) in the current interval."
-    ::= { x400pFarEndCurrentEntry 10 }
+    ::= { mxFarEndCurrentEntry 10 }
 
 
-x400pFarEndInterval OBJECT IDENTIFIER
-    ::= { x400pFarEndStats 2 }
+mxFarEndInterval OBJECT IDENTIFIER
+    ::= { mxFarEndStats 2 }
 
-x400pFarEndIntervalTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pFarEndIntervalEntry
+mxFarEndIntervalTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxFarEndIntervalEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"Provides a table of far end performance interval measurements 
 	 for a given span.  Entries exist the previous 96 intervals 
 	 associated with each span."
-    ::= { x400pSpan 7 }
+    ::= { mxFarEndInterval 1 }
 
-x400pFarEndIntervalEntry OBJECT-TYPE
-    SYNTAX	X400pFarEndIntervalEntry
+mxFarEndIntervalEntry OBJECT-TYPE
+    SYNTAX	MxFarEndIntervalEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -4169,48 +4151,48 @@ x400pFarEndIntervalEntry OBJECT-TYPE
 	 associated span does not support the reporting of far end 
 	 performance measurements, there may be no intervals in this 
 	 table for the associated span; or the intervals may have the 
-	 x400pFarEndIntervalValidData column set to false(2)."
+	 mxFarEndIntervalValidData column set to false(2)."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex,	-- shared index
-	x400pFarEndIntervalIndex
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex,	-- shared index
+	mxFarEndIntervalIndex
     }
-    ::= { x400pFarEndIntervalTable 1 }
+    ::= { mxFarEndIntervalTable 1 }
 
-X400pFarEndIntervalEntry ::= SEQUENCE {
-    x400pFarEndIntervalIndex			Unsigned32,
-    x400pFarEndIntervalESs			PerfIntervalCount,
-    x400pFarEndIntervalSESs			PerfIntervalCount,
-    x400pFarEndIntervalSEFSs			PerfIntervalCount,
-    x400pFarEndIntervalUASs			PerfIntervalCount,
-    x400pFarEndIntervalCSSs			PerfIntervalCount,
-    x400pFarEndIntervalPCVs			PerfIntervalCount,
-    x400pFarEndIntervalLESs			PerfIntervalCount,
-    x400pFarEndIntervalBESs			PerfIntervalCount,
-    x400pFarEndIntervalDMs			PerfIntervalCount,
-    x400pFarEndIntervalValidData		TruthValue
+MxFarEndIntervalEntry ::= SEQUENCE {
+    mxFarEndIntervalIndex			Unsigned32,
+    mxFarEndIntervalESs				PerfIntervalCount,
+    mxFarEndIntervalSESs			PerfIntervalCount,
+    mxFarEndIntervalSEFSs			PerfIntervalCount,
+    mxFarEndIntervalUASs			PerfIntervalCount,
+    mxFarEndIntervalCSSs			PerfIntervalCount,
+    mxFarEndIntervalPCVs			PerfIntervalCount,
+    mxFarEndIntervalLESs			PerfIntervalCount,
+    mxFarEndIntervalBESs			PerfIntervalCount,
+    mxFarEndIntervalDMs				PerfIntervalCount,
+    mxFarEndIntervalValidData			TruthValue
 }
 
-x400pFarEndIntervalIndex OBJECT-TYPE
+mxFarEndIntervalIndex OBJECT-TYPE
     SYNTAX	Unsigned32 (1..96)
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"Provides an index in increments of 15 minute intervals with the 
 	 lowest index value being the most recent interval."
-    ::= { x400pFarEndIntervalEntry 1 }
+    ::= { mxFarEndIntervalEntry 1 }
 
-x400pFarEndIntervalESs OBJECT-TYPE
+mxFarEndIntervalESs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of Errored Seconds (ESs) in the indexed interval."
-    ::= { x400pFarEndIntervalEntry 2 }
+    ::= { mxFarEndIntervalEntry 2 }
 
-x400pFarEndIntervalSESs OBJECT-TYPE
+mxFarEndIntervalSESs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4218,9 +4200,9 @@ x400pFarEndIntervalSESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Severely Errored Seconds (SESs) in the indexed 
 	 interval."
-    ::= { x400pFarEndIntervalEntry 3 }
+    ::= { mxFarEndIntervalEntry 3 }
 
-x400pFarEndIntervalSEFSs OBJECT-TYPE
+mxFarEndIntervalSEFSs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4228,9 +4210,9 @@ x400pFarEndIntervalSEFSs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Severely Errored Framing Seconds (SEFSs) in the 
 	 indexed interval."
-    ::= { x400pFarEndIntervalEntry 4 }
+    ::= { mxFarEndIntervalEntry 4 }
 
-x400pFarEndIntervalUASs OBJECT-TYPE
+mxFarEndIntervalUASs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4238,9 +4220,9 @@ x400pFarEndIntervalUASs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Unavailable Seconds (UASs) in the indexed 
 	 interval."
-    ::= { x400pFarEndIntervalEntry 5 }
+    ::= { mxFarEndIntervalEntry 5 }
 
-x400pFarEndIntervalCSSs OBJECT-TYPE
+mxFarEndIntervalCSSs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4248,9 +4230,9 @@ x400pFarEndIntervalCSSs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Controlled Slip Seconds (CSSs) in the indexed 
 	 interval."
-    ::= { x400pFarEndIntervalEntry 6 }
+    ::= { mxFarEndIntervalEntry 6 }
 
-x400pFarEndIntervalPCVs OBJECT-TYPE
+mxFarEndIntervalPCVs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -4258,9 +4240,9 @@ x400pFarEndIntervalPCVs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Path Coding Violations (PCVs) in the indexed 
 	 interval."
-    ::= { x400pFarEndIntervalEntry 7 }
+    ::= { mxFarEndIntervalEntry 7 }
 
-x400pFarEndIntervalLESs OBJECT-TYPE
+mxFarEndIntervalLESs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4268,9 +4250,9 @@ x400pFarEndIntervalLESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Line Errored Seconds (LESs) in the indexed 
 	 interval."
-    ::= { x400pFarEndIntervalEntry 8 }
+    ::= { mxFarEndIntervalEntry 8 }
 
-x400pFarEndIntervalBESs OBJECT-TYPE
+mxFarEndIntervalBESs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4278,40 +4260,40 @@ x400pFarEndIntervalBESs OBJECT-TYPE
     DESCRIPTION	
 	"The number of Bursty Errored Seconds (BESs) in the indexed 
 	 interval."
-    ::= { x400pFarEndIntervalEntry 9 }
+    ::= { mxFarEndIntervalEntry 9 }
 
-x400pFarEndIntervalDMs OBJECT-TYPE
+mxFarEndIntervalDMs OBJECT-TYPE
     SYNTAX	PerfIntervalCount
     UNITS	"minutes"
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of Degraded Minutes (DMs) in the indexed interval."
-    ::= { x400pFarEndIntervalEntry 10 }
+    ::= { mxFarEndIntervalEntry 10 }
 
-x400pFarEndIntervalValidData OBJECT-TYPE
+mxFarEndIntervalValidData OBJECT-TYPE
     SYNTAX	TruthValue
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"Indicates whether the performance interval counts are valid for 
 	 the indexed interval."
-    ::= { x400pFarEndIntervalEntry 11 }
+    ::= { mxFarEndIntervalEntry 11 }
 
 
-x400pFarEndTotal OBJECT IDENTIFIER
-    ::= { x400pFarEndStats 3 }
+mxFarEndTotal OBJECT IDENTIFIER
+    ::= { mxFarEndStats 3 }
 
-x400pFarEndTotalTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF X400pFarEndTotalEntry
+mxFarEndTotalTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF MxFarEndTotalEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
 	"Provides a table of far end performance statistic totals."
-    ::= { x400pFarEndTotal 1 }
+    ::= { mxFarEndTotal 1 }
 
-x400pFarEndTotalEntry OBJECT-TYPE
-    SYNTAX	X400pFarEndTotalEntry
+mxFarEndTotalEntry OBJECT-TYPE
+    SYNTAX	MxFarEndTotalEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION	
@@ -4319,47 +4301,47 @@ x400pFarEndTotalEntry OBJECT-TYPE
 	 for a given span.  Spans whose drivers or equipment does not 
 	 support the reporting of far end performance measurements will 
 	 not have an entry in this  table, or may have an entry where 
-	 the x400pFarEndTotalValidIntervals is zero (0)."
+	 the mxFarEndTotalValidIntervals is zero (0)."
     INDEX	{
-	x400pDrivName,	-- shared index
-	x400pCardIndex,	-- shared index
-	x400pSpanIndex	-- shared index
+	mxDrivName,	-- shared index
+	mxCardIndex,	-- shared index
+	mxSpanIndex	-- shared index
     }
-    ::= { x400pFarEndTotalTable 1 }
+    ::= { mxFarEndTotalTable 1 }
 
-X400pFarEndTotalEntry ::= SEQUENCE {
-    x400pFarEndTotalValidIntervals		HCPerfValidIntervals,
-    x400pFarEndTotalInvalidIntervals		HCPerfInvalidIntervals,
-    x400pFarEndTotalESs				PerfTotalCount,
-    x400pFarEndTotalSESs			PerfTotalCount,
-    x400pFarEndTotalSEFSs			PerfTotalCount,
-    x400pFarEndTotalUASs			PerfTotalCount,
-    x400pFarEndTotalCSSs			PerfTotalCount,
-    x400pFarEndTotalPCVs			PerfTotalCount,
-    x400pFarEndTotalLESs			PerfTotalCount,
-    x400pFarEndTotalBESs			PerfTotalCount,
-    x400pFarEndTotalDMs				PerfTotalCount
+MxFarEndTotalEntry ::= SEQUENCE {
+    mxFarEndTotalValidIntervals			HCPerfValidIntervals,
+    mxFarEndTotalInvalidIntervals		HCPerfInvalidIntervals,
+    mxFarEndTotalESs				PerfTotalCount,
+    mxFarEndTotalSESs				PerfTotalCount,
+    mxFarEndTotalSEFSs				PerfTotalCount,
+    mxFarEndTotalUASs				PerfTotalCount,
+    mxFarEndTotalCSSs				PerfTotalCount,
+    mxFarEndTotalPCVs				PerfTotalCount,
+    mxFarEndTotalLESs				PerfTotalCount,
+    mxFarEndTotalBESs				PerfTotalCount,
+    mxFarEndTotalDMs				PerfTotalCount
 }
 
-x400pFarEndTotalValidIntervals OBJECT-TYPE
+mxFarEndTotalValidIntervals OBJECT-TYPE
     SYNTAX	HCPerfValidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of intervals for which data was collected."
-    ::= { x400pFarEndTotalEntry 1 }
+    ::= { mxFarEndTotalEntry 1 }
 
-x400pFarEndTotalInvalidIntervals OBJECT-TYPE
+mxFarEndTotalInvalidIntervals OBJECT-TYPE
     SYNTAX	HCPerfInvalidIntervals
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION	
 	"The number of intervals in the range from 0 to 
-	 x400pFarEndTotalValidIntervals for which data is invalid 
+	 mxFarEndTotalValidIntervals for which data is invalid 
 	 (missing)."
-    ::= { x400pFarEndTotalEntry 2 }
+    ::= { mxFarEndTotalEntry 2 }
 
-x400pFarEndTotalESs OBJECT-TYPE
+mxFarEndTotalESs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4367,9 +4349,9 @@ x400pFarEndTotalESs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Errored Seconds (ESs) in all available 
 	 intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 3 }
+    ::= { mxFarEndTotalEntry 3 }
 
-x400pFarEndTotalSESs OBJECT-TYPE
+mxFarEndTotalSESs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4377,9 +4359,9 @@ x400pFarEndTotalSESs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Severly Errored Seconds (SESs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 4 }
+    ::= { mxFarEndTotalEntry 4 }
 
-x400pFarEndTotalSEFSs OBJECT-TYPE
+mxFarEndTotalSEFSs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4387,9 +4369,9 @@ x400pFarEndTotalSEFSs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Severely Errored Framing Seconds (SEFSs) in 
 	 all available intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 5 }
+    ::= { mxFarEndTotalEntry 5 }
 
-x400pFarEndTotalUASs OBJECT-TYPE
+mxFarEndTotalUASs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4397,9 +4379,9 @@ x400pFarEndTotalUASs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Unavailable Seconds (UASs) in all available 
 	 intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 6 }
+    ::= { mxFarEndTotalEntry 6 }
 
-x400pFarEndTotalCSSs OBJECT-TYPE
+mxFarEndTotalCSSs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4407,9 +4389,9 @@ x400pFarEndTotalCSSs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Controlled Slip Seconds (CSSs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 7 }
+    ::= { mxFarEndTotalEntry 7 }
 
-x400pFarEndTotalPCVs OBJECT-TYPE
+mxFarEndTotalPCVs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"violations"
     MAX-ACCESS	read-only
@@ -4417,9 +4399,9 @@ x400pFarEndTotalPCVs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Path Coding Violations (PCVs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 8 }
+    ::= { mxFarEndTotalEntry 8 }
 
-x400pFarEndTotalLESs OBJECT-TYPE
+mxFarEndTotalLESs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4427,9 +4409,9 @@ x400pFarEndTotalLESs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Line Errored Seconds (LESs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 9 }
+    ::= { mxFarEndTotalEntry 9 }
 
-x400pFarEndTotalBESs OBJECT-TYPE
+mxFarEndTotalBESs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"seconds"
     MAX-ACCESS	read-only
@@ -4437,9 +4419,9 @@ x400pFarEndTotalBESs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Bursty Errored Seconds (BESs) in all 
 	 available intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 10 }
+    ::= { mxFarEndTotalEntry 10 }
 
-x400pFarEndTotalDMs OBJECT-TYPE
+mxFarEndTotalDMs OBJECT-TYPE
     SYNTAX	PerfTotalCount
     UNITS	"minutes"
     MAX-ACCESS	read-only
@@ -4447,198 +4429,198 @@ x400pFarEndTotalDMs OBJECT-TYPE
     DESCRIPTION	
 	"The total number of Degraded Minutes (DMs) in all available 
 	 intervals over the last 24-hour period."
-    ::= { x400pFarEndTotalEntry 11 }
+    ::= { mxFarEndTotalEntry 11 }
 
-x400pConformance OBJECT IDENTIFIER
-    ::= { x400pMIB 2 }
+mxConformance OBJECT IDENTIFIER
+    ::= { mxMIB 2 }
 
-x400pGroups OBJECT IDENTIFIER
-    ::= { x400pConformance 1 }
+mxGroups OBJECT IDENTIFIER
+    ::= { mxConformance 1 }
 
-x400pSyncMandatoryGroup OBJECT-GROUP
+mxSyncMandatoryGroup OBJECT-GROUP
     OBJECTS	{
-	x400pSyncSpanId, x400pSyncRowStatus }
+	mxSyncSpanId, mxSyncRowStatus }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects identifying the span."
-    ::= { x400pGroups 1 }
+    ::= { mxGroups 1 }
 
-x400pCardIdGroup OBJECT-GROUP
+mxCardIdGroup OBJECT-GROUP
     OBJECTS	{
-	x400pCardType, x400pCardIdentifier, x400pCardRevision }
+	mxCardType, mxCardIdentifier, mxCardRevision }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects identifying the span type."
-    ::= { x400pGroups 2 }
+    ::= { mxGroups 2 }
 
-x400pChipGroup OBJECT-GROUP
+mxChipGroup OBJECT-GROUP
     OBJECTS	{
-	x400pCardChipType, x400pCardChipRevision }
+	mxCardChipType, mxCardChipRevision }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects identifying the chip type."
-    ::= { x400pGroups 3 }
+    ::= { mxGroups 3 }
 
-x400pPciGroup OBJECT-GROUP
+mxPciGroup OBJECT-GROUP
     OBJECTS	{
-	x400pCardPciBus, x400pCardPciSlot, x400pCardPciIrq }
+	mxCardPciBus, mxCardPciSlot, mxCardPciIrq }
     STATUS	current
     DESCRIPTION	
 	"A collectin of objects identifying the bus location."
-    ::= { x400pGroups 4 }
+    ::= { mxGroups 4 }
 
-x400pCardGroup OBJECT-GROUP
+mxCardGroup OBJECT-GROUP
     OBJECTS	{
-	x400pCardSpanType, x400pCardMode, x400pCardSyncMaster, 
-	x400pCardSyncSource, x400pCardSyncGroup, 
-	x400pCardAdministrativeState, x400pCardOperationalState, 
-	x400pCardUsageState, x400pCardAlarmStatus, 
-	x400pCardProceduralStatus, x400pCardAvailabilityStatus, 
-	x400pCardControlStatus, x400pCardUnknownStatus, 
-	x400pCardSyncSpanId, x400pCardSyncTransitions }
+	mxCardSpanType, mxCardMode, mxCardSyncMaster, 
+	mxCardSyncSource, mxCardSyncGroup, 
+	mxCardAdministrativeState, mxCardOperationalState, 
+	mxCardUsageState, mxCardAlarmStatus, 
+	mxCardProceduralStatus, mxCardAvailabilityStatus, 
+	mxCardControlStatus, mxCardUnknownStatus, 
+	mxCardSyncSpanId, mxCardSyncTransitions }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects identifying the card state."
-    ::= { x400pGroups 5 }
+    ::= { mxGroups 5 }
 
-x400pSpanGroup OBJECT-GROUP
+mxSpanGroup OBJECT-GROUP
     OBJECTS	{
-	x400pSpanDevice, x400pSpanEquipmentId, x400pSpanType, x400pSpanNumber, 
-	x400pSpanRate, x400pSpanMode, x400pSpanCrc, x400pSpanClocking, 
-	x400pSpanPriority, x400pSpanCoding, x400pSpanFraming, 
-	x400pSpanLineImpedance, x400pSpanLineMode, x400pSpanLineLength, 
-	x400pSpanLineAttenuation, x400pSpanLineGain, x400pSpanLineDelay, 
-	x400pSpanTxLevel, x400pSpanRxLevel, x400pSpanAlarmSettleTime, 
-	x400pSpanLineCodeTime, x400pSpanPrimary, x400pSpanDataLink, 
-	x400pSpanLineCode, x400pSpanAlarmSeverityMappingProfile, 
-	x400pSpanAdministrativeState, x400pSpanOperationalState, 
-	x400pSpanUsageState, x400pSpanAlarmStatus, x400pSpanProceduralStatus, 
-	x400pSpanAvailabilityStatus, x400pSpanControlStatus, 
-	x400pSpanStandbyStatus, x400pSpanUnknownStatus, x400pSpanSap, 
-	x400pSpanLoopbackStatus, x400pSpanLineStatus, x400pSpanAlarms, 
-	x400pSpanEvents, x400pSpanReceiveLevel, x400pSpanReceiveThreshold, 
-	x400pSpanRowStatus }
+	mxSpanDevice, mxSpanEquipmentId, mxSpanType, mxSpanNumber, 
+	mxSpanRate, mxSpanMode, mxSpanCrc, mxSpanClocking, 
+	mxSpanPriority, mxSpanCoding, mxSpanFraming, 
+	mxSpanLineImpedance, mxSpanLineMode, mxSpanLineLength, 
+	mxSpanLineAttenuation, mxSpanLineGain, mxSpanLineDelay, 
+	mxSpanTxLevel, mxSpanRxLevel, mxSpanAlarmSettleTime, 
+	mxSpanLineCodeTime, mxSpanPrimary, mxSpanDataLink, 
+	mxSpanLineCode, mxSpanAlarmSeverityMappingProfile, 
+	mxSpanAdministrativeState, mxSpanOperationalState, 
+	mxSpanUsageState, mxSpanAlarmStatus, mxSpanProceduralStatus, 
+	mxSpanAvailabilityStatus, mxSpanControlStatus, 
+	mxSpanStandbyStatus, mxSpanUnknownStatus, mxSpanSap, 
+	mxSpanLoopbackStatus, mxSpanLineStatus, mxSpanAlarms, 
+	mxSpanEvents, mxSpanReceiveLevel, mxSpanReceiveThreshold, 
+	mxSpanRowStatus }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the span group."
-    ::= { x400pGroups 6 }
+    ::= { mxGroups 6 }
 
-x400pChanGroup OBJECT-GROUP
+mxChanGroup OBJECT-GROUP
     OBJECTS	{
-	x400pChanType, x400pChanFormat, x400pChanRate, x400pChanMode, x400pChanAdministrativeState, 
-	x400pChanUsageState, x400pChanAvailabilityStatus, x400pChanControlStatus, 
-	x400pChanSap }
+	mxChanType, mxChanFormat, mxChanRate, mxChanMode, mxChanAdministrativeState, 
+	mxChanUsageState, mxChanAvailabilityStatus, mxChanControlStatus, 
+	mxChanSap }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the channel group."
-    ::= { x400pGroups 7 }
+    ::= { mxGroups 7 }
 
-x400pXconGroup OBJECT-GROUP
+mxXconGroup OBJECT-GROUP
     OBJECTS	{
-	x400pXconSpanIndex, x400pXconChanIndex, x400pXconType, x400pXconStorageType, 
-	x400pXconRowStatus }
+	mxXconSpanIndex, mxXconChanIndex, mxXconType, mxXconStorageType, 
+	mxXconRowStatus }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the cross-connect group."
-    ::= { x400pGroups 8 }
+    ::= { mxGroups 8 }
 
-x400pBertGroup OBJECT-GROUP
+mxBertGroup OBJECT-GROUP
     OBJECTS	{
-	x400pBertMode, x400pBertSelect, x400pBertPattern, x400pBertOperationalState, 
-	x400pBertProceduralStatus, x400pBertBitCount, x400pBertErrorCount }
+	mxBertMode, mxBertSelect, mxBertPattern, mxBertOperationalState, 
+	mxBertProceduralStatus, mxBertBitCount, mxBertErrorCount }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the bit error rate testing 
 	 group."
-    ::= { x400pGroups 9 }
+    ::= { mxGroups 9 }
 
-x400pScalarGroup OBJECT-GROUP
-    OBJECTS	{ x400pDiscontinuityTime }
+mxScalarGroup OBJECT-GROUP
+    OBJECTS	{ mxDiscontinuityTime }
     STATUS	current
     DESCRIPTION	
 	"A collection of scalars."
-    ::= { x400pGroups 10 }
+    ::= { mxGroups 10 }
 
-x400pNearEndCurrentGroup OBJECT-GROUP
+mxNearEndCurrentGroup OBJECT-GROUP
     OBJECTS	{
-	x400pNearEndCurrentTimeElapsed, x400pNearEndCurrentESs, 
-	x400pNearEndCurrentSESs, x400pNearEndCurrentSEFSs, 
-	x400pNearEndCurrentUASs, x400pNearEndCurrentCSSs, 
-	x400pNearEndCurrentPCVs, x400pNearEndCurrentLESs, 
-	x400pNearEndCurrentBESs, x400pNearEndCurrentDMs, x400pNearEndCurrentLCVs 
+	mxNearEndCurrentTimeElapsed, mxNearEndCurrentESs, 
+	mxNearEndCurrentSESs, mxNearEndCurrentSEFSs, 
+	mxNearEndCurrentUASs, mxNearEndCurrentCSSs, 
+	mxNearEndCurrentPCVs, mxNearEndCurrentLESs, 
+	mxNearEndCurrentBESs, mxNearEndCurrentDMs, mxNearEndCurrentLCVs 
 	}
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the near end current 
 	 group."
-    ::= { x400pGroups 11 }
+    ::= { mxGroups 11 }
 
-x400pNearEndIntervalGroup OBJECT-GROUP
+mxNearEndIntervalGroup OBJECT-GROUP
     OBJECTS	{
-	x400pNearEndIntervalESs, x400pNearEndIntervalSESs, 
-	x400pNearEndIntervalSEFSs, x400pNearEndIntervalUASs, 
-	x400pNearEndIntervalCSSs, x400pNearEndIntervalPCVs, 
-	x400pNearEndIntervalLESs, x400pNearEndIntervalBESs, 
-	x400pNearEndIntervalDMs, x400pNearEndIntervalLCVs, 
-	x400pNearEndIntervalValidData }
+	mxNearEndIntervalESs, mxNearEndIntervalSESs, 
+	mxNearEndIntervalSEFSs, mxNearEndIntervalUASs, 
+	mxNearEndIntervalCSSs, mxNearEndIntervalPCVs, 
+	mxNearEndIntervalLESs, mxNearEndIntervalBESs, 
+	mxNearEndIntervalDMs, mxNearEndIntervalLCVs, 
+	mxNearEndIntervalValidData }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the near end interval 
 	 group."
-    ::= { x400pGroups 12 }
+    ::= { mxGroups 12 }
 
-x400pNearEndTotalGroup OBJECT-GROUP
+mxNearEndTotalGroup OBJECT-GROUP
     OBJECTS	{
-	x400pNearEndTotalValidIntervals, x400pNearEndTotalInvalidIntervals, 
-	x400pNearEndTotalESs, x400pNearEndTotalSESs, x400pNearEndTotalSEFSs, 
-	x400pNearEndTotalUASs, x400pNearEndTotalCSSs, x400pNearEndTotalPCVs, 
-	x400pNearEndTotalLESs, x400pNearEndTotalBESs, x400pNearEndTotalDMs, 
-	x400pNearEndTotalLCVs }
+	mxNearEndTotalValidIntervals, mxNearEndTotalInvalidIntervals, 
+	mxNearEndTotalESs, mxNearEndTotalSESs, mxNearEndTotalSEFSs, 
+	mxNearEndTotalUASs, mxNearEndTotalCSSs, mxNearEndTotalPCVs, 
+	mxNearEndTotalLESs, mxNearEndTotalBESs, mxNearEndTotalDMs, 
+	mxNearEndTotalLCVs }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the near end total group."
-    ::= { x400pGroups 13 }
+    ::= { mxGroups 13 }
 
-x400pFarEndCurrentGroup OBJECT-GROUP
+mxFarEndCurrentGroup OBJECT-GROUP
     OBJECTS	{
-	x400pFarEndCurrentTimeElapsed, x400pFarEndCurrentESs, 
-	x400pFarEndCurrentSESs, x400pFarEndCurrentSEFSs, x400pFarEndCurrentUASs, 
-	x400pFarEndCurrentCSSs, x400pFarEndCurrentPCVs, x400pFarEndCurrentLESs, 
-	x400pFarEndCurrentBESs, x400pFarEndCurrentDMs }
+	mxFarEndCurrentTimeElapsed, mxFarEndCurrentESs, 
+	mxFarEndCurrentSESs, mxFarEndCurrentSEFSs, mxFarEndCurrentUASs, 
+	mxFarEndCurrentCSSs, mxFarEndCurrentPCVs, mxFarEndCurrentLESs, 
+	mxFarEndCurrentBESs, mxFarEndCurrentDMs }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the far end current 
 	 group."
-    ::= { x400pGroups 14 }
+    ::= { mxGroups 14 }
 
-x400pFarEndIntervalGroup OBJECT-GROUP
+mxFarEndIntervalGroup OBJECT-GROUP
     OBJECTS	{
-	x400pFarEndIntervalESs, x400pFarEndIntervalSESs, 
-	x400pFarEndIntervalSEFSs, x400pFarEndIntervalUASs, 
-	x400pFarEndIntervalCSSs, x400pFarEndIntervalPCVs, 
-	x400pFarEndIntervalLESs, x400pFarEndIntervalBESs, x400pFarEndIntervalDMs, 
-	x400pFarEndIntervalValidData }
+	mxFarEndIntervalESs, mxFarEndIntervalSESs, 
+	mxFarEndIntervalSEFSs, mxFarEndIntervalUASs, 
+	mxFarEndIntervalCSSs, mxFarEndIntervalPCVs, 
+	mxFarEndIntervalLESs, mxFarEndIntervalBESs, mxFarEndIntervalDMs, 
+	mxFarEndIntervalValidData }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the far end interval 
 	 group."
-    ::= { x400pGroups 15 }
+    ::= { mxGroups 15 }
 
-x400pFarEndTotalGroup OBJECT-GROUP
+mxFarEndTotalGroup OBJECT-GROUP
     OBJECTS	{
-	x400pFarEndTotalValidIntervals, x400pFarEndTotalInvalidIntervals, 
-	x400pFarEndTotalESs, x400pFarEndTotalSESs, x400pFarEndTotalSEFSs, 
-	x400pFarEndTotalUASs, x400pFarEndTotalCSSs, x400pFarEndTotalPCVs, 
-	x400pFarEndTotalLESs, x400pFarEndTotalBESs, x400pFarEndTotalDMs }
+	mxFarEndTotalValidIntervals, mxFarEndTotalInvalidIntervals, 
+	mxFarEndTotalESs, mxFarEndTotalSESs, mxFarEndTotalSEFSs, 
+	mxFarEndTotalUASs, mxFarEndTotalCSSs, mxFarEndTotalPCVs, 
+	mxFarEndTotalLESs, mxFarEndTotalBESs, mxFarEndTotalDMs }
     STATUS	current
     DESCRIPTION	
 	"A collection of objects implementing the far end total group."
-    ::= { x400pGroups 16 }
+    ::= { mxGroups 16 }
 
-x400pCompliances OBJECT IDENTIFIER
-    ::= { x400pConformance 2 }
+mxCompliances OBJECT IDENTIFIER
+    ::= { mxConformance 2 }
 
-x400pBasicCompliance MODULE-COMPLIANCE
+mxBasicCompliance MODULE-COMPLIANCE
     STATUS	current
     DESCRIPTION	
 	"A compliance profile providing basic operation."
@@ -4646,60 +4628,60 @@ x400pBasicCompliance MODULE-COMPLIANCE
     MODULE	-- this module
 
     MANDATORY-GROUPS	{
-	x400pSyncMandatoryGroup, x400pCardIdGroup, x400pChipGroup, 
-	x400pCardGroup }
+	mxScalarGroup, mxSpanGroup, mxChanGroup, mxCardIdGroup, 
+	mxChipGroup }
 
-    GROUP	x400pPciGroup
+    GROUP	mxPciGroup
     DESCRIPTION	
 	"Optional group providing PCI bus information.  Not all 
 	 implementations are expected to have PCI busses."
 
-    GROUP	x400pXconGroup
+    GROUP	mxXconGroup
     DESCRIPTION	
 	"Optional group providing cross-connection indication and 
 	 control."
 
-    GROUP	x400pBertGroup
+    GROUP	mxBertGroup
     DESCRIPTION	
 	"Optional group providing bit error rate testing."
-    OBJECT	x400pBertSelect
+    OBJECT	mxBertSelect
     MIN-ACCESS	read-only
     DESCRIPTION	
 	"Some implementations might not permit BERT test selection from 
 	 a management station."
-    OBJECT	x400pBertPattern
+    OBJECT	mxBertPattern
     MIN-ACCESS	read-only
     DESCRIPTION	
 	"Some implementations might not permit BERT test pattern 
 	 selection from a management station."
 
-    GROUP	x400pNearEndCurrentGroup
+    GROUP	mxNearEndCurrentGroup
     DESCRIPTION	
 	"Optional group providing near end current statistics."
 
-    GROUP	x400pNearEndIntervalGroup
+    GROUP	mxNearEndIntervalGroup
     DESCRIPTION	
 	"Optional group providing near end interval statistics."
 
-    GROUP	x400pNearEndTotalGroup
+    GROUP	mxNearEndTotalGroup
     DESCRIPTION	
 	"Optional group providing near end total statistics."
 
-    GROUP	x400pFarEndCurrentGroup
+    GROUP	mxFarEndCurrentGroup
     DESCRIPTION	
 	"Optional group providing far end current statistics."
 
-    GROUP	x400pFarEndIntervalGroup
+    GROUP	mxFarEndIntervalGroup
     DESCRIPTION	
 	"Optional group providing far end interval statistics."
 
-    GROUP	x400pFarEndTotalGroup
+    GROUP	mxFarEndTotalGroup
     DESCRIPTION	
 	"Optional group providing far end total statistics."
 
-::= { x400pCompliances 1 }
+    ::= { mxCompliances 1 }
 
-x400pEnhancedCompliance MODULE-COMPLIANCE
+mxEnhancedCompliance MODULE-COMPLIANCE
     STATUS	current
     DESCRIPTION	
 	"A compliance profile providing enhanced operation."
@@ -4707,31 +4689,31 @@ x400pEnhancedCompliance MODULE-COMPLIANCE
     MODULE	-- this module
 
     MANDATORY-GROUPS	{
-	x400pScalarGroup, x400pSpanGroup, x400pChanGroup, x400pXconGroup, 
-	x400pNearEndCurrentGroup, x400pFarEndCurrentGroup }
+	mxScalarGroup, mxSpanGroup, mxChanGroup, mxXconGroup, 
+	mxNearEndCurrentGroup, mxFarEndCurrentGroup }
 
-    GROUP	x400pBertGroup
+    GROUP	mxBertGroup
     DESCRIPTION	
 	"Optional group providing bit error rate testing."
 
-    GROUP	x400pNearEndIntervalGroup
+    GROUP	mxNearEndIntervalGroup
     DESCRIPTION	
 	"Optional group providing near end interval statistics."
 
-    GROUP	x400pNearEndTotalGroup
+    GROUP	mxNearEndTotalGroup
     DESCRIPTION	
 	"Optional group providing near end interval totals."
 
-    GROUP	x400pFarEndIntervalGroup
+    GROUP	mxFarEndIntervalGroup
     DESCRIPTION	
 	"Optional group providing far end interval statistics."
 
-    GROUP	x400pFarEndTotalGroup
+    GROUP	mxFarEndTotalGroup
     DESCRIPTION	
 	"Optional group providing far end total statistics."
 
-::= { x400pCompliances 2 }
+    ::= { mxCompliances 2 }
 
-END -- end of module OPENSS7-X400P-MIB.
+END -- end of module OPENSS7-MX-MIB.
 
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
