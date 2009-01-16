@@ -1,11 +1,12 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-10-30 18:31:46 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2009-01-16 20:45:39 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:31:46 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:45:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 0.9.2.46  2009-01-16 20:45:39  brian
+ - sync sad driver to streams
+
  Revision 0.9.2.45  2008-10-30 18:31:46  brian
  - rationalized drivers, modules and test programs
 
@@ -62,10 +66,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-10-30 18:31:46 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2009-01-16 20:45:39 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-10-30 18:31:46 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2009-01-16 20:45:39 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -95,8 +99,8 @@ static char const ident[] =
 #endif
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SAD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-10-30 18:31:46 $"
+#define SAD_COPYRIGHT	"Copyright (c) 2008-2009 Monavacon Limited.  All Rights Reserved."
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2009-01-16 20:45:39 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -303,6 +307,21 @@ sad_put(queue_t *q, mblk_t *mp)
 			sad->transparent = 0;
 			sad->iocstate = 1;
 			goto sad_gap_state1;
+		case SAD_LAP:
+			if (ioc->iocblk.ioc_count == TRANSPARENT) {
+				mp->b_datap->db_type = M_COPYIN;
+				ioc->copyreq.cq_addr = sa_addr;
+				ioc->copyreq.cq_size = sa_size;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) ioc->copyreq.cq_addr;
+				sad->transparent = 1;
+				sad->iocstate = 1;
+				qreply(q, mp);
+				return (0);
+			}
+			sad->transparent = 0;
+			sad->iocstate = 1;
+			goto sad_lap_state1;
 		case SAD_VML:
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
 				mp->b_datap->db_type = M_COPYIN;
@@ -412,6 +431,50 @@ sad_put(queue_t *q, mblk_t *mp)
 
 					sap = (typeof(sap)) dp->b_rptr;
 					if ((err = apush_get(sap)))
+						goto nak;
+				}
+				if (sad->transparent == 1) {
+					mp->b_datap->db_type = M_COPYOUT;
+					ioc->copyreq.cq_addr = (caddr_t) ioc->copyresp.cp_private;
+					ioc->copyreq.cq_size = sa_size;
+					ioc->copyreq.cq_flag = 0;
+					sad->transparent = 1;
+					sad->iocstate = 2;
+					qreply(q, mp);
+					return (0);
+				}
+				/* use implied I_STR copyout */
+				count = sa_size;
+				goto ack;
+			case 2:
+				/* done */
+				goto ack;
+			}
+			err = -EIO;
+			goto nak;
+		case SAD_LAP:
+			switch (sad->iocstate) {
+			case 1:
+			      sad_lap_state1:
+				err = -EFAULT;
+				if (!dp || dp->b_wptr < dp->b_rptr + sa_size)
+					goto nak;
+#ifdef WITH_32BIT_CONVERSION
+				if (ioc->copyresp.cp_flag == IOC_ILP32) {
+					struct strapush32 *sap32 = (typeof(sap32)) dp->b_rptr;
+					struct strapush sa, *sap = &sa;
+
+					sap32_convert(sap32, sap);
+					if ((err = apush_getnext(sap)))
+						goto nak;
+					sap32_revert(sap, sap32);
+				} else
+#endif
+				{
+					struct strapush *sap;
+
+					sap = (typeof(sap)) dp->b_rptr;
+					if ((err = apush_getnext(sap)))
 						goto nak;
 				}
 				if (sad->transparent == 1) {
@@ -595,6 +658,7 @@ static struct sad_ioctl sad_map[] = {
 	{.cmd = SAD_SAP,}
 	, {.cmd = SAD_GAP,}
 	, {.cmd = SAD_VML,}
+	, {.cmd = SAD_LAP,}
 #ifdef LFS
 	, {.cmd = SAD_SAP_SOL,}
 	, {.cmd = SAD_GAP_SOL,}

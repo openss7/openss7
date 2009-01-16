@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacom Limited <http://www.monavacom.com/>
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -153,8 +153,8 @@ volatile int m2paProtocolProfileTable_refresh = 1;
  * This is the top level oid that we want to register under.  This is essentially a prefix, with the
  * suffix appearing in the variable below.
  */
-oid m2paMIB_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 202 };
-oid m2paProtocolProfileTable_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 202, 1, 1, 1, 1, 1 };
+oid m2paMIB_variables_oid[9] = { 1, 3, 6, 1, 4, 1, 29591, 1, 202 };
+oid m2paProtocolProfileTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 202, 1, 1, 1, 1, 1 };
 
 /*
  * Oids for use in notifications defined in this MIB.
@@ -194,160 +194,160 @@ static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
  */
 struct variable7 m2paMIB_variables[] = {
 	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
-#define   M2PAN1                (4 % 256)
-	{M2PAN1, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 2}},
-#define   M2PAPROVING           (5 % 256)
-	{M2PAPROVING, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 3}},
-#define   M2PAMANAGEMENTPROVINGSTATE  (6 % 256)
-	{M2PAMANAGEMENTPROVINGSTATE, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 4}},
-#define   M2PALOOPDELAYLOWER    (7 % 256)
-	{M2PALOOPDELAYLOWER, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 5}},
-#define   M2PALOOPDELAYUPPER    (8 % 256)
-	{M2PALOOPDELAYUPPER, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 6}},
-#define   M2PATRANSMISSIONRATEINTERVALLOWER  (9 % 256)
-	{M2PATRANSMISSIONRATEINTERVALLOWER, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 7}},
-#define   M2PATRANSMISSIONRATEINTERVALUPPER  (10 % 256)
-	{M2PATRANSMISSIONRATEINTERVALUPPER, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 8}},
-#define   M2PASCTPNODELAY       (11 % 256)
-	{M2PASCTPNODELAY, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 9}},
-#define   M2PASCTPMAXSEG        (12 % 256)
-	{M2PASCTPMAXSEG, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 10}},
-#define   M2PASCTPHEARTBEATITVL  (13 % 256)
-	{M2PASCTPHEARTBEATITVL, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 11}},
-#define   M2PASCTPHEARTBEAT     (14 % 256)
-	{M2PASCTPHEARTBEAT, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 12}},
-#define   M2PASCTPRTOINITIAL    (15 % 256)
-	{M2PASCTPRTOINITIAL, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 13}},
-#define   M2PASCTPRTOMIN        (16 % 256)
-	{M2PASCTPRTOMIN, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 14}},
-#define   M2PASCTPRTOMAX        (17 % 256)
-	{M2PASCTPRTOMAX, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 15}},
-#define   M2PASCTPPATHMAXRETRANS  (18 % 256)
-	{M2PASCTPPATHMAXRETRANS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 16}},
-#define   M2PASCTPCOOKIELIFE    (19 % 256)
-	{M2PASCTPCOOKIELIFE, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 17}},
-#define   M2PASCTPCOOKIEINC     (20 % 256)
-	{M2PASCTPCOOKIEINC, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 18}},
-#define   M2PASCTPMAXINITRETRIES  (21 % 256)
-	{M2PASCTPMAXINITRETRIES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 19}},
-#define   M2PASCTPMAXBURST      (22 % 256)
-	{M2PASCTPMAXBURST, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 20}},
-#define   M2PASCTPASSOCMAXRETRANS  (23 % 256)
-	{M2PASCTPASSOCMAXRETRANS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 21}},
-#define   M2PASCTPSACKDELAY     (24 % 256)
-	{M2PASCTPSACKDELAY, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 22}},
-#define   M2PASCTPLIFETIME      (25 % 256)
-	{M2PASCTPLIFETIME, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 23}},
-#define   M2PATIMERT1           (26 % 256)
-	{M2PATIMERT1, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 24}},
-#define   M2PATIMERT2           (27 % 256)
-	{M2PATIMERT2, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 25}},
-#define   M2PATIMERT2L          (28 % 256)
-	{M2PATIMERT2L, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 26}},
-#define   M2PATIMERT2H          (29 % 256)
-	{M2PATIMERT2H, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 27}},
-#define   M2PATIMERT3           (30 % 256)
-	{M2PATIMERT3, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 28}},
-#define   M2PATIMERT4N          (31 % 256)
-	{M2PATIMERT4N, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 29}},
-#define   M2PATIMERT4E          (32 % 256)
-	{M2PATIMERT4E, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 30}},
-#define   M2PATIMERT6           (33 % 256)
-	{M2PATIMERT6, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 31}},
-#define   M2PATIMERT7           (34 % 256)
-	{M2PATIMERT7, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 32}},
-#define   M2PATRANSCONGTHRESHOLDABATEMENTL1MESSAGES  (35 % 256)
-	{M2PATRANSCONGTHRESHOLDABATEMENTL1MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 33}},
-#define   M2PATRANSCONGTHRESHOLDABATEMENTL1OCTETS  (36 % 256)
-	{M2PATRANSCONGTHRESHOLDABATEMENTL1OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 34}},
-#define   M2PATRANSCONGTHRESHOLDONSETL1MESSAGES  (37 % 256)
-	{M2PATRANSCONGTHRESHOLDONSETL1MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 35}},
-#define   M2PATRANSCONGTHRESHOLDONSETL1OCTETS  (38 % 256)
-	{M2PATRANSCONGTHRESHOLDONSETL1OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 36}},
-#define   M2PAPROVINGATTEMPTS   (39 % 256)
-	{M2PAPROVINGATTEMPTS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 37}},
-#define   M2PANUMBEROFTHRESHOLDLEVELS  (40 % 256)
-	{M2PANUMBEROFTHRESHOLDLEVELS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 38}},
-#define   M2PACONGESTIONCOUNTING  (41 % 256)
-	{M2PACONGESTIONCOUNTING, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 39}},
-#define   M2PACONGESTIONREPORTINGBASEOBJECT  (42 % 256)
-	{M2PACONGESTIONREPORTINGBASEOBJECT, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 40}},
-#define   M2PATIMERTX           (43 % 256)
-	{M2PATIMERTX, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 41}},
-#define   M2PATIMERTY           (44 % 256)
-	{M2PATIMERTY, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 42}},
-#define   M2PANUMBEROFCONGESTIONSTATES  (45 % 256)
-	{M2PANUMBEROFCONGESTIONSTATES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 43}},
-#define   M2PAINITIALLEVELOFCONGESTION  (46 % 256)
-	{M2PAINITIALLEVELOFCONGESTION, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 44}},
-#define   M2PARECEIVECONGESTIONTHRESHOLDABATEMENT  (47 % 256)
-	{M2PARECEIVECONGESTIONTHRESHOLDABATEMENT, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 45}},
-#define   M2PARECEIVECONGESTIONTHRESHOLDONSET  (48 % 256)
-	{M2PARECEIVECONGESTIONTHRESHOLDONSET, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 46}},
-#define   M2PARECEIVECONGESTIONTHRESHOLDDISCARD  (49 % 256)
-	{M2PARECEIVECONGESTIONTHRESHOLDDISCARD, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 47}},
-#define   M2PAPROTOCOLPROFILENAME  (50 % 256)
-	{M2PAPROTOCOLPROFILENAME, ASN_OCTET_STR, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 48}},
-#define   M2PATRANSCONGTHRESHOLDABATEMENTL2MESSAGES  (51 % 256)
-	{M2PATRANSCONGTHRESHOLDABATEMENTL2MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 49}},
-#define   M2PATRANSCONGTHRESHOLDABATEMENTL2OCTETS  (52 % 256)
-	{M2PATRANSCONGTHRESHOLDABATEMENTL2OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 50}},
-#define   M2PATRANSCONGTHRESHOLDONSETL2MESSAGES  (53 % 256)
-	{M2PATRANSCONGTHRESHOLDONSETL2MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 51}},
-#define   M2PATRANSCONGTHRESHOLDONSETL2OCTETS  (54 % 256)
-	{M2PATRANSCONGTHRESHOLDONSETL2OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 52}},
-#define   M2PATRANSCONGTHRESHOLDABATEMENTL3MESSAGES  (55 % 256)
-	{M2PATRANSCONGTHRESHOLDABATEMENTL3MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 53}},
-#define   M2PATRANSCONGTHRESHOLDABATEMENTL3OCTETS  (56 % 256)
-	{M2PATRANSCONGTHRESHOLDABATEMENTL3OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 54}},
-#define   M2PATRANSCONGTHRESHOLDONSETL3MESSAGES  (57 % 256)
-	{M2PATRANSCONGTHRESHOLDONSETL3MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 55}},
-#define   M2PATRANSCONGTHRESHOLDONSETL3OCTETS  (58 % 256)
-	{M2PATRANSCONGTHRESHOLDONSETL3OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 56}},
-#define   M2PATRANSCONGTHRESHOLDDISCARDL1MESSAGES  (59 % 256)
-	{M2PATRANSCONGTHRESHOLDDISCARDL1MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 57}},
-#define   M2PATRANSCONGTHRESHOLDDISCARDL1OCTETS  (60 % 256)
-	{M2PATRANSCONGTHRESHOLDDISCARDL1OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 58}},
-#define   M2PATRANSCONGTHRESHOLDDISCARDL2MESSAGES  (61 % 256)
-	{M2PATRANSCONGTHRESHOLDDISCARDL2MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 59}},
-#define   M2PATRANSCONGTHRESHOLDDISCARDL2OCTETS  (62 % 256)
-	{M2PATRANSCONGTHRESHOLDDISCARDL2OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 60}},
-#define   M2PATRANSCONGTHRESHOLDDISCARDL3MESSAGES  (63 % 256)
-	{M2PATRANSCONGTHRESHOLDDISCARDL3MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 61}},
-#define   M2PATRANSCONGTHRESHOLDDISCARDL3OCTETS  (64 % 256)
-	{M2PATRANSCONGTHRESHOLDDISCARDL3OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 62}},
-#define   M2PAPROTOCOLPROFILEROWSTATUS  (65 % 256)
-	{M2PAPROTOCOLPROFILEROWSTATUS, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 63}},
-#define   M2PADEFAULTSCTPNODELAY  (66 % 256)
-	{M2PADEFAULTSCTPNODELAY, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 1}},
-#define   M2PADEFAULTSCTPMAXSEG  (67 % 256)
-	{M2PADEFAULTSCTPMAXSEG, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 2}},
-#define   M2PADEFAULTSCTPHEARTBEATITVL  (68 % 256)
-	{M2PADEFAULTSCTPHEARTBEATITVL, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 3}},
-#define   M2PADEFAULTSCTPHEARTBEAT  (69 % 256)
-	{M2PADEFAULTSCTPHEARTBEAT, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 4}},
-#define   M2PADEFAULTSCTPRTOINITIAL  (70 % 256)
-	{M2PADEFAULTSCTPRTOINITIAL, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 5}},
-#define   M2PADEFAULTSCTPRTOMIN  (71 % 256)
-	{M2PADEFAULTSCTPRTOMIN, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 6}},
-#define   M2PADEFAULTSCTPRTOMAX  (72 % 256)
-	{M2PADEFAULTSCTPRTOMAX, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 7}},
-#define   M2PADEFAULTSCTPPATHMAXRETRANS  (73 % 256)
-	{M2PADEFAULTSCTPPATHMAXRETRANS, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 8}},
-#define   M2PADEFAULTSCTPCOOKIELIFE  (74 % 256)
-	{M2PADEFAULTSCTPCOOKIELIFE, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 9}},
-#define   M2PADEFAULTSCTPCOOKIEINC  (75 % 256)
-	{M2PADEFAULTSCTPCOOKIEINC, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 10}},
-#define   M2PADEFAULTSCTPMAXINITRETRIES  (76 % 256)
-	{M2PADEFAULTSCTPMAXINITRETRIES, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 11}},
-#define   M2PADEFAULTSCTPMAXBURST  (77 % 256)
-	{M2PADEFAULTSCTPMAXBURST, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 12}},
-#define   M2PADEFAULTSCTPASSOCMAXRETRANS  (78 % 256)
-	{M2PADEFAULTSCTPASSOCMAXRETRANS, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 13}},
-#define   M2PADEFAULTSCTPSACKDELAY  (79 % 256)
-	{M2PADEFAULTSCTPSACKDELAY, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 14}},
-#define   M2PADEFAULTSCTPLIFETIME  (80 % 256)
-	{M2PADEFAULTSCTPLIFETIME, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 15}},
+#define   M2PAN1                1
+	{(u_char) M2PAN1, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 2}},
+#define   M2PAPROVING           2
+	{(u_char) M2PAPROVING, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 3}},
+#define   M2PAMANAGEMENTPROVINGSTATE  3
+	{(u_char) M2PAMANAGEMENTPROVINGSTATE, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 4}},
+#define   M2PALOOPDELAYLOWER    4
+	{(u_char) M2PALOOPDELAYLOWER, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 5}},
+#define   M2PALOOPDELAYUPPER    5
+	{(u_char) M2PALOOPDELAYUPPER, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 6}},
+#define   M2PATRANSMISSIONRATEINTERVALLOWER  6
+	{(u_char) M2PATRANSMISSIONRATEINTERVALLOWER, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 7}},
+#define   M2PATRANSMISSIONRATEINTERVALUPPER  7
+	{(u_char) M2PATRANSMISSIONRATEINTERVALUPPER, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 8}},
+#define   M2PASCTPNODELAY       8
+	{(u_char) M2PASCTPNODELAY, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 9}},
+#define   M2PASCTPMAXSEG        9
+	{(u_char) M2PASCTPMAXSEG, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 10}},
+#define   M2PASCTPHEARTBEATITVL  10
+	{(u_char) M2PASCTPHEARTBEATITVL, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 11}},
+#define   M2PASCTPHEARTBEAT     11
+	{(u_char) M2PASCTPHEARTBEAT, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 12}},
+#define   M2PASCTPRTOINITIAL    12
+	{(u_char) M2PASCTPRTOINITIAL, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 13}},
+#define   M2PASCTPRTOMIN        13
+	{(u_char) M2PASCTPRTOMIN, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 14}},
+#define   M2PASCTPRTOMAX        14
+	{(u_char) M2PASCTPRTOMAX, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 15}},
+#define   M2PASCTPPATHMAXRETRANS  15
+	{(u_char) M2PASCTPPATHMAXRETRANS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 16}},
+#define   M2PASCTPCOOKIELIFE    16
+	{(u_char) M2PASCTPCOOKIELIFE, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 17}},
+#define   M2PASCTPCOOKIEINC     17
+	{(u_char) M2PASCTPCOOKIEINC, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 18}},
+#define   M2PASCTPMAXINITRETRIES  18
+	{(u_char) M2PASCTPMAXINITRETRIES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 19}},
+#define   M2PASCTPMAXBURST      19
+	{(u_char) M2PASCTPMAXBURST, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 20}},
+#define   M2PASCTPASSOCMAXRETRANS  20
+	{(u_char) M2PASCTPASSOCMAXRETRANS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 21}},
+#define   M2PASCTPSACKDELAY     21
+	{(u_char) M2PASCTPSACKDELAY, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 22}},
+#define   M2PASCTPLIFETIME      22
+	{(u_char) M2PASCTPLIFETIME, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 23}},
+#define   M2PATIMERT1           23
+	{(u_char) M2PATIMERT1, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 24}},
+#define   M2PATIMERT2           24
+	{(u_char) M2PATIMERT2, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 25}},
+#define   M2PATIMERT2L          25
+	{(u_char) M2PATIMERT2L, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 26}},
+#define   M2PATIMERT2H          26
+	{(u_char) M2PATIMERT2H, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 27}},
+#define   M2PATIMERT3           27
+	{(u_char) M2PATIMERT3, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 28}},
+#define   M2PATIMERT4N          28
+	{(u_char) M2PATIMERT4N, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 29}},
+#define   M2PATIMERT4E          29
+	{(u_char) M2PATIMERT4E, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 30}},
+#define   M2PATIMERT6           30
+	{(u_char) M2PATIMERT6, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 31}},
+#define   M2PATIMERT7           31
+	{(u_char) M2PATIMERT7, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 32}},
+#define   M2PATRANSCONGTHRESHOLDABATEMENTL1MESSAGES  32
+	{(u_char) M2PATRANSCONGTHRESHOLDABATEMENTL1MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 33}},
+#define   M2PATRANSCONGTHRESHOLDABATEMENTL1OCTETS  33
+	{(u_char) M2PATRANSCONGTHRESHOLDABATEMENTL1OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 34}},
+#define   M2PATRANSCONGTHRESHOLDONSETL1MESSAGES  34
+	{(u_char) M2PATRANSCONGTHRESHOLDONSETL1MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 35}},
+#define   M2PATRANSCONGTHRESHOLDONSETL1OCTETS  35
+	{(u_char) M2PATRANSCONGTHRESHOLDONSETL1OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 36}},
+#define   M2PAPROVINGATTEMPTS   36
+	{(u_char) M2PAPROVINGATTEMPTS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 37}},
+#define   M2PANUMBEROFTHRESHOLDLEVELS  37
+	{(u_char) M2PANUMBEROFTHRESHOLDLEVELS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 38}},
+#define   M2PACONGESTIONCOUNTING  38
+	{(u_char) M2PACONGESTIONCOUNTING, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 39}},
+#define   M2PACONGESTIONREPORTINGBASEOBJECT  39
+	{(u_char) M2PACONGESTIONREPORTINGBASEOBJECT, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 40}},
+#define   M2PATIMERTX           40
+	{(u_char) M2PATIMERTX, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 41}},
+#define   M2PATIMERTY           41
+	{(u_char) M2PATIMERTY, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 42}},
+#define   M2PANUMBEROFCONGESTIONSTATES  42
+	{(u_char) M2PANUMBEROFCONGESTIONSTATES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 43}},
+#define   M2PAINITIALLEVELOFCONGESTION  43
+	{(u_char) M2PAINITIALLEVELOFCONGESTION, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 44}},
+#define   M2PARECEIVECONGESTIONTHRESHOLDABATEMENT  44
+	{(u_char) M2PARECEIVECONGESTIONTHRESHOLDABATEMENT, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 45}},
+#define   M2PARECEIVECONGESTIONTHRESHOLDONSET  45
+	{(u_char) M2PARECEIVECONGESTIONTHRESHOLDONSET, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 46}},
+#define   M2PARECEIVECONGESTIONTHRESHOLDDISCARD  46
+	{(u_char) M2PARECEIVECONGESTIONTHRESHOLDDISCARD, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 47}},
+#define   M2PAPROTOCOLPROFILENAME  47
+	{(u_char) M2PAPROTOCOLPROFILENAME, ASN_OCTET_STR, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 48}},
+#define   M2PATRANSCONGTHRESHOLDABATEMENTL2MESSAGES  48
+	{(u_char) M2PATRANSCONGTHRESHOLDABATEMENTL2MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 49}},
+#define   M2PATRANSCONGTHRESHOLDABATEMENTL2OCTETS  49
+	{(u_char) M2PATRANSCONGTHRESHOLDABATEMENTL2OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 50}},
+#define   M2PATRANSCONGTHRESHOLDONSETL2MESSAGES  50
+	{(u_char) M2PATRANSCONGTHRESHOLDONSETL2MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 51}},
+#define   M2PATRANSCONGTHRESHOLDONSETL2OCTETS  51
+	{(u_char) M2PATRANSCONGTHRESHOLDONSETL2OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 52}},
+#define   M2PATRANSCONGTHRESHOLDABATEMENTL3MESSAGES  52
+	{(u_char) M2PATRANSCONGTHRESHOLDABATEMENTL3MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 53}},
+#define   M2PATRANSCONGTHRESHOLDABATEMENTL3OCTETS  53
+	{(u_char) M2PATRANSCONGTHRESHOLDABATEMENTL3OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 54}},
+#define   M2PATRANSCONGTHRESHOLDONSETL3MESSAGES  54
+	{(u_char) M2PATRANSCONGTHRESHOLDONSETL3MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 55}},
+#define   M2PATRANSCONGTHRESHOLDONSETL3OCTETS  55
+	{(u_char) M2PATRANSCONGTHRESHOLDONSETL3OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 56}},
+#define   M2PATRANSCONGTHRESHOLDDISCARDL1MESSAGES  56
+	{(u_char) M2PATRANSCONGTHRESHOLDDISCARDL1MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 57}},
+#define   M2PATRANSCONGTHRESHOLDDISCARDL1OCTETS  57
+	{(u_char) M2PATRANSCONGTHRESHOLDDISCARDL1OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 58}},
+#define   M2PATRANSCONGTHRESHOLDDISCARDL2MESSAGES  58
+	{(u_char) M2PATRANSCONGTHRESHOLDDISCARDL2MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 59}},
+#define   M2PATRANSCONGTHRESHOLDDISCARDL2OCTETS  59
+	{(u_char) M2PATRANSCONGTHRESHOLDDISCARDL2OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 60}},
+#define   M2PATRANSCONGTHRESHOLDDISCARDL3MESSAGES  60
+	{(u_char) M2PATRANSCONGTHRESHOLDDISCARDL3MESSAGES, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 61}},
+#define   M2PATRANSCONGTHRESHOLDDISCARDL3OCTETS  61
+	{(u_char) M2PATRANSCONGTHRESHOLDDISCARDL3OCTETS, ASN_UNSIGNED, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 62}},
+#define   M2PAPROTOCOLPROFILEROWSTATUS  62
+	{(u_char) M2PAPROTOCOLPROFILEROWSTATUS, ASN_INTEGER, RWRITE, var_m2paProtocolProfileTable, 6, {1, 1, 1, 1, 1, 63}},
+#define   M2PADEFAULTSCTPNODELAY  63
+	{(u_char) M2PADEFAULTSCTPNODELAY, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 1}},
+#define   M2PADEFAULTSCTPMAXSEG  64
+	{(u_char) M2PADEFAULTSCTPMAXSEG, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 2}},
+#define   M2PADEFAULTSCTPHEARTBEATITVL  65
+	{(u_char) M2PADEFAULTSCTPHEARTBEATITVL, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 3}},
+#define   M2PADEFAULTSCTPHEARTBEAT  66
+	{(u_char) M2PADEFAULTSCTPHEARTBEAT, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 4}},
+#define   M2PADEFAULTSCTPRTOINITIAL  67
+	{(u_char) M2PADEFAULTSCTPRTOINITIAL, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 5}},
+#define   M2PADEFAULTSCTPRTOMIN  68
+	{(u_char) M2PADEFAULTSCTPRTOMIN, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 6}},
+#define   M2PADEFAULTSCTPRTOMAX  69
+	{(u_char) M2PADEFAULTSCTPRTOMAX, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 7}},
+#define   M2PADEFAULTSCTPPATHMAXRETRANS  70
+	{(u_char) M2PADEFAULTSCTPPATHMAXRETRANS, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 8}},
+#define   M2PADEFAULTSCTPCOOKIELIFE  71
+	{(u_char) M2PADEFAULTSCTPCOOKIELIFE, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 9}},
+#define   M2PADEFAULTSCTPCOOKIEINC  72
+	{(u_char) M2PADEFAULTSCTPCOOKIEINC, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 10}},
+#define   M2PADEFAULTSCTPMAXINITRETRIES  73
+	{(u_char) M2PADEFAULTSCTPMAXINITRETRIES, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 11}},
+#define   M2PADEFAULTSCTPMAXBURST  74
+	{(u_char) M2PADEFAULTSCTPMAXBURST, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 12}},
+#define   M2PADEFAULTSCTPASSOCMAXRETRANS  75
+	{(u_char) M2PADEFAULTSCTPASSOCMAXRETRANS, ASN_UNSIGNED, RWRITE, var_m2paMIB, 3, {1, 2, 13}},
+#define   M2PADEFAULTSCTPSACKDELAY  76
+	{(u_char) M2PADEFAULTSCTPSACKDELAY, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 14}},
+#define   M2PADEFAULTSCTPLIFETIME  77
+	{(u_char) M2PADEFAULTSCTPLIFETIME, ASN_INTEGER, RWRITE, var_m2paMIB, 3, {1, 2, 15}},
 };
 
 /* (L = length of the oidsuffix) */
@@ -473,6 +473,7 @@ m2paMIB_create(void)
 		StorageNew->m2paDefaultSctpNoDelay = 1;
 		StorageNew->m2paDefaultSctpMaxseg = 65536;
 		StorageNew->m2paDefaultSctpHeartbeatItvl = 6000;
+		StorageNew->m2paDefaultSctpHeartbeat = 0;
 		StorageNew->m2paDefaultSctpRtoInitial = 300;
 		StorageNew->m2paDefaultSctpRtoMin = 100;
 		StorageNew->m2paDefaultSctpRtoMax = 6000;
@@ -483,6 +484,7 @@ m2paMIB_create(void)
 		StorageNew->m2paDefaultSctpMaxBurst = 4;
 		StorageNew->m2paDefaultSctpAssocMaxRetrans = 10;
 		StorageNew->m2paDefaultSctpSackDelay = 20;
+		StorageNew->m2paDefaultSctpLifetime = 0;
 
 	}
 	DEBUGMSGTL(("m2paMIB", "done.\n"));
@@ -667,6 +669,7 @@ u_char *
 var_m2paMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct m2paMIB_data *StorageTmp;
+	u_char *rval;
 
 	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
@@ -674,72 +677,120 @@ var_m2paMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *
 	refresh_m2paMIB();
 	if ((StorageTmp = m2paMIBStorage) == NULL)
 		return NULL;
+	*write_method = NULL;
+	*var_len = 0;
+	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case M2PADEFAULTSCTPNODELAY:
+	case (u_char) M2PADEFAULTSCTPNODELAY:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpNoDelay;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpNoDelay);
-		return (u_char *) &StorageTmp->m2paDefaultSctpNoDelay;
-	case M2PADEFAULTSCTPMAXSEG:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpNoDelay;
+		break;
+	case (u_char) M2PADEFAULTSCTPMAXSEG:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpMaxseg;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpMaxseg);
-		return (u_char *) &StorageTmp->m2paDefaultSctpMaxseg;
-	case M2PADEFAULTSCTPHEARTBEATITVL:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpMaxseg;
+		break;
+	case (u_char) M2PADEFAULTSCTPHEARTBEATITVL:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpHeartbeatItvl;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpHeartbeatItvl);
-		return (u_char *) &StorageTmp->m2paDefaultSctpHeartbeatItvl;
-	case M2PADEFAULTSCTPHEARTBEAT:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpHeartbeatItvl;
+		break;
+	case (u_char) M2PADEFAULTSCTPHEARTBEAT:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpHeartbeat;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpHeartbeat);
-		return (u_char *) &StorageTmp->m2paDefaultSctpHeartbeat;
-	case M2PADEFAULTSCTPRTOINITIAL:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpHeartbeat;
+		break;
+	case (u_char) M2PADEFAULTSCTPRTOINITIAL:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpRtoInitial;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpRtoInitial);
-		return (u_char *) &StorageTmp->m2paDefaultSctpRtoInitial;
-	case M2PADEFAULTSCTPRTOMIN:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpRtoInitial;
+		break;
+	case (u_char) M2PADEFAULTSCTPRTOMIN:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpRtoMin;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpRtoMin);
-		return (u_char *) &StorageTmp->m2paDefaultSctpRtoMin;
-	case M2PADEFAULTSCTPRTOMAX:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpRtoMin;
+		break;
+	case (u_char) M2PADEFAULTSCTPRTOMAX:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpRtoMax;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpRtoMax);
-		return (u_char *) &StorageTmp->m2paDefaultSctpRtoMax;
-	case M2PADEFAULTSCTPPATHMAXRETRANS:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpRtoMax;
+		break;
+	case (u_char) M2PADEFAULTSCTPPATHMAXRETRANS:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpPathMaxRetrans;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpPathMaxRetrans);
-		return (u_char *) &StorageTmp->m2paDefaultSctpPathMaxRetrans;
-	case M2PADEFAULTSCTPCOOKIELIFE:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpPathMaxRetrans;
+		break;
+	case (u_char) M2PADEFAULTSCTPCOOKIELIFE:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpCookieLife;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpCookieLife);
-		return (u_char *) &StorageTmp->m2paDefaultSctpCookieLife;
-	case M2PADEFAULTSCTPCOOKIEINC:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpCookieLife;
+		break;
+	case (u_char) M2PADEFAULTSCTPCOOKIEINC:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpCookieInc;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpCookieInc);
-		return (u_char *) &StorageTmp->m2paDefaultSctpCookieInc;
-	case M2PADEFAULTSCTPMAXINITRETRIES:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpCookieInc;
+		break;
+	case (u_char) M2PADEFAULTSCTPMAXINITRETRIES:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpMaxInitRetries;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpMaxInitRetries);
-		return (u_char *) &StorageTmp->m2paDefaultSctpMaxInitRetries;
-	case M2PADEFAULTSCTPMAXBURST:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpMaxInitRetries;
+		break;
+	case (u_char) M2PADEFAULTSCTPMAXBURST:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpMaxBurst;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpMaxBurst);
-		return (u_char *) &StorageTmp->m2paDefaultSctpMaxBurst;
-	case M2PADEFAULTSCTPASSOCMAXRETRANS:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpMaxBurst;
+		break;
+	case (u_char) M2PADEFAULTSCTPASSOCMAXRETRANS:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpAssocMaxRetrans;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpAssocMaxRetrans);
-		return (u_char *) &StorageTmp->m2paDefaultSctpAssocMaxRetrans;
-	case M2PADEFAULTSCTPSACKDELAY:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpAssocMaxRetrans;
+		break;
+	case (u_char) M2PADEFAULTSCTPSACKDELAY:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpSackDelay;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpSackDelay);
-		return (u_char *) &StorageTmp->m2paDefaultSctpSackDelay;
-	case M2PADEFAULTSCTPLIFETIME:
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpSackDelay;
+		break;
+	case (u_char) M2PADEFAULTSCTPLIFETIME:	/* ReadWrite */
 		*write_method = write_m2paDefaultSctpLifetime;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paDefaultSctpLifetime);
-		return (u_char *) &StorageTmp->m2paDefaultSctpLifetime;
+		rval = (u_char *) &StorageTmp->m2paDefaultSctpLifetime;
+		break;
 	default:
 		ERROR_MSG("");
 	}
-	return NULL;
+	return (rval);
 }
 
 /**
@@ -760,10 +811,68 @@ m2paProtocolProfileTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2paN1 = 1000;
 		StorageNew->m2paProving = 1;
+		StorageNew->m2paManagementProvingState = 0;
+		StorageNew->m2paLoopDelayLower = 0;
+		StorageNew->m2paLoopDelayUpper = 0;
+		StorageNew->m2paTransmissionRateIntervalLower = 0;
+		StorageNew->m2paTransmissionRateIntervalUpper = 0;
+		StorageNew->m2paSctpNoDelay = 0;
+		StorageNew->m2paSctpMaxseg = 0;
+		StorageNew->m2paSctpHeartbeatItvl = 0;
+		StorageNew->m2paSctpHeartbeat = 0;
+		StorageNew->m2paSctpRtoInitial = 0;
+		StorageNew->m2paSctpRtoMin = 0;
+		StorageNew->m2paSctpRtoMax = 0;
+		StorageNew->m2paSctpPathMaxRetrans = 0;
+		StorageNew->m2paSctpCookieLife = 0;
+		StorageNew->m2paSctpCookieInc = 0;
+		StorageNew->m2paSctpMaxInitRetries = 0;
+		StorageNew->m2paSctpMaxBurst = 0;
+		StorageNew->m2paSctpAssocMaxRetrans = 0;
 		StorageNew->m2paSctpSackDelay = 20;
+		StorageNew->m2paSctpLifetime = 0;
+		StorageNew->m2paTimerT1 = 0;
+		StorageNew->m2paTimerT2 = 0;
+		StorageNew->m2paTimerT2L = 0;
+		StorageNew->m2paTimerT2H = 0;
+		StorageNew->m2paTimerT3 = 0;
+		StorageNew->m2paTimerT4N = 0;
+		StorageNew->m2paTimerT4E = 0;
+		StorageNew->m2paTimerT6 = 0;
+		StorageNew->m2paTimerT7 = 0;
+		StorageNew->m2paTransCongThresholdAbatementL1Messages = 0;
+		StorageNew->m2paTransCongThresholdAbatementL1Octets = 0;
+		StorageNew->m2paTransCongThresholdOnsetL1Messages = 0;
+		StorageNew->m2paTransCongThresholdOnsetL1Octets = 0;
+		StorageNew->m2paProvingAttempts = 0;
+		StorageNew->m2paNumberOfThresholdLevels = 0;
+		StorageNew->m2paCongestionCounting = 0;
+		StorageNew->m2paCongestionReportingBaseObject = 0;
+		StorageNew->m2paTimerTx = 0;
+		StorageNew->m2paTimerTy = 0;
+		StorageNew->m2paNumberOfCongestionStates = 0;
+		StorageNew->m2paInitialLevelOfCongestion = 0;
 		StorageNew->m2paReceiveCongestionThresholdAbatement = 3;
 		StorageNew->m2paReceiveCongestionThresholdOnset = 6;
 		StorageNew->m2paReceiveCongestionThresholdDiscard = 9;
+		if ((StorageNew->m2paProtocolProfileName = (uint8_t *) strdup("")) != NULL) {
+			StorageNew->m2paProtocolProfileNameLen = strlen("");
+		}
+		StorageNew->m2paTransCongThresholdAbatementL2Messages = 0;
+		StorageNew->m2paTransCongThresholdAbatementL2Octets = 0;
+		StorageNew->m2paTransCongThresholdOnsetL2Messages = 0;
+		StorageNew->m2paTransCongThresholdOnsetL2Octets = 0;
+		StorageNew->m2paTransCongThresholdAbatementL3Messages = 0;
+		StorageNew->m2paTransCongThresholdAbatementL3Octets = 0;
+		StorageNew->m2paTransCongThresholdOnsetL3Messages = 0;
+		StorageNew->m2paTransCongThresholdOnsetL3Octets = 0;
+		StorageNew->m2paTransCongThresholdDiscardL1Messages = 0;
+		StorageNew->m2paTransCongThresholdDiscardL1Octets = 0;
+		StorageNew->m2paTransCongThresholdDiscardL2Messages = 0;
+		StorageNew->m2paTransCongThresholdDiscardL2Octets = 0;
+		StorageNew->m2paTransCongThresholdDiscardL3Messages = 0;
+		StorageNew->m2paTransCongThresholdDiscardL3Octets = 0;
+		StorageNew->m2paProtocolProfileRowStatus = 0;
 		StorageNew->m2paProtocolProfileRowStatus = RS_NOTREADY;
 	}
 	DEBUGMSGTL(("m2paProtocolProfileTable", "done.\n"));
@@ -1099,7 +1208,7 @@ refresh_m2paProtocolProfileTable(void)
 void
 refresh_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
 {
-	if (StorageTmp->m2paProtocolProfileTable_request == sa_request)
+	if (!StorageTmp || StorageTmp->m2paProtocolProfileTable_request == sa_request)
 		return;
 	StorageTmp->m2paProtocolProfileTable_request = sa_request;
 }
@@ -1115,268 +1224,457 @@ u_char *
 var_m2paProtocolProfileTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	u_char *rval;
 
 	DEBUGMSGTL(("m2paMIB", "var_m2paProtocolProfileTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_m2paProtocolProfileTable();
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
-		return NULL;
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, vp, name, length, exact, var_len, write_method);
 	refresh_m2paProtocolProfileTable_row(StorageTmp);
+	*write_method = NULL;
+	*var_len = 0;
+	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case M2PAN1:
+	case (u_char) M2PAN1:	/* Create */
 		*write_method = write_m2paN1;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paN1);
-		return (u_char *) &StorageTmp->m2paN1;
-	case M2PAPROVING:
+		rval = (u_char *) &StorageTmp->m2paN1;
+		break;
+	case (u_char) M2PAPROVING:	/* Create */
 		*write_method = write_m2paProving;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paProving);
-		return (u_char *) &StorageTmp->m2paProving;
-	case M2PAMANAGEMENTPROVINGSTATE:
+		rval = (u_char *) &StorageTmp->m2paProving;
+		break;
+	case (u_char) M2PAMANAGEMENTPROVINGSTATE:	/* Create */
 		*write_method = write_m2paManagementProvingState;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paManagementProvingState);
-		return (u_char *) &StorageTmp->m2paManagementProvingState;
-	case M2PALOOPDELAYLOWER:
+		rval = (u_char *) &StorageTmp->m2paManagementProvingState;
+		break;
+	case (u_char) M2PALOOPDELAYLOWER:	/* Create */
 		*write_method = write_m2paLoopDelayLower;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paLoopDelayLower);
-		return (u_char *) &StorageTmp->m2paLoopDelayLower;
-	case M2PALOOPDELAYUPPER:
+		rval = (u_char *) &StorageTmp->m2paLoopDelayLower;
+		break;
+	case (u_char) M2PALOOPDELAYUPPER:	/* Create */
 		*write_method = write_m2paLoopDelayUpper;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paLoopDelayUpper);
-		return (u_char *) &StorageTmp->m2paLoopDelayUpper;
-	case M2PATRANSMISSIONRATEINTERVALLOWER:
+		rval = (u_char *) &StorageTmp->m2paLoopDelayUpper;
+		break;
+	case (u_char) M2PATRANSMISSIONRATEINTERVALLOWER:	/* Create */
 		*write_method = write_m2paTransmissionRateIntervalLower;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransmissionRateIntervalLower);
-		return (u_char *) &StorageTmp->m2paTransmissionRateIntervalLower;
-	case M2PATRANSMISSIONRATEINTERVALUPPER:
+		rval = (u_char *) &StorageTmp->m2paTransmissionRateIntervalLower;
+		break;
+	case (u_char) M2PATRANSMISSIONRATEINTERVALUPPER:	/* Create */
 		*write_method = write_m2paTransmissionRateIntervalUpper;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransmissionRateIntervalUpper);
-		return (u_char *) &StorageTmp->m2paTransmissionRateIntervalUpper;
-	case M2PASCTPNODELAY:
+		rval = (u_char *) &StorageTmp->m2paTransmissionRateIntervalUpper;
+		break;
+	case (u_char) M2PASCTPNODELAY:	/* Create */
 		*write_method = write_m2paSctpNoDelay;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpNoDelay);
-		return (u_char *) &StorageTmp->m2paSctpNoDelay;
-	case M2PASCTPMAXSEG:
+		rval = (u_char *) &StorageTmp->m2paSctpNoDelay;
+		break;
+	case (u_char) M2PASCTPMAXSEG:	/* Create */
 		*write_method = write_m2paSctpMaxseg;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpMaxseg);
-		return (u_char *) &StorageTmp->m2paSctpMaxseg;
-	case M2PASCTPHEARTBEATITVL:
+		rval = (u_char *) &StorageTmp->m2paSctpMaxseg;
+		break;
+	case (u_char) M2PASCTPHEARTBEATITVL:	/* Create */
 		*write_method = write_m2paSctpHeartbeatItvl;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpHeartbeatItvl);
-		return (u_char *) &StorageTmp->m2paSctpHeartbeatItvl;
-	case M2PASCTPHEARTBEAT:
+		rval = (u_char *) &StorageTmp->m2paSctpHeartbeatItvl;
+		break;
+	case (u_char) M2PASCTPHEARTBEAT:	/* Create */
 		*write_method = write_m2paSctpHeartbeat;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpHeartbeat);
-		return (u_char *) &StorageTmp->m2paSctpHeartbeat;
-	case M2PASCTPRTOINITIAL:
+		rval = (u_char *) &StorageTmp->m2paSctpHeartbeat;
+		break;
+	case (u_char) M2PASCTPRTOINITIAL:	/* Create */
 		*write_method = write_m2paSctpRtoInitial;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpRtoInitial);
-		return (u_char *) &StorageTmp->m2paSctpRtoInitial;
-	case M2PASCTPRTOMIN:
+		rval = (u_char *) &StorageTmp->m2paSctpRtoInitial;
+		break;
+	case (u_char) M2PASCTPRTOMIN:	/* Create */
 		*write_method = write_m2paSctpRtoMin;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpRtoMin);
-		return (u_char *) &StorageTmp->m2paSctpRtoMin;
-	case M2PASCTPRTOMAX:
+		rval = (u_char *) &StorageTmp->m2paSctpRtoMin;
+		break;
+	case (u_char) M2PASCTPRTOMAX:	/* Create */
 		*write_method = write_m2paSctpRtoMax;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpRtoMax);
-		return (u_char *) &StorageTmp->m2paSctpRtoMax;
-	case M2PASCTPPATHMAXRETRANS:
+		rval = (u_char *) &StorageTmp->m2paSctpRtoMax;
+		break;
+	case (u_char) M2PASCTPPATHMAXRETRANS:	/* Create */
 		*write_method = write_m2paSctpPathMaxRetrans;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpPathMaxRetrans);
-		return (u_char *) &StorageTmp->m2paSctpPathMaxRetrans;
-	case M2PASCTPCOOKIELIFE:
+		rval = (u_char *) &StorageTmp->m2paSctpPathMaxRetrans;
+		break;
+	case (u_char) M2PASCTPCOOKIELIFE:	/* Create */
 		*write_method = write_m2paSctpCookieLife;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpCookieLife);
-		return (u_char *) &StorageTmp->m2paSctpCookieLife;
-	case M2PASCTPCOOKIEINC:
+		rval = (u_char *) &StorageTmp->m2paSctpCookieLife;
+		break;
+	case (u_char) M2PASCTPCOOKIEINC:	/* Create */
 		*write_method = write_m2paSctpCookieInc;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpCookieInc);
-		return (u_char *) &StorageTmp->m2paSctpCookieInc;
-	case M2PASCTPMAXINITRETRIES:
+		rval = (u_char *) &StorageTmp->m2paSctpCookieInc;
+		break;
+	case (u_char) M2PASCTPMAXINITRETRIES:	/* Create */
 		*write_method = write_m2paSctpMaxInitRetries;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpMaxInitRetries);
-		return (u_char *) &StorageTmp->m2paSctpMaxInitRetries;
-	case M2PASCTPMAXBURST:
+		rval = (u_char *) &StorageTmp->m2paSctpMaxInitRetries;
+		break;
+	case (u_char) M2PASCTPMAXBURST:	/* Create */
 		*write_method = write_m2paSctpMaxBurst;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpMaxBurst);
-		return (u_char *) &StorageTmp->m2paSctpMaxBurst;
-	case M2PASCTPASSOCMAXRETRANS:
+		rval = (u_char *) &StorageTmp->m2paSctpMaxBurst;
+		break;
+	case (u_char) M2PASCTPASSOCMAXRETRANS:	/* Create */
 		*write_method = write_m2paSctpAssocMaxRetrans;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpAssocMaxRetrans);
-		return (u_char *) &StorageTmp->m2paSctpAssocMaxRetrans;
-	case M2PASCTPSACKDELAY:
+		rval = (u_char *) &StorageTmp->m2paSctpAssocMaxRetrans;
+		break;
+	case (u_char) M2PASCTPSACKDELAY:	/* Create */
 		*write_method = write_m2paSctpSackDelay;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpSackDelay);
-		return (u_char *) &StorageTmp->m2paSctpSackDelay;
-	case M2PASCTPLIFETIME:
+		rval = (u_char *) &StorageTmp->m2paSctpSackDelay;
+		break;
+	case (u_char) M2PASCTPLIFETIME:	/* Create */
 		*write_method = write_m2paSctpLifetime;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paSctpLifetime);
-		return (u_char *) &StorageTmp->m2paSctpLifetime;
-	case M2PATIMERT1:
+		rval = (u_char *) &StorageTmp->m2paSctpLifetime;
+		break;
+	case (u_char) M2PATIMERT1:	/* Create */
 		*write_method = write_m2paTimerT1;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT1);
-		return (u_char *) &StorageTmp->m2paTimerT1;
-	case M2PATIMERT2:
+		rval = (u_char *) &StorageTmp->m2paTimerT1;
+		break;
+	case (u_char) M2PATIMERT2:	/* Create */
 		*write_method = write_m2paTimerT2;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT2);
-		return (u_char *) &StorageTmp->m2paTimerT2;
-	case M2PATIMERT2L:
+		rval = (u_char *) &StorageTmp->m2paTimerT2;
+		break;
+	case (u_char) M2PATIMERT2L:	/* Create */
 		*write_method = write_m2paTimerT2L;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT2L);
-		return (u_char *) &StorageTmp->m2paTimerT2L;
-	case M2PATIMERT2H:
+		rval = (u_char *) &StorageTmp->m2paTimerT2L;
+		break;
+	case (u_char) M2PATIMERT2H:	/* Create */
 		*write_method = write_m2paTimerT2H;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT2H);
-		return (u_char *) &StorageTmp->m2paTimerT2H;
-	case M2PATIMERT3:
+		rval = (u_char *) &StorageTmp->m2paTimerT2H;
+		break;
+	case (u_char) M2PATIMERT3:	/* Create */
 		*write_method = write_m2paTimerT3;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT3);
-		return (u_char *) &StorageTmp->m2paTimerT3;
-	case M2PATIMERT4N:
+		rval = (u_char *) &StorageTmp->m2paTimerT3;
+		break;
+	case (u_char) M2PATIMERT4N:	/* Create */
 		*write_method = write_m2paTimerT4N;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT4N);
-		return (u_char *) &StorageTmp->m2paTimerT4N;
-	case M2PATIMERT4E:
+		rval = (u_char *) &StorageTmp->m2paTimerT4N;
+		break;
+	case (u_char) M2PATIMERT4E:	/* Create */
 		*write_method = write_m2paTimerT4E;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT4E);
-		return (u_char *) &StorageTmp->m2paTimerT4E;
-	case M2PATIMERT6:
+		rval = (u_char *) &StorageTmp->m2paTimerT4E;
+		break;
+	case (u_char) M2PATIMERT6:	/* Create */
 		*write_method = write_m2paTimerT6;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT6);
-		return (u_char *) &StorageTmp->m2paTimerT6;
-	case M2PATIMERT7:
+		rval = (u_char *) &StorageTmp->m2paTimerT6;
+		break;
+	case (u_char) M2PATIMERT7:	/* Create */
 		*write_method = write_m2paTimerT7;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerT7);
-		return (u_char *) &StorageTmp->m2paTimerT7;
-	case M2PATRANSCONGTHRESHOLDABATEMENTL1MESSAGES:
+		rval = (u_char *) &StorageTmp->m2paTimerT7;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDABATEMENTL1MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdAbatementL1Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdAbatementL1Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL1Messages;
-	case M2PATRANSCONGTHRESHOLDABATEMENTL1OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL1Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDABATEMENTL1OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdAbatementL1Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdAbatementL1Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL1Octets;
-	case M2PATRANSCONGTHRESHOLDONSETL1MESSAGES:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL1Octets;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDONSETL1MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdOnsetL1Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdOnsetL1Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL1Messages;
-	case M2PATRANSCONGTHRESHOLDONSETL1OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL1Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDONSETL1OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdOnsetL1Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdOnsetL1Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL1Octets;
-	case M2PAPROVINGATTEMPTS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL1Octets;
+		break;
+	case (u_char) M2PAPROVINGATTEMPTS:	/* Create */
 		*write_method = write_m2paProvingAttempts;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paProvingAttempts);
-		return (u_char *) &StorageTmp->m2paProvingAttempts;
-	case M2PANUMBEROFTHRESHOLDLEVELS:
+		rval = (u_char *) &StorageTmp->m2paProvingAttempts;
+		break;
+	case (u_char) M2PANUMBEROFTHRESHOLDLEVELS:	/* Create */
 		*write_method = write_m2paNumberOfThresholdLevels;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paNumberOfThresholdLevels);
-		return (u_char *) &StorageTmp->m2paNumberOfThresholdLevels;
-	case M2PACONGESTIONCOUNTING:
+		rval = (u_char *) &StorageTmp->m2paNumberOfThresholdLevels;
+		break;
+	case (u_char) M2PACONGESTIONCOUNTING:	/* Create */
 		*write_method = write_m2paCongestionCounting;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paCongestionCounting);
-		return (u_char *) &StorageTmp->m2paCongestionCounting;
-	case M2PACONGESTIONREPORTINGBASEOBJECT:
+		rval = (u_char *) &StorageTmp->m2paCongestionCounting;
+		break;
+	case (u_char) M2PACONGESTIONREPORTINGBASEOBJECT:	/* Create */
 		*write_method = write_m2paCongestionReportingBaseObject;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paCongestionReportingBaseObject);
-		return (u_char *) &StorageTmp->m2paCongestionReportingBaseObject;
-	case M2PATIMERTX:
+		rval = (u_char *) &StorageTmp->m2paCongestionReportingBaseObject;
+		break;
+	case (u_char) M2PATIMERTX:	/* Create */
 		*write_method = write_m2paTimerTx;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerTx);
-		return (u_char *) &StorageTmp->m2paTimerTx;
-	case M2PATIMERTY:
+		rval = (u_char *) &StorageTmp->m2paTimerTx;
+		break;
+	case (u_char) M2PATIMERTY:	/* Create */
 		*write_method = write_m2paTimerTy;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTimerTy);
-		return (u_char *) &StorageTmp->m2paTimerTy;
-	case M2PANUMBEROFCONGESTIONSTATES:
+		rval = (u_char *) &StorageTmp->m2paTimerTy;
+		break;
+	case (u_char) M2PANUMBEROFCONGESTIONSTATES:	/* Create */
 		*write_method = write_m2paNumberOfCongestionStates;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paNumberOfCongestionStates);
-		return (u_char *) &StorageTmp->m2paNumberOfCongestionStates;
-	case M2PAINITIALLEVELOFCONGESTION:
+		rval = (u_char *) &StorageTmp->m2paNumberOfCongestionStates;
+		break;
+	case (u_char) M2PAINITIALLEVELOFCONGESTION:	/* Create */
 		*write_method = write_m2paInitialLevelOfCongestion;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paInitialLevelOfCongestion);
-		return (u_char *) &StorageTmp->m2paInitialLevelOfCongestion;
-	case M2PARECEIVECONGESTIONTHRESHOLDABATEMENT:
+		rval = (u_char *) &StorageTmp->m2paInitialLevelOfCongestion;
+		break;
+	case (u_char) M2PARECEIVECONGESTIONTHRESHOLDABATEMENT:	/* Create */
 		*write_method = write_m2paReceiveCongestionThresholdAbatement;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paReceiveCongestionThresholdAbatement);
-		return (u_char *) &StorageTmp->m2paReceiveCongestionThresholdAbatement;
-	case M2PARECEIVECONGESTIONTHRESHOLDONSET:
+		rval = (u_char *) &StorageTmp->m2paReceiveCongestionThresholdAbatement;
+		break;
+	case (u_char) M2PARECEIVECONGESTIONTHRESHOLDONSET:	/* Create */
 		*write_method = write_m2paReceiveCongestionThresholdOnset;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paReceiveCongestionThresholdOnset);
-		return (u_char *) &StorageTmp->m2paReceiveCongestionThresholdOnset;
-	case M2PARECEIVECONGESTIONTHRESHOLDDISCARD:
+		rval = (u_char *) &StorageTmp->m2paReceiveCongestionThresholdOnset;
+		break;
+	case (u_char) M2PARECEIVECONGESTIONTHRESHOLDDISCARD:	/* Create */
 		*write_method = write_m2paReceiveCongestionThresholdDiscard;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paReceiveCongestionThresholdDiscard);
-		return (u_char *) &StorageTmp->m2paReceiveCongestionThresholdDiscard;
-	case M2PAPROTOCOLPROFILENAME:
+		rval = (u_char *) &StorageTmp->m2paReceiveCongestionThresholdDiscard;
+		break;
+	case (u_char) M2PAPROTOCOLPROFILENAME:	/* Create */
 		*write_method = write_m2paProtocolProfileName;
+		if (!StorageTmp)
+			break;
 		*var_len = StorageTmp->m2paProtocolProfileNameLen;
-		return (u_char *) StorageTmp->m2paProtocolProfileName;
-	case M2PATRANSCONGTHRESHOLDABATEMENTL2MESSAGES:
+		rval = (u_char *) StorageTmp->m2paProtocolProfileName;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDABATEMENTL2MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdAbatementL2Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdAbatementL2Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL2Messages;
-	case M2PATRANSCONGTHRESHOLDABATEMENTL2OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL2Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDABATEMENTL2OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdAbatementL2Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdAbatementL2Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL2Octets;
-	case M2PATRANSCONGTHRESHOLDONSETL2MESSAGES:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL2Octets;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDONSETL2MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdOnsetL2Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdOnsetL2Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL2Messages;
-	case M2PATRANSCONGTHRESHOLDONSETL2OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL2Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDONSETL2OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdOnsetL2Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdOnsetL2Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL2Octets;
-	case M2PATRANSCONGTHRESHOLDABATEMENTL3MESSAGES:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL2Octets;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDABATEMENTL3MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdAbatementL3Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdAbatementL3Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL3Messages;
-	case M2PATRANSCONGTHRESHOLDABATEMENTL3OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL3Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDABATEMENTL3OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdAbatementL3Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdAbatementL3Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL3Octets;
-	case M2PATRANSCONGTHRESHOLDONSETL3MESSAGES:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdAbatementL3Octets;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDONSETL3MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdOnsetL3Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdOnsetL3Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL3Messages;
-	case M2PATRANSCONGTHRESHOLDONSETL3OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL3Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDONSETL3OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdOnsetL3Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdOnsetL3Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL3Octets;
-	case M2PATRANSCONGTHRESHOLDDISCARDL1MESSAGES:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdOnsetL3Octets;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDDISCARDL1MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdDiscardL1Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdDiscardL1Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL1Messages;
-	case M2PATRANSCONGTHRESHOLDDISCARDL1OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL1Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDDISCARDL1OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdDiscardL1Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdDiscardL1Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL1Octets;
-	case M2PATRANSCONGTHRESHOLDDISCARDL2MESSAGES:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL1Octets;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDDISCARDL2MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdDiscardL2Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdDiscardL2Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL2Messages;
-	case M2PATRANSCONGTHRESHOLDDISCARDL2OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL2Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDDISCARDL2OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdDiscardL2Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdDiscardL2Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL2Octets;
-	case M2PATRANSCONGTHRESHOLDDISCARDL3MESSAGES:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL2Octets;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDDISCARDL3MESSAGES:	/* Create */
 		*write_method = write_m2paTransCongThresholdDiscardL3Messages;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdDiscardL3Messages);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL3Messages;
-	case M2PATRANSCONGTHRESHOLDDISCARDL3OCTETS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL3Messages;
+		break;
+	case (u_char) M2PATRANSCONGTHRESHOLDDISCARDL3OCTETS:	/* Create */
 		*write_method = write_m2paTransCongThresholdDiscardL3Octets;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paTransCongThresholdDiscardL3Octets);
-		return (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL3Octets;
-	case M2PAPROTOCOLPROFILEROWSTATUS:
+		rval = (u_char *) &StorageTmp->m2paTransCongThresholdDiscardL3Octets;
+		break;
+	case (u_char) M2PAPROTOCOLPROFILEROWSTATUS:	/* Create */
 		*write_method = write_m2paProtocolProfileRowStatus;
+		if (!StorageTmp)
+			break;
 		*var_len = sizeof(StorageTmp->m2paProtocolProfileRowStatus);
-		return (u_char *) &StorageTmp->m2paProtocolProfileRowStatus;
+		rval = (u_char *) &StorageTmp->m2paProtocolProfileRowStatus;
+		break;
 	default:
 		ERROR_MSG("");
 	}
-	return NULL;
+	return (rval);
 }
 
 /**
@@ -1395,15 +1693,15 @@ write_m2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paN1 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1427,11 +1725,13 @@ write_m2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 		/* Note: default value 1000 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paN1 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paN1;
 		StorageTmp->m2paN1 = set_value;
 		break;
@@ -1460,15 +1760,15 @@ write_m2paProving(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProving entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1500,11 +1800,13 @@ write_m2paProving(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paProving for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paProving;
 		StorageTmp->m2paProving = set_value;
 		break;
@@ -1533,15 +1835,15 @@ write_m2paManagementProvingState(int action, u_char *var_val, u_char var_val_typ
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paManagementProvingState entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1573,11 +1875,13 @@ write_m2paManagementProvingState(int action, u_char *var_val, u_char var_val_typ
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paManagementProvingState for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paManagementProvingState;
 		StorageTmp->m2paManagementProvingState = set_value;
 		break;
@@ -1606,15 +1910,15 @@ write_m2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paLoopDelayLower entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1642,11 +1946,13 @@ write_m2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paLoopDelayLower for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paLoopDelayLower;
 		StorageTmp->m2paLoopDelayLower = set_value;
 		break;
@@ -1675,15 +1981,15 @@ write_m2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paLoopDelayUpper entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1711,11 +2017,13 @@ write_m2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paLoopDelayUpper for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paLoopDelayUpper;
 		StorageTmp->m2paLoopDelayUpper = set_value;
 		break;
@@ -1744,15 +2052,15 @@ write_m2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char var_
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransmissionRateIntervalLower entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1775,11 +2083,13 @@ write_m2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransmissionRateIntervalLower for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransmissionRateIntervalLower;
 		StorageTmp->m2paTransmissionRateIntervalLower = set_value;
 		break;
@@ -1808,15 +2118,15 @@ write_m2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char var_
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransmissionRateIntervalUpper entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1839,11 +2149,13 @@ write_m2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransmissionRateIntervalUpper for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransmissionRateIntervalUpper;
 		StorageTmp->m2paTransmissionRateIntervalUpper = set_value;
 		break;
@@ -1872,15 +2184,15 @@ write_m2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpNoDelay entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1911,11 +2223,13 @@ write_m2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpNoDelay for you to use, and you have just been asked to do something with it.  Note that anything done here must 
+				   be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpNoDelay;
 		StorageTmp->m2paSctpNoDelay = set_value;
 		break;
@@ -1944,15 +2258,15 @@ write_m2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxseg entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -1980,11 +2294,13 @@ write_m2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxseg for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpMaxseg;
 		StorageTmp->m2paSctpMaxseg = set_value;
 		break;
@@ -2013,15 +2329,15 @@ write_m2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpHeartbeatItvl entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2049,11 +2365,13 @@ write_m2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, si
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpHeartbeatItvl for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpHeartbeatItvl;
 		StorageTmp->m2paSctpHeartbeatItvl = set_value;
 		break;
@@ -2082,15 +2400,15 @@ write_m2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpHeartbeat entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2121,11 +2439,13 @@ write_m2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpHeartbeat for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpHeartbeat;
 		StorageTmp->m2paSctpHeartbeat = set_value;
 		break;
@@ -2154,15 +2474,15 @@ write_m2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoInitial entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2190,11 +2510,13 @@ write_m2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoInitial for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpRtoInitial;
 		StorageTmp->m2paSctpRtoInitial = set_value;
 		break;
@@ -2223,15 +2545,15 @@ write_m2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoMin entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2259,11 +2581,13 @@ write_m2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoMin for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpRtoMin;
 		StorageTmp->m2paSctpRtoMin = set_value;
 		break;
@@ -2292,15 +2616,15 @@ write_m2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoMax entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2328,11 +2652,13 @@ write_m2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoMax for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpRtoMax;
 		StorageTmp->m2paSctpRtoMax = set_value;
 		break;
@@ -2361,15 +2687,15 @@ write_m2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpPathMaxRetrans entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2392,11 +2718,13 @@ write_m2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpPathMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpPathMaxRetrans;
 		StorageTmp->m2paSctpPathMaxRetrans = set_value;
 		break;
@@ -2425,15 +2753,15 @@ write_m2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpCookieLife entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2461,11 +2789,13 @@ write_m2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpCookieLife for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpCookieLife;
 		StorageTmp->m2paSctpCookieLife = set_value;
 		break;
@@ -2494,15 +2824,15 @@ write_m2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpCookieInc entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2530,11 +2860,13 @@ write_m2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpCookieInc for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpCookieInc;
 		StorageTmp->m2paSctpCookieInc = set_value;
 		break;
@@ -2563,15 +2895,15 @@ write_m2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxInitRetries entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2594,11 +2926,13 @@ write_m2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxInitRetries for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpMaxInitRetries;
 		StorageTmp->m2paSctpMaxInitRetries = set_value;
 		break;
@@ -2627,15 +2961,15 @@ write_m2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxBurst entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2658,11 +2992,13 @@ write_m2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxBurst for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpMaxBurst;
 		StorageTmp->m2paSctpMaxBurst = set_value;
 		break;
@@ -2691,15 +3027,15 @@ write_m2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpAssocMaxRetrans entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2722,11 +3058,13 @@ write_m2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpAssocMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpAssocMaxRetrans;
 		StorageTmp->m2paSctpAssocMaxRetrans = set_value;
 		break;
@@ -2755,15 +3093,15 @@ write_m2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpSackDelay entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2792,11 +3130,13 @@ write_m2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpSackDelay for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpSackDelay;
 		StorageTmp->m2paSctpSackDelay = set_value;
 		break;
@@ -2825,15 +3165,15 @@ write_m2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpLifetime entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2861,11 +3201,13 @@ write_m2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpLifetime for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paSctpLifetime;
 		StorageTmp->m2paSctpLifetime = set_value;
 		break;
@@ -2894,15 +3236,15 @@ write_m2paTimerT1(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT1 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2930,11 +3272,13 @@ write_m2paTimerT1(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT1 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT1;
 		StorageTmp->m2paTimerT1 = set_value;
 		break;
@@ -2963,15 +3307,15 @@ write_m2paTimerT2(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -2999,11 +3343,13 @@ write_m2paTimerT2(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT2;
 		StorageTmp->m2paTimerT2 = set_value;
 		break;
@@ -3032,15 +3378,15 @@ write_m2paTimerT2L(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2L entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3068,11 +3414,13 @@ write_m2paTimerT2L(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2L for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT2L;
 		StorageTmp->m2paTimerT2L = set_value;
 		break;
@@ -3101,15 +3449,15 @@ write_m2paTimerT2H(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2H entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3137,11 +3485,13 @@ write_m2paTimerT2H(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2H for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT2H;
 		StorageTmp->m2paTimerT2H = set_value;
 		break;
@@ -3170,15 +3520,15 @@ write_m2paTimerT3(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT3 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3206,11 +3556,13 @@ write_m2paTimerT3(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT3 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT3;
 		StorageTmp->m2paTimerT3 = set_value;
 		break;
@@ -3239,15 +3591,15 @@ write_m2paTimerT4N(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT4N entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3275,11 +3627,13 @@ write_m2paTimerT4N(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT4N for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT4N;
 		StorageTmp->m2paTimerT4N = set_value;
 		break;
@@ -3308,15 +3662,15 @@ write_m2paTimerT4E(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT4E entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3344,11 +3698,13 @@ write_m2paTimerT4E(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT4E for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT4E;
 		StorageTmp->m2paTimerT4E = set_value;
 		break;
@@ -3377,15 +3733,15 @@ write_m2paTimerT6(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT6 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3413,11 +3769,13 @@ write_m2paTimerT6(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT6 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT6;
 		StorageTmp->m2paTimerT6 = set_value;
 		break;
@@ -3446,15 +3804,15 @@ write_m2paTimerT7(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT7 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3482,11 +3840,13 @@ write_m2paTimerT7(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT7 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerT7;
 		StorageTmp->m2paTimerT7 = set_value;
 		break;
@@ -3515,15 +3875,15 @@ write_m2paTransCongThresholdAbatementL1Messages(int action, u_char *var_val, u_c
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL1Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3546,11 +3906,13 @@ write_m2paTransCongThresholdAbatementL1Messages(int action, u_char *var_val, u_c
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL1Messages for you to use, and you have just been asked to do something with it.  Note
+				   that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL1Messages;
 		StorageTmp->m2paTransCongThresholdAbatementL1Messages = set_value;
 		break;
@@ -3579,15 +3941,15 @@ write_m2paTransCongThresholdAbatementL1Octets(int action, u_char *var_val, u_cha
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL1Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3610,11 +3972,13 @@ write_m2paTransCongThresholdAbatementL1Octets(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL1Octets for you to use, and you have just been asked to do something with it.  Note that 
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL1Octets;
 		StorageTmp->m2paTransCongThresholdAbatementL1Octets = set_value;
 		break;
@@ -3643,15 +4007,15 @@ write_m2paTransCongThresholdOnsetL1Messages(int action, u_char *var_val, u_char 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL1Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3674,11 +4038,13 @@ write_m2paTransCongThresholdOnsetL1Messages(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL1Messages for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL1Messages;
 		StorageTmp->m2paTransCongThresholdOnsetL1Messages = set_value;
 		break;
@@ -3707,15 +4073,15 @@ write_m2paTransCongThresholdOnsetL1Octets(int action, u_char *var_val, u_char va
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL1Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3738,11 +4104,13 @@ write_m2paTransCongThresholdOnsetL1Octets(int action, u_char *var_val, u_char va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL1Octets for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL1Octets;
 		StorageTmp->m2paTransCongThresholdOnsetL1Octets = set_value;
 		break;
@@ -3771,15 +4139,15 @@ write_m2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, size
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProvingAttempts entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3802,11 +4170,13 @@ write_m2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, size
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paProvingAttempts for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paProvingAttempts;
 		StorageTmp->m2paProvingAttempts = set_value;
 		break;
@@ -3835,15 +4205,15 @@ write_m2paNumberOfThresholdLevels(int action, u_char *var_val, u_char var_val_ty
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paNumberOfThresholdLevels entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3871,11 +4241,13 @@ write_m2paNumberOfThresholdLevels(int action, u_char *var_val, u_char var_val_ty
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paNumberOfThresholdLevels for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paNumberOfThresholdLevels;
 		StorageTmp->m2paNumberOfThresholdLevels = set_value;
 		break;
@@ -3904,15 +4276,15 @@ write_m2paCongestionCounting(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paCongestionCounting entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -3944,11 +4316,13 @@ write_m2paCongestionCounting(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paCongestionCounting for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paCongestionCounting;
 		StorageTmp->m2paCongestionCounting = set_value;
 		break;
@@ -3977,15 +4351,15 @@ write_m2paCongestionReportingBaseObject(int action, u_char *var_val, u_char var_
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paCongestionReportingBaseObject entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4018,11 +4392,13 @@ write_m2paCongestionReportingBaseObject(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paCongestionReportingBaseObject for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paCongestionReportingBaseObject;
 		StorageTmp->m2paCongestionReportingBaseObject = set_value;
 		break;
@@ -4051,15 +4427,15 @@ write_m2paTimerTx(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerTx entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4087,11 +4463,13 @@ write_m2paTimerTx(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerTx for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerTx;
 		StorageTmp->m2paTimerTx = set_value;
 		break;
@@ -4120,15 +4498,15 @@ write_m2paTimerTy(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerTy entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4156,11 +4534,13 @@ write_m2paTimerTy(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerTy for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
 		old_value = StorageTmp->m2paTimerTy;
 		StorageTmp->m2paTimerTy = set_value;
 		break;
@@ -4189,15 +4569,15 @@ write_m2paNumberOfCongestionStates(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paNumberOfCongestionStates entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4220,11 +4600,13 @@ write_m2paNumberOfCongestionStates(int action, u_char *var_val, u_char var_val_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paNumberOfCongestionStates for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paNumberOfCongestionStates;
 		StorageTmp->m2paNumberOfCongestionStates = set_value;
 		break;
@@ -4253,15 +4635,15 @@ write_m2paInitialLevelOfCongestion(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paInitialLevelOfCongestion entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4284,11 +4666,13 @@ write_m2paInitialLevelOfCongestion(int action, u_char *var_val, u_char var_val_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paInitialLevelOfCongestion for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paInitialLevelOfCongestion;
 		StorageTmp->m2paInitialLevelOfCongestion = set_value;
 		break;
@@ -4317,15 +4701,15 @@ write_m2paReceiveCongestionThresholdAbatement(int action, u_char *var_val, u_cha
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdAbatement entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4349,11 +4733,13 @@ write_m2paReceiveCongestionThresholdAbatement(int action, u_char *var_val, u_cha
 		/* Note: default value 3 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdAbatement for you to use, and you have just been asked to do something with it.  Note that 
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paReceiveCongestionThresholdAbatement;
 		StorageTmp->m2paReceiveCongestionThresholdAbatement = set_value;
 		break;
@@ -4382,15 +4768,15 @@ write_m2paReceiveCongestionThresholdOnset(int action, u_char *var_val, u_char va
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdOnset entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4414,11 +4800,13 @@ write_m2paReceiveCongestionThresholdOnset(int action, u_char *var_val, u_char va
 		/* Note: default value 6 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdOnset for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paReceiveCongestionThresholdOnset;
 		StorageTmp->m2paReceiveCongestionThresholdOnset = set_value;
 		break;
@@ -4447,15 +4835,15 @@ write_m2paReceiveCongestionThresholdDiscard(int action, u_char *var_val, u_char 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdDiscard entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4479,11 +4867,13 @@ write_m2paReceiveCongestionThresholdDiscard(int action, u_char *var_val, u_char 
 		/* Note: default value 9 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdDiscard for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paReceiveCongestionThresholdDiscard;
 		StorageTmp->m2paReceiveCongestionThresholdDiscard = set_value;
 		break;
@@ -4512,16 +4902,16 @@ write_m2paProtocolProfileName(int action, u_char *var_val, u_char var_val_type, 
 {
 	static uint8_t *old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProtocolProfileName entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4539,21 +4929,24 @@ write_m2paProtocolProfileName(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (2 > var_val_len || var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paProtocolProfileName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if ((string = malloc(var_val_len)) == NULL)
+		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
 		break;
-	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
-				   UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paProtocolProfileName for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paProtocolProfileName;
 		old_length = StorageTmp->m2paProtocolProfileNameLen;
 		StorageTmp->m2paProtocolProfileName = string;
@@ -4588,15 +4981,15 @@ write_m2paTransCongThresholdAbatementL2Messages(int action, u_char *var_val, u_c
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL2Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4619,11 +5012,13 @@ write_m2paTransCongThresholdAbatementL2Messages(int action, u_char *var_val, u_c
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL2Messages for you to use, and you have just been asked to do something with it.  Note
+				   that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL2Messages;
 		StorageTmp->m2paTransCongThresholdAbatementL2Messages = set_value;
 		break;
@@ -4652,15 +5047,15 @@ write_m2paTransCongThresholdAbatementL2Octets(int action, u_char *var_val, u_cha
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL2Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4683,11 +5078,13 @@ write_m2paTransCongThresholdAbatementL2Octets(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL2Octets for you to use, and you have just been asked to do something with it.  Note that 
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL2Octets;
 		StorageTmp->m2paTransCongThresholdAbatementL2Octets = set_value;
 		break;
@@ -4716,15 +5113,15 @@ write_m2paTransCongThresholdOnsetL2Messages(int action, u_char *var_val, u_char 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL2Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4747,11 +5144,13 @@ write_m2paTransCongThresholdOnsetL2Messages(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL2Messages for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL2Messages;
 		StorageTmp->m2paTransCongThresholdOnsetL2Messages = set_value;
 		break;
@@ -4780,15 +5179,15 @@ write_m2paTransCongThresholdOnsetL2Octets(int action, u_char *var_val, u_char va
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL2Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4811,11 +5210,13 @@ write_m2paTransCongThresholdOnsetL2Octets(int action, u_char *var_val, u_char va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL2Octets for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL2Octets;
 		StorageTmp->m2paTransCongThresholdOnsetL2Octets = set_value;
 		break;
@@ -4844,15 +5245,15 @@ write_m2paTransCongThresholdAbatementL3Messages(int action, u_char *var_val, u_c
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL3Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4875,11 +5276,13 @@ write_m2paTransCongThresholdAbatementL3Messages(int action, u_char *var_val, u_c
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL3Messages for you to use, and you have just been asked to do something with it.  Note
+				   that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL3Messages;
 		StorageTmp->m2paTransCongThresholdAbatementL3Messages = set_value;
 		break;
@@ -4908,15 +5311,15 @@ write_m2paTransCongThresholdAbatementL3Octets(int action, u_char *var_val, u_cha
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL3Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -4939,11 +5342,13 @@ write_m2paTransCongThresholdAbatementL3Octets(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL3Octets for you to use, and you have just been asked to do something with it.  Note that 
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL3Octets;
 		StorageTmp->m2paTransCongThresholdAbatementL3Octets = set_value;
 		break;
@@ -4972,15 +5377,15 @@ write_m2paTransCongThresholdOnsetL3Messages(int action, u_char *var_val, u_char 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL3Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -5003,11 +5408,13 @@ write_m2paTransCongThresholdOnsetL3Messages(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL3Messages for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL3Messages;
 		StorageTmp->m2paTransCongThresholdOnsetL3Messages = set_value;
 		break;
@@ -5036,15 +5443,15 @@ write_m2paTransCongThresholdOnsetL3Octets(int action, u_char *var_val, u_char va
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL3Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -5067,11 +5474,13 @@ write_m2paTransCongThresholdOnsetL3Octets(int action, u_char *var_val, u_char va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL3Octets for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL3Octets;
 		StorageTmp->m2paTransCongThresholdOnsetL3Octets = set_value;
 		break;
@@ -5100,15 +5509,15 @@ write_m2paTransCongThresholdDiscardL1Messages(int action, u_char *var_val, u_cha
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL1Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -5131,11 +5540,13 @@ write_m2paTransCongThresholdDiscardL1Messages(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL1Messages for you to use, and you have just been asked to do something with it.  Note that 
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL1Messages;
 		StorageTmp->m2paTransCongThresholdDiscardL1Messages = set_value;
 		break;
@@ -5164,15 +5575,15 @@ write_m2paTransCongThresholdDiscardL1Octets(int action, u_char *var_val, u_char 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL1Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -5195,11 +5606,13 @@ write_m2paTransCongThresholdDiscardL1Octets(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL1Octets for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL1Octets;
 		StorageTmp->m2paTransCongThresholdDiscardL1Octets = set_value;
 		break;
@@ -5228,15 +5641,15 @@ write_m2paTransCongThresholdDiscardL2Messages(int action, u_char *var_val, u_cha
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL2Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -5259,11 +5672,13 @@ write_m2paTransCongThresholdDiscardL2Messages(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL2Messages for you to use, and you have just been asked to do something with it.  Note that 
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL2Messages;
 		StorageTmp->m2paTransCongThresholdDiscardL2Messages = set_value;
 		break;
@@ -5292,15 +5707,15 @@ write_m2paTransCongThresholdDiscardL2Octets(int action, u_char *var_val, u_char 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL2Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -5323,11 +5738,13 @@ write_m2paTransCongThresholdDiscardL2Octets(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL2Octets for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL2Octets;
 		StorageTmp->m2paTransCongThresholdDiscardL2Octets = set_value;
 		break;
@@ -5356,15 +5773,15 @@ write_m2paTransCongThresholdDiscardL3Messages(int action, u_char *var_val, u_cha
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL3Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -5387,11 +5804,13 @@ write_m2paTransCongThresholdDiscardL3Messages(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL3Messages for you to use, and you have just been asked to do something with it.  Note that 
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL3Messages;
 		StorageTmp->m2paTransCongThresholdDiscardL3Messages = set_value;
 		break;
@@ -5420,15 +5839,15 @@ write_m2paTransCongThresholdDiscardL3Octets(int action, u_char *var_val, u_char 
 {
 	static ulong old_value;
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - (sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1);
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL3Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+
 	switch (action) {
 	case RESERVE1:
-		if (statP == NULL) {
+		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
 			case RS_ACTIVE:
@@ -5451,11 +5870,13 @@ write_m2paTransCongThresholdDiscardL3Octets(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case FREE:		/* Release any resources that have been allocated */
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL3Octets for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL3Octets;
 		StorageTmp->m2paTransCongThresholdDiscardL3Octets = set_value;
 		break;
@@ -6294,6 +6715,23 @@ write_m2paDefaultSctpLifetime(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
+ * @fn int m2paProtocolProfileTable_consistent(struct m2paProtocolProfileTable_data *thedata)
+ * @param thedata the row data to check for consistency.
+ * @brief check the internal consistency of a table row.
+ *
+ * This function checks the internal consistency of a table row for the m2paProtocolProfileTable table.  If the
+ * table row is internally consistent, then this function returns true (1), otherwise the function
+ * returns false (0) and it will not be possible to activate the row until the row's internal
+ * consistency is corrected.
+ */
+int
+m2paProtocolProfileTable_consistent(struct m2paProtocolProfileTable_data *thedata)
+{
+	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
+	return (1);
+}
+
+/**
  * @fn int write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
@@ -6309,12 +6747,12 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 {
 	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
 	static struct m2paProtocolProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - (sizeof(m2paProtocolProfileTable_variables_oid) / sizeof(oid) + 3 - 1);
+	size_t newlen = name_len - 15;
 	static int old_value;
 	int set_value;
 	static struct variable_list *vars, *vp;
 
-	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[sizeof(m2paProtocolProfileTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paProtocolProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -6371,47 +6809,23 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 			/* creation */
 			vars = NULL;
 			/* m2paProtocolProfileId */
-			snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0);
-			if (header_complex_parse_oid(&(name[sizeof(m2paProtocolProfileTable_variables_oid) / sizeof(oid) + 2]), newlen, vars) != SNMPERR_SUCCESS) {
-				/* XXX: free, zero vars */
-				return SNMP_ERR_INCONSISTENTNAME;
-			}
-			vp = vars;
-			if ((StorageNew = m2paProtocolProfileTable_create()) == NULL) {
-				/* XXX: free, zero vars */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			if (header_complex_parse_oid(&(name[15]), newlen, vars) != SNMPERR_SUCCESS) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			if ((StorageNew = m2paProtocolProfileTable_create()) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			vp = vars;
 			memdup((void *) &StorageNew->m2paProtocolProfileId, vp->val.string, vp->val_len);
 			StorageNew->m2paProtocolProfileIdLen = vp->val_len;
 			vp = vp->next_variable;
-			/* XXX: free, zero vars, no longer needed? */
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m2paProtocolProfileTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		}
-		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* row creation, so add it */
-			m2paProtocolProfileTable_add(StorageNew);
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m2paProtocolProfileRowStatus;
-			StorageTmp->m2paProtocolProfileRowStatus = set_value;
+			header_complex_add_data(&m2paProtocolProfileTableStorage, vars, StorageNew);	/* frees vars */
 			break;
 		case RS_DESTROY:
 			/* destroy */
@@ -6425,22 +6839,50 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 			break;
 		}
 		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
+	case FREE:
+		/* Release any resources that have been allocated */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
-			/* row creation, so remove it again */
+			/* creation */
 			m2paProtocolProfileTable_del(StorageNew);
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m2paProtocolProfileRowStatus = old_value;
+			m2paProtocolProfileTable_destroy(&StorageNew);
+			/* XXX: free, zero vars */
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
 			m2paProtocolProfileTable_add(StorageDel);
+			break;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_ACTIVE:
+			old_value = StorageTmp->m2paProtocolProfileRowStatus;
+			StorageTmp->m2paProtocolProfileRowStatus = set_value;
+			if (old_value != RS_ACTIVE) {
+				/* check that activation is possible */
+				if (!m2paProtocolProfileTable_consistent(StorageTmp)) {
+					StorageTmp->m2paProtocolProfileRowStatus = old_value;
+					return SNMP_ERR_INCONSISTENTVALUE;
+				}
+			}
+			break;
+		case RS_NOTINSERVICE:
+			/* set the flag? */
+			old_value = StorageTmp->m2paProtocolProfileRowStatus;
+			StorageTmp->m2paProtocolProfileRowStatus = set_value;
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m2paProtocolProfileRowStatus = old_value;
 			break;
 		}
 		break;
@@ -6449,17 +6891,34 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
-			StorageTmp->m2paProtocolProfileRowStatus = RS_ACTIVE;
+			/* check if row is ready, otherwise leave at RS_NOTREADY */
+			if (m2paProtocolProfileTable_consistent(StorageNew)) {
+				/* XXX: commit creation to underlying device */
+				/* XXX: activate with underlying device */
+				StorageNew->m2paProtocolProfileRowStatus = RS_ACTIVE;
+			}
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* XXX: check if row is ready, otherwise leave at RS_NOTREADY */
-			StorageTmp->m2paProtocolProfileRowStatus = RS_NOTINSERVICE;
+			/* check if row is ready, otherwise leave at RS_NOTREADY */
+			if (m2paProtocolProfileTable_consistent(StorageNew)) {
+				/* XXX: commit creation to underlying device, inactive */
+				StorageNew->m2paProtocolProfileRowStatus = RS_NOTINSERVICE;
+			}
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
 			/* state change already performed */
+			if (old_value != set_value) {
+				switch (set_value) {
+				case RS_ACTIVE:
+					/* XXX: activate with underlying device */
+					break;
+				case RS_NOTINSERVICE:
+					/* XXX: deactivate with underlying device */
+					break;
+				}
+			}
 			break;
 		case RS_DESTROY:
 			/* row deletion, free it its dead */
@@ -6504,7 +6963,7 @@ m2paMIB_loop_handler(int dummy)
 }
 #endif				/* defined MASTER */
 /**
- * @fn void m2paMIB_readfd_handler(int fd, void *dummy)
+ * @fn void m2paMIB_fd_handler(int fd, void *dummy)
  * @param fd file descriptor to read.
  * @param dummy client data passed to registration function (always NULL).
  * @brief handle read event on file descriptor.
@@ -6516,7 +6975,7 @@ m2paMIB_loop_handler(int dummy)
  * events, first and interval events, and alarm indications.
  */
 void
-m2paMIB_readfd_handler(int fd, void *dummy)
+m2paMIB_fd_handler(int fd, void *dummy)
 {
 	/* XXX: place actions to handle sa_readfd here... */
 	return;
@@ -6561,7 +7020,7 @@ sa_version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2008-2009  Monavacom Limited.  All Rights Reserved.\n\
+Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved.\n\
 Distributed under Affero GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -6679,7 +7138,7 @@ sa_copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2009  Monavacom Limited <http://www.monavacom.com>\n\
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\

@@ -80,7 +80,7 @@
 #ifndef __SYS_MXI_IOCTL_H__
 #define __SYS_MXI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 

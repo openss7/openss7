@@ -1,10 +1,12 @@
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sctp.macros,v 0.9.2.12 2008-07-11 09:58:09 brian Exp $
+.\" @(#) $Id: sctp.macros,v 0.9.2.13 2009-01-16 20:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -52,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-11 09:58:09 $ by $Author: brian $
+.\" Last Modified $Date: 2009-01-16 20:44:08 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sctp.macros,v $
+.\" Revision 0.9.2.13  2009-01-16 20:44:08  brian
+.\" - updated copyrights
+.\"
 .\" Revision 0.9.2.12  2008-07-11 09:58:09  brian
 .\" - minor doc updates
 .\"
@@ -190,9 +195,11 @@
 .de CO
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 2008-2009\ Monavacon\ Limited.
+\f(HRAll\ Rights\ Reserved.
 .br
-\f(HRAll Rights Reserved.
+\f(HRCopyright\ \(co\ 2001-2008\ OpenSS7\ Corporation.
+\f(HRAll\ Rights\ Reserved.
 .ie '\\*(.T'ps' \{\
 .PP
 .ce 1
@@ -252,9 +259,11 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .PP
 .\}
 .el .br
-\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 2008-2009\ Monavacon\ Limited.
+\f(HRAll\ Rights\ Reserved.
 .br
-\f(HRAll Rights Reserved.
+\f(HRCopyright\ \(co\ 2001-2008\ OpenSS7\ Corporation.
+\f(HRAll\ Rights\ Reserved.
 .ie '\\*(.T'ps' \{\
 .PP
 .ce 1
@@ -344,11 +353,11 @@ The OpenSS7 Project http://www.openss7.org/
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corp.
-.if (\n[.l]u < 80n) \{\
+\f(HRCopyright\ \(co\ 2008-2009\ Monavacon\ Ltd.
+All\ Rights\ Reserved.
 .br
-.\}
-All Rights Reserved.
+\f(HRCopyright\ \(co\ 2001-2008\ OpenSS7\ Corp.
+All\ Rights\ Reserved.
 .br
 .I (See roff source for permission notice.)
 .hy
@@ -363,11 +372,11 @@ All Rights Reserved.
 .PP
 \f(HRCopyright\ \(co\ 1992\ UNIX International, Inc.
 .br
-\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corp.
-.if (\n[.l]u < 80n) \{\
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7\ Corp.
+All\ Rights\ Reserved.
 .br
-.\}
-All Rights Reserved.
+\f(HRCopyright\ \(co\ 2008-2009\ Monavacon\ Ltd.
+All\ Rights\ Reserved.
 .br
 .I (See roff source for permission notice.)
 .hy
@@ -382,11 +391,11 @@ All Rights Reserved.
 .PP
 \f(HRCopyright\ \(co\ 2000\ John A. Boyd Jr.  protologos, LLC
 .br
-\f(HRCopyright\ \(co\ 2001-2008\ OpenSS7 Corp.
-.if (\n[.l]u < 80n) \{\
+\f(HRCopyright\ \(co\ 2001-2008\ OpenSS7\ Corp.
+All\ Rights\ Reserved.
 .br
-.\}
-All Rights Reserved.
+\f(HRCopyright\ \(co\ 2008-2009\ Monavacon\ Ltd.
+All\ Rights\ Reserved.
 .br
 .I (See roff source for permission notice.)
 .hy
@@ -399,11 +408,11 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corp.
-.if (\n[.l]u < 80n) \{\
+\f(HRCopyright\ \(co\ 2008-2009\ Monavacon\ Ltd.
+All\ Rights\ Reserved.
 .br
-.\}
-All Rights Reserved.
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7\ Corp.
+All\ Rights\ Reserved.
 .br
 .I (See roff source for permission notice.)
 .hy
@@ -416,13 +425,14 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 2008-2009\ Monavacon\ Ltd.
+All\ Rights\ Reserved.
+.br
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7\ Corp.
+All\ Rights\ Reserved.
 .br
 \f(HRCopyright\ \(co\ 1999-2004\ The Board of Trustees of the University of Illinois
-.if (\n[.l]u < 80n) \{\
-.br
-.\}
-All Rights Reserved.
+All\ Rights\ Reserved.
 .br
 .I (See roff source for permission notice.)
 .hy

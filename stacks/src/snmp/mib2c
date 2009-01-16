@@ -2,7 +2,7 @@
 #!/usr/bin/perl -w
 # =============================================================================
 #
-# @(#) $RCSfile: mib2c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2009-01-14 14:29:58 $
+# @(#) $RCSfile: mib2c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2009-01-16 06:52:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-14 14:29:58 $ by $Author: brian $
+# Last Modified $Date: 2009-01-16 06:52:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: mib2c,v $
+# Revision 0.9.2.22  2009-01-16 06:52:45  brian
+# - corrections
+#
 # Revision 0.9.2.21  2009-01-14 14:29:58  brian
 # - working up agents
 #
@@ -398,7 +401,7 @@ sub defval {
 		$ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len)))\n";
 		$ret .= "StorageNew->${name}Len = $len;\n";
 	    } else {
-		$ret = "{\nstatic const oid tmpoid[$len] = $val;\n";
+		$ret = "{\nstatic oid tmpoid[$len] = $val;\n";
 		$ret .= "if ((StorageNew->${name} = snmp_duplicate_objid(tmpoid, $len)))\n";
 		$ret .= "StorageNew->${name}Len = $len;\n}\n";
 	    }

@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-24 13:40:56 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-01-16 20:40:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-24 13:40:56 $ by $Author: brian $
+# Last Modified $Date: 2009-01-16 20:40:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.4  2009-01-16 20:40:56  brian
+# - working up mibs and agents
+#
 # Revision 0.9.2.3  2008-12-24 13:40:56  brian
 # - updated mibs
 #
@@ -76,12 +79,14 @@ export MIBS
 export MIBDIRS
 export MIBFILES
 
-all: basic storage openss7
+all: storage openss7
 
 check: \
 	x400pMIB.tree \
 	mxMIB.tree \
 	phyMIB.tree \
+	ds0.tree \
+	ds0Bundle.tree \
 	ds1.tree \
 	ds1EXT.tree
 
@@ -97,6 +102,14 @@ phyMIB.tree: MIBS+=OPENSS7-PHY-MIB
 phyMIB.tree: mibs/OPENSS7-PHY-MIB.mib
 	snmptranslate -Tp OPENSS7-PHY-MIB::phyMIB >phyMIB.tree
 
+ds0.tree: MIBS+=DS0-MIB:PerfHist-TC-MIB
+ds0.tree: mibs/RFC2494-MIB.txt
+	snmptranslate -Tp DS0-MIB::ds0>ds0.tree
+
+ds0Bundle.tree: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
+ds0Bundle.tree: mibs/RFC2494-EXT-MIB.mib
+	snmptranslate -Tp DS0BUNDLE-MIB::ds0Bundle >ds0Bundle.tree
+
 ds1.tree: MIBS+=DS1-MIB:PerfHist-TC-MIB
 ds1.tree: mibs/RFC4805-MIB.txt
 	snmptranslate -Tp DS1-MIB::ds1>ds1.tree
@@ -109,6 +122,8 @@ basic: \
 	x400pMIB_simple.c x400pMIB_simple.h \
 	mxMIB_simple.c mxMIB_simple.h \
 	phyMIB_simple.c phyMIB_simple.h \
+	ds0_simple.c ds0_simple.h \
+	ds0Bundle_simple.c ds0Bundle_simple.h \
 	ds1_simple.c ds1_simple.h \
 	ds1EXT_simple.c ds1EXT_simple.h
 
@@ -127,6 +142,16 @@ phyMIB_simple.c phyMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-PHY-MIB.mib
 	./mib2c -c ./mib2c.conf -f phyMIB_simple phyMIB
 	indent -nhnl phyMIB_simple.[ch]
 
+ds0_simple.c ds0_simple.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
+ds0_simple.c ds0_simple.h: mib2c mib2c.conf mibs/RFC4805-MIB.txt
+	./mib2c -c ./mib2c.conf -f ds0_simple ds0
+	indent -nhnl ds0_simple.[ch]
+
+ds0Bundle_simple.c ds0Bundle_simple.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
+ds0Bundle_simple.c ds0Bundle_simple.h: mib2c mib2c.conf mibs/RFC4805-EXT-MIB.mib
+	./mib2c -c ./mib2c.conf -f ds0Bundle_simple ds0Bundle
+	indent -nhnl ds0Bundle_simple.[ch]
+
 ds1_simple.c ds1_simple.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
 ds1_simple.c ds1_simple.h: mib2c mib2c.conf mibs/RFC4805-MIB.txt
 	./mib2c -c ./mib2c.conf -f ds1_simple ds1
@@ -138,9 +163,8 @@ ds1EXT_simple.c ds1EXT_simple.h: mib2c mib2c.conf mibs/RFC4805-EXT-MIB.mib
 	indent -nhnl ds1EXT_simple.[ch]
 
 storage: \
-	x400pMIB_storage.c x400pMIB_storage.h \
-	mxMIB_storage.c mxMIB_storage.h \
-	phyMIB_storage.c phyMIB_storage.h \
+	ds0_storage.c ds0_storage.h \
+	ds0Bundle_storage.c ds0Bundle_storage.h \
 	ds1_storage.c ds1_storage.h \
 	ds1EXT_storage.c ds1EXT_storage.h
 
@@ -159,6 +183,16 @@ phyMIB_storage.c phyMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-PHY-MIB
 	./mib2c -c ./mib2c.storage.conf -f phyMIB_storage phyMIB
 	indent -nhnl phyMIB_storage.[ch]
 
+ds0_storage.c ds0_storage.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
+ds0_storage.c ds0_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-MIB.txt
+	./mib2c -c ./mib2c.storage.conf -f ds0_storage ds0
+	indent -nhnl ds0_storage.[ch]
+
+ds0Bundle_storage.c ds0Bundle_storage.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
+ds0Bundle_storage.c ds0Bundle_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-EXT-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f ds0Bundle_storage ds0Bundle
+	indent -nhnl ds0Bundle_storage.[ch]
+
 ds1_storage.c ds1_storage.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
 ds1_storage.c ds1_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-MIB.txt
 	./mib2c -c ./mib2c.storage.conf -f ds1_storage ds1
@@ -172,9 +206,7 @@ ds1EXT_storage.c ds1EXT_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-EXT-MIB
 openss7: \
 	x400pMIB_openss7.c x400pMIB_openss7.h \
 	mxMIB_openss7.c mxMIB_openss7.h \
-	phyMIB_openss7.c phyMIB_openss7.h \
-	ds1_openss7.c ds1_openss7.h \
-	ds1EXT_openss7.c ds1EXT_openss7.h
+	phyMIB_openss7.c phyMIB_openss7.h
 
 x400pMIB_openss7.c x400pMIB_openss7.h: MIBS=+OPENSS7-X400P-MX-MIB
 x400pMIB_openss7.c x400pMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-X400P-MX-MIB.mib
@@ -190,6 +222,16 @@ phyMIB_openss7.c phyMIB_openss7.h: MIBS=+OPENSS7-PHY-MIB
 phyMIB_openss7.c phyMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-PHY-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f phyMIB_openss7 phyMIB
 	indent -nhnl phyMIB_openss7.[ch]
+
+ds0_openss7.c ds0_openss7.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
+ds0_openss7.c ds0_openss7.h: mib2c mib2c.openss7.conf mibs/RFC4805-MIB.txt
+	./mib2c -c ./mib2c.openss7.conf -f ds0_openss7 ds0
+	indent -nhnl ds0_openss7.[ch]
+
+ds0Bundle_openss7.c ds0Bundle_openss7.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
+ds0Bundle_openss7.c ds0Bundle_openss7.h: mib2c mib2c.openss7.conf mibs/RFC4805-EXT-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f ds0Bundle_openss7 ds0Bundle
+	indent -nhnl ds0Bundle_openss7.[ch]
 
 ds1_openss7.c ds1_openss7.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
 ds1_openss7.c ds1_openss7.h: mib2c mib2c.openss7.conf mibs/RFC4805-MIB.txt
@@ -230,6 +272,20 @@ clean:
 	rm -f phyMIB_simple.[ch]~
 	rm -f phyMIB_storage.[ch]~
 	rm -f phyMIB_openss7.[ch]~
+	rm -f ds0.tree
+	rm -f ds0_simple.[ch]
+	rm -f ds0_storage.[ch]
+	rm -f ds0_openss7.[ch]
+	rm -f ds0_simple.[ch]~
+	rm -f ds0_storage.[ch]~
+	rm -f ds0_openss7.[ch]~
+	rm -f ds0Bundle.tree
+	rm -f ds0Bundle_simple.[ch]
+	rm -f ds0Bundle_storage.[ch]
+	rm -f ds0Bundle_openss7.[ch]
+	rm -f ds0Bundle_simple.[ch]~
+	rm -f ds0Bundle_storage.[ch]~
+	rm -f ds0Bundle_openss7.[ch]~
 	rm -f ds1.tree
 	rm -f ds1_simple.[ch]
 	rm -f ds1_storage.[ch]

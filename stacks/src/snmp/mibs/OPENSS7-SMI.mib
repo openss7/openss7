@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SMI.mib,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-01-10 17:09:27 $
+-- @(#) $RCSfile: OPENSS7-SMI.mib,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-01-11 11:46:38 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,20 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 17:09:27 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-11 11:46:38 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SMI.mib,v $
+-- Revision 0.9.2.16  2009-01-11 11:46:38  brian
+-- - updates
+--
+-- Revision 0.9.2.15  2009-01-10 17:18:43  brian
+-- - updated headers
+--
+-- Revision 0.9.2.14  2009-01-10 17:14:33  brian
+-- - correction
+--
 -- Revision 0.9.2.13  2009-01-10 17:09:27  brian
 -- - updated agents
 --
@@ -217,13 +226,7 @@ openss7Q7511 OBJECT-IDENTITY
     STATUS	current
     DESCRIPTION
 	"ITU-T Q.751.1 and ANSI T1.116.1 Specs."
-    ::= { openss7Q7511 1 }
-
-openss7Q7512 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.751.2 and ANSI T1.116.2 Specs."
-    ::= { openss7Q7511 2 }
+    ::= { openss7Q751 1 }
 
 openss7Q752 OBJECT-IDENTITY
     STATUS	current

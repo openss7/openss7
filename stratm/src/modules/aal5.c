@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $
+ @(#) $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-01-16 20:46:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-07 10:40:24 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:46:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: aal5.c,v $
+ Revision 0.9.2.4  2009-01-16 20:46:07  brian
+ - minor compile corrections
+
  Revision 0.9.2.3  2008-12-07 10:40:24  brian
  - new stratm package
 
@@ -62,9 +65,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $"
+#ident "@(#) $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-01-16 20:46:07 $"
 
-static char const ident[] = "$RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $";
+static char const ident[] = "$RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-01-16 20:46:07 $";
 
 /*
  * This is an ATM Adaption Layer (AAL) Type 5 (AAL5) for passing packets of variable length across
@@ -84,7 +87,7 @@ static char const ident[] = "$RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $
 #include <sys/dlpi.h>
 
 #define AAL5_DESCRIP	"MTP3B-AAL5 STREAMS MODULE."
-#define AAL5_REVISION	"OpenSS7 $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $"
+#define AAL5_REVISION	"OpenSS7 $RCSfile: aal5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-01-16 20:46:07 $"
 #define AAL5_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define AAL5_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL5 module."
 #define AAL5_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2446,7 +2449,7 @@ dl_w_data(struct dl *dl, queue_t *q, mblk_t *mp)
 	if (likely(err == 0))
 		return (err);
 	dl_restore_state(dl);
-	return dl_reply_error(dl, q, mp, -1UL, err);
+	return dl_reply_error(dl, q, mp, -1U, err);
 }
 static fastcall int
 dl_r_data(struct dl *dl, queue_t *q, mblk_t *mp)
