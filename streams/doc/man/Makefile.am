@@ -1,11 +1,12 @@
 # =============================================================================
-# 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2008-07-31 17:28:19 $
+#
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2009-01-16 20:25:46 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -18,10 +19,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-31 17:28:19 $ by $Author: brian $
+# Last Modified $Date: 2009-01-16 20:25:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -346,6 +346,7 @@ if PKG_BUILD_INDEP
 ##	man9/lis_alloc_dma_fcn.9 \
 ##	man9/lis_alloc_kernel_fcn.9 \
 ##	man9/lis_appq.9 \
+##	man9/lis_apush_lst.9 \
 ##	man9/lis_apush_get.9 \
 ##	man9/lis_apush_set.9 \
 ##	man9/lis_assert_fail.9 \
@@ -684,6 +685,7 @@ if PKG_BUILD_INDEP
 ##lfs_compat_pages = \
 ##	man9/lfscompat.9 \
 ##	man9/appq.9 \
+##	man9/apush_lst.9 \
 ##	man9/apush_get.9 \
 ##	man9/apush_set.9 \
 ##	man9/bcanget.9 \
@@ -1105,10 +1107,12 @@ man_MANS = \
 	man9/apush_get.9 \
 	man9/apush_set.9 \
 	man9/apush_vml.9 \
+	man9/apush_lst.9 \
 	man9/autopush.9 \
 	man9/autopush_add.9 \
 	man9/autopush_del.9 \
 	man9/autopush_find.9 \
+	man9/autopush_next.9 \
 	man9/autopush_search.9 \
 	man9/autopush_vml.9 \
 	man9/backq.9 \
@@ -1660,6 +1664,7 @@ man_MANS = \
 ##	man9/lis_alloc_dma_fcn.9.man \
 ##	man9/lis_alloc_kernel_fcn.9.man \
 ##	man9/lis_appq.9.man \
+##	man9/lis_apush_lst.9.man \
 ##	man9/lis_apush_get.9.man \
 ##	man9/lis_apush_set.9.man \
 ##	man9/lis_assert_fail.9.man \
@@ -1998,6 +2003,7 @@ man_MANS = \
 ##dist_noinst_lfs_compat_pages = \
 ##	man9/lfscompat.9.man \
 ##	man9/appq.9.man \
+##	man9/apush_lst.9.man \
 ##	man9/apush_get.9.man \
 ##	man9/apush_set.9.man \
 ##	man9/bcanget.9.man \
@@ -2254,10 +2260,12 @@ dist_noinst_MANS = \
 	man9/apush_get.9.man \
 	man9/apush_set.9.man \
 	man9/apush_vml.9.man \
+	man9/apush_lst.9.man \
 	man9/autopush.9.man \
 	man9/autopush_add.9.man \
 	man9/autopush_del.9.man \
 	man9/autopush_find.9.man \
+	man9/autopush_next.9.man \
 	man9/autopush_search.9.man \
 	man9/autopush_vml.9.man \
 	man9/backq.9.man \
@@ -2527,6 +2535,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.94  2009-01-16 20:25:46  brian
+# - working up streams mibs and agents
+#
 # Revision 0.9.2.93  2008-07-31 17:28:19  brian
 # - workaround for runqueues for crash(8)
 #

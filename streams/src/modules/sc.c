@@ -1,11 +1,12 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:31 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-01-16 20:25:49 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:31 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:25:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.60  2009-01-16 20:25:49  brian
+ - working up streams mibs and agents
+
  Revision 0.9.2.59  2008-09-22 20:31:31  brian
  - added module version and truncated logs
 
@@ -59,10 +63,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:31 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-01-16 20:25:49 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:31 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-01-16 20:25:49 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -88,8 +92,8 @@ static char const ident[] =
 #include "src/kernel/strlookup.h"
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:31 $"
+#define SC_COPYRIGHT	"Copyright (c) 2008-2009 Monavacon Limited.  All Rights Reserved."
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-01-16 20:25:49 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -792,6 +796,10 @@ sc_wput(queue_t *q, mblk_t *mp)
 				usize = sizeof(struct sc_slist);
 			}
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
+				if (uaddr == NULL) {
+					rval = str_slist_count();
+					goto ack;
+				}
 				mp->b_datap->db_type = M_COPYIN;
 				ioc->copyreq.cq_addr = uaddr;
 				ioc->copyreq.cq_size = usize;

@@ -1,9 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.30 2008-08-11 22:23:18 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.31 2009-01-16 20:25:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:25:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.31  2009-01-16 20:25:47  brian
+ - working up streams mibs and agents
+
  Revision 0.9.2.30  2008-08-11 22:23:18  brian
  - rationalization of header files
 
@@ -80,7 +84,7 @@
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.30 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.31 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/streams/strconf.h directly, include sys/strconf.h instead."
@@ -152,9 +156,11 @@ __STREAMS_EXTERN void unregister_strsync(struct fmodsw *fmod);
 __STREAMS_EXTERN int autopush_add(struct strapush *sap);
 __STREAMS_EXTERN int autopush_del(struct strapush *sap);
 __STREAMS_EXTERN int autopush_vml(struct str_mlist *smp, int nmods);
+__STREAMS_EXTERN struct strapush *autopush_next(dev_t dev);
 __STREAMS_EXTERN struct strapush *autopush_find(dev_t dev);
 __STREAMS_EXTERN struct strapush *autopush_search(const char *name, minor_t minor);
 
+__STREAMS_EXTERN int apush_lst(struct strapush *sap);
 __STREAMS_EXTERN int apush_get(struct strapush *sap);
 __STREAMS_EXTERN int apush_set(struct strapush *sap);
 __STREAMS_EXTERN int apush_vml(struct str_list *slp);
