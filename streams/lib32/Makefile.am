@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 12:54:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2009-01-16 20:25:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 12:54:03 $ by $Author: brian $
+# Last Modified $Date: 2009-01-16 20:25:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -331,7 +331,7 @@ strMIB_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS) \
 				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
 strMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
 strMIB_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-strMIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
+strMIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
 
 ## RPM_BUILD_USER
 endif
@@ -347,6 +347,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2009-01-16 20:25:48  brian
+# - working up streams mibs and agents
+#
 # Revision 0.9.2.10  2008-04-28 12:54:03  brian
 # - update file headers for release
 #

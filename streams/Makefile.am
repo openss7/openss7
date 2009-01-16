@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.159 $) $Date: 2008-11-26 12:23:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.160 $) $Date: 2009-01-16 20:25:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-26 12:23:07 $ by $Author: brian $
+# Last Modified $Date: 2009-01-16 20:25:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -608,7 +608,7 @@ strMIB_la_LDFLAGS		= -module -avoid-version \
 				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
 strMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
 strMIB_la_CFLAGS		= $(USER_CFLAGS)
-strMIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
+strMIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
 
 EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 
@@ -1120,6 +1120,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.160  2009-01-16 20:25:46  brian
+# - working up streams mibs and agents
+#
 # Revision 0.9.2.159  2008-11-26 12:23:07  brian
 # - correction for FDL update
 #

@@ -1,9 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.20 2008-08-11 22:23:18 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.21 2009-01-16 20:25:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:25:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.h,v $
+ Revision 0.9.2.21  2009-01-16 20:25:47  brian
+ - working up streams mibs and agents
+
  Revision 0.9.2.20  2008-08-11 22:23:18  brian
  - rationalization of header files
 
@@ -80,7 +84,7 @@
 #ifndef __SYS_STREAMS_SAD_H__
 #define __SYS_STREAMS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.21 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_SAD_H__
 #warning "Do not include sys/streams/sad.h directly, include sys/sad.h instead."
@@ -114,6 +118,7 @@
 #define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/**< Set autopush. */
 #define SAD_GAP		((SAD_IOC_MAGIC << 8) | 0x02)	/**< Get autopush. */
 #define SAD_VML		((SAD_IOC_MAGIC << 8) | 0x03)	/**< Validate modules. */
+#define SAD_LAP		((SAD_IOC_MAGIC << 8) | 0x04)	/**< Get next autopush. */
 
 #define SAD_SAP_SOL	((SAD_IOC_MAGIC << 8) | 0x17)	/**< Set autopush (anchor). */
 #define SAD_GAP_SOL	((SAD_IOC_MAGIC << 8) | 0x18)	/**< Get autopush (anchor). */

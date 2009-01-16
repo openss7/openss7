@@ -1,3 +1,27 @@
+2009-01-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: correct libadds
+	* doc/man/Makefile.am: add manual pages
+	* doc/man/streams.macros: change copyright statements
+	* doc/man/man4/sad.4.man: add SAD_LAP ioctl
+	* doc/man/man9/apush_get.9.man: document SAD_LAP commands
+	* doc/man/man9/autopush_find.9.man: document SAD_LAP commands
+	* include/sys/streams/sad.h: add SAD_LAP ioctl and commands
+	* include/sys/streams/strconf.h: add SAD_LAP ioctl and commands
+	* lib32/Makefile.am: correct libadds
+	* src/drivers/sad.c: add SAD_LAP ioctl and commands
+	* src/kernel/strsad.c: add SAD_LAP ioctl and commands
+	* src/modules/sc.c: correct list counts
+	* src/snmp/strExtMIB.c: work up agent
+	* src/snmp/strExtMIB.h: work up agent
+	* src/snmp/strMIB.c: work up agent
+	* src/snmp/strMIB.h: work up agent
+	* src/snmp/mibs/OPENSS7-STREAMS-EXT-MIB.mib: corrections and enhancements
+	* src/snmp/mibs/OPENSS7-STREAMS-MIB.mib: corrections and enhancements
+
+	* doc/man/man9/apush_lst.9.man: new manual page
+	* doc/man/man9/autopush_next.9.man: new manual page
+
 2009-01-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/strExtMIB.c: working up agents

@@ -1,11 +1,12 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-04-28 12:54:05 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:25:48 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:25:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsad.c,v $
+ Revision 0.9.2.56  2009-01-16 20:25:48  brian
+ - working up streams mibs and agents
+
  Revision 0.9.2.55  2008-04-28 12:54:05  brian
  - update file headers for release
 
@@ -71,10 +75,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-04-28 12:54:05 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:25:48 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-04-28 12:54:05 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:25:48 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -110,7 +114,7 @@ static char const ident[] =
 STATIC spinlock_t apush_lock = SPIN_LOCK_UNLOCKED;
 
 STATIC struct apinfo *
-__autopush_find(struct cdevsw *cdev, unsigned char minor)
+__autopush_find(struct cdevsw *cdev, minor_t minor)
 {
 	struct list_head *pos;
 	struct apinfo *api = NULL;
@@ -124,6 +128,35 @@ __autopush_find(struct cdevsw *cdev, unsigned char minor)
 		api = NULL;
 	}
 	return (api);
+}
+
+STATIC struct apinfo *
+__autopush_next(struct cdevsw *cdev, minor_t minor)
+{
+	struct list_head *pos;
+	struct apinfo *api = NULL, *ani = NULL;
+	minor_t next = minor;
+
+	ensure(cdev->d_apush.next, INIT_LIST_HEAD(&cdev->d_apush));
+	list_for_each(pos, &cdev->d_apush) {
+		api = list_entry(pos, struct apinfo, api_more);
+
+		if (minor >= api->api_sap.sap_minor && minor <= api->api_sap.sap_lastminor)
+			break;
+		if (next == minor) {
+			if (api->api_sap.sap_minor > minor) {
+				next = api->api_sap.sap_minor;
+				ani = api;
+			}
+		} else {
+			if (api->api_sap.sap_minor > minor && api->api_sap.sap_minor < next) {
+				next = api->api_sap.sap_minor;
+				ani = api;
+			}
+		}
+		api = NULL;
+	}
+	return (api ?: ani);
 }
 
 STATIC int
@@ -170,6 +203,32 @@ __autopush_del(struct cdevsw *cdev, struct strapush *sap)
       error:
 	return (err);
 }
+
+streams_fastcall struct strapush *
+autopush_next(dev_t dev)
+{
+	unsigned long flags;
+	struct cdevsw *cdev;
+	struct apinfo *api = NULL;
+
+	cdev = cdrv_get(getmajor(dev));
+	if (cdev == NULL)
+		goto notfound;
+	_printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+	/* XXX: do these locks have to be so severe? */
+	streams_spin_lock(&apush_lock, flags);
+	if ((api = __autopush_next(cdev, getminor(dev))) != NULL)
+		ap_get(api);
+	streams_spin_unlock(&apush_lock, flags);
+	_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+	_ctrace(sdev_put(cdev));
+      notfound:
+	return ((struct strapush *) api);
+}
+
+#if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
+EXPORT_SYMBOL_GPL(autopush_next);
+#endif
 
 streams_fastcall struct strapush *
 autopush_find(dev_t dev)
@@ -395,6 +454,59 @@ apush_set(struct strapush *sap)
 }
 
 EXPORT_SYMBOL(apush_set);
+
+streams_fastcall int
+apush_lst(struct strapush *sap)
+{
+	if (sap != NULL) {
+		struct strapush *ap;
+		struct cdevsw *cdev;
+		unsigned long flags;
+
+		if (sap->sap_module[0] == '\0')
+			if (sap->sap_major == 0
+			    || sap->sap_major != getmajor(makedevice(sap->sap_major, 0))) {
+				_ptrace(("Error path taken! EINVAL\n"));
+				goto einval;
+			}
+		if (sap->sap_minor != getminor(makedevice(0, sap->sap_minor))) {
+			_ptrace(("Error path taken! EINVAL\n"));
+			goto einval;
+		}
+		if (sap->sap_module[0] == '\0')
+			cdev = sdev_get(sap->sap_major);
+		else
+			cdev = cdev_find(sap->sap_module);
+		if (cdev == NULL) {
+			_ptrace(("Error path taken! ENOSTR\n"));
+			goto enostr;
+		}
+		_printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+		streams_spin_lock(&apush_lock, flags);
+		if ((ap = (struct strapush *) __autopush_next(cdev, sap->sap_minor)))
+			ap_get((struct apinfo *) ap);
+		streams_spin_unlock(&apush_lock, flags);
+		if (ap) {
+			*sap = *ap;
+			ap_put((struct apinfo *) ap);
+		}
+		_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+		_ctrace(sdev_put(cdev));
+		if (!ap) {
+			_ptrace(("Error path taken! ENODEV\n"));
+			goto enodev;
+		}
+		return (0);
+	}
+      einval:
+	return (-EINVAL);
+      enostr:
+	return (-ENOSTR);
+      enodev:
+	return (-ENODEV);
+}
+
+EXPORT_SYMBOL(apush_lst);	/* strconf.h LfS specific */
 
 streams_fastcall int
 apush_get(struct strapush *sap)

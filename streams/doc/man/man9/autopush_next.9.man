@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: autopush_find.9.man,v 0.9.2.19 2009-01-16 20:25:47 brian Exp $
+.\" @(#) $Id: autopush_next.9.man,v 0.9.2.1 2009-01-16 20:25:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -59,18 +59,9 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: autopush_find.9.man,v $
-.\" Revision 0.9.2.19  2009-01-16 20:25:47  brian
+.\" $Log: autopush_next.9.man,v $
+.\" Revision 0.9.2.1  2009-01-16 20:25:47  brian
 .\" - working up streams mibs and agents
-.\"
-.\" Revision 0.9.2.18  2008-12-16 08:31:04  brian
-.\" - do not truncate keys to 6 chars
-.\"
-.\" Revision 0.9.2.17  2008-04-28 12:53:48  brian
-.\" - update file headers for release
-.\"
-.\" Revision 0.9.2.16  2006/04/05 09:44:09  brian
-.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
 .R1
@@ -89,12 +80,12 @@ search-truncate 40
 .so streams.macros
 .\"
 .\"
-.TH AUTOPUSH_FIND 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH AUTOPUSH_NEXT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B autopush_find
-\- finds an autopush list entry for a given \fISTREAMS\fP device number
+.B autopush_next
+\- finds the next autopush list entry for a given \fISTREAMS\fP device number
 .\"
 .\"
 .SH SYNOPSIS
@@ -105,7 +96,7 @@ search-truncate 40
 .br
 .B #include <sys/sad.h>
 .HP
-.BI "struct strapush *autopush_find(struct cdevsw *" cdev ", minor_t " minor );
+.BI "struct strapush *autopush_next(struct cdevsw *" cdev ", minor_t " minor );
 .\"
 .\"
 .SH ARGUMENTS
@@ -127,10 +118,10 @@ implementation extension.
 .\"
 .SH DESCRIPTION
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 performs the same function within the kernel as is provided to user space via
 the
-.B SAD_GAP
+.B SAD_LAP
 IO control to the
 .BR sad (4)
 .I STREAMS
@@ -168,6 +159,10 @@ The first character minor device number in a range associated with the
 \fISTREAMS\fP device to which this autopush list belongs.  This value will be
 less than or equal to the
 .I minor
+argument, unless there is no specification that spans the
+.I minor
+argument, in which case this value will be greater than the
+.I minor
 argument.
 .TP
 .I sap_lastminor
@@ -189,14 +184,14 @@ module names representing the module autopush list.
 .\"
 .\"
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 is useful along with
 .BR autopush_add (9)
 and
 .BR autopush_del (9)
 when registering \fISTREAMS\fP character devices with
 .BR register_strdev (9).
-.BR autopush_find ()
+.BR autopush_next ()
 permits a kernel module to find the autopush list within a
 .BR cdevsw
 table entry.
@@ -204,11 +199,11 @@ table entry.
 .\"
 .SH USAGE
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 is a
 .BR "@PACKAGE_TITLE@" -specific
 function.
-.BR autopush_find ()
+.BR autopush_next ()
 should not be used by portable
 .I STREAMS
 drivers or modules.  Instead, the
@@ -222,36 +217,36 @@ should be used instead.
 .SH RETURN
 .PP
 Upon success,
-.BR autopush_find ()
+.BR autopush_next ()
 returns a pointer to the
 .B strapush
 structure describing the autopush list for the requested \fISTREAMS\fP device.
 Upon failure,
-.BR autopush_find ()
+.BR autopush_next ()
 returns
 .BR NULL .
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 fails and returns
 .B NULL
 when the autopush list associated with
 .I cdev
-is empty, or does not contain an entry for the character minor device number
+is empty, or does not contain an entry for (nor beyond) the character minor device number
 .IR minor .
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 can only be called from process context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 is MP-safe.  The caller is responsible to ensure exclusive access to the
 passed in
 .B cdevsw
@@ -261,7 +256,7 @@ structure
 .\"
 .SH NOTICES
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 simply locates the
 .B strapush
 structure associated with the
@@ -284,13 +279,13 @@ modules loaded as a side-effect of the lookup.
 .\"
 .SH BUGS
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 is a
 .B @PACKAGE_TITLE@
 .[
@@ -305,7 +300,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 is a
 .B @PACKAGE_TITLE@
 .[
@@ -318,7 +313,7 @@ drivers and modules.
 .\"
 .SH HISTORY
 .PP
-.BR autopush_find ()
+.BR autopush_next ()
 is new for
 .BR "@PACKAGE_TITLE@" .
 .[

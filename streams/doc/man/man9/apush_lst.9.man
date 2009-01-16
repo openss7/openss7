@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: apush_get.9.man,v 0.9.2.24 2009-01-16 20:25:47 brian Exp $
+.\" @(#) $Id: apush_lst.9.man,v 0.9.2.1 2009-01-16 20:25:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -59,18 +59,9 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: apush_get.9.man,v $
-.\" Revision 0.9.2.24  2009-01-16 20:25:47  brian
+.\" $Log: apush_lst.9.man,v $
+.\" Revision 0.9.2.1  2009-01-16 20:25:47  brian
 .\" - working up streams mibs and agents
-.\"
-.\" Revision 0.9.2.23  2008-12-16 08:31:04  brian
-.\" - do not truncate keys to 6 chars
-.\"
-.\" Revision 0.9.2.22  2008-04-28 12:53:47  brian
-.\" - update file headers for release
-.\"
-.\" Revision 0.9.2.21  2006/04/05 09:44:06  brian
-.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
 .R1
@@ -89,12 +80,12 @@ search-truncate 40
 .so streams.macros
 .\"
 .\"
-.TH APUSH_GET 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH APUSH_LST 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B apush_get
-\- get the autopush list associated with a \fISTREAMS\fP driver
+.B apush_lst
+\- list the next autopush list associated with a \fISTREAMS\fP driver
 .\"
 .\"
 .SH SYNOPSIS
@@ -107,7 +98,7 @@ search-truncate 40
 .br
 .B #include <sys/sad.h>
 .HP
-.BI "int apush_get(struct strapush *" sap );
+.BI "int apush_lst(struct strapush *" sap );
 .\"
 .\"
 .SH ARGUMENTS
@@ -128,8 +119,8 @@ implementation specific.
 .\"
 .SH DESCRIPTION
 .PP
-.BR apush_get ()
-gets the autopush list associated with the \fISTREAMS\fP character device
+.BR apush_lst ()
+gets the next autopush list associated with the \fISTREAMS\fP character device
 specified in
 .IR sap->sap_major " and " sap->sap_minor
 from the module list in the passed in
@@ -168,7 +159,11 @@ special device for which to get the list of autopush modules.  On successful
 return, this value indicates the first minor device number in the range of
 minor device numbers for which the passed in
 .I sap_minor
-belongs.
+belongs, or which is greater than the passed in
+.I sap_minor
+when an autopush specification for
+.I sap_minor
+does not exist.
 .TP
 .I sap_lastminor
 ignored on call and on return indicates the last minor device number in the
@@ -187,28 +182,28 @@ the list of the returned names of autopush modules.
 .\"
 .SH USAGE
 .PP
-.BR apush_get ()
+.BR apush_lst ()
 is functionally equivalent to the
-.BR SAD_GAP
+.BR SAD_LAP
 input-output control to the
 .BR sad (4)
 driver.
 The
-.BR apush_get ()
-function is a useful way for a driver or module to manipulate the autopush
+.BR apush_lst ()
+function is a useful way for a driver or module to interrogate the autopush
 list associated with a \fISTREAMS\fP driver.
 .\"
 .\"
 .SH RETURN
 .PP
 Upon success,
-.BR apush_get ()
+.BR apush_lst ()
 returns zero (0) and the completed
 .B strapush
 structure pointed to by
 .IR sap .
 Upon failure,
-.BR apush_get ()
+.BR apush_lst ()
 leaves the
 .B strapush
 pointed to by
@@ -219,7 +214,7 @@ structure unchanged and returns a negative error number.
 .SH ERRORS
 .PP
 Upon failure,
-.BR apush_get ()
+.BR apush_lst ()
 returns one of the following negative error numbers:
 .TP \w'[EWOULDBLOCK]'u
 .RB [ EINVAL ]
@@ -235,7 +230,7 @@ successfully loaded.
 .\"
 .SH CONTEXT
 .PP
-.BR apush_get ()
+.BR apush_lst ()
 can be called from any blocking context, including user context and queue
 .IR qi_qopen (9)
 and
@@ -247,7 +242,7 @@ routines.
 .\"
 .SH MP-STREAMS
 .PP
-.BR apush_get ()
+.BR apush_lst ()
 is MP-safe.
 The caller must ensure exclusive access to the passed in
 .B strapush
@@ -256,9 +251,9 @@ structure.
 .\"
 .SH NOTICES
 .PP
-.BR apush_get ()
+.BR apush_lst ()
 is an
-.IR LiS -specific
+.IR LfS -specific
 function.
 This symbol is exported primarily in support of the
 .I STREAMS Compatibiltiy Modules
@@ -279,18 +274,18 @@ package,
 .\".BR CONFIG_STREAMS_LIS_COMPAT
 .\"defined.
 .\".PP
-.\".BR apush_get ()
+.\".BR apush_lst ()
 .\"should not be used by portable
 .\".I STREAMS
 .\"drivers and modules.
 .PP
-.BR apush_get ()
+.BR apush_lst ()
 is an internal implementation specific function, and will not be used directly by portable
 .I STREAMS
 drivers and modules.
 .PP
 Calling
-.BR apush_get ()
+.BR apush_lst ()
 has the kernel module side-effect that if a \fISTREAMS\fP device associated
 with
 .I sap->sap_major
@@ -323,27 +318,27 @@ autopush modules in the list.
 .\"
 .SH BUGS
 .PP
-.BR apush_get ()
+.BR apush_lst ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR apush_get ()
+.BR apush_lst ()
 is compatible with
-.IR LiS ,
+.IR LfS ,
 .[
-LiS
+LfS
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .\"Symbol
 .\".BR lis_apush_get ()
-.\"is provided for compatibility with LiS.  See
+.\"is provided for compatibility with LfS.  See
 .\".BR liscompat (9).
 .\".BR lis_apush_get ()
 .\"simply calls
-.\".BR apush_get ()
+.\".BR apush_lst ()
 .\"directly.
 .\".IP \(em
 .I SVR 4.2 MP DDI/DKI
@@ -371,9 +366,9 @@ svr42
 .RI ( STREAMS
 Administrative Driver).  See
 .BR sad (4).
-.BR apush_get ()
+.BR apush_lst ()
 is provided only for compatibility with
-.IR LiS ,
+.IR LfS ,
 and is not subject to standardization.
 For the
 .B "@PACKAGE_TITLE@"
@@ -381,15 +376,15 @@ For the
 @PACKAGE_TITLE@
 .]
 specific function, see
-.BR autopush_find (9).
+.BR autopush_next (9).
 .\"
 .\"
 .SH HISTORY
 .\".PP
 .\".BR lis_apush_get ()
-.\"is an LiS-specific function.
+.\"is an LfS-specific function.
 .PP
-.BR apush_get ()
+.BR apush_lst ()
 is specific to
 .BR "@PACKAGE_TITLE@" .
 .[
@@ -402,3 +397,4 @@ $LIST$
 .]
 .TI
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+
