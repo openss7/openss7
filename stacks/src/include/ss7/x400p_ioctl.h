@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x400p_ioctl.h,v 0.9.2.1 2009-01-14 14:29:56 brian Exp $
+ @(#) $Id: x400p_ioctl.h,v 0.9.2.2 2009-01-16 20:44:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-14 14:29:56 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:44:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400p_ioctl.h,v $
+ Revision 0.9.2.2  2009-01-16 20:44:50  brian
+ - updating mibs and agents
+
  Revision 0.9.2.1  2009-01-14 14:29:56  brian
  - working up agents
 
@@ -60,14 +63,14 @@
 #ifndef __X400P_IOCTL_H__
 #define __X400P_IOCTL_H__
 
-#ident "@(#) $RCSfile: x400p_ioctl.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: x400p_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed by doxygen(1). */
 
 #include <linux/ioctl.h>
 #include <sys/smi_ioctl.h>
 
-#define MX_IOC_MAGIC	'x'
+#define MX_IOC_MAGIC	'c'
 
 #define MX_OBJ_TYPE_DFLT	0	/* defaults */
 #define MX_OBJ_TYPE_SYNC	1	/* synchronization group */
@@ -343,7 +346,9 @@ typedef struct mx_option {
  *
  * Configures the object (creates, destroys, moves).  These actions require
  * reconfiguration of the object and a change in its relationship to other
- * objects.
+ * objects.  Also, this structure contains information that must be specified
+ * during creation of the object.  Each structure can optionally be followed by
+ * an options structure to specify the options during creation.
  */
 struct mx_conf_dflt {
 };
@@ -353,7 +358,7 @@ struct mx_conf_sync {
 };
 struct mx_conf_card {
 	uint mxCardIndex;
-	uint mxCardSpanType; /* affects configuration of spans */
+	uint mxCardSpanType;		/* affects configuration of spans */
 #define MXCARDSPANTYPE_NONE		1
 #define MXCARDSPANTYPE_T1		2
 #define MXCARDSPANTYPE_E1		3
@@ -364,7 +369,7 @@ struct mx_conf_span {
 	uint mxCardIndex;
 	uint mxSpanIndex;
 	char mxSpanName[32];
-	uint mxSpanType; /* affects configuration of channels */
+	uint mxSpanType;		/* affects configuration of channels */
 #define MXSPANTYPE_NONE			0
 #define MXSPANTYPE_T1			1
 #define MXSPANTYPE_E1			2
@@ -429,6 +434,7 @@ union mx_config_obj {
 	struct mx_conf_xcon xcon;
 	struct mx_conf_bert bert;
 };
+
 #define MX_GET		0	/* get options or configuration */
 #define MX_ADD		1	/* add configuration */
 #define MX_CHA		2	/* set options or change configuration */
@@ -730,6 +736,7 @@ union mx_notify_obj {
 	struct mx_notify_xcon xcon;
 	struct mx_notify_bert bert;
 };
+
 #define MX_SYNCTRANSITION		(1<< 0)
 #define MX_LOOPUP			(1<< 1)
 #define MX_LOOPDOWN			(1<< 2)
@@ -754,7 +761,112 @@ typedef struct mx_notify {
 #define MX_IOCCNOTIFY	_IOWR(MX_IOC_MAGIC,	19, mx_notify_t)	/* clear */
 
 /*
+ * ATTRIBUTES
+ *
+ * Provides a structure that contains all of the other information structures
+ * pertaining to an object.  This is the total view of the object.  This 
+ * structure can only be read and cannot be used to reconfigure or change
+ * options associated with an object.  This structure is primarily for the
+ * convenience of management agents so that it is possible to atomically read
+ * all of the attributes associated with an object.
+ */
+struct mx_attr_dflt {
+	struct mx_conf_dflt config;
+	struct mx_opt_conf_dflt option;
+	struct mx_info_dflt inform;
+	struct mx_statem_dflt statem;
+	struct mx_status_dflt status;
+	struct mx_stats_dflt stats;
+	struct mx_notify_dflt events;
+};
+struct mx_attr_sync {
+	struct mx_conf_sync config;
+	struct mx_opt_conf_sync option;
+	struct mx_info_sync inform;
+	struct mx_statem_sync statem;
+	struct mx_status_sync status;
+	struct mx_stats_sync stats;
+	struct mx_notify_sync events;
+};
+struct mx_attr_card {
+	struct mx_conf_card config;
+	struct mx_opt_conf_card option;
+	struct mx_info_card inform;
+	struct mx_statem_card statem;
+	struct mx_status_card status;
+	struct mx_stats_card stats;
+	struct mx_notify_card events;
+};
+struct mx_attr_span {
+	struct mx_conf_span config;
+	struct mx_opt_conf_span option;
+	struct mx_info_span inform;
+	struct mx_statem_span statem;
+	struct mx_status_span status;
+	struct mx_stats_span stats;
+	struct mx_notify_span events;
+};
+struct mx_attr_chan {
+	struct mx_conf_chan config;
+	struct mx_opt_conf_chan option;
+	struct mx_info_chan inform;
+	struct mx_statem_chan statem;
+	struct mx_status_chan status;
+	struct mx_stats_chan stats;
+	struct mx_notify_chan events;
+};
+struct mx_attr_frac {
+	struct mx_conf_frac config;
+	struct mx_opt_conf_frac option;
+	struct mx_info_frac inform;
+	struct mx_statem_frac statem;
+	struct mx_status_frac status;
+	struct mx_stats_frac stats;
+	struct mx_notify_frac events;
+};
+struct mx_attr_xcon {
+	struct mx_conf_xcon config;
+	struct mx_opt_conf_xcon option;
+	struct mx_info_xcon inform;
+	struct mx_statem_xcon statem;
+	struct mx_status_xcon status;
+	struct mx_stats_xcon stats;
+	struct mx_notify_xcon events;
+};
+struct mx_attr_bert {
+	struct mx_conf_bert config;
+	struct mx_opt_conf_bert option;
+	struct mx_info_bert inform;
+	struct mx_statem_bert statem;
+	struct mx_status_bert status;
+	struct mx_stats_bert stats;
+	struct mx_notify_bert events;
+};
+union mx_attr_obj {
+	struct mx_attr_dflt dflt;
+	struct mx_attr_sync sync;
+	struct mx_attr_card card;
+	struct mx_attr_span span;
+	struct mx_attr_chan chan;
+	struct mx_attr_frac frac;
+	struct mx_attr_xcon xcon;
+	struct mx_attr_bert bert;
+};
+typedef struct mx_attr {
+	uint type;			/* object type */
+	uint id;			/* object identifier */
+	uint cmd;			/* command */
+	/* followed by object-specific structure */
+	union mx_attr_obj attrs[0];
+} mx_attr_t;
+
+#define	MX_IOCGATTR	_IOWR(MX_IOC_MAGIC,	20, mx_attr_t)	/* get attributes */
+
+/*
  * MANAGEMENT
+ *
+ * Provides specific and defined management actions that can be affected on
+ * objects.
  */
 struct mx_action_dflt {
 };
@@ -787,7 +899,6 @@ union mx_action_obj {
 #define MX_TST_FBIT		 2
 #define MX_TST_SPAN		 3
 #define MX_TST_CHANNELS		 4
-
 typedef struct mx_mgmt {
 	uint type;			/* object type */
 	uint id;			/* object identifier */
@@ -796,10 +907,14 @@ typedef struct mx_mgmt {
 	union mx_action_obj action[0];
 } mx_mgmt_t;
 
-#define MX_IOCCMGMT	_IOWR(MX_IOC_MAGIC,	20, mx_mgmt_t)	/* command */
+#define MX_IOCCMGMT	_IOWR(MX_IOC_MAGIC,	21, mx_mgmt_t)	/* command */
 
 /*
  * PASS LOWER
+ *
+ * This structure is deprecated and as largely used for testing as a mechanism
+ * to bypass an input-output control to a stream linked under a multiplexing
+ * driver supporting this interface.
  */
 typedef struct mx_pass {
 	int muxid;			/* mux index of lower stream */
@@ -810,10 +925,10 @@ typedef struct mx_pass {
 	/* followed by ctrl and data part of message to pass */
 } mx_pass_t;
 
-#define MX_IOCCPASS	_IOWR(MX_IOC_MAGIC,	21, mx_pass_t)	/* pass */
+#define MX_IOCCPASS	_IOWR(MX_IOC_MAGIC,	22, mx_pass_t)	/* pass */
 
 #define MX_IOC_FIRST	0
-#define MX_IOC_LAST	21
+#define MX_IOC_LAST	22
 #define MX_IOC_PRIVATE	32
 
 #endif				/* __X400P_IOCTL_H__ */

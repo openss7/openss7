@@ -1,15 +1,14 @@
-This is /home/brian/os8/stacks/doc/specs/sccpi/sccpi.info, produced by makeinfo
-version 4.13 from /home/brian/os8/stacks/doc/specs/sccpi/sccpi.texi.
-
 INFO-DIR-SECTION OpenSS7
 START-INFO-DIR-ENTRY
+This is /home/brian/os8/stacks/doc/specs/sccpi/sccpi.info, produced by makeinfo version 4.11 from /home/brian/os8/stacks/doc/specs/sccpi/sccpi.texi.
+
 * SCCPI: (sccpi).		Signalling Connection Control Part Interface
 END-INFO-DIR-ENTRY
 
 This file documents the OpenSS7 Signalling Connection Control Part Interface
 (SCCPI).
 
-This is Edition 0.9a, last updated 2008-12-29, for OpenSS7 SS7 Stack version
+This is Edition 0.9a, last updated 2009-01-16, for OpenSS7 SS7 Stack version
 0.9a release 8.20081103 published by OpenSS7 Corporation
 (http://www.openss7.com/).
 
@@ -174,6 +173,7 @@ for a current version.
 
 Only the texinfo or roff source is controlled.  A printed (or postscript)
 version of this document is an *UNCONTROLLED VERSION*.
+
 
 $Log: sccpi.texi,v $
 Revision 0.9.2.3  2008-12-20 12:55:39  brian
@@ -966,6 +966,7 @@ tables.
 .......
 
 This primitive consits of one `M_PCPROTO' message block, structured as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_INFO_REQ */
      } N_info_req_t;
@@ -1015,6 +1016,7 @@ primitive described above.
 .......
 
 This primitive consists of one `M_PCPROTO' message block, structured as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_INFO_ACK */
              np_ulong NSDU_size;             /* maximum NSDU size */
@@ -1201,6 +1203,7 @@ outstanding by the NS provider for the specified NS user entity being bound.
 .......
 
 This primitive consists of one `M_PROTO' message block, structured as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_BIND_REQ */
              np_ulong ADDR_length;           /* length of address */
@@ -1351,6 +1354,7 @@ specified network address.
 
 This primitives consists of one `M_PCPROTO' message block, structured as
 follows:
+
      typedef struct {
          np_ulong PRIM_type;        /* always N_BIND_ACK */
          np_ulong ADDR_length;      /* address length */
@@ -1465,6 +1469,7 @@ previously bound to the network address.
 .......
 
 This primitives consists of one `M_PROTO' message block, structured as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_UNBIND_REQ */
      } N_unbind_req_t;
@@ -1517,6 +1522,7 @@ with the Stream.
 .......
 
 These primitives consists of one `M_PROTO' message block, structured as follows:
+
      typedef struct {
          np_ulong PRIM_type;			/* always N_OPTMGMT_REQ */
          np_ulong QOS_length;		/* length of QOS parameter values */
@@ -1609,6 +1615,7 @@ the user that no action was taken on the primitive that caused the error.
 
 This primitives consists of one `M_PCPROTO' message block, structured as
 follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_ERROR_ACK */
              np_ulong ERROR_prim;            /* primitive in error */
@@ -1707,6 +1714,7 @@ that have no other means of confirmation.
 
 This primitives consists of one `M_PCPROTO' message block, structured as
 follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_OK_ACK */
              np_ulong CORRECT_prim;          /* primitive being acknowledged */
@@ -1811,6 +1819,7 @@ N_INFO_ACK::).  If the user does not specify QOS parameter values, the default
 values (specified via `N_OPTMGMT_REQ') are used by the NS provider.
 
 The structure of the `M_PROTO' message block is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_CONN_REQ */
              np_ulong DEST_length;           /* destination address length */
@@ -1930,6 +1939,7 @@ present if the corresponding `N_CONN_RES' had an NS user data parameter
 specified, and their data will be identical.
 
 The structure of the `M_PROTO' message block is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_CONN_IND */
              np_ulong DEST_length;           /* destination address length */
@@ -2032,6 +2042,7 @@ The NS user can send any integral number of octets of data within the range
 supported by the NS provider.
 
 The structure of the `M_PROTO' block is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_CONN_RES */
              np_ulong TOKEN_value;           /* NC response token value */
@@ -2179,6 +2190,7 @@ only be present if the corresponding `N_CONN_RES' had NS user data specified
 with it, and their data will always be identical.
 
 The structure of the `M_PROTO' message block is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_CONN_CON */
              np_ulong RES_length;            /* responding address length */
@@ -2310,6 +2322,7 @@ The following guidelines must be followed with respect to the use of the
           needs to be overridden.
 
 The structure of the `M_PROTO' message block, if present, is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_DATA_REQ */
              np_ulong DATA_xfer_flags;       /* data transfer flags */
@@ -2411,6 +2424,7 @@ the NS user data field is always the same as that supplied in the corresponding
 message blocks is optional (see guidelines under *note N_DATA_REQ::).
 
 The structure of the `M_PROTO' message block, if present, is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_DATA_IND */
              np_ulong DATA_xfer_flags;       /* data transfer flags */
@@ -2499,6 +2513,7 @@ confirmation parameter set.
 
 The format of the primitive is one `M_PROTO' message block, structured as
 follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_DATACK_REQ */
      } N_datack_req_t;
@@ -2556,6 +2571,7 @@ that had previously been sent with the receipt confirmation set.
 
 The format of the primitive is one `M_PROTO' message block, structured as
 follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_DATACK_IND */
      } N_datack_ind_t;
@@ -2625,6 +2641,7 @@ octets of data within the range supported by the NS provider (*note
 N_INFO_ACK::).
 
 The structure of the `M_PROTO' message block is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_EXDATA_REQ */
      } N_exdata_req_t;
@@ -2691,6 +2708,7 @@ blocks is identical to that supplied with the corresponding `N_EXDATA_REQ'
 primitive.
 
 The structure of the `M_PROTO' message block is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_EXDATA_IND */
      } N_exdata_ind_t;
@@ -2754,6 +2772,7 @@ connection.
 
 The format of this primitive is one `M_PROTO' message block, structured as
 follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_RESET_REQ */
              np_ulong RESET_reason;          /* reason for reset */
@@ -2816,6 +2835,7 @@ network connection has been reset.
 .......
 
 The format of the message is one `M_PROTO' message block, structured as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_RESET_IND */
              np_ulong RESET_orig;            /* reset originator */
@@ -2858,6 +2878,7 @@ request.
 
 The format of the primitive is one `M_PROTO' message block and is structured as
 follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_RESET_RES */
      } N_reset_res_t;
@@ -2920,6 +2941,7 @@ initiated the reset even before receiving a `N_RESET_RES'.
 
 The format of the primitive is one `M_PROTO' message block, structured as
 follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_RESET_CON */
      } N_reset_con_t;
@@ -2955,6 +2977,7 @@ File: sccpi.info,  Node: Inform Service,  Next: Network Connection Release Phase
 
 4.2.6.2 Format
 ..............
+
 
      #define N_INFORM_REQ    33
      typedef struct {
@@ -3006,6 +3029,7 @@ The new state remains unchanged.
 
 4.2.6.4 Format
 ..............
+
 
      #define N_INFORM_IND    34
      typedef struct {
@@ -3098,6 +3122,7 @@ an NS user.  The NS user may send any integral number of octets of data within
 a range supported by the NS provider (*note N_INFO_ACK::).
 
 The structure of the `M_PROTO' message block is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_DISCON_REQ */
              np_ulong DISCON_reason;         /* reason */
@@ -3192,6 +3217,7 @@ parameter is present only if the originator parameter indicates that the
 release was initiated by the NS user.
 
 The structure of the `M_PROTO' message block is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_DISCON_IND */
              np_ulong DISCON_orig;           /* originator */
@@ -3294,6 +3320,7 @@ specified destination.
 The format of the primitive is one `M_PROTO' message block followed by one or
 more `M_DATA' message blocks.  The `M_PROTO' message block is structured as
 followed:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_UNITDATA_REQ */
              np_ulong DEST_length;           /* destination address length */
@@ -3337,8 +3364,8 @@ receipt of this primitive:
      responsibility of the NS provider to report it with the `N_UDERROR_IND'
      primitive.  The following non-fatal error codes are allowed:
      `[NBADADDR]'     The network address as specified in the primitive
-                     was in an incorrect format, or the address
-                     contained illegal information.
+                     was in an incorrect format, or the address contained
+                     illegal information.
      `[NBADDATA]'     The amount of user data specified was outside the
                      range supported by the NS provider.
      `[NOUTSTATE]'    The primitive was issued from an invalid state.
@@ -3352,10 +3379,9 @@ receipt of this primitive:
                         -- The network service interface was found to be
                           in an incorrect state.
                      
-                        -- The amount of NS user data associated with
-                          the primitive defines a network service data
-                          unit larger than that allowed by the NS
-                          provider.
+                        -- The amount of NS user data associated with the
+                          primitive defines a network service data unit
+                          larger than that allowed by the NS provider.
 
 File: sccpi.info,  Node: N_UNITDATA_IND
 
@@ -3374,6 +3400,7 @@ the specified source address.
 The format of the message is one `M_PROTO' message block followed by one or
 more `M_DATA' message blocks containing at least one byte of data.  The format
 of the `M_PROTO' is as follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_UNITDATA_IND */
              np_ulong SRC_length;            /* source address length */
@@ -3434,6 +3461,7 @@ destination address and QOS parameters has resulted in an error condition.
 
 The format of the primitive is one `M_PROTO' message block, structured as
 follows:
+
      typedef struct {
              np_ulong PRIM_type;             /* always N_UDERROR_IND */
              np_ulong DEST_length;           /* destination address length */
@@ -3483,6 +3511,7 @@ returned due to an error.
 
 The format of the mssage is one `M_PROTO' message block followed by one or more
 `M_DATA' message blocks (containing the originalling sent NS user data).
+
      #define N_NOTICE_IND    32
      typedef struct {
              np_ulong PRIM_type;             /* always N_NOTICE_IND */
@@ -3620,6 +3649,7 @@ File: sccpi.info,  Node: SCCP Status Service,  Next: SCCP PC Status Service,  Up
  Format
 .......
 
+
      #define N_STATE_REQ     39
      typedef struct {
              np_ulong PRIM_type;             /* always N_STATE_REQ */
@@ -3668,6 +3698,7 @@ receipt of this primitive:
 
 The format of the message is one `M_PCPROTO' message block.  The structure of
 the `M_PCPROTO' message block is as follows:
+
      #define N_STATE_IND     40
      typedef struct {
              np_ulong PRIM_type;             /* always N_STATE_IND */
@@ -3718,6 +3749,7 @@ inaccessibility of remote SCCP-User at the affected signalling point.
 
 The format of the message is one `M_PROTO' message block.  The structure of the
 `M_PROTO' message block is as follows:
+
      #define N_PCSTATE_IND   41
      typedef struct {
              np_ulong PRIM_type;             /* always N_PCSTATE_IND */
@@ -3757,6 +3789,7 @@ File: sccpi.info,  Node: SCCP Coordination Service,  Prev: SCCP PC Status Servic
  Format
 .......
 
+
      #define N_COORD_REQ     35
      typedef struct {
              np_ulong PRIM_type;             /* alwyas N_COORD_REQ */
@@ -3792,6 +3825,7 @@ receipt of this primitive:
  Format
 .......
 
+
      #define N_COORD_IND     37
      typedef struct {
              np_ulong PRIM_type;             /* alwyas N_COORD_IND */
@@ -3824,6 +3858,7 @@ SMI               Indicates the subsystem multiplicity indicator.
 
  Format
 .......
+
 
      #define N_COORD_RES     36
      typedef struct {
@@ -3865,6 +3900,7 @@ receipt of this primitive:
 
  Format
 .......
+
 
      #define N_COORD_CON     38
      typedef struct {
@@ -5433,72 +5469,72 @@ File: sccpi.info,  Node: Index,  Prev: References,  Up: Top
                                                                       (line   6)
 * N_BIND_ACK <1>:                        N_BIND_ACK.                  (line   9)
 * N_BIND_ACK:                            Local Management Services.   (line  51)
-* N_bind_ack_t:                          N_BIND_ACK.                  (line  29)
+* N_bind_ack_t:                          N_BIND_ACK.                  (line  30)
 * N_BIND_REQ <1>:                        N_BIND_REQ.                  (line   9)
 * N_BIND_REQ:                            Local Management Services.   (line  46)
-* N_bind_req_t:                          N_BIND_REQ.                  (line  32)
+* N_bind_req_t:                          N_BIND_REQ.                  (line  33)
 * N_CONN_CON <1>:                        N_CONN_CON.                  (line   9)
 * N_CONN_CON:                            Connection Oriented Services.
                                                                       (line 101)
-* N_conn_con_t:                          N_CONN_CON.                  (line  34)
+* N_conn_con_t:                          N_CONN_CON.                  (line  35)
 * N_CONN_IND:                            N_CONN_IND.                  (line   9)
-* N_conn_ind_t:                          N_CONN_IND.                  (line  35)
+* N_conn_ind_t:                          N_CONN_IND.                  (line  36)
 * N_CONN_REQ <1>:                        N_CONN_REQ.                  (line   9)
 * N_CONN_REQ:                            Connection Oriented Services.
                                                                       (line  94)
-* N_conn_req_t:                          N_CONN_REQ.                  (line  35)
+* N_conn_req_t:                          N_CONN_REQ.                  (line  36)
 * N_CONN_RES:                            N_CONN_RES.                  (line   9)
-* N_conn_res_t:                          N_CONN_RES.                  (line  34)
-* N_COORD_CON <1>:                       SCCP Coordination Service.   (line 121)
+* N_conn_res_t:                          N_CONN_RES.                  (line  35)
+* N_COORD_CON <1>:                       SCCP Coordination Service.   (line 124)
 * N_COORD_CON:                           SCCP Provider Management Services.
                                                                       (line  38)
-* N_coord_con_t:                         SCCP Coordination Service.   (line 124)
-* N_COORD_IND <1>:                       SCCP Coordination Service.   (line  47)
+* N_coord_con_t:                         SCCP Coordination Service.   (line 127)
+* N_COORD_IND <1>:                       SCCP Coordination Service.   (line  48)
 * N_COORD_IND:                           SCCP Provider Management Services.
                                                                       (line  36)
-* N_coord_ind_t:                         SCCP Coordination Service.   (line  50)
+* N_coord_ind_t:                         SCCP Coordination Service.   (line  51)
 * N_COORD_REQ <1>:                       SCCP Coordination Service.   (line  12)
 * N_COORD_REQ:                           SCCP Provider Management Services.
                                                                       (line  29)
 * N_coord_req_t:                         SCCP Coordination Service.   (line  15)
-* N_COORD_RES <1>:                       SCCP Coordination Service.   (line  80)
+* N_COORD_RES <1>:                       SCCP Coordination Service.   (line  82)
 * N_COORD_RES:                           SCCP Provider Management Services.
                                                                       (line  31)
-* N_coord_res_t:                         SCCP Coordination Service.   (line  83)
+* N_coord_res_t:                         SCCP Coordination Service.   (line  85)
 * N_DATA_IND <1>:                        N_DATA_IND.                  (line   9)
 * N_DATA_IND:                            Connection Oriented Services.
                                                                       (line 128)
 * N_DATA_REQ <1>:                        N_DATA_REQ.                  (line   9)
 * N_DATA_REQ:                            Connection Oriented Services.
                                                                       (line 122)
-* N_data_req_t:                          N_DATA_REQ.                  (line  62)
+* N_data_req_t:                          N_DATA_REQ.                  (line  63)
 * N_DATACK_IND:                          N_DATACK_IND.                (line   9)
-* N_datack_ind_t:                        N_DATACK_IND.                (line  22)
+* N_datack_ind_t:                        N_DATACK_IND.                (line  23)
 * N_DATACK_REQ:                          N_DATACK_REQ.                (line   9)
-* N_datack_req_t:                        N_DATACK_REQ.                (line  22)
+* N_datack_req_t:                        N_DATACK_REQ.                (line  23)
 * N_DISCON_IND:                          N_DISCON_IND.                (line   9)
-* N_discon_ind_t:                        N_DISCON_IND.                (line  32)
+* N_discon_ind_t:                        N_DISCON_IND.                (line  33)
 * N_DISCON_REQ <1>:                      N_DISCON_REQ.                (line   9)
 * N_DISCON_REQ:                          Connection Oriented Services.
                                                                       (line 175)
-* N_discon_req_t:                        N_DISCON_REQ.                (line  32)
+* N_discon_req_t:                        N_DISCON_REQ.                (line  33)
 * N_ERROR_ACK <1>:                       N_ERROR_ACK.                 (line   9)
 * N_ERROR_ACK:                           Local Management Services.   (line 110)
-* N_error_ack_t:                         N_ERROR_ACK.                 (line  26)
+* N_error_ack_t:                         N_ERROR_ACK.                 (line  27)
 * N_EXDATA_IND:                          N_EXDATA_IND.                (line   9)
-* N_exdata_ind_t:                        N_EXDATA_IND.                (line  25)
+* N_exdata_ind_t:                        N_EXDATA_IND.                (line  26)
 * N_EXDATA_REQ:                          N_EXDATA_REQ.                (line   9)
-* N_exdata_req_t:                        N_EXDATA_REQ.                (line  25)
+* N_exdata_req_t:                        N_EXDATA_REQ.                (line  26)
 * N_INFO_ACK <1>:                        N_INFO_ACK.                  (line   9)
 * N_INFO_ACK:                            Local Management Services.   (line  23)
 * N_info_ack_t:                          N_INFO_ACK.                  (line  16)
 * N_INFO_REQ <1>:                        SCCP Information Request.    (line   9)
 * N_INFO_REQ:                            Local Management Services.   (line  18)
 * N_info_req_t:                          SCCP Information Request.    (line  18)
-* N_INFORM_IND <1>:                      Inform Service.              (line  63)
+* N_INFORM_IND <1>:                      Inform Service.              (line  64)
 * N_INFORM_IND:                          Connection Oriented Services.
                                                                       (line 153)
-* N_inform_ind_t:                        Inform Service.              (line  66)
+* N_inform_ind_t:                        Inform Service.              (line  67)
 * N_INFORM_REQ <1>:                      Inform Service.              (line  12)
 * N_INFORM_REQ:                          Connection Oriented Services.
                                                                       (line 151)
@@ -5507,37 +5543,37 @@ File: sccpi.info,  Node: Index,  Prev: References,  Up: Top
 * N_notice_ind_t:                        Notice Indication.           (line  16)
 * N_OK_ACK <1>:                          N_OK_ACK.                    (line   9)
 * N_OK_ACK:                              Local Management Services.   (line  79)
-* N_ok_ack_t:                            N_OK_ACK.                    (line  26)
+* N_ok_ack_t:                            N_OK_ACK.                    (line  27)
 * N_OPTMGMT_REQ <1>:                     SCCP Options Management Request.
                                                                       (line   9)
 * N_OPTMGMT_REQ:                         Local Management Services.   (line  96)
 * N_optmgmt_req_t:                       SCCP Options Management Request.
-                                                                      (line  23)
+                                                                      (line  24)
 * N_PCSTATE_IND:                         SCCP PC Status Service.      (line  12)
 * N_pcstate_ind_t:                       SCCP PC Status Service.      (line  19)
 * N_RESET_CON:                           N_RESET_CON.                 (line   9)
-* N_reset_con_t:                         N_RESET_CON.                 (line  23)
+* N_reset_con_t:                         N_RESET_CON.                 (line  24)
 * N_RESET_IND:                           N_RESET_IND.                 (line   9)
-* N_reset_ind_t:                         N_RESET_IND.                 (line  22)
+* N_reset_ind_t:                         N_RESET_IND.                 (line  23)
 * N_RESET_REQ:                           N_RESET_REQ.                 (line   9)
-* N_reset_req_t:                         N_RESET_REQ.                 (line  22)
+* N_reset_req_t:                         N_RESET_REQ.                 (line  23)
 * N_RESET_RES:                           N_RESET_RES.                 (line   9)
-* N_reset_res_t:                         N_RESET_RES.                 (line  21)
-* N_STATE_IND:                           SCCP Status Service.         (line  58)
-* N_state_ind_t:                         SCCP Status Service.         (line  61)
+* N_reset_res_t:                         N_RESET_RES.                 (line  22)
+* N_STATE_IND:                           SCCP Status Service.         (line  59)
+* N_state_ind_t:                         SCCP Status Service.         (line  62)
 * N_STATE_REQ:                           SCCP Status Service.         (line  12)
 * N_state_req_t:                         SCCP Status Service.         (line  15)
 * N_UDERROR_IND:                         N_UDERROR_IND.               (line   9)
-* N_uderror_ind_t:                       N_UDERROR_IND.               (line  25)
+* N_uderror_ind_t:                       N_UDERROR_IND.               (line  26)
 * N_UNBIND_REQ <1>:                      N_UNBIND_REQ.                (line   9)
 * N_UNBIND_REQ:                          Local Management Services.   (line  66)
-* N_unbind_req_t:                        N_UNBIND_REQ.                (line  20)
+* N_unbind_req_t:                        N_UNBIND_REQ.                (line  21)
 * N_UNITDATA_IND <1>:                    N_UNITDATA_IND.              (line   9)
 * N_UNITDATA_IND:                        Connectionless Services.     (line  30)
-* N_unitdata_ind_t:                      N_UNITDATA_IND.              (line  27)
+* N_unitdata_ind_t:                      N_UNITDATA_IND.              (line  28)
 * N_UNITDATA_REQ <1>:                    N_UNITDATA_REQ.              (line   9)
 * N_UNITDATA_REQ:                        Connectionless Services.     (line  23)
-* N_unitdata_req_t:                      N_UNITDATA_REQ.              (line  25)
+* N_unitdata_req_t:                      N_UNITDATA_REQ.              (line  26)
 * SCCPI input-output controls:           SCCPI Input-Output Controls. (line   6)
 * SCCPI management information base:     SCCPI Management Information Base.
                                                                       (line   6)
@@ -5549,126 +5585,126 @@ File: sccpi.info,  Node: Index,  Prev: References,  Up: Top
 Tag Table:
 Node: Top2499
 Node: Preface3181
-Node: Introduction8499
-Node: The SCCP Layer11082
-Node: Model of the SCCPI11511
-Ref: Figure 112523
-Node: SCCPI Services12921
-Ref: SCCPI Services-Footnote-115793
-Ref: SCCPI Services-Footnote-215818
-Node: SCCP Service Primitives16345
-Ref: Table 117717
-Ref: Table 218539
-Ref: Table 319911
-Ref: Table 421141
-Node: SCCPI Services Definition21209
-Ref: SCCPI Services Definition-Footnote-121766
-Node: Local Management Services21850
-Ref: Figure 223050
-Ref: Figure 424192
-Ref: Figure 524601
-Ref: Figure 625027
-Ref: Figure 725574
-Ref: Figure 826030
-Node: Connectionless Services26109
-Ref: Figure 927496
-Node: Connection Oriented Services27567
-Ref: Table 530793
-Ref: Figure 1132728
-Ref: Figure 1233573
-Ref: Figure 1334276
-Ref: Figure 1435094
-Node: SCCP Provider Management Services35170
-Node: SCCPI Primitives36463
-Node: Local Management Primitives37619
-Node: SCCP Information Request38130
-Ref: N_INFO_REQ38346
-Node: N_INFO_ACK39504
-Ref: N_INFO_ACK-Footnote-148470
-Node: N_BIND_REQ48637
-Node: N_BIND_ACK55419
-Node: N_UNBIND_REQ60532
-Node: SCCP Options Management Request61897
-Ref: N_OPTMGMT_REQ62169
-Node: N_ERROR_ACK65560
-Node: N_OK_ACK69162
-Node: Connection Mode Primitives71299
-Node: Connection Establishment Phase71966
-Node: N_CONN_REQ72409
-Node: N_CONN_IND77665
-Node: N_CONN_RES82590
-Node: N_CONN_CON89878
-Node: Normal Data Transfer Phase93620
-Node: N_DATA_REQ94183
-Node: N_DATA_IND99177
-Node: Receipt Confirmation Service Primitives101323
-Node: N_DATACK_REQ102818
-Node: N_DATACK_IND104645
-Node: Expedited Data Transfer Service105557
-Node: N_EXDATA_REQ106990
-Node: N_EXDATA_IND109260
-Node: Reset Service110297
-Node: N_RESET_REQ111278
-Node: N_RESET_IND113161
-Node: N_RESET_RES114199
-Node: N_RESET_CON115895
-Node: Inform Service116800
-Ref: N_INFORM_REQ117068
-Ref: N_INFORM_IND118417
-Node: Network Connection Release Phase119633
-Node: N_DISCON_REQ120614
-Node: N_DISCON_IND125002
-Node: Connectionless Mode Primitives128600
-Node: Unit Data Transfer129118
-Node: N_UNITDATA_REQ129277
-Node: N_UNITDATA_IND132355
-Node: Unit Data Error134377
-Node: N_UDERROR_IND134530
-Node: Notice Indication136039
-Ref: N_NOTICE_IND136167
-Node: SCCP Provider Management Primitives139613
-Node: SCCP Status Service139911
-Ref: N_STATE_REQ140157
-Ref: N_STATE_IND141270
-Node: SCCP PC Status Service142392
-Ref: N_PCSTATE_IND142694
-Node: SCCP Coordination Service143846
-Ref: N_COORD_REQ144124
-Ref: N_COORD_IND144766
-Ref: N_COORD_RES145687
-Ref: N_COORD_CON146670
-Node: Diagnostics Requirements147507
-Node: SCCPI Input-Output Controls149720
-Node: SCCPI Management Information Base149922
-Node: Addendum for SCCP Conformance150141
-Node: Addendum for ITU-T Q.711 Conformance150486
-Node: Addendum for ANSI T1.112 Conformance151644
-Node: Addendum for ETSI EN 300 009-1 Conformance151918
-Node: Mapping SCCPI Primitives152159
-Node: Mapping SCCPI Primitives to Q.711152502
-Node: Mapping SCCPI Primitives to ANSI T1.112153266
-Node: Mapping SCCPI Primitives to ETSI EN 300 009-1153973
-Node: State/Event Tables154662
-Node: Precedence Tables154839
-Node: SCCPI Header Files155008
-Node: SCCPI Library155176
-Node: SCCPI Drivers and Modules155340
-Node: SCCPI Utilities155525
-Node: SCCPI File Formats155695
-Node: SCCPI Compatibility and Porting155877
-Node: License156077
-Node: GNU Affero General Public License156282
-Node: GNU Free Documentation License193049
-Node: Glossary218033
-Node: Acronyms219177
-Node: References223021
-Ref: Q.700223130
-Ref: Q.701223382
-Ref: Q.702223679
-Ref: Q.703223931
-Ref: Q.704224178
-Ref: CDIAPI224449
-Ref: Q.771224603
-Node: Index224888
+Node: Introduction8500
+Node: The SCCP Layer11083
+Node: Model of the SCCPI11512
+Ref: Figure 112524
+Node: SCCPI Services12922
+Ref: SCCPI Services-Footnote-115794
+Ref: SCCPI Services-Footnote-215819
+Node: SCCP Service Primitives16346
+Ref: Table 117718
+Ref: Table 218540
+Ref: Table 319912
+Ref: Table 421142
+Node: SCCPI Services Definition21210
+Ref: SCCPI Services Definition-Footnote-121767
+Node: Local Management Services21851
+Ref: Figure 223051
+Ref: Figure 424193
+Ref: Figure 524602
+Ref: Figure 625028
+Ref: Figure 725575
+Ref: Figure 826031
+Node: Connectionless Services26110
+Ref: Figure 927497
+Node: Connection Oriented Services27568
+Ref: Table 530794
+Ref: Figure 1132729
+Ref: Figure 1233574
+Ref: Figure 1334277
+Ref: Figure 1435095
+Node: SCCP Provider Management Services35171
+Node: SCCPI Primitives36464
+Node: Local Management Primitives37620
+Node: SCCP Information Request38131
+Ref: N_INFO_REQ38347
+Node: N_INFO_ACK39506
+Ref: N_INFO_ACK-Footnote-148473
+Node: N_BIND_REQ48640
+Node: N_BIND_ACK55423
+Node: N_UNBIND_REQ60537
+Node: SCCP Options Management Request61903
+Ref: N_OPTMGMT_REQ62175
+Node: N_ERROR_ACK65567
+Node: N_OK_ACK69170
+Node: Connection Mode Primitives71308
+Node: Connection Establishment Phase71975
+Node: N_CONN_REQ72418
+Node: N_CONN_IND77675
+Node: N_CONN_RES82601
+Node: N_CONN_CON89890
+Node: Normal Data Transfer Phase93633
+Node: N_DATA_REQ94196
+Node: N_DATA_IND99191
+Node: Receipt Confirmation Service Primitives101338
+Node: N_DATACK_REQ102833
+Node: N_DATACK_IND104661
+Node: Expedited Data Transfer Service105574
+Node: N_EXDATA_REQ107007
+Node: N_EXDATA_IND109278
+Node: Reset Service110316
+Node: N_RESET_REQ111297
+Node: N_RESET_IND113181
+Node: N_RESET_RES114220
+Node: N_RESET_CON115917
+Node: Inform Service116823
+Ref: N_INFORM_REQ117091
+Ref: N_INFORM_IND118441
+Node: Network Connection Release Phase119658
+Node: N_DISCON_REQ120639
+Node: N_DISCON_IND125028
+Node: Connectionless Mode Primitives128627
+Node: Unit Data Transfer129145
+Node: N_UNITDATA_REQ129304
+Node: N_UNITDATA_IND132357
+Node: Unit Data Error134380
+Node: N_UDERROR_IND134533
+Node: Notice Indication136043
+Ref: N_NOTICE_IND136171
+Node: SCCP Provider Management Primitives139618
+Node: SCCP Status Service139916
+Ref: N_STATE_REQ140162
+Ref: N_STATE_IND141276
+Node: SCCP PC Status Service142399
+Ref: N_PCSTATE_IND142701
+Node: SCCP Coordination Service143854
+Ref: N_COORD_REQ144132
+Ref: N_COORD_IND144775
+Ref: N_COORD_RES145697
+Ref: N_COORD_CON146681
+Node: Diagnostics Requirements147519
+Node: SCCPI Input-Output Controls149732
+Node: SCCPI Management Information Base149934
+Node: Addendum for SCCP Conformance150153
+Node: Addendum for ITU-T Q.711 Conformance150498
+Node: Addendum for ANSI T1.112 Conformance151656
+Node: Addendum for ETSI EN 300 009-1 Conformance151930
+Node: Mapping SCCPI Primitives152171
+Node: Mapping SCCPI Primitives to Q.711152514
+Node: Mapping SCCPI Primitives to ANSI T1.112153278
+Node: Mapping SCCPI Primitives to ETSI EN 300 009-1153985
+Node: State/Event Tables154674
+Node: Precedence Tables154851
+Node: SCCPI Header Files155020
+Node: SCCPI Library155188
+Node: SCCPI Drivers and Modules155352
+Node: SCCPI Utilities155537
+Node: SCCPI File Formats155707
+Node: SCCPI Compatibility and Porting155889
+Node: License156089
+Node: GNU Affero General Public License156294
+Node: GNU Free Documentation License193061
+Node: Glossary218045
+Node: Acronyms219189
+Node: References223033
+Ref: Q.700223142
+Ref: Q.701223394
+Ref: Q.702223691
+Ref: Q.703223943
+Ref: Q.704224190
+Ref: CDIAPI224461
+Ref: Q.771224615
+Node: Index224900
 
 End Tag Table

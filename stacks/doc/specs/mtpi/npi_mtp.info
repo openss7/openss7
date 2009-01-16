@@ -1,14 +1,13 @@
-This is /home/brian/os8/stacks/doc/specs/mtpi/npi_mtp.info, produced by
-makeinfo version 4.13 from /home/brian/os8/stacks/doc/specs/mtpi/npi_mtp.texi.
-
 INFO-DIR-SECTION OpenSS7
 START-INFO-DIR-ENTRY
+This is /home/brian/os8/stacks/doc/specs/mtpi/npi_mtp.info, produced by makeinfo version 4.11 from /home/brian/os8/stacks/doc/specs/mtpi/npi_mtp.texi.
+
 * NPI-MTP: (npi_mtp).		NPI Corrigendum for MTP
 END-INFO-DIR-ENTRY
 
 This file documents the MTP Corrigendum to the Network Provider Interface.
 
-This is Edition 0.9a, last updated 2008-12-29, for OpenSS7 SS7 Stack version
+This is Edition 0.9a, last updated 2009-01-16, for OpenSS7 SS7 Stack version
 0.9a release 8.20081103 published by OpenSS7 Corporation
 (http://www.openss7.com/).
 
@@ -86,6 +85,7 @@ will take any responsibility in it.
 Take care that you are working with a current version of this document: you
 will not be informed of updates.  For a current version, please see the source
 documentation at `http://www.openss7.org/'.
+
 
      $Log: npi_mtp.texi,v $
      Revision 0.9.2.2  2008-11-26 12:01:33  brian
@@ -221,6 +221,7 @@ The MTP network protocol address uses a `sockaddr' structure to support sockets
 compatibility libraries consistent with the MTP XTI/TLI interface.
 
 The network protocol address is formatted as follows:
+
 
      struct sockaddr_mtp {
      	sa_family_t mtp_family;		/* Address family */
@@ -400,6 +401,7 @@ primitive before issuing an `N_DATA_REQ' or `N_UNITDATA_REQ' primitive.
  Format
 .......
 
+
      #define N_QOS_SEL_DATA_MTP      0x0801
      typedef struct {
              np_ulong n_qos_type;            /* always N_QOS_SEL_DATA_MTP */
@@ -437,6 +439,7 @@ service parameters on a connection with `N_CONN_REQ', `N_CONN_IND',
  Format
 .......
 
+
      #define N_QOS_SEL_CONN_MTP      0x0802
      typedef struct {
              np_ulong n_qos_type;            /* always N_QOS_SEL_CONN_MTP */
@@ -469,6 +472,7 @@ service parameters for information with the `N_INFO_ACK' primitive.
 
  Format
 .......
+
 
      #define N_QOS_SEL_INFO_MTP      0x0803
      typedef struct {
@@ -511,6 +515,7 @@ quality of service parameters for information with the `N_INFO_ACK' primitive.
 
  Format
 .......
+
 
      #define N_QOS_RANGE_INFO_MTP        0x0804
      typedef struct {
@@ -3476,59 +3481,59 @@ File: npi_mtp.info,  Node: Index,  Prev: References,  Up: Top
 Tag Table:
 Node: Top1828
 Node: Preface2227
-Node: Introduction3311
-Node: Protocol Address4162
-Node: Connection and Connectionless Modes4509
-Node: Sending Data of Zero Octets5904
-Node: Quality of Service Parameters6875
-Node: NPI-MTP7617
-Ref: NPI-MTP-Footnote-120056
-Ref: NPI-MTP-Footnote-220200
-Ref: NPI-MTP-Footnote-320392
-Node: NPI-MTP Rules for Conformance20480
-Node: CONS & CLNS: Local Management20837
-Node: N_INFO_ACK21039
-Ref: N_INFO_ACK-Footnote-130753
-Ref: N_INFO_ACK-Footnote-231077
-Node: N_OPTMGMT_REQ31148
-Node: N_BIND_REQ32923
-Ref: N_BIND_REQ-Footnote-136761
-Ref: N_BIND_REQ-Footnote-236861
-Node: N_BIND_ACK36965
-Node: CONS: NC Establishment Phase38407
-Node: N_CONN_REQ38899
-Ref: N_CONN_REQ-Footnote-141913
-Ref: N_CONN_REQ-Footnote-242007
-Node: N_CONN_IND42105
-Node: N_CONN_RES42360
-Node: N_CONN_CON42658
-Node: CONS: Data Transfer Phase44579
-Node: N_DATA_REQ44804
-Node: N_DATA_IND45515
-Node: N_EXDATA_REQ47131
-Node: N_EXDATA_IND47582
-Node: N_DATACK_REQ47911
-Node: N_DATACK_IND48361
-Node: CONS: NC Termination Phase48666
-Node: N_DISCON_REQ48894
-Node: N_DISCON_IND50365
-Node: N_RESET_REQ53277
-Node: N_RESET_RES53788
-Node: N_RESET_IND54124
-Node: N_RESET_CON55192
-Node: CLNS: Data Transfer Phase55514
-Node: N_UNITDATA_REQ55697
-Node: N_UNITDATA_IND57534
-Node: N_UDERROR_IND59917
-Node: NPI-MTP Mapping of Primitives64724
-Ref: Table A-167732
-Node: NPI-MTP Header File Listing67801
-Node: License77232
-Node: GNU Affero General Public License77435
-Node: GNU Free Documentation License114204
-Node: Glossary139190
-Node: Acronyms140336
-Node: References140679
-Node: Index143447
+Node: Introduction3312
+Node: Protocol Address4163
+Node: Connection and Connectionless Modes4510
+Node: Sending Data of Zero Octets5905
+Node: Quality of Service Parameters6876
+Node: NPI-MTP7618
+Ref: NPI-MTP-Footnote-120062
+Ref: NPI-MTP-Footnote-220206
+Ref: NPI-MTP-Footnote-320398
+Node: NPI-MTP Rules for Conformance20486
+Node: CONS & CLNS: Local Management20843
+Node: N_INFO_ACK21045
+Ref: N_INFO_ACK-Footnote-130759
+Ref: N_INFO_ACK-Footnote-231083
+Node: N_OPTMGMT_REQ31154
+Node: N_BIND_REQ32929
+Ref: N_BIND_REQ-Footnote-136767
+Ref: N_BIND_REQ-Footnote-236867
+Node: N_BIND_ACK36971
+Node: CONS: NC Establishment Phase38413
+Node: N_CONN_REQ38905
+Ref: N_CONN_REQ-Footnote-141919
+Ref: N_CONN_REQ-Footnote-242013
+Node: N_CONN_IND42111
+Node: N_CONN_RES42366
+Node: N_CONN_CON42664
+Node: CONS: Data Transfer Phase44585
+Node: N_DATA_REQ44810
+Node: N_DATA_IND45521
+Node: N_EXDATA_REQ47137
+Node: N_EXDATA_IND47588
+Node: N_DATACK_REQ47917
+Node: N_DATACK_IND48367
+Node: CONS: NC Termination Phase48672
+Node: N_DISCON_REQ48900
+Node: N_DISCON_IND50371
+Node: N_RESET_REQ53283
+Node: N_RESET_RES53794
+Node: N_RESET_IND54130
+Node: N_RESET_CON55198
+Node: CLNS: Data Transfer Phase55520
+Node: N_UNITDATA_REQ55703
+Node: N_UNITDATA_IND57540
+Node: N_UDERROR_IND59923
+Node: NPI-MTP Mapping of Primitives64730
+Ref: Table A-167738
+Node: NPI-MTP Header File Listing67807
+Node: License77238
+Node: GNU Affero General Public License77441
+Node: GNU Free Documentation License114210
+Node: Glossary139196
+Node: Acronyms140342
+Node: References140685
+Node: Index143453
 
 End Tag Table

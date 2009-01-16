@@ -38,42 +38,42 @@ oid strExtMIB_simple_variables_oid[] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000 };
 
 struct variable7 strExtMIB_simple_variables[] = {
 /*  magic number        , variable type , ro/rw , callback fn  , L, oidsuffix */
-#define   STREXTSTRLOGRECORDNEXTINDEX  2
-	{STREXTSTRLOGRECORDNEXTINDEX, ASN_UNSIGNED, RONLY, var_strExtStrlogRecordTable, 4, {1, 1, 1, 1}},
-#define   STREXTSTRLOGRECORDTIMESTAMP  5
-	{STREXTSTRLOGRECORDTIMESTAMP, ASN_TIMETICKS, RONLY, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 2}},
-#define   STREXTSTRLOGRECORDMID  6
-	{STREXTSTRLOGRECORDMID, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 3}},
-#define   STREXTSTRLOGRECORDSID  7
-	{STREXTSTRLOGRECORDSID, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 4}},
-#define   STREXTSTRLOGRECORDLEVEL  8
-	{STREXTSTRLOGRECORDLEVEL, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 5}},
-#define   STREXTSTRLOGRECORDFLAGS  9
-	{STREXTSTRLOGRECORDFLAGS, ASN_BIT_STR, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 6}},
-#define   STREXTSTRLOGRECORDMSGSTRING  10
-	{STREXTSTRLOGRECORDMSGSTRING, ASN_OCTET_STR, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 7}},
-#define   STREXTSTRLOGRECORDROWSTATUS  11
-	{STREXTSTRLOGRECORDROWSTATUS, ASN_INTEGER, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 2, 8}},
-#define   STRNLOGARGS           12
+#define   STREXTSTRLOGRECORDTIMESTAMP  1
+	{STREXTSTRLOGRECORDTIMESTAMP, ASN_TIMETICKS, RONLY, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 2}},
+#define   STREXTSTRLOGRECORDMID  2
+	{STREXTSTRLOGRECORDMID, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 3}},
+#define   STREXTSTRLOGRECORDSID  3
+	{STREXTSTRLOGRECORDSID, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 4}},
+#define   STREXTSTRLOGRECORDLEVEL  4
+	{STREXTSTRLOGRECORDLEVEL, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 5}},
+#define   STREXTSTRLOGRECORDFLAGS  5
+	{STREXTSTRLOGRECORDFLAGS, ASN_BIT_STR, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 6}},
+#define   STREXTSTRLOGRECORDMSGSTRING  6
+	{STREXTSTRLOGRECORDMSGSTRING, ASN_OCTET_STR, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 7}},
+#define   STREXTSTRLOGRECORDROWSTATUS  7
+	{STREXTSTRLOGRECORDROWSTATUS, ASN_INTEGER, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 8}},
+#define   STRNLOGARGS           8
 	{STRNLOGARGS, ASN_UNSIGNED, RWRITE, var_strExtMIB, 3, {1, 2, 1}},
-#define   STREXTSTRLOGTIMESTAMP  13
-	{STREXTSTRLOGTIMESTAMP, ASN_TIMETICKS,, var_strExtMIB, 4, {1, 3, 1, 1}},
-#define   STREXTSTRLOGMID       14
-	{STREXTSTRLOGMID, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 2}},
-#define   STREXTSTRLOGSID       15
-	{STREXTSTRLOGSID, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 3}},
-#define   STREXTSTRLOGLEVEL     16
-	{STREXTSTRLOGLEVEL, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 4}},
-#define   STREXTSTRLOGFLAGS     17
-	{STREXTSTRLOGFLAGS, ASN_BIT_STR,, var_strExtMIB, 4, {1, 3, 1, 5}},
-#define   STREXTSTRLOGFMTSTRING  18
-	{STREXTSTRLOGFMTSTRING, ASN_OCTET_STR,, var_strExtMIB, 4, {1, 3, 1, 6}},
-#define   STREXTSTRLOGINTEGER   19
-	{STREXTSTRLOGINTEGER, ASN_INTEGER,, var_strExtMIB, 4, {1, 3, 1, 7}},
-#define   STREXTSTRLOGUNSIGNED  20
-	{STREXTSTRLOGUNSIGNED, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 8}},
-#define   STREXTSTRLOGSTRING    21
-	{STREXTSTRLOGSTRING, ASN_OCTET_STR,, var_strExtMIB, 4, {1, 3, 1, 9}},
+#define   STREXTSTRLOGINDEX     8
+	{STREXTSTRLOGINDEX, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 1}},
+#define   STREXTSTRLOGTIMESTAMP  8
+	{STREXTSTRLOGTIMESTAMP, ASN_TIMETICKS,, var_strExtMIB, 4, {1, 3, 1, 2}},
+#define   STREXTSTRLOGMID       8
+	{STREXTSTRLOGMID, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 3}},
+#define   STREXTSTRLOGSID       8
+	{STREXTSTRLOGSID, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 4}},
+#define   STREXTSTRLOGLEVEL     8
+	{STREXTSTRLOGLEVEL, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 5}},
+#define   STREXTSTRLOGFLAGS     8
+	{STREXTSTRLOGFLAGS, ASN_BIT_STR,, var_strExtMIB, 4, {1, 3, 1, 6}},
+#define   STREXTSTRLOGFMTSTRING  8
+	{STREXTSTRLOGFMTSTRING, ASN_OCTET_STR,, var_strExtMIB, 4, {1, 3, 1, 7}},
+#define   STREXTSTRLOGINTEGER   8
+	{STREXTSTRLOGINTEGER, ASN_INTEGER,, var_strExtMIB, 4, {1, 3, 1, 8}},
+#define   STREXTSTRLOGUNSIGNED  8
+	{STREXTSTRLOGUNSIGNED, ASN_UNSIGNED,, var_strExtMIB, 4, {1, 3, 1, 9}},
+#define   STREXTSTRLOGSTRING    8
+	{STREXTSTRLOGSTRING, ASN_OCTET_STR,, var_strExtMIB, 4, {1, 3, 1, 10}},
 };
 
 /*    (L = length of the oidsuffix) */
@@ -166,86 +166,6 @@ var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int
 	 */
 	switch (vp->magic) {
 
-	case STREXTSTRLOGRECORDNEXTINDEX:
-
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case STREXTSTRLOGRECORDTIMESTAMP:
-
-		long_ret = 0;
-		return (u_char *) &long_ret;
-	case STREXTSTRLOGRECORDMID:
-		*write_method = write_strExtStrlogRecordMid;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case STREXTSTRLOGRECORDSID:
-		*write_method = write_strExtStrlogRecordSid;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case STREXTSTRLOGRECORDLEVEL:
-		*write_method = write_strExtStrlogRecordLevel;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case STREXTSTRLOGRECORDFLAGS:
-		*write_method = write_strExtStrlogRecordFlags;
-		*string = 0;
-		*var_len = strlen(string);
-		return (u_char *) string;
-	case STREXTSTRLOGRECORDMSGSTRING:
-		*write_method = write_strExtStrlogRecordMsgString;
-		*string = 0;
-		*var_len = strlen(string);
-		return (u_char *) string;
-	case STREXTSTRLOGRECORDROWSTATUS:
-		*write_method = write_strExtStrlogRecordRowStatus;
-		long_ret = 0;
-		return (u_char *) &long_ret;
-
-	default:
-		ERROR_MSG("");
-	}
-	return NULL;
-}
-
-/*
- * var_strExtStrlogRecordTable():
- *   Handle this table separately from the scalar value case.
- *   The workings of this are basically the same as for var_strExtMIB_simple above.
- */
-unsigned char *
-var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
-{
-
-	/* variables we may use later */
-	static long long_ret;
-	static u_long ulong_ret;
-	static unsigned char string[SPRINT_MAX_LEN];
-	static oid objid[MAX_OID_LEN];
-	static struct counter64 c64;
-
-	/* 
-	 * This assumes that the table is a 'simple' table.
-	 *    See the implementation documentation for the meaning of this.
-	 *    You will need to provide the correct value for the TABLE_SIZE parameter
-	 *
-	 * If this table does not meet the requirements for a simple table,
-	 *    you will need to provide the replacement code yourself.
-	 *    Mib2c is not smart enough to write this for you.
-	 *    Again, see the implementation documentation for what is required.
-	 */
-	if (header_simple_table(vp, name, length, exact, var_len, write_method, TABLE_SIZE)
-	    == MATCH_FAILED)
-		return NULL;
-
-	/* 
-	 * this is where we do the value assignments for the mib results.
-	 */
-	switch (vp->magic) {
-
-	case STREXTSTRLOGRECORDNEXTINDEX:
-
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
 	case STREXTSTRLOGRECORDTIMESTAMP:
 
 		long_ret = 0;

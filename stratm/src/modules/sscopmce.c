@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:25 $
+ @(#) $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-07 10:40:25 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:46:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscopmce.c,v $
+ Revision 0.9.2.3  2009-01-16 20:46:07  brian
+ - minor compile corrections
+
  Revision 0.9.2.2  2008-12-07 10:40:25  brian
  - new stratm package
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:25 $"
+#ident "@(#) $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $"
 
-static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:25 $";
+static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $";
 
 /*
  * This is an SSCOPE-MCE module for use with MTP3b.  It can be pushed over a UDP or IP Stream to
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2
 #include <sys/npi_ip.h>
 
 #define SSCOPMCE_DESCRIP	"MTP3B-SSCOPMCE STREAMS MODULE."
-#define SSCOPMCE_REVISION	"OpenSS7 $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:25 $"
+#define SSCOPMCE_REVISION	"OpenSS7 $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $"
 #define SSCOPMCE_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOPMCE_DEVICE		"Provides OpenSS7 MTP3B-I.432.3-SSCOPMCE module."
 #define SSCOPMCE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1514,7 +1517,7 @@ np_w_data(struct np *np, queue_t *q, mblk_t *mp)
 	if (likely(err == 0))
 		return (err);
 	np_restore_state(np);
-	return np_reply_error(np, q, mp, -1UL, err);
+	return np_reply_error(np, q, mp, -1U, err);
 }
 static fastcall int
 np_r_data(struct np *np, queue_t *q, mblk_t *mp)

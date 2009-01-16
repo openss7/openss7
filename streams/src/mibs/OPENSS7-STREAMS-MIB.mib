@@ -1,12 +1,13 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:-,\f\b\:· fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-STREAMS-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2009-01-02 15:04:20 $
+-- @(#) $RCSfile: OPENSS7-STREAMS-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.14 $) $Date: 2009-01-16 20:25:50 $
 --
 -- -----------------------------------------------------------------------------
 --
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
--- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
 -- All Rights Reserved.
 --
@@ -15,7 +16,7 @@
 -- Software Foundation; version 3 of the License.
 --
 -- This program is distributed in the hope that it will be useful, but WITHOUT 
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
 -- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
 -- for more details.
 --
@@ -23,6 +24,13 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
 -- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
 -- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +55,23 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-02 15:04:20 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-16 20:25:50 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-STREAMS-MIB.mib,v $
+-- Revision 0.9.2.14  2009-01-16 20:25:50  brian
+-- - working up streams mibs and agents
+--
+-- Revision 0.9.2.13  2009-01-16 14:06:58  brian
+-- - update STREAMS mib
+--
+-- Revision 0.9.2.12  2009-01-15 17:49:35  brian
+-- - MIB updates
+--
+-- Revision 0.9.2.11  2009-01-10 17:18:43  brian
+-- - updated headers
+--
 -- Revision 0.9.2.10  2009-01-02 15:04:20  brian
 -- - updated agents
 --
@@ -98,7 +118,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 strMIB MODULE-IDENTITY
-    LAST-UPDATED "200710010804Z"
+    LAST-UPDATED "200901161403Z"
     ORGANIZATION
         "The OpenSS7 Project"
     CONTACT-INFO
@@ -124,6 +144,12 @@ strMIB MODULE-IDENTITY
     DESCRIPTION
         "Made strStrhold a TruthValue.  Also more spelling 
          corrections."
+    REVISION    "200901151746Z"
+    DESCRIPTION
+        "Additional spelling corrections."
+    REVISION    "200901161403Z"
+    DESCRIPTION
+        "Reindexed strMod tables on name instead of module id."
     ::= { openss7Modules 1 }
 
 
@@ -199,35 +225,20 @@ strModEntry OBJECT-TYPE
          STREAMS structure."
     REFERENCE
         "scls(8)"
-    INDEX       { strModIdnum }
+    INDEX       { strModName }
     ::= { strModTable 1 }
 
 StrModEntry ::= SEQUENCE {
-    strModIdnum         Unsigned32,
     strModName          StreamsModuleName,
+    strModIdnum         Unsigned32,
     strModType          INTEGER,
     strModMajor         Unsigned32,
     strModRowStatus     RowStatus
 }
 
-strModIdnum OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..16383)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Indicates the driver or module STREAMS module id.  The 
-         STREAMS module id is unique within the entire system 
-         and is used as an index to this and other tables.  This 
-         is the module identifier that appears in the mi_idnum 
-         field of the module_info(9) STREAMS structure for the 
-         module or driver."
-    REFERENCE
-        "scls(8)"
-    ::= { strModEntry 1 }
-
 strModName OBJECT-TYPE
     SYNTAX      StreamsModuleName
-    MAX-ACCESS  read-create
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "Indicates the name of the STREAMS driver or module.  
@@ -237,6 +248,21 @@ strModName OBJECT-TYPE
          textual convention as STREAMS module names are limited 
          to FMNAMESZ in length.  Once this object is created in 
          an entry, it becomes read-only until it is destroyed."
+    REFERENCE
+        "scls(8)"
+    ::= { strModEntry 1 }
+
+strModIdnum OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16383)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the driver or module STREAMS module id.  The 
+         STREAMS module id is unique within the entire system 
+         and is used as an index to this and other tables.  This 
+         is the module identifier that appears in the mi_idnum 
+         field of the module_info(9) STREAMS structure for the 
+         module or driver."
     REFERENCE
         "scls(8)"
     ::= { strModEntry 2 }
@@ -354,7 +380,7 @@ strModInfoEntry OBJECT-TYPE
          STREAMS module reload (that occurs on system reboot) 
          the values will revert back to the values compiled-in 
          for the STREAMS module."
-    INDEX       { strModIdnum, strModInfoIndex }
+    INDEX       { strModName, strModInfoIndex }
     ::= { strModInfoTable 1 }
 
 StrModInfoEntry ::= SEQUENCE {
@@ -518,13 +544,13 @@ strModStatEntry OBJECT-TYPE
          reinitialization.  The scalar strDiscontinuityTime is 
          used to determine when the last discontinuity in 
          counter values occured."
-    INDEX       { strModIdnum, strModStatIndex }
+    INDEX       { strModName, strModStatIndex }
     ::= { strModStatTable 1 }
 
 StrModStatEntry ::= SEQUENCE {
     strModStatIndex     Unsigned32,
     strModStatQueues    StreamsModuleQueues,
-    strModStatPCnt      Counter32,
+    strModStatPcnt      Counter32,
     strModStatScnt      Counter32,
     strModStatOcnt      Counter32,
     strModStatCcnt      Counter32,
@@ -557,7 +583,7 @@ strModStatQueues OBJECT-TYPE
         "scls(8), sc(4), module_stat(9)"
     ::= { strModStatEntry 2 }
 
-strModStatPCnt OBJECT-TYPE
+strModStatPcnt OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
@@ -707,11 +733,10 @@ strApshEntry OBJECT-TYPE
          minor device number to which the entry belongs."
     REFERENCE
         "autopush(8)"
-    INDEX       { strApshName, strApshMinor }
+    INDEX       { strModName, strApshMinor, strApshLastMinor }
     ::= { strApshTable 1 }
 
 StrApshEntry ::= SEQUENCE {
-    strApshName         StreamsModuleName,
     strApshMajor        Unsigned32,
     strApshMinor        Unsigned32,
     strApshLastMinor    Unsigned32,
@@ -719,26 +744,16 @@ StrApshEntry ::= SEQUENCE {
     strApshRowStatus    RowStatus
 }
 
-strApshName OBJECT-TYPE
-    SYNTAX      StreamsModuleName
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Provides the driver name."
-    REFERENCE
-        "autopush(8)"
-    ::= { strApshEntry 1 }
-
 strApshMajor OBJECT-TYPE
     SYNTAX      Unsigned32 (1..16383)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Provides the primary majro device number associated 
+        "Provides the primary major device number associated 
          with the driver."
     REFERENCE
         "autopush(8)"
-    ::= { strApshEntry 2 }
+    ::= { strApshEntry 1 }
 
 strApshMinor OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16383 | 4294967295)
@@ -752,7 +767,7 @@ strApshMinor OBJECT-TYPE
          for this driver and LastMinor is ignored."
     REFERENCE
         "autopush(8)"
-    ::= { strApshEntry 3 }
+    ::= { strApshEntry 2 }
 
 strApshLastMinor OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16383)
@@ -766,7 +781,7 @@ strApshLastMinor OBJECT-TYPE
          ranges specified in this autopush specification entry."
     REFERENCE
         "autopush(8)"
-    ::= { strApshEntry 4 }
+    ::= { strApshEntry 3 }
 
 strApshModules OBJECT-TYPE
     SYNTAX      StreamsModuleList
@@ -780,7 +795,7 @@ strApshModules OBJECT-TYPE
          reboots, and might first be verified by the agent."
     REFERENCE
         "autopush(8)"
-    ::= { strApshEntry 5 }
+    ::= { strApshEntry 4 }
 
 strApshRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -792,7 +807,7 @@ strApshRowStatus OBJECT-TYPE
          table."
     REFERENCE
         "autopush(8)"
-    ::= { strApshEntry 6 }
+    ::= { strApshEntry 5 }
 
 strStats OBJECT IDENTIFIER
     ::= { strTables 5 }
@@ -1524,7 +1539,7 @@ strModInfoTableConditionalGroup OBJECT-GROUP
     ::= { strGroups 10 }
 
 strModStatTableMandatoryGroup OBJECT-GROUP
-    OBJECTS     { strModStatQueues, strModStatPCnt, strModStatScnt, 
+    OBJECTS     { strModStatQueues, strModStatPcnt, strModStatScnt, 
                   strModStatOcnt, strModStatCcnt, strModStatAcnt }
     STATUS      current
     DESCRIPTION

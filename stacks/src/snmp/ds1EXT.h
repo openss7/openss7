@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ds1EXT.h,v 0.9.2.2 2009-01-14 14:29:58 brian Exp $
+ @(#) $Id: ds1EXT.h,v 0.9.2.3 2009-01-16 20:44:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-14 14:29:58 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:44:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ds1EXT.h,v $
+ Revision 0.9.2.3  2009-01-16 20:44:53  brian
+ - updating mibs and agents
+
  Revision 0.9.2.2  2009-01-14 14:29:58  brian
  - working up agents
 
@@ -63,7 +66,7 @@
 #ifndef __LOCAL_DS1EXT_H__
 #define __LOCAL_DS1EXT_H__
 
-#ident "@(#) $RCSfile: ds1EXT.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ds1EXT.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -341,34 +344,34 @@ extern struct header_complex_index *dsx1ChanMappingTableStorage;
 #define DSX1FARENDINTERVALVALIDDATA_FALSE        2
 
 /* notifications */
-extern oid dsx1LineStatusChange_oid[10];
+extern oid dsx1LineStatusChange_oid[11];
 
 /* scalars accessible only for notify */
 
 /* object id definitions */
-extern oid ds1NearEndConfigGroup_oid[10];
-extern oid ds1NearEndStatisticsGroup_oid[10];
-extern oid ds1FarEndGroup_oid[10];
-extern oid ds1DeprecatedGroup_oid[10];
-extern oid ds1NearEndOptionalConfigGroup_oid[10];
-extern oid ds1DS2Group_oid[10];
-extern oid ds1TransStatsGroup_oid[10];
-extern oid ds1NearEndOptionalTrapGroup_oid[10];
-extern oid ds1ChanMappingGroup_oid[10];
-extern oid ds1NearEndConfigurationGroup_oid[10];
-extern oid ds1NearEndCfgGroup_oid[10];
-extern oid ds1NearEndStatGroup_oid[10];
-extern oid ds1FarEndNGroup_oid[10];
-extern oid ds1Compliance_oid[10];
-extern oid ds1MibT1PriCompliance_oid[10];
-extern oid ds1MibE1PriCompliance_oid[10];
-extern oid ds1Ds2Compliance_oid[10];
-extern oid ds1NCompliance_oid[10];
-extern oid ds1MibT1PriNCompliance_oid[10];
-extern oid ds1MibE1PriNCompliance_oid[10];
-extern oid ds1J1Compliance_oid[10];
-extern oid ds1NMibT1PriNCompliance_oid[10];
-extern oid ds1NMibE1PriNCompliance_oid[10];
+extern oid ds1NearEndConfigGroup_oid[11];
+extern oid ds1NearEndStatisticsGroup_oid[11];
+extern oid ds1FarEndGroup_oid[11];
+extern oid ds1DeprecatedGroup_oid[11];
+extern oid ds1NearEndOptionalConfigGroup_oid[11];
+extern oid ds1DS2Group_oid[11];
+extern oid ds1TransStatsGroup_oid[11];
+extern oid ds1NearEndOptionalTrapGroup_oid[11];
+extern oid ds1ChanMappingGroup_oid[11];
+extern oid ds1NearEndConfigurationGroup_oid[11];
+extern oid ds1NearEndCfgGroup_oid[11];
+extern oid ds1NearEndStatGroup_oid[11];
+extern oid ds1FarEndNGroup_oid[11];
+extern oid ds1Compliance_oid[11];
+extern oid ds1MibT1PriCompliance_oid[11];
+extern oid ds1MibE1PriCompliance_oid[11];
+extern oid ds1Ds2Compliance_oid[11];
+extern oid ds1NCompliance_oid[11];
+extern oid ds1MibT1PriNCompliance_oid[11];
+extern oid ds1MibE1PriNCompliance_oid[11];
+extern oid ds1J1Compliance_oid[11];
+extern oid ds1NMibT1PriNCompliance_oid[11];
+extern oid ds1NMibE1PriNCompliance_oid[11];
 
 /* function prototypes */
 /* trap function prototypes */

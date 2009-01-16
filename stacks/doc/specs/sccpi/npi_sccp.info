@@ -1,14 +1,13 @@
-This is /home/brian/os8/stacks/doc/specs/sccpi/npi_sccp.info, produced by
-makeinfo version 4.13 from /home/brian/os8/stacks/doc/specs/sccpi/npi_sccp.texi.
-
 INFO-DIR-SECTION OpenSS7
 START-INFO-DIR-ENTRY
+This is /home/brian/os8/stacks/doc/specs/sccpi/npi_sccp.info, produced by makeinfo version 4.11 from /home/brian/os8/stacks/doc/specs/sccpi/npi_sccp.texi.
+
 * NPI-SCCP: (npi_sccp).		NPI Addendum for SCCP
 END-INFO-DIR-ENTRY
 
 This file documents the SCCP Addendum to the Network Provider Interface.
 
-This is Edition 0.9a, last updated 2008-12-29, for OpenSS7 SS7 Stack version
+This is Edition 0.9a, last updated 2009-01-16, for OpenSS7 SS7 Stack version
 0.9a release 8.20081103 published by OpenSS7 Corporation
 (http://www.openss7.com/).
 
@@ -152,6 +151,7 @@ for a current version.
 
 Only the texinfo or roff source is controlled.  A printed (or postscript)
 version of this document is an *UNCONTROLLED VERSION*.
+
 
      $Log: npi_sccp.texi,v $
      Revision 0.9.2.2  2008-11-26 12:01:34  brian
@@ -331,6 +331,7 @@ The SCCP network protocol address uses a sockaddr struct to support sockets
 compatibility libraries consistent with the SCCP XTI/TLI interface.
 
 The network protocol address is formatted as follows:
+
 
      typedef struct sccp_addr {
              uint ni;                        /* network indicator */
@@ -549,6 +550,7 @@ File: npi_sccp.info,  Node: SCCP Quality of Service Formats,  Next: NPI Connecti
 
 The SCCP provides the following quality of service structures:
 
+
      typedef union {
              np_ulong n_qos_type;
              N_qos_sel_data_sccp_t sel_data;
@@ -588,6 +590,7 @@ File: npi_sccp.info,  Node: N_QOS_SEL_DATA_SCCP
 .......
 
 The `N_qos_sel_data_sccp_t' structure is formatted as follows:
+
      #define N_QOS_SEL_DATA_SCCP     0x0901
      typedef struct {
              np_ulong n_qos_type;            /* always N_QOS_SEL_DATA_SCCP */
@@ -653,6 +656,7 @@ File: npi_sccp.info,  Node: N_QOS_SEL_CONN_SCCP
 .......
 
 The `N_qos_sel_conn_sccp_t' structure is formatted as follows:
+
      #define N_QOS_SEL_CONN_SCCP     0x0902
      typedef struct {
              np_ulong n_qos_type;            /* always N_QOS_SEL_CONN_SCCP */
@@ -718,6 +722,7 @@ File: npi_sccp.info,  Node: N_QOS_SEL_INFO_SCCP
 .......
 
 The `N_qos_sel_info_sccp_t' structure is formatted as follows:
+
      #define N_QOS_SEL_INFO_SCCP     0x0903
      typedef struct {
              np_ulong n_qos_type;            /* always N_QOS_SEL_INFO_SCCP */
@@ -738,6 +743,7 @@ File: npi_sccp.info,  Node: N_QOS_RANGE_INFO_SCCP
 .......
 
 The `N_qos_range_info_sccp_t' structure is formatted as follows:
+
      #define N_QOS_RANGE_INFO_SCCP   0x0904
      typedef struct {
              np_ulong n_qos_type;            /* always N_QOS_RANGE_INFO_SCCP */
@@ -762,6 +768,7 @@ File: npi_sccp.info,  Node: N_QOS_SEL_INFR_SCCP
 .......
 
 The `N_qos_sel_infr_sccp_t' structure is formatted as follows:
+
      #define N_QOS_SEL_INFR_SCCP     0x0905
      typedef struct {
              np_ulong n_qos_type;            /* always N_QOS_SEL_INFR_SCCP */
@@ -786,6 +793,7 @@ primitive before issuing an N_DATA_REQ or `N_UNITDATA_REQ' primitive.
 .......
 
 The `N_qos_sel_data_mtp_t' structure is formatted as follows:
+
      #define N_QOS_SEL_DATA_MTP      0x0801
      typedef struct {
              ulong n_qos_type;               /* always N_QOS_SEL_DATA_MTP */
@@ -815,6 +823,7 @@ MP
 
 This quality of service structure type is used when selecting quality of
 service parameters for information with the N_INFO_ACK primitive.
+
 
      #define N_QOS_SEL_INFO_MTP      0x0803
      typedef struct {
@@ -857,6 +866,7 @@ quality of service parameters for information with the N_INFO_ACK primitive.
 
  Format
 .......
+
 
      #define N_QOS_RANGE_INFO_MTP    0x0804
      typedef struct {
@@ -2676,6 +2686,7 @@ File: npi_sccp.info,  Node: N_NOTICE_IND,  Up: SCCP Notice Service
  Format
 .......
 
+
      #define N_NOTICE_IND    32
      typedef struct {
              np_ulong PRIM_type;             /* always N_NOTICE_IND */
@@ -2716,6 +2727,7 @@ File: npi_sccp.info,  Node: N_INFORM_REQ,  Next: N_INFORM_IND,  Up: SCCP Inform 
 
  Format
 .......
+
 
      #define N_INFORM_REQ    33
      typedef struct {
@@ -2765,6 +2777,7 @@ File: npi_sccp.info,  Node: N_INFORM_IND,  Prev: N_INFORM_REQ,  Up: SCCP Inform 
 
  Format
 .......
+
 
      #define N_INFORM_IND    34
      typedef struct {
@@ -2831,6 +2844,7 @@ also be used provide the "N-COORD Request" primitive.
  Format
 .......
 
+
      #define N_COORD_REQ     35
      typedef struct {
              np_ulong PRIM_type;             /* alwyas N_COORD_REQ */
@@ -2858,6 +2872,7 @@ also be used provide the "N-COORD Indication" primitive.
 
  Format
 .......
+
 
      #define N_COORD_IND     37
      typedef struct {
@@ -2888,6 +2903,7 @@ also be used provide the "N-COORD Response" primitive.
  Format
 .......
 
+
      #define N_COORD_RES     36
      typedef struct {
              np_ulong PRIM_type;             /* always N_COORD_RES */
@@ -2915,6 +2931,7 @@ also be used provide the "N-COORD Confirmation" primitive.
 
  Format
 .......
+
 
      #define N_COORD_CON     38
      typedef struct {
@@ -2956,6 +2973,7 @@ primitive.
 
  Format
 .......
+
 
      #define N_STATE_REQ     39
      typedef struct {
@@ -3017,6 +3035,7 @@ also be used to provide the "N-STATE Indication".
 
  Format
 .......
+
 
      #define N_STATE_IND     40
      typedef struct {
@@ -3090,6 +3109,7 @@ also be used to provide the "N-PCSTATE Indication".
  Format
 .......
 
+
      #define N_PCSTATE_IND   41
      typedef struct {
              np_ulong PRIM_type;             /* always N_PCSTATE_IND */
@@ -3141,6 +3161,7 @@ File: npi_sccp.info,  Node: N_TRAFFIC_IND,  Up: SCCP Traffic Service
 
  Format
 .......
+
 
      #define N_TRAFFIC_IND   42
      typedef struct {
@@ -5826,163 +5847,163 @@ File: npi_sccp.info,  Node: Index,  Prev: References,  Up: Top
 Tag Table:
 Node: Top1830
 Node: Preface2485
-Node: Introduction6461
-Ref: Introduction-Footnote-17349
-Ref: Introduction-Footnote-27410
-Ref: Introduction-Footnote-37447
-Node: Overview7484
-Node: Protocol Address8773
-Node: Connection and Connectionless Modes9140
-Ref: Connection and Connectionless Modes-Footnote-110558
-Ref: Connection and Connectionless Modes-Footnote-210597
-Node: Sending Data of Zero Octets10636
-Node: Quality of Service Parameters11584
-Node: Protocol Addressing12324
-Node: Protocol Address12839
-Node: Quality of Service19361
-Node: SCCP Quality of Service Overview19627
-Node: SCCP Quality of Service Formats19831
-Ref: SCCP Quality of Service Formats-Footnote-120896
-Node: N_QOS_SEL_DATA_SCCP21199
-Node: N_QOS_SEL_CONN_SCCP23093
-Node: N_QOS_SEL_INFO_SCCP24955
-Node: N_QOS_RANGE_INFO_SCCP25669
-Node: N_QOS_SEL_INFR_SCCP26302
-Node: NPI Connection Modes30422
-Node: Supported Services30590
-Node: Local Management Services30890
-Node: Acknowledgement Service31185
-Node: Information Service31418
-Node: Options Management Service31674
-Node: Bind Service32046
-Node: Connection-Oriented Mode Services32749
-Node: Signalling Connection Establishment Service33557
-Node: Signalling Connection Request Service34424
-Node: Normal Data Transfer Service35722
-Node: Expedited Data Transfer Service36444
-Node: Reset Service37148
-Node: Inform Service37620
-Node: Signalling Connection Release Service38610
-Node: Connectionless Mode Services39033
-Node: Unit Data Transfer Service39320
-Node: Notice Service40008
-Node: SCCP Management Services40188
-Node: User Status Service40460
-Node: Signalling Point Status Service40654
-Node: Coordination Service40905
-Node: Rules for Conformance41102
-Node: Local Management Primitives41523
-Node: N_INFO_REQ41847
-Node: N_INFO_ACK41977
-Ref: N_INFO_ACK-Footnote-151780
-Ref: N_INFO_ACK-Footnote-252074
-Node: N_BIND_REQ52147
-Node: N_BIND_ACK52336
-Node: N_UNBIND_REQ52527
-Node: N_OPTMGMT_REQ52725
-Node: N_ERROR_ACK55699
-Node: N_OK_ACK57728
-Node: CONS Connection Establishment58864
-Node: N_CONN_REQ59162
-Node: N_CONN_IND65799
-Node: N_CONN_RES68604
-Node: N_CONN_CON71618
-Node: CONS Normal Data Transfer74104
-Node: N_DATA_REQ74370
-Node: N_DATA_IND74672
-Node: CONS Receipt Confirmation Service74977
-Node: N_DATACK_REQ75270
-Node: N_DATACK_IND75714
-Node: CONS Expedited Data Transfer Service76218
-Node: N_EXDATA_REQ76510
-Node: N_EXDATA_IND76799
-Node: CONS Reset Service77091
-Node: N_RESET_REQ77375
-Node: N_RESET_IND79015
-Node: N_RESET_RES80651
-Node: N_RESET_CON80954
-Node: CONS Network Connection Release81241
-Node: N_DISCON_REQ81489
-Node: N_DISCON_IND81794
-Node: CLNS86091
-Node: N_UNITDATA_REQ86280
-Node: N_UNITDATA_IND86567
-Node: N_UDERROR_IND86879
-Node: Extension Primitives89251
-Node: SCCP Notice Service89591
-Node: N_NOTICE_IND89773
-Node: SCCP Inform Service90522
-Node: N_INFORM_REQ90755
-Node: N_INFORM_IND91856
-Node: SCCP Coordination Service92969
-Node: N_COORD_REQ93243
-Node: N_COORD_IND93831
-Node: N_COORD_RES94526
-Node: N_COORD_CON95135
-Node: SCCP State Service95812
-Node: N_STATE_REQ96042
-Node: N_STATE_IND97660
-Node: SCCP PC State Service99333
-Node: N_PCSTATE_IND99550
-Node: SCCP Traffic Service100655
-Node: N_TRAFFIC_IND100843
-Node: NPI-SCCP Input-Output Controls102164
-Node: NPI-SCCP Management Information Base102377
-Node: Mapping NPI-SCCP Primitives102609
-Node: Mapping NPI Primitives to ITU-T X.213103016
-Node: Mapping of X.213 CONS Connect/Disconnect Primitives to NPI103439
-Ref: Table A-1106762
-Node: Mapping of X.213 CONS Data Transfer Primitives to NPI107170
-Ref: Table A-2109926
-Node: Mapping of X.213 CLNS Data Transfer Primitives to NPI110179
-Ref: Table A-3111828
-Node: Mapping NPI Primitives to ITU-T Q.711114662
-Node: Mapping of Q.711 CONS Connect/Disconnect Primitives to NPI115187
-Ref: Table A-4119300
-Node: Mapping of Q.711 CONS Data Transfer Primitives to NPI120913
-Ref: Table A-5123720
-Ref: Table A-5b127565
-Node: Mapping of Q.711 CLNS Data Transfer Primitives to NPI129502
-Ref: Table A-6132138
-Node: Mapping of Q.711 Management Primitives to NPI133568
-Ref: Table A-7137420
-Node: Mapping NPI Primitives to ETSI EN 300 009-1137493
-Node: Mapping NPI Primitives to ANSI T1.112137792
-Node: NPI-SCCP Header Files138032
-Node: Protocol Primitive Header138443
-Node: Protocol Primitive Header Listing139292
-Node: Input-Output Control Header160779
-Node: NPI-SCCP Library161902
-Node: NPI-SCCP Drivers and Modules162349
-Node: TCI Module163174
-Node: TRI Driver and Module163610
-Node: SCCP Multiplexing Driver164414
-Node: SUA Application Server Driver and Module165010
-Node: NPI Conversion Module165695
-Node: TPI Conversion Module166663
-Node: NPI-SCCP Utilities167641
-Node: NPI-SCCP Compatibility and Porting168289
-Node: License168501
-Node: GNU Affero General Public License169114
-Node: GNU Free Documentation License205884
-Node: Glossary230871
-Node: Acronyms232018
-Node: References235865
-Ref: NPI235979
-Ref: Q.714236125
-Ref: Q.711236369
-Ref: Q.713236628
-Ref: XNS236877
-Ref: T1.111237036
-Ref: T1.112237188
-Ref: X.213237352
-Ref: ISO8348237650
-Ref: ISO8348/AD1237940
-Ref: ISO8473238289
-Ref: ISO8208238670
-Ref: ISO8878239000
-Ref: SVID239327
-Ref: X.210239393
-Node: Index239723
+Node: Introduction6462
+Ref: Introduction-Footnote-17350
+Ref: Introduction-Footnote-27411
+Ref: Introduction-Footnote-37448
+Node: Overview7485
+Node: Protocol Address8774
+Node: Connection and Connectionless Modes9141
+Ref: Connection and Connectionless Modes-Footnote-110559
+Ref: Connection and Connectionless Modes-Footnote-210598
+Node: Sending Data of Zero Octets10637
+Node: Quality of Service Parameters11585
+Node: Protocol Addressing12325
+Node: Protocol Address12840
+Node: Quality of Service19363
+Node: SCCP Quality of Service Overview19629
+Node: SCCP Quality of Service Formats19833
+Ref: SCCP Quality of Service Formats-Footnote-120899
+Node: N_QOS_SEL_DATA_SCCP21202
+Node: N_QOS_SEL_CONN_SCCP23097
+Node: N_QOS_SEL_INFO_SCCP24960
+Node: N_QOS_RANGE_INFO_SCCP25675
+Node: N_QOS_SEL_INFR_SCCP26309
+Node: NPI Connection Modes30433
+Node: Supported Services30601
+Node: Local Management Services30901
+Node: Acknowledgement Service31196
+Node: Information Service31429
+Node: Options Management Service31685
+Node: Bind Service32057
+Node: Connection-Oriented Mode Services32760
+Node: Signalling Connection Establishment Service33568
+Node: Signalling Connection Request Service34435
+Node: Normal Data Transfer Service35733
+Node: Expedited Data Transfer Service36455
+Node: Reset Service37159
+Node: Inform Service37631
+Node: Signalling Connection Release Service38621
+Node: Connectionless Mode Services39044
+Node: Unit Data Transfer Service39331
+Node: Notice Service40019
+Node: SCCP Management Services40199
+Node: User Status Service40471
+Node: Signalling Point Status Service40665
+Node: Coordination Service40916
+Node: Rules for Conformance41113
+Node: Local Management Primitives41534
+Node: N_INFO_REQ41858
+Node: N_INFO_ACK41988
+Ref: N_INFO_ACK-Footnote-151791
+Ref: N_INFO_ACK-Footnote-252085
+Node: N_BIND_REQ52158
+Node: N_BIND_ACK52347
+Node: N_UNBIND_REQ52538
+Node: N_OPTMGMT_REQ52736
+Node: N_ERROR_ACK55710
+Node: N_OK_ACK57739
+Node: CONS Connection Establishment58875
+Node: N_CONN_REQ59173
+Node: N_CONN_IND65810
+Node: N_CONN_RES68615
+Node: N_CONN_CON71629
+Node: CONS Normal Data Transfer74115
+Node: N_DATA_REQ74381
+Node: N_DATA_IND74683
+Node: CONS Receipt Confirmation Service74988
+Node: N_DATACK_REQ75281
+Node: N_DATACK_IND75725
+Node: CONS Expedited Data Transfer Service76229
+Node: N_EXDATA_REQ76521
+Node: N_EXDATA_IND76810
+Node: CONS Reset Service77102
+Node: N_RESET_REQ77386
+Node: N_RESET_IND79026
+Node: N_RESET_RES80662
+Node: N_RESET_CON80965
+Node: CONS Network Connection Release81252
+Node: N_DISCON_REQ81500
+Node: N_DISCON_IND81805
+Node: CLNS86102
+Node: N_UNITDATA_REQ86291
+Node: N_UNITDATA_IND86578
+Node: N_UDERROR_IND86890
+Node: Extension Primitives89262
+Node: SCCP Notice Service89602
+Node: N_NOTICE_IND89784
+Node: SCCP Inform Service90534
+Node: N_INFORM_REQ90767
+Node: N_INFORM_IND91869
+Node: SCCP Coordination Service92983
+Node: N_COORD_REQ93257
+Node: N_COORD_IND93846
+Node: N_COORD_RES94542
+Node: N_COORD_CON95152
+Node: SCCP State Service95830
+Node: N_STATE_REQ96060
+Node: N_STATE_IND97679
+Node: SCCP PC State Service99353
+Node: N_PCSTATE_IND99570
+Node: SCCP Traffic Service100676
+Node: N_TRAFFIC_IND100864
+Node: NPI-SCCP Input-Output Controls102186
+Node: NPI-SCCP Management Information Base102399
+Node: Mapping NPI-SCCP Primitives102631
+Node: Mapping NPI Primitives to ITU-T X.213103038
+Node: Mapping of X.213 CONS Connect/Disconnect Primitives to NPI103461
+Ref: Table A-1106784
+Node: Mapping of X.213 CONS Data Transfer Primitives to NPI107192
+Ref: Table A-2109948
+Node: Mapping of X.213 CLNS Data Transfer Primitives to NPI110201
+Ref: Table A-3111850
+Node: Mapping NPI Primitives to ITU-T Q.711114684
+Node: Mapping of Q.711 CONS Connect/Disconnect Primitives to NPI115209
+Ref: Table A-4119322
+Node: Mapping of Q.711 CONS Data Transfer Primitives to NPI120935
+Ref: Table A-5123742
+Ref: Table A-5b127587
+Node: Mapping of Q.711 CLNS Data Transfer Primitives to NPI129524
+Ref: Table A-6132160
+Node: Mapping of Q.711 Management Primitives to NPI133590
+Ref: Table A-7137442
+Node: Mapping NPI Primitives to ETSI EN 300 009-1137515
+Node: Mapping NPI Primitives to ANSI T1.112137814
+Node: NPI-SCCP Header Files138054
+Node: Protocol Primitive Header138465
+Node: Protocol Primitive Header Listing139314
+Node: Input-Output Control Header160801
+Node: NPI-SCCP Library161924
+Node: NPI-SCCP Drivers and Modules162371
+Node: TCI Module163196
+Node: TRI Driver and Module163632
+Node: SCCP Multiplexing Driver164436
+Node: SUA Application Server Driver and Module165032
+Node: NPI Conversion Module165717
+Node: TPI Conversion Module166685
+Node: NPI-SCCP Utilities167663
+Node: NPI-SCCP Compatibility and Porting168311
+Node: License168523
+Node: GNU Affero General Public License169136
+Node: GNU Free Documentation License205906
+Node: Glossary230893
+Node: Acronyms232040
+Node: References235887
+Ref: NPI236001
+Ref: Q.714236147
+Ref: Q.711236391
+Ref: Q.713236650
+Ref: XNS236899
+Ref: T1.111237058
+Ref: T1.112237210
+Ref: X.213237374
+Ref: ISO8348237672
+Ref: ISO8348/AD1237962
+Ref: ISO8473238311
+Ref: ISO8208238692
+Ref: ISO8878239022
+Ref: SVID239349
+Ref: X.210239415
+Node: Index239745
 
 End Tag Table

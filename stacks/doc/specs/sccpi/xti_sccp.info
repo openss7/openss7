@@ -1,14 +1,13 @@
-This is /home/brian/os8/stacks/doc/specs/sccpi/xti_sccp.info, produced by
-makeinfo version 4.13 from /home/brian/os8/stacks/doc/specs/sccpi/xti_sccp.texi.
-
 INFO-DIR-SECTION OpenSS7
 START-INFO-DIR-ENTRY
+This is /home/brian/os8/stacks/doc/specs/sccpi/xti_sccp.info, produced by makeinfo version 4.11 from /home/brian/os8/stacks/doc/specs/sccpi/xti_sccp.texi.
+
 * XTI-SCCP: (xti_sccp).		XTI Corrigendum for SCCP
 END-INFO-DIR-ENTRY
 
 This file documents the SCCP Corrigendum to the X/Open Transport Interface.
 
-This is Edition 0.9a, last updated 2008-12-29, for OpenSS7 SS7 Stack version
+This is Edition 0.9a, last updated 2009-01-16, for OpenSS7 SS7 Stack version
 0.9a release 8.20081103 published by OpenSS7 Corporation
 (http://www.openss7.com/).
 
@@ -137,6 +136,7 @@ version of this document is an *UNCONTROLLED VERSION*.
 
  Version Control
 ----------------
+
 
      $Log: xti_sccp.texi,v $
      Revision 0.9.2.2  2008-11-26 12:01:34  brian
@@ -3575,92 +3575,92 @@ File: xti_sccp.info,  Node: Index,  Prev: References,  Up: Top
 Tag Table:
 Node: Top1836
 Node: Preface2228
-Ref: Preface-Footnote-16433
-Node: Introduction6509
-Node: Scope6735
-Ref: Scope-Footnote-110263
-Node: Relationship to XTI10395
-Node: Modes11001
-Node: Terminology12264
-Node: Conformance13101
-Node: API Implementation13447
-Node: Underlying SCCP Service Provider14080
-Node: Future Directions14677
-Node: Services14953
-Node: Overview of the Connection-less Service15206
-Node: CLNS Initialization/De-initialization15508
-Node: CLNS Data Transfer15858
-Node: Receiving Unit Data16650
-Node: Sending Unit Data16960
-Node: Receiving Unit Data Errors17196
-Node: Overview of the Connection-Oriented Service17376
-Node: CONS Initialization/De-initialization18462
-Node: CONS Connection Establishment18966
-Node: CONS Data Transfer20203
-Node: Receiving Data20961
-Node: Sending Data22065
-Node: Connection Resets22431
-Node: CONS Connection Release25716
-Node: Mapping of SCCP Primitives28207
-Node: Connection-Oriented Primitives28532
-Node: N-CONNECT28967
-Ref: Table 2-130839
-Node: N-DATA31508
-Ref: Table 2-232794
-Node: N-EXPEDITED-DATA33472
-Ref: Table 2-434703
-Node: N-RESET34763
-Ref: Table 2-536221
-Node: N-INFORM38070
-Ref: Table 2-639394
-Node: N-DISCONNECT41457
-Ref: Table 2-742855
-Node: Connection-Less Primitives42913
-Node: N-UNIT-DATA43078
-Ref: Table 2-844478
-Node: N-NOTICE44536
-Ref: Table 2-945634
-Node: Management Primitives45690
-Node: N-STATE45849
-Ref: Table 2-1046586
-Node: N-PCSTATE46642
-Ref: Table 2-1147402
-Node: N-COORD47459
-Ref: Table 2-1248281
-Node: States and Events48337
-Node: Functions48856
-Node: XTI Function Considerations49384
-Node: t_accept(3)49791
-Node: t_bind(3)53433
-Node: t_connect(3)54883
-Node: t_getinfo(3)59186
-Node: t_look(3)59763
-Node: t_listen(3)59930
-Node: t_open(3)61721
-Node: t_optmgmt(3)62485
-Node: t_rcv(3)62789
-Node: t_rcvconnect(3)64125
-Node: t_rcvdis(3)66092
-Ref: t_rcvdis(3)-Footnote-169384
-Ref: t_rcvdis(3)-Footnote-269560
-Node: t_rcvudata(3)69761
-Node: t_rcvuderr(3)70123
-Node: t_snd(3)70578
-Node: t_snddis(3)72485
-Node: t_sndudata(3)75958
-Node: Options76295
-Node: Description of the XTI-SCCP Options77653
-Ref: Table 5-183651
-Node: Use of SCCP Options83707
-Ref: Table 5-285172
-Node: Header File85225
-Node: Protocol Terminology95450
-Node: License97537
-Node: GNU Affero General Public License98136
-Node: GNU Free Documentation License134906
-Node: Glossary159893
-Node: Acronyms161040
-Node: References165029
-Node: Index167798
+Ref: Preface-Footnote-16434
+Node: Introduction6510
+Node: Scope6736
+Ref: Scope-Footnote-110264
+Node: Relationship to XTI10396
+Node: Modes11002
+Node: Terminology12265
+Node: Conformance13102
+Node: API Implementation13448
+Node: Underlying SCCP Service Provider14081
+Node: Future Directions14678
+Node: Services14954
+Node: Overview of the Connection-less Service15207
+Node: CLNS Initialization/De-initialization15509
+Node: CLNS Data Transfer15859
+Node: Receiving Unit Data16651
+Node: Sending Unit Data16961
+Node: Receiving Unit Data Errors17197
+Node: Overview of the Connection-Oriented Service17377
+Node: CONS Initialization/De-initialization18463
+Node: CONS Connection Establishment18967
+Node: CONS Data Transfer20204
+Node: Receiving Data20962
+Node: Sending Data22066
+Node: Connection Resets22432
+Node: CONS Connection Release25717
+Node: Mapping of SCCP Primitives28208
+Node: Connection-Oriented Primitives28533
+Node: N-CONNECT28968
+Ref: Table 2-130840
+Node: N-DATA31509
+Ref: Table 2-232795
+Node: N-EXPEDITED-DATA33473
+Ref: Table 2-434704
+Node: N-RESET34764
+Ref: Table 2-536222
+Node: N-INFORM38071
+Ref: Table 2-639395
+Node: N-DISCONNECT41458
+Ref: Table 2-742856
+Node: Connection-Less Primitives42914
+Node: N-UNIT-DATA43079
+Ref: Table 2-844479
+Node: N-NOTICE44537
+Ref: Table 2-945635
+Node: Management Primitives45691
+Node: N-STATE45850
+Ref: Table 2-1046587
+Node: N-PCSTATE46643
+Ref: Table 2-1147403
+Node: N-COORD47460
+Ref: Table 2-1248282
+Node: States and Events48338
+Node: Functions48857
+Node: XTI Function Considerations49385
+Node: t_accept(3)49792
+Node: t_bind(3)53434
+Node: t_connect(3)54884
+Node: t_getinfo(3)59187
+Node: t_look(3)59764
+Node: t_listen(3)59931
+Node: t_open(3)61722
+Node: t_optmgmt(3)62486
+Node: t_rcv(3)62790
+Node: t_rcvconnect(3)64126
+Node: t_rcvdis(3)66093
+Ref: t_rcvdis(3)-Footnote-169385
+Ref: t_rcvdis(3)-Footnote-269561
+Node: t_rcvudata(3)69762
+Node: t_rcvuderr(3)70124
+Node: t_snd(3)70579
+Node: t_snddis(3)72486
+Node: t_sndudata(3)75959
+Node: Options76296
+Node: Description of the XTI-SCCP Options77654
+Ref: Table 5-183652
+Node: Use of SCCP Options83708
+Ref: Table 5-285173
+Node: Header File85226
+Node: Protocol Terminology95451
+Node: License97538
+Node: GNU Affero General Public License98137
+Node: GNU Free Documentation License134907
+Node: Glossary159894
+Node: Acronyms161041
+Node: References165030
+Node: Index167799
 
 End Tag Table

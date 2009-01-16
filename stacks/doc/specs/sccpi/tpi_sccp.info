@@ -1,14 +1,13 @@
-This is /home/brian/os8/stacks/doc/specs/sccpi/tpi_sccp.info, produced by
-makeinfo version 4.13 from /home/brian/os8/stacks/doc/specs/sccpi/tpi_sccp.texi.
-
 INFO-DIR-SECTION OpenSS7
 START-INFO-DIR-ENTRY
+This is /home/brian/os8/stacks/doc/specs/sccpi/tpi_sccp.info, produced by makeinfo version 4.11 from /home/brian/os8/stacks/doc/specs/sccpi/tpi_sccp.texi.
+
 * TPI-SCCP: (tpi_sccp).		TPI Corrigendum for SCCP
 END-INFO-DIR-ENTRY
 
 This file documents the SCCP Corrigendum to the Transport Provider Interface.
 
-This is Edition 0.9a, last updated 2008-12-29, for OpenSS7 SS7 Stack version
+This is Edition 0.9a, last updated 2009-01-16, for OpenSS7 SS7 Stack version
 0.9a release 8.20081103 published by OpenSS7 Corporation
 (http://www.openss7.com/).
 
@@ -116,6 +115,7 @@ for a current version.
 Only the texinfo or roff source is controlled.  A printed (or postscript)
 version of this document is an *UNCONTROLLED VERSION*.
 
+
      $Log: tpi_sccp.texi,v $
      Revision 0.9.2.2  2008-11-26 12:01:34  brian
      - updated to FDL 1.3
@@ -208,6 +208,7 @@ see `xti(3)' (*note (*manpages*)xti(3)::).
 Sets whether, and the amount of time if, the Stream will linger waiting for
 unsent data to be delivered.  This option is formatted as a `t_linger'
 structure defined as follows:
+
 
 struct t_linger {
         t_scalar_t l_onoff;             /* option on/off */
@@ -2333,46 +2334,46 @@ File: tpi_sccp.info,  Node: Index,  Prev: References,  Up: Top
 Tag Table:
 Node: Top1838
 Node: Preface2280
-Node: TPI-SCCP4661
-Node: XTI Level Options6593
-Node: MTP Level Options9037
-Node: SCCP Level Options10272
-Node: Mapping TPI-SCCP Primitives18686
-Node: Mapping TPI Primitives to ITU-T Q.71119066
-Node: N-CONNECT19555
-Ref: Table A-121075
-Node: N-DATA21976
-Ref: Table A-223051
-Node: N-EXPEDITED-DATA23802
-Ref: Table A-324861
-Node: N-RESET25015
-Ref: Table A-426145
-Node: N-INFORM26206
-Ref: Table A-527175
-Node: N-DISCONNECT27236
-Ref: Table A-628420
-Node: N-UNIT-DATA28483
-Ref: Table A-729749
-Node: N-NOTICE29812
-Ref: Table A-830878
-Node: N-STATE30939
-Node: N-PCSTATE31011
-Node: N-COORD31091
-Node: Mapping TPI Primitives to ANSI T1.11231165
-Node: Mapping TPI Primitives to ETSI ETS 300 009-131452
-Node: Mapping TPI Primitives to ITU-T X.21331753
-Node: TPI-SCCP Header Files31994
-Node: TPI-SCCP Library32185
-Node: TPI-SCCP Drivers and Modules32631
-Node: NPI Conversion Module33369
-Node: TPI Conversion Module34237
-Node: TPI-SCCP Utilities35196
-Node: License35817
-Node: GNU Affero General Public License36414
-Node: GNU Free Documentation License73184
-Node: Glossary98171
-Node: Acronyms99318
-Node: References103165
-Node: Index105934
+Node: TPI-SCCP4662
+Node: XTI Level Options6594
+Node: MTP Level Options9039
+Node: SCCP Level Options10274
+Node: Mapping TPI-SCCP Primitives18688
+Node: Mapping TPI Primitives to ITU-T Q.71119068
+Node: N-CONNECT19557
+Ref: Table A-121077
+Node: N-DATA21978
+Ref: Table A-223053
+Node: N-EXPEDITED-DATA23804
+Ref: Table A-324863
+Node: N-RESET25017
+Ref: Table A-426147
+Node: N-INFORM26208
+Ref: Table A-527177
+Node: N-DISCONNECT27238
+Ref: Table A-628422
+Node: N-UNIT-DATA28485
+Ref: Table A-729751
+Node: N-NOTICE29814
+Ref: Table A-830880
+Node: N-STATE30941
+Node: N-PCSTATE31013
+Node: N-COORD31093
+Node: Mapping TPI Primitives to ANSI T1.11231167
+Node: Mapping TPI Primitives to ETSI ETS 300 009-131454
+Node: Mapping TPI Primitives to ITU-T X.21331755
+Node: TPI-SCCP Header Files31996
+Node: TPI-SCCP Library32187
+Node: TPI-SCCP Drivers and Modules32633
+Node: NPI Conversion Module33371
+Node: TPI Conversion Module34239
+Node: TPI-SCCP Utilities35198
+Node: License35819
+Node: GNU Affero General Public License36416
+Node: GNU Free Documentation License73186
+Node: Glossary98173
+Node: Acronyms99320
+Node: References103167
+Node: Index105936
 
 End Tag Table

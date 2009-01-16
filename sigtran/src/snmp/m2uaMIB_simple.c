@@ -40,123 +40,123 @@ struct variable7 m2uaMIB_simple_variables[] = {
 /*  magic number        , variable type , ro/rw , callback fn  , L, oidsuffix */
 #define   M2UAASNEXTINDEX       1
 	{M2UAASNEXTINDEX, ASN_UNSIGNED, RONLY, var_m2uaMIB, 5, {1, 2, 1, 1, 1}},
-#define   M2UAASNAME            5
+#define   M2UAASNAME            2
 	{M2UAASNAME, ASN_OCTET_STR, RWRITE, var_m2uaAsTable, 7, {1, 2, 1, 1, 2, 1, 2}},
-#define   M2UAASADMINISTRATIVESTATE  6
+#define   M2UAASADMINISTRATIVESTATE  3
 	{M2UAASADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaAsTable, 7, {1, 2, 1, 1, 2, 1, 3}},
-#define   M2UAASOPERATIONALSTATE  7
+#define   M2UAASOPERATIONALSTATE  4
 	{M2UAASOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m2uaAsTable, 7, {1, 2, 1, 1, 2, 1, 4}},
-#define   M2UAASPROCEDURALSTATUS  8
+#define   M2UAASPROCEDURALSTATUS  5
 	{M2UAASPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m2uaAsTable, 7, {1, 2, 1, 1, 2, 1, 5}},
-#define   M2UAASUSAGESTATE      9
+#define   M2UAASUSAGESTATE      6
 	{M2UAASUSAGESTATE, ASN_INTEGER, RONLY, var_m2uaAsTable, 7, {1, 2, 1, 1, 2, 1, 6}},
-#define   M2UAASSTATUS          10
+#define   M2UAASSTATUS          7
 	{M2UAASSTATUS, ASN_INTEGER, RWRITE, var_m2uaAsTable, 7, {1, 2, 1, 1, 2, 1, 7}},
-#define   M2UAIFNEXTINDEX       11
+#define   M2UAIFNEXTINDEX       8
 	{M2UAIFNEXTINDEX, ASN_UNSIGNED, RONLY, var_m2uaMIB, 5, {1, 2, 1, 2, 1}},
-#define   M2UAIFNAME            15
+#define   M2UAIFNAME            9
 	{M2UAIFNAME, ASN_OCTET_STR, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 2}},
-#define   M2UAIFASINDEX         16
+#define   M2UAIFASINDEX         10
 	{M2UAIFASINDEX, ASN_UNSIGNED, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 3}},
-#define   M2UAIFIDNUM           17
+#define   M2UAIFIDNUM           11
 	{M2UAIFIDNUM, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 4}},
-#define   M2UAIFIDNAME          18
+#define   M2UAIFIDNAME          12
 	{M2UAIFIDNAME, ASN_OCTET_STR, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 5}},
-#define   M2UAIFADMINISTRATIVESTATE  19
+#define   M2UAIFADMINISTRATIVESTATE  13
 	{M2UAIFADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 6}},
-#define   M2UAIFOPERATIONALSTATE  20
+#define   M2UAIFOPERATIONALSTATE  14
 	{M2UAIFOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 7}},
-#define   M2UAIFPROCEDURALSTATUS  21
+#define   M2UAIFPROCEDURALSTATUS  15
 	{M2UAIFPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 8}},
-#define   M2UAIFUSAGESTATE      22
+#define   M2UAIFUSAGESTATE      16
 	{M2UAIFUSAGESTATE, ASN_INTEGER, RONLY, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 9}},
-#define   M2UAIFEQUIPMENT       23
+#define   M2UAIFEQUIPMENT       17
 	{M2UAIFEQUIPMENT, ASN_OBJECT_ID, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 10}},
-#define   M2UAIFMAXSIFSIZE      24
+#define   M2UAIFMAXSIFSIZE      18
 	{M2UAIFMAXSIFSIZE, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 11}},
-#define   M2UAIFTRANSMISSIONRATE  25
+#define   M2UAIFTRANSMISSIONRATE  19
 	{M2UAIFTRANSMISSIONRATE, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 12}},
-#define   M2UAIFCIC             26
+#define   M2UAIFCIC             20
 	{M2UAIFCIC, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 13}},
-#define   M2UAIFROWSTATUS       27
+#define   M2UAIFROWSTATUS       21
 	{M2UAIFROWSTATUS, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 14}},
-#define   M2UAASPNEXTINDEX      31
+#define   M2UAASPNEXTINDEX      22
 	{M2UAASPNEXTINDEX, ASN_UNSIGNED, RONLY, var_m2uaMIB, 5, {1, 2, 2, 1, 1}},
-#define   M2UAASPINDEX          34
+#define   M2UAASPINDEX          23
 	{M2UAASPINDEX, ASN_UNSIGNED, RONLY, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 1}},
-#define   M2UAASPNAME           35
+#define   M2UAASPNAME           24
 	{M2UAASPNAME, ASN_OCTET_STR, RONLY, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 2}},
-#define   M2UASGINDEX           36
+#define   M2UASGINDEX           25
 	{M2UASGINDEX, ASN_UNSIGNED, RWRITE, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 3}},
-#define   M2UAASPADMINISTRATIVESTATE  37
+#define   M2UAASPADMINISTRATIVESTATE  26
 	{M2UAASPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 4}},
-#define   M2UAASPOPERATIONALSTATE  38
+#define   M2UAASPOPERATIONALSTATE  27
 	{M2UAASPOPERATIONALSTATE, ASN_INTEGER, RWRITE, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 5}},
-#define   M2UAASPUSAGESTATE     39
+#define   M2UAASPUSAGESTATE     28
 	{M2UAASPUSAGESTATE, ASN_INTEGER, RONLY, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 6}},
-#define   M2UAASPPROCEDURALSTATUS  40
+#define   M2UAASPPROCEDURALSTATUS  29
 	{M2UAASPPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 7}},
-#define   M2UAASPSTATE          41
+#define   M2UAASPSTATE          30
 	{M2UAASPSTATE, ASN_INTEGER, RONLY, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 8}},
-#define   M2UAASPROWSTATUS      42
+#define   M2UAASPROWSTATUS      31
 	{M2UAASPROWSTATUS, ASN_INTEGER, RWRITE, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 9}},
-#define   M2UAASPINDEX          45
+#define   M2UAASPINDEX          32
 	{M2UAASPINDEX, ASN_UNSIGNED, RONLY, var_m2uaAspSgTable, 7, {1, 2, 2, 1, 2, 1, 1}},
-#define   M2UASGINDEX           46
+#define   M2UASGINDEX           33
 	{M2UASGINDEX, ASN_UNSIGNED, RWRITE, var_m2uaAspSgTable, 7, {1, 2, 2, 1, 2, 1, 3}},
-#define   M2UAASPSGASPID        47
+#define   M2UAASPSGASPID        34
 	{M2UAASPSGASPID, ASN_UNSIGNED, RWRITE, var_m2uaAspSgTable, 7, {1, 2, 2, 2, 1, 1, 1}},
-#define   M2UAASPSGASPPORT      48
+#define   M2UAASPSGASPPORT      35
 	{M2UAASPSGASPPORT, ASN_INTEGER, RWRITE, var_m2uaAspSgTable, 7, {1, 2, 2, 2, 1, 1, 2}},
-#define   M2UAASPSGASPSTATE     49
+#define   M2UAASPSGASPSTATE     36
 	{M2UAASPSGASPSTATE, ASN_INTEGER, RONLY, var_m2uaAspSgTable, 7, {1, 2, 2, 2, 1, 1, 3}},
-#define   M2UAASPSGADMINISTRATIVESTATE  50
+#define   M2UAASPSGADMINISTRATIVESTATE  37
 	{M2UAASPSGADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaAspSgTable, 7, {1, 2, 2, 2, 1, 1, 4}},
-#define   M2UASGNEXTINDEX       51
+#define   M2UASGNEXTINDEX       38
 	{M2UASGNEXTINDEX, ASN_UNSIGNED, RONLY, var_m2uaMIB, 5, {1, 2, 3, 1, 1}},
-#define   M2UASGINDEX           54
+#define   M2UASGINDEX           39
 	{M2UASGINDEX, ASN_UNSIGNED, RONLY, var_m2uaSgTable, 7, {1, 2, 3, 1, 2, 1, 1}},
-#define   M2UASGNAME            55
+#define   M2UASGNAME            40
 	{M2UASGNAME, ASN_OCTET_STR, RWRITE, var_m2uaSgTable, 7, {1, 2, 3, 1, 2, 1, 2}},
-#define   M2UASGROWSTATUS       56
+#define   M2UASGROWSTATUS       41
 	{M2UASGROWSTATUS, ASN_INTEGER, RWRITE, var_m2uaSgTable, 7, {1, 2, 3, 1, 2, 1, 3}},
-#define   M2UASGINDEX           59
+#define   M2UASGINDEX           42
 	{M2UASGINDEX, ASN_UNSIGNED, RWRITE, var_m2uaSgAspTable, 7, {1, 2, 2, 1, 2, 1, 3}},
-#define   M2UAASPINDEX          60
+#define   M2UAASPINDEX          43
 	{M2UAASPINDEX, ASN_UNSIGNED, RONLY, var_m2uaSgAspTable, 7, {1, 2, 2, 1, 2, 1, 1}},
-#define   M2UASGASPID           61
+#define   M2UASGASPID           44
 	{M2UASGASPID, ASN_UNSIGNED, RWRITE, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 1}},
-#define   M2UASGASPPORT         62
+#define   M2UASGASPPORT         45
 	{M2UASGASPPORT, ASN_INTEGER, RWRITE, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 2}},
-#define   M2UASGASPSTATE        63
+#define   M2UASGASPSTATE        46
 	{M2UASGASPSTATE, ASN_INTEGER, RONLY, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 3}},
-#define   M2UASGASPADMINISTRATIVESTATE  64
+#define   M2UASGASPADMINISTRATIVESTATE  47
 	{M2UASGASPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 4}},
-#define   M2UASGASPOPERATIONALSTATE  65
+#define   M2UASGASPOPERATIONALSTATE  48
 	{M2UASGASPOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 5}},
-#define   M2UASGINDEX           68
+#define   M2UASGINDEX           49
 	{M2UASGINDEX, ASN_UNSIGNED, RWRITE, var_m2uaSgAspAsTable, 7, {1, 2, 2, 1, 2, 1, 3}},
-#define   M2UAASPINDEX          69
+#define   M2UAASPINDEX          50
 	{M2UAASPINDEX, ASN_UNSIGNED, RONLY, var_m2uaSgAspAsTable, 7, {1, 2, 2, 1, 2, 1, 1}},
-#define   M2UASGASPASREGISTRATIONREQUIRED  71
+#define   M2UASGASPASREGISTRATIONREQUIRED  51
 	{M2UASGASPASREGISTRATIONREQUIRED, ASN_INTEGER, RWRITE, var_m2uaSgAspAsTable, 7, {1, 2, 3, 3, 1, 1, 1}},
-#define   M2UASGASPASSTATE      72
+#define   M2UASGASPASSTATE      52
 	{M2UASGASPASSTATE, ASN_INTEGER, RONLY, var_m2uaSgAspAsTable, 7, {1, 2, 3, 3, 1, 1, 2}},
-#define   M2UASGASPASADMINISTRATIVESTATE  73
+#define   M2UASGASPASADMINISTRATIVESTATE  53
 	{M2UASGASPASADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaSgAspAsTable, 7, {1, 2, 3, 3, 1, 1, 3}},
-#define   M2UASGASPASOPERATIONALSTATE  74
+#define   M2UASGASPASOPERATIONALSTATE  54
 	{M2UASGASPASOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m2uaSgAspAsTable, 7, {1, 2, 3, 3, 1, 1, 4}},
-#define   M2UASGINDEX           77
+#define   M2UASGINDEX           55
 	{M2UASGINDEX, ASN_UNSIGNED, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 2, 1, 2, 1, 3}},
-#define   M2UASGASTRAFFICMODE   79
+#define   M2UASGASTRAFFICMODE   56
 	{M2UASGASTRAFFICMODE, ASN_OBJECT_ID, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 1}},
-#define   M2UASGASSTATE         80
+#define   M2UASGASSTATE         57
 	{M2UASGASSTATE, ASN_INTEGER, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 2}},
-#define   M2UASGASADMINISTRATIVESTATE  81
+#define   M2UASGASADMINISTRATIVESTATE  58
 	{M2UASGASADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 3}},
-#define   M2UASGASOPERATIONALSTATE  82
+#define   M2UASGASOPERATIONALSTATE  59
 	{M2UASGASOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 4}},
-#define   M2UASGASROWSTATUS     83
+#define   M2UASGASROWSTATUS     60
 	{M2UASGASROWSTATUS, ASN_INTEGER, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 5}},
 };
 

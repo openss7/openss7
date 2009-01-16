@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-01-10 17:09:24 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2009-01-10 18:18:40 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 17:09:24 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-10 18:18:40 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB.mib,v $
+-- Revision 0.9.2.17  2009-01-10 18:18:40  brian
+-- - corrections
+--
 -- Revision 0.9.2.16  2009-01-10 17:09:24  brian
 -- - updated agents
 --
@@ -111,7 +114,7 @@ OPENSS7-MTP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
-    Unsigned32, Counter32, Gauge32, zeroDotZero
+    Unsigned32, Counter32, Gauge32, zeroDotZero, IpAddress
 	FROM SNMPv2-SMI
 
     TEXTUAL-CONVENTION, AutonomousType, RowPointer, RowStatus, 
@@ -15140,7 +15143,7 @@ mtpSctpLocalEntry OBJECT-TYPE
 
 MtpSctpLocalEntry ::= SEQUENCE {
     mtpSctpLocalId				Unsigned32,
-    mtpSctpLocalAddress				IPAddress,
+    mtpSctpLocalAddress				IpAddress,
     mtpSctpLocalRowStatus			RowStatus
 }
 
@@ -15155,7 +15158,7 @@ mtpSctpLocalId OBJECT-TYPE
     ::= { mtpSctpLocalEntry 1 }
 
 mtpSctpLocalAddress OBJECT-TYPE
-    SYNTAX	IPAddress
+    SYNTAX	IpAddress
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
@@ -15203,7 +15206,7 @@ mtpSctpRemoteEntry OBJECT-TYPE
 
 MtpSctpRemoteEntry ::= SEQUENCE {
     mtpSctpRemoteId				Unsigned32,
-    mtpSctpRemoteAddress			IPAddress,
+    mtpSctpRemoteAddress			IpAddress,
     mtpSctpRemoteRowStatus			RowStatus
 }
 
@@ -15218,7 +15221,7 @@ mtpSctpRemoteId OBJECT-TYPE
     ::= { mtpSctpRemoteEntry 1 }
 
 mtpSctpRemoteAddress OBJECT-TYPE
-    SYNTAX	IPAddress
+    SYNTAX	IpAddress
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION

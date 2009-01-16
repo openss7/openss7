@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2009-01-14 14:29:57 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:44:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-14 14:29:57 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:44:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.56  2009-01-16 20:44:51  brian
+ - updating mibs and agents
+
  Revision 0.9.2.55  2009-01-14 14:29:57  brian
  - working up agents
 
@@ -68,9 +71,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2009-01-14 14:29:57 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:44:51 $"
 
-static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2009-01-14 14:29:57 $";
+static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:44:51 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -115,7 +118,8 @@ static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 #include <sys/mxi.h>
-#include <ss7/x400p_ioctl.h>
+#include <sys/mxi_ioctl2.h>
+#include <sys/dsx_ioctl.h>
 
 #ifdef X400P_DOWNLOAD_FIRMWARE
 #include "v400pfw.h"
@@ -124,7 +128,7 @@ static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2009-01-14 14:29:57 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:44:51 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -7877,14 +7881,125 @@ lmi_optmgmt_req(queue_t *q, mblk_t *mp)
  *  =========================================================================
  */
 STATIC noinline __unlikely int
-mx_iocginfo_dflt(queue_t *q, mblk_t *mp, mx_info_t * arg)
+dsx_iocginfo(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocgoption(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocsoption(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioclconfig(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocgconfig(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocsconfig(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioctconfig(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioccconfig(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocgstatem(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioccmreset(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocgstatus(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocsstatus(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioccstatus(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocgstatsp(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocsstatsp(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocgstats(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioccstats(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocgnotify(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocsnotify(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioccnotify(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_iocgattr(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioccmgmt(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+dsx_ioccpass(queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+STATIC noinline __unlikely int
+mx_iocginfo_dflt(mx_info_t * arg)
 {
 	struct mx_info_dflt *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (arg->id != 0)
-		goto esrch;
 	val->mxDrivIdnum = DRV_ID;
 	val->mxDrivMajor = CMAJOR_0;
 	strncpy(val->mxDrivDescription, SL_X400P_DESCRIP, sizeof(val->mxDrivDescription));
@@ -7894,24 +8009,14 @@ mx_iocginfo_dflt(queue_t *q, mblk_t *mp, mx_info_t * arg)
 	strncpy(val->mxDrivContact, SL_X400P_CONTACT, sizeof(val->mxDrivContact));
 	val->mxDrivLicense = MXDRIVLICENSE_GPL;
 	memcpy(val->mxDrivDate,  "\x07\xd9\x01\x0e\x0c\x21\x08\x00\x00\x00\x00\x00", 12);
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_iocginfo_card(queue_t *q, mblk_t *mp, mx_info_t * arg)
+mx_iocginfo_card(struct cd *cd, mx_info_t * arg)
 {
-	struct cd *cd;
 	struct mx_info_card *val;
 
 	val = (typeof(val)) (arg + 1);
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (!(cd = cd_find(arg->id)))
-		goto esrch;
 	/* FIXME: complete this */
 	switch (cd->board) {
 	case PLX9030:
@@ -7995,56 +8100,79 @@ mx_iocginfo_card(queue_t *q, mblk_t *mp, mx_info_t * arg)
 	val->mxCardPciSlot = cd->slot;
 	val->mxCardPciIrq = cd->irq;
 	val->mxCardName[0] = '\0';
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_iocginfo_span(queue_t *q, mblk_t *mp, mx_info_t * arg)
+mx_iocginfo_span(struct sp *sp, mx_info_t * arg)
 {
-	struct sp *sp;
-
-	if (!(sp = sp_find(arg->id)))
-		goto esrch;
 	/* there is no span information */
-	mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
 	return (0);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_iocginfo_chan(queue_t *q, mblk_t *mp, mx_info_t * arg)
+mx_iocginfo_chan(struct sp *sp, struct xp *xp, mx_info_t * arg)
 {
-	struct xp *xp;
-
-	if (IS_ERR((xp = xp_find(arg->id))))
-		goto esrch;
 	/* there is no channel information */
-	mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
 	return (0);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
 mx_iocginfo(queue_t *q, mblk_t *mp)
 {
 	mx_info_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
 
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		return mx_iocginfo_dflt(q, mp, arg);
+	{
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *) (&arg->info->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocginfo_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->info->dflt + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
 		/* this driver does not support synchronization groups */
 		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		return mx_iocginfo_card(q, mp, arg);
+	{
+		struct cd *cd;
+
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *) (&arg->info->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocginfo_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->info->card + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		return mx_iocginfo_span(q, mp, arg);
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *) (&arg->info->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocginfo_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->info->span + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		return mx_iocginfo_chan(q, mp, arg);
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->info->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocginfo_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->info->chan + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
 		/* this driver does not support fractionals */
 		goto esrch;
@@ -8057,32 +8185,25 @@ mx_iocginfo(queue_t *q, mblk_t *mp)
 	default:
 		goto einval;
 	}
+	return (ret);
+      emsgsize:
+	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
 STATIC noinline __unlikely int
-mx_iocgoption_dflt(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_iocgoption_dflt(mx_option_t * arg)
 {
-	if (arg->id != 0)
-		goto esrch;
 	/* this is no default options */
-	mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
 	return (0);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_iocgoption_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_iocgoption_card(struct cd *cd, mx_option_t * arg)
 {
-	struct cd *cd;
 	struct mx_opt_conf_card *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (!(cd = cd_find(arg->id)))
-		goto esrch;
 	val->mxCardMode = 0;
 	if (cd->config.ifgmode & SDL_GMODE_LOC_LB)
 		val->mxCardMode |= (1 << MXCARDMODE_LOCALLOOPBACK);
@@ -8110,23 +8231,13 @@ mx_iocgoption_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
 		val->mxCardSyncSource = MXCARDSYNCSOURCE_SYNC4;
 		break;
 	}
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_iocgoption_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_iocgoption_span(struct sp *sp, mx_option_t * arg)
 {
-	struct sp *sp;
 	struct mx_opt_conf_span *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (!(sp = sp_find(arg->id)))
-		goto esrch;
 	switch (sp->config.ifgmode) {
 	case SDL_GMODE_LOC_LB:
 		val->mxSpanMode = (1 << MXSPANMODE_LOCAL);
@@ -8305,28 +8416,15 @@ mx_iocgoption_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
 	val->mxSpanLineCodeTime = 5000;	/* always 5 seconds for this driver */
 	val->mxSpanLineCode = MXSPANLINECODE_NOCODE;	/* not supported this driver */
 	val->mxSpanReceiveThreshold = 0;	/* not supported this driver */
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_iocgoption_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_iocgoption_chan(struct sp *sp, struct xp *xp, mx_option_t * arg)
 {
-	struct sp *sp;
-	struct xp *xp;
 	struct mx_opt_conf_chan *val;
 	sdl_config_t *config;
 
 	val = (typeof(val)) (arg + 1);
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (!(sp = sp_find(arg->id)))
-		goto esrch;
-	if (IS_ERR((xp = xp_find(arg->id))))
-		goto esrch;
 	config = xp ? &xp->sdl.config : &sp->config;
 	switch (config->iftype) {
 	case SDL_TYPE_DS0:	/* DS0 channel */
@@ -8366,42 +8464,78 @@ mx_iocgoption_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
 		val->mxChanMode = 0;	/* no loopback supported */
 		break;
 	}
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
 mx_iocgoption(queue_t *q, mblk_t *mp)
 {
 	mx_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
 
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		return mx_iocgoption_dflt(q, mp, arg);
+	{
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *)(&arg->option->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgoption_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->option->dflt + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
-		/* this driver does not support synchronization groups */
 		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		return mx_iocgoption_card(q, mp, arg);
+	{
+		struct cd *cd;
+
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->option->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgoption_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->option->card + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		return mx_iocgoption_span(q, mp, arg);
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->option->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgoption_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->option->span + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		return mx_iocgoption_chan(q, mp, arg);
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *)(&arg->option->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgoption_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->option->chan + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
-		/* this driver does not support fractionals */
 		goto esrch;
 	case MX_OBJ_TYPE_XCON:	/* cross connect */
-		/* this driver does not support cross-connect */
 		goto esrch;
 	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
-		/* this driver does not support bert */
 		goto esrch;
 	default:
 		goto einval;
 	}
+	return (ret);
+emsgsize:
+	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
@@ -8409,7 +8543,7 @@ mx_iocgoption(queue_t *q, mblk_t *mp)
 }
 
 STATIC noinline __unlikely int
-mx_test_options_dflt(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_test_options_dflt(mx_option_t * arg)
 {
 	if (arg->id != 0)
 		goto esrch;
@@ -8419,13 +8553,11 @@ mx_test_options_dflt(queue_t *q, mblk_t *mp, mx_option_t * arg)
 	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_test_options_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_test_options_card(mx_option_t * arg)
 {
 	struct cd *cd;
 	struct mx_opt_conf_card *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
 	if (!(cd = cd_find(arg->id)))
 		goto esrch;
 	/* check validity of arguments */
@@ -8451,21 +8583,17 @@ mx_test_options_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
 		goto einval;
 	}
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
 STATIC noinline __unlikely int
-mx_test_options_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_test_options_span(mx_option_t * arg)
 {
 	struct sp *sp;
 	struct mx_opt_conf_span *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
 	if (!(sp = sp_find(arg->id)))
 		goto esrch;
 	/* check validity of values */
@@ -8689,21 +8817,17 @@ mx_test_options_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
 	if (val->mxSpanReceiveThreshold != 0)
 		goto einval;
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
 STATIC noinline __unlikely int
-mx_test_options_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_test_options_chan(mx_option_t * arg)
 {
 	struct xp *xp;
 	struct mx_opt_conf_chan *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
 	if (IS_ERR((xp = xp_find(arg->id))) || xp == NULL)
 		goto esrch;
 	/* check validity of values */
@@ -8800,8 +8924,6 @@ mx_test_options_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
 		goto einval;
 	}
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
@@ -8811,17 +8933,35 @@ mx_test_options_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
 STATIC noinline __unlikely int
 mx_test_options(queue_t *q, mblk_t *mp, mx_option_t * arg)
 {
+	int ret;
+
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		return mx_test_options_dflt(q, mp, arg);
+		if ((unsigned char *)(&arg->option->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_test_options_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->option->dflt + 1);
+		break;
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
 		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		return mx_test_options_card(q, mp, arg);
+		if ((unsigned char *)(&arg->option->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_test_options_card(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->option->card + 1);
+		break;
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		return mx_test_options_span(q, mp, arg);
+		if ((unsigned char *)(&arg->option->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_test_options_span(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->option->span + 1);
+		break;
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		return mx_test_options_chan(q, mp, arg);
+		if ((unsigned char *)(&arg->option->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_test_options_chan(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->option->chan + 1);
+		break;
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
 		goto esrch;
 	case MX_OBJ_TYPE_XCON:	/* cross connect */
@@ -8831,6 +8971,9 @@ mx_test_options(queue_t *q, mblk_t *mp, mx_option_t * arg)
 	default:
 		goto einval;
 	}
+	return (ret);
+emsgsize:
+	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
@@ -8838,7 +8981,7 @@ mx_test_options(queue_t *q, mblk_t *mp, mx_option_t * arg)
 }
 
 STATIC noinline __unlikely int
-mx_set_options_dflt(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_set_options_dflt(mx_option_t * arg)
 {
 	if (arg->id != 0)
 		goto esrch;
@@ -8848,7 +8991,7 @@ mx_set_options_dflt(queue_t *q, mblk_t *mp, mx_option_t * arg)
 	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_set_options_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_set_options_card(mx_option_t * arg)
 {
 	struct cd *cd;
 	struct mx_opt_conf_card *val = (typeof(val)) (arg + 1);
@@ -8922,7 +9065,7 @@ mx_set_options_card(queue_t *q, mblk_t *mp, mx_option_t * arg)
 	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_set_options_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_set_options_span(mx_option_t * arg)
 {
 	struct sp *sp;
 	struct mx_opt_conf_span *val = (typeof(val)) (arg + 1);
@@ -9198,7 +9341,7 @@ mx_set_options_span(queue_t *q, mblk_t *mp, mx_option_t * arg)
 	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_set_options_chan(queue_t *q, mblk_t *mp, mx_option_t * arg)
+mx_set_options_chan(mx_option_t * arg)
 {
 	struct xp *xp;
 	struct mx_opt_conf_chan *val = (typeof(val)) (arg + 1);
@@ -9305,15 +9448,15 @@ mx_set_options(queue_t *q, mblk_t *mp, mx_option_t * arg)
 {
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		return mx_set_options_dflt(q, mp, arg);
+		return mx_set_options_dflt(arg);
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
 		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		return mx_set_options_card(q, mp, arg);
+		return mx_set_options_card(arg);
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		return mx_set_options_span(q, mp, arg);
+		return mx_set_options_span(arg);
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		return mx_set_options_chan(q, mp, arg);
+		return mx_set_options_chan(arg);
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
 		goto esrch;
 	case MX_OBJ_TYPE_XCON:	/* cross connect */
@@ -9436,23 +9579,23 @@ mx_ioclconfig(queue_t *q, mblk_t *mp)
 	return (-EINVAL);
 }
 
+STATIC noinline __unlikely int
+mx_iocgconfig_dflt(mx_config_t *arg)
+{
+	/* there is no configuration for default */
+	return (0);
+}
 /**
  * mx_iocgconfig_card: - get configuration information for a card
- * @q: active queue (management stream write queue)
- * @mp: the input-output control
+ * @cd: card structure
  * @arg; the configuration structure
  */
 STATIC noinline __unlikely int
-mx_iocgconfig_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_iocgconfig_card(struct cd *cd, mx_config_t * arg)
 {
-	struct cd *cd;
 	struct mx_conf_card *val;
 
 	val = (typeof(val)) (arg + 1);
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if ((cd = cd_find(arg->id)) == NULL)
-		goto esrch;
 	val->mxCardIndex = cd->card;
 	switch (cd->config.ifgtype) {
 	case SDL_GTYPE_E1:
@@ -9469,31 +9612,20 @@ mx_iocgconfig_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
 		break;
 	}
 	val->mxCardSyncGroup = 0;
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 
 /**
  * mx_iocgconfig_span: - get configuration information for a span
- * @q: active queue (management stream write queue)
- * @mp: the input-output control
+ * @sp: span structure
  * @arg; the configuration structure
  */
 STATIC noinline __unlikely int
-mx_iocgconfig_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_iocgconfig_span(struct sp *sp, mx_config_t * arg)
 {
-	struct sp *sp;
 	struct mx_conf_span *val;
 
 	val = (typeof(val)) (arg + 1);
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		return (-EMSGSIZE);
-	if ((sp = sp_find(arg->id)) == NULL)
-		return (-ESRCH);
 	val->mxCardIndex = (arg->id >> 12) & 0xf;
 	val->mxSpanIndex = (arg->id >> 8) & 0xf;
 	val->mxSpanName[0] = '\0';
@@ -9592,36 +9724,25 @@ mx_iocgconfig_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
 	}
 	val->mxSpanPriority = 0;
 	val->mxSpanPrimary = 0;
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
 }
 
 /**
  * mx_iocgconfig_chan: - get configuration information for a channel
- * @q: active queue (management stream write queue)
- * @mp: the input-output control
+ * @sp: span structure
+ * @xp: channel structure
  * @arg; the configuration structure
  */
 STATIC noinline __unlikely int
-mx_iocgconfig_chan(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_iocgconfig_chan(struct sp *sp, struct xp *xp, mx_config_t * arg)
 {
-	struct xp *xp;
 	struct mx_conf_chan *val;
 
 	val = (typeof(val)) (arg + 1);
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (IS_ERR((xp = xp_find(arg->id))))
-		goto esrch;
 	val->mxCardIndex = (arg->id >> 12) & 0x0f;
 	val->mxSpanIndex = (arg->id >> 8) & 0x0f;
 	val->mxChanIndex = (arg->id >> 0) & 0xff;
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 
 /**
@@ -9634,36 +9755,73 @@ STATIC noinline __unlikely int
 mx_iocgconfig(queue_t *q, mblk_t *mp)
 {
 	mx_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
 
 	arg->cmd = MX_GET;
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
+	{
 		if (arg->id != 0)
-			return (-ESRCH);
-		/* there is no configuration for default */
-		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
-		return (0);
+			goto esrch;
+		if ((unsigned char *)(&arg->config->dflt + 1) >= mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgconfig_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->config->dflt + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
-		/* this driver does not support synchronization groups */
 		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		return mx_iocgconfig_card(q, mp, arg);
+	{
+		struct cd *cd;
+
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->config->card + 1) >= mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgconfig_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->config->card + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		return mx_iocgconfig_span(q, mp, arg);
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->config->span + 1) >= mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgconfig_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->config->span + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		return mx_iocgconfig_chan(q, mp, arg);
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *)(&arg->config->chan + 1) >= mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgconfig_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->config->chan + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
-		/* this driver does not support fractionals */
 		goto esrch;
 	case MX_OBJ_TYPE_XCON:	/* cross connect */
-		/* this driver does not support cross-connect */
 		goto esrch;
 	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
-		/* this driver does not support bert testing */
 		goto esrch;
 	default:
 		goto einval;
 	}
+	return (ret);
+      emsgsize:
+	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
@@ -9671,15 +9829,15 @@ mx_iocgconfig(queue_t *q, mblk_t *mp)
 }
 
 STATIC noinline __unlikely int
-mx_test_config_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_test_config_dflt(mx_config_t * arg)
 {
-	struct cd *cd;
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_test_config_card(struct cd *cd, mx_config_t * arg)
+{
 	struct mx_conf_card *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		return (-EMSGSIZE);
-	if ((cd = cd_find(arg->id)) == NULL)
-		goto esrch;
 	if (val->mxCardIndex != cd->card)
 		goto einval;
 	switch (val->mxCardSpanType) {
@@ -9762,25 +9920,17 @@ mx_test_config_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
 	/* the driver only supports one large default synchronization group */
 	if (val->mxCardSyncGroup != 0)
 		goto einval;
-	mp->b_cont->b_wptr = (unsigned char *) (val + 1);
 	return (0);
-      esrch:
-	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
 
 STATIC noinline __unlikely int
-mx_test_config_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_test_config_span(struct sp *sp, mx_config_t * arg)
 {
-	struct sp *sp;
 	struct cd *cd;
 	struct mx_conf_span *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if ((sp = sp_find(arg->id)) == NULL)
-		goto esrch;
 	cd = sp->cd;
 	if (val->mxCardIndex != cd->card)
 		goto einval;
@@ -9980,31 +10130,18 @@ mx_test_config_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
 	if (val->mxSpanPrimary != 0)
 		goto einval;
 	return (0);
-emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
 
 STATIC noinline __unlikely int
-mx_test_config_chan(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_test_config_chan(struct sp *sp, struct xp *xp, mx_config_t * arg)
 {
 	struct cd *cd;
-	struct sp *sp;
-	struct xp *xp;
 	struct mx_conf_chan *val = (typeof(val)) (arg + 1);
 	uint chan;
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (!(cd = cd_find(arg->id)))
-		goto esrch;
-	if (!(sp = sp_find(arg->id)))
-		goto esrch;
-	if (IS_ERR((xp = xp_find(arg->id))))
-		goto esrch;
+	cd = sp->cd;
 	chan = (arg->id >> 0) & 0xff;
 	if (val->mxCardIndex != cd->card)
 		goto einval;
@@ -10023,10 +10160,6 @@ mx_test_config_chan(queue_t *q, mblk_t *mp, mx_config_t * arg)
 		break;
 	}
 	return (0);
-emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
@@ -10042,6 +10175,8 @@ emsgsize:
 STATIC noinline __unlikely int
 mx_test_config(queue_t *q, mblk_t *mp, mx_config_t * arg)
 {
+	int ret;
+
 	switch (arg->cmd) {
 	case MX_CHA:
 	case MX_TST:
@@ -10058,17 +10193,56 @@ mx_test_config(queue_t *q, mblk_t *mp, mx_config_t * arg)
 	}
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:
+	{
 		if (arg->id != 0)
 			goto esrch;
+		if ((unsigned char *)(&arg->config->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_test_config_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->config->dflt + 1);
 		break;
+	}
 	case MX_OBJ_TYPE_SYNC:
 		goto esrch;
 	case MX_OBJ_TYPE_CARD:
-		return mx_test_config_card(q, mp, arg);
+	{
+		struct cd *cd;
+
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->config->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_test_config_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->config->card + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SPAN:
-		return mx_test_config_span(q, mp, arg);
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->config->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_test_config_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->config->span + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_CHAN:
-		return mx_test_config_chan(q, mp, arg);
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *)(&arg->config->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_test_config_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->config->chan + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_FRAC:
 		/* fractionals not supported by this driver */
 		goto esrch;
@@ -10081,6 +10255,9 @@ mx_test_config(queue_t *q, mblk_t *mp, mx_config_t * arg)
 	default:
 		goto einval;
 	}
+	return (ret);
+      emsgsize:
+	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
@@ -10088,7 +10265,17 @@ mx_test_config(queue_t *q, mblk_t *mp, mx_config_t * arg)
 }
 
 static noinline __unlikely int
-mx_commit_config_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_commit_config_dflt(mx_config_t * arg)
+{
+	if (arg->id != 0)
+		goto esrch;
+	/* not configuration to commit */
+	return (0);
+esrch:
+	return (-ESRCH);
+}
+static noinline __unlikely int
+mx_commit_config_card(mx_config_t * arg)
 {
 	struct cd *cd;
 	struct sp *sp;
@@ -10276,7 +10463,7 @@ mx_commit_config_card(queue_t *q, mblk_t *mp, mx_config_t * arg)
 }
 
 static noinline __unlikely int
-mx_commit_config_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_commit_config_span(mx_config_t * arg)
 {
 	struct sp *sp;
 
@@ -10288,7 +10475,7 @@ mx_commit_config_span(queue_t *q, mblk_t *mp, mx_config_t * arg)
 }
 
 static noinline __unlikely int
-mx_commit_config_chan(queue_t *q, mblk_t *mp, mx_config_t * arg)
+mx_commit_config_chan(mx_config_t * arg)
 {
 	struct xp *xp;
 
@@ -10313,19 +10500,16 @@ mx_commit_config(queue_t *q, mblk_t *mp, mx_config_t * arg)
 {
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		if (arg->id != 0)
-			goto esrch;
-		/* not configuration to commit */
-		return (0);
+		return mx_commit_config_dflt(arg);
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
 		/* syncrhonization groups not supported by driver */
 		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		return mx_commit_config_card(q, mp, arg);
+		return mx_commit_config_card(arg);
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		return mx_commit_config_span(q, mp, arg);
+		return mx_commit_config_span(arg);
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		return mx_commit_config_chan(q, mp, arg);
+		return mx_commit_config_chan(arg);
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
 		/* fractionals not supported by driver */
 		goto esrch;
@@ -10375,85 +10559,118 @@ mx_ioccconfig(queue_t *q, mblk_t *mp)
 	return mx_commit_config(q, mp, arg);
 }
 STATIC noinline __unlikely int
+mx_iocgstatem_dflt(mx_statem_t *arg)
+{
+	/* no state information for default */
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgstatem_card(struct cd *cd, mx_statem_t *arg)
+{
+	/* no state information for cards */
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgstatem_span(struct sp *sp, mx_statem_t *arg)
+{
+	/* no state information for spans */
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgstatem_chan(struct sp *sp, struct xp *xp, mx_statem_t *arg)
+{
+	uint chan;
+
+	chan = arg->id & 0xff;
+	switch (sp->config.ifgtype) {
+	case SDL_GTYPE_E1:
+		if (1 > chan || chan > 31)
+			goto esrch;
+		break;
+	case SDL_GTYPE_T1:
+	case SDL_GTYPE_J1:
+		if (1 > chan || chan > 24)
+			goto esrch;
+		break;
+	default:
+		goto esrch;
+	}
+	/* no state information for channels */
+	return (0);
+esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
 mx_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	mx_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
 
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		if (arg->id != 0)
-			return (-ESRCH);
-		/* no state information for default */
-		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
-		return (0);
-	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
 	{
-		/* this driver does not support synchronization groups */
-		return (-ESRCH);
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *) (&arg->statem->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstatem_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->statem->dflt + 1);
+		break;
 	}
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
 	{
 		struct cd *cd;
 
-		if ((cd = cd_find(arg->id)) == NULL)
-			return (-ESRCH);
-		/* no state information for cards */
-		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
-		return (0);
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *) (&arg->statem->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstatem_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->statem->card + 1);
+		break;
 	}
 	case MX_OBJ_TYPE_SPAN:	/* span */
 	{
 		struct sp *sp;
 
-		if ((sp = sp_find(arg->id)) == NULL)
-			return (-ESRCH);
-		/* no state information for spans */
-		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
-		return (0);
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *) (&arg->statem->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstatem_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->statem->span + 1);
+		break;
 	}
 	case MX_OBJ_TYPE_CHAN:	/* channel */
 	{
 		struct sp *sp;
-		uint chan;
+		struct xp *xp;
 
-		if ((sp = sp_find(arg->id)) == NULL)
-			return (-ESRCH);
-		chan = arg->id & 0xff;
-		switch (sp->config.ifgtype) {
-		case SDL_GTYPE_E1:
-			if (1 > chan || chan > 31)
-				return (-ESRCH);
-			break;
-		case SDL_GTYPE_T1:
-		case SDL_GTYPE_J1:
-			if (1 > chan || chan > 24)
-				return (-ESRCH);
-			break;
-		default:
-			return (-ESRCH);
-		}
-		/* no state information for channels */
-		mp->b_cont->b_wptr = (unsigned char *) (arg + 1);
-		return (0);
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->statem->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstatem_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->statem->chan + 1);
+		break;
 	}
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
-	{
-		/* this driver does not support fractionals */
-		return (-ESRCH);
-	}
+		goto esrch;
 	case MX_OBJ_TYPE_XCON:	/* cross connect */
-	{
-		/* this driver does not support cross-connect */
-		return (-ESRCH);
-	}
+		goto esrch;
 	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
-	{
-		/* this driver does not support bert */
-		return (-ESRCH);
-	}
+		goto esrch;
 	default:
 		goto einval;
 	}
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
@@ -10480,15 +10697,15 @@ mx_ioccmreset(queue_t *q, mblk_t *mp)
 }
 
 STATIC noinline __unlikely int
-mx_iocgstatus_card(queue_t *q, mblk_t *mp, mx_status_t * arg)
+mx_iocgstatus_dflt(mx_status_t * arg)
 {
-	struct cd *cd;
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgstatus_card(struct cd *cd, mx_status_t * arg)
+{
 	struct mx_status_card *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if ((cd = cd_find(arg->id)) == NULL)
-		goto esrch;
 	/* mxCardAdministrativeState */
 	if (cd->config.ifflags & SDL_IF_UP)
 		val->mxCardAdministrativeState = X721_ADMINISTRATIVESTATE_UNLOCKED;
@@ -10583,21 +10800,12 @@ mx_iocgstatus_card(queue_t *q, mblk_t *mp, mx_status_t * arg)
 	/* mxCardStandbyStatus */
 	val->mxCardStandbyStatus = X721_STANDBYSTATUS_PROVIDINGSERVICE;
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_iocgstatus_span(queue_t *q, mblk_t *mp, mx_status_t * arg)
+mx_iocgstatus_span(struct sp *sp, mx_status_t * arg)
 {
-	struct sp *sp;
 	struct mx_status_span *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) (val + 1) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (!(sp = sp_find(arg->id)))
-		goto esrch;
 	/* mxSpanAdministrativeState */
 	if (sp->config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING))
 		val->mxSpanAdministrativeState = X721_ADMINISTRATIVESTATE_UNLOCKED;
@@ -10697,21 +10905,12 @@ mx_iocgstatus_span(queue_t *q, mblk_t *mp, mx_status_t * arg)
 	/* mxSpanEvents */
 	val->mxSpanEvents = 0;	/* for now */
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
-mx_iocgstatus_chan(queue_t *q, mblk_t *mp, mx_status_t * arg)
+mx_iocgstatus_chan(struct sp *sp, struct xp *xp, mx_status_t * arg)
 {
-	struct xp *xp;
 	struct mx_status_chan *val = (typeof(val)) (arg + 1);
 
-	if ((unsigned char *) val + sizeof(val) > mp->b_cont->b_wptr)
-		goto emsgsize;
-	if (IS_ERR((xp = xp_find(arg->id))))
-		goto esrch;
 	/* mxChanAdministrativeState */
 	if (!xp || xp->sdl.config.ifflags & (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING))
 		val->mxChanAdministrativeState = X721_ADMINISTRATIVESTATE_UNLOCKED;
@@ -10762,27 +10961,65 @@ mx_iocgstatus_chan(queue_t *q, mblk_t *mp, mx_status_t * arg)
 	/* mxChanStandbyStatus */
 	val->mxChanStandbyStatus = X721_STANDBYSTATUS_PROVIDINGSERVICE;
 	return (0);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
 }
 STATIC noinline __unlikely int
 mx_iocgstatus(queue_t *q, mblk_t *mp)
 {
 	mx_status_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
 
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		return (0);
+	{
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *)(&arg->status->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstatus_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->status->dflt + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
 		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		return mx_iocgstatus_card(q, mp, arg);
+	{
+		struct cd *cd;
+
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->status->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstatus_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->status->card + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		return mx_iocgstatus_span(q, mp, arg);
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->status->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstatus_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->status->span + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		return mx_iocgstatus_chan(q, mp, arg);
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *)(&arg->status->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstatus_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->status->chan + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
 		goto esrch;
 	case MX_OBJ_TYPE_XCON:	/* cross connect */
@@ -10792,6 +11029,9 @@ mx_iocgstatus(queue_t *q, mblk_t *mp)
 	default:
 		goto einval;
 	}
+	return (ret);
+      emsgsize:
+	return (-EMSGSIZE);
       esrch:
 	return (-ESRCH);
       einval:
@@ -10924,33 +11164,104 @@ mx_iocsstatsp(queue_t *q, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC noinline __unlikely int
+mx_iocgstats_dflt(mx_stats_t *arg)
+{
+	/* FIXME: get these */
+	bzero(&arg->stats->dflt, sizeof(arg->stats->dflt));
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgstats_card(struct cd *cd, mx_stats_t *arg)
+{
+	/* FIXME: get these */
+	bzero(&arg->stats->card, sizeof(arg->stats->card));
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgstats_span(struct sp *sp, mx_stats_t *arg)
+{
+	/* FIXME: get these */
+	bzero(&arg->stats->span, sizeof(arg->stats->span));
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgstats_chan(struct sp *sp, struct xp *xp, mx_stats_t *arg)
+{
+	/* FIXME: get these */
+	bzero(&arg->stats->chan, sizeof(arg->stats->chan));
+	return (0);
+}
+STATIC noinline __unlikely int
 mx_iocgstats(queue_t *q, mblk_t *mp)
 {
 	mx_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
 
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		return (0);
+	{
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *)(&arg->stats->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstats_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->stats->dflt + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
-		return (0);
+		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+	{
+		struct cd *cd;
+
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->stats->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstats_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->stats->card + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->stats->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstats_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->stats->span + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		return (0);
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *)(&arg->stats->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgstats_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->stats->chan + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
-		return (0);
+		goto esrch;
 	case MX_OBJ_TYPE_XCON:	/* cross connect */
-		return (0);
+		goto esrch;
 	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+		goto esrch;
 	default:
 		goto einval;
 	}
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
@@ -10986,38 +11297,100 @@ mx_ioccstats(queue_t *q, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC noinline __unlikely int
+mx_iocgnotify_dflt(mx_notify_t *arg)
+{
+	/* FIXME: complete this */
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgnotify_card(struct cd *cd, mx_notify_t *arg)
+{
+	/* FIXME: complete this */
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgnotify_span(struct sp *sp, mx_notify_t *arg)
+{
+	/* FIXME: complete this */
+	return (0);
+}
+STATIC noinline __unlikely int
+mx_iocgnotify_chan(struct sp *sp, struct xp *xp, mx_notify_t *arg)
+{
+	/* FIXME: complete this */
+	return (0);
+}
+STATIC noinline __unlikely int
 mx_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	mx_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
 
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+	{
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *)(&arg->events->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgnotify_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->events->dflt + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+		goto esrch;
 	case MX_OBJ_TYPE_CARD:	/* card */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+	{
+		struct cd *cd;
+
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->events->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgnotify_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->events->card + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_SPAN:	/* span */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->events->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgnotify_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->events->span + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_CHAN:	/* channel */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *)(&arg->events->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgnotify_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->events->chan + 1);
+		break;
+	}
 	case MX_OBJ_TYPE_FRAC:	/* fractional */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+		goto esrch;
 	case MX_OBJ_TYPE_XCON:	/* cross connect */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+		goto esrch;
 	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
-		/* FIXME: complete this */
-		return (-EOPNOTSUPP);
+		goto esrch;
 	default:
 		goto einval;
 	}
+emsgsize:
+	return (-EMSGSIZE);
+esrch:
+	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
@@ -11090,6 +11463,171 @@ mx_ioccnotify(queue_t *q, mblk_t *mp)
 	default:
 		goto einval;
 	}
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+mx_iocgattr_dflt(mx_attr_t * arg)
+{
+	int ret;
+
+	if ((ret = mx_iocgconfig_dflt((mx_config_t *)&arg->attrs->dflt.config)) < 0)
+		goto error;
+	if ((ret = mx_iocgoption_dflt((mx_option_t *)&arg->attrs->dflt.option)) < 0)
+		goto error;
+	if ((ret = mx_iocginfo_dflt((mx_info_t *)&arg->attrs->dflt.inform)) < 0)
+		goto error;
+	if ((ret = mx_iocgstatem_dflt((mx_statem_t *)&arg->attrs->dflt.statem)) < 0)
+		goto error;
+	if ((ret = mx_iocgstatus_dflt((mx_status_t *)&arg->attrs->dflt.status)) < 0)
+		goto error;
+	if ((ret = mx_iocgstats_dflt((mx_stats_t *)&arg->attrs->dflt.stats)) < 0)
+		goto error;
+	if ((ret = mx_iocgnotify_dflt((mx_notify_t *)&arg->attrs->dflt.events)) < 0)
+		goto error;
+	return (0);
+error:
+	return (ret);
+}
+STATIC noinline __unlikely int
+mx_iocgattr_card(struct cd *cd, mx_attr_t * arg)
+{
+	int ret;
+
+	if ((ret = mx_iocgconfig_card(cd, (mx_config_t *)&arg->attrs->card.config)) < 0)
+		goto error;
+	if ((ret = mx_iocgoption_card(cd, (mx_option_t *)&arg->attrs->card.option)) < 0)
+		goto error;
+	if ((ret = mx_iocginfo_card(cd, (mx_info_t *)&arg->attrs->card.inform)) < 0)
+		goto error;
+	if ((ret = mx_iocgstatem_card(cd, (mx_statem_t *)&arg->attrs->card.statem)) < 0)
+		goto error;
+	if ((ret = mx_iocgstatus_card(cd, (mx_status_t *)&arg->attrs->card.status)) < 0)
+		goto error;
+	if ((ret = mx_iocgstats_card(cd, (mx_stats_t *)&arg->attrs->card.stats)) < 0)
+		goto error;
+	if ((ret = mx_iocgnotify_card(cd, (mx_notify_t *)&arg->attrs->card.events)) < 0)
+		goto error;
+	return (0);
+error:
+	return (ret);
+}
+STATIC noinline __unlikely int
+mx_iocgattr_span(struct sp *sp, mx_attr_t * arg)
+{
+	int ret;
+
+	if ((ret = mx_iocgconfig_span(sp, (mx_config_t *)&arg->attrs->span.config)) < 0)
+		goto error;
+	if ((ret = mx_iocgoption_span(sp, (mx_option_t *)&arg->attrs->span.option)) < 0)
+		goto error;
+	if ((ret = mx_iocginfo_span(sp, (mx_info_t *)&arg->attrs->span.inform)) < 0)
+		goto error;
+	if ((ret = mx_iocgstatem_span(sp, (mx_statem_t *)&arg->attrs->span.statem)) < 0)
+		goto error;
+	if ((ret = mx_iocgstatus_span(sp, (mx_status_t *)&arg->attrs->span.status)) < 0)
+		goto error;
+	if ((ret = mx_iocgstats_span(sp, (mx_stats_t *)&arg->attrs->span.stats)) < 0)
+		goto error;
+	if ((ret = mx_iocgnotify_span(sp, (mx_notify_t *)&arg->attrs->span.events)) < 0)
+		goto error;
+	return (0);
+error:
+	return (ret);
+}
+STATIC noinline __unlikely int
+mx_iocgattr_chan(struct sp *sp, struct xp *xp, mx_attr_t * arg)
+{
+	int ret;
+
+	if ((ret = mx_iocgconfig_chan(sp, xp, (mx_config_t *)&arg->attrs->chan.config)) < 0)
+		goto error;
+	if ((ret = mx_iocgoption_chan(sp, xp, (mx_option_t *)&arg->attrs->chan.option)) < 0)
+		goto error;
+	if ((ret = mx_iocginfo_chan(sp, xp, (mx_info_t *)&arg->attrs->chan.inform)) < 0)
+		goto error;
+	if ((ret = mx_iocgstatem_chan(sp, xp, (mx_statem_t *)&arg->attrs->chan.statem)) < 0)
+		goto error;
+	if ((ret = mx_iocgstatus_chan(sp, xp, (mx_status_t *)&arg->attrs->chan.status)) < 0)
+		goto error;
+	if ((ret = mx_iocgstats_chan(sp, xp, (mx_stats_t *)&arg->attrs->chan.stats)) < 0)
+		goto error;
+	if ((ret = mx_iocgnotify_chan(sp, xp, (mx_notify_t *)&arg->attrs->chan.events)) < 0)
+		goto error;
+	return (0);
+error:
+	return (ret);
+}
+STATIC noinline __unlikely int
+mx_iocgattr(queue_t *q, mblk_t *mp)
+{
+	mx_attr_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
+
+	switch (arg->type) {
+	case MX_OBJ_TYPE_DFLT:	/* defaults */
+	{
+		if ((unsigned char *)(&arg->attrs->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgattr_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->attrs->dflt + 1);
+		break;
+	}
+	case MX_OBJ_TYPE_SYNC:	/* synchronization group */
+		goto esrch;
+	case MX_OBJ_TYPE_CARD:	/* card */
+	{
+		struct cd *cd;
+
+		if (!(cd = cd_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->attrs->card + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgattr_card(cd, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->attrs->card + 1);
+		break;
+	}
+	case MX_OBJ_TYPE_SPAN:	/* span */
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *)(&arg->attrs->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgattr_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->attrs->span + 1);
+		break;
+	}
+	case MX_OBJ_TYPE_CHAN:	/* channel */
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *)(&arg->attrs->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = mx_iocgattr_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *)(&arg->attrs->chan + 1);
+		break;
+	}
+	case MX_OBJ_TYPE_FRAC:	/* fractional */
+		goto esrch;
+	case MX_OBJ_TYPE_XCON:	/* cross connect */
+		goto esrch;
+	case MX_OBJ_TYPE_BERT:	/* bit error rate test */
+		goto esrch;
+	default:
+		goto einval;
+	}
+	return (ret);
+emsgsize:
+	return (-EMSGSIZE);
+esrch:
+	return (-ESRCH);
       einval:
 	return (-EINVAL);
 }
@@ -13735,18 +14273,17 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	int ret = 0;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 
-	(void) nr;
 	switch (type) {
 	case __SID:
 	{
-		switch (cmd) {
+		switch (nr) {
 		default:
 			ptrace(("%s: ERROR: Unknown IOCTL %d\n", DRV_NAME, cmd));
-		case I_STR:
-		case I_LINK:
-		case I_PLINK:
-		case I_UNLINK:
-		case I_PUNLINK:
+		case _IOC_NR(I_STR):
+		case _IOC_NR(I_LINK):
+		case _IOC_NR(I_PLINK):
+		case _IOC_NR(I_UNLINK):
+		case _IOC_NR(I_PUNLINK):
 			rare();
 			(void) lp;
 			ret = -EINVAL;
@@ -13756,81 +14293,165 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 		ret = -EOPNOTSUPP;
 		break;
 	}
+	case DSX_IOC_MAGIC:
+	{
+		if (count < size || mp->b_cont == NULL)
+			return (-EINVAL);
+		switch (nr) {
+		case _IOC_NR(DSX_IOCGINFO): /* dsx_info_t */
+			ret = dsx_iocginfo(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCGOPTION):	/* dsx_option_t */
+			ret = dsx_iocgoption(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCSOPTION):	/* dsx_option_t */
+			ret = dsx_iocsoption(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCLCONFIG):	/* dsx_config_t */
+			ret = dsx_ioclconfig(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCGCONFIG):	/* dsx_config_t */
+			ret = dsx_iocgconfig(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCSCONFIG):	/* dsx_config_t */
+			ret = dsx_iocsconfig(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCTCONFIG):	/* dsx_config_t */
+			ret = dsx_ioctconfig(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCCCONFIG):	/* dsx_config_t */
+			ret = dsx_ioccconfig(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCGSTATEM):	/* dsx_statem_t */
+			ret = dsx_iocgstatem(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCCMRESET):	/* dsx_statem_t */
+			ret = dsx_ioccmreset(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCGSTATUS):	/* dsx_status_t */
+			ret = dsx_iocgstatus(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCSSTATUS):	/* dsx_status_t */
+			ret = dsx_iocsstatus(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCCSTATUS):	/* dsx_status_t */
+			ret = dsx_ioccstatus(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCGSTATSP):	/* dsx_stats_t */
+			ret = dsx_iocgstatsp(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCSSTATSP):	/* dsx_stats_t */
+			ret = dsx_iocsstatsp(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCGSTATS):	/* dsx_stats_t */
+			ret = dsx_iocgstats(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCCSTATS):	/* dsx_stats_t */
+			ret = dsx_ioccstats(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCGNOTIFY):	/* dsx_notify_t */
+			ret = dsx_iocgnotify(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCSNOTIFY):	/* dsx_notify_t */
+			ret = dsx_iocsnotify(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCCNOTIFY):	/* dsx_notify_t */
+			ret = dsx_ioccnotify(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCGATTR):	/* dsx_attr_t */
+			ret = dsx_iocgattr(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCCMGMT):	/* dsx_mgmt_t */
+			ret = dsx_ioccmgmt(q, mp);
+			break;
+		case _IOC_NR(DSX_IOCCPASS):	/* dsx_pass_t */
+			ret = dsx_ioccpass(q, mp);
+			break;
+		default:
+			ret = -EOPNOTSUPP;
+			break;
+		}
+		break;
+	}
 	case MX_IOC_MAGIC:
 	{
 		if (count < size || mp->b_cont == NULL)
 			return (-EINVAL);
-		switch (cmd) {
-		case MX_IOCGINFO:	/* mx_info_t */
+		switch (nr) {
+		case _IOC_NR(MX_IOCGINFO):	/* mx_info_t */
 			ret = mx_iocginfo(q, mp);
 			break;
-		case MX_IOCGOPTION:	/* mx_option_t */
+		case _IOC_NR(MX_IOCGOPTION):	/* mx_option_t */
 			ret = mx_iocgoption(q, mp);
 			break;
-		case MX_IOCSOPTION:	/* mx_option_t */
+		case _IOC_NR(MX_IOCSOPTION):	/* mx_option_t */
 			ret = mx_iocsoption(q, mp);
 			break;
-		case MX_IOCLCONFIG:	/* mx_config_t */
+		case _IOC_NR(MX_IOCLCONFIG):	/* mx_config_t */
 			ret = mx_ioclconfig(q, mp);
 			break;
-		case MX_IOCGCONFIG:	/* mx_config_t */
+		case _IOC_NR(MX_IOCGCONFIG):	/* mx_config_t */
 			ret = mx_iocgconfig(q, mp);
 			break;
-		case MX_IOCSCONFIG:	/* mx_config_t */
+		case _IOC_NR(MX_IOCSCONFIG):	/* mx_config_t */
 			ret = mx_iocsconfig(q, mp);
 			break;
-		case MX_IOCTCONFIG:	/* mx_config_t */
+		case _IOC_NR(MX_IOCTCONFIG):	/* mx_config_t */
 			ret = mx_ioctconfig(q, mp);
 			break;
-		case MX_IOCCCONFIG:	/* mx_config_t */
+		case _IOC_NR(MX_IOCCCONFIG):	/* mx_config_t */
 			ret = mx_ioccconfig(q, mp);
 			break;
-		case MX_IOCGSTATEM:	/* mx_statem_t */
+		case _IOC_NR(MX_IOCGSTATEM):	/* mx_statem_t */
 			ret = mx_iocgstatem(q, mp);
 			break;
-		case MX_IOCCMRESET:	/* mx_statem_t */
+		case _IOC_NR(MX_IOCCMRESET):	/* mx_statem_t */
 			ret = mx_ioccmreset(q, mp);
 			break;
-		case MX_IOCGSTATUS:	/* mx_status_t */
+		case _IOC_NR(MX_IOCGSTATUS):	/* mx_status_t */
 			ret = mx_iocgstatus(q, mp);
 			break;
-		case MX_IOCSSTATUS:	/* mx_status_t */
+		case _IOC_NR(MX_IOCSSTATUS):	/* mx_status_t */
 			ret = mx_iocsstatus(q, mp);
 			break;
-		case MX_IOCCSTATUS:	/* mx_status_t */
+		case _IOC_NR(MX_IOCCSTATUS):	/* mx_status_t */
 			ret = mx_ioccstatus(q, mp);
 			break;
-		case MX_IOCGSTATSP:	/* mx_stats_t */
+		case _IOC_NR(MX_IOCGSTATSP):	/* mx_stats_t */
 			ret = mx_iocgstatsp(q, mp);
 			break;
-		case MX_IOCSSTATSP:	/* mx_stats_t */
+		case _IOC_NR(MX_IOCSSTATSP):	/* mx_stats_t */
 			ret = mx_iocsstatsp(q, mp);
 			break;
-		case MX_IOCGSTATS:	/* mx_stats_t */
+		case _IOC_NR(MX_IOCGSTATS):	/* mx_stats_t */
 			ret = mx_iocgstats(q, mp);
 			break;
-		case MX_IOCCSTATS:	/* mx_stats_t */
+		case _IOC_NR(MX_IOCCSTATS):	/* mx_stats_t */
 			ret = mx_ioccstats(q, mp);
 			break;
-		case MX_IOCGNOTIFY:	/* mx_notify_t */
+		case _IOC_NR(MX_IOCGNOTIFY):	/* mx_notify_t */
 			ret = mx_iocgnotify(q, mp);
 			break;
-		case MX_IOCSNOTIFY:	/* mx_notify_t */
+		case _IOC_NR(MX_IOCSNOTIFY):	/* mx_notify_t */
 			ret = mx_iocsnotify(q, mp);
 			break;
-		case MX_IOCCNOTIFY:	/* mx_notify_t */
+		case _IOC_NR(MX_IOCCNOTIFY):	/* mx_notify_t */
 			ret = mx_ioccnotify(q, mp);
 			break;
-		case MX_IOCCMGMT:	/* mx_mgmt_t */
+		case _IOC_NR(MX_IOCGATTR):	/* mx_attr_t */
+			ret = mx_iocgattr(q, mp);
+			break;
+		case _IOC_NR(MX_IOCCMGMT):	/* mx_mgmt_t */
 			ret = mx_ioccmgmt(q, mp);
 			break;
-		case MX_IOCCPASS:	/* mx_pass_t */
+		case _IOC_NR(MX_IOCCPASS):	/* mx_pass_t */
 			ret = mx_ioccpass(q, mp);
 			break;
 		default:
 			ret = -EOPNOTSUPP;
 			break;
 		}
+		break;
 	}
 	case SL_IOC_MAGIC:
 	{
@@ -13838,50 +14459,50 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 			return -EINVAL;
 			break;
 		}
-		switch (cmd) {
-		case SL_IOCGOPTIONS:	/* lmi_option_t */
+		switch (nr) {
+		case _IOC_NR(SL_IOCGOPTIONS):	/* lmi_option_t */
 			ret = sl_iocgoptions(q, mp);
 			break;
-		case SL_IOCSOPTIONS:	/* lmi_option_t */
+		case _IOC_NR(SL_IOCSOPTIONS):	/* lmi_option_t */
 			ret = sl_iocsoptions(q, mp);
 			break;
-		case SL_IOCGCONFIG:	/* sl_config_t */
+		case _IOC_NR(SL_IOCGCONFIG):	/* sl_config_t */
 			ret = sl_iocgconfig(q, mp);
 			break;
-		case SL_IOCSCONFIG:	/* sl_config_t */
+		case _IOC_NR(SL_IOCSCONFIG):	/* sl_config_t */
 			ret = sl_iocsconfig(q, mp);
 			break;
-		case SL_IOCTCONFIG:	/* sl_config_t */
+		case _IOC_NR(SL_IOCTCONFIG):	/* sl_config_t */
 			ret = sl_ioctconfig(q, mp);
 			break;
-		case SL_IOCCCONFIG:	/* sl_config_t */
+		case _IOC_NR(SL_IOCCCONFIG):	/* sl_config_t */
 			ret = sl_ioccconfig(q, mp);
 			break;
-		case SL_IOCGSTATEM:	/* sl_statem_t */
+		case _IOC_NR(SL_IOCGSTATEM):	/* sl_statem_t */
 			ret = sl_iocgstatem(q, mp);
 			break;
-		case SL_IOCCMRESET:	/* sl_statem_t */
+		case _IOC_NR(SL_IOCCMRESET):	/* sl_statem_t */
 			ret = sl_ioccmreset(q, mp);
 			break;
-		case SL_IOCGSTATSP:	/* lmi_sta_t */
+		case _IOC_NR(SL_IOCGSTATSP):	/* lmi_sta_t */
 			ret = sl_iocgstatsp(q, mp);
 			break;
-		case SL_IOCSSTATSP:	/* lmi_sta_t */
+		case _IOC_NR(SL_IOCSSTATSP):	/* lmi_sta_t */
 			ret = sl_iocsstatsp(q, mp);
 			break;
-		case SL_IOCGSTATS:	/* sl_stats_t */
+		case _IOC_NR(SL_IOCGSTATS):	/* sl_stats_t */
 			ret = sl_iocgstats(q, mp);
 			break;
-		case SL_IOCCSTATS:	/* sl_stats_t */
+		case _IOC_NR(SL_IOCCSTATS):	/* sl_stats_t */
 			ret = sl_ioccstats(q, mp);
 			break;
-		case SL_IOCGNOTIFY:	/* sl_notify_t */
+		case _IOC_NR(SL_IOCGNOTIFY):	/* sl_notify_t */
 			ret = sl_iocgnotify(q, mp);
 			break;
-		case SL_IOCSNOTIFY:	/* sl_notify_t */
+		case _IOC_NR(SL_IOCSNOTIFY):	/* sl_notify_t */
 			ret = sl_iocsnotify(q, mp);
 			break;
-		case SL_IOCCNOTIFY:	/* sl_notify_t */
+		case _IOC_NR(SL_IOCCNOTIFY):	/* sl_notify_t */
 			ret = sl_ioccnotify(q, mp);
 			break;
 		default:
@@ -13896,53 +14517,53 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		switch (cmd) {
-		case SDT_IOCGOPTIONS:	/* lmi_option_t */
+		switch (nr) {
+		case _IOC_NR(SDT_IOCGOPTIONS):	/* lmi_option_t */
 			ret = sdt_iocgoptions(q, mp);
 			break;
-		case SDT_IOCSOPTIONS:	/* lmi_option_t */
+		case _IOC_NR(SDT_IOCSOPTIONS):	/* lmi_option_t */
 			ret = sdt_iocsoptions(q, mp);
 			break;
-		case SDT_IOCGCONFIG:	/* sdt_config_t */
+		case _IOC_NR(SDT_IOCGCONFIG):	/* sdt_config_t */
 			ret = sdt_iocgconfig(q, mp);
 			break;
-		case SDT_IOCSCONFIG:	/* sdt_config_t */
+		case _IOC_NR(SDT_IOCSCONFIG):	/* sdt_config_t */
 			ret = sdt_iocsconfig(q, mp);
 			break;
-		case SDT_IOCTCONFIG:	/* sdt_config_t */
+		case _IOC_NR(SDT_IOCTCONFIG):	/* sdt_config_t */
 			ret = sdt_ioctconfig(q, mp);
 			break;
-		case SDT_IOCCCONFIG:	/* sdt_config_t */
+		case _IOC_NR(SDT_IOCCCONFIG):	/* sdt_config_t */
 			ret = sdt_ioccconfig(q, mp);
 			break;
-		case SDT_IOCGSTATEM:	/* sdt_statem_t */
+		case _IOC_NR(SDT_IOCGSTATEM):	/* sdt_statem_t */
 			ret = sdt_iocgstatem(q, mp);
 			break;
-		case SDT_IOCCMRESET:	/* sdt_statem_t */
+		case _IOC_NR(SDT_IOCCMRESET):	/* sdt_statem_t */
 			ret = sdt_ioccmreset(q, mp);
 			break;
-		case SDT_IOCGSTATSP:	/* lmi_sta_t */
+		case _IOC_NR(SDT_IOCGSTATSP):	/* lmi_sta_t */
 			ret = sdt_iocgstatsp(q, mp);
 			break;
-		case SDT_IOCSSTATSP:	/* lmi_sta_t */
+		case _IOC_NR(SDT_IOCSSTATSP):	/* lmi_sta_t */
 			ret = sdt_iocsstatsp(q, mp);
 			break;
-		case SDT_IOCGSTATS:	/* sdt_stats_t */
+		case _IOC_NR(SDT_IOCGSTATS):	/* sdt_stats_t */
 			ret = sdt_iocgstats(q, mp);
 			break;
-		case SDT_IOCCSTATS:	/* sdt_stats_t */
+		case _IOC_NR(SDT_IOCCSTATS):	/* sdt_stats_t */
 			ret = sdt_ioccstats(q, mp);
 			break;
-		case SDT_IOCGNOTIFY:	/* sdt_notify_t */
+		case _IOC_NR(SDT_IOCGNOTIFY):	/* sdt_notify_t */
 			ret = sdt_iocgnotify(q, mp);
 			break;
-		case SDT_IOCSNOTIFY:	/* sdt_notify_t */
+		case _IOC_NR(SDT_IOCSNOTIFY):	/* sdt_notify_t */
 			ret = sdt_iocsnotify(q, mp);
 			break;
-		case SDT_IOCCNOTIFY:	/* sdt_notify_t */
+		case _IOC_NR(SDT_IOCCNOTIFY):	/* sdt_notify_t */
 			ret = sdt_ioccnotify(q, mp);
 			break;
-		case SDT_IOCCABORT:	/* */
+		case _IOC_NR(SDT_IOCCABORT):	/* */
 			ret = sdt_ioccabort(q, mp);
 			break;
 		default:
@@ -13958,72 +14579,72 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		switch (cmd) {
-		case SDL_IOCGOPTIONS:	/* lmi_option_t */
+		switch (nr) {
+		case _IOC_NR(SDL_IOCGOPTIONS):	/* lmi_option_t */
 			printd(("%s: %p: SDL_IOCGOPTIONS\n", DRV_NAME, xp));
 			ret = sdl_iocgoptions(q, mp);
 			break;
-		case SDL_IOCSOPTIONS:	/* lmi_option_t */
+		case _IOC_NR(SDL_IOCSOPTIONS):	/* lmi_option_t */
 			printd(("%s: %p: SDL_IOCSOPTIONS\n", DRV_NAME, xp));
 			ret = sdl_iocsoptions(q, mp);
 			break;
-		case SDL_IOCGCONFIG:	/* sdl_config_t */
+		case _IOC_NR(SDL_IOCGCONFIG):	/* sdl_config_t */
 			printd(("%s: %p: SDL_IOCGCONFIG\n", DRV_NAME, xp));
 			ret = sdl_iocgconfig(q, mp);
 			break;
-		case SDL_IOCSCONFIG:	/* sdl_config_t */
+		case _IOC_NR(SDL_IOCSCONFIG):	/* sdl_config_t */
 			printd(("%s: %p: SDL_IOCSCONFIG\n", DRV_NAME, xp));
 			ret = sdl_iocsconfig(q, mp);
 			break;
-		case SDL_IOCTCONFIG:	/* sdl_config_t */
+		case _IOC_NR(SDL_IOCTCONFIG):	/* sdl_config_t */
 			printd(("%s: %p: SDL_IOCTCONFIG\n", DRV_NAME, xp));
 			ret = sdl_ioctconfig(q, mp);
 			break;
-		case SDL_IOCCCONFIG:	/* sdl_config_t */
+		case _IOC_NR(SDL_IOCCCONFIG):	/* sdl_config_t */
 			printd(("%s: %p: SDL_IOCCCONFIG\n", DRV_NAME, xp));
 			ret = sdl_ioccconfig(q, mp);
 			break;
-		case SDL_IOCGSTATEM:	/* sdl_statem_t */
+		case _IOC_NR(SDL_IOCGSTATEM):	/* sdl_statem_t */
 			printd(("%s: %p: SDL_IOCGSTATEM\n", DRV_NAME, xp));
 			ret = sdl_iocgstatem(q, mp);
 			break;
-		case SDL_IOCCMRESET:	/* sdl_statem_t */
+		case _IOC_NR(SDL_IOCCMRESET):	/* sdl_statem_t */
 			printd(("%s: %p: SDL_IOCCMRESET\n", DRV_NAME, xp));
 			ret = sdl_ioccmreset(q, mp);
 			break;
-		case SDL_IOCGSTATSP:	/* sdl_stats_t */
+		case _IOC_NR(SDL_IOCGSTATSP):	/* sdl_stats_t */
 			printd(("%s: %p: SDL_IOCGSTATSP\n", DRV_NAME, xp));
 			ret = sdl_iocgstatsp(q, mp);
 			break;
-		case SDL_IOCSSTATSP:	/* sdl_stats_t */
+		case _IOC_NR(SDL_IOCSSTATSP):	/* sdl_stats_t */
 			printd(("%s: %p: SDL_IOCSSTATSP\n", DRV_NAME, xp));
 			ret = sdl_iocsstatsp(q, mp);
 			break;
-		case SDL_IOCGSTATS:	/* sdl_stats_t */
+		case _IOC_NR(SDL_IOCGSTATS):	/* sdl_stats_t */
 			printd(("%s: %p: SDL_IOCGSTATS\n", DRV_NAME, xp));
 			ret = sdl_iocgstats(q, mp);
 			break;
-		case SDL_IOCCSTATS:	/* sdl_stats_t */
+		case _IOC_NR(SDL_IOCCSTATS):	/* sdl_stats_t */
 			printd(("%s: %p: SDL_IOCCSTATS\n", DRV_NAME, xp));
 			ret = sdl_ioccstats(q, mp);
 			break;
-		case SDL_IOCGNOTIFY:	/* sdl_notify_t */
+		case _IOC_NR(SDL_IOCGNOTIFY):	/* sdl_notify_t */
 			printd(("%s: %p: SDL_IOCGNOTIFY\n", DRV_NAME, xp));
 			ret = sdl_iocgnotify(q, mp);
 			break;
-		case SDL_IOCSNOTIFY:	/* sdl_notify_t */
+		case _IOC_NR(SDL_IOCSNOTIFY):	/* sdl_notify_t */
 			printd(("%s: %p: SDL_IOCSNOTIFY\n", DRV_NAME, xp));
 			ret = sdl_iocsnotify(q, mp);
 			break;
-		case SDL_IOCCNOTIFY:	/* sdl_notify_t */
+		case _IOC_NR(SDL_IOCCNOTIFY):	/* sdl_notify_t */
 			printd(("%s: %p: SDL_IOCCNOTIFY\n", DRV_NAME, xp));
 			ret = sdl_ioccnotify(q, mp);
 			break;
-		case SDL_IOCCDISCTX:	/* */
+		case _IOC_NR(SDL_IOCCDISCTX):	/* */
 			printd(("%s: %p: SDL_IOCCDISCTX\n", DRV_NAME, xp));
 			ret = sdl_ioccdisctx(q, mp);
 			break;
-		case SDL_IOCCCONNTX:	/* */
+		case _IOC_NR(SDL_IOCCCONNTX):	/* */
 			printd(("%s: %p: SDL_IOCCCONNTX\n", DRV_NAME, xp));
 			ret = sdl_ioccconntx(q, mp);
 			break;
@@ -14040,7 +14661,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	if (ret >= 0) {
 		mp->b_datap->db_type = M_IOCACK;
 		iocp->ioc_error = 0;
-		iocp->ioc_rval = 0;
+		iocp->ioc_rval = ret;
 	} else {
 		mp->b_datap->db_type = M_IOCNAK;
 		iocp->ioc_error = -ret;

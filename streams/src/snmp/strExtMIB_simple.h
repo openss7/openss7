@@ -12,7 +12,6 @@ config_require(util_funcs)
 	void init_strExtMIB_simple(void);
 	FindVarMethod var_strExtMIB_simple;
 	FindVarMethod var_strExtStrlogRecordTable;
-	FindVarMethod var_strExtStrlogRecordTable;
 
 	WriteMethod write_strExtStrlogRecordMid;
 	WriteMethod write_strExtStrlogRecordSid;

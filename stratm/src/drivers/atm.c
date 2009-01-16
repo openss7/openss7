@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:24 $
+ @(#) $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-07 10:40:24 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:46:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: atm.c,v $
+ Revision 0.9.2.3  2009-01-16 20:46:07  brian
+ - minor compile corrections
+
  Revision 0.9.2.2  2008-12-07 10:40:24  brian
  - new stratm package
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:24 $"
+#ident "@(#) $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $"
 
-static char const ident[] = "$RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:24 $";
+static char const ident[] = "$RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $";
 
 /*
  * This is an ATM multiplexing driver.  The driver links CDI Streams beneath the multiplexing driver
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #include <sys/atm_dlpi.h>
 
 #define ATM_DESCRIP	"ATM STREAMS MULTIPLEXING DRIVER."
-#define ATM_REVISION	"OpenSS7 $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 10:40:24 $"
+#define ATM_REVISION	"OpenSS7 $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $"
 #define ATM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ATM_DEVICE	"Provides OpenSS7 ATM I.432.X Pseudo-Device Driver."
 #define ATM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2564,7 +2567,7 @@ MODULE_PARM(modid, "h");
 MODULE_PARM(major, "d");
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for ATM driver.  (0 for allocation.)");
-MODULE_PARM_DESC(modid, "Major Device Number for ATM driver. (0 for allocation.)");
+MODULE_PARM_DESC(major, "Major Device Number for ATM driver. (0 for allocation.)");
 #endif				/* LINUX */
 
 static struct module_info atm_minfo = {
@@ -2630,6 +2633,7 @@ atminit(void)
 {
 	int err;
 
+	(void) modid;
 	cmn_err(CE_NOTE, DRV_BANNER);
 	if ((err = register_strdev(&atm_cdev, major)) < 0) {
 		cmn_err(CE_WARN, "%s: could not register driver %d, err = %d\n", DRV_NAME,

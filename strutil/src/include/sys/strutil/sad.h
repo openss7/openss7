@@ -1,26 +1,28 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.14 2007/08/14 12:58:03 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.15 2009-01-16 20:45:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:03 $ by $Author: brian $
+ Last Modified $Date: 2009-01-16 20:45:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.h,v $
+ Revision 0.9.2.15  2009-01-16 20:45:39  brian
+ - sync sad driver to streams
+
  Revision 0.9.2.14  2007/08/14 12:58:03  brian
  - GNUv3 header updates
 
@@ -66,10 +71,10 @@
 #ifndef __SYS_STREAMS_SAD_H__
 #define __SYS_STREAMS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_SAD_H__
-#warning "Do no include sys/streams/sad.h directly, include sys/sad.h instead."
+#warning "Do not include sys/streams/sad.h directly, include sys/sad.h instead."
 #endif
 
 /* This file can be processed with doxygen(1). */
@@ -100,6 +105,7 @@
 #define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/**< Set autopush. */
 #define SAD_GAP		((SAD_IOC_MAGIC << 8) | 0x02)	/**< Get autopush. */
 #define SAD_VML		((SAD_IOC_MAGIC << 8) | 0x03)	/**< Validate modules. */
+#define SAD_LAP		((SAD_IOC_MAGIC << 8) | 0x04)	/**< Get next autopush. */
 
 #define SAD_SAP_SOL	((SAD_IOC_MAGIC << 8) | 0x17)	/**< Set autopush (anchor). */
 #define SAD_GAP_SOL	((SAD_IOC_MAGIC << 8) | 0x18)	/**< Get autopush (anchor). */
