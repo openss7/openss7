@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.160 $) $Date: 2009-01-16 20:25:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2009-01-19 10:39:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-16 20:25:46 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 10:39:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,7 +122,7 @@ sbin_PROGRAMS			+= \
 endif
 
 if WITH_SNMP_AGENT
-sbin_PROGRAMS			+= strmib
+sbin_PROGRAMS			+= streamsd
 endif
 
 #dist_bin_SCRIPTS		= scripts/modpost.sh scripts/modsyms.sh
@@ -598,6 +598,8 @@ libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 strMIB_la_SOURCES		= \
 				  src/snmp/strMIB.c \
 				  src/snmp/strMIB.h \
+				  src/snmp/strExtMIB.c \
+				  src/snmp/strExtMIB.h \
 				  src/snmp/ds_agent.h \
 				  src/snmp/header_complex.h \
 				  src/snmp/mib_modules.h \
@@ -744,17 +746,21 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-strmib_SOURCES			= src/snmp/strMIB.c \
+streamsd_SOURCES		= src/snmp/streamsd.c \
+				  src/snmp/streamsd.h \
+				  src/snmp/strMIB.c \
 				  src/snmp/strMIB.h \
+				  src/snmp/strExtMIB.c \
+				  src/snmp/strExtMIB.h \
 				  src/snmp/ds_agent.h \
 				  src/snmp/header_complex.h \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
 				  src/snmp/util_funcs.h
-strmib_LDFLAGS			= $(SNMP_LDFLAGS)
-strmib_LDADD			= libstreams.la $(SNMP_LDADD)
-strmib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
-strmib_CFLAGS			= $(USER_CFLAGS)
+streamsd_LDFLAGS		= $(SNMP_LDFLAGS)
+streamsd_LDADD			= libstreams.la $(SNMP_LDADD)
+streamsd_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+streamsd_CFLAGS			= $(USER_CFLAGS)
 
 test_clone_SOURCES		= src/test/test-clone.c
 test_clone_LDFLAGS		=
@@ -1120,6 +1126,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.161  2009-01-19 10:39:39  brian
+# - added new standalone agent
+#
 # Revision 0.9.2.160  2009-01-16 20:25:46  brian
 # - working up streams mibs and agents
 #
