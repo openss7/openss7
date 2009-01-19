@@ -63,6 +63,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/agent_trap.h>
 #include <ucd-snmp/callback.h>
 #include <ucd-snmp/snmp-tc.h>
 #include <ucd-snmp/default_store.h>
@@ -140,6 +141,7 @@ extern char sa_sysctlf[256];
 extern FILE *stdlog;
 #endif				/* !defined MODULE */
 extern int sa_fclose;			/* default close files between requests */
+static int my_fd;			/* file descriptor for this MIB's use */
 extern int sa_fd;			/* file descriptor for MIB use */
 extern int sa_readfd;			/* file descriptor for autonomnous events */
 extern int sa_changed;			/* indication to reread MIB configuration */
@@ -257,58 +259,58 @@ oid reachableAddressTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212,
 /*
  * Oids for use in notifications defined in this MIB.
  */
-oid lLCConnection2Event_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 0 };
-oid lLCClessACKEvent_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 0 };
-oid lLCStationEvent_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 0 };
+oid lLCConnection2Event_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 0, 1 };
+oid lLCClessACKEvent_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 0, 2 };
+oid lLCStationEvent_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 0, 3 };
 
 /*
  * Oids accessible only for notify defined in this MIB.
  */
-oid physicalBitErrorThresholdReached_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid physicalConnectionError_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid phsyicalConnectionEstablished_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid physicalLossOfSignal_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid physicalLossOfSynchronization_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid fRMR_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid pdusDiscarded1_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid pdusDiscarded2_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid pduRetransmissions_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid acknowledgeTimeout_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid busyStateTimeout_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid rejectTimeout_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid pBitTimeout_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid type2Violation_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid retranmissions_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid type3Violation_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid noResponse_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid pdusDiscarded_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid bufferProblems_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationPDUHeader_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid reachabilityChange_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationData_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid constraintViolation_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationReceivingAdjacency_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationIDLength_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationAreaAddress_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationAreaAddresses_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationSourceId_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationMaximumAreaAddresses_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationVirtualLinkChange_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationVirtualLinkAddress_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationSystemId_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationVersion_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationDesignatedIntermediateSystemChange_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationOverloadStateChange_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid reservedName_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
-oid notificationLSPHeader_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3 };
+oid physicalBitErrorThresholdReached_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 1 };
+oid physicalConnectionError_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 2 };
+oid phsyicalConnectionEstablished_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 3 };
+oid physicalLossOfSignal_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 4 };
+oid physicalLossOfSynchronization_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 5 };
+oid fRMR_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 6 };
+oid pdusDiscarded1_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 7 };
+oid pdusDiscarded2_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 8 };
+oid pduRetransmissions_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 9 };
+oid acknowledgeTimeout_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 10 };
+oid busyStateTimeout_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 11 };
+oid rejectTimeout_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 12 };
+oid pBitTimeout_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 13 };
+oid type2Violation_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 14 };
+oid retranmissions_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 15 };
+oid type3Violation_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 16 };
+oid noResponse_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 17 };
+oid pdusDiscarded_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 18 };
+oid bufferProblems_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 19 };
+oid notificationPDUHeader_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 20 };
+oid reachabilityChange_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 21 };
+oid notificationData_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 22 };
+oid constraintViolation_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 23 };
+oid notificationReceivingAdjacency_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 24 };
+oid notificationIDLength_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 25 };
+oid notificationAreaAddress_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 26 };
+oid notificationAreaAddresses_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 27 };
+oid notificationSourceId_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 28 };
+oid notificationMaximumAreaAddresses_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 29 };
+oid notificationVirtualLinkChange_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 30 };
+oid notificationVirtualLinkAddress_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 31 };
+oid notificationSystemId_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 32 };
+oid notificationVersion_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 33 };
+oid notificationDesignatedIntermediateSystemChange_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 34 };
+oid notificationOverloadStateChange_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 35 };
+oid reservedName_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 36 };
+oid notificationLSPHeader_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 1, 3, 37 };
 
 /*
  * Other oids defined in this MIB.
  */
-oid osiObjectGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 1 };
-oid osiNotificationGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 1 };
-oid osiTotalCompliance_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 2 };
-static const oid zeroDotZero_oid[2] = { 0, 0 };
+oid osiObjectGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 1, 1 };
+oid osiNotificationGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 1, 2 };
+oid osiTotalCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 212, 2, 2, 1 };
+static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
 /*
@@ -1767,8 +1769,6 @@ struct variable7 dlMIB_variables[] = {
 	{(u_char) DESTINATIONERRORMETRICOUTPUTADJACENCIES, ASN_OCTET_STR, RWRITE, var_destinationTable, 6, {1, 1, 60, 1, 1, 9}},
 #define   DESINTATIONSYSTEMMETRIC  725
 	{(u_char) DESINTATIONSYSTEMMETRIC, ASN_INTEGER, RONLY, var_destinationSystemTable, 6, {1, 1, 61, 1, 1, 3}},
-#define   DESTINATIONAREAID     726
-	{(u_char) DESTINATIONAREAID, ASN_OCTET_STR, RONLY, var_destinationAreaTable, 6, {1, 1, 62, 1, 1, 1}},
 #define   REACHABLEADDRESSPREFIX  727
 	{(u_char) REACHABLEADDRESSPREFIX, ASN_OCTET_STR, RWRITE, var_reachableAddressTable, 6, {1, 1, 63, 1, 1, 2}},
 #define   REACHABLEADDRESSMAPPINGTYPE  728
@@ -1947,6 +1947,8 @@ void dlMIB_fd_handler(int, void *);
 void
 init_dlMIB(void)
 {
+	(void) my_fd;
+	(void) zeroDotZero_oid;
 	(void) snmpTrapOID_oid;
 	DEBUGMSGTL(("dlMIB", "initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
@@ -2091,8 +2093,9 @@ init_dlMIB(void)
 		register_exceptfd(sa_readfd, dlMIB_fd_handler, (void *) 1);
 	}
 #if defined MASTER
-	dlMIBold_signal_handler = external_signal_handler[0];
-	external_signal_handler[0] = &dlMIB_loop_handler;
+	dlMIBold_signal_handler = external_signal_handler[SIGCHLD];
+	external_signal_handler[SIGCHLD] = &dlMIB_loop_handler;
+	external_signal_scheduled[SIGCHLD] = 1;
 #endif				/* defined MASTER */
 #endif				/* defined MODULE */
 	DEBUGMSGTL(("dlMIB", "done.\n"));
@@ -2116,7 +2119,7 @@ deinit_dlMIB(void)
 	DEBUGMSGTL(("dlMIB", "deinitializating...  "));
 #if defined MODULE
 #if defined MASTER
-	external_signal_handler[0] = dlMIBold_signal_handler;
+	external_signal_handler[SIGCHLD] = dlMIBold_signal_handler;
 #endif				/* defined MASTER */
 	if (sa_readfd != 0) {
 		unregister_exceptfd(sa_readfd);
@@ -2234,9 +2237,8 @@ dlMIB_create(void)
 		StorageNew->lLCConnection2DefaultBusyStateTimeoutValue = 0;
 		StorageNew->lLCConnection2DefaultPBitTimeoutValue = 0;
 		StorageNew->lLCConnection2DefaultRejectTimeoutValue = 0;
-		if ((StorageNew->lLCConnection2DefaultRoute = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnection2DefaultRoute = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2DefaultRouteLen = strlen("");
-		}
 		StorageNew->lLCConnection2DefaultKStep = 0;
 		StorageNew->lLCConnection2DefaultMaxSendWindowSize = 0;
 		StorageNew->lLCConnection2DefaultOptionalTolerationIPDUs = 0;
@@ -2332,6 +2334,7 @@ parse_dlMIB(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2DefaultBusyStateTimeoutValue, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2DefaultPBitTimeoutValue, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2DefaultRejectTimeoutValue, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCConnection2DefaultRoute);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2DefaultRoute, &StorageTmp->lLCConnection2DefaultRouteLen);
 	if (StorageTmp->lLCConnection2DefaultRoute == NULL) {
 		config_perror("invalid specification for lLCConnection2DefaultRoute");
@@ -2359,7 +2362,7 @@ store_dlMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct dlMIB_data *StorageTmp;
 
 	DEBUGMSGTL(("dlMIB", "storing data...  "));
-	refresh_dlMIB();
+	refresh_dlMIB(1);
 	if ((StorageTmp = dlMIBStorage) == NULL) {
 		DEBUGMSGTL(("dlMIB", "error.\n"));
 		return SNMPERR_GENERR;
@@ -2401,7 +2404,8 @@ store_dlMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 }
 
 /**
- * @fn void refresh_dlMIB(void)
+ * @fn void refresh_dlMIB(int force)
+ * @param force forced refresh when non-zero.
  * @brief refresh the scalar values of dlMIB.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -2411,7 +2415,7 @@ store_dlMIB(int majorID, int minorID, void *serverarg, void *clientarg)
  * time, or after a SIGPOLL has been received (and a scalar has been requested).
  */
 void
-refresh_dlMIB(void)
+refresh_dlMIB(int force)
 {
 	if (dlMIBStorage == NULL) {
 		struct dlMIB_data *StorageNew;
@@ -2421,10 +2425,10 @@ refresh_dlMIB(void)
 		dlMIBStorage = StorageNew;
 		dlMIB_refresh = 1;
 	}
-	if (dlMIB_refresh == 0)
+	if (!force && dlMIB_refresh == 0)
 		return;
-	dlMIB_refresh = 0;
 	/* XXX: Update scalars as required here... */
+	dlMIB_refresh = 0;
 }
 
 /**
@@ -2453,7 +2457,7 @@ var_dlMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *va
 	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
 	/* Refresh the MIB values if required. */
-	refresh_dlMIB();
+	refresh_dlMIB(0);
 	if ((StorageTmp = dlMIBStorage) == NULL)
 		return NULL;
 	*write_method = NULL;
@@ -2643,9 +2647,8 @@ communicationsEntityTable_create(void)
 	DEBUGMSGTL(("communicationsEntityTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityLocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->communicationsEntityLocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->communicationsEntityLocalSapNamesLen = 2;
-		}
 		StorageNew->communicationsEntityOperationalState = 0;
 
 	}
@@ -2782,11 +2785,13 @@ parse_communicationsEntityTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->communicationsEntityLocalSapNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->communicationsEntityLocalSapNames, &StorageTmp->communicationsEntityLocalSapNamesLen);
 	if (StorageTmp->communicationsEntityLocalSapNames == NULL) {
 		config_perror("invalid specification for communicationsEntityLocalSapNames");
@@ -2812,7 +2817,7 @@ store_communicationsEntityTable(int majorID, int minorID, void *serverarg, void 
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("communicationsEntityTable", "storing data...  "));
-	refresh_communicationsEntityTable();
+	refresh_communicationsEntityTable(1);
 	(void) tmpsize;
 	for (hcindex = communicationsEntityTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct communicationsEntityTable_data *) hcindex->data;
@@ -2848,13 +2853,11 @@ sap1Table_create(void)
 	DEBUGMSGTL(("sap1Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		StorageNew->sap1Address = 0;
-		if ((StorageNew->sap1UserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->sap1UserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->sap1UserEntityNamesLen = 2;
-		}
 
 	}
 	DEBUGMSGTL(("sap1Table", "done.\n"));
@@ -2994,17 +2997,20 @@ parse_sap1Table(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
 		return;
 	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sap1Address, &tmpsize);
+	SNMP_FREE(StorageTmp->sap1UserEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sap1UserEntityNames, &StorageTmp->sap1UserEntityNamesLen);
 	if (StorageTmp->sap1UserEntityNames == NULL) {
 		config_perror("invalid specification for sap1UserEntityNames");
@@ -3029,7 +3035,7 @@ store_sap1Table(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("sap1Table", "storing data...  "));
-	refresh_sap1Table();
+	refresh_sap1Table(1);
 	(void) tmpsize;
 	for (hcindex = sap1TableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sap1Table_data *) hcindex->data;
@@ -3066,18 +3072,14 @@ sap2Table_create(void)
 	DEBUGMSGTL(("sap2Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sapIdLen = strlen("");
-		}
-		if ((StorageNew->sap2Address = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sap2Address = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sap2AddressLen = strlen("");
-		}
-		if ((StorageNew->sap2UserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->sap2UserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->sap2UserEntityNamesLen = 2;
-		}
-		if ((StorageNew->sap2ProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->sap2ProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->sap2ProviderEntityNamesLen = 2;
-		}
 
 	}
 	DEBUGMSGTL(("sap2Table", "done.\n"));
@@ -3217,21 +3219,25 @@ parse_sap2Table(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sap2Address);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sap2Address, &StorageTmp->sap2AddressLen);
 	if (StorageTmp->sap2Address == NULL) {
 		config_perror("invalid specification for sap2Address");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sap2UserEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sap2UserEntityNames, &StorageTmp->sap2UserEntityNamesLen);
 	if (StorageTmp->sap2UserEntityNames == NULL) {
 		config_perror("invalid specification for sap2UserEntityNames");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sap2ProviderEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sap2ProviderEntityNames, &StorageTmp->sap2ProviderEntityNamesLen);
 	if (StorageTmp->sap2ProviderEntityNames == NULL) {
 		config_perror("invalid specification for sap2ProviderEntityNames");
@@ -3256,7 +3262,7 @@ store_sap2Table(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("sap2Table", "storing data...  "));
-	refresh_sap2Table();
+	refresh_sap2Table(1);
 	(void) tmpsize;
 	for (hcindex = sap2TableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sap2Table_data *) hcindex->data;
@@ -3293,9 +3299,8 @@ clProtocolMachineTable_create(void)
 	DEBUGMSGTL(("clProtocolMachineTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		StorageNew->clProtocolMachineOperationalState = 0;
 		StorageNew->clProtocolMachineTotalRemoteSAPs = 0;
 
@@ -3435,11 +3440,13 @@ parse_clProtocolMachineTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
@@ -3466,7 +3473,7 @@ store_clProtocolMachineTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("clProtocolMachineTable", "storing data...  "));
-	refresh_clProtocolMachineTable();
+	refresh_clProtocolMachineTable(1);
 	(void) tmpsize;
 	for (hcindex = clProtocolMachineTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct clProtocolMachineTable_data *) hcindex->data;
@@ -3503,9 +3510,8 @@ coProtocolMachineTable_create(void)
 	DEBUGMSGTL(("coProtocolMachineTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		StorageNew->coProtocolMachineOperationalState = 0;
 
 	}
@@ -3644,11 +3650,13 @@ parse_coProtocolMachineTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
@@ -3674,7 +3682,7 @@ store_coProtocolMachineTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("coProtocolMachineTable", "storing data...  "));
-	refresh_coProtocolMachineTable();
+	refresh_coProtocolMachineTable(1);
 	(void) tmpsize;
 	for (hcindex = coProtocolMachineTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct coProtocolMachineTable_data *) hcindex->data;
@@ -3710,18 +3718,14 @@ singlePeerConnectionTable_create(void)
 	DEBUGMSGTL(("singlePeerConnectionTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->underlyingConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->underlyingConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->underlyingConnectionNamesLen = 2;
-		}
-		if ((StorageNew->suppportedConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->suppportedConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->suppportedConnectionNamesLen = 2;
-		}
 
 	}
 	DEBUGMSGTL(("singlePeerConnectionTable", "done.\n"));
@@ -3867,26 +3871,31 @@ parse_singlePeerConnectionTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->connectionId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->connectionId, &StorageTmp->connectionIdLen);
 	if (StorageTmp->connectionId == NULL) {
 		config_perror("invalid specification for connectionId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->underlyingConnectionNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->underlyingConnectionNames, &StorageTmp->underlyingConnectionNamesLen);
 	if (StorageTmp->underlyingConnectionNames == NULL) {
 		config_perror("invalid specification for underlyingConnectionNames");
 		return;
 	}
+	SNMP_FREE(StorageTmp->suppportedConnectionNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->suppportedConnectionNames, &StorageTmp->suppportedConnectionNamesLen);
 	if (StorageTmp->suppportedConnectionNames == NULL) {
 		config_perror("invalid specification for suppportedConnectionNames");
@@ -3911,7 +3920,7 @@ store_singlePeerConnectionTable(int majorID, int minorID, void *serverarg, void 
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("singlePeerConnectionTable", "storing data...  "));
-	refresh_singlePeerConnectionTable();
+	refresh_singlePeerConnectionTable(1);
 	(void) tmpsize;
 	for (hcindex = singlePeerConnectionTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct singlePeerConnectionTable_data *) hcindex->data;
@@ -3949,12 +3958,10 @@ physicalEntityTable_create(void)
 	DEBUGMSGTL(("physicalEntityTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->physicalEntityPhysicalEntityTitles = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->physicalEntityPhysicalEntityTitles = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->physicalEntityPhysicalEntityTitlesLen = 2;
-		}
 
 	}
 	DEBUGMSGTL(("physicalEntityTable", "done.\n"));
@@ -4090,11 +4097,13 @@ parse_physicalEntityTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->physicalEntityPhysicalEntityTitles);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->physicalEntityPhysicalEntityTitles, &StorageTmp->physicalEntityPhysicalEntityTitlesLen);
 	if (StorageTmp->physicalEntityPhysicalEntityTitles == NULL) {
 		config_perror("invalid specification for physicalEntityPhysicalEntityTitles");
@@ -4119,7 +4128,7 @@ store_physicalEntityTable(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("physicalEntityTable", "storing data...  "));
-	refresh_physicalEntityTable();
+	refresh_physicalEntityTable(1);
 	(void) tmpsize;
 	for (hcindex = physicalEntityTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct physicalEntityTable_data *) hcindex->data;
@@ -4154,12 +4163,10 @@ physicalSAPTable_create(void)
 	DEBUGMSGTL(("physicalSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sapIdLen = strlen("");
-		}
 		StorageNew->physicalSAPRowStatus = 0;
 		StorageNew->physicalSAPRowStatus = RS_NOTREADY;
 	}
@@ -4298,11 +4305,13 @@ parse_physicalSAPTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
@@ -4328,7 +4337,7 @@ store_physicalSAPTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("physicalSAPTable", "storing data...  "));
-	refresh_physicalSAPTable();
+	refresh_physicalSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = physicalSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct physicalSAPTable_data *) hcindex->data;
@@ -4364,35 +4373,27 @@ dataCircuitTable_create(void)
 	DEBUGMSGTL(("dataCircuitTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->dataCircuitBitErrorsReceived = 0;
 		StorageNew->dataCircuitBitErrorsTransmitted = 0;
-		if ((StorageNew->dataCircuitBitErrorsThreshold = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dataCircuitBitErrorsThreshold = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dataCircuitBitErrorsThresholdLen = strlen("");
-		}
 		StorageNew->dataCircuitType = 0;
-		if ((StorageNew->dataCircuitPhysicalMediaNames = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dataCircuitPhysicalMediaNames = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dataCircuitPhysicalMediaNamesLen = strlen("");
-		}
-		if ((StorageNew->dataCircuitPhysicalInterfaceType = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dataCircuitPhysicalInterfaceType = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dataCircuitPhysicalInterfaceTypeLen = strlen("");
-		}
-		if ((StorageNew->dataCircuitPhysicalInterfaceStandard = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dataCircuitPhysicalInterfaceStandard = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dataCircuitPhysicalInterfaceStandardLen = strlen("");
-		}
 		StorageNew->dataCircuitSynchronizationMode = 0;
-		if ((StorageNew->dataCircuitTransmissionCoding = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dataCircuitTransmissionCoding = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dataCircuitTransmissionCodingLen = strlen("");
-		}
 		StorageNew->dataCircuitTransmissionMode = 0;
-		if ((StorageNew->dataCircuitTransmissionRate = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dataCircuitTransmissionRate = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dataCircuitTransmissionRateLen = strlen("");
-		}
 		StorageNew->dataCircuitRowStatus = 0;
 		StorageNew->dataCircuitRowStatus = RS_NOTREADY;
 	}
@@ -4539,11 +4540,13 @@ parse_dataCircuitTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
@@ -4551,34 +4554,40 @@ parse_dataCircuitTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->dataCircuitBitErrorsReceived, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->dataCircuitBitErrorsTransmitted, &tmpsize);
+	SNMP_FREE(StorageTmp->dataCircuitBitErrorsThreshold);
 	line = read_config_read_data(ASN_OPAQUE, line, &StorageTmp->dataCircuitBitErrorsThreshold, &StorageTmp->dataCircuitBitErrorsThresholdLen);
 	if (StorageTmp->dataCircuitBitErrorsThreshold == NULL) {
 		config_perror("invalid specification for dataCircuitBitErrorsThreshold");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dataCircuitType, &tmpsize);
+	SNMP_FREE(StorageTmp->dataCircuitPhysicalMediaNames);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dataCircuitPhysicalMediaNames, &StorageTmp->dataCircuitPhysicalMediaNamesLen);
 	if (StorageTmp->dataCircuitPhysicalMediaNames == NULL) {
 		config_perror("invalid specification for dataCircuitPhysicalMediaNames");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dataCircuitPhysicalInterfaceType);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dataCircuitPhysicalInterfaceType, &StorageTmp->dataCircuitPhysicalInterfaceTypeLen);
 	if (StorageTmp->dataCircuitPhysicalInterfaceType == NULL) {
 		config_perror("invalid specification for dataCircuitPhysicalInterfaceType");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dataCircuitPhysicalInterfaceStandard);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dataCircuitPhysicalInterfaceStandard, &StorageTmp->dataCircuitPhysicalInterfaceStandardLen);
 	if (StorageTmp->dataCircuitPhysicalInterfaceStandard == NULL) {
 		config_perror("invalid specification for dataCircuitPhysicalInterfaceStandard");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dataCircuitSynchronizationMode, &tmpsize);
+	SNMP_FREE(StorageTmp->dataCircuitTransmissionCoding);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dataCircuitTransmissionCoding, &StorageTmp->dataCircuitTransmissionCodingLen);
 	if (StorageTmp->dataCircuitTransmissionCoding == NULL) {
 		config_perror("invalid specification for dataCircuitTransmissionCoding");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dataCircuitTransmissionMode, &tmpsize);
+	SNMP_FREE(StorageTmp->dataCircuitTransmissionRate);
 	line = read_config_read_data(ASN_OPAQUE, line, &StorageTmp->dataCircuitTransmissionRate, &StorageTmp->dataCircuitTransmissionRateLen);
 	if (StorageTmp->dataCircuitTransmissionRate == NULL) {
 		config_perror("invalid specification for dataCircuitTransmissionRate");
@@ -4604,7 +4613,7 @@ store_dataCircuitTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("dataCircuitTable", "storing data...  "));
-	refresh_dataCircuitTable();
+	refresh_dataCircuitTable(1);
 	(void) tmpsize;
 	for (hcindex = dataCircuitTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dataCircuitTable_data *) hcindex->data;
@@ -4651,18 +4660,14 @@ physicalConnectionTable_create(void)
 	DEBUGMSGTL(("physicalConnectionTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->connectionIdLen = strlen("");
-		}
-		if ((StorageNew->physicalConnectionEndpointIdentifier = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->physicalConnectionEndpointIdentifier = (uint8_t *) strdup("")) != NULL)
 			StorageNew->physicalConnectionEndpointIdentifierLen = strlen("");
-		}
 		StorageNew->physicalConnectionPortNumber = 0;
 		StorageNew->physicalConnectionRowStatus = 0;
 		StorageNew->physicalConnectionRowStatus = RS_NOTREADY;
@@ -4808,21 +4813,25 @@ parse_physicalConnectionTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->connectionId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->connectionId, &StorageTmp->connectionIdLen);
 	if (StorageTmp->connectionId == NULL) {
 		config_perror("invalid specification for connectionId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->physicalConnectionEndpointIdentifier);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->physicalConnectionEndpointIdentifier, &StorageTmp->physicalConnectionEndpointIdentifierLen);
 	if (StorageTmp->physicalConnectionEndpointIdentifier == NULL) {
 		config_perror("invalid specification for physicalConnectionEndpointIdentifier");
@@ -4849,7 +4858,7 @@ store_physicalConnectionTable(int majorID, int minorID, void *serverarg, void *c
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("physicalConnectionTable", "storing data...  "));
-	refresh_physicalConnectionTable();
+	refresh_physicalConnectionTable(1);
 	(void) tmpsize;
 	for (hcindex = physicalConnectionTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct physicalConnectionTable_data *) hcindex->data;
@@ -4888,12 +4897,10 @@ datalinkEntityTable_create(void)
 	DEBUGMSGTL(("datalinkEntityTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->datalinkEntityProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->datalinkEntityProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->datalinkEntityProviderEntityNamesLen = 2;
-		}
 		StorageNew->datalinkEntityRowStatus = 0;
 		StorageNew->datalinkEntityRowStatus = RS_NOTREADY;
 	}
@@ -5030,11 +5037,13 @@ parse_datalinkEntityTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->datalinkEntityProviderEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->datalinkEntityProviderEntityNames, &StorageTmp->datalinkEntityProviderEntityNamesLen);
 	if (StorageTmp->datalinkEntityProviderEntityNames == NULL) {
 		config_perror("invalid specification for datalinkEntityProviderEntityNames");
@@ -5060,7 +5069,7 @@ store_datalinkEntityTable(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("datalinkEntityTable", "storing data...  "));
-	refresh_datalinkEntityTable();
+	refresh_datalinkEntityTable(1);
 	(void) tmpsize;
 	for (hcindex = datalinkEntityTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct datalinkEntityTable_data *) hcindex->data;
@@ -5096,12 +5105,10 @@ dLSAPTable_create(void)
 	DEBUGMSGTL(("dLSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sapIdLen = strlen("");
-		}
 		StorageNew->dLSAPRowStatus = 0;
 		StorageNew->dLSAPRowStatus = RS_NOTREADY;
 	}
@@ -5240,11 +5247,13 @@ parse_dLSAPTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
@@ -5270,7 +5279,7 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("dLSAPTable", "storing data...  "));
-	refresh_dLSAPTable();
+	refresh_dLSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = dLSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dLSAPTable_data *) hcindex->data;
@@ -5306,9 +5315,8 @@ lAPBDLETable_create(void)
 	DEBUGMSGTL(("lAPBDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		StorageNew->lAPBDLEmT1Timer = 0;
 		StorageNew->lAPBDLEmT3Timer = 0;
 		StorageNew->lAPBDLEmW = 0;
@@ -5456,6 +5464,7 @@ parse_lAPBDLETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
@@ -5494,7 +5503,7 @@ store_lAPBDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lAPBDLETable", "storing data...  "));
-	refresh_lAPBDLETable();
+	refresh_lAPBDLETable(1);
 	(void) tmpsize;
 	for (hcindex = lAPBDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lAPBDLETable_data *) hcindex->data;
@@ -5542,12 +5551,10 @@ sLPPMTable_create(void)
 	DEBUGMSGTL(("sLPPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->sLPPMadministrativeState = 0;
 		StorageNew->sLPPMRowStatus = 0;
 		StorageNew->sLPPMRowStatus = RS_NOTREADY;
@@ -5687,11 +5694,13 @@ parse_sLPPMTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
@@ -5718,7 +5727,7 @@ store_sLPPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("sLPPMTable", "storing data...  "));
-	refresh_sLPPMTable();
+	refresh_sLPPMTable(1);
 	(void) tmpsize;
 	for (hcindex = sLPPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPPMTable_data *) hcindex->data;
@@ -5755,15 +5764,12 @@ sLPConnectionTable_create(void)
 	DEBUGMSGTL(("sLPConnectionTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->connectionIdLen = strlen("");
-		}
 		StorageNew->sLPConnectionInterfaceType = 0;
 		StorageNew->sLPConnectionK = 0;
 		StorageNew->sLPConnectionN1 = 0;
@@ -5799,12 +5805,10 @@ sLPConnectionTable_create(void)
 		StorageNew->sLPConnectionAdministrativeState = 0;
 		StorageNew->sLPConnectionOperationalState = 0;
 		StorageNew->sLPConnectionUsageState = 0;
-		if (memdup((u_char **) &StorageNew->sLPConnectionProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->sLPConnectionProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sLPConnectionProceduralStatusLen = 1;
-		}
-		if (memdup((u_char **) &StorageNew->sLPConnectionAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->sLPConnectionAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sLPConnectionAlarmStatusLen = 1;
-		}
 		StorageNew->sLPConnectionRowStatus = 0;
 		StorageNew->sLPConnectionRowStatus = RS_NOTREADY;
 	}
@@ -5951,16 +5955,19 @@ parse_sLPConnectionTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->connectionId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->connectionId, &StorageTmp->connectionIdLen);
 	if (StorageTmp->connectionId == NULL) {
 		config_perror("invalid specification for connectionId");
@@ -6001,11 +6008,13 @@ parse_sLPConnectionTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionUsageState, &tmpsize);
+	SNMP_FREE(StorageTmp->sLPConnectionProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sLPConnectionProceduralStatus, &StorageTmp->sLPConnectionProceduralStatusLen);
 	if (StorageTmp->sLPConnectionProceduralStatus == NULL) {
 		config_perror("invalid specification for sLPConnectionProceduralStatus");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sLPConnectionAlarmStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sLPConnectionAlarmStatus, &StorageTmp->sLPConnectionAlarmStatusLen);
 	if (StorageTmp->sLPConnectionAlarmStatus == NULL) {
 		config_perror("invalid specification for sLPConnectionAlarmStatus");
@@ -6031,7 +6040,7 @@ store_sLPConnectionTable(int majorID, int minorID, void *serverarg, void *client
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("sLPConnectionTable", "storing data...  "));
-	refresh_sLPConnectionTable();
+	refresh_sLPConnectionTable(1);
 	(void) tmpsize;
 	for (hcindex = sLPConnectionTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPConnectionTable_data *) hcindex->data;
@@ -6105,18 +6114,14 @@ sLPConnectionIVMOTable_create(void)
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->connectionIdLen = strlen("");
-		}
-		if ((StorageNew->sLPConnectionIVMOid = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sLPConnectionIVMOid = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sLPConnectionIVMOidLen = strlen("");
-		}
 		StorageNew->sLPConnectionIVMOinterfaceType = 0;
 		StorageNew->sLPConnectionIVMOk = 0;
 		StorageNew->sLPConnectionIVMOn1 = 0;
@@ -6270,21 +6275,25 @@ parse_sLPConnectionIVMOTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->connectionId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->connectionId, &StorageTmp->connectionIdLen);
 	if (StorageTmp->connectionId == NULL) {
 		config_perror("invalid specification for connectionId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sLPConnectionIVMOid);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionIVMOid, &StorageTmp->sLPConnectionIVMOidLen);
 	if (StorageTmp->sLPConnectionIVMOid == NULL) {
 		config_perror("invalid specification for sLPConnectionIVMOid");
@@ -6319,7 +6328,7 @@ store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "storing data...  "));
-	refresh_sLPConnectionIVMOTable();
+	refresh_sLPConnectionIVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = sLPConnectionIVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPConnectionIVMOTable_data *) hcindex->data;
@@ -6366,9 +6375,8 @@ mACDLETable_create(void)
 	DEBUGMSGTL(("mACDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		StorageNew->mACDLERowStatus = 0;
 		StorageNew->mACDLERowStatus = RS_NOTREADY;
 	}
@@ -6503,6 +6511,7 @@ parse_mACDLETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
@@ -6528,7 +6537,7 @@ store_mACDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("mACDLETable", "storing data...  "));
-	refresh_mACDLETable();
+	refresh_mACDLETable(1);
 	(void) tmpsize;
 	for (hcindex = mACDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mACDLETable_data *) hcindex->data;
@@ -6563,9 +6572,8 @@ mACTable_create(void)
 	DEBUGMSGTL(("mACTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		StorageNew->mACOperationalState = 0;
 		StorageNew->mACRowStatus = 0;
 		StorageNew->mACRowStatus = RS_NOTREADY;
@@ -6705,12 +6713,14 @@ parse_mACTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mACOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->mACId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mACId, &StorageTmp->mACIdLen);
 	if (StorageTmp->mACId == NULL) {
 		config_perror("invalid specification for mACId");
@@ -6736,7 +6746,7 @@ store_mACTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("mACTable", "storing data...  "));
-	refresh_mACTable();
+	refresh_mACTable(1);
 	(void) tmpsize;
 	for (hcindex = mACTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mACTable_data *) hcindex->data;
@@ -6773,9 +6783,8 @@ lLCDLETable_create(void)
 	DEBUGMSGTL(("lLCDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		StorageNew->lLCDLERowStatus = 0;
 		StorageNew->lLCDLERowStatus = RS_NOTREADY;
 	}
@@ -6910,6 +6919,7 @@ parse_lLCDLETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
@@ -6935,7 +6945,7 @@ store_lLCDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCDLETable", "storing data...  "));
-	refresh_lLCDLETable();
+	refresh_lLCDLETable(1);
 	(void) tmpsize;
 	for (hcindex = lLCDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCDLETable_data *) hcindex->data;
@@ -6970,12 +6980,10 @@ lLCCLPMTable_create(void)
 	DEBUGMSGTL(("lLCCLPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->lLCCLPMRowStatus = 0;
 		StorageNew->lLCCLPMRowStatus = RS_NOTREADY;
 	}
@@ -7114,11 +7122,13 @@ parse_lLCCLPMTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
@@ -7144,7 +7154,7 @@ store_lLCCLPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCCLPMTable", "storing data...  "));
-	refresh_lLCCLPMTable();
+	refresh_lLCCLPMTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCCLPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCCLPMTable_data *) hcindex->data;
@@ -7180,12 +7190,10 @@ lLCCOPMTable_create(void)
 	DEBUGMSGTL(("lLCCOPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->lLCCOPMRowStatus = 0;
 		StorageNew->lLCCOPMRowStatus = RS_NOTREADY;
 	}
@@ -7324,11 +7332,13 @@ parse_lLCCOPMTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
@@ -7354,7 +7364,7 @@ store_lLCCOPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCCOPMTable", "storing data...  "));
-	refresh_lLCCOPMTable();
+	refresh_lLCCOPMTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCCOPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCCOPMTable_data *) hcindex->data;
@@ -7390,23 +7400,18 @@ resourceTypeIdTable_create(void)
 	DEBUGMSGTL(("resourceTypeIdTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		/* StorageNew->resourceTypeIdName = (uint8_t *) strdup(\"RTID\"); *//* DEFVAL \"RTID\" */
 		/* StorageNew->resourceTypeIdNameLen = strlen(\"RTID\"); *//* DEFVAL \"RTID\" */
-		if ((StorageNew->resourceInfoManufacturerOUI = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->resourceInfoManufacturerOUI = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerOUILen = strlen("");
-		}
-		if ((StorageNew->resourceInfoManufacturerName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->resourceInfoManufacturerName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerNameLen = strlen("");
-		}
-		if ((StorageNew->resourceInfoManufacturerProductName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->resourceInfoManufacturerProductName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerProductNameLen = strlen("");
-		}
-		if ((StorageNew->resourceInfoManufacturerProductVersion = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->resourceInfoManufacturerProductVersion = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerProductVersionLen = strlen("");
-		}
 
 	}
 	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
@@ -7550,31 +7555,37 @@ parse_resourceTypeIdTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceTypeIdName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceTypeIdName, &StorageTmp->resourceTypeIdNameLen);
 	if (StorageTmp->resourceTypeIdName == NULL) {
 		config_perror("invalid specification for resourceTypeIdName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceInfoManufacturerOUI);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceInfoManufacturerOUI, &StorageTmp->resourceInfoManufacturerOUILen);
 	if (StorageTmp->resourceInfoManufacturerOUI == NULL) {
 		config_perror("invalid specification for resourceInfoManufacturerOUI");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceInfoManufacturerName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceInfoManufacturerName, &StorageTmp->resourceInfoManufacturerNameLen);
 	if (StorageTmp->resourceInfoManufacturerName == NULL) {
 		config_perror("invalid specification for resourceInfoManufacturerName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceInfoManufacturerProductName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceInfoManufacturerProductName, &StorageTmp->resourceInfoManufacturerProductNameLen);
 	if (StorageTmp->resourceInfoManufacturerProductName == NULL) {
 		config_perror("invalid specification for resourceInfoManufacturerProductName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceInfoManufacturerProductVersion);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceInfoManufacturerProductVersion, &StorageTmp->resourceInfoManufacturerProductVersionLen);
 	if (StorageTmp->resourceInfoManufacturerProductVersion == NULL) {
 		config_perror("invalid specification for resourceInfoManufacturerProductVersion");
@@ -7599,7 +7610,7 @@ store_resourceTypeIdTable(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("resourceTypeIdTable", "storing data...  "));
-	refresh_resourceTypeIdTable();
+	refresh_resourceTypeIdTable(1);
 	(void) tmpsize;
 	for (hcindex = resourceTypeIdTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct resourceTypeIdTable_data *) hcindex->data;
@@ -7638,20 +7649,16 @@ lLCStationTable_create(void)
 	DEBUGMSGTL(("lLCStationTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sapIdLen = strlen("");
-		}
-		if ((StorageNew->lLCStationLLCName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCStationLLCName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCStationLLCNameLen = strlen("");
-		}
 		StorageNew->lLCStationMaximumLSAPsConfigured = 0;
 		StorageNew->lLCStationNumberOfActiveLSAPs = 0;
-		if (memdup((u_char **) &StorageNew->lLCStationSupportedServicesTypes, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->lLCStationSupportedServicesTypes, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->lLCStationSupportedServicesTypesLen = 1;
-		}
 		StorageNew->lLCStationStatus = 0;
 		StorageNew->lLCStationType1AcknowledgeTimeoutValue = 0;
 		StorageNew->lLCStationType1MaximumRetryCount = 0;
@@ -7667,9 +7674,8 @@ lLCStationTable_create(void)
 		StorageNew->lLCStationMaxBufferUseSize = 0;
 		StorageNew->lLCStationInactiveLSAP = 0;
 		StorageNew->lLCStationPDUsDiscard = 0;
-		if (memdup((u_char **) &StorageNew->lLCStationSTRIndicator, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->lLCStationSTRIndicator, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->lLCStationSTRIndicatorLen = 1;
-		}
 		StorageNew->lLCStationVersionNumber = 0;
 		StorageNew->lLCStationType1AcknowledgmentTimerTimeouts = 0;
 
@@ -7815,16 +7821,19 @@ parse_lLCStationTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCStationLLCName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCStationLLCName, &StorageTmp->lLCStationLLCNameLen);
 	if (StorageTmp->lLCStationLLCName == NULL) {
 		config_perror("invalid specification for lLCStationLLCName");
@@ -7832,6 +7841,7 @@ parse_lLCStationTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCStationMaximumLSAPsConfigured, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->lLCStationNumberOfActiveLSAPs, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCStationSupportedServicesTypes);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCStationSupportedServicesTypes, &StorageTmp->lLCStationSupportedServicesTypesLen);
 	if (StorageTmp->lLCStationSupportedServicesTypes == NULL) {
 		config_perror("invalid specification for lLCStationSupportedServicesTypes");
@@ -7852,6 +7862,7 @@ parse_lLCStationTable(const char *token, char *line)
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->lLCStationMaxBufferUseSize, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCStationInactiveLSAP, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCStationPDUsDiscard, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCStationSTRIndicator);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCStationSTRIndicator, &StorageTmp->lLCStationSTRIndicatorLen);
 	if (StorageTmp->lLCStationSTRIndicator == NULL) {
 		config_perror("invalid specification for lLCStationSTRIndicator");
@@ -7878,7 +7889,7 @@ store_lLCStationTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCStationTable", "storing data...  "));
-	refresh_lLCStationTable();
+	refresh_lLCStationTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCStationTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCStationTable_data *) hcindex->data;
@@ -7935,18 +7946,14 @@ lLCSAPTable_create(void)
 	DEBUGMSGTL(("lLCSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sapIdLen = strlen("");
-		}
-		if ((StorageNew->lLCSAPName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCSAPName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCSAPNameLen = strlen("");
-		}
-		if ((StorageNew->lLCSAPAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCSAPAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCSAPAddressLen = strlen("");
-		}
 		StorageNew->lLCSAPRDE = 0;
 
 	}
@@ -8089,21 +8096,25 @@ parse_lLCSAPTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCSAPName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCSAPName, &StorageTmp->lLCSAPNameLen);
 	if (StorageTmp->lLCSAPName == NULL) {
 		config_perror("invalid specification for lLCSAPName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCSAPAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCSAPAddress, &StorageTmp->lLCSAPAddressLen);
 	if (StorageTmp->lLCSAPAddress == NULL) {
 		config_perror("invalid specification for lLCSAPAddress");
@@ -8129,7 +8140,7 @@ store_lLCSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCSAPTable", "storing data...  "));
-	refresh_lLCSAPTable();
+	refresh_lLCSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCSAPTable_data *) hcindex->data;
@@ -8167,12 +8178,10 @@ rDESetupTable_create(void)
 	DEBUGMSGTL(("rDESetupTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sapIdLen = strlen("");
-		}
 		StorageNew->rDESetupAgingEnabled = 0;
 		StorageNew->rDESetupAgingValue = 0;
 		StorageNew->rDESetupEnableType2Reset = 0;
@@ -8320,11 +8329,13 @@ parse_rDESetupTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
@@ -8359,7 +8370,7 @@ store_rDESetupTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("rDESetupTable", "storing data...  "));
-	refresh_rDESetupTable();
+	refresh_rDESetupTable(1);
 	(void) tmpsize;
 	for (hcindex = rDESetupTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct rDESetupTable_data *) hcindex->data;
@@ -8404,18 +8415,15 @@ rDEPairTable_create(void)
 	DEBUGMSGTL(("rDEPairTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sapIdLen = strlen("");
-		}
 		StorageNew->rDEPairDiscardCounter = 0;
 		StorageNew->rDEPairNSRPDUCounter = 0;
 		StorageNew->rDEPairNSRSelectedCounter = 0;
-		if ((StorageNew->rDEPairRIF = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->rDEPairRIF = (uint8_t *) strdup("")) != NULL)
 			StorageNew->rDEPairRIFLen = strlen("");
-		}
 		StorageNew->rDEPairSRFPDUCounter = 0;
 		StorageNew->rDEPairQueryCounter = 0;
 
@@ -8561,16 +8569,19 @@ parse_rDEPairTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->rDEPairName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->rDEPairName, &StorageTmp->rDEPairNameLen);
 	if (StorageTmp->rDEPairName == NULL) {
 		config_perror("invalid specification for rDEPairName");
@@ -8579,6 +8590,7 @@ parse_rDEPairTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->rDEPairDiscardCounter, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->rDEPairNSRPDUCounter, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->rDEPairNSRSelectedCounter, &tmpsize);
+	SNMP_FREE(StorageTmp->rDEPairRIF);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->rDEPairRIF, &StorageTmp->rDEPairRIFLen);
 	if (StorageTmp->rDEPairRIF == NULL) {
 		config_perror("invalid specification for rDEPairRIF");
@@ -8605,7 +8617,7 @@ store_rDEPairTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("rDEPairTable", "storing data...  "));
-	refresh_rDEPairTable();
+	refresh_rDEPairTable(1);
 	(void) tmpsize;
 	for (hcindex = rDEPairTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct rDEPairTable_data *) hcindex->data;
@@ -8647,18 +8659,14 @@ lLCConnectionLessTable_create(void)
 	DEBUGMSGTL(("lLCConnectionLessTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->lLCConnectionlessName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnectionlessName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnectionlessNameLen = strlen("");
-		}
 		StorageNew->lLCConnectionlessMaximumLLCInformationFieldSize = 0;
 		StorageNew->lLCConnectionlessTESTReceivedABBResponse = 0;
 		StorageNew->lLCConnectionlessTESTReceivedCommand = 0;
@@ -8815,21 +8823,25 @@ parse_lLCConnectionLessTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCConnectionlessName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnectionlessName, &StorageTmp->lLCConnectionlessNameLen);
 	if (StorageTmp->lLCConnectionlessName == NULL) {
 		config_perror("invalid specification for lLCConnectionlessName");
@@ -8867,7 +8879,7 @@ store_lLCConnectionLessTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnectionLessTable", "storing data...  "));
-	refresh_lLCConnectionLessTable();
+	refresh_lLCConnectionLessTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionLessTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnectionLessTable_data *) hcindex->data;
@@ -8917,18 +8929,14 @@ lLCConnection2Table_create(void)
 	DEBUGMSGTL(("lLCConnection2Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->lLCConnection2Name = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnection2Name = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2NameLen = strlen("");
-		}
 		StorageNew->lLCConnection2MaximumRetransmissions = 0;
 		StorageNew->lLCConnection2ReceivedWindowSize = 0;
 		StorageNew->lLCConnection2SendWindowSize = 0;
@@ -8941,9 +8949,8 @@ lLCConnection2Table_create(void)
 		StorageNew->lLCConnection2RemoteReset = 0;
 		StorageNew->lLCConnection2LocalReset = 0;
 		StorageNew->lLCConnection2ProviderReset = 0;
-		if ((StorageNew->lLCConnection2Route = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnection2Route = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2RouteLen = strlen("");
-		}
 		StorageNew->lLCConnection2KStep = 0;
 		StorageNew->lLCConnection2MaxSendWindowSize = 0;
 		StorageNew->lLCConnection2ReceivedI = 0;
@@ -8976,12 +8983,10 @@ lLCConnection2Table_create(void)
 		StorageNew->lLCConnection2AdministrativeState = 0;
 		StorageNew->lLCConnection2OperationalState = 0;
 		StorageNew->lLCConnection2UsageState = 0;
-		if (memdup((u_char **) &StorageNew->lLCConnection2ProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->lLCConnection2ProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->lLCConnection2ProceduralStatusLen = 1;
-		}
-		if (memdup((u_char **) &StorageNew->lLCConnection2AlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->lLCConnection2AlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->lLCConnection2AlarmStatusLen = 1;
-		}
 
 	}
 	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
@@ -9131,21 +9136,25 @@ parse_lLCConnection2Table(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCConnection2Name);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2Name, &StorageTmp->lLCConnection2NameLen);
 	if (StorageTmp->lLCConnection2Name == NULL) {
 		config_perror("invalid specification for lLCConnection2Name");
@@ -9163,6 +9172,7 @@ parse_lLCConnection2Table(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCConnection2RemoteReset, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCConnection2LocalReset, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCConnection2ProviderReset, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCConnection2Route);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2Route, &StorageTmp->lLCConnection2RouteLen);
 	if (StorageTmp->lLCConnection2Route == NULL) {
 		config_perror("invalid specification for lLCConnection2Route");
@@ -9200,11 +9210,13 @@ parse_lLCConnection2Table(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2AdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2OperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2UsageState, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCConnection2ProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCConnection2ProceduralStatus, &StorageTmp->lLCConnection2ProceduralStatusLen);
 	if (StorageTmp->lLCConnection2ProceduralStatus == NULL) {
 		config_perror("invalid specification for lLCConnection2ProceduralStatus");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCConnection2AlarmStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCConnection2AlarmStatus, &StorageTmp->lLCConnection2AlarmStatusLen);
 	if (StorageTmp->lLCConnection2AlarmStatus == NULL) {
 		config_perror("invalid specification for lLCConnection2AlarmStatus");
@@ -9229,7 +9241,7 @@ store_lLCConnection2Table(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnection2Table", "storing data...  "));
-	refresh_lLCConnection2Table();
+	refresh_lLCConnection2Table(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnection2TableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnection2Table_data *) hcindex->data;
@@ -9313,18 +9325,14 @@ lLCConnection2IVMOTable_create(void)
 	DEBUGMSGTL(("lLCConnection2IVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->connectionIdLen = strlen("");
-		}
-		if ((StorageNew->lLCConnection2IVMOName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnection2IVMOName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2IVMONameLen = strlen("");
-		}
 		StorageNew->lLCConnection2IVMOMaximumRetransmissions = 0;
 		StorageNew->lLCConnection2IVMOReceivedWindowSize = 0;
 		StorageNew->lLCConnection2IVMOSendWindowSize = 0;
@@ -9479,21 +9487,25 @@ parse_lLCConnection2IVMOTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->connectionId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->connectionId, &StorageTmp->connectionIdLen);
 	if (StorageTmp->connectionId == NULL) {
 		config_perror("invalid specification for connectionId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCConnection2IVMOName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2IVMOName, &StorageTmp->lLCConnection2IVMONameLen);
 	if (StorageTmp->lLCConnection2IVMOName == NULL) {
 		config_perror("invalid specification for lLCConnection2IVMOName");
@@ -9529,7 +9541,7 @@ store_lLCConnection2IVMOTable(int majorID, int minorID, void *serverarg, void *c
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnection2IVMOTable", "storing data...  "));
-	refresh_lLCConnection2IVMOTable();
+	refresh_lLCConnection2IVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnection2IVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnection2IVMOTable_data *) hcindex->data;
@@ -9577,15 +9589,12 @@ lLCConnectionlessAckTable_create(void)
 	DEBUGMSGTL(("lLCConnectionlessAckTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->lLCConnectionlessAckMaximumLLCInformationFieldSize = 0;
 		StorageNew->lLCConnectionlessAckMaximumRetransmissions = 0;
 		StorageNew->lLCConnectionlessAckTESTReceivedABBResponse = 0;
@@ -9766,21 +9775,25 @@ parse_lLCConnectionlessAckTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCConnectionlessAckName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnectionlessAckName, &StorageTmp->lLCConnectionlessAckNameLen);
 	if (StorageTmp->lLCConnectionlessAckName == NULL) {
 		config_perror("invalid specification for lLCConnectionlessAckName");
@@ -9840,7 +9853,7 @@ store_lLCConnectionlessAckTable(int majorID, int minorID, void *serverarg, void 
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnectionlessAckTable", "storing data...  "));
-	refresh_lLCConnectionlessAckTable();
+	refresh_lLCConnectionlessAckTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionlessAckTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnectionlessAckTable_data *) hcindex->data;
@@ -9912,12 +9925,10 @@ lLCConnectionlessAckIVMOTable_create(void)
 	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize = 0;
 		StorageNew->lLCConnectionlessAckIVMOMaximumRetransmissions = 0;
 		StorageNew->lLCConnectionlessAckIVMORowStatus = 0;
@@ -10062,16 +10073,19 @@ parse_lLCConnectionlessAckIVMOTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCConnectionlessAckIVMOName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnectionlessAckIVMOName, &StorageTmp->lLCConnectionlessAckIVMONameLen);
 	if (StorageTmp->lLCConnectionlessAckIVMOName == NULL) {
 		config_perror("invalid specification for lLCConnectionlessAckIVMOName");
@@ -10099,7 +10113,7 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "storing data...  "));
-	refresh_lLCConnectionlessAckIVMOTable();
+	refresh_lLCConnectionlessAckIVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionlessAckIVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnectionlessAckIVMOTable_data *) hcindex->data;
@@ -10138,15 +10152,12 @@ networkEntityTable_create(void)
 	DEBUGMSGTL(("networkEntityTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->networkEntityTitles = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->networkEntityTitles = (uint8_t *) strdup("")) != NULL)
 			StorageNew->networkEntityTitlesLen = strlen("");
-		}
-		if (memdup((u_char **) &StorageNew->networkEntitySystemTypes, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->networkEntitySystemTypes, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->networkEntitySystemTypesLen = 1;
-		}
 		StorageNew->networkEntityRowStatus = 0;
 		StorageNew->networkEntityRowStatus = RS_NOTREADY;
 	}
@@ -10285,16 +10296,19 @@ parse_networkEntityTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->networkEntityTitles);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->networkEntityTitles, &StorageTmp->networkEntityTitlesLen);
 	if (StorageTmp->networkEntityTitles == NULL) {
 		config_perror("invalid specification for networkEntityTitles");
 		return;
 	}
+	SNMP_FREE(StorageTmp->networkEntitySystemTypes);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->networkEntitySystemTypes, &StorageTmp->networkEntitySystemTypesLen);
 	if (StorageTmp->networkEntitySystemTypes == NULL) {
 		config_perror("invalid specification for networkEntitySystemTypes");
@@ -10320,7 +10334,7 @@ store_networkEntityTable(int majorID, int minorID, void *serverarg, void *client
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("networkEntityTable", "storing data...  "));
-	refresh_networkEntityTable();
+	refresh_networkEntityTable(1);
 	(void) tmpsize;
 	for (hcindex = networkEntityTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct networkEntityTable_data *) hcindex->data;
@@ -10357,9 +10371,8 @@ nSAPTable_create(void)
 	DEBUGMSGTL(("nSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sapIdLen = strlen("");
-		}
 		StorageNew->nSAPRowStatus = 0;
 		StorageNew->nSAPRowStatus = RS_NOTREADY;
 	}
@@ -10494,6 +10507,7 @@ parse_nSAPTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->sapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 	if (StorageTmp->sapId == NULL) {
 		config_perror("invalid specification for sapId");
@@ -10519,7 +10533,7 @@ store_nSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("nSAPTable", "storing data...  "));
-	refresh_nSAPTable();
+	refresh_nSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = nSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct nSAPTable_data *) hcindex->data;
@@ -10554,19 +10568,15 @@ cLNSTable_create(void)
 	DEBUGMSGTL(("cLNSTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->cLNSAdministrativeState = 0;
-		if ((StorageNew->cLNSSupportedProtocols = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSSupportedProtocols = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSSupportedProtocolsLen = strlen("");
-		}
-		if (memdup((u_char **) &StorageNew->cLNSOperationalSystemType, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->cLNSOperationalSystemType, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->cLNSOperationalSystemTypeLen = 1;
-		}
 		StorageNew->cLNSOctetsSentCounter = 0;
 		StorageNew->cLNSOctetsReceivedCounter = 0;
 		StorageNew->cLNSSegmentsReceived = 0;
@@ -10719,22 +10729,26 @@ parse_cLNSTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSAdministrativeState, &tmpsize);
+	SNMP_FREE(StorageTmp->cLNSSupportedProtocols);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSSupportedProtocols, &StorageTmp->cLNSSupportedProtocolsLen);
 	if (StorageTmp->cLNSSupportedProtocols == NULL) {
 		config_perror("invalid specification for cLNSSupportedProtocols");
 		return;
 	}
+	SNMP_FREE(StorageTmp->cLNSOperationalSystemType);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->cLNSOperationalSystemType, &StorageTmp->cLNSOperationalSystemTypeLen);
 	if (StorageTmp->cLNSOperationalSystemType == NULL) {
 		config_perror("invalid specification for cLNSOperationalSystemType");
@@ -10770,7 +10784,7 @@ store_cLNSTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("cLNSTable", "storing data...  "));
-	refresh_cLNSTable();
+	refresh_cLNSTable(1);
 	(void) tmpsize;
 	for (hcindex = cLNSTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct cLNSTable_data *) hcindex->data;
@@ -10819,28 +10833,23 @@ cLNSISISTable_create(void)
 	DEBUGMSGTL(("cLNSISISTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->cLNSISISversion = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISversion = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISversionLen = strlen("");
-		}
 		StorageNew->cLNSISISiSType = 0;
-		if ((StorageNew->cLNSISISsystemId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISsystemId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISsystemIdLen = strlen("");
-		}
 		StorageNew->cLNSISISmaximumPathSplits = 0;
 		StorageNew->cLNSISISminimumLSPTransmissionInterval = 0;
 		StorageNew->cLNSISISmaximumLSPGenerationInterval = 0;
 		StorageNew->cLNSISISminimumBroadcastLSPTransmissionInterval = 0;
 		StorageNew->cLNSISIScompleteSNPInterval = 0;
 		StorageNew->cLNSISISoriginatingL1LSPBufferSize = 0;
-		if ((StorageNew->cLNSISISmanualAreaAddresses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISmanualAreaAddresses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISmanualAreaAddressesLen = strlen("");
-		}
 		StorageNew->cLNSISISmaximumAreaAddresses = 0;
 		StorageNew->cLNSISISminimumLSPGenerationInterval = 0;
 		StorageNew->cLNSISISpollESHelloRate = 0;
@@ -10848,9 +10857,8 @@ cLNSISISTable_create(void)
 		StorageNew->cLNSISISwaitingTime = 0;
 		StorageNew->cLNSISISdRISISHelloTimer = 0;
 		StorageNew->cLNSISISl1State = 0;
-		if ((StorageNew->cLNSISISareaAddresses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISareaAddresses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISareaAddressesLen = strlen("");
-		}
 		StorageNew->cLNSISIScorruptedLSPsDetected = 0;
 		StorageNew->cLNSISISlSPL1DatabaseOverloads = 0;
 		StorageNew->cLNSISISmanualAddressesDroppedFromAreas = 0;
@@ -10861,12 +10869,10 @@ cLNSISISTable_create(void)
 		StorageNew->cLNSISISmaximumAreaAddressesMismatches = 0;
 		StorageNew->cLNSISISoriginatingLSPBufferSizeMismatches = 0;
 		StorageNew->cLNSISISlSPTooLargeToPropagate = 0;
-		if ((StorageNew->cLNSISISareaTransmitPassword = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISareaTransmitPassword = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISareaTransmitPasswordLen = strlen("");
-		}
-		if ((StorageNew->cLNSISISareaReceivePasswords = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISareaReceivePasswords = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISareaReceivePasswordsLen = strlen("");
-		}
 		StorageNew->cLNSISISauthenticationFailures = 0;
 		StorageNew->cLNSISISRowStatus = 0;
 		StorageNew->cLNSISISRowStatus = RS_NOTREADY;
@@ -11018,22 +11024,26 @@ parse_cLNSISISTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->cLNSISISversion);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISversion, &StorageTmp->cLNSISISversionLen);
 	if (StorageTmp->cLNSISISversion == NULL) {
 		config_perror("invalid specification for cLNSISISversion");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISiSType, &tmpsize);
+	SNMP_FREE(StorageTmp->cLNSISISsystemId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISsystemId, &StorageTmp->cLNSISISsystemIdLen);
 	if (StorageTmp->cLNSISISsystemId == NULL) {
 		config_perror("invalid specification for cLNSISISsystemId");
@@ -11045,6 +11055,7 @@ parse_cLNSISISTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISminimumBroadcastLSPTransmissionInterval, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISIScompleteSNPInterval, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISoriginatingL1LSPBufferSize, &tmpsize);
+	SNMP_FREE(StorageTmp->cLNSISISmanualAreaAddresses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISmanualAreaAddresses, &StorageTmp->cLNSISISmanualAreaAddressesLen);
 	if (StorageTmp->cLNSISISmanualAreaAddresses == NULL) {
 		config_perror("invalid specification for cLNSISISmanualAreaAddresses");
@@ -11057,6 +11068,7 @@ parse_cLNSISISTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISwaitingTime, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISdRISISHelloTimer, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISl1State, &tmpsize);
+	SNMP_FREE(StorageTmp->cLNSISISareaAddresses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISareaAddresses, &StorageTmp->cLNSISISareaAddressesLen);
 	if (StorageTmp->cLNSISISareaAddresses == NULL) {
 		config_perror("invalid specification for cLNSISISareaAddresses");
@@ -11072,11 +11084,13 @@ parse_cLNSISISTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->cLNSISISmaximumAreaAddressesMismatches, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->cLNSISISoriginatingLSPBufferSizeMismatches, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->cLNSISISlSPTooLargeToPropagate, &tmpsize);
+	SNMP_FREE(StorageTmp->cLNSISISareaTransmitPassword);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISareaTransmitPassword, &StorageTmp->cLNSISISareaTransmitPasswordLen);
 	if (StorageTmp->cLNSISISareaTransmitPassword == NULL) {
 		config_perror("invalid specification for cLNSISISareaTransmitPassword");
 		return;
 	}
+	SNMP_FREE(StorageTmp->cLNSISISareaReceivePasswords);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISareaReceivePasswords, &StorageTmp->cLNSISISareaReceivePasswordsLen);
 	if (StorageTmp->cLNSISISareaReceivePasswords == NULL) {
 		config_perror("invalid specification for cLNSISISareaReceivePasswords");
@@ -11103,7 +11117,7 @@ store_cLNSISISTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("cLNSISISTable", "storing data...  "));
-	refresh_cLNSISISTable();
+	refresh_cLNSISISTable(1);
 	(void) tmpsize;
 	for (hcindex = cLNSISISTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct cLNSISISTable_data *) hcindex->data;
@@ -11170,26 +11184,21 @@ cLNSISISLevel2Table_create(void)
 	DEBUGMSGTL(("cLNSISISLevel2Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->cLNSISISLevel2maximumVirtualAdjacencies = 0;
-		if ((StorageNew->cLNSISISLevel2partitionAreaAddresses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISLevel2partitionAreaAddresses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISLevel2partitionAreaAddressesLen = strlen("");
-		}
-		if ((StorageNew->cLNSISISLevel2partitionDesignatedL2IntermediateSystem = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISLevel2partitionDesignatedL2IntermediateSystem = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISLevel2partitionDesignatedL2IntermediateSystemLen = strlen("");
-		}
 		StorageNew->cLNSISISLevel2partitionVirtualLinkChanges = 0;
 		StorageNew->cLNSISISLevel2originatingL2LSPBufferSize = 0;
 		StorageNew->cLNSISISLevel2l2State = 0;
 		StorageNew->cLNSISISLevel2lSPL2DatabaseOverloads = 0;
-		if ((StorageNew->cLNSISISLevel2domainTransmitPassword = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISLevel2domainTransmitPassword = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISLevel2domainTransmitPasswordLen = strlen("");
-		}
-		if ((StorageNew->cLNSISISLevel2domainReceivePasswords = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->cLNSISISLevel2domainReceivePasswords = (uint8_t *) strdup("")) != NULL)
 			StorageNew->cLNSISISLevel2domainReceivePasswordsLen = strlen("");
-		}
 		StorageNew->cLNSISISLevel2RowStatus = 0;
 		StorageNew->cLNSISISLevel2RowStatus = RS_NOTREADY;
 	}
@@ -11332,17 +11341,20 @@ parse_cLNSISISLevel2Table(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISLevel2maximumVirtualAdjacencies, &tmpsize);
+	SNMP_FREE(StorageTmp->cLNSISISLevel2partitionAreaAddresses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISLevel2partitionAreaAddresses, &StorageTmp->cLNSISISLevel2partitionAreaAddressesLen);
 	if (StorageTmp->cLNSISISLevel2partitionAreaAddresses == NULL) {
 		config_perror("invalid specification for cLNSISISLevel2partitionAreaAddresses");
 		return;
 	}
+	SNMP_FREE(StorageTmp->cLNSISISLevel2partitionDesignatedL2IntermediateSystem);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISLevel2partitionDesignatedL2IntermediateSystem, &StorageTmp->cLNSISISLevel2partitionDesignatedL2IntermediateSystemLen);
 	if (StorageTmp->cLNSISISLevel2partitionDesignatedL2IntermediateSystem == NULL) {
 		config_perror("invalid specification for cLNSISISLevel2partitionDesignatedL2IntermediateSystem");
@@ -11352,11 +11364,13 @@ parse_cLNSISISLevel2Table(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISLevel2originatingL2LSPBufferSize, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cLNSISISLevel2l2State, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->cLNSISISLevel2lSPL2DatabaseOverloads, &tmpsize);
+	SNMP_FREE(StorageTmp->cLNSISISLevel2domainTransmitPassword);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISLevel2domainTransmitPassword, &StorageTmp->cLNSISISLevel2domainTransmitPasswordLen);
 	if (StorageTmp->cLNSISISLevel2domainTransmitPassword == NULL) {
 		config_perror("invalid specification for cLNSISISLevel2domainTransmitPassword");
 		return;
 	}
+	SNMP_FREE(StorageTmp->cLNSISISLevel2domainReceivePasswords);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->cLNSISISLevel2domainReceivePasswords, &StorageTmp->cLNSISISLevel2domainReceivePasswordsLen);
 	if (StorageTmp->cLNSISISLevel2domainReceivePasswords == NULL) {
 		config_perror("invalid specification for cLNSISISLevel2domainReceivePasswords");
@@ -11382,7 +11396,7 @@ store_cLNSISISLevel2Table(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("cLNSISISLevel2Table", "storing data...  "));
-	refresh_cLNSISISLevel2Table();
+	refresh_cLNSISISLevel2Table(1);
 	(void) tmpsize;
 	for (hcindex = cLNSISISLevel2TableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct cLNSISISLevel2Table_data *) hcindex->data;
@@ -11428,89 +11442,65 @@ linkageTable_create(void)
 	DEBUGMSGTL(("linkageTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
 		StorageNew->linkageOperationalState = 0;
 		StorageNew->linkageAdministrativeState = 0;
-		if ((StorageNew->linkageSnServiceProvider = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageSnServiceProvider = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageSnServiceProviderLen = strlen("");
-		}
-		if ((StorageNew->linkageSnSAP = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->linkageSnSAP = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->linkageSnSAPLen = 2;
-		}
-		if ((StorageNew->linkageOperationalProtocols = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageOperationalProtocols = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageOperationalProtocolsLen = strlen("");
-		}
-		if ((StorageNew->linkageISiSO9542OperationalSubsets = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISiSO9542OperationalSubsets = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISiSO9542OperationalSubsetsLen = strlen("");
-		}
-		if ((StorageNew->linkageISHoldingTimerMultiplier = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISHoldingTimerMultiplier = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISHoldingTimerMultiplierLen = strlen("");
-		}
-		if ((StorageNew->linkageISISConfigurationTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISConfigurationTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISConfigurationTimerLen = strlen("");
-		}
-		if ((StorageNew->linkageISSuggestedEsConfigurationTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISSuggestedEsConfigurationTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISSuggestedEsConfigurationTimerLen = strlen("");
-		}
-		if ((StorageNew->linkageISRedirectHoldingTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISRedirectHoldingTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISRedirectHoldingTimeLen = strlen("");
-		}
 		StorageNew->linkageISESReachabilityChanges = 0;
 		StorageNew->linkageISInvalid9542PDUs = 0;
-		if ((StorageNew->linkageESiSO9542OperationalSubsets = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageESiSO9542OperationalSubsets = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageESiSO9542OperationalSubsetsLen = strlen("");
-		}
-		if ((StorageNew->linkageESHoldingTimerMultiplier = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageESHoldingTimerMultiplier = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageESHoldingTimerMultiplierLen = strlen("");
-		}
-		if ((StorageNew->linkageESManualISSNPAAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageESManualISSNPAAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageESManualISSNPAAddressLen = strlen("");
-		}
-		if ((StorageNew->linkageESDefaultESConfigTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageESDefaultESConfigTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageESDefaultESConfigTimerLen = strlen("");
-		}
-		if ((StorageNew->linkageESActiveESConfigTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageESActiveESConfigTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageESActiveESConfigTimerLen = strlen("");
-		}
 		StorageNew->linkageESISReachabilityChanges = 0;
 		StorageNew->linkageESInvalid9542PDUs = 0;
 		StorageNew->linkageEnableChecksum = 0;
-		if ((StorageNew->linkageInitialMinimumTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageInitialMinimumTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageInitialMinimumTimerLen = strlen("");
-		}
-		if ((StorageNew->linkageReserveTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageReserveTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageReserveTimerLen = strlen("");
-		}
-		if ((StorageNew->linkageIdleTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageIdleTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageIdleTimerLen = strlen("");
-		}
 		StorageNew->linkageSNDCFCallsPlaced = 0;
 		StorageNew->linkageSNDCFCallsFailed = 0;
 		StorageNew->linkageCODLCallsPlaced = 0;
 		StorageNew->linkageCODLCallsFailed = 0;
-		if ((StorageNew->linkageISISType = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISType = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISTypeLen = strlen("");
-		}
-		if ((StorageNew->linkageISISiSISHelloTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISiSISHelloTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISiSISHelloTimerLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl1DefaultMetric = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl1DefaultMetric = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl1DefaultMetricLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl1DelayMetric = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl1DelayMetric = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl1DelayMetricLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl1ExpenseMetric = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl1ExpenseMetric = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl1ExpenseMetricLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl1ErrorMetric = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl1ErrorMetric = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl1ErrorMetricLen = strlen("");
-		}
-		if ((StorageNew->linkageISISexternalDomain = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISexternalDomain = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISexternalDomainLen = strlen("");
-		}
 		StorageNew->linkageISISchangedInAdjacencyState = 0;
 		StorageNew->linkageISISinitialisationFailures = 0;
 		StorageNew->linkageISISrejectedAdjacencies = 0;
@@ -11518,66 +11508,47 @@ linkageTable_create(void)
 		StorageNew->linkageISISiSISControlPDUsReceived = 0;
 		StorageNew->linkageISISiDFieldLenthMismatches = 0;
 		StorageNew->linkageISISmaximumAreaAddressesMismatches = 0;
-		if ((StorageNew->linkageISIScircuitTransmitPassword = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISIScircuitTransmitPassword = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISIScircuitTransmitPasswordLen = strlen("");
-		}
-		if ((StorageNew->linkageISIScircuitReceivedPasswords = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISIScircuitReceivedPasswords = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISIScircuitReceivedPasswordsLen = strlen("");
-		}
 		StorageNew->linkageISISauthenticationFailures = 0;
-		if ((StorageNew->linkageISISl1IntermediateSystemPriority = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl1IntermediateSystemPriority = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl1IntermediateSystemPriorityLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl1CircuitID = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl1CircuitID = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl1CircuitIDLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl1DesignatedIntermediateSystem = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl1DesignatedIntermediateSystem = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl1DesignatedIntermediateSystemLen = strlen("");
-		}
 		StorageNew->linkageISISlanL1DesignatedIntermediateSystemChanges = 0;
-		if ((StorageNew->linkageISIScallEstablishmentDefaultMetricIncrement = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISIScallEstablishmentDefaultMetricIncrement = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISIScallEstablishmentDefaultMetricIncrementLen = strlen("");
-		}
-		if ((StorageNew->linkageISIScallEstablishmentDelayMetricIncrement = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISIScallEstablishmentDelayMetricIncrement = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISIScallEstablishmentDelayMetricIncrementLen = strlen("");
-		}
-		if ((StorageNew->linkageISIScallEstablishmentExpenseMetricIncrement = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISIScallEstablishmentExpenseMetricIncrement = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISIScallEstablishmentExpenseMetricIncrementLen = strlen("");
-		}
-		if ((StorageNew->linkageISIScallEstablishmentErrorMetricIncrement = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISIScallEstablishmentErrorMetricIncrement = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISIScallEstablishmentErrorMetricIncrementLen = strlen("");
-		}
-		if ((StorageNew->linkageISISptPtCircuitID = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISptPtCircuitID = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISptPtCircuitIDLen = strlen("");
-		}
-		if ((StorageNew->linkageISISoutgoingCallIVMO = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISoutgoingCallIVMO = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISoutgoingCallIVMOLen = strlen("");
-		}
-		if ((StorageNew->linkageISISneighborSNPAAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISneighborSNPAAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISneighborSNPAAddressLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl2DefaultMetric = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl2DefaultMetric = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl2DefaultMetricLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl2DelayMetric = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl2DelayMetric = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl2DelayMetricLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl2ExpenseMetric = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl2ExpenseMetric = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl2ExpenseMetricLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl2ErrorMetric = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl2ErrorMetric = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl2ErrorMetricLen = strlen("");
-		}
 		StorageNew->linkageISISmanualL2OnlyMode = 0;
-		if ((StorageNew->linkageISISl2IntermediateSystemPriority = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl2IntermediateSystemPriority = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl2IntermediateSystemPriorityLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl2CircuitID = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl2CircuitID = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl2CircuitIDLen = strlen("");
-		}
-		if ((StorageNew->linkageISISl2DesignatedIntermediateSystem = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageISISl2DesignatedIntermediateSystem = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageISISl2DesignatedIntermediateSystemLen = strlen("");
-		}
 		StorageNew->linkageISISlanL2DesignatedIntermediteSystemChanges = 0;
 		StorageNew->linkageRowStatus = 0;
 		StorageNew->linkageRowStatus = RS_NOTREADY;
@@ -11805,16 +11776,19 @@ parse_linkageTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->protocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->protocolMachineId, &StorageTmp->protocolMachineIdLen);
 	if (StorageTmp->protocolMachineId == NULL) {
 		config_perror("invalid specification for protocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageId, &StorageTmp->linkageIdLen);
 	if (StorageTmp->linkageId == NULL) {
 		config_perror("invalid specification for linkageId");
@@ -11822,41 +11796,49 @@ parse_linkageTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->linkageOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->linkageAdministrativeState, &tmpsize);
+	SNMP_FREE(StorageTmp->linkageSnServiceProvider);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageSnServiceProvider, &StorageTmp->linkageSnServiceProviderLen);
 	if (StorageTmp->linkageSnServiceProvider == NULL) {
 		config_perror("invalid specification for linkageSnServiceProvider");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageSnSAP);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->linkageSnSAP, &StorageTmp->linkageSnSAPLen);
 	if (StorageTmp->linkageSnSAP == NULL) {
 		config_perror("invalid specification for linkageSnSAP");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageOperationalProtocols);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageOperationalProtocols, &StorageTmp->linkageOperationalProtocolsLen);
 	if (StorageTmp->linkageOperationalProtocols == NULL) {
 		config_perror("invalid specification for linkageOperationalProtocols");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISiSO9542OperationalSubsets);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISiSO9542OperationalSubsets, &StorageTmp->linkageISiSO9542OperationalSubsetsLen);
 	if (StorageTmp->linkageISiSO9542OperationalSubsets == NULL) {
 		config_perror("invalid specification for linkageISiSO9542OperationalSubsets");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISHoldingTimerMultiplier);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISHoldingTimerMultiplier, &StorageTmp->linkageISHoldingTimerMultiplierLen);
 	if (StorageTmp->linkageISHoldingTimerMultiplier == NULL) {
 		config_perror("invalid specification for linkageISHoldingTimerMultiplier");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISConfigurationTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISConfigurationTimer, &StorageTmp->linkageISISConfigurationTimerLen);
 	if (StorageTmp->linkageISISConfigurationTimer == NULL) {
 		config_perror("invalid specification for linkageISISConfigurationTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISSuggestedEsConfigurationTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISSuggestedEsConfigurationTimer, &StorageTmp->linkageISSuggestedEsConfigurationTimerLen);
 	if (StorageTmp->linkageISSuggestedEsConfigurationTimer == NULL) {
 		config_perror("invalid specification for linkageISSuggestedEsConfigurationTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISRedirectHoldingTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISRedirectHoldingTime, &StorageTmp->linkageISRedirectHoldingTimeLen);
 	if (StorageTmp->linkageISRedirectHoldingTime == NULL) {
 		config_perror("invalid specification for linkageISRedirectHoldingTime");
@@ -11864,26 +11846,31 @@ parse_linkageTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageISESReachabilityChanges, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageISInvalid9542PDUs, &tmpsize);
+	SNMP_FREE(StorageTmp->linkageESiSO9542OperationalSubsets);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageESiSO9542OperationalSubsets, &StorageTmp->linkageESiSO9542OperationalSubsetsLen);
 	if (StorageTmp->linkageESiSO9542OperationalSubsets == NULL) {
 		config_perror("invalid specification for linkageESiSO9542OperationalSubsets");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageESHoldingTimerMultiplier);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageESHoldingTimerMultiplier, &StorageTmp->linkageESHoldingTimerMultiplierLen);
 	if (StorageTmp->linkageESHoldingTimerMultiplier == NULL) {
 		config_perror("invalid specification for linkageESHoldingTimerMultiplier");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageESManualISSNPAAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageESManualISSNPAAddress, &StorageTmp->linkageESManualISSNPAAddressLen);
 	if (StorageTmp->linkageESManualISSNPAAddress == NULL) {
 		config_perror("invalid specification for linkageESManualISSNPAAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageESDefaultESConfigTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageESDefaultESConfigTimer, &StorageTmp->linkageESDefaultESConfigTimerLen);
 	if (StorageTmp->linkageESDefaultESConfigTimer == NULL) {
 		config_perror("invalid specification for linkageESDefaultESConfigTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageESActiveESConfigTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageESActiveESConfigTimer, &StorageTmp->linkageESActiveESConfigTimerLen);
 	if (StorageTmp->linkageESActiveESConfigTimer == NULL) {
 		config_perror("invalid specification for linkageESActiveESConfigTimer");
@@ -11892,16 +11879,19 @@ parse_linkageTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageESISReachabilityChanges, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageESInvalid9542PDUs, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->linkageEnableChecksum, &tmpsize);
+	SNMP_FREE(StorageTmp->linkageInitialMinimumTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageInitialMinimumTimer, &StorageTmp->linkageInitialMinimumTimerLen);
 	if (StorageTmp->linkageInitialMinimumTimer == NULL) {
 		config_perror("invalid specification for linkageInitialMinimumTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageReserveTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageReserveTimer, &StorageTmp->linkageReserveTimerLen);
 	if (StorageTmp->linkageReserveTimer == NULL) {
 		config_perror("invalid specification for linkageReserveTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageIdleTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageIdleTimer, &StorageTmp->linkageIdleTimerLen);
 	if (StorageTmp->linkageIdleTimer == NULL) {
 		config_perror("invalid specification for linkageIdleTimer");
@@ -11911,36 +11901,43 @@ parse_linkageTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageSNDCFCallsFailed, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageCODLCallsPlaced, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageCODLCallsFailed, &tmpsize);
+	SNMP_FREE(StorageTmp->linkageISISType);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISType, &StorageTmp->linkageISISTypeLen);
 	if (StorageTmp->linkageISISType == NULL) {
 		config_perror("invalid specification for linkageISISType");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISiSISHelloTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISiSISHelloTimer, &StorageTmp->linkageISISiSISHelloTimerLen);
 	if (StorageTmp->linkageISISiSISHelloTimer == NULL) {
 		config_perror("invalid specification for linkageISISiSISHelloTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl1DefaultMetric);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl1DefaultMetric, &StorageTmp->linkageISISl1DefaultMetricLen);
 	if (StorageTmp->linkageISISl1DefaultMetric == NULL) {
 		config_perror("invalid specification for linkageISISl1DefaultMetric");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl1DelayMetric);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl1DelayMetric, &StorageTmp->linkageISISl1DelayMetricLen);
 	if (StorageTmp->linkageISISl1DelayMetric == NULL) {
 		config_perror("invalid specification for linkageISISl1DelayMetric");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl1ExpenseMetric);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl1ExpenseMetric, &StorageTmp->linkageISISl1ExpenseMetricLen);
 	if (StorageTmp->linkageISISl1ExpenseMetric == NULL) {
 		config_perror("invalid specification for linkageISISl1ExpenseMetric");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl1ErrorMetric);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl1ErrorMetric, &StorageTmp->linkageISISl1ErrorMetricLen);
 	if (StorageTmp->linkageISISl1ErrorMetric == NULL) {
 		config_perror("invalid specification for linkageISISl1ErrorMetric");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISexternalDomain);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISexternalDomain, &StorageTmp->linkageISISexternalDomainLen);
 	if (StorageTmp->linkageISISexternalDomain == NULL) {
 		config_perror("invalid specification for linkageISISexternalDomain");
@@ -11953,99 +11950,118 @@ parse_linkageTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageISISiSISControlPDUsReceived, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageISISiDFieldLenthMismatches, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageISISmaximumAreaAddressesMismatches, &tmpsize);
+	SNMP_FREE(StorageTmp->linkageISIScircuitTransmitPassword);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISIScircuitTransmitPassword, &StorageTmp->linkageISIScircuitTransmitPasswordLen);
 	if (StorageTmp->linkageISIScircuitTransmitPassword == NULL) {
 		config_perror("invalid specification for linkageISIScircuitTransmitPassword");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISIScircuitReceivedPasswords);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISIScircuitReceivedPasswords, &StorageTmp->linkageISIScircuitReceivedPasswordsLen);
 	if (StorageTmp->linkageISIScircuitReceivedPasswords == NULL) {
 		config_perror("invalid specification for linkageISIScircuitReceivedPasswords");
 		return;
 	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageISISauthenticationFailures, &tmpsize);
+	SNMP_FREE(StorageTmp->linkageISISl1IntermediateSystemPriority);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl1IntermediateSystemPriority, &StorageTmp->linkageISISl1IntermediateSystemPriorityLen);
 	if (StorageTmp->linkageISISl1IntermediateSystemPriority == NULL) {
 		config_perror("invalid specification for linkageISISl1IntermediateSystemPriority");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl1CircuitID);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl1CircuitID, &StorageTmp->linkageISISl1CircuitIDLen);
 	if (StorageTmp->linkageISISl1CircuitID == NULL) {
 		config_perror("invalid specification for linkageISISl1CircuitID");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl1DesignatedIntermediateSystem);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl1DesignatedIntermediateSystem, &StorageTmp->linkageISISl1DesignatedIntermediateSystemLen);
 	if (StorageTmp->linkageISISl1DesignatedIntermediateSystem == NULL) {
 		config_perror("invalid specification for linkageISISl1DesignatedIntermediateSystem");
 		return;
 	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->linkageISISlanL1DesignatedIntermediateSystemChanges, &tmpsize);
+	SNMP_FREE(StorageTmp->linkageISIScallEstablishmentDefaultMetricIncrement);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISIScallEstablishmentDefaultMetricIncrement, &StorageTmp->linkageISIScallEstablishmentDefaultMetricIncrementLen);
 	if (StorageTmp->linkageISIScallEstablishmentDefaultMetricIncrement == NULL) {
 		config_perror("invalid specification for linkageISIScallEstablishmentDefaultMetricIncrement");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISIScallEstablishmentDelayMetricIncrement);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISIScallEstablishmentDelayMetricIncrement, &StorageTmp->linkageISIScallEstablishmentDelayMetricIncrementLen);
 	if (StorageTmp->linkageISIScallEstablishmentDelayMetricIncrement == NULL) {
 		config_perror("invalid specification for linkageISIScallEstablishmentDelayMetricIncrement");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISIScallEstablishmentExpenseMetricIncrement);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISIScallEstablishmentExpenseMetricIncrement, &StorageTmp->linkageISIScallEstablishmentExpenseMetricIncrementLen);
 	if (StorageTmp->linkageISIScallEstablishmentExpenseMetricIncrement == NULL) {
 		config_perror("invalid specification for linkageISIScallEstablishmentExpenseMetricIncrement");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISIScallEstablishmentErrorMetricIncrement);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISIScallEstablishmentErrorMetricIncrement, &StorageTmp->linkageISIScallEstablishmentErrorMetricIncrementLen);
 	if (StorageTmp->linkageISIScallEstablishmentErrorMetricIncrement == NULL) {
 		config_perror("invalid specification for linkageISIScallEstablishmentErrorMetricIncrement");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISptPtCircuitID);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISptPtCircuitID, &StorageTmp->linkageISISptPtCircuitIDLen);
 	if (StorageTmp->linkageISISptPtCircuitID == NULL) {
 		config_perror("invalid specification for linkageISISptPtCircuitID");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISoutgoingCallIVMO);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISoutgoingCallIVMO, &StorageTmp->linkageISISoutgoingCallIVMOLen);
 	if (StorageTmp->linkageISISoutgoingCallIVMO == NULL) {
 		config_perror("invalid specification for linkageISISoutgoingCallIVMO");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISneighborSNPAAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISneighborSNPAAddress, &StorageTmp->linkageISISneighborSNPAAddressLen);
 	if (StorageTmp->linkageISISneighborSNPAAddress == NULL) {
 		config_perror("invalid specification for linkageISISneighborSNPAAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl2DefaultMetric);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl2DefaultMetric, &StorageTmp->linkageISISl2DefaultMetricLen);
 	if (StorageTmp->linkageISISl2DefaultMetric == NULL) {
 		config_perror("invalid specification for linkageISISl2DefaultMetric");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl2DelayMetric);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl2DelayMetric, &StorageTmp->linkageISISl2DelayMetricLen);
 	if (StorageTmp->linkageISISl2DelayMetric == NULL) {
 		config_perror("invalid specification for linkageISISl2DelayMetric");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl2ExpenseMetric);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl2ExpenseMetric, &StorageTmp->linkageISISl2ExpenseMetricLen);
 	if (StorageTmp->linkageISISl2ExpenseMetric == NULL) {
 		config_perror("invalid specification for linkageISISl2ExpenseMetric");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl2ErrorMetric);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl2ErrorMetric, &StorageTmp->linkageISISl2ErrorMetricLen);
 	if (StorageTmp->linkageISISl2ErrorMetric == NULL) {
 		config_perror("invalid specification for linkageISISl2ErrorMetric");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->linkageISISmanualL2OnlyMode, &tmpsize);
+	SNMP_FREE(StorageTmp->linkageISISl2IntermediateSystemPriority);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl2IntermediateSystemPriority, &StorageTmp->linkageISISl2IntermediateSystemPriorityLen);
 	if (StorageTmp->linkageISISl2IntermediateSystemPriority == NULL) {
 		config_perror("invalid specification for linkageISISl2IntermediateSystemPriority");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl2CircuitID);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl2CircuitID, &StorageTmp->linkageISISl2CircuitIDLen);
 	if (StorageTmp->linkageISISl2CircuitID == NULL) {
 		config_perror("invalid specification for linkageISISl2CircuitID");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageISISl2DesignatedIntermediateSystem);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageISISl2DesignatedIntermediateSystem, &StorageTmp->linkageISISl2DesignatedIntermediateSystemLen);
 	if (StorageTmp->linkageISISl2DesignatedIntermediateSystem == NULL) {
 		config_perror("invalid specification for linkageISISl2DesignatedIntermediateSystem");
@@ -12072,7 +12088,7 @@ store_linkageTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("linkageTable", "storing data...  "));
-	refresh_linkageTable();
+	refresh_linkageTable(1);
 	(void) tmpsize;
 	for (hcindex = linkageTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct linkageTable_data *) hcindex->data;
@@ -12181,16 +12197,13 @@ cONSTable_create(void)
 	DEBUGMSGTL(("cONSTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->cONSAdministrativeState = 0;
-		if (memdup((u_char **) &StorageNew->cONSOperationalSystemType, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->cONSOperationalSystemType, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->cONSOperationalSystemTypeLen = 1;
-		}
 		StorageNew->cONSRowStatus = 0;
 		StorageNew->cONSRowStatus = RS_NOTREADY;
 	}
@@ -12331,17 +12344,20 @@ parse_cONSTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->cONSAdministrativeState, &tmpsize);
+	SNMP_FREE(StorageTmp->cONSOperationalSystemType);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->cONSOperationalSystemType, &StorageTmp->cONSOperationalSystemTypeLen);
 	if (StorageTmp->cONSOperationalSystemType == NULL) {
 		config_perror("invalid specification for cONSOperationalSystemType");
@@ -12367,7 +12383,7 @@ store_cONSTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("cONSTable", "storing data...  "));
-	refresh_cONSTable();
+	refresh_cONSTable(1);
 	(void) tmpsize;
 	for (hcindex = cONSTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct cONSTable_data *) hcindex->data;
@@ -12405,21 +12421,16 @@ networkConnectionTable_create(void)
 	DEBUGMSGTL(("networkConnectionTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->coProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->connectionId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->connectionIdLen = strlen("");
-		}
-		if ((StorageNew->networkConnectionLocalNSAPMO = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->networkConnectionLocalNSAPMO = (uint8_t *) strdup("")) != NULL)
 			StorageNew->networkConnectionLocalNSAPMOLen = strlen("");
-		}
-		if ((StorageNew->networkConnectionRemoteNSAPAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->networkConnectionRemoteNSAPAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->networkConnectionRemoteNSAPAddressLen = strlen("");
-		}
 		StorageNew->networkConnectionRowStatus = 0;
 		StorageNew->networkConnectionRowStatus = RS_NOTREADY;
 	}
@@ -12566,26 +12577,31 @@ parse_networkConnectionTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->coProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 	if (StorageTmp->coProtocolMachineId == NULL) {
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->connectionId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->connectionId, &StorageTmp->connectionIdLen);
 	if (StorageTmp->connectionId == NULL) {
 		config_perror("invalid specification for connectionId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->networkConnectionLocalNSAPMO);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->networkConnectionLocalNSAPMO, &StorageTmp->networkConnectionLocalNSAPMOLen);
 	if (StorageTmp->networkConnectionLocalNSAPMO == NULL) {
 		config_perror("invalid specification for networkConnectionLocalNSAPMO");
 		return;
 	}
+	SNMP_FREE(StorageTmp->networkConnectionRemoteNSAPAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->networkConnectionRemoteNSAPAddress, &StorageTmp->networkConnectionRemoteNSAPAddressLen);
 	if (StorageTmp->networkConnectionRemoteNSAPAddress == NULL) {
 		config_perror("invalid specification for networkConnectionRemoteNSAPAddress");
@@ -12611,7 +12627,7 @@ store_networkConnectionTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("networkConnectionTable", "storing data...  "));
-	refresh_networkConnectionTable();
+	refresh_networkConnectionTable(1);
 	(void) tmpsize;
 	for (hcindex = networkConnectionTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct networkConnectionTable_data *) hcindex->data;
@@ -12652,136 +12668,94 @@ x25PLETable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x25PLEoperationalState = 0;
 		StorageNew->x25PLEadministrativeState = 0;
-		if ((StorageNew->x25PLEprotocolVersionSupported = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEprotocolVersionSupported = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEprotocolVersionSupportedLen = strlen("");
-		}
-		if ((StorageNew->x25PLElocalDTEAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLElocalDTEAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLElocalDTEAddressLen = strlen("");
-		}
 		StorageNew->x25PLEMode = 0;
-		if ((StorageNew->x25PLEdefaultThroughputClasses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEdefaultThroughputClasses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEdefaultThroughputClassesLen = strlen("");
-		}
-		if ((StorageNew->x25PLEflowControlParameterNegotiation = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEflowControlParameterNegotiation = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEflowControlParameterNegotiationLen = strlen("");
-		}
-		if ((StorageNew->x25PLEdefaultPackageSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEdefaultPackageSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEdefaultPackageSizesLen = strlen("");
-		}
-		if ((StorageNew->x25PLEthroughputClassNegotiation = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEthroughputClassNegotiation = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEthroughputClassNegotiationLen = strlen("");
-		}
-		if ((StorageNew->x25PLEsNserviceProvider = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEsNserviceProvider = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEsNserviceProviderLen = strlen("");
-		}
-		if ((StorageNew->x25PLEsNsAP = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEsNsAP = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEsNsAPLen = strlen("");
-		}
-		if ((StorageNew->x25PElogicalChannelAssignments = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PElogicalChannelAssignments = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PElogicalChannelAssignmentsLen = strlen("");
-		}
 		StorageNew->x25PLEinterfaceMode = 0;
-		if ((StorageNew->x25PLEdefaultThroughputClass = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEdefaultThroughputClass = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEdefaultThroughputClassLen = strlen("");
-		}
-		if ((StorageNew->x25PLEflowControlNegotiationPermitted = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEflowControlNegotiationPermitted = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEflowControlNegotiationPermittedLen = strlen("");
-		}
 		StorageNew->x25PLEcallDeflectionSubscription = 0;
-		if ((StorageNew->x25PLEmaxActiveCircuits = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEmaxActiveCircuits = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEmaxActiveCircuitsLen = strlen("");
-		}
-		if ((StorageNew->x25PLErestartTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLErestartTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLErestartTimeLen = strlen("");
-		}
-		if ((StorageNew->x25PLEdefaultPacketSize = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEdefaultPacketSize = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEdefaultPacketSizeLen = strlen("");
-		}
-		if ((StorageNew->x25PLEdefaultWindowSize = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEdefaultWindowSize = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEdefaultWindowSizeLen = strlen("");
-		}
-		if ((StorageNew->x25PLEminimumRecallTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEminimumRecallTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEminimumRecallTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLErestartCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLErestartCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLErestartCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLEsN_ServiceProvider = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEsN_ServiceProvider = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEsN_ServiceProviderLen = strlen("");
-		}
-		if ((StorageNew->x25PLEsN_SA_P = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEsN_SA_P = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEsN_SA_PLen = strlen("");
-		}
-		if ((StorageNew->x25PLElogicalChannelAssignments = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLElogicalChannelAssignments = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLElogicalChannelAssignmentsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEpacketSequencing = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEpacketSequencing = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEpacketSequencingLen = strlen("");
-		}
-		if ((StorageNew->x25PLEoctetsSentCounter = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEoctetsSentCounter = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEoctetsSentCounterLen = strlen("");
-		}
-		if ((StorageNew->x25PLEoctetsReceivedCounter = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEoctetsReceivedCounter = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEoctetsReceivedCounterLen = strlen("");
-		}
-		if ((StorageNew->x25PLEdataPacketsSent = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEdataPacketsSent = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEdataPacketsSentLen = strlen("");
-		}
-		if ((StorageNew->x25PLEdataPacketsReceived = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEdataPacketsReceived = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEdataPacketsReceivedLen = strlen("");
-		}
-		if ((StorageNew->x25PLEcallAttempts = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEcallAttempts = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEcallAttemptsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEcallsConnected = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEcallsConnected = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEcallsConnectedLen = strlen("");
-		}
 		StorageNew->x25PLEproviderInitiatedDisconnects = 0;
-		if ((StorageNew->x25PLEcallTimeouts = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEcallTimeouts = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEcallTimeoutsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEclearTimeouts = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEclearTimeouts = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEclearTimeoutsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEremotelyInitiatedResets = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEremotelyInitiatedResets = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEremotelyInitiatedResetsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEdataRetransmissionTimerExpiries = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEdataRetransmissionTimerExpiries = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEdataRetransmissionTimerExpiriesLen = strlen("");
-		}
-		if ((StorageNew->x25PLEproviderInitiatedResets = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEproviderInitiatedResets = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEproviderInitiatedResetsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEresetTimeouts = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEresetTimeouts = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEresetTimeoutsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEremotelyInitiatedRestarts = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEremotelyInitiatedRestarts = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEremotelyInitiatedRestartsLen = strlen("");
-		}
-		if ((StorageNew->x25PLErestartCountsExceeded = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLErestartCountsExceeded = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLErestartCountsExceededLen = strlen("");
-		}
-		if ((StorageNew->x25PLEprotocolErrorsDetectedLocally = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEprotocolErrorsDetectedLocally = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEprotocolErrorsDetectedLocallyLen = strlen("");
-		}
-		if ((StorageNew->x25PLEprotocolErrorsAccusedOf = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEprotocolErrorsAccusedOf = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEprotocolErrorsAccusedOfLen = strlen("");
-		}
-		if ((StorageNew->x25PLEcallEstablishmentRetryCountsExceeded = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEcallEstablishmentRetryCountsExceeded = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEcallEstablishmentRetryCountsExceededLen = strlen("");
-		}
-		if ((StorageNew->x25PLEclearCountsExceeded = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEclearCountsExceeded = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEclearCountsExceededLen = strlen("");
-		}
-		if ((StorageNew->x25PLEpLEClientMOName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEpLEClientMOName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEpLEClientMONameLen = strlen("");
-		}
-		if ((StorageNew->x25PLEregistrationRequestTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEregistrationRequestTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEregistrationRequestTimeLen = strlen("");
-		}
-		if ((StorageNew->x25PLEregistrationRequestCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEregistrationRequestCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEregistrationRequestCountLen = strlen("");
-		}
 		StorageNew->x25PLEregistrationPermitted = 0;
 		StorageNew->x25PLERowStatus = 0;
 		StorageNew->x25PLERowStatus = RS_NOTREADY;
@@ -13001,6 +12975,7 @@ parse_x25PLETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
@@ -13008,215 +12983,257 @@ parse_x25PLETable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLEoperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLEadministrativeState, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEprotocolVersionSupported);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEprotocolVersionSupported, &StorageTmp->x25PLEprotocolVersionSupportedLen);
 	if (StorageTmp->x25PLEprotocolVersionSupported == NULL) {
 		config_perror("invalid specification for x25PLEprotocolVersionSupported");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLElocalDTEAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLElocalDTEAddress, &StorageTmp->x25PLElocalDTEAddressLen);
 	if (StorageTmp->x25PLElocalDTEAddress == NULL) {
 		config_perror("invalid specification for x25PLElocalDTEAddress");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLEMode, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEdefaultThroughputClasses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEdefaultThroughputClasses, &StorageTmp->x25PLEdefaultThroughputClassesLen);
 	if (StorageTmp->x25PLEdefaultThroughputClasses == NULL) {
 		config_perror("invalid specification for x25PLEdefaultThroughputClasses");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEflowControlParameterNegotiation);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEflowControlParameterNegotiation, &StorageTmp->x25PLEflowControlParameterNegotiationLen);
 	if (StorageTmp->x25PLEflowControlParameterNegotiation == NULL) {
 		config_perror("invalid specification for x25PLEflowControlParameterNegotiation");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEdefaultPackageSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEdefaultPackageSizes, &StorageTmp->x25PLEdefaultPackageSizesLen);
 	if (StorageTmp->x25PLEdefaultPackageSizes == NULL) {
 		config_perror("invalid specification for x25PLEdefaultPackageSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEthroughputClassNegotiation);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEthroughputClassNegotiation, &StorageTmp->x25PLEthroughputClassNegotiationLen);
 	if (StorageTmp->x25PLEthroughputClassNegotiation == NULL) {
 		config_perror("invalid specification for x25PLEthroughputClassNegotiation");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEsNserviceProvider);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEsNserviceProvider, &StorageTmp->x25PLEsNserviceProviderLen);
 	if (StorageTmp->x25PLEsNserviceProvider == NULL) {
 		config_perror("invalid specification for x25PLEsNserviceProvider");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEsNsAP);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEsNsAP, &StorageTmp->x25PLEsNsAPLen);
 	if (StorageTmp->x25PLEsNsAP == NULL) {
 		config_perror("invalid specification for x25PLEsNsAP");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PElogicalChannelAssignments);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PElogicalChannelAssignments, &StorageTmp->x25PElogicalChannelAssignmentsLen);
 	if (StorageTmp->x25PElogicalChannelAssignments == NULL) {
 		config_perror("invalid specification for x25PElogicalChannelAssignments");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLEinterfaceMode, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEdefaultThroughputClass);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEdefaultThroughputClass, &StorageTmp->x25PLEdefaultThroughputClassLen);
 	if (StorageTmp->x25PLEdefaultThroughputClass == NULL) {
 		config_perror("invalid specification for x25PLEdefaultThroughputClass");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEflowControlNegotiationPermitted);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEflowControlNegotiationPermitted, &StorageTmp->x25PLEflowControlNegotiationPermittedLen);
 	if (StorageTmp->x25PLEflowControlNegotiationPermitted == NULL) {
 		config_perror("invalid specification for x25PLEflowControlNegotiationPermitted");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLEcallDeflectionSubscription, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEmaxActiveCircuits);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEmaxActiveCircuits, &StorageTmp->x25PLEmaxActiveCircuitsLen);
 	if (StorageTmp->x25PLEmaxActiveCircuits == NULL) {
 		config_perror("invalid specification for x25PLEmaxActiveCircuits");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLErestartTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLErestartTime, &StorageTmp->x25PLErestartTimeLen);
 	if (StorageTmp->x25PLErestartTime == NULL) {
 		config_perror("invalid specification for x25PLErestartTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEdefaultPacketSize);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEdefaultPacketSize, &StorageTmp->x25PLEdefaultPacketSizeLen);
 	if (StorageTmp->x25PLEdefaultPacketSize == NULL) {
 		config_perror("invalid specification for x25PLEdefaultPacketSize");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEdefaultWindowSize);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEdefaultWindowSize, &StorageTmp->x25PLEdefaultWindowSizeLen);
 	if (StorageTmp->x25PLEdefaultWindowSize == NULL) {
 		config_perror("invalid specification for x25PLEdefaultWindowSize");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEminimumRecallTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEminimumRecallTimer, &StorageTmp->x25PLEminimumRecallTimerLen);
 	if (StorageTmp->x25PLEminimumRecallTimer == NULL) {
 		config_perror("invalid specification for x25PLEminimumRecallTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLErestartCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLErestartCount, &StorageTmp->x25PLErestartCountLen);
 	if (StorageTmp->x25PLErestartCount == NULL) {
 		config_perror("invalid specification for x25PLErestartCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEsN_ServiceProvider);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEsN_ServiceProvider, &StorageTmp->x25PLEsN_ServiceProviderLen);
 	if (StorageTmp->x25PLEsN_ServiceProvider == NULL) {
 		config_perror("invalid specification for x25PLEsN_ServiceProvider");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEsN_SA_P);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEsN_SA_P, &StorageTmp->x25PLEsN_SA_PLen);
 	if (StorageTmp->x25PLEsN_SA_P == NULL) {
 		config_perror("invalid specification for x25PLEsN_SA_P");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLElogicalChannelAssignments);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLElogicalChannelAssignments, &StorageTmp->x25PLElogicalChannelAssignmentsLen);
 	if (StorageTmp->x25PLElogicalChannelAssignments == NULL) {
 		config_perror("invalid specification for x25PLElogicalChannelAssignments");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEpacketSequencing);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEpacketSequencing, &StorageTmp->x25PLEpacketSequencingLen);
 	if (StorageTmp->x25PLEpacketSequencing == NULL) {
 		config_perror("invalid specification for x25PLEpacketSequencing");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEoctetsSentCounter);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEoctetsSentCounter, &StorageTmp->x25PLEoctetsSentCounterLen);
 	if (StorageTmp->x25PLEoctetsSentCounter == NULL) {
 		config_perror("invalid specification for x25PLEoctetsSentCounter");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEoctetsReceivedCounter);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEoctetsReceivedCounter, &StorageTmp->x25PLEoctetsReceivedCounterLen);
 	if (StorageTmp->x25PLEoctetsReceivedCounter == NULL) {
 		config_perror("invalid specification for x25PLEoctetsReceivedCounter");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEdataPacketsSent);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEdataPacketsSent, &StorageTmp->x25PLEdataPacketsSentLen);
 	if (StorageTmp->x25PLEdataPacketsSent == NULL) {
 		config_perror("invalid specification for x25PLEdataPacketsSent");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEdataPacketsReceived);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEdataPacketsReceived, &StorageTmp->x25PLEdataPacketsReceivedLen);
 	if (StorageTmp->x25PLEdataPacketsReceived == NULL) {
 		config_perror("invalid specification for x25PLEdataPacketsReceived");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEcallAttempts);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEcallAttempts, &StorageTmp->x25PLEcallAttemptsLen);
 	if (StorageTmp->x25PLEcallAttempts == NULL) {
 		config_perror("invalid specification for x25PLEcallAttempts");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEcallsConnected);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEcallsConnected, &StorageTmp->x25PLEcallsConnectedLen);
 	if (StorageTmp->x25PLEcallsConnected == NULL) {
 		config_perror("invalid specification for x25PLEcallsConnected");
 		return;
 	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->x25PLEproviderInitiatedDisconnects, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEcallTimeouts);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEcallTimeouts, &StorageTmp->x25PLEcallTimeoutsLen);
 	if (StorageTmp->x25PLEcallTimeouts == NULL) {
 		config_perror("invalid specification for x25PLEcallTimeouts");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEclearTimeouts);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEclearTimeouts, &StorageTmp->x25PLEclearTimeoutsLen);
 	if (StorageTmp->x25PLEclearTimeouts == NULL) {
 		config_perror("invalid specification for x25PLEclearTimeouts");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEremotelyInitiatedResets);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEremotelyInitiatedResets, &StorageTmp->x25PLEremotelyInitiatedResetsLen);
 	if (StorageTmp->x25PLEremotelyInitiatedResets == NULL) {
 		config_perror("invalid specification for x25PLEremotelyInitiatedResets");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEdataRetransmissionTimerExpiries);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEdataRetransmissionTimerExpiries, &StorageTmp->x25PLEdataRetransmissionTimerExpiriesLen);
 	if (StorageTmp->x25PLEdataRetransmissionTimerExpiries == NULL) {
 		config_perror("invalid specification for x25PLEdataRetransmissionTimerExpiries");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEproviderInitiatedResets);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEproviderInitiatedResets, &StorageTmp->x25PLEproviderInitiatedResetsLen);
 	if (StorageTmp->x25PLEproviderInitiatedResets == NULL) {
 		config_perror("invalid specification for x25PLEproviderInitiatedResets");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEresetTimeouts);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEresetTimeouts, &StorageTmp->x25PLEresetTimeoutsLen);
 	if (StorageTmp->x25PLEresetTimeouts == NULL) {
 		config_perror("invalid specification for x25PLEresetTimeouts");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEremotelyInitiatedRestarts);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEremotelyInitiatedRestarts, &StorageTmp->x25PLEremotelyInitiatedRestartsLen);
 	if (StorageTmp->x25PLEremotelyInitiatedRestarts == NULL) {
 		config_perror("invalid specification for x25PLEremotelyInitiatedRestarts");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLErestartCountsExceeded);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLErestartCountsExceeded, &StorageTmp->x25PLErestartCountsExceededLen);
 	if (StorageTmp->x25PLErestartCountsExceeded == NULL) {
 		config_perror("invalid specification for x25PLErestartCountsExceeded");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEprotocolErrorsDetectedLocally);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEprotocolErrorsDetectedLocally, &StorageTmp->x25PLEprotocolErrorsDetectedLocallyLen);
 	if (StorageTmp->x25PLEprotocolErrorsDetectedLocally == NULL) {
 		config_perror("invalid specification for x25PLEprotocolErrorsDetectedLocally");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEprotocolErrorsAccusedOf);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEprotocolErrorsAccusedOf, &StorageTmp->x25PLEprotocolErrorsAccusedOfLen);
 	if (StorageTmp->x25PLEprotocolErrorsAccusedOf == NULL) {
 		config_perror("invalid specification for x25PLEprotocolErrorsAccusedOf");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEcallEstablishmentRetryCountsExceeded);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEcallEstablishmentRetryCountsExceeded, &StorageTmp->x25PLEcallEstablishmentRetryCountsExceededLen);
 	if (StorageTmp->x25PLEcallEstablishmentRetryCountsExceeded == NULL) {
 		config_perror("invalid specification for x25PLEcallEstablishmentRetryCountsExceeded");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEclearCountsExceeded);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEclearCountsExceeded, &StorageTmp->x25PLEclearCountsExceededLen);
 	if (StorageTmp->x25PLEclearCountsExceeded == NULL) {
 		config_perror("invalid specification for x25PLEclearCountsExceeded");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEpLEClientMOName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEpLEClientMOName, &StorageTmp->x25PLEpLEClientMONameLen);
 	if (StorageTmp->x25PLEpLEClientMOName == NULL) {
 		config_perror("invalid specification for x25PLEpLEClientMOName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEregistrationRequestTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEregistrationRequestTime, &StorageTmp->x25PLEregistrationRequestTimeLen);
 	if (StorageTmp->x25PLEregistrationRequestTime == NULL) {
 		config_perror("invalid specification for x25PLEregistrationRequestTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEregistrationRequestCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEregistrationRequestCount, &StorageTmp->x25PLEregistrationRequestCountLen);
 	if (StorageTmp->x25PLEregistrationRequestCount == NULL) {
 		config_perror("invalid specification for x25PLEregistrationRequestCount");
@@ -13243,7 +13260,7 @@ store_x25PLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("x25PLETable", "storing data...  "));
-	refresh_x25PLETable();
+	refresh_x25PLETable(1);
 	(void) tmpsize;
 	for (hcindex = x25PLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct x25PLETable_data *) hcindex->data;
@@ -13327,43 +13344,31 @@ x25PLE_DTETable_create(void)
 	DEBUGMSGTL(("x25PLE_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
 		StorageNew->x25PLE_DTEcallDeflectionSubscription = 0;
-		if ((StorageNew->x25PLE_DTEcallRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEcallRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEcallRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEextendedPacketSequenceNumbering = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEextendedPacketSequenceNumbering = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEextendedPacketSequenceNumberingLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEmaxActiveCircuits = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEmaxActiveCircuits = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEmaxActiveCircuitsLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEminimumRecallTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEminimumRecallTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEminimumRecallTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEresetRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEresetRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEresetRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTErestartRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTErestartRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTErestartRequestRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTErestartRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTErestartRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTErestartRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEclearRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEclearRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEclearRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEinterruptResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEinterruptResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEinterruptResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEresetRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEresetRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEresetRequestRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEclearRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEclearRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEclearRequestRetransmissionCountLen = strlen("");
-		}
 		StorageNew->x25PLE_DTEcallAttempts = 0;
 		StorageNew->x25PLE_DTEprotocolErrorsDetectedLocally = 0;
 		StorageNew->x25PLE_DTEprotocolErrorsAccusedOf = 0;
@@ -13383,27 +13388,20 @@ x25PLE_DTETable_create(void)
 		StorageNew->x25PLE_DTEremotelyInitiatedRestarts = 0;
 		StorageNew->x25PLE_DTEresetTimeouts = 0;
 		StorageNew->x25PLE_DTErestartCountsExceeded = 0;
-		if ((StorageNew->x25PLE_DTEwindowStatusTransmissionTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEwindowStatusTransmissionTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEwindowStatusTransmissionTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEwindowRotationTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEwindowRotationTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEwindowRotationTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEdataPacketRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEdataPacketRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEdataPacketRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTErejectResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTErejectResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTErejectResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTErejectRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTErejectRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTErejectRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEregistrationRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEregistrationRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEregistrationRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DTEregistrationRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DTEregistrationRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DTEregistrationRequestRetransmissionCountLen = strlen("");
-		}
 		StorageNew->x25PLE_DTEregistrationPermitted = 0;
 
 	}
@@ -13574,62 +13572,74 @@ parse_x25PLE_DTETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DTEcallDeflectionSubscription, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLE_DTEcallRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEcallRequestResponseTimer, &StorageTmp->x25PLE_DTEcallRequestResponseTimerLen);
 	if (StorageTmp->x25PLE_DTEcallRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTEcallRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEextendedPacketSequenceNumbering);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEextendedPacketSequenceNumbering, &StorageTmp->x25PLE_DTEextendedPacketSequenceNumberingLen);
 	if (StorageTmp->x25PLE_DTEextendedPacketSequenceNumbering == NULL) {
 		config_perror("invalid specification for x25PLE_DTEextendedPacketSequenceNumbering");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEmaxActiveCircuits);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEmaxActiveCircuits, &StorageTmp->x25PLE_DTEmaxActiveCircuitsLen);
 	if (StorageTmp->x25PLE_DTEmaxActiveCircuits == NULL) {
 		config_perror("invalid specification for x25PLE_DTEmaxActiveCircuits");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEminimumRecallTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEminimumRecallTimer, &StorageTmp->x25PLE_DTEminimumRecallTimerLen);
 	if (StorageTmp->x25PLE_DTEminimumRecallTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTEminimumRecallTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEresetRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEresetRequestResponseTimer, &StorageTmp->x25PLE_DTEresetRequestResponseTimerLen);
 	if (StorageTmp->x25PLE_DTEresetRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTEresetRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTErestartRequestRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTErestartRequestRetransmissionCount, &StorageTmp->x25PLE_DTErestartRequestRetransmissionCountLen);
 	if (StorageTmp->x25PLE_DTErestartRequestRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLE_DTErestartRequestRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTErestartRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTErestartRequestResponseTimer, &StorageTmp->x25PLE_DTErestartRequestResponseTimerLen);
 	if (StorageTmp->x25PLE_DTErestartRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTErestartRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEclearRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEclearRequestResponseTimer, &StorageTmp->x25PLE_DTEclearRequestResponseTimerLen);
 	if (StorageTmp->x25PLE_DTEclearRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTEclearRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEinterruptResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEinterruptResponseTimer, &StorageTmp->x25PLE_DTEinterruptResponseTimerLen);
 	if (StorageTmp->x25PLE_DTEinterruptResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTEinterruptResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEresetRequestRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEresetRequestRetransmissionCount, &StorageTmp->x25PLE_DTEresetRequestRetransmissionCountLen);
 	if (StorageTmp->x25PLE_DTEresetRequestRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLE_DTEresetRequestRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEclearRequestRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEclearRequestRetransmissionCount, &StorageTmp->x25PLE_DTEclearRequestRetransmissionCountLen);
 	if (StorageTmp->x25PLE_DTEclearRequestRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLE_DTEclearRequestRetransmissionCount");
@@ -13654,36 +13664,43 @@ parse_x25PLE_DTETable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->x25PLE_DTEremotelyInitiatedRestarts, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->x25PLE_DTEresetTimeouts, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->x25PLE_DTErestartCountsExceeded, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLE_DTEwindowStatusTransmissionTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEwindowStatusTransmissionTimer, &StorageTmp->x25PLE_DTEwindowStatusTransmissionTimerLen);
 	if (StorageTmp->x25PLE_DTEwindowStatusTransmissionTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTEwindowStatusTransmissionTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEwindowRotationTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEwindowRotationTimer, &StorageTmp->x25PLE_DTEwindowRotationTimerLen);
 	if (StorageTmp->x25PLE_DTEwindowRotationTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTEwindowRotationTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEdataPacketRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEdataPacketRetransmissionCount, &StorageTmp->x25PLE_DTEdataPacketRetransmissionCountLen);
 	if (StorageTmp->x25PLE_DTEdataPacketRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLE_DTEdataPacketRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTErejectResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTErejectResponseTimer, &StorageTmp->x25PLE_DTErejectResponseTimerLen);
 	if (StorageTmp->x25PLE_DTErejectResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTErejectResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTErejectRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTErejectRetransmissionCount, &StorageTmp->x25PLE_DTErejectRetransmissionCountLen);
 	if (StorageTmp->x25PLE_DTErejectRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLE_DTErejectRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEregistrationRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEregistrationRequestResponseTimer, &StorageTmp->x25PLE_DTEregistrationRequestResponseTimerLen);
 	if (StorageTmp->x25PLE_DTEregistrationRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLE_DTEregistrationRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DTEregistrationRequestRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DTEregistrationRequestRetransmissionCount, &StorageTmp->x25PLE_DTEregistrationRequestRetransmissionCountLen);
 	if (StorageTmp->x25PLE_DTEregistrationRequestRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLE_DTEregistrationRequestRetransmissionCount");
@@ -13709,7 +13726,7 @@ store_x25PLE_DTETable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("x25PLE_DTETable", "storing data...  "));
-	refresh_x25PLE_DTETable();
+	refresh_x25PLE_DTETable(1);
 	(void) tmpsize;
 	for (hcindex = x25PLE_DTETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct x25PLE_DTETable_data *) hcindex->data;
@@ -13784,9 +13801,8 @@ x25PLE_DCETable_create(void)
 	DEBUGMSGTL(("x25PLE_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
 		StorageNew->x25PLE_DCEcallAttempts = 0;
 		StorageNew->x25PLE_DCEcallsConnected = 0;
 		StorageNew->x25PLE_DCEcUG = 0;
@@ -13816,21 +13832,17 @@ x25PLE_DCETable_create(void)
 		StorageNew->x25PLE_DCEcUGWithIncomingAccess = 0;
 		StorageNew->x25PLE_DCEcUGWithOutgoingAccess = 0;
 		StorageNew->x25PLE_DCEdBitModification = 0;
-		if ((StorageNew->x25PLE_DCEdefaultThroughputClassesAssignment = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DCEdefaultThroughputClassesAssignment = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DCEdefaultThroughputClassesAssignmentLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DCEextendedPacketSequenceNumbering = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DCEextendedPacketSequenceNumbering = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DCEextendedPacketSequenceNumberingLen = strlen("");
-		}
 		StorageNew->x25PLE_DCEhuntGroup = 0;
 		StorageNew->x25PLE_DCEincomingCallBarredWithinCUG = 0;
 		StorageNew->x25PLE_DCElocalChargingPrevention = 0;
-		if ((StorageNew->x25PLE_DCEnonStandardDefaultPacketSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DCEnonStandardDefaultPacketSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DCEnonStandardDefaultPacketSizesLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DCEnonStandardDefaultWindowSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DCEnonStandardDefaultWindowSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DCEnonStandardDefaultWindowSizesLen = strlen("");
-		}
 		StorageNew->x25PLE_DCEnUIOverride = 0;
 		StorageNew->x25PLE_DCEnUISubscription = 0;
 		StorageNew->x25PLE_DCEoneWayLogicalChannelIncoming = 0;
@@ -13840,15 +13852,12 @@ x25PLE_DCETable_create(void)
 		StorageNew->x25PLE_DCEreverseChargingAcceptance = 0;
 		StorageNew->x25PLE_DCErOASubscription = 0;
 		StorageNew->x25PLE_DCEclearIndication = 0;
-		if ((StorageNew->x25PLE_DCEincomingCall = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DCEincomingCall = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DCEincomingCallLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DCEresetIndication = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DCEresetIndication = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DCEresetIndicationLen = strlen("");
-		}
-		if ((StorageNew->x25PLE_DCErestartIndication = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLE_DCErestartIndication = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLE_DCErestartIndicationLen = strlen("");
-		}
 
 	}
 	DEBUGMSGTL(("x25PLE_DCETable", "done.\n"));
@@ -13996,6 +14005,7 @@ parse_x25PLE_DCETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
@@ -14030,11 +14040,13 @@ parse_x25PLE_DCETable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCEcUGWithIncomingAccess, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCEcUGWithOutgoingAccess, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCEdBitModification, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLE_DCEdefaultThroughputClassesAssignment);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DCEdefaultThroughputClassesAssignment, &StorageTmp->x25PLE_DCEdefaultThroughputClassesAssignmentLen);
 	if (StorageTmp->x25PLE_DCEdefaultThroughputClassesAssignment == NULL) {
 		config_perror("invalid specification for x25PLE_DCEdefaultThroughputClassesAssignment");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DCEextendedPacketSequenceNumbering);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DCEextendedPacketSequenceNumbering, &StorageTmp->x25PLE_DCEextendedPacketSequenceNumberingLen);
 	if (StorageTmp->x25PLE_DCEextendedPacketSequenceNumbering == NULL) {
 		config_perror("invalid specification for x25PLE_DCEextendedPacketSequenceNumbering");
@@ -14043,11 +14055,13 @@ parse_x25PLE_DCETable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCEhuntGroup, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCEincomingCallBarredWithinCUG, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCElocalChargingPrevention, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLE_DCEnonStandardDefaultPacketSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DCEnonStandardDefaultPacketSizes, &StorageTmp->x25PLE_DCEnonStandardDefaultPacketSizesLen);
 	if (StorageTmp->x25PLE_DCEnonStandardDefaultPacketSizes == NULL) {
 		config_perror("invalid specification for x25PLE_DCEnonStandardDefaultPacketSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DCEnonStandardDefaultWindowSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DCEnonStandardDefaultWindowSizes, &StorageTmp->x25PLE_DCEnonStandardDefaultWindowSizesLen);
 	if (StorageTmp->x25PLE_DCEnonStandardDefaultWindowSizes == NULL) {
 		config_perror("invalid specification for x25PLE_DCEnonStandardDefaultWindowSizes");
@@ -14062,16 +14076,19 @@ parse_x25PLE_DCETable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCEreverseChargingAcceptance, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCErOASubscription, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLE_DCEclearIndication, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLE_DCEincomingCall);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DCEincomingCall, &StorageTmp->x25PLE_DCEincomingCallLen);
 	if (StorageTmp->x25PLE_DCEincomingCall == NULL) {
 		config_perror("invalid specification for x25PLE_DCEincomingCall");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DCEresetIndication);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DCEresetIndication, &StorageTmp->x25PLE_DCEresetIndicationLen);
 	if (StorageTmp->x25PLE_DCEresetIndication == NULL) {
 		config_perror("invalid specification for x25PLE_DCEresetIndication");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLE_DCErestartIndication);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLE_DCErestartIndication, &StorageTmp->x25PLE_DCErestartIndicationLen);
 	if (StorageTmp->x25PLE_DCErestartIndication == NULL) {
 		config_perror("invalid specification for x25PLE_DCErestartIndication");
@@ -14096,7 +14113,7 @@ store_x25PLE_DCETable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("x25PLE_DCETable", "storing data...  "));
-	refresh_x25PLE_DCETable();
+	refresh_x25PLE_DCETable(1);
 	(void) tmpsize;
 	for (hcindex = x25PLE_DCETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct x25PLE_DCETable_data *) hcindex->data;
@@ -14178,68 +14195,48 @@ x25PLEIVMOTable_create(void)
 	DEBUGMSGTL(("x25PLEIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEIVMOlocalDTEAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOlocalDTEAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOlocalDTEAddressLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOlogicalChannelAssignments = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOlogicalChannelAssignments = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOlogicalChannelAssignmentsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOsN_ServiceProvider = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOsN_ServiceProvider = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOsN_ServiceProviderLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOdefaultPacketSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOdefaultPacketSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOdefaultPacketSizesLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOdefaultThroughputClasses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOdefaultThroughputClasses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOdefaultThroughputClassesLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOdefaultWindowSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOdefaultWindowSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOdefaultWindowSizesLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOflowControlParameterNegotiation = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOflowControlParameterNegotiation = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOflowControlParameterNegotiationLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOthroughputClassNegotiation = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOthroughputClassNegotiation = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOthroughputClassNegotiationLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOx25PLEMode = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOx25PLEMode = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOx25PLEModeLen = strlen("");
-		}
 		StorageNew->x25PLEIVMOinterfaceMode = 0;
-		if ((StorageNew->x25PLEIVMOdefaultThroughputClass = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOdefaultThroughputClass = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOdefaultThroughputClassLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOflowControlNegotiationPermitted = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOflowControlNegotiationPermitted = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOflowControlNegotiationPermittedLen = strlen("");
-		}
 		StorageNew->x25PLEIVMOcallDeflectionSubscription = 0;
-		if ((StorageNew->x25PLEIVMOmaxActiveCircuits = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOmaxActiveCircuits = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOmaxActiveCircuitsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOrestartTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOrestartTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOrestartTimeLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOdefaultPacketSize = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOdefaultPacketSize = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOdefaultPacketSizeLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOdefaultWindowSize = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOdefaultWindowSize = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOdefaultWindowSizeLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOminimumRecallTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOminimumRecallTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOminimumRecallTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOrestartCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOrestartCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOrestartCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOpacketSequencing = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOpacketSequencing = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOpacketSequencingLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOregistrationRequestTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOregistrationRequestTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOregistrationRequestTimeLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMOregistrationRequestCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOregistrationRequestCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOregistrationRequestCountLen = strlen("");
-		}
 		StorageNew->x25PLEIVMOregistrationPermitted = 0;
 		StorageNew->x25PLEIVMORowStatus = 0;
 		StorageNew->x25PLEIVMORowStatus = RS_NOTREADY;
@@ -14415,108 +14412,129 @@ parse_x25PLEIVMOTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEIVMOId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOId, &StorageTmp->x25PLEIVMOIdLen);
 	if (StorageTmp->x25PLEIVMOId == NULL) {
 		config_perror("invalid specification for x25PLEIVMOId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOlocalDTEAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOlocalDTEAddress, &StorageTmp->x25PLEIVMOlocalDTEAddressLen);
 	if (StorageTmp->x25PLEIVMOlocalDTEAddress == NULL) {
 		config_perror("invalid specification for x25PLEIVMOlocalDTEAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOlogicalChannelAssignments);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOlogicalChannelAssignments, &StorageTmp->x25PLEIVMOlogicalChannelAssignmentsLen);
 	if (StorageTmp->x25PLEIVMOlogicalChannelAssignments == NULL) {
 		config_perror("invalid specification for x25PLEIVMOlogicalChannelAssignments");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOsN_ServiceProvider);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOsN_ServiceProvider, &StorageTmp->x25PLEIVMOsN_ServiceProviderLen);
 	if (StorageTmp->x25PLEIVMOsN_ServiceProvider == NULL) {
 		config_perror("invalid specification for x25PLEIVMOsN_ServiceProvider");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOdefaultPacketSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOdefaultPacketSizes, &StorageTmp->x25PLEIVMOdefaultPacketSizesLen);
 	if (StorageTmp->x25PLEIVMOdefaultPacketSizes == NULL) {
 		config_perror("invalid specification for x25PLEIVMOdefaultPacketSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOdefaultThroughputClasses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOdefaultThroughputClasses, &StorageTmp->x25PLEIVMOdefaultThroughputClassesLen);
 	if (StorageTmp->x25PLEIVMOdefaultThroughputClasses == NULL) {
 		config_perror("invalid specification for x25PLEIVMOdefaultThroughputClasses");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOdefaultWindowSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOdefaultWindowSizes, &StorageTmp->x25PLEIVMOdefaultWindowSizesLen);
 	if (StorageTmp->x25PLEIVMOdefaultWindowSizes == NULL) {
 		config_perror("invalid specification for x25PLEIVMOdefaultWindowSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOflowControlParameterNegotiation);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOflowControlParameterNegotiation, &StorageTmp->x25PLEIVMOflowControlParameterNegotiationLen);
 	if (StorageTmp->x25PLEIVMOflowControlParameterNegotiation == NULL) {
 		config_perror("invalid specification for x25PLEIVMOflowControlParameterNegotiation");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOthroughputClassNegotiation);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOthroughputClassNegotiation, &StorageTmp->x25PLEIVMOthroughputClassNegotiationLen);
 	if (StorageTmp->x25PLEIVMOthroughputClassNegotiation == NULL) {
 		config_perror("invalid specification for x25PLEIVMOthroughputClassNegotiation");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOx25PLEMode);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOx25PLEMode, &StorageTmp->x25PLEIVMOx25PLEModeLen);
 	if (StorageTmp->x25PLEIVMOx25PLEMode == NULL) {
 		config_perror("invalid specification for x25PLEIVMOx25PLEMode");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLEIVMOinterfaceMode, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEIVMOdefaultThroughputClass);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOdefaultThroughputClass, &StorageTmp->x25PLEIVMOdefaultThroughputClassLen);
 	if (StorageTmp->x25PLEIVMOdefaultThroughputClass == NULL) {
 		config_perror("invalid specification for x25PLEIVMOdefaultThroughputClass");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOflowControlNegotiationPermitted);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOflowControlNegotiationPermitted, &StorageTmp->x25PLEIVMOflowControlNegotiationPermittedLen);
 	if (StorageTmp->x25PLEIVMOflowControlNegotiationPermitted == NULL) {
 		config_perror("invalid specification for x25PLEIVMOflowControlNegotiationPermitted");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLEIVMOcallDeflectionSubscription, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEIVMOmaxActiveCircuits);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOmaxActiveCircuits, &StorageTmp->x25PLEIVMOmaxActiveCircuitsLen);
 	if (StorageTmp->x25PLEIVMOmaxActiveCircuits == NULL) {
 		config_perror("invalid specification for x25PLEIVMOmaxActiveCircuits");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOrestartTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOrestartTime, &StorageTmp->x25PLEIVMOrestartTimeLen);
 	if (StorageTmp->x25PLEIVMOrestartTime == NULL) {
 		config_perror("invalid specification for x25PLEIVMOrestartTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOdefaultPacketSize);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOdefaultPacketSize, &StorageTmp->x25PLEIVMOdefaultPacketSizeLen);
 	if (StorageTmp->x25PLEIVMOdefaultPacketSize == NULL) {
 		config_perror("invalid specification for x25PLEIVMOdefaultPacketSize");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOdefaultWindowSize);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOdefaultWindowSize, &StorageTmp->x25PLEIVMOdefaultWindowSizeLen);
 	if (StorageTmp->x25PLEIVMOdefaultWindowSize == NULL) {
 		config_perror("invalid specification for x25PLEIVMOdefaultWindowSize");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOminimumRecallTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOminimumRecallTimer, &StorageTmp->x25PLEIVMOminimumRecallTimerLen);
 	if (StorageTmp->x25PLEIVMOminimumRecallTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMOminimumRecallTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOrestartCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOrestartCount, &StorageTmp->x25PLEIVMOrestartCountLen);
 	if (StorageTmp->x25PLEIVMOrestartCount == NULL) {
 		config_perror("invalid specification for x25PLEIVMOrestartCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOpacketSequencing);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOpacketSequencing, &StorageTmp->x25PLEIVMOpacketSequencingLen);
 	if (StorageTmp->x25PLEIVMOpacketSequencing == NULL) {
 		config_perror("invalid specification for x25PLEIVMOpacketSequencing");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOregistrationRequestTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOregistrationRequestTime, &StorageTmp->x25PLEIVMOregistrationRequestTimeLen);
 	if (StorageTmp->x25PLEIVMOregistrationRequestTime == NULL) {
 		config_perror("invalid specification for x25PLEIVMOregistrationRequestTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMOregistrationRequestCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOregistrationRequestCount, &StorageTmp->x25PLEIVMOregistrationRequestCountLen);
 	if (StorageTmp->x25PLEIVMOregistrationRequestCount == NULL) {
 		config_perror("invalid specification for x25PLEIVMOregistrationRequestCount");
@@ -14543,7 +14561,7 @@ store_x25PLEIVMOTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("x25PLEIVMOTable", "storing data...  "));
-	refresh_x25PLEIVMOTable();
+	refresh_x25PLEIVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = x25PLEIVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct x25PLEIVMOTable_data *) hcindex->data;
@@ -14601,55 +14619,39 @@ x25PLEIVMO_DTETable_create(void)
 	DEBUGMSGTL(("x25PLEIVMO_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEIVMOId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOIdLen = strlen("");
-		}
 		StorageNew->x25PLEIVMO_DTEcallDeflectionSubscription = 0;
-		if ((StorageNew->x25PLEIVMO_DTEcallRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEcallRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEcallRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEextendedPacketSequenceNumbering = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEextendedPacketSequenceNumbering = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEextendedPacketSequenceNumberingLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEmaxActiveCircuits = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEmaxActiveCircuits = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEmaxActiveCircuitsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEminimumRecallTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEminimumRecallTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEminimumRecallTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEresetRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEresetRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEresetRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTErestartRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTErestartRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTErestartRequestRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTErestartRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTErestartRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTErestartRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEclearRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEclearRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEclearRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEinterruptResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEinterruptResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEinterruptResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEresetRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEresetRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEresetRequestRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEclearRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEclearRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEclearRequestRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEcallAttempts = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEcallAttempts = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEcallAttemptsLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEprotocolErrorsDetectedLocally = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEprotocolErrorsDetectedLocally = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEprotocolErrorsDetectedLocallyLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEprotocolErrorsAccusedOf = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEprotocolErrorsAccusedOf = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEprotocolErrorsAccusedOfLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEcallEstablishmentRetryCountsExceeded = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEcallEstablishmentRetryCountsExceeded = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEcallEstablishmentRetryCountsExceededLen = strlen("");
-		}
 		StorageNew->x25PLEIVMO_DTEoctetsReceivedCounter = 0;
 		StorageNew->x25PLEIVMO_DTEoctetsSentCounter = 0;
 		StorageNew->x25PLEIVMO_DTEcallTimeouts = 0;
@@ -14665,27 +14667,20 @@ x25PLEIVMO_DTETable_create(void)
 		StorageNew->x25PLEIVMO_DTEremotelyInitiatedRestarts = 0;
 		StorageNew->x25PLEIVMO_DTEresetTimeouts = 0;
 		StorageNew->x25PLEIVMO_DTErestartCountsExceeded = 0;
-		if ((StorageNew->x25PLEIVMO_DTEwindowStatusTransmissionTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEwindowStatusTransmissionTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEwindowStatusTransmissionTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEwindowRotationTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEwindowRotationTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEwindowRotationTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEdataPacketRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEdataPacketRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEdataPacketRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTErejectResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTErejectResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTErejectResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTErejectRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTErejectRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTErejectRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEregistrationRequestResponseTimer = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEregistrationRequestResponseTimer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEregistrationRequestResponseTimerLen = strlen("");
-		}
-		if ((StorageNew->x25PLEIVMO_DTEregistrationRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMO_DTEregistrationRequestRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMO_DTEregistrationRequestRetransmissionCountLen = strlen("");
-		}
 		StorageNew->x25PLEIVMO_DTEregistrationPermitted = 0;
 		StorageNew->x25PLEIVMO_DTERowStatus = 0;
 		StorageNew->x25PLEIVMO_DTERowStatus = RS_NOTREADY;
@@ -14865,82 +14860,98 @@ parse_x25PLEIVMO_DTETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEIVMOId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOId, &StorageTmp->x25PLEIVMOIdLen);
 	if (StorageTmp->x25PLEIVMOId == NULL) {
 		config_perror("invalid specification for x25PLEIVMOId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x25PLEIVMO_DTEcallDeflectionSubscription, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEcallRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEcallRequestResponseTimer, &StorageTmp->x25PLEIVMO_DTEcallRequestResponseTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTEcallRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEcallRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEextendedPacketSequenceNumbering);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEextendedPacketSequenceNumbering, &StorageTmp->x25PLEIVMO_DTEextendedPacketSequenceNumberingLen);
 	if (StorageTmp->x25PLEIVMO_DTEextendedPacketSequenceNumbering == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEextendedPacketSequenceNumbering");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEmaxActiveCircuits);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEmaxActiveCircuits, &StorageTmp->x25PLEIVMO_DTEmaxActiveCircuitsLen);
 	if (StorageTmp->x25PLEIVMO_DTEmaxActiveCircuits == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEmaxActiveCircuits");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEminimumRecallTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEminimumRecallTimer, &StorageTmp->x25PLEIVMO_DTEminimumRecallTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTEminimumRecallTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEminimumRecallTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEresetRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEresetRequestResponseTimer, &StorageTmp->x25PLEIVMO_DTEresetRequestResponseTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTEresetRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEresetRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTErestartRequestRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTErestartRequestRetransmissionCount, &StorageTmp->x25PLEIVMO_DTErestartRequestRetransmissionCountLen);
 	if (StorageTmp->x25PLEIVMO_DTErestartRequestRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTErestartRequestRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTErestartRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTErestartRequestResponseTimer, &StorageTmp->x25PLEIVMO_DTErestartRequestResponseTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTErestartRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTErestartRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEclearRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEclearRequestResponseTimer, &StorageTmp->x25PLEIVMO_DTEclearRequestResponseTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTEclearRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEclearRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEinterruptResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEinterruptResponseTimer, &StorageTmp->x25PLEIVMO_DTEinterruptResponseTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTEinterruptResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEinterruptResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEresetRequestRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEresetRequestRetransmissionCount, &StorageTmp->x25PLEIVMO_DTEresetRequestRetransmissionCountLen);
 	if (StorageTmp->x25PLEIVMO_DTEresetRequestRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEresetRequestRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEclearRequestRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEclearRequestRetransmissionCount, &StorageTmp->x25PLEIVMO_DTEclearRequestRetransmissionCountLen);
 	if (StorageTmp->x25PLEIVMO_DTEclearRequestRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEclearRequestRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEcallAttempts);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEcallAttempts, &StorageTmp->x25PLEIVMO_DTEcallAttemptsLen);
 	if (StorageTmp->x25PLEIVMO_DTEcallAttempts == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEcallAttempts");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEprotocolErrorsDetectedLocally);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEprotocolErrorsDetectedLocally, &StorageTmp->x25PLEIVMO_DTEprotocolErrorsDetectedLocallyLen);
 	if (StorageTmp->x25PLEIVMO_DTEprotocolErrorsDetectedLocally == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEprotocolErrorsDetectedLocally");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEprotocolErrorsAccusedOf);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEprotocolErrorsAccusedOf, &StorageTmp->x25PLEIVMO_DTEprotocolErrorsAccusedOfLen);
 	if (StorageTmp->x25PLEIVMO_DTEprotocolErrorsAccusedOf == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEprotocolErrorsAccusedOf");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEcallEstablishmentRetryCountsExceeded);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEcallEstablishmentRetryCountsExceeded, &StorageTmp->x25PLEIVMO_DTEcallEstablishmentRetryCountsExceededLen);
 	if (StorageTmp->x25PLEIVMO_DTEcallEstablishmentRetryCountsExceeded == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEcallEstablishmentRetryCountsExceeded");
@@ -14961,36 +14972,43 @@ parse_x25PLEIVMO_DTETable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->x25PLEIVMO_DTEremotelyInitiatedRestarts, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->x25PLEIVMO_DTEresetTimeouts, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->x25PLEIVMO_DTErestartCountsExceeded, &tmpsize);
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEwindowStatusTransmissionTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEwindowStatusTransmissionTimer, &StorageTmp->x25PLEIVMO_DTEwindowStatusTransmissionTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTEwindowStatusTransmissionTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEwindowStatusTransmissionTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEwindowRotationTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEwindowRotationTimer, &StorageTmp->x25PLEIVMO_DTEwindowRotationTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTEwindowRotationTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEwindowRotationTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEdataPacketRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEdataPacketRetransmissionCount, &StorageTmp->x25PLEIVMO_DTEdataPacketRetransmissionCountLen);
 	if (StorageTmp->x25PLEIVMO_DTEdataPacketRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEdataPacketRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTErejectResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTErejectResponseTimer, &StorageTmp->x25PLEIVMO_DTErejectResponseTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTErejectResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTErejectResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTErejectRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTErejectRetransmissionCount, &StorageTmp->x25PLEIVMO_DTErejectRetransmissionCountLen);
 	if (StorageTmp->x25PLEIVMO_DTErejectRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTErejectRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEregistrationRequestResponseTimer);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEregistrationRequestResponseTimer, &StorageTmp->x25PLEIVMO_DTEregistrationRequestResponseTimerLen);
 	if (StorageTmp->x25PLEIVMO_DTEregistrationRequestResponseTimer == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEregistrationRequestResponseTimer");
 		return;
 	}
+	SNMP_FREE(StorageTmp->x25PLEIVMO_DTEregistrationRequestRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMO_DTEregistrationRequestRetransmissionCount, &StorageTmp->x25PLEIVMO_DTEregistrationRequestRetransmissionCountLen);
 	if (StorageTmp->x25PLEIVMO_DTEregistrationRequestRetransmissionCount == NULL) {
 		config_perror("invalid specification for x25PLEIVMO_DTEregistrationRequestRetransmissionCount");
@@ -15017,7 +15035,7 @@ store_x25PLEIVMO_DTETable(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("x25PLEIVMO_DTETable", "storing data...  "));
-	refresh_x25PLEIVMO_DTETable();
+	refresh_x25PLEIVMO_DTETable(1);
 	(void) tmpsize;
 	for (hcindex = x25PLEIVMO_DTETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct x25PLEIVMO_DTETable_data *) hcindex->data;
@@ -15096,9 +15114,8 @@ x25PLEIVMO_DCETable_create(void)
 	DEBUGMSGTL(("x25PLEIVMO_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEIVMOId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEIVMOId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIVMOIdLen = strlen("");
-		}
 		StorageNew->x25PLEIVMO_DCERowStatus = 0;
 		StorageNew->x25PLEIVMO_DCERowStatus = RS_NOTREADY;
 	}
@@ -15233,6 +15250,7 @@ parse_x25PLEIVMO_DCETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEIVMOId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEIVMOId, &StorageTmp->x25PLEIVMOIdLen);
 	if (StorageTmp->x25PLEIVMOId == NULL) {
 		config_perror("invalid specification for x25PLEIVMOId");
@@ -15258,7 +15276,7 @@ store_x25PLEIVMO_DCETable(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("x25PLEIVMO_DCETable", "storing data...  "));
-	refresh_x25PLEIVMO_DCETable();
+	refresh_x25PLEIVMO_DCETable(1);
 	(void) tmpsize;
 	for (hcindex = x25PLEIVMO_DCETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct x25PLEIVMO_DCETable_data *) hcindex->data;
@@ -15293,48 +15311,34 @@ virtualCallTable_create(void)
 	DEBUGMSGTL(("virtualCallTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->virtualCallChannel = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallChannel = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallChannelLen = strlen("");
-		}
-		if ((StorageNew->virtualCallPacketSize = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallPacketSize = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallPacketSizeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallWindowSize = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallWindowSize = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallWindowSizeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallOctetsSentCounter = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallOctetsSentCounter = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallOctetsSentCounterLen = strlen("");
-		}
-		if ((StorageNew->virtualCallOctetsReceivedCounter = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallOctetsReceivedCounter = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallOctetsReceivedCounterLen = strlen("");
-		}
-		if ((StorageNew->virtualCallDataPacketsSent = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallDataPacketsSent = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallDataPacketsSentLen = strlen("");
-		}
-		if ((StorageNew->virtualCallDataPacketsReceived = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallDataPacketsReceived = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallDataPacketsReceivedLen = strlen("");
-		}
-		if ((StorageNew->virtualCallRemotelyInitiatedResets = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallRemotelyInitiatedResets = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallRemotelyInitiatedResetsLen = strlen("");
-		}
-		if ((StorageNew->virtualCallDataRetransmissionTimerExpiries = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallDataRetransmissionTimerExpiries = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallDataRetransmissionTimerExpiriesLen = strlen("");
-		}
-		if ((StorageNew->virtualCallProviderInitiatedResets = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallProviderInitiatedResets = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallProviderInitiatedResetsLen = strlen("");
-		}
-		if ((StorageNew->virtualCallResetTimeouts = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallResetTimeouts = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallResetTimeoutsLen = strlen("");
-		}
-		if ((StorageNew->virtualCallInterruptPacketsSent = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallInterruptPacketsSent = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallInterruptPacketsSentLen = strlen("");
-		}
-		if ((StorageNew->virtualCallInterruptPacketsReceived = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallInterruptPacketsReceived = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallInterruptPacketsReceivedLen = strlen("");
-		}
-		if ((StorageNew->virtualCallInterruptTimerExpiries = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallInterruptTimerExpiries = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallInterruptTimerExpiriesLen = strlen("");
-		}
 
 	}
 	DEBUGMSGTL(("virtualCallTable", "done.\n"));
@@ -15496,76 +15500,91 @@ parse_virtualCallTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->virtualCallId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallId, &StorageTmp->virtualCallIdLen);
 	if (StorageTmp->virtualCallId == NULL) {
 		config_perror("invalid specification for virtualCallId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallChannel);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallChannel, &StorageTmp->virtualCallChannelLen);
 	if (StorageTmp->virtualCallChannel == NULL) {
 		config_perror("invalid specification for virtualCallChannel");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallPacketSize);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallPacketSize, &StorageTmp->virtualCallPacketSizeLen);
 	if (StorageTmp->virtualCallPacketSize == NULL) {
 		config_perror("invalid specification for virtualCallPacketSize");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallWindowSize);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallWindowSize, &StorageTmp->virtualCallWindowSizeLen);
 	if (StorageTmp->virtualCallWindowSize == NULL) {
 		config_perror("invalid specification for virtualCallWindowSize");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallOctetsSentCounter);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallOctetsSentCounter, &StorageTmp->virtualCallOctetsSentCounterLen);
 	if (StorageTmp->virtualCallOctetsSentCounter == NULL) {
 		config_perror("invalid specification for virtualCallOctetsSentCounter");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallOctetsReceivedCounter);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallOctetsReceivedCounter, &StorageTmp->virtualCallOctetsReceivedCounterLen);
 	if (StorageTmp->virtualCallOctetsReceivedCounter == NULL) {
 		config_perror("invalid specification for virtualCallOctetsReceivedCounter");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallDataPacketsSent);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallDataPacketsSent, &StorageTmp->virtualCallDataPacketsSentLen);
 	if (StorageTmp->virtualCallDataPacketsSent == NULL) {
 		config_perror("invalid specification for virtualCallDataPacketsSent");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallDataPacketsReceived);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallDataPacketsReceived, &StorageTmp->virtualCallDataPacketsReceivedLen);
 	if (StorageTmp->virtualCallDataPacketsReceived == NULL) {
 		config_perror("invalid specification for virtualCallDataPacketsReceived");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallRemotelyInitiatedResets);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallRemotelyInitiatedResets, &StorageTmp->virtualCallRemotelyInitiatedResetsLen);
 	if (StorageTmp->virtualCallRemotelyInitiatedResets == NULL) {
 		config_perror("invalid specification for virtualCallRemotelyInitiatedResets");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallDataRetransmissionTimerExpiries);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallDataRetransmissionTimerExpiries, &StorageTmp->virtualCallDataRetransmissionTimerExpiriesLen);
 	if (StorageTmp->virtualCallDataRetransmissionTimerExpiries == NULL) {
 		config_perror("invalid specification for virtualCallDataRetransmissionTimerExpiries");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallProviderInitiatedResets);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallProviderInitiatedResets, &StorageTmp->virtualCallProviderInitiatedResetsLen);
 	if (StorageTmp->virtualCallProviderInitiatedResets == NULL) {
 		config_perror("invalid specification for virtualCallProviderInitiatedResets");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallResetTimeouts);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallResetTimeouts, &StorageTmp->virtualCallResetTimeoutsLen);
 	if (StorageTmp->virtualCallResetTimeouts == NULL) {
 		config_perror("invalid specification for virtualCallResetTimeouts");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallInterruptPacketsSent);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallInterruptPacketsSent, &StorageTmp->virtualCallInterruptPacketsSentLen);
 	if (StorageTmp->virtualCallInterruptPacketsSent == NULL) {
 		config_perror("invalid specification for virtualCallInterruptPacketsSent");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallInterruptPacketsReceived);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallInterruptPacketsReceived, &StorageTmp->virtualCallInterruptPacketsReceivedLen);
 	if (StorageTmp->virtualCallInterruptPacketsReceived == NULL) {
 		config_perror("invalid specification for virtualCallInterruptPacketsReceived");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallInterruptTimerExpiries);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallInterruptTimerExpiries, &StorageTmp->virtualCallInterruptTimerExpiriesLen);
 	if (StorageTmp->virtualCallInterruptTimerExpiries == NULL) {
 		config_perror("invalid specification for virtualCallInterruptTimerExpiries");
@@ -15590,7 +15609,7 @@ store_virtualCallTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("virtualCallTable", "storing data...  "));
-	refresh_virtualCallTable();
+	refresh_virtualCallTable(1);
 	(void) tmpsize;
 	for (hcindex = virtualCallTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct virtualCallTable_data *) hcindex->data;
@@ -15638,18 +15657,14 @@ virtualCircuitTable_create(void)
 	DEBUGMSGTL(("virtualCircuitTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->virtualCircuitLogicalChannel = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitLogicalChannel = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitLogicalChannelLen = strlen("");
-		}
-		if ((StorageNew->virtualCircuitPacketSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitPacketSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitPacketSizesLen = strlen("");
-		}
-		if ((StorageNew->virtualCircuitThroughputClasses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitThroughputClasses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitThroughputClassesLen = strlen("");
-		}
-		if ((StorageNew->virtualCircuitWindowSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitWindowSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitWindowSizesLen = strlen("");
-		}
 
 	}
 	DEBUGMSGTL(("virtualCircuitTable", "done.\n"));
@@ -15791,26 +15806,31 @@ parse_virtualCircuitTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->virtualCircuitId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 	if (StorageTmp->virtualCircuitId == NULL) {
 		config_perror("invalid specification for virtualCircuitId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitLogicalChannel);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitLogicalChannel, &StorageTmp->virtualCircuitLogicalChannelLen);
 	if (StorageTmp->virtualCircuitLogicalChannel == NULL) {
 		config_perror("invalid specification for virtualCircuitLogicalChannel");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitPacketSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitPacketSizes, &StorageTmp->virtualCircuitPacketSizesLen);
 	if (StorageTmp->virtualCircuitPacketSizes == NULL) {
 		config_perror("invalid specification for virtualCircuitPacketSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitThroughputClasses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitThroughputClasses, &StorageTmp->virtualCircuitThroughputClassesLen);
 	if (StorageTmp->virtualCircuitThroughputClasses == NULL) {
 		config_perror("invalid specification for virtualCircuitThroughputClasses");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitWindowSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitWindowSizes, &StorageTmp->virtualCircuitWindowSizesLen);
 	if (StorageTmp->virtualCircuitWindowSizes == NULL) {
 		config_perror("invalid specification for virtualCircuitWindowSizes");
@@ -15835,7 +15855,7 @@ store_virtualCircuitTable(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("virtualCircuitTable", "storing data...  "));
-	refresh_virtualCircuitTable();
+	refresh_virtualCircuitTable(1);
 	(void) tmpsize;
 	for (hcindex = virtualCircuitTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct virtualCircuitTable_data *) hcindex->data;
@@ -15873,9 +15893,8 @@ virtualCircuit_DTETable_create(void)
 	DEBUGMSGTL(("virtualCircuit_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitIdLen = strlen("");
-		}
 		StorageNew->virtualCircuit_DTEoctetsSentCounter = 0;
 		StorageNew->virtualCircuit_DTEoctetsReceivedCounter = 0;
 		StorageNew->virtualCircuit_DTEdataPacketsReceived = 0;
@@ -16020,6 +16039,7 @@ parse_virtualCircuit_DTETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->virtualCircuitId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 	if (StorageTmp->virtualCircuitId == NULL) {
 		config_perror("invalid specification for virtualCircuitId");
@@ -16055,7 +16075,7 @@ store_virtualCircuit_DTETable(int majorID, int minorID, void *serverarg, void *c
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("virtualCircuit_DTETable", "storing data...  "));
-	refresh_virtualCircuit_DTETable();
+	refresh_virtualCircuit_DTETable(1);
 	(void) tmpsize;
 	for (hcindex = virtualCircuit_DTETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct virtualCircuit_DTETable_data *) hcindex->data;
@@ -16100,9 +16120,8 @@ virtualCircuit_DCETable_create(void)
 	DEBUGMSGTL(("virtualCircuit_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitIdLen = strlen("");
-		}
 		StorageNew->virtualCircuit_DCEdataPacketsReceived = 0;
 		StorageNew->virtualCircuit_DCEdataPacketsSent = 0;
 		StorageNew->virtualCircuit_DCEinterruptPacketsReceived = 0;
@@ -16250,6 +16269,7 @@ parse_virtualCircuit_DCETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->virtualCircuitId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 	if (StorageTmp->virtualCircuitId == NULL) {
 		config_perror("invalid specification for virtualCircuitId");
@@ -16288,7 +16308,7 @@ store_virtualCircuit_DCETable(int majorID, int minorID, void *serverarg, void *c
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("virtualCircuit_DCETable", "storing data...  "));
-	refresh_virtualCircuit_DCETable();
+	refresh_virtualCircuit_DCETable(1);
 	(void) tmpsize;
 	for (hcindex = virtualCircuit_DCETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct virtualCircuit_DCETable_data *) hcindex->data;
@@ -16336,15 +16356,12 @@ permanentVirtualCircuitTable_create(void)
 	DEBUGMSGTL(("permanentVirtualCircuitTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCallId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIdLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuitChannel = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuitChannel = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuitChannelLen = strlen("");
-		}
 		StorageNew->permanentVirtualCircuitRowStatus = 0;
 		StorageNew->permanentVirtualCircuitRowStatus = RS_NOTREADY;
 	}
@@ -16485,16 +16502,19 @@ parse_permanentVirtualCircuitTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallId, &StorageTmp->virtualCallIdLen);
 	if (StorageTmp->virtualCallId == NULL) {
 		config_perror("invalid specification for virtualCallId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuitChannel);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuitChannel, &StorageTmp->permanentVirtualCircuitChannelLen);
 	if (StorageTmp->permanentVirtualCircuitChannel == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuitChannel");
@@ -16520,7 +16540,7 @@ store_permanentVirtualCircuitTable(int majorID, int minorID, void *serverarg, vo
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("permanentVirtualCircuitTable", "storing data...  "));
-	refresh_permanentVirtualCircuitTable();
+	refresh_permanentVirtualCircuitTable(1);
 	(void) tmpsize;
 	for (hcindex = permanentVirtualCircuitTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct permanentVirtualCircuitTable_data *) hcindex->data;
@@ -16557,24 +16577,18 @@ permanentVirtualCircuit_DTETable_create(void)
 	DEBUGMSGTL(("permanentVirtualCircuit_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitIdLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DTElogicalChannel = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DTElogicalChannel = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DTElogicalChannelLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DTEpacketSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DTEpacketSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DTEpacketSizesLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DTEthroughputClasses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DTEthroughputClasses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DTEthroughputClassesLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DTEwindowSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DTEwindowSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DTEwindowSizesLen = strlen("");
-		}
 		StorageNew->permanentVirtualCircuit_DTERowStatus = 0;
 		StorageNew->permanentVirtualCircuit_DTERowStatus = RS_NOTREADY;
 	}
@@ -16721,31 +16735,37 @@ parse_permanentVirtualCircuit_DTETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 	if (StorageTmp->virtualCircuitId == NULL) {
 		config_perror("invalid specification for virtualCircuitId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DTElogicalChannel);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DTElogicalChannel, &StorageTmp->permanentVirtualCircuit_DTElogicalChannelLen);
 	if (StorageTmp->permanentVirtualCircuit_DTElogicalChannel == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DTElogicalChannel");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DTEpacketSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DTEpacketSizes, &StorageTmp->permanentVirtualCircuit_DTEpacketSizesLen);
 	if (StorageTmp->permanentVirtualCircuit_DTEpacketSizes == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DTEpacketSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DTEthroughputClasses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DTEthroughputClasses, &StorageTmp->permanentVirtualCircuit_DTEthroughputClassesLen);
 	if (StorageTmp->permanentVirtualCircuit_DTEthroughputClasses == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DTEthroughputClasses");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DTEwindowSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DTEwindowSizes, &StorageTmp->permanentVirtualCircuit_DTEwindowSizesLen);
 	if (StorageTmp->permanentVirtualCircuit_DTEwindowSizes == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DTEwindowSizes");
@@ -16771,7 +16791,7 @@ store_permanentVirtualCircuit_DTETable(int majorID, int minorID, void *serverarg
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("permanentVirtualCircuit_DTETable", "storing data...  "));
-	refresh_permanentVirtualCircuit_DTETable();
+	refresh_permanentVirtualCircuit_DTETable(1);
 	(void) tmpsize;
 	for (hcindex = permanentVirtualCircuit_DTETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct permanentVirtualCircuit_DTETable_data *) hcindex->data;
@@ -16811,34 +16831,25 @@ permanentVirtualCircuit_DCETable_create(void)
 	DEBUGMSGTL(("permanentVirtualCircuit_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitIdLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DCEchargingDirection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DCEchargingDirection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DCEchargingDirectionLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DCElogicalChannel = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DCElogicalChannel = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DCElogicalChannelLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DCEpacketSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DCEpacketSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DCEpacketSizesLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DCEthroughputClasses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DCEthroughputClasses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DCEthroughputClassesLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DCEwindowSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DCEwindowSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DCEwindowSizesLen = strlen("");
-		}
 		StorageNew->permanentVirtualCircuit_DCEoperationalState = 0;
-		if ((StorageNew->permanentVirtualCircuit_DCEremoteDTEAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DCEremoteDTEAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DCEremoteDTEAddressLen = strlen("");
-		}
-		if ((StorageNew->permanentVirtualCircuit_DCEremoteLogicalChannel = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->permanentVirtualCircuit_DCEremoteLogicalChannel = (uint8_t *) strdup("")) != NULL)
 			StorageNew->permanentVirtualCircuit_DCEremoteLogicalChannelLen = strlen("");
-		}
 		StorageNew->permanentVirtualCircuit_DCERowStatus = 0;
 		StorageNew->permanentVirtualCircuit_DCERowStatus = RS_NOTREADY;
 	}
@@ -16991,47 +17002,56 @@ parse_permanentVirtualCircuit_DCETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 	if (StorageTmp->virtualCircuitId == NULL) {
 		config_perror("invalid specification for virtualCircuitId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DCEchargingDirection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DCEchargingDirection, &StorageTmp->permanentVirtualCircuit_DCEchargingDirectionLen);
 	if (StorageTmp->permanentVirtualCircuit_DCEchargingDirection == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DCEchargingDirection");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DCElogicalChannel);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DCElogicalChannel, &StorageTmp->permanentVirtualCircuit_DCElogicalChannelLen);
 	if (StorageTmp->permanentVirtualCircuit_DCElogicalChannel == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DCElogicalChannel");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DCEpacketSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DCEpacketSizes, &StorageTmp->permanentVirtualCircuit_DCEpacketSizesLen);
 	if (StorageTmp->permanentVirtualCircuit_DCEpacketSizes == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DCEpacketSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DCEthroughputClasses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DCEthroughputClasses, &StorageTmp->permanentVirtualCircuit_DCEthroughputClassesLen);
 	if (StorageTmp->permanentVirtualCircuit_DCEthroughputClasses == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DCEthroughputClasses");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DCEwindowSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DCEwindowSizes, &StorageTmp->permanentVirtualCircuit_DCEwindowSizesLen);
 	if (StorageTmp->permanentVirtualCircuit_DCEwindowSizes == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DCEwindowSizes");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->permanentVirtualCircuit_DCEoperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DCEremoteDTEAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DCEremoteDTEAddress, &StorageTmp->permanentVirtualCircuit_DCEremoteDTEAddressLen);
 	if (StorageTmp->permanentVirtualCircuit_DCEremoteDTEAddress == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DCEremoteDTEAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->permanentVirtualCircuit_DCEremoteLogicalChannel);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->permanentVirtualCircuit_DCEremoteLogicalChannel, &StorageTmp->permanentVirtualCircuit_DCEremoteLogicalChannelLen);
 	if (StorageTmp->permanentVirtualCircuit_DCEremoteLogicalChannel == NULL) {
 		config_perror("invalid specification for permanentVirtualCircuit_DCEremoteLogicalChannel");
@@ -17057,7 +17077,7 @@ store_permanentVirtualCircuit_DCETable(int majorID, int minorID, void *serverarg
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("permanentVirtualCircuit_DCETable", "storing data...  "));
-	refresh_permanentVirtualCircuit_DCETable();
+	refresh_permanentVirtualCircuit_DCETable(1);
 	(void) tmpsize;
 	for (hcindex = permanentVirtualCircuit_DCETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct permanentVirtualCircuit_DCETable_data *) hcindex->data;
@@ -17102,67 +17122,47 @@ virtualCallIVMOTable_create(void)
 	DEBUGMSGTL(("virtualCallIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
 		StorageNew->virtualCallIVMOfastSelect = 0;
-		if ((StorageNew->virtualCallIVMOpacketSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOpacketSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOpacketSizesLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOreverseCharging = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOreverseCharging = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOreverseChargingLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOthroughputClasses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOthroughputClasses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOthroughputClassesLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOwindowSizes = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOwindowSizes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOwindowSizesLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOproposedPacketSize = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOproposedPacketSize = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOproposedPacketSizeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOproposedWindowSize = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOproposedWindowSize = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOproposedWindowSizeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOacceptReverseCharging = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOacceptReverseCharging = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOacceptReverseChargingLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOproposeReverseCharging = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOproposeReverseCharging = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOproposeReverseChargingLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOcallTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOcallTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOcallTimeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOresetTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOresetTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOresetTimeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOclearTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOclearTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOclearTimeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOinterruptTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOinterruptTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOinterruptTimeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOresetCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOresetCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOresetCountLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOclearCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOclearCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOclearCountLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOwindowTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOwindowTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOwindowTimeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOdataRetransmissionTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOdataRetransmissionTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOdataRetransmissionTimeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOdataRetransmissionCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOdataRetransmissionCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOdataRetransmissionCountLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOrejectTime = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOrejectTime = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOrejectTimeLen = strlen("");
-		}
-		if ((StorageNew->virtualCallIVMOrejectCount = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallIVMOrejectCount = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIVMOrejectCountLen = strlen("");
-		}
 		StorageNew->virtualCallIVMORowStatus = 0;
 		StorageNew->virtualCallIVMORowStatus = RS_NOTREADY;
 	}
@@ -17339,107 +17339,128 @@ parse_virtualCallIVMOTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOId, &StorageTmp->virtualCallIVMOIdLen);
 	if (StorageTmp->virtualCallIVMOId == NULL) {
 		config_perror("invalid specification for virtualCallIVMOId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->virtualCallIVMOfastSelect, &tmpsize);
+	SNMP_FREE(StorageTmp->virtualCallIVMOpacketSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOpacketSizes, &StorageTmp->virtualCallIVMOpacketSizesLen);
 	if (StorageTmp->virtualCallIVMOpacketSizes == NULL) {
 		config_perror("invalid specification for virtualCallIVMOpacketSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOreverseCharging);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOreverseCharging, &StorageTmp->virtualCallIVMOreverseChargingLen);
 	if (StorageTmp->virtualCallIVMOreverseCharging == NULL) {
 		config_perror("invalid specification for virtualCallIVMOreverseCharging");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOthroughputClasses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOthroughputClasses, &StorageTmp->virtualCallIVMOthroughputClassesLen);
 	if (StorageTmp->virtualCallIVMOthroughputClasses == NULL) {
 		config_perror("invalid specification for virtualCallIVMOthroughputClasses");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOwindowSizes);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOwindowSizes, &StorageTmp->virtualCallIVMOwindowSizesLen);
 	if (StorageTmp->virtualCallIVMOwindowSizes == NULL) {
 		config_perror("invalid specification for virtualCallIVMOwindowSizes");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOproposedPacketSize);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOproposedPacketSize, &StorageTmp->virtualCallIVMOproposedPacketSizeLen);
 	if (StorageTmp->virtualCallIVMOproposedPacketSize == NULL) {
 		config_perror("invalid specification for virtualCallIVMOproposedPacketSize");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOproposedWindowSize);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOproposedWindowSize, &StorageTmp->virtualCallIVMOproposedWindowSizeLen);
 	if (StorageTmp->virtualCallIVMOproposedWindowSize == NULL) {
 		config_perror("invalid specification for virtualCallIVMOproposedWindowSize");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOacceptReverseCharging);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOacceptReverseCharging, &StorageTmp->virtualCallIVMOacceptReverseChargingLen);
 	if (StorageTmp->virtualCallIVMOacceptReverseCharging == NULL) {
 		config_perror("invalid specification for virtualCallIVMOacceptReverseCharging");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOproposeReverseCharging);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOproposeReverseCharging, &StorageTmp->virtualCallIVMOproposeReverseChargingLen);
 	if (StorageTmp->virtualCallIVMOproposeReverseCharging == NULL) {
 		config_perror("invalid specification for virtualCallIVMOproposeReverseCharging");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOcallTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOcallTime, &StorageTmp->virtualCallIVMOcallTimeLen);
 	if (StorageTmp->virtualCallIVMOcallTime == NULL) {
 		config_perror("invalid specification for virtualCallIVMOcallTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOresetTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOresetTime, &StorageTmp->virtualCallIVMOresetTimeLen);
 	if (StorageTmp->virtualCallIVMOresetTime == NULL) {
 		config_perror("invalid specification for virtualCallIVMOresetTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOclearTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOclearTime, &StorageTmp->virtualCallIVMOclearTimeLen);
 	if (StorageTmp->virtualCallIVMOclearTime == NULL) {
 		config_perror("invalid specification for virtualCallIVMOclearTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOinterruptTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOinterruptTime, &StorageTmp->virtualCallIVMOinterruptTimeLen);
 	if (StorageTmp->virtualCallIVMOinterruptTime == NULL) {
 		config_perror("invalid specification for virtualCallIVMOinterruptTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOresetCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOresetCount, &StorageTmp->virtualCallIVMOresetCountLen);
 	if (StorageTmp->virtualCallIVMOresetCount == NULL) {
 		config_perror("invalid specification for virtualCallIVMOresetCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOclearCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOclearCount, &StorageTmp->virtualCallIVMOclearCountLen);
 	if (StorageTmp->virtualCallIVMOclearCount == NULL) {
 		config_perror("invalid specification for virtualCallIVMOclearCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOwindowTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOwindowTime, &StorageTmp->virtualCallIVMOwindowTimeLen);
 	if (StorageTmp->virtualCallIVMOwindowTime == NULL) {
 		config_perror("invalid specification for virtualCallIVMOwindowTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOdataRetransmissionTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOdataRetransmissionTime, &StorageTmp->virtualCallIVMOdataRetransmissionTimeLen);
 	if (StorageTmp->virtualCallIVMOdataRetransmissionTime == NULL) {
 		config_perror("invalid specification for virtualCallIVMOdataRetransmissionTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOdataRetransmissionCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOdataRetransmissionCount, &StorageTmp->virtualCallIVMOdataRetransmissionCountLen);
 	if (StorageTmp->virtualCallIVMOdataRetransmissionCount == NULL) {
 		config_perror("invalid specification for virtualCallIVMOdataRetransmissionCount");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOrejectTime);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOrejectTime, &StorageTmp->virtualCallIVMOrejectTimeLen);
 	if (StorageTmp->virtualCallIVMOrejectTime == NULL) {
 		config_perror("invalid specification for virtualCallIVMOrejectTime");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallIVMOrejectCount);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallIVMOrejectCount, &StorageTmp->virtualCallIVMOrejectCountLen);
 	if (StorageTmp->virtualCallIVMOrejectCount == NULL) {
 		config_perror("invalid specification for virtualCallIVMOrejectCount");
@@ -17465,7 +17486,7 @@ store_virtualCallIVMOTable(int majorID, int minorID, void *serverarg, void *clie
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("virtualCallIVMOTable", "storing data...  "));
-	refresh_virtualCallIVMOTable();
+	refresh_virtualCallIVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = virtualCallIVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct virtualCallIVMOTable_data *) hcindex->data;
@@ -17521,33 +17542,24 @@ switchedVirtualCallTable_create(void)
 	DEBUGMSGTL(("switchedVirtualCallTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCallId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCallId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCallIdLen = strlen("");
-		}
-		if ((StorageNew->switchedVirtualCalldirection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->switchedVirtualCalldirection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->switchedVirtualCalldirectionLen = strlen("");
-		}
-		if ((StorageNew->switchedVirtualCallremoteDTEAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->switchedVirtualCallremoteDTEAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->switchedVirtualCallremoteDTEAddressLen = strlen("");
-		}
-		if ((StorageNew->switchedVirtualCallthroughputClass = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->switchedVirtualCallthroughputClass = (uint8_t *) strdup("")) != NULL)
 			StorageNew->switchedVirtualCallthroughputClassLen = strlen("");
-		}
-		if ((StorageNew->switchedVirtualCallredirectReason = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->switchedVirtualCallredirectReason = (uint8_t *) strdup("")) != NULL)
 			StorageNew->switchedVirtualCallredirectReasonLen = strlen("");
-		}
-		if ((StorageNew->switchedVirtualCalloriginallyCalledAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->switchedVirtualCalloriginallyCalledAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->switchedVirtualCalloriginallyCalledAddressLen = strlen("");
-		}
-		if ((StorageNew->switchedVirtualCallcallingAddressExtension = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->switchedVirtualCallcallingAddressExtension = (uint8_t *) strdup("")) != NULL)
 			StorageNew->switchedVirtualCallcallingAddressExtensionLen = strlen("");
-		}
-		if ((StorageNew->switchedVirtualCallcalledAddressExtension = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->switchedVirtualCallcalledAddressExtension = (uint8_t *) strdup("")) != NULL)
 			StorageNew->switchedVirtualCallcalledAddressExtensionLen = strlen("");
-		}
 		StorageNew->switchedVirtualCallRowStatus = 0;
 		StorageNew->switchedVirtualCallRowStatus = RS_NOTREADY;
 	}
@@ -17700,46 +17712,55 @@ parse_switchedVirtualCallTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCallId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCallId, &StorageTmp->virtualCallIdLen);
 	if (StorageTmp->virtualCallId == NULL) {
 		config_perror("invalid specification for virtualCallId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->switchedVirtualCalldirection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->switchedVirtualCalldirection, &StorageTmp->switchedVirtualCalldirectionLen);
 	if (StorageTmp->switchedVirtualCalldirection == NULL) {
 		config_perror("invalid specification for switchedVirtualCalldirection");
 		return;
 	}
+	SNMP_FREE(StorageTmp->switchedVirtualCallremoteDTEAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->switchedVirtualCallremoteDTEAddress, &StorageTmp->switchedVirtualCallremoteDTEAddressLen);
 	if (StorageTmp->switchedVirtualCallremoteDTEAddress == NULL) {
 		config_perror("invalid specification for switchedVirtualCallremoteDTEAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->switchedVirtualCallthroughputClass);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->switchedVirtualCallthroughputClass, &StorageTmp->switchedVirtualCallthroughputClassLen);
 	if (StorageTmp->switchedVirtualCallthroughputClass == NULL) {
 		config_perror("invalid specification for switchedVirtualCallthroughputClass");
 		return;
 	}
+	SNMP_FREE(StorageTmp->switchedVirtualCallredirectReason);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->switchedVirtualCallredirectReason, &StorageTmp->switchedVirtualCallredirectReasonLen);
 	if (StorageTmp->switchedVirtualCallredirectReason == NULL) {
 		config_perror("invalid specification for switchedVirtualCallredirectReason");
 		return;
 	}
+	SNMP_FREE(StorageTmp->switchedVirtualCalloriginallyCalledAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->switchedVirtualCalloriginallyCalledAddress, &StorageTmp->switchedVirtualCalloriginallyCalledAddressLen);
 	if (StorageTmp->switchedVirtualCalloriginallyCalledAddress == NULL) {
 		config_perror("invalid specification for switchedVirtualCalloriginallyCalledAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->switchedVirtualCallcallingAddressExtension);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->switchedVirtualCallcallingAddressExtension, &StorageTmp->switchedVirtualCallcallingAddressExtensionLen);
 	if (StorageTmp->switchedVirtualCallcallingAddressExtension == NULL) {
 		config_perror("invalid specification for switchedVirtualCallcallingAddressExtension");
 		return;
 	}
+	SNMP_FREE(StorageTmp->switchedVirtualCallcalledAddressExtension);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->switchedVirtualCallcalledAddressExtension, &StorageTmp->switchedVirtualCallcalledAddressExtensionLen);
 	if (StorageTmp->switchedVirtualCallcalledAddressExtension == NULL) {
 		config_perror("invalid specification for switchedVirtualCallcalledAddressExtension");
@@ -17765,7 +17786,7 @@ store_switchedVirtualCallTable(int majorID, int minorID, void *serverarg, void *
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("switchedVirtualCallTable", "storing data...  "));
-	refresh_switchedVirtualCallTable();
+	refresh_switchedVirtualCallTable(1);
 	(void) tmpsize;
 	for (hcindex = switchedVirtualCallTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct switchedVirtualCallTable_data *) hcindex->data;
@@ -17808,34 +17829,25 @@ virtualCall_DTETable_create(void)
 	DEBUGMSGTL(("virtualCall_DTETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DTEcallingAddressExtension = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DTEcallingAddressExtension = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DTEcallingAddressExtensionLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DTEcalledAddressExtension = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DTEcalledAddressExtension = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DTEcalledAddressExtensionLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DTEdirection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DTEdirection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DTEdirectionLen = strlen("");
-		}
 		StorageNew->virtualCall_DTEfastSelect = 0;
-		if ((StorageNew->virtualCall_DTEoriginallyCalledAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DTEoriginallyCalledAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DTEoriginallyCalledAddressLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DTEredirectReason = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DTEredirectReason = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DTEredirectReasonLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DTEremoteDTEAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DTEremoteDTEAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DTEremoteDTEAddressLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DTEreverseCharging = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DTEreverseCharging = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DTEreverseChargingLen = strlen("");
-		}
 		StorageNew->virtualCall_DTERowStatus = 0;
 		StorageNew->virtualCall_DTERowStatus = RS_NOTREADY;
 	}
@@ -17988,47 +18000,56 @@ parse_virtualCall_DTETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 	if (StorageTmp->virtualCircuitId == NULL) {
 		config_perror("invalid specification for virtualCircuitId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DTEcallingAddressExtension);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DTEcallingAddressExtension, &StorageTmp->virtualCall_DTEcallingAddressExtensionLen);
 	if (StorageTmp->virtualCall_DTEcallingAddressExtension == NULL) {
 		config_perror("invalid specification for virtualCall_DTEcallingAddressExtension");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DTEcalledAddressExtension);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DTEcalledAddressExtension, &StorageTmp->virtualCall_DTEcalledAddressExtensionLen);
 	if (StorageTmp->virtualCall_DTEcalledAddressExtension == NULL) {
 		config_perror("invalid specification for virtualCall_DTEcalledAddressExtension");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DTEdirection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DTEdirection, &StorageTmp->virtualCall_DTEdirectionLen);
 	if (StorageTmp->virtualCall_DTEdirection == NULL) {
 		config_perror("invalid specification for virtualCall_DTEdirection");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->virtualCall_DTEfastSelect, &tmpsize);
+	SNMP_FREE(StorageTmp->virtualCall_DTEoriginallyCalledAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DTEoriginallyCalledAddress, &StorageTmp->virtualCall_DTEoriginallyCalledAddressLen);
 	if (StorageTmp->virtualCall_DTEoriginallyCalledAddress == NULL) {
 		config_perror("invalid specification for virtualCall_DTEoriginallyCalledAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DTEredirectReason);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DTEredirectReason, &StorageTmp->virtualCall_DTEredirectReasonLen);
 	if (StorageTmp->virtualCall_DTEredirectReason == NULL) {
 		config_perror("invalid specification for virtualCall_DTEredirectReason");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DTEremoteDTEAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DTEremoteDTEAddress, &StorageTmp->virtualCall_DTEremoteDTEAddressLen);
 	if (StorageTmp->virtualCall_DTEremoteDTEAddress == NULL) {
 		config_perror("invalid specification for virtualCall_DTEremoteDTEAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DTEreverseCharging);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DTEreverseCharging, &StorageTmp->virtualCall_DTEreverseChargingLen);
 	if (StorageTmp->virtualCall_DTEreverseCharging == NULL) {
 		config_perror("invalid specification for virtualCall_DTEreverseCharging");
@@ -18054,7 +18075,7 @@ store_virtualCall_DTETable(int majorID, int minorID, void *serverarg, void *clie
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("virtualCall_DTETable", "storing data...  "));
-	refresh_virtualCall_DTETable();
+	refresh_virtualCall_DTETable(1);
 	(void) tmpsize;
 	for (hcindex = virtualCall_DTETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct virtualCall_DTETable_data *) hcindex->data;
@@ -18098,45 +18119,33 @@ virtualCall_DCETable_create(void)
 	DEBUGMSGTL(("virtualCall_DCETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DCEchargingDirection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEchargingDirection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEchargingDirectionLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DCEcUGSelection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEcUGSelection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEcUGSelectionLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DCEdirection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEdirection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEdirectionLen = strlen("");
-		}
 		StorageNew->virtualCall_DCEfastSelect = 0;
-		if ((StorageNew->virtualCall_DCEremoteDTEAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEremoteDTEAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEremoteDTEAddressLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DCEtransitDelaySelectionAndIndication = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEtransitDelaySelectionAndIndication = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEtransitDelaySelectionAndIndicationLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DCEbilateralCUGSelection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEbilateralCUGSelection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEbilateralCUGSelectionLen = strlen("");
-		}
 		StorageNew->virtualCall_DCEcallRedirectionDeflectionNotification = 0;
 		StorageNew->virtualCall_DCEcalledLineAddressModifiedNotification = 0;
-		if ((StorageNew->virtualCall_DCEcUGWithOutgoingAccessSelection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEcUGWithOutgoingAccessSelection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEcUGWithOutgoingAccessSelectionLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DCEnUISelection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEnUISelection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEnUISelectionLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DCEreverseCharging = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCEreverseCharging = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCEreverseChargingLen = strlen("");
-		}
-		if ((StorageNew->virtualCall_DCErOASelection = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCall_DCErOASelection = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCall_DCErOASelectionLen = strlen("");
-		}
 		StorageNew->virtualCall_DCERowStatus = 0;
 		StorageNew->virtualCall_DCERowStatus = RS_NOTREADY;
 	}
@@ -18295,42 +18304,50 @@ parse_virtualCall_DCETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 	if (StorageTmp->virtualCircuitId == NULL) {
 		config_perror("invalid specification for virtualCircuitId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DCEchargingDirection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEchargingDirection, &StorageTmp->virtualCall_DCEchargingDirectionLen);
 	if (StorageTmp->virtualCall_DCEchargingDirection == NULL) {
 		config_perror("invalid specification for virtualCall_DCEchargingDirection");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DCEcUGSelection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEcUGSelection, &StorageTmp->virtualCall_DCEcUGSelectionLen);
 	if (StorageTmp->virtualCall_DCEcUGSelection == NULL) {
 		config_perror("invalid specification for virtualCall_DCEcUGSelection");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DCEdirection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEdirection, &StorageTmp->virtualCall_DCEdirectionLen);
 	if (StorageTmp->virtualCall_DCEdirection == NULL) {
 		config_perror("invalid specification for virtualCall_DCEdirection");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->virtualCall_DCEfastSelect, &tmpsize);
+	SNMP_FREE(StorageTmp->virtualCall_DCEremoteDTEAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEremoteDTEAddress, &StorageTmp->virtualCall_DCEremoteDTEAddressLen);
 	if (StorageTmp->virtualCall_DCEremoteDTEAddress == NULL) {
 		config_perror("invalid specification for virtualCall_DCEremoteDTEAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DCEtransitDelaySelectionAndIndication);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEtransitDelaySelectionAndIndication, &StorageTmp->virtualCall_DCEtransitDelaySelectionAndIndicationLen);
 	if (StorageTmp->virtualCall_DCEtransitDelaySelectionAndIndication == NULL) {
 		config_perror("invalid specification for virtualCall_DCEtransitDelaySelectionAndIndication");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DCEbilateralCUGSelection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEbilateralCUGSelection, &StorageTmp->virtualCall_DCEbilateralCUGSelectionLen);
 	if (StorageTmp->virtualCall_DCEbilateralCUGSelection == NULL) {
 		config_perror("invalid specification for virtualCall_DCEbilateralCUGSelection");
@@ -18338,21 +18355,25 @@ parse_virtualCall_DCETable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->virtualCall_DCEcallRedirectionDeflectionNotification, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->virtualCall_DCEcalledLineAddressModifiedNotification, &tmpsize);
+	SNMP_FREE(StorageTmp->virtualCall_DCEcUGWithOutgoingAccessSelection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEcUGWithOutgoingAccessSelection, &StorageTmp->virtualCall_DCEcUGWithOutgoingAccessSelectionLen);
 	if (StorageTmp->virtualCall_DCEcUGWithOutgoingAccessSelection == NULL) {
 		config_perror("invalid specification for virtualCall_DCEcUGWithOutgoingAccessSelection");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DCEnUISelection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEnUISelection, &StorageTmp->virtualCall_DCEnUISelectionLen);
 	if (StorageTmp->virtualCall_DCEnUISelection == NULL) {
 		config_perror("invalid specification for virtualCall_DCEnUISelection");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DCEreverseCharging);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCEreverseCharging, &StorageTmp->virtualCall_DCEreverseChargingLen);
 	if (StorageTmp->virtualCall_DCEreverseCharging == NULL) {
 		config_perror("invalid specification for virtualCall_DCEreverseCharging");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCall_DCErOASelection);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCall_DCErOASelection, &StorageTmp->virtualCall_DCErOASelectionLen);
 	if (StorageTmp->virtualCall_DCErOASelection == NULL) {
 		config_perror("invalid specification for virtualCall_DCErOASelection");
@@ -18378,7 +18399,7 @@ store_virtualCall_DCETable(int majorID, int minorID, void *serverarg, void *clie
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("virtualCall_DCETable", "storing data...  "));
-	refresh_virtualCall_DCETable();
+	refresh_virtualCall_DCETable(1);
 	(void) tmpsize;
 	for (hcindex = virtualCall_DCETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct virtualCall_DCETable_data *) hcindex->data;
@@ -18429,12 +18450,10 @@ dSeriesCountsTable_create(void)
 	DEBUGMSGTL(("dSeriesCountsTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->x25PLEId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->x25PLEIdLen = strlen("");
-		}
-		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->virtualCircuitId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->virtualCircuitIdLen = strlen("");
-		}
 		StorageNew->dSeriesResetRequestIndicationPackets = 0;
 		StorageNew->dSeriesSegmentsSent = 0;
 		StorageNew->dSeriesSegmentsReceived = 0;
@@ -18580,16 +18599,19 @@ parse_dSeriesCountsTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->x25PLEId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 	if (StorageTmp->x25PLEId == NULL) {
 		config_perror("invalid specification for x25PLEId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualCircuitId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 	if (StorageTmp->virtualCircuitId == NULL) {
 		config_perror("invalid specification for virtualCircuitId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dSeriesId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dSeriesId, &StorageTmp->dSeriesIdLen);
 	if (StorageTmp->dSeriesId == NULL) {
 		config_perror("invalid specification for dSeriesId");
@@ -18618,7 +18640,7 @@ store_dSeriesCountsTable(int majorID, int minorID, void *serverarg, void *client
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("dSeriesCountsTable", "storing data...  "));
-	refresh_dSeriesCountsTable();
+	refresh_dSeriesCountsTable(1);
 	(void) tmpsize;
 	for (hcindex = dSeriesCountsTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dSeriesCountsTable_data *) hcindex->data;
@@ -18658,27 +18680,21 @@ adjacencyTable_create(void)
 	DEBUGMSGTL(("adjacencyTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
-		if ((StorageNew->linkageId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->linkageId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->linkageIdLen = strlen("");
-		}
 		StorageNew->adjacencyState = 0;
-		if ((StorageNew->neighbourSNPAAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->neighbourSNPAAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->neighbourSNPAAddressLen = strlen("");
-		}
 		StorageNew->neighbourSystemType = 0;
-		if ((StorageNew->neighbourSystemIds = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->neighbourSystemIds = (uint8_t *) strdup("")) != NULL)
 			StorageNew->neighbourSystemIdsLen = strlen("");
-		}
 		StorageNew->adjacencyUsage = ADJACENCYUSAGE_UNDEFINED;
-		if ((StorageNew->areaAddressesOfNeighbour = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->areaAddressesOfNeighbour = (uint8_t *) strdup("")) != NULL)
 			StorageNew->areaAddressesOfNeighbourLen = strlen("");
-		}
 		StorageNew->holdingTimer = 0;
 		StorageNew->priorityOfNeighbour = 0;
 		StorageNew->adjacencyRowStatus = 0;
@@ -18833,39 +18849,46 @@ parse_adjacencyTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->linkageId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->linkageId, &StorageTmp->linkageIdLen);
 	if (StorageTmp->linkageId == NULL) {
 		config_perror("invalid specification for linkageId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->adjacencyId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->adjacencyId, &StorageTmp->adjacencyIdLen);
 	if (StorageTmp->adjacencyId == NULL) {
 		config_perror("invalid specification for adjacencyId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->adjacencyState, &tmpsize);
+	SNMP_FREE(StorageTmp->neighbourSNPAAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->neighbourSNPAAddress, &StorageTmp->neighbourSNPAAddressLen);
 	if (StorageTmp->neighbourSNPAAddress == NULL) {
 		config_perror("invalid specification for neighbourSNPAAddress");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->neighbourSystemType, &tmpsize);
+	SNMP_FREE(StorageTmp->neighbourSystemIds);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->neighbourSystemIds, &StorageTmp->neighbourSystemIdsLen);
 	if (StorageTmp->neighbourSystemIds == NULL) {
 		config_perror("invalid specification for neighbourSystemIds");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->adjacencyUsage, &tmpsize);
+	SNMP_FREE(StorageTmp->areaAddressesOfNeighbour);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->areaAddressesOfNeighbour, &StorageTmp->areaAddressesOfNeighbourLen);
 	if (StorageTmp->areaAddressesOfNeighbour == NULL) {
 		config_perror("invalid specification for areaAddressesOfNeighbour");
@@ -18893,7 +18916,7 @@ store_adjacencyTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("adjacencyTable", "storing data...  "));
-	refresh_adjacencyTable();
+	refresh_adjacencyTable(1);
 	(void) tmpsize;
 	for (hcindex = adjacencyTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct adjacencyTable_data *) hcindex->data;
@@ -18939,12 +18962,10 @@ virtualAdjacencyTable_create(void)
 	DEBUGMSGTL(("virtualAdjacencyTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->virtualAdjacencyMetric = 0;
 
 	}
@@ -19087,16 +19108,19 @@ parse_virtualAdjacencyTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->virtualAdjacencyNetworkEntityTitle);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->virtualAdjacencyNetworkEntityTitle, &StorageTmp->virtualAdjacencyNetworkEntityTitleLen);
 	if (StorageTmp->virtualAdjacencyNetworkEntityTitle == NULL) {
 		config_perror("invalid specification for virtualAdjacencyNetworkEntityTitle");
@@ -19122,7 +19146,7 @@ store_virtualAdjacencyTable(int majorID, int minorID, void *serverarg, void *cli
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("virtualAdjacencyTable", "storing data...  "));
-	refresh_virtualAdjacencyTable();
+	refresh_virtualAdjacencyTable(1);
 	(void) tmpsize;
 	for (hcindex = virtualAdjacencyTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct virtualAdjacencyTable_data *) hcindex->data;
@@ -19159,28 +19183,22 @@ destinationTable_create(void)
 	DEBUGMSGTL(("destinationTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->destinationDefaultMetricPathCost = 0;
-		if ((StorageNew->destinationDefaultMetricOutputAdjacencies = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->destinationDefaultMetricOutputAdjacencies = (uint8_t *) strdup("")) != NULL)
 			StorageNew->destinationDefaultMetricOutputAdjacenciesLen = strlen("");
-		}
 		StorageNew->destinationDelayMetricPathCost = 0;
-		if ((StorageNew->destinationDelayMetricOutputAdjacencies = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->destinationDelayMetricOutputAdjacencies = (uint8_t *) strdup("")) != NULL)
 			StorageNew->destinationDelayMetricOutputAdjacenciesLen = strlen("");
-		}
 		StorageNew->destinationExpenseMetricPathCost = 0;
-		if ((StorageNew->destinationExpenseMetricOutputAdjacencies = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->destinationExpenseMetricOutputAdjacencies = (uint8_t *) strdup("")) != NULL)
 			StorageNew->destinationExpenseMetricOutputAdjacenciesLen = strlen("");
-		}
 		StorageNew->destinationErrorMetricPathCost = 0;
-		if ((StorageNew->destinationErrorMetricOutputAdjacencies = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->destinationErrorMetricOutputAdjacencies = (uint8_t *) strdup("")) != NULL)
 			StorageNew->destinationErrorMetricOutputAdjacenciesLen = strlen("");
-		}
 
 	}
 	DEBUGMSGTL(("destinationTable", "done.\n"));
@@ -19330,40 +19348,47 @@ parse_destinationTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->destinationAddressPrefix);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->destinationAddressPrefix, &StorageTmp->destinationAddressPrefixLen);
 	if (StorageTmp->destinationAddressPrefix == NULL) {
 		config_perror("invalid specification for destinationAddressPrefix");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->destinationDefaultMetricPathCost, &tmpsize);
+	SNMP_FREE(StorageTmp->destinationDefaultMetricOutputAdjacencies);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->destinationDefaultMetricOutputAdjacencies, &StorageTmp->destinationDefaultMetricOutputAdjacenciesLen);
 	if (StorageTmp->destinationDefaultMetricOutputAdjacencies == NULL) {
 		config_perror("invalid specification for destinationDefaultMetricOutputAdjacencies");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->destinationDelayMetricPathCost, &tmpsize);
+	SNMP_FREE(StorageTmp->destinationDelayMetricOutputAdjacencies);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->destinationDelayMetricOutputAdjacencies, &StorageTmp->destinationDelayMetricOutputAdjacenciesLen);
 	if (StorageTmp->destinationDelayMetricOutputAdjacencies == NULL) {
 		config_perror("invalid specification for destinationDelayMetricOutputAdjacencies");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->destinationExpenseMetricPathCost, &tmpsize);
+	SNMP_FREE(StorageTmp->destinationExpenseMetricOutputAdjacencies);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->destinationExpenseMetricOutputAdjacencies, &StorageTmp->destinationExpenseMetricOutputAdjacenciesLen);
 	if (StorageTmp->destinationExpenseMetricOutputAdjacencies == NULL) {
 		config_perror("invalid specification for destinationExpenseMetricOutputAdjacencies");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->destinationErrorMetricPathCost, &tmpsize);
+	SNMP_FREE(StorageTmp->destinationErrorMetricOutputAdjacencies);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->destinationErrorMetricOutputAdjacencies, &StorageTmp->destinationErrorMetricOutputAdjacenciesLen);
 	if (StorageTmp->destinationErrorMetricOutputAdjacencies == NULL) {
 		config_perror("invalid specification for destinationErrorMetricOutputAdjacencies");
@@ -19388,7 +19413,7 @@ store_destinationTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("destinationTable", "storing data...  "));
-	refresh_destinationTable();
+	refresh_destinationTable(1);
 	(void) tmpsize;
 	for (hcindex = destinationTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct destinationTable_data *) hcindex->data;
@@ -19432,12 +19457,10 @@ destinationSystemTable_create(void)
 	DEBUGMSGTL(("destinationSystemTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->clProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->clProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->desintationSystemMetric = 0;
 
 	}
@@ -19586,16 +19609,19 @@ parse_destinationSystemTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->communicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 	if (StorageTmp->communicationsEntityId == NULL) {
 		config_perror("invalid specification for communicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->clProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
 	if (StorageTmp->clProtocolMachineId == NULL) {
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->destinationSystemNetworkEntityTitle);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->destinationSystemNetworkEntityTitle, &StorageTmp->destinationSystemNetworkEntityTitleLen);
 	if (StorageTmp->destinationSystemNetworkEntityTitle == NULL) {
 		config_perror("invalid specification for destinationSystemNetworkEntityTitle");
@@ -19603,6 +19629,7 @@ parse_destinationSystemTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->destinationSystemMetricType, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->desintationSystemMetric, &tmpsize);
+	SNMP_FREE(StorageTmp->destinationSystemAdjacency);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->destinationSystemAdjacency, &StorageTmp->destinationSystemAdjacencyLen);
 	if (StorageTmp->destinationSystemAdjacency == NULL) {
 		config_perror("invalid specification for destinationSystemAdjacency");
@@ -19627,7 +19654,7 @@ store_destinationSystemTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("destinationSystemTable", "storing data...  "));
-	refresh_destinationSystemTable();
+	refresh_destinationSystemTable(1);
 	(void) tmpsize;
 	for (hcindex = destinationSystemTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct destinationSystemTable_data *) hcindex->data;
@@ -19799,6 +19826,7 @@ parse_destinationAreaTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->destinationAreaId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->destinationAreaId, &StorageTmp->destinationAreaIdLen);
 	if (StorageTmp->destinationAreaId == NULL) {
 		config_perror("invalid specification for destinationAreaId");
@@ -19823,7 +19851,7 @@ store_destinationAreaTable(int majorID, int minorID, void *serverarg, void *clie
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("destinationAreaTable", "storing data...  "));
-	refresh_destinationAreaTable();
+	refresh_destinationAreaTable(1);
 	(void) tmpsize;
 	for (hcindex = destinationAreaTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct destinationAreaTable_data *) hcindex->data;
@@ -19857,9 +19885,8 @@ reachableAddressTable_create(void)
 	DEBUGMSGTL(("reachableAddressTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->reachableAddressPrefix = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->reachableAddressPrefix = (uint8_t *) strdup("")) != NULL)
 			StorageNew->reachableAddressPrefixLen = strlen("");
-		}
 		StorageNew->reachableAddressMappingType = 0;
 		StorageNew->reachableAddressDefaultMetric = 20;
 		StorageNew->reachableAddressDelayMetric = 0;
@@ -19871,9 +19898,8 @@ reachableAddressTable_create(void)
 		StorageNew->reachableAddressErrorMetricType = REACHABLEADDRESSERRORMETRICTYPE_INTERNAL;
 		StorageNew->reachableAddressOperationalState = 0;
 		StorageNew->reachableAddressAdministrativeState = 0;
-		if ((StorageNew->reachableAddressSNPAAddresses = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->reachableAddressSNPAAddresses = (uint8_t *) strdup("")) != NULL)
 			StorageNew->reachableAddressSNPAAddressesLen = strlen("");
-		}
 		/* StorageNew->reachableAddressSNPAMask = (uint8_t *) strdup(\"\"); *//* DEFVAL \"\" */
 		/* StorageNew->reachableAddressSNPAMaskLen = strlen(\"\"); *//* DEFVAL \"\" */
 		/* StorageNew->reachableAddressSNPAPrefix = (uint8_t *) strdup(\"\"); *//* DEFVAL \"\" */
@@ -20020,11 +20046,13 @@ parse_reachableAddressTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->reachableAddressId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->reachableAddressId, &StorageTmp->reachableAddressIdLen);
 	if (StorageTmp->reachableAddressId == NULL) {
 		config_perror("invalid specification for reachableAddressId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->reachableAddressPrefix);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->reachableAddressPrefix, &StorageTmp->reachableAddressPrefixLen);
 	if (StorageTmp->reachableAddressPrefix == NULL) {
 		config_perror("invalid specification for reachableAddressPrefix");
@@ -20041,16 +20069,19 @@ parse_reachableAddressTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->reachableAddressErrorMetricType, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->reachableAddressOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->reachableAddressAdministrativeState, &tmpsize);
+	SNMP_FREE(StorageTmp->reachableAddressSNPAAddresses);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->reachableAddressSNPAAddresses, &StorageTmp->reachableAddressSNPAAddressesLen);
 	if (StorageTmp->reachableAddressSNPAAddresses == NULL) {
 		config_perror("invalid specification for reachableAddressSNPAAddresses");
 		return;
 	}
+	SNMP_FREE(StorageTmp->reachableAddressSNPAMask);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->reachableAddressSNPAMask, &StorageTmp->reachableAddressSNPAMaskLen);
 	if (StorageTmp->reachableAddressSNPAMask == NULL) {
 		config_perror("invalid specification for reachableAddressSNPAMask");
 		return;
 	}
+	SNMP_FREE(StorageTmp->reachableAddressSNPAPrefix);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->reachableAddressSNPAPrefix, &StorageTmp->reachableAddressSNPAPrefixLen);
 	if (StorageTmp->reachableAddressSNPAPrefix == NULL) {
 		config_perror("invalid specification for reachableAddressSNPAPrefix");
@@ -20076,7 +20107,7 @@ store_reachableAddressTable(int majorID, int minorID, void *serverarg, void *cli
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("reachableAddressTable", "storing data...  "));
-	refresh_reachableAddressTable();
+	refresh_reachableAddressTable(1);
 	(void) tmpsize;
 	for (hcindex = reachableAddressTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct reachableAddressTable_data *) hcindex->data;
@@ -20111,7 +20142,28 @@ store_reachableAddressTable(int majorID, int minorID, void *serverarg, void *cli
 }
 
 /**
- * @fn void refresh_communicationsEntityTable(void)
+ * @fn void refresh_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the communicationsEntityTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct communicationsEntityTable_data *
+refresh_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->communicationsEntityTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->communicationsEntityTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_communicationsEntityTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the communicationsEntityTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20121,28 +20173,12 @@ store_reachableAddressTable(int majorID, int minorID, void *serverarg, void *cli
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_communicationsEntityTable(void)
+refresh_communicationsEntityTable(int force)
 {
-	if (communicationsEntityTable_refresh == 0)
+	if (!force && communicationsEntityTable_refresh == 0)
 		return;
-	communicationsEntityTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp)
- * @brief refresh the contents of the communicationsEntityTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->communicationsEntityTable_request == sa_request)
-		return;
-	StorageTmp->communicationsEntityTable_request = sa_request;
+	communicationsEntityTable_refresh = 0;
 }
 
 /**
@@ -20160,10 +20196,11 @@ var_communicationsEntityTable(struct variable *vp, oid * name, size_t *length, i
 
 	DEBUGMSGTL(("dlMIB", "var_communicationsEntityTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_communicationsEntityTable();
+	refresh_communicationsEntityTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(communicationsEntityTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_communicationsEntityTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(communicationsEntityTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_communicationsEntityTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20188,7 +20225,28 @@ var_communicationsEntityTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
- * @fn void refresh_sap1Table(void)
+ * @fn void refresh_sap1Table_row(struct sap1Table_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sap1Table row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sap1Table_data *
+refresh_sap1Table_row(struct sap1Table_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sap1Table_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sap1Table_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sap1Table(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the sap1Table.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20198,28 +20256,12 @@ var_communicationsEntityTable(struct variable *vp, oid * name, size_t *length, i
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sap1Table(void)
+refresh_sap1Table(int force)
 {
-	if (sap1Table_refresh == 0)
+	if (!force && sap1Table_refresh == 0)
 		return;
-	sap1Table_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_sap1Table_row(struct sap1Table_data *StorageTmp)
- * @brief refresh the contents of the sap1Table row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_sap1Table_row(struct sap1Table_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->sap1Table_request == sa_request)
-		return;
-	StorageTmp->sap1Table_request = sa_request;
+	sap1Table_refresh = 0;
 }
 
 /**
@@ -20237,10 +20279,11 @@ var_sap1Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 
 	DEBUGMSGTL(("dlMIB", "var_sap1Table: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sap1Table();
+	refresh_sap1Table(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(sap1TableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_sap1Table_row(StorageTmp);
+	while ((StorageTmp = header_complex(sap1TableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sap1Table_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20265,7 +20308,28 @@ var_sap1Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 }
 
 /**
- * @fn void refresh_sap2Table(void)
+ * @fn void refresh_sap2Table_row(struct sap2Table_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sap2Table row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sap2Table_data *
+refresh_sap2Table_row(struct sap2Table_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sap2Table_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sap2Table_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sap2Table(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the sap2Table.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20275,28 +20339,12 @@ var_sap1Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sap2Table(void)
+refresh_sap2Table(int force)
 {
-	if (sap2Table_refresh == 0)
+	if (!force && sap2Table_refresh == 0)
 		return;
-	sap2Table_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_sap2Table_row(struct sap2Table_data *StorageTmp)
- * @brief refresh the contents of the sap2Table row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_sap2Table_row(struct sap2Table_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->sap2Table_request == sa_request)
-		return;
-	StorageTmp->sap2Table_request = sa_request;
+	sap2Table_refresh = 0;
 }
 
 /**
@@ -20314,10 +20362,11 @@ var_sap2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 
 	DEBUGMSGTL(("dlMIB", "var_sap2Table: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sap2Table();
+	refresh_sap2Table(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(sap2TableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_sap2Table_row(StorageTmp);
+	while ((StorageTmp = header_complex(sap2TableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sap2Table_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20348,7 +20397,28 @@ var_sap2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 }
 
 /**
- * @fn void refresh_clProtocolMachineTable(void)
+ * @fn void refresh_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the clProtocolMachineTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct clProtocolMachineTable_data *
+refresh_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->clProtocolMachineTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->clProtocolMachineTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_clProtocolMachineTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the clProtocolMachineTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20358,28 +20428,12 @@ var_sap2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_clProtocolMachineTable(void)
+refresh_clProtocolMachineTable(int force)
 {
-	if (clProtocolMachineTable_refresh == 0)
+	if (!force && clProtocolMachineTable_refresh == 0)
 		return;
-	clProtocolMachineTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp)
- * @brief refresh the contents of the clProtocolMachineTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->clProtocolMachineTable_request == sa_request)
-		return;
-	StorageTmp->clProtocolMachineTable_request = sa_request;
+	clProtocolMachineTable_refresh = 0;
 }
 
 /**
@@ -20397,10 +20451,11 @@ var_clProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 
 	DEBUGMSGTL(("dlMIB", "var_clProtocolMachineTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_clProtocolMachineTable();
+	refresh_clProtocolMachineTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(clProtocolMachineTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_clProtocolMachineTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(clProtocolMachineTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_clProtocolMachineTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20425,7 +20480,28 @@ var_clProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
- * @fn void refresh_coProtocolMachineTable(void)
+ * @fn void refresh_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the coProtocolMachineTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct coProtocolMachineTable_data *
+refresh_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->coProtocolMachineTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->coProtocolMachineTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_coProtocolMachineTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the coProtocolMachineTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20435,28 +20511,12 @@ var_clProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_coProtocolMachineTable(void)
+refresh_coProtocolMachineTable(int force)
 {
-	if (coProtocolMachineTable_refresh == 0)
+	if (!force && coProtocolMachineTable_refresh == 0)
 		return;
-	coProtocolMachineTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp)
- * @brief refresh the contents of the coProtocolMachineTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->coProtocolMachineTable_request == sa_request)
-		return;
-	StorageTmp->coProtocolMachineTable_request = sa_request;
+	coProtocolMachineTable_refresh = 0;
 }
 
 /**
@@ -20474,10 +20534,11 @@ var_coProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 
 	DEBUGMSGTL(("dlMIB", "var_coProtocolMachineTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_coProtocolMachineTable();
+	refresh_coProtocolMachineTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(coProtocolMachineTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_coProtocolMachineTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(coProtocolMachineTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_coProtocolMachineTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20496,7 +20557,28 @@ var_coProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
- * @fn void refresh_singlePeerConnectionTable(void)
+ * @fn void refresh_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the singlePeerConnectionTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct singlePeerConnectionTable_data *
+refresh_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->singlePeerConnectionTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->singlePeerConnectionTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_singlePeerConnectionTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the singlePeerConnectionTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20506,28 +20588,12 @@ var_coProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_singlePeerConnectionTable(void)
+refresh_singlePeerConnectionTable(int force)
 {
-	if (singlePeerConnectionTable_refresh == 0)
+	if (!force && singlePeerConnectionTable_refresh == 0)
 		return;
-	singlePeerConnectionTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp)
- * @brief refresh the contents of the singlePeerConnectionTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->singlePeerConnectionTable_request == sa_request)
-		return;
-	StorageTmp->singlePeerConnectionTable_request = sa_request;
+	singlePeerConnectionTable_refresh = 0;
 }
 
 /**
@@ -20545,10 +20611,11 @@ var_singlePeerConnectionTable(struct variable *vp, oid * name, size_t *length, i
 
 	DEBUGMSGTL(("dlMIB", "var_singlePeerConnectionTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_singlePeerConnectionTable();
+	refresh_singlePeerConnectionTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(singlePeerConnectionTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_singlePeerConnectionTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(singlePeerConnectionTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_singlePeerConnectionTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20573,7 +20640,28 @@ var_singlePeerConnectionTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
- * @fn void refresh_physicalEntityTable(void)
+ * @fn void refresh_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the physicalEntityTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct physicalEntityTable_data *
+refresh_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->physicalEntityTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->physicalEntityTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_physicalEntityTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the physicalEntityTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20583,28 +20671,12 @@ var_singlePeerConnectionTable(struct variable *vp, oid * name, size_t *length, i
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_physicalEntityTable(void)
+refresh_physicalEntityTable(int force)
 {
-	if (physicalEntityTable_refresh == 0)
+	if (!force && physicalEntityTable_refresh == 0)
 		return;
-	physicalEntityTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp)
- * @brief refresh the contents of the physicalEntityTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->physicalEntityTable_request == sa_request)
-		return;
-	StorageTmp->physicalEntityTable_request = sa_request;
+	physicalEntityTable_refresh = 0;
 }
 
 /**
@@ -20622,10 +20694,11 @@ var_physicalEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("dlMIB", "var_physicalEntityTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_physicalEntityTable();
+	refresh_physicalEntityTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(physicalEntityTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_physicalEntityTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(physicalEntityTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_physicalEntityTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20645,7 +20718,28 @@ var_physicalEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_physicalSAPTable(void)
+ * @fn void refresh_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the physicalSAPTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct physicalSAPTable_data *
+refresh_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->physicalSAPTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->physicalSAPTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_physicalSAPTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the physicalSAPTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20655,28 +20749,12 @@ var_physicalEntityTable(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_physicalSAPTable(void)
+refresh_physicalSAPTable(int force)
 {
-	if (physicalSAPTable_refresh == 0)
+	if (!force && physicalSAPTable_refresh == 0)
 		return;
-	physicalSAPTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
- * @brief refresh the contents of the physicalSAPTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->physicalSAPTable_request == sa_request)
-		return;
-	StorageTmp->physicalSAPTable_request = sa_request;
+	physicalSAPTable_refresh = 0;
 }
 
 /**
@@ -20694,10 +20772,11 @@ var_physicalSAPTable(struct variable *vp, oid * name, size_t *length, int exact,
 
 	DEBUGMSGTL(("dlMIB", "var_physicalSAPTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_physicalSAPTable();
+	refresh_physicalSAPTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(physicalSAPTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_physicalSAPTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(physicalSAPTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_physicalSAPTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20710,7 +20789,28 @@ var_physicalSAPTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
- * @fn void refresh_dataCircuitTable(void)
+ * @fn void refresh_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the dataCircuitTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct dataCircuitTable_data *
+refresh_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->dataCircuitTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->dataCircuitTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_dataCircuitTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the dataCircuitTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20720,28 +20820,12 @@ var_physicalSAPTable(struct variable *vp, oid * name, size_t *length, int exact,
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_dataCircuitTable(void)
+refresh_dataCircuitTable(int force)
 {
-	if (dataCircuitTable_refresh == 0)
+	if (!force && dataCircuitTable_refresh == 0)
 		return;
-	dataCircuitTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
- * @brief refresh the contents of the dataCircuitTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->dataCircuitTable_request == sa_request)
-		return;
-	StorageTmp->dataCircuitTable_request = sa_request;
+	dataCircuitTable_refresh = 0;
 }
 
 /**
@@ -20759,10 +20843,11 @@ var_dataCircuitTable(struct variable *vp, oid * name, size_t *length, int exact,
 
 	DEBUGMSGTL(("dlMIB", "var_dataCircuitTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_dataCircuitTable();
+	refresh_dataCircuitTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(dataCircuitTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_dataCircuitTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(dataCircuitTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_dataCircuitTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20857,7 +20942,28 @@ var_dataCircuitTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
- * @fn void refresh_physicalConnectionTable(void)
+ * @fn void refresh_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the physicalConnectionTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct physicalConnectionTable_data *
+refresh_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->physicalConnectionTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->physicalConnectionTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_physicalConnectionTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the physicalConnectionTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20867,28 +20973,12 @@ var_dataCircuitTable(struct variable *vp, oid * name, size_t *length, int exact,
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_physicalConnectionTable(void)
+refresh_physicalConnectionTable(int force)
 {
-	if (physicalConnectionTable_refresh == 0)
+	if (!force && physicalConnectionTable_refresh == 0)
 		return;
-	physicalConnectionTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
- * @brief refresh the contents of the physicalConnectionTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->physicalConnectionTable_request == sa_request)
-		return;
-	StorageTmp->physicalConnectionTable_request = sa_request;
+	physicalConnectionTable_refresh = 0;
 }
 
 /**
@@ -20906,10 +20996,11 @@ var_physicalConnectionTable(struct variable *vp, oid * name, size_t *length, int
 
 	DEBUGMSGTL(("dlMIB", "var_physicalConnectionTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_physicalConnectionTable();
+	refresh_physicalConnectionTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(physicalConnectionTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_physicalConnectionTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(physicalConnectionTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_physicalConnectionTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -20943,7 +21034,28 @@ var_physicalConnectionTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
- * @fn void refresh_datalinkEntityTable(void)
+ * @fn void refresh_datalinkEntityTable_row(struct datalinkEntityTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the datalinkEntityTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct datalinkEntityTable_data *
+refresh_datalinkEntityTable_row(struct datalinkEntityTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->datalinkEntityTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->datalinkEntityTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_datalinkEntityTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the datalinkEntityTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -20953,28 +21065,12 @@ var_physicalConnectionTable(struct variable *vp, oid * name, size_t *length, int
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_datalinkEntityTable(void)
+refresh_datalinkEntityTable(int force)
 {
-	if (datalinkEntityTable_refresh == 0)
+	if (!force && datalinkEntityTable_refresh == 0)
 		return;
-	datalinkEntityTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_datalinkEntityTable_row(struct datalinkEntityTable_data *StorageTmp)
- * @brief refresh the contents of the datalinkEntityTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_datalinkEntityTable_row(struct datalinkEntityTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->datalinkEntityTable_request == sa_request)
-		return;
-	StorageTmp->datalinkEntityTable_request = sa_request;
+	datalinkEntityTable_refresh = 0;
 }
 
 /**
@@ -20992,10 +21088,11 @@ var_datalinkEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("dlMIB", "var_datalinkEntityTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_datalinkEntityTable();
+	refresh_datalinkEntityTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(datalinkEntityTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_datalinkEntityTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(datalinkEntityTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_datalinkEntityTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21022,7 +21119,28 @@ var_datalinkEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_dLSAPTable(void)
+ * @fn void refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the dLSAPTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct dLSAPTable_data *
+refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->dLSAPTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->dLSAPTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_dLSAPTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the dLSAPTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -21032,28 +21150,12 @@ var_datalinkEntityTable(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_dLSAPTable(void)
+refresh_dLSAPTable(int force)
 {
-	if (dLSAPTable_refresh == 0)
+	if (!force && dLSAPTable_refresh == 0)
 		return;
-	dLSAPTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
- * @brief refresh the contents of the dLSAPTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->dLSAPTable_request == sa_request)
-		return;
-	StorageTmp->dLSAPTable_request = sa_request;
+	dLSAPTable_refresh = 0;
 }
 
 /**
@@ -21071,10 +21173,11 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 
 	DEBUGMSGTL(("dlMIB", "var_dLSAPTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_dLSAPTable();
+	refresh_dLSAPTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(dLSAPTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_dLSAPTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(dLSAPTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_dLSAPTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21094,7 +21197,28 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 }
 
 /**
- * @fn void refresh_lAPBDLETable(void)
+ * @fn void refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lAPBDLETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lAPBDLETable_data *
+refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lAPBDLETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lAPBDLETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lAPBDLETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lAPBDLETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -21104,28 +21228,12 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lAPBDLETable(void)
+refresh_lAPBDLETable(int force)
 {
-	if (lAPBDLETable_refresh == 0)
+	if (!force && lAPBDLETable_refresh == 0)
 		return;
-	lAPBDLETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp)
- * @brief refresh the contents of the lAPBDLETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lAPBDLETable_request == sa_request)
-		return;
-	StorageTmp->lAPBDLETable_request = sa_request;
+	lAPBDLETable_refresh = 0;
 }
 
 /**
@@ -21143,10 +21251,11 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("dlMIB", "var_lAPBDLETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lAPBDLETable();
+	refresh_lAPBDLETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lAPBDLETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lAPBDLETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lAPBDLETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lAPBDLETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21250,7 +21359,28 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_sLPPMTable(void)
+ * @fn void refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sLPPMTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sLPPMTable_data *
+refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sLPPMTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sLPPMTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sLPPMTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the sLPPMTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -21260,28 +21390,12 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sLPPMTable(void)
+refresh_sLPPMTable(int force)
 {
-	if (sLPPMTable_refresh == 0)
+	if (!force && sLPPMTable_refresh == 0)
 		return;
-	sLPPMTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp)
- * @brief refresh the contents of the sLPPMTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->sLPPMTable_request == sa_request)
-		return;
-	StorageTmp->sLPPMTable_request = sa_request;
+	sLPPMTable_refresh = 0;
 }
 
 /**
@@ -21299,10 +21413,11 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 
 	DEBUGMSGTL(("dlMIB", "var_sLPPMTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sLPPMTable();
+	refresh_sLPPMTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(sLPPMTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_sLPPMTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(sLPPMTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sLPPMTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21329,7 +21444,28 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 }
 
 /**
- * @fn void refresh_sLPConnectionTable(void)
+ * @fn void refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sLPConnectionTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sLPConnectionTable_data *
+refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sLPConnectionTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sLPConnectionTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sLPConnectionTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the sLPConnectionTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -21339,28 +21475,12 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sLPConnectionTable(void)
+refresh_sLPConnectionTable(int force)
 {
-	if (sLPConnectionTable_refresh == 0)
+	if (!force && sLPConnectionTable_refresh == 0)
 		return;
-	sLPConnectionTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp)
- * @brief refresh the contents of the sLPConnectionTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->sLPConnectionTable_request == sa_request)
-		return;
-	StorageTmp->sLPConnectionTable_request = sa_request;
+	sLPConnectionTable_refresh = 0;
 }
 
 /**
@@ -21378,10 +21498,11 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 
 	DEBUGMSGTL(("dlMIB", "var_sLPConnectionTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sLPConnectionTable();
+	refresh_sLPConnectionTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(sLPConnectionTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_sLPConnectionTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(sLPConnectionTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sLPConnectionTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21633,7 +21754,28 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
- * @fn void refresh_sLPConnectionIVMOTable(void)
+ * @fn void refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sLPConnectionIVMOTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sLPConnectionIVMOTable_data *
+refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sLPConnectionIVMOTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sLPConnectionIVMOTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sLPConnectionIVMOTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the sLPConnectionIVMOTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -21643,28 +21785,12 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sLPConnectionIVMOTable(void)
+refresh_sLPConnectionIVMOTable(int force)
 {
-	if (sLPConnectionIVMOTable_refresh == 0)
+	if (!force && sLPConnectionIVMOTable_refresh == 0)
 		return;
-	sLPConnectionIVMOTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp)
- * @brief refresh the contents of the sLPConnectionIVMOTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->sLPConnectionIVMOTable_request == sa_request)
-		return;
-	StorageTmp->sLPConnectionIVMOTable_request = sa_request;
+	sLPConnectionIVMOTable_refresh = 0;
 }
 
 /**
@@ -21682,10 +21808,11 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 
 	DEBUGMSGTL(("dlMIB", "var_sLPConnectionIVMOTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sLPConnectionIVMOTable();
+	refresh_sLPConnectionIVMOTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_sLPConnectionIVMOTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sLPConnectionIVMOTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21774,7 +21901,28 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
- * @fn void refresh_mACDLETable(void)
+ * @fn void refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the mACDLETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct mACDLETable_data *
+refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->mACDLETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->mACDLETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_mACDLETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the mACDLETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -21784,28 +21932,12 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_mACDLETable(void)
+refresh_mACDLETable(int force)
 {
-	if (mACDLETable_refresh == 0)
+	if (!force && mACDLETable_refresh == 0)
 		return;
-	mACDLETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp)
- * @brief refresh the contents of the mACDLETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->mACDLETable_request == sa_request)
-		return;
-	StorageTmp->mACDLETable_request = sa_request;
+	mACDLETable_refresh = 0;
 }
 
 /**
@@ -21823,10 +21955,11 @@ var_mACDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	DEBUGMSGTL(("dlMIB", "var_mACDLETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_mACDLETable();
+	refresh_mACDLETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(mACDLETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_mACDLETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(mACDLETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_mACDLETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21846,7 +21979,28 @@ var_mACDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
- * @fn void refresh_mACTable(void)
+ * @fn void refresh_mACTable_row(struct mACTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the mACTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct mACTable_data *
+refresh_mACTable_row(struct mACTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->mACTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->mACTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_mACTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the mACTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -21856,28 +22010,12 @@ var_mACDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_mACTable(void)
+refresh_mACTable(int force)
 {
-	if (mACTable_refresh == 0)
+	if (!force && mACTable_refresh == 0)
 		return;
-	mACTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_mACTable_row(struct mACTable_data *StorageTmp)
- * @brief refresh the contents of the mACTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_mACTable_row(struct mACTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->mACTable_request == sa_request)
-		return;
-	StorageTmp->mACTable_request = sa_request;
+	mACTable_refresh = 0;
 }
 
 /**
@@ -21895,10 +22033,11 @@ var_mACTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 
 	DEBUGMSGTL(("dlMIB", "var_mACTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_mACTable();
+	refresh_mACTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(mACTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_mACTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(mACTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_mACTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21924,7 +22063,28 @@ var_mACTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 }
 
 /**
- * @fn void refresh_lLCDLETable(void)
+ * @fn void refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCDLETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCDLETable_data *
+refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCDLETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCDLETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCDLETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCDLETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -21934,28 +22094,12 @@ var_mACTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCDLETable(void)
+refresh_lLCDLETable(int force)
 {
-	if (lLCDLETable_refresh == 0)
+	if (!force && lLCDLETable_refresh == 0)
 		return;
-	lLCDLETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp)
- * @brief refresh the contents of the lLCDLETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCDLETable_request == sa_request)
-		return;
-	StorageTmp->lLCDLETable_request = sa_request;
+	lLCDLETable_refresh = 0;
 }
 
 /**
@@ -21973,10 +22117,11 @@ var_lLCDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	DEBUGMSGTL(("dlMIB", "var_lLCDLETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCDLETable();
+	refresh_lLCDLETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCDLETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCDLETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCDLETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCDLETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -21996,7 +22141,28 @@ var_lLCDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
- * @fn void refresh_lLCCLPMTable(void)
+ * @fn void refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCCLPMTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCCLPMTable_data *
+refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCCLPMTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCCLPMTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCCLPMTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCCLPMTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22006,28 +22172,12 @@ var_lLCDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCCLPMTable(void)
+refresh_lLCCLPMTable(int force)
 {
-	if (lLCCLPMTable_refresh == 0)
+	if (!force && lLCCLPMTable_refresh == 0)
 		return;
-	lLCCLPMTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp)
- * @brief refresh the contents of the lLCCLPMTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCCLPMTable_request == sa_request)
-		return;
-	StorageTmp->lLCCLPMTable_request = sa_request;
+	lLCCLPMTable_refresh = 0;
 }
 
 /**
@@ -22045,10 +22195,11 @@ var_lLCCLPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("dlMIB", "var_lLCCLPMTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCCLPMTable();
+	refresh_lLCCLPMTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCCLPMTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCCLPMTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCCLPMTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCCLPMTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -22068,7 +22219,28 @@ var_lLCCLPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_lLCCOPMTable(void)
+ * @fn void refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCCOPMTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCCOPMTable_data *
+refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCCOPMTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCCOPMTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCCOPMTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCCOPMTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22078,28 +22250,12 @@ var_lLCCLPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCCOPMTable(void)
+refresh_lLCCOPMTable(int force)
 {
-	if (lLCCOPMTable_refresh == 0)
+	if (!force && lLCCOPMTable_refresh == 0)
 		return;
-	lLCCOPMTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp)
- * @brief refresh the contents of the lLCCOPMTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCCOPMTable_request == sa_request)
-		return;
-	StorageTmp->lLCCOPMTable_request = sa_request;
+	lLCCOPMTable_refresh = 0;
 }
 
 /**
@@ -22117,10 +22273,11 @@ var_lLCCOPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("dlMIB", "var_lLCCOPMTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCCOPMTable();
+	refresh_lLCCOPMTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCCOPMTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCCOPMTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCCOPMTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCCOPMTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -22140,7 +22297,28 @@ var_lLCCOPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_resourceTypeIdTable(void)
+ * @fn void refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the resourceTypeIdTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct resourceTypeIdTable_data *
+refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->resourceTypeIdTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->resourceTypeIdTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_resourceTypeIdTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the resourceTypeIdTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22150,28 +22328,12 @@ var_lLCCOPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_resourceTypeIdTable(void)
+refresh_resourceTypeIdTable(int force)
 {
-	if (resourceTypeIdTable_refresh == 0)
+	if (!force && resourceTypeIdTable_refresh == 0)
 		return;
-	resourceTypeIdTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp)
- * @brief refresh the contents of the resourceTypeIdTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->resourceTypeIdTable_request == sa_request)
-		return;
-	StorageTmp->resourceTypeIdTable_request = sa_request;
+	resourceTypeIdTable_refresh = 0;
 }
 
 /**
@@ -22189,10 +22351,11 @@ var_resourceTypeIdTable(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("dlMIB", "var_resourceTypeIdTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_resourceTypeIdTable();
+	refresh_resourceTypeIdTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(resourceTypeIdTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_resourceTypeIdTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(resourceTypeIdTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_resourceTypeIdTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -22235,7 +22398,28 @@ var_resourceTypeIdTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_lLCStationTable(void)
+ * @fn void refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCStationTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCStationTable_data *
+refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCStationTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCStationTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCStationTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCStationTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22245,28 +22429,12 @@ var_resourceTypeIdTable(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCStationTable(void)
+refresh_lLCStationTable(int force)
 {
-	if (lLCStationTable_refresh == 0)
+	if (!force && lLCStationTable_refresh == 0)
 		return;
-	lLCStationTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp)
- * @brief refresh the contents of the lLCStationTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCStationTable_request == sa_request)
-		return;
-	StorageTmp->lLCStationTable_request = sa_request;
+	lLCStationTable_refresh = 0;
 }
 
 /**
@@ -22284,10 +22452,11 @@ var_lLCStationTable(struct variable *vp, oid * name, size_t *length, int exact, 
 
 	DEBUGMSGTL(("dlMIB", "var_lLCStationTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCStationTable();
+	refresh_lLCStationTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCStationTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCStationTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCStationTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCStationTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -22444,7 +22613,28 @@ var_lLCStationTable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
- * @fn void refresh_lLCSAPTable(void)
+ * @fn void refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCSAPTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCSAPTable_data *
+refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCSAPTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCSAPTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCSAPTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCSAPTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22454,28 +22644,12 @@ var_lLCStationTable(struct variable *vp, oid * name, size_t *length, int exact, 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCSAPTable(void)
+refresh_lLCSAPTable(int force)
 {
-	if (lLCSAPTable_refresh == 0)
+	if (!force && lLCSAPTable_refresh == 0)
 		return;
-	lLCSAPTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp)
- * @brief refresh the contents of the lLCSAPTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCSAPTable_request == sa_request)
-		return;
-	StorageTmp->lLCSAPTable_request = sa_request;
+	lLCSAPTable_refresh = 0;
 }
 
 /**
@@ -22493,10 +22667,11 @@ var_lLCSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	DEBUGMSGTL(("dlMIB", "var_lLCSAPTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCSAPTable();
+	refresh_lLCSAPTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCSAPTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCSAPTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCSAPTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCSAPTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -22521,7 +22696,28 @@ var_lLCSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
- * @fn void refresh_rDESetupTable(void)
+ * @fn void refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the rDESetupTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct rDESetupTable_data *
+refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->rDESetupTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->rDESetupTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_rDESetupTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the rDESetupTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22531,28 +22727,12 @@ var_lLCSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_rDESetupTable(void)
+refresh_rDESetupTable(int force)
 {
-	if (rDESetupTable_refresh == 0)
+	if (!force && rDESetupTable_refresh == 0)
 		return;
-	rDESetupTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp)
- * @brief refresh the contents of the rDESetupTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->rDESetupTable_request == sa_request)
-		return;
-	StorageTmp->rDESetupTable_request = sa_request;
+	rDESetupTable_refresh = 0;
 }
 
 /**
@@ -22570,10 +22750,11 @@ var_rDESetupTable(struct variable *vp, oid * name, size_t *length, int exact, si
 
 	DEBUGMSGTL(("dlMIB", "var_rDESetupTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_rDESetupTable();
+	refresh_rDESetupTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(rDESetupTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_rDESetupTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(rDESetupTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_rDESetupTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -22655,7 +22836,28 @@ var_rDESetupTable(struct variable *vp, oid * name, size_t *length, int exact, si
 }
 
 /**
- * @fn void refresh_rDEPairTable(void)
+ * @fn void refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the rDEPairTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct rDEPairTable_data *
+refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->rDEPairTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->rDEPairTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_rDEPairTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the rDEPairTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22665,28 +22867,12 @@ var_rDESetupTable(struct variable *vp, oid * name, size_t *length, int exact, si
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_rDEPairTable(void)
+refresh_rDEPairTable(int force)
 {
-	if (rDEPairTable_refresh == 0)
+	if (!force && rDEPairTable_refresh == 0)
 		return;
-	rDEPairTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp)
- * @brief refresh the contents of the rDEPairTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->rDEPairTable_request == sa_request)
-		return;
-	StorageTmp->rDEPairTable_request = sa_request;
+	rDEPairTable_refresh = 0;
 }
 
 /**
@@ -22704,10 +22890,11 @@ var_rDEPairTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("dlMIB", "var_rDEPairTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_rDEPairTable();
+	refresh_rDEPairTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(rDEPairTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_rDEPairTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(rDEPairTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_rDEPairTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -22756,7 +22943,28 @@ var_rDEPairTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_lLCConnectionLessTable(void)
+ * @fn void refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnectionLessTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnectionLessTable_data *
+refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnectionLessTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnectionLessTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnectionLessTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnectionLessTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22766,28 +22974,12 @@ var_rDEPairTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnectionLessTable(void)
+refresh_lLCConnectionLessTable(int force)
 {
-	if (lLCConnectionLessTable_refresh == 0)
+	if (!force && lLCConnectionLessTable_refresh == 0)
 		return;
-	lLCConnectionLessTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp)
- * @brief refresh the contents of the lLCConnectionLessTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnectionLessTable_request == sa_request)
-		return;
-	StorageTmp->lLCConnectionLessTable_request = sa_request;
+	lLCConnectionLessTable_refresh = 0;
 }
 
 /**
@@ -22805,10 +22997,11 @@ var_lLCConnectionLessTable(struct variable *vp, oid * name, size_t *length, int 
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnectionLessTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnectionLessTable();
+	refresh_lLCConnectionLessTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnectionLessTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnectionLessTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnectionLessTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnectionLessTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -22907,7 +23100,28 @@ var_lLCConnectionLessTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
- * @fn void refresh_lLCConnection2Table(void)
+ * @fn void refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnection2Table row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnection2Table_data *
+refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnection2Table_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnection2Table_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnection2Table(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnection2Table.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -22917,28 +23131,12 @@ var_lLCConnectionLessTable(struct variable *vp, oid * name, size_t *length, int 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnection2Table(void)
+refresh_lLCConnection2Table(int force)
 {
-	if (lLCConnection2Table_refresh == 0)
+	if (!force && lLCConnection2Table_refresh == 0)
 		return;
-	lLCConnection2Table_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp)
- * @brief refresh the contents of the lLCConnection2Table row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnection2Table_request == sa_request)
-		return;
-	StorageTmp->lLCConnection2Table_request = sa_request;
+	lLCConnection2Table_refresh = 0;
 }
 
 /**
@@ -22956,10 +23154,11 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnection2Table: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnection2Table();
+	refresh_lLCConnection2Table(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnection2TableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnection2Table_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnection2TableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnection2Table_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -23274,7 +23473,28 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_lLCConnection2IVMOTable(void)
+ * @fn void refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnection2IVMOTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnection2IVMOTable_data *
+refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnection2IVMOTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnection2IVMOTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnection2IVMOTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnection2IVMOTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -23284,28 +23504,12 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnection2IVMOTable(void)
+refresh_lLCConnection2IVMOTable(int force)
 {
-	if (lLCConnection2IVMOTable_refresh == 0)
+	if (!force && lLCConnection2IVMOTable_refresh == 0)
 		return;
-	lLCConnection2IVMOTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp)
- * @brief refresh the contents of the lLCConnection2IVMOTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnection2IVMOTable_request == sa_request)
-		return;
-	StorageTmp->lLCConnection2IVMOTable_request = sa_request;
+	lLCConnection2IVMOTable_refresh = 0;
 }
 
 /**
@@ -23323,10 +23527,11 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnection2IVMOTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnection2IVMOTable();
+	refresh_lLCConnection2IVMOTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnection2IVMOTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnection2IVMOTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -23416,7 +23621,28 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
- * @fn void refresh_lLCConnectionlessAckTable(void)
+ * @fn void refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnectionlessAckTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnectionlessAckTable_data *
+refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnectionlessAckTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnectionlessAckTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnectionlessAckTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnectionlessAckTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -23426,28 +23652,12 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnectionlessAckTable(void)
+refresh_lLCConnectionlessAckTable(int force)
 {
-	if (lLCConnectionlessAckTable_refresh == 0)
+	if (!force && lLCConnectionlessAckTable_refresh == 0)
 		return;
-	lLCConnectionlessAckTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp)
- * @brief refresh the contents of the lLCConnectionlessAckTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnectionlessAckTable_request == sa_request)
-		return;
-	StorageTmp->lLCConnectionlessAckTable_request = sa_request;
+	lLCConnectionlessAckTable_refresh = 0;
 }
 
 /**
@@ -23465,10 +23675,11 @@ var_lLCConnectionlessAckTable(struct variable *vp, oid * name, size_t *length, i
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnectionlessAckTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnectionlessAckTable();
+	refresh_lLCConnectionlessAckTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnectionlessAckTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnectionlessAckTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -23694,7 +23905,28 @@ var_lLCConnectionlessAckTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
- * @fn void refresh_lLCConnectionlessAckIVMOTable(void)
+ * @fn void refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnectionlessAckIVMOTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnectionlessAckIVMOTable_data *
+refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnectionlessAckIVMOTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnectionlessAckIVMOTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnectionlessAckIVMOTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnectionlessAckIVMOTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -23704,28 +23936,12 @@ var_lLCConnectionlessAckTable(struct variable *vp, oid * name, size_t *length, i
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnectionlessAckIVMOTable(void)
+refresh_lLCConnectionlessAckIVMOTable(int force)
 {
-	if (lLCConnectionlessAckIVMOTable_refresh == 0)
+	if (!force && lLCConnectionlessAckIVMOTable_refresh == 0)
 		return;
-	lLCConnectionlessAckIVMOTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp)
- * @brief refresh the contents of the lLCConnectionlessAckIVMOTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnectionlessAckIVMOTable_request == sa_request)
-		return;
-	StorageTmp->lLCConnectionlessAckIVMOTable_request = sa_request;
+	lLCConnectionlessAckIVMOTable_refresh = 0;
 }
 
 /**
@@ -23743,10 +23959,11 @@ var_lLCConnectionlessAckIVMOTable(struct variable *vp, oid * name, size_t *lengt
 
 	DEBUGMSGTL(("dlMIB", "var_lLCConnectionlessAckIVMOTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnectionlessAckIVMOTable();
+	refresh_lLCConnectionlessAckIVMOTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnectionlessAckIVMOTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnectionlessAckIVMOTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -23780,7 +23997,28 @@ var_lLCConnectionlessAckIVMOTable(struct variable *vp, oid * name, size_t *lengt
 }
 
 /**
- * @fn void refresh_networkEntityTable(void)
+ * @fn void refresh_networkEntityTable_row(struct networkEntityTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the networkEntityTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct networkEntityTable_data *
+refresh_networkEntityTable_row(struct networkEntityTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->networkEntityTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->networkEntityTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_networkEntityTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the networkEntityTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -23790,28 +24028,12 @@ var_lLCConnectionlessAckIVMOTable(struct variable *vp, oid * name, size_t *lengt
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_networkEntityTable(void)
+refresh_networkEntityTable(int force)
 {
-	if (networkEntityTable_refresh == 0)
+	if (!force && networkEntityTable_refresh == 0)
 		return;
-	networkEntityTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_networkEntityTable_row(struct networkEntityTable_data *StorageTmp)
- * @brief refresh the contents of the networkEntityTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_networkEntityTable_row(struct networkEntityTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->networkEntityTable_request == sa_request)
-		return;
-	StorageTmp->networkEntityTable_request = sa_request;
+	networkEntityTable_refresh = 0;
 }
 
 /**
@@ -23829,10 +24051,11 @@ var_networkEntityTable(struct variable *vp, oid * name, size_t *length, int exac
 
 	DEBUGMSGTL(("dlMIB", "var_networkEntityTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_networkEntityTable();
+	refresh_networkEntityTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(networkEntityTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_networkEntityTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(networkEntityTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_networkEntityTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -23866,7 +24089,28 @@ var_networkEntityTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
- * @fn void refresh_nSAPTable(void)
+ * @fn void refresh_nSAPTable_row(struct nSAPTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the nSAPTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct nSAPTable_data *
+refresh_nSAPTable_row(struct nSAPTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->nSAPTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->nSAPTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_nSAPTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the nSAPTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -23876,28 +24120,12 @@ var_networkEntityTable(struct variable *vp, oid * name, size_t *length, int exac
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_nSAPTable(void)
+refresh_nSAPTable(int force)
 {
-	if (nSAPTable_refresh == 0)
+	if (!force && nSAPTable_refresh == 0)
 		return;
-	nSAPTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_nSAPTable_row(struct nSAPTable_data *StorageTmp)
- * @brief refresh the contents of the nSAPTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_nSAPTable_row(struct nSAPTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->nSAPTable_request == sa_request)
-		return;
-	StorageTmp->nSAPTable_request = sa_request;
+	nSAPTable_refresh = 0;
 }
 
 /**
@@ -23915,10 +24143,11 @@ var_nSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 
 	DEBUGMSGTL(("dlMIB", "var_nSAPTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_nSAPTable();
+	refresh_nSAPTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(nSAPTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_nSAPTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(nSAPTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_nSAPTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -23938,7 +24167,28 @@ var_nSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 }
 
 /**
- * @fn void refresh_cLNSTable(void)
+ * @fn void refresh_cLNSTable_row(struct cLNSTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the cLNSTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct cLNSTable_data *
+refresh_cLNSTable_row(struct cLNSTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->cLNSTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->cLNSTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_cLNSTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the cLNSTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -23948,28 +24198,12 @@ var_nSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_cLNSTable(void)
+refresh_cLNSTable(int force)
 {
-	if (cLNSTable_refresh == 0)
+	if (!force && cLNSTable_refresh == 0)
 		return;
-	cLNSTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_cLNSTable_row(struct cLNSTable_data *StorageTmp)
- * @brief refresh the contents of the cLNSTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_cLNSTable_row(struct cLNSTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->cLNSTable_request == sa_request)
-		return;
-	StorageTmp->cLNSTable_request = sa_request;
+	cLNSTable_refresh = 0;
 }
 
 /**
@@ -23987,10 +24221,11 @@ var_cLNSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 
 	DEBUGMSGTL(("dlMIB", "var_cLNSTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_cLNSTable();
+	refresh_cLNSTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(cLNSTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_cLNSTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(cLNSTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_cLNSTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -24093,7 +24328,28 @@ var_cLNSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 }
 
 /**
- * @fn void refresh_cLNSISISTable(void)
+ * @fn void refresh_cLNSISISTable_row(struct cLNSISISTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the cLNSISISTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct cLNSISISTable_data *
+refresh_cLNSISISTable_row(struct cLNSISISTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->cLNSISISTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->cLNSISISTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_cLNSISISTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the cLNSISISTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -24103,28 +24359,12 @@ var_cLNSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_cLNSISISTable(void)
+refresh_cLNSISISTable(int force)
 {
-	if (cLNSISISTable_refresh == 0)
+	if (!force && cLNSISISTable_refresh == 0)
 		return;
-	cLNSISISTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_cLNSISISTable_row(struct cLNSISISTable_data *StorageTmp)
- * @brief refresh the contents of the cLNSISISTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_cLNSISISTable_row(struct cLNSISISTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->cLNSISISTable_request == sa_request)
-		return;
-	StorageTmp->cLNSISISTable_request = sa_request;
+	cLNSISISTable_refresh = 0;
 }
 
 /**
@@ -24142,10 +24382,11 @@ var_cLNSISISTable(struct variable *vp, oid * name, size_t *length, int exact, si
 
 	DEBUGMSGTL(("dlMIB", "var_cLNSISISTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_cLNSISISTable();
+	refresh_cLNSISISTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(cLNSISISTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_cLNSISISTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(cLNSISISTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_cLNSISISTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -24350,7 +24591,28 @@ var_cLNSISISTable(struct variable *vp, oid * name, size_t *length, int exact, si
 }
 
 /**
- * @fn void refresh_cLNSISISLevel2Table(void)
+ * @fn void refresh_cLNSISISLevel2Table_row(struct cLNSISISLevel2Table_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the cLNSISISLevel2Table row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct cLNSISISLevel2Table_data *
+refresh_cLNSISISLevel2Table_row(struct cLNSISISLevel2Table_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->cLNSISISLevel2Table_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->cLNSISISLevel2Table_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_cLNSISISLevel2Table(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the cLNSISISLevel2Table.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -24360,28 +24622,12 @@ var_cLNSISISTable(struct variable *vp, oid * name, size_t *length, int exact, si
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_cLNSISISLevel2Table(void)
+refresh_cLNSISISLevel2Table(int force)
 {
-	if (cLNSISISLevel2Table_refresh == 0)
+	if (!force && cLNSISISLevel2Table_refresh == 0)
 		return;
-	cLNSISISLevel2Table_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_cLNSISISLevel2Table_row(struct cLNSISISLevel2Table_data *StorageTmp)
- * @brief refresh the contents of the cLNSISISLevel2Table row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_cLNSISISLevel2Table_row(struct cLNSISISLevel2Table_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->cLNSISISLevel2Table_request == sa_request)
-		return;
-	StorageTmp->cLNSISISLevel2Table_request = sa_request;
+	cLNSISISLevel2Table_refresh = 0;
 }
 
 /**
@@ -24399,10 +24645,11 @@ var_cLNSISISLevel2Table(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("dlMIB", "var_cLNSISISLevel2Table: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_cLNSISISLevel2Table();
+	refresh_cLNSISISLevel2Table(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(cLNSISISLevel2TableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_cLNSISISLevel2Table_row(StorageTmp);
+	while ((StorageTmp = header_complex(cLNSISISLevel2TableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_cLNSISISLevel2Table_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -24475,7 +24722,28 @@ var_cLNSISISLevel2Table(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_linkageTable(void)
+ * @fn void refresh_linkageTable_row(struct linkageTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the linkageTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct linkageTable_data *
+refresh_linkageTable_row(struct linkageTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->linkageTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->linkageTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_linkageTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the linkageTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -24485,28 +24753,12 @@ var_cLNSISISLevel2Table(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_linkageTable(void)
+refresh_linkageTable(int force)
 {
-	if (linkageTable_refresh == 0)
+	if (!force && linkageTable_refresh == 0)
 		return;
-	linkageTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_linkageTable_row(struct linkageTable_data *StorageTmp)
- * @brief refresh the contents of the linkageTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_linkageTable_row(struct linkageTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->linkageTable_request == sa_request)
-		return;
-	StorageTmp->linkageTable_request = sa_request;
+	linkageTable_refresh = 0;
 }
 
 /**
@@ -24524,10 +24776,11 @@ var_linkageTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("dlMIB", "var_linkageTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_linkageTable();
+	refresh_linkageTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(linkageTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_linkageTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(linkageTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_linkageTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -24930,7 +25183,28 @@ var_linkageTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_cONSTable(void)
+ * @fn void refresh_cONSTable_row(struct cONSTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the cONSTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct cONSTable_data *
+refresh_cONSTable_row(struct cONSTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->cONSTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->cONSTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_cONSTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the cONSTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -24940,28 +25214,12 @@ var_linkageTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_cONSTable(void)
+refresh_cONSTable(int force)
 {
-	if (cONSTable_refresh == 0)
+	if (!force && cONSTable_refresh == 0)
 		return;
-	cONSTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_cONSTable_row(struct cONSTable_data *StorageTmp)
- * @brief refresh the contents of the cONSTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_cONSTable_row(struct cONSTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->cONSTable_request == sa_request)
-		return;
-	StorageTmp->cONSTable_request = sa_request;
+	cONSTable_refresh = 0;
 }
 
 /**
@@ -24979,10 +25237,11 @@ var_cONSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 
 	DEBUGMSGTL(("dlMIB", "var_cONSTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_cONSTable();
+	refresh_cONSTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(cONSTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_cONSTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(cONSTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_cONSTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -25016,7 +25275,28 @@ var_cONSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 }
 
 /**
- * @fn void refresh_networkConnectionTable(void)
+ * @fn void refresh_networkConnectionTable_row(struct networkConnectionTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the networkConnectionTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct networkConnectionTable_data *
+refresh_networkConnectionTable_row(struct networkConnectionTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->networkConnectionTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->networkConnectionTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_networkConnectionTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the networkConnectionTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -25026,28 +25306,12 @@ var_cONSTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_networkConnectionTable(void)
+refresh_networkConnectionTable(int force)
 {
-	if (networkConnectionTable_refresh == 0)
+	if (!force && networkConnectionTable_refresh == 0)
 		return;
-	networkConnectionTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_networkConnectionTable_row(struct networkConnectionTable_data *StorageTmp)
- * @brief refresh the contents of the networkConnectionTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_networkConnectionTable_row(struct networkConnectionTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->networkConnectionTable_request == sa_request)
-		return;
-	StorageTmp->networkConnectionTable_request = sa_request;
+	networkConnectionTable_refresh = 0;
 }
 
 /**
@@ -25065,10 +25329,11 @@ var_networkConnectionTable(struct variable *vp, oid * name, size_t *length, int 
 
 	DEBUGMSGTL(("dlMIB", "var_networkConnectionTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_networkConnectionTable();
+	refresh_networkConnectionTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(networkConnectionTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_networkConnectionTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(networkConnectionTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_networkConnectionTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -25099,7 +25364,28 @@ var_networkConnectionTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
- * @fn void refresh_x25PLETable(void)
+ * @fn void refresh_x25PLETable_row(struct x25PLETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the x25PLETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct x25PLETable_data *
+refresh_x25PLETable_row(struct x25PLETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->x25PLETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->x25PLETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_x25PLETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the x25PLETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -25109,28 +25395,12 @@ var_networkConnectionTable(struct variable *vp, oid * name, size_t *length, int 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_x25PLETable(void)
+refresh_x25PLETable(int force)
 {
-	if (x25PLETable_refresh == 0)
+	if (!force && x25PLETable_refresh == 0)
 		return;
-	x25PLETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_x25PLETable_row(struct x25PLETable_data *StorageTmp)
- * @brief refresh the contents of the x25PLETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_x25PLETable_row(struct x25PLETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->x25PLETable_request == sa_request)
-		return;
-	StorageTmp->x25PLETable_request = sa_request;
+	x25PLETable_refresh = 0;
 }
 
 /**
@@ -25148,10 +25418,11 @@ var_x25PLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_x25PLETable();
+	refresh_x25PLETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(x25PLETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_x25PLETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(x25PLETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_x25PLETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -25464,7 +25735,28 @@ var_x25PLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
- * @fn void refresh_x25PLE_DTETable(void)
+ * @fn void refresh_x25PLE_DTETable_row(struct x25PLE_DTETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the x25PLE_DTETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct x25PLE_DTETable_data *
+refresh_x25PLE_DTETable_row(struct x25PLE_DTETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->x25PLE_DTETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->x25PLE_DTETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_x25PLE_DTETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the x25PLE_DTETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -25474,28 +25766,12 @@ var_x25PLETable(struct variable *vp, oid * name, size_t *length, int exact, size
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_x25PLE_DTETable(void)
+refresh_x25PLE_DTETable(int force)
 {
-	if (x25PLE_DTETable_refresh == 0)
+	if (!force && x25PLE_DTETable_refresh == 0)
 		return;
-	x25PLE_DTETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_x25PLE_DTETable_row(struct x25PLE_DTETable_data *StorageTmp)
- * @brief refresh the contents of the x25PLE_DTETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_x25PLE_DTETable_row(struct x25PLE_DTETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->x25PLE_DTETable_request == sa_request)
-		return;
-	StorageTmp->x25PLE_DTETable_request = sa_request;
+	x25PLE_DTETable_refresh = 0;
 }
 
 /**
@@ -25513,10 +25789,11 @@ var_x25PLE_DTETable(struct variable *vp, oid * name, size_t *length, int exact, 
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLE_DTETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_x25PLE_DTETable();
+	refresh_x25PLE_DTETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(x25PLE_DTETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_x25PLE_DTETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(x25PLE_DTETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_x25PLE_DTETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -25763,7 +26040,28 @@ var_x25PLE_DTETable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
- * @fn void refresh_x25PLE_DCETable(void)
+ * @fn void refresh_x25PLE_DCETable_row(struct x25PLE_DCETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the x25PLE_DCETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct x25PLE_DCETable_data *
+refresh_x25PLE_DCETable_row(struct x25PLE_DCETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->x25PLE_DCETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->x25PLE_DCETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_x25PLE_DCETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the x25PLE_DCETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -25773,28 +26071,12 @@ var_x25PLE_DTETable(struct variable *vp, oid * name, size_t *length, int exact, 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_x25PLE_DCETable(void)
+refresh_x25PLE_DCETable(int force)
 {
-	if (x25PLE_DCETable_refresh == 0)
+	if (!force && x25PLE_DCETable_refresh == 0)
 		return;
-	x25PLE_DCETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_x25PLE_DCETable_row(struct x25PLE_DCETable_data *StorageTmp)
- * @brief refresh the contents of the x25PLE_DCETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_x25PLE_DCETable_row(struct x25PLE_DCETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->x25PLE_DCETable_request == sa_request)
-		return;
-	StorageTmp->x25PLE_DCETable_request = sa_request;
+	x25PLE_DCETable_refresh = 0;
 }
 
 /**
@@ -25812,10 +26094,11 @@ var_x25PLE_DCETable(struct variable *vp, oid * name, size_t *length, int exact, 
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLE_DCETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_x25PLE_DCETable();
+	refresh_x25PLE_DCETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(x25PLE_DCETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_x25PLE_DCETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(x25PLE_DCETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_x25PLE_DCETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -26116,7 +26399,28 @@ var_x25PLE_DCETable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
- * @fn void refresh_x25PLEIVMOTable(void)
+ * @fn void refresh_x25PLEIVMOTable_row(struct x25PLEIVMOTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the x25PLEIVMOTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct x25PLEIVMOTable_data *
+refresh_x25PLEIVMOTable_row(struct x25PLEIVMOTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->x25PLEIVMOTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->x25PLEIVMOTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_x25PLEIVMOTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the x25PLEIVMOTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -26126,28 +26430,12 @@ var_x25PLE_DCETable(struct variable *vp, oid * name, size_t *length, int exact, 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_x25PLEIVMOTable(void)
+refresh_x25PLEIVMOTable(int force)
 {
-	if (x25PLEIVMOTable_refresh == 0)
+	if (!force && x25PLEIVMOTable_refresh == 0)
 		return;
-	x25PLEIVMOTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_x25PLEIVMOTable_row(struct x25PLEIVMOTable_data *StorageTmp)
- * @brief refresh the contents of the x25PLEIVMOTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_x25PLEIVMOTable_row(struct x25PLEIVMOTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->x25PLEIVMOTable_request == sa_request)
-		return;
-	StorageTmp->x25PLEIVMOTable_request = sa_request;
+	x25PLEIVMOTable_refresh = 0;
 }
 
 /**
@@ -26165,10 +26453,11 @@ var_x25PLEIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, 
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLEIVMOTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_x25PLEIVMOTable();
+	refresh_x25PLEIVMOTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(x25PLEIVMOTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_x25PLEIVMOTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(x25PLEIVMOTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_x25PLEIVMOTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -26325,7 +26614,28 @@ var_x25PLEIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
- * @fn void refresh_x25PLEIVMO_DTETable(void)
+ * @fn void refresh_x25PLEIVMO_DTETable_row(struct x25PLEIVMO_DTETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the x25PLEIVMO_DTETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct x25PLEIVMO_DTETable_data *
+refresh_x25PLEIVMO_DTETable_row(struct x25PLEIVMO_DTETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->x25PLEIVMO_DTETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->x25PLEIVMO_DTETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_x25PLEIVMO_DTETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the x25PLEIVMO_DTETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -26335,28 +26645,12 @@ var_x25PLEIVMOTable(struct variable *vp, oid * name, size_t *length, int exact, 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_x25PLEIVMO_DTETable(void)
+refresh_x25PLEIVMO_DTETable(int force)
 {
-	if (x25PLEIVMO_DTETable_refresh == 0)
+	if (!force && x25PLEIVMO_DTETable_refresh == 0)
 		return;
-	x25PLEIVMO_DTETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_x25PLEIVMO_DTETable_row(struct x25PLEIVMO_DTETable_data *StorageTmp)
- * @brief refresh the contents of the x25PLEIVMO_DTETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_x25PLEIVMO_DTETable_row(struct x25PLEIVMO_DTETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->x25PLEIVMO_DTETable_request == sa_request)
-		return;
-	StorageTmp->x25PLEIVMO_DTETable_request = sa_request;
+	x25PLEIVMO_DTETable_refresh = 0;
 }
 
 /**
@@ -26374,10 +26668,11 @@ var_x25PLEIVMO_DTETable(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLEIVMO_DTETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_x25PLEIVMO_DTETable();
+	refresh_x25PLEIVMO_DTETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(x25PLEIVMO_DTETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_x25PLEIVMO_DTETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(x25PLEIVMO_DTETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_x25PLEIVMO_DTETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -26630,7 +26925,28 @@ var_x25PLEIVMO_DTETable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_x25PLEIVMO_DCETable(void)
+ * @fn void refresh_x25PLEIVMO_DCETable_row(struct x25PLEIVMO_DCETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the x25PLEIVMO_DCETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct x25PLEIVMO_DCETable_data *
+refresh_x25PLEIVMO_DCETable_row(struct x25PLEIVMO_DCETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->x25PLEIVMO_DCETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->x25PLEIVMO_DCETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_x25PLEIVMO_DCETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the x25PLEIVMO_DCETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -26640,28 +26956,12 @@ var_x25PLEIVMO_DTETable(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_x25PLEIVMO_DCETable(void)
+refresh_x25PLEIVMO_DCETable(int force)
 {
-	if (x25PLEIVMO_DCETable_refresh == 0)
+	if (!force && x25PLEIVMO_DCETable_refresh == 0)
 		return;
-	x25PLEIVMO_DCETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_x25PLEIVMO_DCETable_row(struct x25PLEIVMO_DCETable_data *StorageTmp)
- * @brief refresh the contents of the x25PLEIVMO_DCETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_x25PLEIVMO_DCETable_row(struct x25PLEIVMO_DCETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->x25PLEIVMO_DCETable_request == sa_request)
-		return;
-	StorageTmp->x25PLEIVMO_DCETable_request = sa_request;
+	x25PLEIVMO_DCETable_refresh = 0;
 }
 
 /**
@@ -26679,10 +26979,11 @@ var_x25PLEIVMO_DCETable(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("dlMIB", "var_x25PLEIVMO_DCETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_x25PLEIVMO_DCETable();
+	refresh_x25PLEIVMO_DCETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(x25PLEIVMO_DCETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_x25PLEIVMO_DCETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(x25PLEIVMO_DCETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_x25PLEIVMO_DCETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -26702,7 +27003,28 @@ var_x25PLEIVMO_DCETable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_virtualCallTable(void)
+ * @fn void refresh_virtualCallTable_row(struct virtualCallTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the virtualCallTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct virtualCallTable_data *
+refresh_virtualCallTable_row(struct virtualCallTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->virtualCallTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->virtualCallTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_virtualCallTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the virtualCallTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -26712,28 +27034,12 @@ var_x25PLEIVMO_DCETable(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_virtualCallTable(void)
+refresh_virtualCallTable(int force)
 {
-	if (virtualCallTable_refresh == 0)
+	if (!force && virtualCallTable_refresh == 0)
 		return;
-	virtualCallTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_virtualCallTable_row(struct virtualCallTable_data *StorageTmp)
- * @brief refresh the contents of the virtualCallTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_virtualCallTable_row(struct virtualCallTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->virtualCallTable_request == sa_request)
-		return;
-	StorageTmp->virtualCallTable_request = sa_request;
+	virtualCallTable_refresh = 0;
 }
 
 /**
@@ -26751,10 +27057,11 @@ var_virtualCallTable(struct variable *vp, oid * name, size_t *length, int exact,
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCallTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_virtualCallTable();
+	refresh_virtualCallTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(virtualCallTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_virtualCallTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(virtualCallTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_virtualCallTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -26851,7 +27158,28 @@ var_virtualCallTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
- * @fn void refresh_virtualCircuitTable(void)
+ * @fn void refresh_virtualCircuitTable_row(struct virtualCircuitTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the virtualCircuitTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct virtualCircuitTable_data *
+refresh_virtualCircuitTable_row(struct virtualCircuitTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->virtualCircuitTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->virtualCircuitTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_virtualCircuitTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the virtualCircuitTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -26861,28 +27189,12 @@ var_virtualCallTable(struct variable *vp, oid * name, size_t *length, int exact,
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_virtualCircuitTable(void)
+refresh_virtualCircuitTable(int force)
 {
-	if (virtualCircuitTable_refresh == 0)
+	if (!force && virtualCircuitTable_refresh == 0)
 		return;
-	virtualCircuitTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_virtualCircuitTable_row(struct virtualCircuitTable_data *StorageTmp)
- * @brief refresh the contents of the virtualCircuitTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_virtualCircuitTable_row(struct virtualCircuitTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->virtualCircuitTable_request == sa_request)
-		return;
-	StorageTmp->virtualCircuitTable_request = sa_request;
+	virtualCircuitTable_refresh = 0;
 }
 
 /**
@@ -26900,10 +27212,11 @@ var_virtualCircuitTable(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCircuitTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_virtualCircuitTable();
+	refresh_virtualCircuitTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(virtualCircuitTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_virtualCircuitTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(virtualCircuitTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_virtualCircuitTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -26940,7 +27253,28 @@ var_virtualCircuitTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_virtualCircuit_DTETable(void)
+ * @fn void refresh_virtualCircuit_DTETable_row(struct virtualCircuit_DTETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the virtualCircuit_DTETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct virtualCircuit_DTETable_data *
+refresh_virtualCircuit_DTETable_row(struct virtualCircuit_DTETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->virtualCircuit_DTETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->virtualCircuit_DTETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_virtualCircuit_DTETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the virtualCircuit_DTETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -26950,28 +27284,12 @@ var_virtualCircuitTable(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_virtualCircuit_DTETable(void)
+refresh_virtualCircuit_DTETable(int force)
 {
-	if (virtualCircuit_DTETable_refresh == 0)
+	if (!force && virtualCircuit_DTETable_refresh == 0)
 		return;
-	virtualCircuit_DTETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_virtualCircuit_DTETable_row(struct virtualCircuit_DTETable_data *StorageTmp)
- * @brief refresh the contents of the virtualCircuit_DTETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_virtualCircuit_DTETable_row(struct virtualCircuit_DTETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->virtualCircuit_DTETable_request == sa_request)
-		return;
-	StorageTmp->virtualCircuit_DTETable_request = sa_request;
+	virtualCircuit_DTETable_refresh = 0;
 }
 
 /**
@@ -26989,10 +27307,11 @@ var_virtualCircuit_DTETable(struct variable *vp, oid * name, size_t *length, int
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCircuit_DTETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_virtualCircuit_DTETable();
+	refresh_virtualCircuit_DTETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(virtualCircuit_DTETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_virtualCircuit_DTETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(virtualCircuit_DTETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_virtualCircuit_DTETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -27071,7 +27390,28 @@ var_virtualCircuit_DTETable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
- * @fn void refresh_virtualCircuit_DCETable(void)
+ * @fn void refresh_virtualCircuit_DCETable_row(struct virtualCircuit_DCETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the virtualCircuit_DCETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct virtualCircuit_DCETable_data *
+refresh_virtualCircuit_DCETable_row(struct virtualCircuit_DCETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->virtualCircuit_DCETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->virtualCircuit_DCETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_virtualCircuit_DCETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the virtualCircuit_DCETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -27081,28 +27421,12 @@ var_virtualCircuit_DTETable(struct variable *vp, oid * name, size_t *length, int
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_virtualCircuit_DCETable(void)
+refresh_virtualCircuit_DCETable(int force)
 {
-	if (virtualCircuit_DCETable_refresh == 0)
+	if (!force && virtualCircuit_DCETable_refresh == 0)
 		return;
-	virtualCircuit_DCETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_virtualCircuit_DCETable_row(struct virtualCircuit_DCETable_data *StorageTmp)
- * @brief refresh the contents of the virtualCircuit_DCETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_virtualCircuit_DCETable_row(struct virtualCircuit_DCETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->virtualCircuit_DCETable_request == sa_request)
-		return;
-	StorageTmp->virtualCircuit_DCETable_request = sa_request;
+	virtualCircuit_DCETable_refresh = 0;
 }
 
 /**
@@ -27120,10 +27444,11 @@ var_virtualCircuit_DCETable(struct variable *vp, oid * name, size_t *length, int
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCircuit_DCETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_virtualCircuit_DCETable();
+	refresh_virtualCircuit_DCETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(virtualCircuit_DCETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_virtualCircuit_DCETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(virtualCircuit_DCETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_virtualCircuit_DCETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -27220,7 +27545,28 @@ var_virtualCircuit_DCETable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
- * @fn void refresh_permanentVirtualCircuitTable(void)
+ * @fn void refresh_permanentVirtualCircuitTable_row(struct permanentVirtualCircuitTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the permanentVirtualCircuitTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct permanentVirtualCircuitTable_data *
+refresh_permanentVirtualCircuitTable_row(struct permanentVirtualCircuitTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->permanentVirtualCircuitTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->permanentVirtualCircuitTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_permanentVirtualCircuitTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the permanentVirtualCircuitTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -27230,28 +27576,12 @@ var_virtualCircuit_DCETable(struct variable *vp, oid * name, size_t *length, int
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_permanentVirtualCircuitTable(void)
+refresh_permanentVirtualCircuitTable(int force)
 {
-	if (permanentVirtualCircuitTable_refresh == 0)
+	if (!force && permanentVirtualCircuitTable_refresh == 0)
 		return;
-	permanentVirtualCircuitTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_permanentVirtualCircuitTable_row(struct permanentVirtualCircuitTable_data *StorageTmp)
- * @brief refresh the contents of the permanentVirtualCircuitTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_permanentVirtualCircuitTable_row(struct permanentVirtualCircuitTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->permanentVirtualCircuitTable_request == sa_request)
-		return;
-	StorageTmp->permanentVirtualCircuitTable_request = sa_request;
+	permanentVirtualCircuitTable_refresh = 0;
 }
 
 /**
@@ -27269,10 +27599,11 @@ var_permanentVirtualCircuitTable(struct variable *vp, oid * name, size_t *length
 
 	DEBUGMSGTL(("dlMIB", "var_permanentVirtualCircuitTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_permanentVirtualCircuitTable();
+	refresh_permanentVirtualCircuitTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(permanentVirtualCircuitTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_permanentVirtualCircuitTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(permanentVirtualCircuitTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_permanentVirtualCircuitTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -27298,7 +27629,28 @@ var_permanentVirtualCircuitTable(struct variable *vp, oid * name, size_t *length
 }
 
 /**
- * @fn void refresh_permanentVirtualCircuit_DTETable(void)
+ * @fn void refresh_permanentVirtualCircuit_DTETable_row(struct permanentVirtualCircuit_DTETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the permanentVirtualCircuit_DTETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct permanentVirtualCircuit_DTETable_data *
+refresh_permanentVirtualCircuit_DTETable_row(struct permanentVirtualCircuit_DTETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->permanentVirtualCircuit_DTETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->permanentVirtualCircuit_DTETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_permanentVirtualCircuit_DTETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the permanentVirtualCircuit_DTETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -27308,28 +27660,12 @@ var_permanentVirtualCircuitTable(struct variable *vp, oid * name, size_t *length
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_permanentVirtualCircuit_DTETable(void)
+refresh_permanentVirtualCircuit_DTETable(int force)
 {
-	if (permanentVirtualCircuit_DTETable_refresh == 0)
+	if (!force && permanentVirtualCircuit_DTETable_refresh == 0)
 		return;
-	permanentVirtualCircuit_DTETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_permanentVirtualCircuit_DTETable_row(struct permanentVirtualCircuit_DTETable_data *StorageTmp)
- * @brief refresh the contents of the permanentVirtualCircuit_DTETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_permanentVirtualCircuit_DTETable_row(struct permanentVirtualCircuit_DTETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->permanentVirtualCircuit_DTETable_request == sa_request)
-		return;
-	StorageTmp->permanentVirtualCircuit_DTETable_request = sa_request;
+	permanentVirtualCircuit_DTETable_refresh = 0;
 }
 
 /**
@@ -27347,10 +27683,11 @@ var_permanentVirtualCircuit_DTETable(struct variable *vp, oid * name, size_t *le
 
 	DEBUGMSGTL(("dlMIB", "var_permanentVirtualCircuit_DTETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_permanentVirtualCircuit_DTETable();
+	refresh_permanentVirtualCircuit_DTETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(permanentVirtualCircuit_DTETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_permanentVirtualCircuit_DTETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(permanentVirtualCircuit_DTETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_permanentVirtualCircuit_DTETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -27393,7 +27730,28 @@ var_permanentVirtualCircuit_DTETable(struct variable *vp, oid * name, size_t *le
 }
 
 /**
- * @fn void refresh_permanentVirtualCircuit_DCETable(void)
+ * @fn void refresh_permanentVirtualCircuit_DCETable_row(struct permanentVirtualCircuit_DCETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the permanentVirtualCircuit_DCETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct permanentVirtualCircuit_DCETable_data *
+refresh_permanentVirtualCircuit_DCETable_row(struct permanentVirtualCircuit_DCETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->permanentVirtualCircuit_DCETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->permanentVirtualCircuit_DCETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_permanentVirtualCircuit_DCETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the permanentVirtualCircuit_DCETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -27403,28 +27761,12 @@ var_permanentVirtualCircuit_DTETable(struct variable *vp, oid * name, size_t *le
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_permanentVirtualCircuit_DCETable(void)
+refresh_permanentVirtualCircuit_DCETable(int force)
 {
-	if (permanentVirtualCircuit_DCETable_refresh == 0)
+	if (!force && permanentVirtualCircuit_DCETable_refresh == 0)
 		return;
-	permanentVirtualCircuit_DCETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_permanentVirtualCircuit_DCETable_row(struct permanentVirtualCircuit_DCETable_data *StorageTmp)
- * @brief refresh the contents of the permanentVirtualCircuit_DCETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_permanentVirtualCircuit_DCETable_row(struct permanentVirtualCircuit_DCETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->permanentVirtualCircuit_DCETable_request == sa_request)
-		return;
-	StorageTmp->permanentVirtualCircuit_DCETable_request = sa_request;
+	permanentVirtualCircuit_DCETable_refresh = 0;
 }
 
 /**
@@ -27442,10 +27784,11 @@ var_permanentVirtualCircuit_DCETable(struct variable *vp, oid * name, size_t *le
 
 	DEBUGMSGTL(("dlMIB", "var_permanentVirtualCircuit_DCETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_permanentVirtualCircuit_DCETable();
+	refresh_permanentVirtualCircuit_DCETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(permanentVirtualCircuit_DCETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_permanentVirtualCircuit_DCETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(permanentVirtualCircuit_DCETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_permanentVirtualCircuit_DCETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -27512,7 +27855,28 @@ var_permanentVirtualCircuit_DCETable(struct variable *vp, oid * name, size_t *le
 }
 
 /**
- * @fn void refresh_virtualCallIVMOTable(void)
+ * @fn void refresh_virtualCallIVMOTable_row(struct virtualCallIVMOTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the virtualCallIVMOTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct virtualCallIVMOTable_data *
+refresh_virtualCallIVMOTable_row(struct virtualCallIVMOTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->virtualCallIVMOTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->virtualCallIVMOTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_virtualCallIVMOTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the virtualCallIVMOTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -27522,28 +27886,12 @@ var_permanentVirtualCircuit_DCETable(struct variable *vp, oid * name, size_t *le
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_virtualCallIVMOTable(void)
+refresh_virtualCallIVMOTable(int force)
 {
-	if (virtualCallIVMOTable_refresh == 0)
+	if (!force && virtualCallIVMOTable_refresh == 0)
 		return;
-	virtualCallIVMOTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_virtualCallIVMOTable_row(struct virtualCallIVMOTable_data *StorageTmp)
- * @brief refresh the contents of the virtualCallIVMOTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_virtualCallIVMOTable_row(struct virtualCallIVMOTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->virtualCallIVMOTable_request == sa_request)
-		return;
-	StorageTmp->virtualCallIVMOTable_request = sa_request;
+	virtualCallIVMOTable_refresh = 0;
 }
 
 /**
@@ -27561,10 +27909,11 @@ var_virtualCallIVMOTable(struct variable *vp, oid * name, size_t *length, int ex
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCallIVMOTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_virtualCallIVMOTable();
+	refresh_virtualCallIVMOTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(virtualCallIVMOTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_virtualCallIVMOTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(virtualCallIVMOTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_virtualCallIVMOTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -27703,7 +28052,28 @@ var_virtualCallIVMOTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
- * @fn void refresh_switchedVirtualCallTable(void)
+ * @fn void refresh_switchedVirtualCallTable_row(struct switchedVirtualCallTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the switchedVirtualCallTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct switchedVirtualCallTable_data *
+refresh_switchedVirtualCallTable_row(struct switchedVirtualCallTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->switchedVirtualCallTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->switchedVirtualCallTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_switchedVirtualCallTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the switchedVirtualCallTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -27713,28 +28083,12 @@ var_virtualCallIVMOTable(struct variable *vp, oid * name, size_t *length, int ex
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_switchedVirtualCallTable(void)
+refresh_switchedVirtualCallTable(int force)
 {
-	if (switchedVirtualCallTable_refresh == 0)
+	if (!force && switchedVirtualCallTable_refresh == 0)
 		return;
-	switchedVirtualCallTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_switchedVirtualCallTable_row(struct switchedVirtualCallTable_data *StorageTmp)
- * @brief refresh the contents of the switchedVirtualCallTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_switchedVirtualCallTable_row(struct switchedVirtualCallTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->switchedVirtualCallTable_request == sa_request)
-		return;
-	StorageTmp->switchedVirtualCallTable_request = sa_request;
+	switchedVirtualCallTable_refresh = 0;
 }
 
 /**
@@ -27752,10 +28106,11 @@ var_switchedVirtualCallTable(struct variable *vp, oid * name, size_t *length, in
 
 	DEBUGMSGTL(("dlMIB", "var_switchedVirtualCallTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_switchedVirtualCallTable();
+	refresh_switchedVirtualCallTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(switchedVirtualCallTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_switchedVirtualCallTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(switchedVirtualCallTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_switchedVirtualCallTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -27817,7 +28172,28 @@ var_switchedVirtualCallTable(struct variable *vp, oid * name, size_t *length, in
 }
 
 /**
- * @fn void refresh_virtualCall_DTETable(void)
+ * @fn void refresh_virtualCall_DTETable_row(struct virtualCall_DTETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the virtualCall_DTETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct virtualCall_DTETable_data *
+refresh_virtualCall_DTETable_row(struct virtualCall_DTETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->virtualCall_DTETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->virtualCall_DTETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_virtualCall_DTETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the virtualCall_DTETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -27827,28 +28203,12 @@ var_switchedVirtualCallTable(struct variable *vp, oid * name, size_t *length, in
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_virtualCall_DTETable(void)
+refresh_virtualCall_DTETable(int force)
 {
-	if (virtualCall_DTETable_refresh == 0)
+	if (!force && virtualCall_DTETable_refresh == 0)
 		return;
-	virtualCall_DTETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_virtualCall_DTETable_row(struct virtualCall_DTETable_data *StorageTmp)
- * @brief refresh the contents of the virtualCall_DTETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_virtualCall_DTETable_row(struct virtualCall_DTETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->virtualCall_DTETable_request == sa_request)
-		return;
-	StorageTmp->virtualCall_DTETable_request = sa_request;
+	virtualCall_DTETable_refresh = 0;
 }
 
 /**
@@ -27866,10 +28226,11 @@ var_virtualCall_DTETable(struct variable *vp, oid * name, size_t *length, int ex
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCall_DTETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_virtualCall_DTETable();
+	refresh_virtualCall_DTETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(virtualCall_DTETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_virtualCall_DTETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(virtualCall_DTETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_virtualCall_DTETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -27937,7 +28298,28 @@ var_virtualCall_DTETable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
- * @fn void refresh_virtualCall_DCETable(void)
+ * @fn void refresh_virtualCall_DCETable_row(struct virtualCall_DCETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the virtualCall_DCETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct virtualCall_DCETable_data *
+refresh_virtualCall_DCETable_row(struct virtualCall_DCETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->virtualCall_DCETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->virtualCall_DCETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_virtualCall_DCETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the virtualCall_DCETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -27947,28 +28329,12 @@ var_virtualCall_DTETable(struct variable *vp, oid * name, size_t *length, int ex
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_virtualCall_DCETable(void)
+refresh_virtualCall_DCETable(int force)
 {
-	if (virtualCall_DCETable_refresh == 0)
+	if (!force && virtualCall_DCETable_refresh == 0)
 		return;
-	virtualCall_DCETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_virtualCall_DCETable_row(struct virtualCall_DCETable_data *StorageTmp)
- * @brief refresh the contents of the virtualCall_DCETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_virtualCall_DCETable_row(struct virtualCall_DCETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->virtualCall_DCETable_request == sa_request)
-		return;
-	StorageTmp->virtualCall_DCETable_request = sa_request;
+	virtualCall_DCETable_refresh = 0;
 }
 
 /**
@@ -27986,10 +28352,11 @@ var_virtualCall_DCETable(struct variable *vp, oid * name, size_t *length, int ex
 
 	DEBUGMSGTL(("dlMIB", "var_virtualCall_DCETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_virtualCall_DCETable();
+	refresh_virtualCall_DCETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(virtualCall_DCETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_virtualCall_DCETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(virtualCall_DCETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_virtualCall_DCETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -28086,7 +28453,28 @@ var_virtualCall_DCETable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
- * @fn void refresh_dSeriesCountsTable(void)
+ * @fn void refresh_dSeriesCountsTable_row(struct dSeriesCountsTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the dSeriesCountsTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct dSeriesCountsTable_data *
+refresh_dSeriesCountsTable_row(struct dSeriesCountsTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->dSeriesCountsTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->dSeriesCountsTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_dSeriesCountsTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the dSeriesCountsTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -28096,28 +28484,12 @@ var_virtualCall_DCETable(struct variable *vp, oid * name, size_t *length, int ex
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_dSeriesCountsTable(void)
+refresh_dSeriesCountsTable(int force)
 {
-	if (dSeriesCountsTable_refresh == 0)
+	if (!force && dSeriesCountsTable_refresh == 0)
 		return;
-	dSeriesCountsTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_dSeriesCountsTable_row(struct dSeriesCountsTable_data *StorageTmp)
- * @brief refresh the contents of the dSeriesCountsTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_dSeriesCountsTable_row(struct dSeriesCountsTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->dSeriesCountsTable_request == sa_request)
-		return;
-	StorageTmp->dSeriesCountsTable_request = sa_request;
+	dSeriesCountsTable_refresh = 0;
 }
 
 /**
@@ -28135,10 +28507,11 @@ var_dSeriesCountsTable(struct variable *vp, oid * name, size_t *length, int exac
 
 	DEBUGMSGTL(("dlMIB", "var_dSeriesCountsTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_dSeriesCountsTable();
+	refresh_dSeriesCountsTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(dSeriesCountsTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_dSeriesCountsTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(dSeriesCountsTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_dSeriesCountsTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -28176,7 +28549,28 @@ var_dSeriesCountsTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
- * @fn void refresh_adjacencyTable(void)
+ * @fn void refresh_adjacencyTable_row(struct adjacencyTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the adjacencyTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct adjacencyTable_data *
+refresh_adjacencyTable_row(struct adjacencyTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->adjacencyTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->adjacencyTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_adjacencyTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the adjacencyTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -28186,28 +28580,12 @@ var_dSeriesCountsTable(struct variable *vp, oid * name, size_t *length, int exac
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_adjacencyTable(void)
+refresh_adjacencyTable(int force)
 {
-	if (adjacencyTable_refresh == 0)
+	if (!force && adjacencyTable_refresh == 0)
 		return;
-	adjacencyTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_adjacencyTable_row(struct adjacencyTable_data *StorageTmp)
- * @brief refresh the contents of the adjacencyTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_adjacencyTable_row(struct adjacencyTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->adjacencyTable_request == sa_request)
-		return;
-	StorageTmp->adjacencyTable_request = sa_request;
+	adjacencyTable_refresh = 0;
 }
 
 /**
@@ -28225,10 +28603,11 @@ var_adjacencyTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("dlMIB", "var_adjacencyTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_adjacencyTable();
+	refresh_adjacencyTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(adjacencyTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_adjacencyTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(adjacencyTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_adjacencyTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -28298,7 +28677,28 @@ var_adjacencyTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_virtualAdjacencyTable(void)
+ * @fn void refresh_virtualAdjacencyTable_row(struct virtualAdjacencyTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the virtualAdjacencyTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct virtualAdjacencyTable_data *
+refresh_virtualAdjacencyTable_row(struct virtualAdjacencyTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->virtualAdjacencyTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->virtualAdjacencyTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_virtualAdjacencyTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the virtualAdjacencyTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -28308,28 +28708,12 @@ var_adjacencyTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_virtualAdjacencyTable(void)
+refresh_virtualAdjacencyTable(int force)
 {
-	if (virtualAdjacencyTable_refresh == 0)
+	if (!force && virtualAdjacencyTable_refresh == 0)
 		return;
-	virtualAdjacencyTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_virtualAdjacencyTable_row(struct virtualAdjacencyTable_data *StorageTmp)
- * @brief refresh the contents of the virtualAdjacencyTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_virtualAdjacencyTable_row(struct virtualAdjacencyTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->virtualAdjacencyTable_request == sa_request)
-		return;
-	StorageTmp->virtualAdjacencyTable_request = sa_request;
+	virtualAdjacencyTable_refresh = 0;
 }
 
 /**
@@ -28347,10 +28731,11 @@ var_virtualAdjacencyTable(struct variable *vp, oid * name, size_t *length, int e
 
 	DEBUGMSGTL(("dlMIB", "var_virtualAdjacencyTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_virtualAdjacencyTable();
+	refresh_virtualAdjacencyTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(virtualAdjacencyTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_virtualAdjacencyTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(virtualAdjacencyTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_virtualAdjacencyTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -28369,7 +28754,28 @@ var_virtualAdjacencyTable(struct variable *vp, oid * name, size_t *length, int e
 }
 
 /**
- * @fn void refresh_destinationTable(void)
+ * @fn void refresh_destinationTable_row(struct destinationTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the destinationTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct destinationTable_data *
+refresh_destinationTable_row(struct destinationTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->destinationTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->destinationTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_destinationTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the destinationTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -28379,28 +28785,12 @@ var_virtualAdjacencyTable(struct variable *vp, oid * name, size_t *length, int e
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_destinationTable(void)
+refresh_destinationTable(int force)
 {
-	if (destinationTable_refresh == 0)
+	if (!force && destinationTable_refresh == 0)
 		return;
-	destinationTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_destinationTable_row(struct destinationTable_data *StorageTmp)
- * @brief refresh the contents of the destinationTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_destinationTable_row(struct destinationTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->destinationTable_request == sa_request)
-		return;
-	StorageTmp->destinationTable_request = sa_request;
+	destinationTable_refresh = 0;
 }
 
 /**
@@ -28418,10 +28808,11 @@ var_destinationTable(struct variable *vp, oid * name, size_t *length, int exact,
 
 	DEBUGMSGTL(("dlMIB", "var_destinationTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_destinationTable();
+	refresh_destinationTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(destinationTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_destinationTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(destinationTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_destinationTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -28490,7 +28881,28 @@ var_destinationTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
- * @fn void refresh_destinationSystemTable(void)
+ * @fn void refresh_destinationSystemTable_row(struct destinationSystemTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the destinationSystemTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct destinationSystemTable_data *
+refresh_destinationSystemTable_row(struct destinationSystemTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->destinationSystemTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->destinationSystemTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_destinationSystemTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the destinationSystemTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -28500,28 +28912,12 @@ var_destinationTable(struct variable *vp, oid * name, size_t *length, int exact,
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_destinationSystemTable(void)
+refresh_destinationSystemTable(int force)
 {
-	if (destinationSystemTable_refresh == 0)
+	if (!force && destinationSystemTable_refresh == 0)
 		return;
-	destinationSystemTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_destinationSystemTable_row(struct destinationSystemTable_data *StorageTmp)
- * @brief refresh the contents of the destinationSystemTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_destinationSystemTable_row(struct destinationSystemTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->destinationSystemTable_request == sa_request)
-		return;
-	StorageTmp->destinationSystemTable_request = sa_request;
+	destinationSystemTable_refresh = 0;
 }
 
 /**
@@ -28539,10 +28935,11 @@ var_destinationSystemTable(struct variable *vp, oid * name, size_t *length, int 
 
 	DEBUGMSGTL(("dlMIB", "var_destinationSystemTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_destinationSystemTable();
+	refresh_destinationSystemTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(destinationSystemTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_destinationSystemTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(destinationSystemTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_destinationSystemTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -28561,7 +28958,28 @@ var_destinationSystemTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
- * @fn void refresh_destinationAreaTable(void)
+ * @fn void refresh_destinationAreaTable_row(struct destinationAreaTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the destinationAreaTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct destinationAreaTable_data *
+refresh_destinationAreaTable_row(struct destinationAreaTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->destinationAreaTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->destinationAreaTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_destinationAreaTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the destinationAreaTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -28571,28 +28989,12 @@ var_destinationSystemTable(struct variable *vp, oid * name, size_t *length, int 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_destinationAreaTable(void)
+refresh_destinationAreaTable(int force)
 {
-	if (destinationAreaTable_refresh == 0)
+	if (!force && destinationAreaTable_refresh == 0)
 		return;
-	destinationAreaTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_destinationAreaTable_row(struct destinationAreaTable_data *StorageTmp)
- * @brief refresh the contents of the destinationAreaTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_destinationAreaTable_row(struct destinationAreaTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->destinationAreaTable_request == sa_request)
-		return;
-	StorageTmp->destinationAreaTable_request = sa_request;
+	destinationAreaTable_refresh = 0;
 }
 
 /**
@@ -28610,21 +29012,16 @@ var_destinationAreaTable(struct variable *vp, oid * name, size_t *length, int ex
 
 	DEBUGMSGTL(("dlMIB", "var_destinationAreaTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_destinationAreaTable();
+	refresh_destinationAreaTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(destinationAreaTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_destinationAreaTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(destinationAreaTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_destinationAreaTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) DESTINATIONAREAID:	/* ReadOnly */
-		if (!StorageTmp)
-			break;
-		*var_len = StorageTmp->destinationAreaIdLen;
-		rval = (u_char *) StorageTmp->destinationAreaId;
-		break;
 	default:
 		ERROR_MSG("");
 	}
@@ -28632,7 +29029,28 @@ var_destinationAreaTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
- * @fn void refresh_reachableAddressTable(void)
+ * @fn void refresh_reachableAddressTable_row(struct reachableAddressTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the reachableAddressTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct reachableAddressTable_data *
+refresh_reachableAddressTable_row(struct reachableAddressTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->reachableAddressTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->reachableAddressTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_reachableAddressTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the reachableAddressTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -28642,28 +29060,12 @@ var_destinationAreaTable(struct variable *vp, oid * name, size_t *length, int ex
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_reachableAddressTable(void)
+refresh_reachableAddressTable(int force)
 {
-	if (reachableAddressTable_refresh == 0)
+	if (!force && reachableAddressTable_refresh == 0)
 		return;
-	reachableAddressTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_reachableAddressTable_row(struct reachableAddressTable_data *StorageTmp)
- * @brief refresh the contents of the reachableAddressTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_reachableAddressTable_row(struct reachableAddressTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->reachableAddressTable_request == sa_request)
-		return;
-	StorageTmp->reachableAddressTable_request = sa_request;
+	reachableAddressTable_refresh = 0;
 }
 
 /**
@@ -28681,10 +29083,11 @@ var_reachableAddressTable(struct variable *vp, oid * name, size_t *length, int e
 
 	DEBUGMSGTL(("dlMIB", "var_reachableAddressTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_reachableAddressTable();
+	refresh_reachableAddressTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(reachableAddressTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_reachableAddressTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(reachableAddressTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_reachableAddressTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -28828,7 +29231,8 @@ write_physicalEntityPhysicalEntityTitles(int action, u_char *var_val, u_char var
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_physicalEntityPhysicalEntityTitles entering action=%d...  \n", action));
-	StorageTmp = header_complex(physicalEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(physicalEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -28890,7 +29294,8 @@ write_dataCircuitBitErrorsThreshold(int action, u_char *var_val, u_char var_val_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitBitErrorsThreshold entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -28972,7 +29377,8 @@ write_dataCircuitType(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitType entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29047,7 +29453,8 @@ write_dataCircuitPhysicalMediaNames(int action, u_char *var_val, u_char var_val_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitPhysicalMediaNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29125,7 +29532,8 @@ write_dataCircuitPhysicalInterfaceType(int action, u_char *var_val, u_char var_v
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitPhysicalInterfaceType entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29203,7 +29611,8 @@ write_dataCircuitPhysicalInterfaceStandard(int action, u_char *var_val, u_char v
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitPhysicalInterfaceStandard entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29280,7 +29689,8 @@ write_dataCircuitSynchronizationMode(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitSynchronizationMode entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29355,7 +29765,8 @@ write_dataCircuitTransmissionCoding(int action, u_char *var_val, u_char var_val_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitTransmissionCoding entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29432,7 +29843,8 @@ write_dataCircuitTransmissionMode(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitTransmissionMode entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29508,7 +29920,8 @@ write_dataCircuitTransmissionRate(int action, u_char *var_val, u_char var_val_ty
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_dataCircuitTransmissionRate entering action=%d...  \n", action));
-	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29591,7 +30004,8 @@ write_physicalConnectionEndpointIdentifier(int action, u_char *var_val, u_char v
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_physicalConnectionEndpointIdentifier entering action=%d...  \n", action));
-	StorageTmp = header_complex(physicalConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(physicalConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29668,7 +30082,8 @@ write_physicalConnectionPortNumber(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_physicalConnectionPortNumber entering action=%d...  \n", action));
-	StorageTmp = header_complex(physicalConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(physicalConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29735,7 +30150,8 @@ write_datalinkEntityProviderEntityNames(int action, u_char *var_val, u_char var_
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_datalinkEntityProviderEntityNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(datalinkEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(datalinkEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29810,7 +30226,8 @@ write_lAPBDLEmT1Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lAPBDLEmT1Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29881,7 +30298,8 @@ write_lAPBDLEmT3Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lAPBDLEmT3Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -29952,7 +30370,8 @@ write_lAPBDLEmW(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lAPBDLEmW entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30018,7 +30437,8 @@ write_lAPBDLEmXSend(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lAPBDLEmXSend entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30084,7 +30504,8 @@ write_lAPBDLEmXReceive(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lAPBDLEmXReceive entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30150,7 +30571,8 @@ write_lAPBDLEmT2Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lAPBDLEmT2Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30221,7 +30643,8 @@ write_sLPPMadministrativeState(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPPMadministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPPMTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPPMTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30296,7 +30719,8 @@ write_sLPConnectionInterfaceType(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionInterfaceType entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30370,7 +30794,8 @@ write_sLPConnectionK(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionK entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30436,7 +30861,8 @@ write_sLPConnectionN1(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionN1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30502,7 +30928,8 @@ write_sLPConnectionN2(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionN2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30568,7 +30995,8 @@ write_sLPConnectionSequenceModulus(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionSequenceModulus entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30639,7 +31067,8 @@ write_sLPConnectionT1Timer(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionT1Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30710,7 +31139,8 @@ write_sLPConnectionT2Timer(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionT2Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30781,7 +31211,8 @@ write_sLPConnectionT3Timer(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionT3Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30852,7 +31283,8 @@ write_sLPConnectionT4Timer(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionT4Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30923,7 +31355,8 @@ write_sLPConnectionAdministrativeState(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -30998,7 +31431,8 @@ write_sLPConnectionIVMOinterfaceType(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOinterfaceType entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31072,7 +31506,8 @@ write_sLPConnectionIVMOk(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOk entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31138,7 +31573,8 @@ write_sLPConnectionIVMOn1(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOn1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31204,7 +31640,8 @@ write_sLPConnectionIVMOn2(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOn2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31270,7 +31707,8 @@ write_sLPConnectionIVMOsequenceModulus(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOsequenceModulus entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31341,7 +31779,8 @@ write_sLPConnectionIVMOt1Timer(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOt1Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31412,7 +31851,8 @@ write_sLPConnectionIVMOt2Timer(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOt2Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31483,7 +31923,8 @@ write_sLPConnectionIVMOt3Timer(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOt3Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31554,7 +31995,8 @@ write_sLPConnectionIVMOt4Timer(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_sLPConnectionIVMOt4Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -31626,7 +32068,8 @@ write_lLCStationLLCName(int action, u_char *var_val, u_char var_val_type, size_t
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationLLCName entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -31691,7 +32134,8 @@ write_lLCStationSupportedServicesTypes(int action, u_char *var_val, u_char var_v
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationSupportedServicesTypes entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -31754,7 +32198,8 @@ write_lLCStationType1AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationType1AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -31811,7 +32256,8 @@ write_lLCStationType1MaximumRetryCount(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationType1MaximumRetryCount entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -31863,7 +32309,8 @@ write_lLCStationMaximumPDUN3(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationMaximumPDUN3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -31915,7 +32362,8 @@ write_lLCStationMaximumRetransmissions4(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationMaximumRetransmissions4 entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -31967,7 +32415,8 @@ write_lLCStationReceiveVariableLifetime(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationReceiveVariableLifetime entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32024,7 +32473,8 @@ write_lLCStationTransmitVariableLifetime(int action, u_char *var_val, u_char var
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationTransmitVariableLifetime entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32081,7 +32531,8 @@ write_lLCStationType3AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationType3AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32138,7 +32589,8 @@ write_lLCStationBufferSize(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationBufferSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32191,7 +32643,8 @@ write_lLCStationSTRIndicator(int action, u_char *var_val, u_char var_val_type, s
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationSTRIndicator entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32254,7 +32707,8 @@ write_lLCStationVersionNumber(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCStationVersionNumber entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32306,7 +32760,8 @@ write_rDESetupAgingEnabled(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupAgingEnabled entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32366,7 +32821,8 @@ write_rDESetupAgingValue(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupAgingValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32418,7 +32874,8 @@ write_rDESetupEnableType2Reset(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupEnableType2Reset entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32470,7 +32927,8 @@ write_rDESetupMaximumRouteDescriptors(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupMaximumRouteDescriptors entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32522,7 +32980,8 @@ write_rDESetupMaximumResponseTime(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupMaximumResponseTime entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32579,7 +33038,8 @@ write_rDESetupMinimumPDUSize(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupMinimumPDUSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32631,7 +33091,8 @@ write_rDESetupRDEHold(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupRDEHold entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32691,7 +33152,8 @@ write_rDESetupRDEReplace(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupRDEReplace entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32751,7 +33213,8 @@ write_rDESetupResetOnTestEnabled(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_rDESetupResetOnTestEnabled entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32812,7 +33275,8 @@ write_lLCConnectionlessName(int action, u_char *var_val, u_char var_val_type, si
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnectionlessName entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32876,7 +33340,8 @@ write_lLCConnectionlessMaximumLLCInformationFieldSize(int action, u_char *var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnectionlessMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32929,7 +33394,8 @@ write_lLCConnection2Name(int action, u_char *var_val, u_char var_val_type, size_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2Name entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -32993,7 +33459,8 @@ write_lLCConnection2MaximumRetransmissions(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2MaximumRetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33045,7 +33512,8 @@ write_lLCConnection2ReceivedWindowSize(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2ReceivedWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33097,7 +33565,8 @@ write_lLCConnection2SendWindowSize(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2SendWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33149,7 +33618,8 @@ write_lLCConnection2AcknowledgeTimeoutValue(int action, u_char *var_val, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33206,7 +33676,8 @@ write_lLCConnection2BusyStateTimeoutValue(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2BusyStateTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33263,7 +33734,8 @@ write_lLCConnection2PBitTimeoutValue(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2PBitTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33320,7 +33792,8 @@ write_lLCConnection2RejectTimeoutValue(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2RejectTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33378,7 +33851,8 @@ write_lLCConnection2Route(int action, u_char *var_val, u_char var_val_type, size
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2Route entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33442,7 +33916,8 @@ write_lLCConnection2KStep(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2KStep entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33494,7 +33969,8 @@ write_lLCConnection2MaxSendWindowSize(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2MaxSendWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33546,7 +34022,8 @@ write_lLCConnection2OptionalTolerationIPDUs(int action, u_char *var_val, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2OptionalTolerationIPDUs entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33606,7 +34083,8 @@ write_lLCConnection2AdministrativeState(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2AdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33668,7 +34146,8 @@ write_lLCConnection2AlarmStatus(int action, u_char *var_val, u_char var_val_type
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2AlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33731,7 +34210,8 @@ write_lLCConnection2IVMOMaximumRetransmissions(int action, u_char *var_val, u_ch
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOMaximumRetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33783,7 +34263,8 @@ write_lLCConnection2IVMOReceivedWindowSize(int action, u_char *var_val, u_char v
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOReceivedWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33835,7 +34316,8 @@ write_lLCConnection2IVMOSendWindowSize(int action, u_char *var_val, u_char var_v
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOSendWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33887,7 +34369,8 @@ write_lLCConnection2IVMOAcknowledgeTimeoutValue(int action, u_char *var_val, u_c
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOAcknowledgeTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -33944,7 +34427,8 @@ write_lLCConnection2IVMOBusyStateTimeoutValue(int action, u_char *var_val, u_cha
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOBusyStateTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34001,7 +34485,8 @@ write_lLCConnection2IVMOBitTimeoutValue(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOBitTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34058,7 +34543,8 @@ write_lLCConnection2IVMORejectTimeoutValue(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMORejectTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34115,7 +34601,8 @@ write_lLCConnection2IVMORoute(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMORoute entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34167,7 +34654,8 @@ write_lLCConnection2IVMOKStep(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOKStep entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34219,7 +34707,8 @@ write_lLCConnection2IVMOMaxSendWindowSize(int action, u_char *var_val, u_char va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOMaxSendWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34271,7 +34760,8 @@ write_lLCConnection2IVMOOptionalTolerationIPDUs(int action, u_char *var_val, u_c
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnection2IVMOOptionalTolerationIPDUs entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34331,7 +34821,8 @@ write_lLCConnectionlessAckMaximumLLCInformationFieldSize(int action, u_char *var
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnectionlessAckMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34383,7 +34874,8 @@ write_lLCConnectionlessAckMaximumRetransmissions(int action, u_char *var_val, u_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnectionlessAckMaximumRetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34435,7 +34927,8 @@ write_lLCConnectionlessAckReceiveResources(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnectionlessAckReceiveResources entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -34495,7 +34988,8 @@ write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize(int action, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -34561,7 +35055,8 @@ write_lLCConnectionlessAckIVMOMaximumRetransmissions(int action, u_char *var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_lLCConnectionlessAckIVMOMaximumRetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -34628,7 +35123,8 @@ write_networkEntityTitles(int action, u_char *var_val, u_char var_val_type, size
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_networkEntityTitles entering action=%d...  \n", action));
-	StorageTmp = header_complex(networkEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(networkEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -34706,7 +35202,8 @@ write_networkEntitySystemTypes(int action, u_char *var_val, u_char var_val_type,
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_networkEntitySystemTypes entering action=%d...  \n", action));
-	StorageTmp = header_complex(networkEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(networkEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -34783,7 +35280,8 @@ write_cLNSAdministrativeState(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_cLNSAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -34859,7 +35357,8 @@ write_cLNSSupportedProtocols(int action, u_char *var_val, u_char var_val_type, s
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_cLNSSupportedProtocols entering action=%d...  \n", action));
-	StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -34937,7 +35436,8 @@ write_cLNSOperationalSystemType(int action, u_char *var_val, u_char var_val_type
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_cLNSOperationalSystemType entering action=%d...  \n", action));
-	StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -35014,7 +35514,8 @@ write_cLNSMaximumLifetime(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_cLNSMaximumLifetime entering action=%d...  \n", action));
-	StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -35085,7 +35586,8 @@ write_cLNSEnableChecksum(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_cLNSEnableChecksum entering action=%d...  \n", action));
-	StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(cLNSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -35160,7 +35662,8 @@ write_cONSAdministrativeState(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_cONSAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(cONSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(cONSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -35236,7 +35739,8 @@ write_cONSOperationalSystemType(int action, u_char *var_val, u_char var_val_type
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_cONSOperationalSystemType entering action=%d...  \n", action));
-	StorageTmp = header_complex(cONSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(cONSTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -35314,7 +35818,8 @@ write_neighbourSNPAAddress(int action, u_char *var_val, u_char var_val_type, siz
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_neighbourSNPAAddress entering action=%d...  \n", action));
-	StorageTmp = header_complex(adjacencyTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(adjacencyTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -35393,7 +35898,8 @@ write_neighbourSystemIds(int action, u_char *var_val, u_char var_val_type, size_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_neighbourSystemIds entering action=%d...  \n", action));
-	StorageTmp = header_complex(adjacencyTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(adjacencyTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -35470,7 +35976,8 @@ write_destinationDefaultMetricPathCost(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_destinationDefaultMetricPathCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -35528,7 +36035,8 @@ write_destinationDefaultMetricOutputAdjacencies(int action, u_char *var_val, u_c
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_destinationDefaultMetricOutputAdjacencies entering action=%d...  \n", action));
-	StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -35591,7 +36099,8 @@ write_destinationDelayMetricPathCost(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_destinationDelayMetricPathCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -35649,7 +36158,8 @@ write_destinationDelayMetricOutputAdjacencies(int action, u_char *var_val, u_cha
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_destinationDelayMetricOutputAdjacencies entering action=%d...  \n", action));
-	StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -35712,7 +36222,8 @@ write_destinationExpenseMetricPathCost(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_destinationExpenseMetricPathCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -35770,7 +36281,8 @@ write_destinationExpenseMetricOutputAdjacencies(int action, u_char *var_val, u_c
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_destinationExpenseMetricOutputAdjacencies entering action=%d...  \n", action));
-	StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -35833,7 +36345,8 @@ write_destinationErrorMetricPathCost(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_destinationErrorMetricPathCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -35891,7 +36404,8 @@ write_destinationErrorMetricOutputAdjacencies(int action, u_char *var_val, u_cha
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_destinationErrorMetricOutputAdjacencies entering action=%d...  \n", action));
-	StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(destinationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -35955,7 +36469,8 @@ write_reachableAddressPrefix(int action, u_char *var_val, u_char var_val_type, s
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressPrefix entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36033,7 +36548,8 @@ write_reachableAddressMappingType(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressMappingType entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36109,7 +36625,8 @@ write_reachableAddressDefaultMetric(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressDefaultMetric entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36181,7 +36698,8 @@ write_reachableAddressDelayMetric(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressDelayMetric entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36253,7 +36771,8 @@ write_reachableAddressExpenseMetric(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressExpenseMetric entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36325,7 +36844,8 @@ write_reachableAddressErrorMetric(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressErrorMetric entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36397,7 +36917,8 @@ write_reachableAddressDefaultMetricType(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressDefaultMetricType entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36472,7 +36993,8 @@ write_reachableAddressDelayMetricType(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressDelayMetricType entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36547,7 +37069,8 @@ write_reachableAddressExpenseMetricType(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressExpenseMetricType entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36622,7 +37145,8 @@ write_reachableAddressErrorMetricType(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressErrorMetricType entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36697,7 +37221,8 @@ write_reachableAddressAdministrativeState(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36773,7 +37298,8 @@ write_reachableAddressSNPAAddresses(int action, u_char *var_val, u_char var_val_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressSNPAAddresses entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36851,7 +37377,8 @@ write_reachableAddressSNPAMask(int action, u_char *var_val, u_char var_val_type,
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressSNPAMask entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -36931,7 +37458,8 @@ write_reachableAddressSNPAPrefix(int action, u_char *var_val, u_char var_val_typ
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("dlMIB", "write_reachableAddressSNPAPrefix entering action=%d...  \n", action));
-	StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(reachableAddressTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -39326,6 +39854,23 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sapId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sapId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = physicalSAPTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -39534,6 +40079,23 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = dataCircuitTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -39747,6 +40309,31 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* connectionId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index connectionId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = physicalConnectionTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -39953,6 +40540,15 @@ write_datalinkEntityRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = datalinkEntityTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -40158,6 +40754,23 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sapId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sapId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = dLSAPTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -40361,6 +40974,15 @@ write_lAPBDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lAPBDLETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -40566,6 +41188,23 @@ write_sLPPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = sLPPMTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -40779,6 +41418,31 @@ write_sLPConnectionRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* connectionId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index connectionId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = sLPConnectionTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -40995,6 +41659,31 @@ write_sLPConnectionIVMORowStatus(int action, u_char *var_val, u_char var_val_typ
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* connectionId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index connectionId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = sLPConnectionIVMOTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -41201,6 +41890,15 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = mACDLETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -41406,6 +42104,23 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* mACId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = mACTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -41609,6 +42324,15 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lLCDLETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -41814,6 +42538,23 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* clProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index clProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lLCCLPMTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -42022,6 +42763,23 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lLCCOPMTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -42235,6 +42993,31 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* lLCConnectionlessAckIVMOName */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index lLCConnectionlessAckIVMOName: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lLCConnectionlessAckIVMOTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -42441,6 +43224,15 @@ write_networkEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = networkEntityTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -42641,6 +43433,15 @@ write_nSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* sapId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sapId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = nSAPTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -42846,6 +43647,23 @@ write_cLNSRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* clProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index clProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = cLNSTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -43054,6 +43872,23 @@ write_cLNSISISRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* clProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index clProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = cLNSISISTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -43257,6 +44092,15 @@ write_cLNSISISLevel2RowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = cLNSISISLevel2Table_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -43467,6 +44311,31 @@ write_linkageRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* protocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index protocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* linkageId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index linkageId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = linkageTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -43678,6 +44547,23 @@ write_cONSRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = cONSTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -43891,6 +44777,31 @@ write_networkConnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* coProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index coProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* connectionId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index connectionId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = networkConnectionTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -44097,6 +45008,15 @@ write_x25PLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = x25PLETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -44297,6 +45217,15 @@ write_x25PLEIVMORowStatus(int action, u_char *var_val, u_char var_val_type, size
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEIVMOId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEIVMOId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = x25PLEIVMOTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -44497,6 +45426,15 @@ write_x25PLEIVMO_DTERowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEIVMOId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEIVMOId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = x25PLEIVMO_DTETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -44697,6 +45635,15 @@ write_x25PLEIVMO_DCERowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEIVMOId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEIVMOId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = x25PLEIVMO_DCETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -44902,6 +45849,23 @@ write_permanentVirtualCircuitRowStatus(int action, u_char *var_val, u_char var_v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* virtualCallId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index virtualCallId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = permanentVirtualCircuitTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -45110,6 +46074,23 @@ write_permanentVirtualCircuit_DTERowStatus(int action, u_char *var_val, u_char v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* virtualCircuitId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index virtualCircuitId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = permanentVirtualCircuit_DTETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -45318,6 +46299,23 @@ write_permanentVirtualCircuit_DCERowStatus(int action, u_char *var_val, u_char v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* virtualCircuitId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index virtualCircuitId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = permanentVirtualCircuit_DCETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -45526,6 +46524,23 @@ write_virtualCallIVMORowStatus(int action, u_char *var_val, u_char var_val_type,
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* virtualCallIVMOId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index virtualCallIVMOId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = virtualCallIVMOTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -45734,6 +46749,23 @@ write_switchedVirtualCallRowStatus(int action, u_char *var_val, u_char var_val_t
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* virtualCallId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index virtualCallId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = switchedVirtualCallTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -45942,6 +46974,23 @@ write_virtualCall_DTERowStatus(int action, u_char *var_val, u_char var_val_type,
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* virtualCircuitId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index virtualCircuitId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = virtualCall_DTETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -46150,6 +47199,23 @@ write_virtualCall_DCERowStatus(int action, u_char *var_val, u_char var_val_type,
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* virtualCircuitId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index virtualCircuitId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = virtualCall_DCETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -46363,6 +47429,31 @@ write_dSeriesRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* x25PLEId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index x25PLEId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* virtualCircuitId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index virtualCircuitId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* dSeriesId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index dSeriesId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = dSeriesCountsTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -46584,6 +47675,39 @@ write_adjacencyRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* communicationsEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index communicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* clProtocolMachineId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index clProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* linkageId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index linkageId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* adjacencyId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index adjacencyId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = adjacencyTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -46793,6 +47917,15 @@ write_reachableAddressRowStatus(int action, u_char *var_val, u_char var_val_type
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* reachableAddressId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index reachableAddressId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = reachableAddressTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -46956,7 +48089,7 @@ send_lLCStationEvent_v2trap(struct variable_list *vars)
 #if defined MASTER
 /**
  * @fn void dlMIB_loop_handler(int dummy)
- * @param dummy signal number (always zero (0))
+ * @param sig signal number
  * @brief handle event loop interation.
  *
  * This function is registered so that, when operating as a module, snmpd will call it one per event
@@ -46970,17 +48103,25 @@ send_lLCStationEvent_v2trap(struct variable_list *vars)
  * request number but it is a temporally unique identifier for a request.
  */
 void
-dlMIB_loop_handler(int dummy)
+dlMIB_loop_handler(int sig)
 {
-	if (external_signal_scheduled[dummy] == 0)
-		external_signal_scheduled[dummy]--;
+	if (external_signal_scheduled[sig] == 0)
+		external_signal_scheduled[sig]--;
 	/* close files after each request */
-	if (sa_fclose && sa_fd != 0) {
-		close(sa_fd);
-		sa_fd = 0;
+	if (sa_fclose) {
+		if (sa_fd != 0) {
+			close(sa_fd);
+			sa_fd = 0;
+		}
+		if (my_fd != 0) {
+			close(my_fd);
+			my_fd = 0;
+		}
 	}
 	/* prepare for next request */
 	sa_request++;
+	if (dlMIBold_signal_handler != NULL)
+		(*dlMIBold_signal_handler) (sig);
 }
 #endif				/* defined MASTER */
 /**

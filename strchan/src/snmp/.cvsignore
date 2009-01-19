@@ -4,4 +4,6 @@
 *_simple.h
 *_storage.c
 *_storage.h
+*_master.c
+*_master.h
 *.tree

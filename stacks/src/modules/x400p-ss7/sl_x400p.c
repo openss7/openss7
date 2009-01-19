@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:44:51 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2009-01-19 13:31:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-16 20:44:51 $ by $Author: brian $
+ Last Modified $Date: 2009-01-19 13:31:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.57  2009-01-19 13:31:39  brian
+ - updating standalone agents
+
  Revision 0.9.2.56  2009-01-16 20:44:51  brian
  - updating mibs and agents
 
@@ -71,9 +74,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:44:51 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2009-01-19 13:31:39 $"
 
-static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:44:51 $";
+static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2009-01-19 13:31:39 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -128,7 +131,7 @@ static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2009-01-16 20:44:51 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2009-01-19 13:31:39 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -7881,29 +7884,896 @@ lmi_optmgmt_req(queue_t *q, mblk_t *mp)
  *  =========================================================================
  */
 STATIC noinline __unlikely int
+dsx_iocginfo_dflt(dsx_info_t *arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocginfo_span(struct sp *sp, dsx_info_t *arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocginfo_chan(struct sp *sp, struct xp *xp, dsx_info_t *arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocginfo_frac(struct sp *sp, struct xp *xp, dsx_info_t *arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
 dsx_iocginfo(queue_t *q, mblk_t *mp)
 {
-	return (-EOPNOTSUPP);
+	dsx_info_t *arg = (typeof(arg)) mp->b_cont->b_wptr;
+	int ret;
+
+	switch (arg->type) {
+	case DSX_OBJ_TYPE_DFLT:
+	{
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *) (&arg->info->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocginfo_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->info->dflt + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_SPAN:
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *) (&arg->info->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocginfo_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->info->span + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_CHAN:
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->info->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocginfo_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->info->chan + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_FRAC:
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->info->frac + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocginfo_frac(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->info->frac + 1);
+		break;
+	}
+	default:
+		goto einval;
+	}
+	return (ret);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+dsx_iocgoption_dflt(dsx_option_t *arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocgoption_span(struct sp *sp, dsx_option_t * arg)
+{
+	struct dsx_opt_conf_span *val = (typeof(val)) (arg + 1);
+
+	val->dsx1SendCode = DSX1SENDCODE_DSX1SENDNOCODE;
+	val->dsx1LoopbackConfig = DSX1LOOPBACKCONFIG_DSX1NOLOOP;
+	switch (sp->config.ifclock) {
+	case SDL_CLOCK_INT:
+	case SDL_CLOCK_EXT:
+	case SDL_CLOCK_MASTER:
+		val->dsx1TransmitClockSource = DSX1TRANSMITCLOCKSOURCE_LOCALTIMING;
+		break;
+	case SDL_CLOCK_LOOP:
+		val->dsx1TransmitClockSource = DSX1TRANSMITCLOCKSOURCE_LOOPTIMING;
+		break;
+	case SDL_CLOCK_SLAVE:
+		val->dsx1TransmitClockSource = DSX1TRANSMITCLOCKSOURCE_THROUGHTIMING;
+		break;
+	default:
+	case SDL_CLOCK_DPLL:
+	case SDL_CLOCK_ABR:
+	case SDL_CLOCK_SHAPER:
+	case SDL_CLOCK_TICK:
+	case SDL_CLOCK_NONE:
+		val->dsx1TransmitClockSource = DSX1TRANSMITCLOCKSOURCE_ADAPTIVE;
+		break;
+	}
+	val->dsx1Fdl = 0;
+	val->dsx1Fdl |= (1 << DSX1FDL_OTHER);
+	val->dsx1Fdl |= (1 << DSX1FDL_DSX1ANSIT1403);
+	val->dsx1Fdl |= (1 << DSX1FDL_DSX1ATT54016);
+	val->dsx1Fdl |= (1 << DSX1FDL_DSX1FDLNONE);
+	val->dsx1LineStatusChangeTrapEnable = DSX1LINESTATUSCHANGETRAPENABLE_DISABLED;
+	if (sp->config.iftxlevel & ~0x7) {
+		val->dsx1LineMode = DSX1LINEMODE_DSU;
+		val->dsx1LineLength = 0;
+		val->dsx1LineBuildOut = DSX1LINEBUILDOUT_NOTAPPLICABLE;
+		val->dsx1LineImpedance = DSX1LINEIMPEDANCE_NOTAPPLICABLE;
+	} else if (0 < sp->config.iftxlevel && sp->config.iftxlevel < 5) {
+		val->dsx1LineMode = DSX1LINEMODE_DSU;
+		val->dsx1LineBuildOut = DSX1LINEBUILDOUT_NOTAPPLICABLE;
+		if (sp->config.ifgtype != SDL_GTYPE_E1) {
+			val->dsx1LineImpedance = DSX1LINEIMPEDANCE_BALANCED100OHMS;
+			switch (sp->config.iftxlevel) {
+			case 0:
+				val->dsx1LineLength = 40;	/* 40 meters: 133ft */
+				break;
+			case 1:
+				val->dsx1LineLength = 80;	/* 80 meters: 266ft */
+				break;
+			case 2:
+				val->dsx1LineLength = 120;	/* 120 meters: 399ft */
+				break;
+			case 3:
+				val->dsx1LineLength = 160;	/* 160 meters: 533ft */
+				break;
+			case 4:
+				val->dsx1LineLength = 200;	/* 200 meters: 666ft */
+				break;
+			}
+		} else {
+			switch (sp->config.iftxlevel) {
+			case 1:
+			case 3:
+				val->dsx1LineImpedance = DSX1LINEIMPEDANCE_UNBALANCED75OHMS;
+				break;
+			case 2:
+			case 4:
+				val->dsx1LineImpedance = DSX1LINEIMPEDANCE_BALANCED120OHMS;
+				break;
+			}
+		}
+	} else {
+		val->dsx1LineLength = 0;
+		val->dsx1LineMode = DSX1LINEMODE_CSU;
+		if (sp->config.ifgtype != SDL_GTYPE_E1) {
+			val->dsx1LineImpedance = DSX1LINEIMPEDANCE_BALANCED100OHMS;
+			switch (sp->config.iftxlevel) {
+			case 0:
+				val->dsx1LineBuildOut = DSX1LINEBUILDOUT_ZERODB;
+				break;
+			case 5:
+				val->dsx1LineBuildOut = DSX1LINEBUILDOUT_NEG75DB;
+				break;
+			case 6:
+				val->dsx1LineBuildOut = DSX1LINEBUILDOUT_NEG15DB;
+				break;
+			case 7:
+				val->dsx1LineBuildOut = DSX1LINEBUILDOUT_NEG225DB;
+				break;
+			}
+		} else {
+			switch (sp->config.iftxlevel) {
+			case 0:
+			case 7:
+				val->dsx1LineImpedance = DSX1LINEIMPEDANCE_NOTAPPLICABLE;
+				break;
+			case 5:
+				val->dsx1LineImpedance = DSX1LINEIMPEDANCE_UNBALANCED75OHMS;
+				break;
+			case 6:
+				val->dsx1LineImpedance = DSX1LINEIMPEDANCE_BALANCED120OHMS;
+				break;
+			}
+		}
+	}
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocgoption_chan(struct sp *sp, struct xp *xp, dsx_option_t *arg)
+{
+	struct dsx_opt_conf_chan *val = (typeof(val)) (arg + 1);
+
+	val->dsx0TransmitCodesEnable = DSX0TRANSMITCODESENABLE_FALSE;
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocgoption_frac(struct sp *sp, struct xp *xp, dsx_option_t *arg)
+{
+	return (0);
 }
 STATIC noinline __unlikely int
 dsx_iocgoption(queue_t *q, mblk_t *mp)
 {
+	dsx_option_t *arg = (typeof(arg)) mp->b_cont->b_wptr;
+	int ret;
+
+	switch (arg->id) {
+	case DSX_OBJ_TYPE_DFLT:
+	{
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *) (&arg->option->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocgoption_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->dflt + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_SPAN:
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *) (&arg->option->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocgoption_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->span + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_CHAN:
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->option->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocgoption_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->chan + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_FRAC:
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->option->frac + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocgoption_frac(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->frac + 1);
+		break;
+	}
+	default:
+		goto einval;
+	}
+	return (ret);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+dsx_test_options_dflt(dsx_option_t * arg)
+{
+	return (0);
+
+}
+STATIC noinline __unlikely int
+dsx_test_options_span(struct sp *sp, dsx_option_t * arg)
+{
+	struct dsx_opt_conf_span *val = (typeof(val)) (arg + 1);
+
+	switch (val->dsx1SendCode) {
+	case DSX1SENDCODE_DSX1SENDNOCODE:
+		break;
+	case DSX1SENDCODE_DSX1SENDLINECODE:
+	case DSX1SENDCODE_DSX1SENDPAYLOADCODE:
+	case DSX1SENDCODE_DSX1SENDRESETCODE:
+	case DSX1SENDCODE_DSX1SENDQRS:
+	case DSX1SENDCODE_DSX1SEND511PATTERN:
+	case DSX1SENDCODE_DSX1SEND3IN24PATTERN:
+	case DSX1SENDCODE_DSX1SENDOTHERTESTPATTERN:
+		goto eopnotsupp;
+	default:
+		goto einval;
+	}
+	switch (val->dsx1LoopbackConfig) {
+	case DSX1LOOPBACKCONFIG_DSX1NOLOOP:
+		break;
+	case DSX1LOOPBACKCONFIG_DSX1PAYLOADLOOP:
+	case DSX1LOOPBACKCONFIG_DSX1LINELOOP:
+	case DSX1LOOPBACKCONFIG_DSX1OTHERLOOP:
+	case DSX1LOOPBACKCONFIG_DSX1INWARDLOOP:
+	case DSX1LOOPBACKCONFIG_DSX1DUALLOOP:
+		goto eopnotsupp;
+	default:
+		goto einval;
+	}
+	switch (val->dsx1TransmitClockSource) {
+	case DSX1TRANSMITCLOCKSOURCE_LOOPTIMING:
+	case DSX1TRANSMITCLOCKSOURCE_LOCALTIMING:
+	case DSX1TRANSMITCLOCKSOURCE_THROUGHTIMING:
+		break;
+	case DSX1TRANSMITCLOCKSOURCE_ADAPTIVE:
+		goto eopnotsupp;
+	default:
+		goto einval;
+	}
+	if (val->dsx1Fdl & (1<<DSX1FDL_OTHER))
+		goto eopnotsupp;
+	if (val->dsx1Fdl & (1<<DSX1FDL_DSX1ANSIT1403))
+		goto eopnotsupp;
+	if (val->dsx1Fdl & (1<<DSX1FDL_DSX1ATT54016))
+		goto eopnotsupp;
+	if (val->dsx1Fdl & (1<<DSX1FDL_DSX1FDLNONE))
+		goto eopnotsupp;
+	if (sp->config.ifgtype != SDL_GTYPE_E1) {
+		if (0 > val->dsx1LineLength || val->dsx1LineLength > 200)
+			goto einval;
+	}
+	switch (val->dsx1LineStatusChangeTrapEnable) {
+	case DSX1LINESTATUSCHANGETRAPENABLE_ENABLED:
+	case DSX1LINESTATUSCHANGETRAPENABLE_DISABLED:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->dsx1LineMode) {
+	case DSX1LINEMODE_CSU:
+	case DSX1LINEMODE_DSU:
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->dsx1LineBuildOut) {
+	case DSX1LINEBUILDOUT_NOTAPPLICABLE:
+		if (val->dsx1LineMode == DSX1LINEMODE_CSU && sp->config.ifgtype != SDL_GTYPE_E1)
+			goto einval;
+		break;
+	case DSX1LINEBUILDOUT_NEG75DB:
+	case DSX1LINEBUILDOUT_NEG15DB:
+	case DSX1LINEBUILDOUT_NEG225DB:
+	case DSX1LINEBUILDOUT_ZERODB:
+		if (val->dsx1LineMode != DSX1LINEMODE_CSU || sp->config.ifgtype == SDL_GTYPE_E1)
+			goto einval;
+		break;
+	default:
+		goto einval;
+	}
+	switch (val->dsx1LineImpedance) {
+	case DSX1LINEIMPEDANCE_NOTAPPLICABLE:
+		if (sp->config.iftxlevel <= 8)
+			goto einval;
+		break;
+	case DSX1LINEIMPEDANCE_BALANCED100OHMS:
+		if (sp->config.ifgtype == SDL_GTYPE_E1)
+			goto einval;
+		break;
+	case DSX1LINEIMPEDANCE_UNBALANCED75OHMS:
+	case DSX1LINEIMPEDANCE_BALANCED120OHMS:
+		if (sp->config.ifgtype != SDL_GTYPE_E1)
+			goto einval;
+		break;
+	default:
+		goto einval;
+	}
+	return (0);
+      eopnotsupp:
 	return (-EOPNOTSUPP);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+dsx_test_options_chan(struct sp *sp, struct xp *xp, dsx_option_t * arg)
+{
+	struct dsx_opt_conf_chan *val = (typeof(val)) (arg + 1);
+
+	switch (val->dsx0TransmitCodesEnable) {
+	case DSX0TRANSMITCODESENABLE_FALSE:
+		break;
+	case DSX0TRANSMITCODESENABLE_TRUE:
+		goto eopnotsupp;
+	default:
+		goto einval;
+	}
+	return (0);
+      eopnotsupp:
+	return (-EOPNOTSUPP);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+dsx_test_options_frac(struct sp *sp, struct xp *xp, dsx_option_t * arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_test_options(queue_t *q, mblk_t *mp, dsx_option_t * arg)
+{
+	int ret;
+
+	switch (arg->type) {
+	case DSX_OBJ_TYPE_DFLT:	/* defaults */
+		if ((unsigned char *) (&arg->option->dflt + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_test_options_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->dflt + 1);
+		break;
+	case DSX_OBJ_TYPE_SPAN:	/* span */
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *) (&arg->option->span + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_test_options_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->span + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_CHAN:	/* channel */
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->option->chan + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_test_options_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->chan + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_FRAC:	/* fractional */
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->option->frac + 1) > mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_test_options_frac(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->frac + 1);
+		break;
+	}
+	default:
+		goto einval;
+	}
+	return (ret);
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
+}
+STATIC noinline __unlikely int
+dsx_set_options_dflt(dsx_option_t * arg)
+{
+	if (arg->id != 0)
+		goto esrch;
+	return (0);
+esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+dsx_set_options_span(dsx_option_t * arg)
+{
+	struct sp *sp;
+	struct dsx_opt_conf_span *val = (typeof(val)) (arg + 1);
+	uint txlevel = 0, span_reconfig = 0;
+
+	if (!(sp = sp_find(arg->id)))
+		goto esrch;
+	switch (val->dsx1LoopbackConfig) {
+	case DSX1LOOPBACKCONFIG_DSX1NOLOOP:
+		if (sp->config.ifgmode & SDL_GMODE_LOC_LB) {
+			span_reconfig = 1;
+			sp->config.ifgmode &= ~SDL_GMODE_LOC_LB;
+		}
+		if (sp->config.ifgmode & SDL_GMODE_REM_LB) {
+			span_reconfig = 1;
+			sp->config.ifgmode &= ~SDL_GMODE_REM_LB;
+		}
+		break;
+	}
+	switch (val->dsx1TransmitClockSource) {
+	case DSX1TRANSMITCLOCKSOURCE_LOOPTIMING:
+		if (sp->config.ifclock != SDL_CLOCK_LOOP) {
+			span_reconfig = 1;
+			sp->config.ifclock = SDL_CLOCK_LOOP;
+		}
+		break;
+	case DSX1TRANSMITCLOCKSOURCE_LOCALTIMING:
+		if (sp->config.ifclock != SDL_CLOCK_EXT) {
+			span_reconfig = 1;
+			sp->config.ifclock = SDL_CLOCK_EXT;
+		}
+		break;
+	case DSX1TRANSMITCLOCKSOURCE_THROUGHTIMING:
+		if (sp->config.ifclock != SDL_CLOCK_INT) {
+			span_reconfig = 1;
+			sp->config.ifclock = SDL_CLOCK_INT;
+		}
+		break;
+	}
+	if (sp->config.ifgtype == SDL_GTYPE_E1) {
+		switch (val->dsx1LineImpedance) {
+		case DSX1LINEIMPEDANCE_UNBALANCED75OHMS:
+			txlevel = 1;
+			break;
+		case DSX1LINEIMPEDANCE_BALANCED120OHMS:
+			txlevel = 2;
+			break;
+		}
+	} else {
+		val->dsx1LineImpedance = DSX1LINEIMPEDANCE_BALANCED100OHMS;
+		switch (val->dsx1LineMode) {
+		case DSX1LINEMODE_DSU:
+			if (0 <= val->dsx1LineLength && val->dsx1LineLength < 40) {
+				txlevel = 0;
+			} else if (40 <= val->dsx1LineLength && val->dsx1LineLength < 80) {
+				txlevel = 1;
+			} else if (80 <= val->dsx1LineLength && val->dsx1LineLength < 120) {
+				txlevel = 2;
+			} else if (120 <= val->dsx1LineLength && val->dsx1LineLength < 160) {
+				txlevel = 3;
+			} else if (160 <= val->dsx1LineLength && val->dsx1LineLength <= 200) {
+				txlevel = 4;
+			}
+			break;
+		case DSX1LINEMODE_CSU:
+			switch (val->dsx1LineBuildOut) {
+			case DSX1LINEBUILDOUT_NOTAPPLICABLE:
+			case DSX1LINEBUILDOUT_ZERODB:
+				txlevel = 0;
+				break;
+			case DSX1LINEBUILDOUT_NEG75DB:
+				txlevel = 5;
+				break;
+			case DSX1LINEBUILDOUT_NEG15DB:
+				txlevel = 6;
+				break;
+			case DSX1LINEBUILDOUT_NEG225DB:
+				txlevel = 7;
+				break;
+			}
+			break;
+		}
+	}
+	if (sp->config.iftxlevel != txlevel) {
+		span_reconfig = 1;
+		sp->config.iftxlevel = txlevel;
+	}
+	if (span_reconfig && (sp->config.ifflags & SDL_IF_UP))
+		xp_span_reconfig(sp->cd, sp->span);
+	return (0);
+      esrch:
+	return (-ESRCH);
+}
+STATIC noinline __unlikely int
+dsx_set_options_chan(dsx_option_t * arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_set_options_frac(dsx_option_t * arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_set_options(queue_t *q, mblk_t *mp, dsx_option_t * arg)
+{
+	switch (arg->type) {
+	case DSX_OBJ_TYPE_DFLT:
+		return dsx_set_options_dflt(arg);
+	case DSX_OBJ_TYPE_SPAN:
+		return dsx_set_options_span(arg);
+	case DSX_OBJ_TYPE_CHAN:
+		return dsx_set_options_chan(arg);
+	case DSX_OBJ_TYPE_FRAC:
+		return dsx_set_options_frac(arg);
+	default:
+		goto einval;
+	}
+      einval:
+	return (-EINVAL);
 }
 STATIC noinline __unlikely int
 dsx_iocsoption(queue_t *q, mblk_t *mp)
 {
-	return (-EOPNOTSUPP);
+	dsx_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
+
+	if ((ret = dsx_test_options(q, mp, arg)))
+		return (ret);
+	return dsx_set_options(q, mp, arg);
 }
+/**
+ * dsx_ioclconfig: - list configuration input-output control
+ * @q: active queue (management stream write queue)
+ * @mp: the input-output control
+ *
+ * Lists as a number of unsigned integers the identifiers of all of the elements of a type that will
+ * fit into the buffer area.  When successful, returns the number of elements (whether they would
+ * fit into the buffer or not).
+ */
 STATIC noinline __unlikely int
 dsx_ioclconfig(queue_t *q, mblk_t *mp)
 {
-	return (-EOPNOTSUPP);
+	dsx_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	uint num = 0, *val = (typeof(val)) (arg + 1);
+	struct cd *cd;
+	struct sp *sp;
+	uint span, chan;
+
+	switch (arg->type) {
+	case DSX_OBJ_TYPE_DFLT:
+		if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+			*val = 0;
+		val++;
+		num++;
+		break;
+	case DSX_OBJ_TYPE_SPAN:
+		for (cd = x400p_cards; cd; cd = cd->next)
+			for (span = 0; span < X400_SPANS; span++, val++, num++)
+				if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+					*val = (DRV_ID << 16) | (cd->card << 12) | (span << 8);
+		break;
+	case DSX_OBJ_TYPE_CHAN:
+		for (cd = x400p_cards; cd; cd = cd->next) {
+			for (span = 0; span < X400_SPANS; span++) {
+				if ((sp = cd->spans[span])) {
+					switch (sp->config.ifgtype) {
+					case SDL_GTYPE_E1:
+						for (chan = 1; chan <= 31; chan++, val++, num++)
+							if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+								*val = (DRV_ID << 16) | (cd->card << 12) | (span << 8) | (chan << 0);
+						break;
+					case SDL_GTYPE_T1:
+					case SDL_GTYPE_J1:
+						for (chan = 1; chan <= 24; chan++, val++, num++)
+							if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+								*val = (DRV_ID << 16) | (cd->card << 12) | (span << 8) | (chan << 0);
+						break;
+					}
+				}
+			}
+		}
+		break;
+	case DSX_OBJ_TYPE_FRAC:
+		break;
+	default:
+		goto einval;
+	}
+	mp->b_cont->b_wptr = (unsigned char *) val;
+	return (num);
+      einval:
+	return (-EINVAL);
 }
+STATIC noinline __unlikely int
+dsx_iocgconfig_dflt(dsx_config_t *arg)
+{
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocgconfig_span(struct sp *sp, dsx_config_t *arg)
+{
+	struct dsx_conf_span *val = (typeof(val)) (arg + 1);
+	val->dsx1LineIndex = (DRV_ID << 16) | (sp->cd->card << 12);
+	val->dsx1IfIndex = (DRV_ID << 16) | (sp->cd->card << 12) | (sp->span << 8);
+	val->dsx1Ds1ChannelNumber = 0;
+	val->dsx1CircuitIdentifier[0] = '\0';
+	switch (sp->config.ifgtype) {
+	case SDL_GTYPE_E2:
+		val->dsx1LineType = DSX1LINETYPE_DSX1E2;
+		val->dsx1LineCoding = DSX1LINECODING_OTHER;
+		break;
+	case SDL_GTYPE_T2:
+	case SDL_GTYPE_T3:
+		val->dsx1LineType = DSX1LINETYPE_DSX1DS2M12;
+		val->dsx1LineCoding = DSX1LINECODING_DSX1B6ZS;
+		break;
+	case SDL_GTYPE_E1:
+		switch (sp->config.ifframing) {
+		case SDL_FRAMING_CAS:
+			switch (sp->config.ifgcrc) {
+			case SDL_GCRC_CRC4:
+				val->dsx1LineType = DSX1LINETYPE_DSX1E1CRCMF;
+				break;
+			case SDL_GCRC_CRC5:
+				val->dsx1LineType = DSX1LINETYPE_DSX1E1MF;
+				break;
+			}
+			break;
+		case SDL_FRAMING_CCS:
+			switch (sp->config.ifgcrc) {
+			case SDL_GCRC_CRC4:
+				val->dsx1LineType = DSX1LINETYPE_DSX1E1CRC;
+				break;
+			case SDL_GCRC_CRC5:
+				val->dsx1LineType = DSX1LINETYPE_DSX1E1;
+				break;
+			}
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		case SDL_CODING_HDB3:
+			val->dsx1LineCoding = DSX1LINECODING_DSX1HDB3;
+			break;
+		case SDL_CODING_AMI:
+			val->dsx1LineCoding = DSX1LINECODING_DSX1AMI;
+			break;
+		}
+		break;
+	case SDL_GTYPE_T1:
+		switch (sp->config.ifframing) {
+		case SDL_FRAMING_D4:
+			val->dsx1LineType = DSX1LINETYPE_DSX1D4;
+			break;
+		case SDL_FRAMING_ESF:
+			val->dsx1LineType = DSX1LINETYPE_DSX1ESF;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		case SDL_CODING_AMI:
+			val->dsx1LineCoding  = DSX1LINECODING_DSX1AMI;
+			val->dsx1SignalMode = DSX1SIGNALMODE_ROBBEDBIT;
+			break;
+		case SDL_CODING_B8ZS:
+			val->dsx1LineCoding  = DSX1LINECODING_DSX1B8ZS;
+			val->dsx1SignalMode = DSX1SIGNALMODE_NONE;
+			break;
+		case SDL_CODING_B6ZS:
+			val->dsx1LineCoding  = DSX1LINECODING_DSX1B6ZS;
+			val->dsx1SignalMode = DSX1SIGNALMODE_NONE;
+			break;
+		}
+		break;
+	case SDL_GTYPE_J1:
+		val->dsx1LineType = DSX1LINETYPE_DSX1J1ESF;
+		switch (sp->config.ifcoding) {
+		case SDL_CODING_AMI:
+			val->dsx1LineCoding  = DSX1LINECODING_DSX1AMI;
+			break;
+		case SDL_CODING_B8ZS:
+			val->dsx1LineCoding  = DSX1LINECODING_DSX1B8ZS;
+			break;
+		case SDL_CODING_B6ZS:
+			val->dsx1LineCoding  = DSX1LINECODING_DSX1B6ZS;
+			break;
+		}
+		break;
+	}
+	val->dsx1Channelization = DSX1CHANNELIZATION_ENABLEDDS0;
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocgconfig_chan(struct sp *sp, struct xp *xp, dsx_config_t *arg)
+{
+	struct dsx_conf_chan *val = (typeof(val)) (arg + 1);
+	uint iftype;
+
+	val->ifIndex = arg->id;
+	val->dsx1IfIndex = (DRV_ID << 16) | (sp->cd->card << 12) | (sp->span << 8);
+	val->dsx0Ds0ChannelNumber = arg->id & 0x1f;
+	val->dsx0CircuitIdentifier[0] = '\0';
+	iftype = xp ? xp->sdl.config.iftype : sp->config.iftype;
+	switch (iftype) {
+	case SDL_TYPE_DS0:
+		val->dsx0RobbedBitSignalling = DSX0ROBBEDBITSIGNALLING_FALSE;
+		break;
+	case SDL_TYPE_DS0A:
+		val->dsx0RobbedBitSignalling = DSX0ROBBEDBITSIGNALLING_TRUE;
+		break;
+	}
+	val->dsx0IdleCode = 0x00;
+	val->dsx0SeizedCode = 0x0f;
+	return (0);
+}
+STATIC noinline __unlikely int
+dsx_iocgconfig_frac(struct sp *sp, struct xp *xp, dsx_config_t *arg)
+{
+	return (-ESRCH);
+}
+/**
+ * dsx_iocgconfig: - get configuration information for an object
+ * @q: active queue (management stream write queue)
+ * @mp: the input-output control
+ * @arg; the configuration structure
+ */
 STATIC noinline __unlikely int
 dsx_iocgconfig(queue_t *q, mblk_t *mp)
 {
-	return (-EOPNOTSUPP);
+	dsx_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	int ret;
+
+	arg->cmd = DSX_GET;
+	switch (arg->type) {
+	case DSX_OBJ_TYPE_DFLT:
+	{
+		if (arg->id != 0)
+			goto esrch;
+		if ((unsigned char *) (&arg->config->dflt + 1) >= mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocgconfig_dflt(arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->config->dflt + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_SPAN:
+	{
+		struct sp *sp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if ((unsigned char *) (&arg->config->span + 1) >= mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocgconfig_span(sp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->config->span + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_CHAN:
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->config->chan + 1) >= mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocgconfig_chan(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->config->chan + 1);
+		break;
+	}
+	case DSX_OBJ_TYPE_FRAC:
+	{
+		struct sp *sp;
+		struct xp *xp;
+
+		if (!(sp = sp_find(arg->id)))
+			goto esrch;
+		if (IS_ERR((xp = xp_find(arg->id))))
+			goto esrch;
+		if ((unsigned char *) (&arg->config->frac + 1) >= mp->b_cont->b_wptr)
+			goto emsgsize;
+		if ((ret = dsx_iocgconfig_frac(sp, xp, arg)) >= 0)
+			mp->b_cont->b_wptr = (unsigned char *) (&arg->config->frac + 1);
+		break;
+	}
+	default:
+		goto einval;
+	}
+      emsgsize:
+	return (-EMSGSIZE);
+      esrch:
+	return (-ESRCH);
+      einval:
+	return (-EINVAL);
 }
 STATIC noinline __unlikely int
 dsx_iocsconfig(queue_t *q, mblk_t *mp)
@@ -9593,9 +10463,8 @@ mx_iocgconfig_dflt(mx_config_t *arg)
 STATIC noinline __unlikely int
 mx_iocgconfig_card(struct cd *cd, mx_config_t * arg)
 {
-	struct mx_conf_card *val;
+	struct mx_conf_card *val = (typeof(val)) (arg + 1);
 
-	val = (typeof(val)) (arg + 1);
 	val->mxCardIndex = cd->card;
 	switch (cd->config.ifgtype) {
 	case SDL_GTYPE_E1:

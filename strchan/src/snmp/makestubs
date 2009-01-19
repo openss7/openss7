@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-01-16 20:40:56 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2009-01-19 13:31:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-16 20:40:56 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 13:31:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.5  2009-01-19 13:31:55  brian
+# - updating standalone agents
+#
 # Revision 0.9.2.4  2009-01-16 20:40:56  brian
 # - working up mibs and agents
 #
@@ -72,14 +75,14 @@
 # =============================================================================
 
 MIBS=
-MIBDIRS=./mibs:/usr/share/snmp/mibs
+MIBDIRS=./mibs:/usr/share/snmp/mibs:../../../streams/src/mibs
 MIBFILES=
 
 export MIBS
 export MIBDIRS
 export MIBFILES
 
-all: storage openss7
+all: storage openss7 master
 
 check: \
 	x400pMIB.tree \
@@ -166,7 +169,9 @@ storage: \
 	ds0_storage.c ds0_storage.h \
 	ds0Bundle_storage.c ds0Bundle_storage.h \
 	ds1_storage.c ds1_storage.h \
-	ds1EXT_storage.c ds1EXT_storage.h
+	ds1EXT_storage.c ds1EXT_storage.h \
+	x400pMIB_storage.c x400pMIB_storage.h \
+	phyMIB_storage.c phyMIB_storage.h
 
 x400pMIB_storage.c x400pMIB_storage.h: MIBS=+OPENSS7-X400P-MX-MIB
 x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-X400P-MX-MIB.mib
@@ -204,9 +209,7 @@ ds1EXT_storage.c ds1EXT_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-EXT-MIB
 	indent -nhnl ds1EXT_storage.[ch]
 
 openss7: \
-	x400pMIB_openss7.c x400pMIB_openss7.h \
-	mxMIB_openss7.c mxMIB_openss7.h \
-	phyMIB_openss7.c phyMIB_openss7.h
+	mxMIB_openss7.c mxMIB_openss7.h
 
 x400pMIB_openss7.c x400pMIB_openss7.h: MIBS=+OPENSS7-X400P-MX-MIB
 x400pMIB_openss7.c x400pMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-X400P-MX-MIB.mib
@@ -250,7 +253,17 @@ tables:
 	./mib2c -c ./mib2c.storage.conf x400pChanTable
 	indent -nhnl str*Table.[ch]
 
+master: \
+	chand_master.c chand_master.h
+
+chand_master.c chand_master.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
+chand_master.c chand_master.h: mib2c mib2c.master.conf mibs/OPENSS7-MX-MIB.mib
+	./mib2c -c ./mib2c.master.conf -f chand_master mxMIB
+	indent -nhnl chand_master.[ch]
+
 clean:
+	rm -f chand_master.[ch]
+	rm -f chand_master.[ch]~
 	rm -f x400pMIB.tree
 	rm -f x400pMIB_simple.[ch]
 	rm -f x400pMIB_storage.[ch]

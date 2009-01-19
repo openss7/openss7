@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 23:39:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2009-01-19 13:31:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 13:31:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,6 +76,34 @@ test_chan_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_chan_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_chan_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+#if WITH_SNMP_AGENT
+#snmpdlmod32_LTLIBRARIES	+= mxMIB.la
+#endif
+EXTRA_LTLIBRARIES		= mxMIB.la
+
+mxMIB_la_SOURCES		= $(top_srcdir)/src/snmp/ds0Bundle.c \
+				  $(top_srcdir)/src/snmp/ds0Bundle.h \
+				  $(top_srcdir)/src/snmp/ds0.c \
+				  $(top_srcdir)/src/snmp/ds0.h \
+				  $(top_srcdir)/src/snmp/ds1EXT.c \
+				  $(top_srcdir)/src/snmp/ds1EXT.h \
+				  $(top_srcdir)/src/snmp/mxMIB.c \
+				  $(top_srcdir)/src/snmp/mxMIB.h \
+				  $(top_srcdir)/src/snmp/phyMIB.c \
+				  $(top_srcdir)/src/snmp/phyMIB.h \
+				  $(top_srcdir)/src/snmp/x400pMIB.c \
+				  $(top_srcdir)/src/snmp/x400pMIB.h \
+				  $(top_srcdir)/src/snmp/ds_agent.h \
+				  $(top_srcdir)/src/snmp/header_complex.h \
+				  $(top_srcdir)/src/snmp/mib_modules.h \
+				  $(top_srcdir)/src/snmp/struct.h \
+				  $(top_srcdir)/src/snmp/util_funcs.h
+mxMIB_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS) \
+				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
+mxMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+mxMIB_la_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
+mxMIB_la_LIBADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
+
 ## RPM_BUILD_USER
 endif
 
@@ -90,6 +118,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2009-01-19 13:31:53  brian
+# - updating standalone agents
+#
 # Revision 0.9.2.5  2008-04-28 23:39:54  brian
 # - updated headers for release
 #

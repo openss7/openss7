@@ -63,6 +63,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/agent_trap.h>
 #include <ucd-snmp/callback.h>
 #include <ucd-snmp/snmp-tc.h>
 #include <ucd-snmp/default_store.h>
@@ -140,6 +141,7 @@ extern char sa_sysctlf[256];
 extern FILE *stdlog;
 #endif				/* !defined MODULE */
 extern int sa_fclose;			/* default close files between requests */
+static int my_fd;			/* file descriptor for this MIB's use */
 extern int sa_fd;			/* file descriptor for MIB use */
 extern int sa_readfd;			/* file descriptor for autonomnous events */
 extern int sa_changed;			/* indication to reread MIB configuration */
@@ -171,13 +173,13 @@ oid sLPConnectionIVMOTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 22,
 /*
  * Oids accessible only for notify defined in this MIB.
  */
-oid fRMR_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 22, 1, 3 };
+oid fRMR_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 22, 1, 3, 1 };
 
 /*
  * Other oids defined in this MIB.
  */
 
-static const oid zeroDotZero_oid[2] = { 0, 0 };
+static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
 /*
@@ -396,6 +398,8 @@ void lapbMIB_fd_handler(int, void *);
 void
 init_lapbMIB(void)
 {
+	(void) my_fd;
+	(void) zeroDotZero_oid;
 	(void) snmpTrapOID_oid;
 	DEBUGMSGTL(("lapbMIB", "initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
@@ -424,8 +428,9 @@ init_lapbMIB(void)
 		register_exceptfd(sa_readfd, lapbMIB_fd_handler, (void *) 1);
 	}
 #if defined MASTER
-	lapbMIBold_signal_handler = external_signal_handler[0];
-	external_signal_handler[0] = &lapbMIB_loop_handler;
+	lapbMIBold_signal_handler = external_signal_handler[SIGCHLD];
+	external_signal_handler[SIGCHLD] = &lapbMIB_loop_handler;
+	external_signal_scheduled[SIGCHLD] = 1;
 #endif				/* defined MASTER */
 #endif				/* defined MODULE */
 	DEBUGMSGTL(("lapbMIB", "done.\n"));
@@ -449,7 +454,7 @@ deinit_lapbMIB(void)
 	DEBUGMSGTL(("lapbMIB", "deinitializating...  "));
 #if defined MODULE
 #if defined MASTER
-	external_signal_handler[0] = lapbMIBold_signal_handler;
+	external_signal_handler[SIGCHLD] = lapbMIBold_signal_handler;
 #endif				/* defined MASTER */
 	if (sa_readfd != 0) {
 		unregister_exceptfd(sa_readfd);
@@ -600,7 +605,7 @@ store_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct lapbMIB_data *StorageTmp;
 
 	DEBUGMSGTL(("lapbMIB", "storing data...  "));
-	refresh_lapbMIB();
+	refresh_lapbMIB(1);
 	if ((StorageTmp = lapbMIBStorage) == NULL) {
 		DEBUGMSGTL(("lapbMIB", "error.\n"));
 		return SNMPERR_GENERR;
@@ -629,7 +634,8 @@ store_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 }
 
 /**
- * @fn void refresh_lapbMIB(void)
+ * @fn void refresh_lapbMIB(int force)
+ * @param force forced refresh when non-zero.
  * @brief refresh the scalar values of lapbMIB.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -639,7 +645,7 @@ store_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg)
  * time, or after a SIGPOLL has been received (and a scalar has been requested).
  */
 void
-refresh_lapbMIB(void)
+refresh_lapbMIB(int force)
 {
 	if (lapbMIBStorage == NULL) {
 		struct lapbMIB_data *StorageNew;
@@ -649,10 +655,10 @@ refresh_lapbMIB(void)
 		lapbMIBStorage = StorageNew;
 		lapbMIB_refresh = 1;
 	}
-	if (lapbMIB_refresh == 0)
+	if (!force && lapbMIB_refresh == 0)
 		return;
-	lapbMIB_refresh = 0;
 	/* XXX: Update scalars as required here... */
+	lapbMIB_refresh = 0;
 }
 
 /**
@@ -681,7 +687,7 @@ var_lapbMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *
 	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
 	/* Refresh the MIB values if required. */
-	refresh_lapbMIB();
+	refresh_lapbMIB(0);
 	if ((StorageTmp = lapbMIBStorage) == NULL)
 		return NULL;
 	*write_method = NULL;
@@ -780,13 +786,11 @@ lAPBDLETable_create(void)
 	DEBUGMSGTL(("lAPBDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lAPBDLElocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->lAPBDLElocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->lAPBDLElocalSapNamesLen = 2;
-		}
 		StorageNew->lAPBDLEoperationalState = 0;
-		if ((StorageNew->lAPBDLEproviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->lAPBDLEproviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->lAPBDLEproviderEntityNamesLen = 2;
-		}
 		StorageNew->lAPBDLEmT1Timer = 0;
 		StorageNew->lAPBDLEmT3Timer = 0;
 		StorageNew->lAPBDLEmW = 0;
@@ -938,17 +942,20 @@ parse_lAPBDLETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lAPBDLEcommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId, &StorageTmp->lAPBDLEcommunicationsEntityIdLen);
 	if (StorageTmp->lAPBDLEcommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lAPBDLEcommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lAPBDLElocalSapNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->lAPBDLElocalSapNames, &StorageTmp->lAPBDLElocalSapNamesLen);
 	if (StorageTmp->lAPBDLElocalSapNames == NULL) {
 		config_perror("invalid specification for lAPBDLElocalSapNames");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lAPBDLEoperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->lAPBDLEproviderEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->lAPBDLEproviderEntityNames, &StorageTmp->lAPBDLEproviderEntityNamesLen);
 	if (StorageTmp->lAPBDLEproviderEntityNames == NULL) {
 		config_perror("invalid specification for lAPBDLEproviderEntityNames");
@@ -987,7 +994,7 @@ store_lAPBDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lAPBDLETable", "storing data...  "));
-	refresh_lAPBDLETable();
+	refresh_lAPBDLETable(1);
 	(void) tmpsize;
 	for (hcindex = lAPBDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lAPBDLETable_data *) hcindex->data;
@@ -1038,13 +1045,11 @@ dLSAPTable_create(void)
 	DEBUGMSGTL(("dLSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lAPBDLEcommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lAPBDLEcommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lAPBDLEcommunicationsEntityIdLen = strlen("");
-		}
 		StorageNew->dLSAPsap1Address = 0;
-		if ((StorageNew->dLSAPuserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->dLSAPuserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->dLSAPuserEntityNamesLen = 2;
-		}
 		StorageNew->dLSAPRowStatus = 0;
 		StorageNew->dLSAPRowStatus = RS_NOTREADY;
 	}
@@ -1185,17 +1190,20 @@ parse_dLSAPTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lAPBDLEcommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId, &StorageTmp->lAPBDLEcommunicationsEntityIdLen);
 	if (StorageTmp->lAPBDLEcommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lAPBDLEcommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dLSAPsapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dLSAPsapId, &StorageTmp->dLSAPsapIdLen);
 	if (StorageTmp->dLSAPsapId == NULL) {
 		config_perror("invalid specification for dLSAPsapId");
 		return;
 	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->dLSAPsap1Address, &tmpsize);
+	SNMP_FREE(StorageTmp->dLSAPuserEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->dLSAPuserEntityNames, &StorageTmp->dLSAPuserEntityNamesLen);
 	if (StorageTmp->dLSAPuserEntityNames == NULL) {
 		config_perror("invalid specification for dLSAPuserEntityNames");
@@ -1221,7 +1229,7 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("dLSAPTable", "storing data...  "));
-	refresh_dLSAPTable();
+	refresh_dLSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = dLSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dLSAPTable_data *) hcindex->data;
@@ -1259,9 +1267,8 @@ sLPPMTable_create(void)
 	DEBUGMSGTL(("sLPPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lAPBDLEcommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lAPBDLEcommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lAPBDLEcommunicationsEntityIdLen = strlen("");
-		}
 		StorageNew->sLPPMoperationalState = 0;
 		StorageNew->sLPPMadministrativeState = 0;
 		StorageNew->sLPPMRowStatus = 0;
@@ -1402,11 +1409,13 @@ parse_sLPPMTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lAPBDLEcommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lAPBDLEcommunicationsEntityId, &StorageTmp->lAPBDLEcommunicationsEntityIdLen);
 	if (StorageTmp->lAPBDLEcommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lAPBDLEcommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sLPPMcoProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPPMcoProtocolMachineId, &StorageTmp->sLPPMcoProtocolMachineIdLen);
 	if (StorageTmp->sLPPMcoProtocolMachineId == NULL) {
 		config_perror("invalid specification for sLPPMcoProtocolMachineId");
@@ -1434,7 +1443,7 @@ store_sLPPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("sLPPMTable", "storing data...  "));
-	refresh_sLPPMTable();
+	refresh_sLPPMTable(1);
 	(void) tmpsize;
 	for (hcindex = sLPPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPPMTable_data *) hcindex->data;
@@ -1511,12 +1520,10 @@ sLPConnectionTable_create(void)
 		StorageNew->sLPConnectionAdministrativeState = 0;
 		StorageNew->sLPConnectionOperationalState = 0;
 		StorageNew->sLPConnectionUsageState = 0;
-		if (memdup((u_char **) &StorageNew->sLPConnectionProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->sLPConnectionProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sLPConnectionProceduralStatusLen = 1;
-		}
-		if (memdup((u_char **) &StorageNew->sLPConnectionAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->sLPConnectionAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sLPConnectionAlarmStatusLen = 1;
-		}
 		StorageNew->sLPConnectionRowStatus = 0;
 		StorageNew->sLPConnectionRowStatus = RS_NOTREADY;
 	}
@@ -1659,16 +1666,19 @@ parse_sLPConnectionTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->sLPConnectionConnectionId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionConnectionId, &StorageTmp->sLPConnectionConnectionIdLen);
 	if (StorageTmp->sLPConnectionConnectionId == NULL) {
 		config_perror("invalid specification for sLPConnectionConnectionId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sLPConnectionUnderlyingConnectionNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sLPConnectionUnderlyingConnectionNames, &StorageTmp->sLPConnectionUnderlyingConnectionNamesLen);
 	if (StorageTmp->sLPConnectionUnderlyingConnectionNames == NULL) {
 		config_perror("invalid specification for sLPConnectionUnderlyingConnectionNames");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sLPConnectionSupportedConnectionNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sLPConnectionSupportedConnectionNames, &StorageTmp->sLPConnectionSupportedConnectionNamesLen);
 	if (StorageTmp->sLPConnectionSupportedConnectionNames == NULL) {
 		config_perror("invalid specification for sLPConnectionSupportedConnectionNames");
@@ -1709,11 +1719,13 @@ parse_sLPConnectionTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sLPConnectionUsageState, &tmpsize);
+	SNMP_FREE(StorageTmp->sLPConnectionProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sLPConnectionProceduralStatus, &StorageTmp->sLPConnectionProceduralStatusLen);
 	if (StorageTmp->sLPConnectionProceduralStatus == NULL) {
 		config_perror("invalid specification for sLPConnectionProceduralStatus");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sLPConnectionAlarmStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sLPConnectionAlarmStatus, &StorageTmp->sLPConnectionAlarmStatusLen);
 	if (StorageTmp->sLPConnectionAlarmStatus == NULL) {
 		config_perror("invalid specification for sLPConnectionAlarmStatus");
@@ -1739,7 +1751,7 @@ store_sLPConnectionTable(int majorID, int minorID, void *serverarg, void *client
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("sLPConnectionTable", "storing data...  "));
-	refresh_sLPConnectionTable();
+	refresh_sLPConnectionTable(1);
 	(void) tmpsize;
 	for (hcindex = sLPConnectionTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPConnectionTable_data *) hcindex->data;
@@ -1813,12 +1825,10 @@ sLPConnectionIVMOTable_create(void)
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sLPConnectionConnectionId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sLPConnectionConnectionId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sLPConnectionConnectionIdLen = strlen("");
-		}
-		if ((StorageNew->sLPConnectionIVMOid = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->sLPConnectionIVMOid = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sLPConnectionIVMOidLen = strlen("");
-		}
 		StorageNew->sLPConnectionIVMOinterfaceType = 0;
 		StorageNew->sLPConnectionIVMOk = 0;
 		StorageNew->sLPConnectionIVMOn1 = 0;
@@ -1964,11 +1974,13 @@ parse_sLPConnectionIVMOTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->sLPConnectionConnectionId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionConnectionId, &StorageTmp->sLPConnectionConnectionIdLen);
 	if (StorageTmp->sLPConnectionConnectionId == NULL) {
 		config_perror("invalid specification for sLPConnectionConnectionId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->sLPConnectionIVMOid);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sLPConnectionIVMOid, &StorageTmp->sLPConnectionIVMOidLen);
 	if (StorageTmp->sLPConnectionIVMOid == NULL) {
 		config_perror("invalid specification for sLPConnectionIVMOid");
@@ -2003,7 +2015,7 @@ store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("sLPConnectionIVMOTable", "storing data...  "));
-	refresh_sLPConnectionIVMOTable();
+	refresh_sLPConnectionIVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = sLPConnectionIVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct sLPConnectionIVMOTable_data *) hcindex->data;
@@ -2033,7 +2045,28 @@ store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *cl
 }
 
 /**
- * @fn void refresh_lAPBDLETable(void)
+ * @fn void refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lAPBDLETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lAPBDLETable_data *
+refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lAPBDLETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lAPBDLETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lAPBDLETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lAPBDLETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -2043,28 +2076,12 @@ store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *cl
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lAPBDLETable(void)
+refresh_lAPBDLETable(int force)
 {
-	if (lAPBDLETable_refresh == 0)
+	if (!force && lAPBDLETable_refresh == 0)
 		return;
-	lAPBDLETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp)
- * @brief refresh the contents of the lAPBDLETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lAPBDLETable_row(struct lAPBDLETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lAPBDLETable_request == sa_request)
-		return;
-	StorageTmp->lAPBDLETable_request = sa_request;
+	lAPBDLETable_refresh = 0;
 }
 
 /**
@@ -2082,10 +2099,11 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("lapbMIB", "var_lAPBDLETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lAPBDLETable();
+	refresh_lAPBDLETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lAPBDLETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lAPBDLETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lAPBDLETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lAPBDLETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -2210,7 +2228,28 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_dLSAPTable(void)
+ * @fn void refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the dLSAPTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct dLSAPTable_data *
+refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->dLSAPTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->dLSAPTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_dLSAPTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the dLSAPTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -2220,28 +2259,12 @@ var_lAPBDLETable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_dLSAPTable(void)
+refresh_dLSAPTable(int force)
 {
-	if (dLSAPTable_refresh == 0)
+	if (!force && dLSAPTable_refresh == 0)
 		return;
-	dLSAPTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
- * @brief refresh the contents of the dLSAPTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->dLSAPTable_request == sa_request)
-		return;
-	StorageTmp->dLSAPTable_request = sa_request;
+	dLSAPTable_refresh = 0;
 }
 
 /**
@@ -2259,10 +2282,11 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 
 	DEBUGMSGTL(("lapbMIB", "var_dLSAPTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_dLSAPTable();
+	refresh_dLSAPTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(dLSAPTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_dLSAPTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(dLSAPTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_dLSAPTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -2294,7 +2318,28 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 }
 
 /**
- * @fn void refresh_sLPPMTable(void)
+ * @fn void refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sLPPMTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sLPPMTable_data *
+refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sLPPMTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sLPPMTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sLPPMTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the sLPPMTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -2304,28 +2349,12 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sLPPMTable(void)
+refresh_sLPPMTable(int force)
 {
-	if (sLPPMTable_refresh == 0)
+	if (!force && sLPPMTable_refresh == 0)
 		return;
-	sLPPMTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp)
- * @brief refresh the contents of the sLPPMTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_sLPPMTable_row(struct sLPPMTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->sLPPMTable_request == sa_request)
-		return;
-	StorageTmp->sLPPMTable_request = sa_request;
+	sLPPMTable_refresh = 0;
 }
 
 /**
@@ -2343,10 +2372,11 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 
 	DEBUGMSGTL(("lapbMIB", "var_sLPPMTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sLPPMTable();
+	refresh_sLPPMTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(sLPPMTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_sLPPMTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(sLPPMTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sLPPMTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -2379,7 +2409,28 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 }
 
 /**
- * @fn void refresh_sLPConnectionTable(void)
+ * @fn void refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sLPConnectionTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sLPConnectionTable_data *
+refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sLPConnectionTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sLPConnectionTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sLPConnectionTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the sLPConnectionTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -2389,28 +2440,12 @@ var_sLPPMTable(struct variable *vp, oid * name, size_t *length, int exact, size_
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sLPConnectionTable(void)
+refresh_sLPConnectionTable(int force)
 {
-	if (sLPConnectionTable_refresh == 0)
+	if (!force && sLPConnectionTable_refresh == 0)
 		return;
-	sLPConnectionTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp)
- * @brief refresh the contents of the sLPConnectionTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_sLPConnectionTable_row(struct sLPConnectionTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->sLPConnectionTable_request == sa_request)
-		return;
-	StorageTmp->sLPConnectionTable_request = sa_request;
+	sLPConnectionTable_refresh = 0;
 }
 
 /**
@@ -2428,10 +2463,11 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 
 	DEBUGMSGTL(("lapbMIB", "var_sLPConnectionTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sLPConnectionTable();
+	refresh_sLPConnectionTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(sLPConnectionTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_sLPConnectionTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(sLPConnectionTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sLPConnectionTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -2697,7 +2733,28 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
- * @fn void refresh_sLPConnectionIVMOTable(void)
+ * @fn void refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sLPConnectionIVMOTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sLPConnectionIVMOTable_data *
+refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sLPConnectionIVMOTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sLPConnectionIVMOTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sLPConnectionIVMOTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the sLPConnectionIVMOTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -2707,28 +2764,12 @@ var_sLPConnectionTable(struct variable *vp, oid * name, size_t *length, int exac
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sLPConnectionIVMOTable(void)
+refresh_sLPConnectionIVMOTable(int force)
 {
-	if (sLPConnectionIVMOTable_refresh == 0)
+	if (!force && sLPConnectionIVMOTable_refresh == 0)
 		return;
-	sLPConnectionIVMOTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp)
- * @brief refresh the contents of the sLPConnectionIVMOTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_sLPConnectionIVMOTable_row(struct sLPConnectionIVMOTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->sLPConnectionIVMOTable_request == sa_request)
-		return;
-	StorageTmp->sLPConnectionIVMOTable_request = sa_request;
+	sLPConnectionIVMOTable_refresh = 0;
 }
 
 /**
@@ -2746,10 +2787,11 @@ var_sLPConnectionIVMOTable(struct variable *vp, oid * name, size_t *length, int 
 
 	DEBUGMSGTL(("lapbMIB", "var_sLPConnectionIVMOTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sLPConnectionIVMOTable();
+	refresh_sLPConnectionIVMOTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_sLPConnectionIVMOTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sLPConnectionIVMOTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -2858,7 +2900,8 @@ write_lAPBDLElocalSapNames(int action, u_char *var_val, u_char var_val_type, siz
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLElocalSapNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -2933,7 +2976,8 @@ write_lAPBDLEoperationalState(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEoperationalState entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3008,7 +3052,8 @@ write_lAPBDLEproviderEntityNames(int action, u_char *var_val, u_char var_val_typ
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEproviderEntityNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3083,7 +3128,8 @@ write_lAPBDLEmT1Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmT1Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3154,7 +3200,8 @@ write_lAPBDLEmT3Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmT3Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3225,7 +3272,8 @@ write_lAPBDLEmW(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmW entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3291,7 +3339,8 @@ write_lAPBDLEmXSend(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmXSend entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3357,7 +3406,8 @@ write_lAPBDLEmXReceive(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmXReceive entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3423,7 +3473,8 @@ write_lAPBDLEmT2Timer(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_lAPBDLEmT2Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lAPBDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3494,7 +3545,8 @@ write_sLPPMadministrativeState(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPPMadministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPPMTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPPMTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3570,7 +3622,8 @@ write_sLPConnectionUnderlyingConnectionNames(int action, u_char *var_val, u_char
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionUnderlyingConnectionNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3647,7 +3700,8 @@ write_sLPConnectionSupportedConnectionNames(int action, u_char *var_val, u_char 
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionSupportedConnectionNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3723,7 +3777,8 @@ write_sLPConnectionInterfaceType(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionInterfaceType entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3797,7 +3852,8 @@ write_sLPConnectionK(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionK entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3863,7 +3919,8 @@ write_sLPConnectionN1(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionN1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3929,7 +3986,8 @@ write_sLPConnectionN2(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionN2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -3995,7 +4053,8 @@ write_sLPConnectionSequenceModulus(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionSequenceModulus entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4066,7 +4125,8 @@ write_sLPConnectionT1Timer(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionT1Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4137,7 +4197,8 @@ write_sLPConnectionT2Timer(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionT2Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4208,7 +4269,8 @@ write_sLPConnectionT3Timer(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionT3Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4279,7 +4341,8 @@ write_sLPConnectionT4Timer(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionT4Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4350,7 +4413,8 @@ write_sLPConnectionAdministrativeState(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4425,7 +4489,8 @@ write_sLPConnectionIVMOinterfaceType(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOinterfaceType entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4499,7 +4564,8 @@ write_sLPConnectionIVMOk(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOk entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4565,7 +4631,8 @@ write_sLPConnectionIVMOn1(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOn1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4631,7 +4698,8 @@ write_sLPConnectionIVMOn2(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOn2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4697,7 +4765,8 @@ write_sLPConnectionIVMOsequenceModulus(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOsequenceModulus entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4768,7 +4837,8 @@ write_sLPConnectionIVMOt1Timer(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOt1Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4839,7 +4909,8 @@ write_sLPConnectionIVMOt2Timer(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOt2Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4910,7 +4981,8 @@ write_sLPConnectionIVMOt3Timer(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOt3Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -4981,7 +5053,8 @@ write_sLPConnectionIVMOt4Timer(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("lapbMIB", "write_sLPConnectionIVMOt4Timer entering action=%d...  \n", action));
-	StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(sLPConnectionIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -5687,6 +5760,14 @@ write_lAPBDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* lAPBDLEcommunicationsEntityId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index lAPBDLEcommunicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lAPBDLETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -5892,6 +5973,21 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* lAPBDLEcommunicationsEntityId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index lAPBDLEcommunicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* dLSAPsapId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index dLSAPsapId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = dLSAPTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -6100,6 +6196,21 @@ write_sLPPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* lAPBDLEcommunicationsEntityId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index lAPBDLEcommunicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sLPPMcoProtocolMachineId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sLPPMcoProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = sLPPMTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -6303,6 +6414,14 @@ write_sLPConnectionRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* sLPConnectionConnectionId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sLPConnectionConnectionId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = sLPConnectionTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -6503,6 +6622,14 @@ write_sLPConnectionIVMORowStatus(int action, u_char *var_val, u_char var_val_typ
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* sLPConnectionConnectionId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sLPConnectionConnectionId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = sLPConnectionIVMOTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -6621,7 +6748,7 @@ write_sLPConnectionIVMORowStatus(int action, u_char *var_val, u_char var_val_typ
 #if defined MASTER
 /**
  * @fn void lapbMIB_loop_handler(int dummy)
- * @param dummy signal number (always zero (0))
+ * @param sig signal number
  * @brief handle event loop interation.
  *
  * This function is registered so that, when operating as a module, snmpd will call it one per event
@@ -6635,17 +6762,25 @@ write_sLPConnectionIVMORowStatus(int action, u_char *var_val, u_char var_val_typ
  * request number but it is a temporally unique identifier for a request.
  */
 void
-lapbMIB_loop_handler(int dummy)
+lapbMIB_loop_handler(int sig)
 {
-	if (external_signal_scheduled[dummy] == 0)
-		external_signal_scheduled[dummy]--;
+	if (external_signal_scheduled[sig] == 0)
+		external_signal_scheduled[sig]--;
 	/* close files after each request */
-	if (sa_fclose && sa_fd != 0) {
-		close(sa_fd);
-		sa_fd = 0;
+	if (sa_fclose) {
+		if (sa_fd != 0) {
+			close(sa_fd);
+			sa_fd = 0;
+		}
+		if (my_fd != 0) {
+			close(my_fd);
+			my_fd = 0;
+		}
 	}
 	/* prepare for next request */
 	sa_request++;
+	if (lapbMIBold_signal_handler != NULL)
+		(*lapbMIBold_signal_handler) (sig);
 }
 #endif				/* defined MASTER */
 /**

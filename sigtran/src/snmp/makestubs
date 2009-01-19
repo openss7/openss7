@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-01-03 10:51:00 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-19 13:31:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-03 10:51:00 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 13:31:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.3  2009-01-19 13:31:38  brian
+# - updating standalone agents
+#
 # Revision 0.9.2.2  2009-01-03 10:51:00  brian
 # - updated agent
 #
@@ -87,7 +90,7 @@ export MIBS
 export MIBDIRS
 export MIBFILES
 
-all: simple storage openss7
+all: simple storage openss7 master
 
 check: \
 	m2paMIB.tree \
@@ -230,7 +233,16 @@ metricMIB_openss7.c metricMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M
 	./mib2c -c ./mib2c.openss7.conf -f metricMIB_openss7 metricMIB
 	indent -nhnl metricMIB_openss7.[ch]
 
+master: \
+	sigtrand_master.c sigtrand_master.h
+
+sigtrand_master.c sigtrand_master.h: mib2c mib2c.master.conf mibs/OPENSS7-SIGTRAN-MIB.mib
+	./mib2c -c ./mib2c.master.conf -f sigtrand_master sigtranMIB
+	indent -nhnl sigtrand_master.[ch]
+
 clean:
+	rm -f sigtrand_master.[ch]
+	rm -f sigtrand_master.[ch]~
 	rm -f m2paMIB.tree
 	rm -f m2uaAspMIB.tree
 	rm -f m2uaMIB.tree

@@ -63,6 +63,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/agent_trap.h>
 #include <ucd-snmp/callback.h>
 #include <ucd-snmp/snmp-tc.h>
 #include <ucd-snmp/default_store.h>
@@ -140,6 +141,7 @@ extern char sa_sysctlf[256];
 extern FILE *stdlog;
 #endif				/* !defined MODULE */
 extern int sa_fclose;			/* default close files between requests */
+static int my_fd;			/* file descriptor for this MIB's use */
 extern int sa_fd;			/* file descriptor for MIB use */
 extern int sa_readfd;			/* file descriptor for autonomnous events */
 extern int sa_changed;			/* indication to reread MIB configuration */
@@ -180,56 +182,56 @@ oid lLCConnectionlessAckIVMOTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591,
 /*
  * Oids for use in notifications defined in this MIB.
  */
-oid lLCConnection2Event_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 0 };
-oid lLCClessACKEvent_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 0 };
-oid lLCStationEvent_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 0 };
+oid lLCConnection2Event_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 0, 1 };
+oid lLCClessACKEvent_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 0, 2 };
+oid lLCStationEvent_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 0, 3 };
 
 /*
  * Oids accessible only for notify defined in this MIB.
  */
-oid pdusDiscarded1_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid pdusDiscarded2_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid pduRetransmissions_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid acknowledgeTimeout_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid busyStateTimeout_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid rejectTimeout_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid pBitTimeout_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid type2Violation_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid retranmissions_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid type3Violation_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid noResponse_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid pdusDiscarded_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
-oid bufferProblems_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3 };
+oid pdusDiscarded1_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 1 };
+oid pdusDiscarded2_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 2 };
+oid pduRetransmissions_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 3 };
+oid acknowledgeTimeout_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 4 };
+oid busyStateTimeout_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 5 };
+oid rejectTimeout_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 6 };
+oid pBitTimeout_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 7 };
+oid type2Violation_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 8 };
+oid retranmissions_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 9 };
+oid type3Violation_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 10 };
+oid noResponse_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 11 };
+oid pdusDiscarded_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 12 };
+oid bufferProblems_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 1, 3, 13 };
 
 /*
  * Other oids defined in this MIB.
  */
-oid macBasicMandatoryGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcBasicMandatoryGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcBasicConditionalGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcBasicStatisticsGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcBasicNotificationGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcBasicParametersGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType1MandatoryGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType1StatisticsGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType2MandatoryGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType2ConditionalGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType2StatisticsGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType2InitialValuesGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType2InitialValueDefaultsGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType2NotificationGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType2ParametersGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType2RDEConditionalGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType3MandatoryGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType3ConditionalGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType3StatisticsGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType3NotificationGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType3ParametersGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType3IntialValuesGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcType3InitialValueDefaultsGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcTmnStateGroup_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1 };
-oid llcMIBCompliance_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 2 };
-static const oid zeroDotZero_oid[2] = { 0, 0 };
+oid macBasicMandatoryGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 1 };
+oid llcBasicMandatoryGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 2 };
+oid llcBasicConditionalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 3 };
+oid llcBasicStatisticsGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 4 };
+oid llcBasicNotificationGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 5 };
+oid llcBasicParametersGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 6 };
+oid llcType1MandatoryGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 7 };
+oid llcType1StatisticsGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 8 };
+oid llcType2MandatoryGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 9 };
+oid llcType2ConditionalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 10 };
+oid llcType2StatisticsGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 11 };
+oid llcType2InitialValuesGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 12 };
+oid llcType2InitialValueDefaultsGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 13 };
+oid llcType2NotificationGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 14 };
+oid llcType2ParametersGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 15 };
+oid llcType2RDEConditionalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 16 };
+oid llcType3MandatoryGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 17 };
+oid llcType3ConditionalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 18 };
+oid llcType3StatisticsGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 19 };
+oid llcType3NotificationGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 20 };
+oid llcType3ParametersGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 21 };
+oid llcType3IntialValuesGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 22 };
+oid llcType3InitialValueDefaultsGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 23 };
+oid llcTmnStateGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 1, 25 };
+oid llcMIBCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 23, 2, 2, 1 };
+static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
 /*
@@ -669,6 +671,8 @@ void llcMIB_fd_handler(int, void *);
 void
 init_llcMIB(void)
 {
+	(void) my_fd;
+	(void) zeroDotZero_oid;
 	(void) snmpTrapOID_oid;
 	DEBUGMSGTL(("llcMIB", "initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
@@ -719,8 +723,9 @@ init_llcMIB(void)
 		register_exceptfd(sa_readfd, llcMIB_fd_handler, (void *) 1);
 	}
 #if defined MASTER
-	llcMIBold_signal_handler = external_signal_handler[0];
-	external_signal_handler[0] = &llcMIB_loop_handler;
+	llcMIBold_signal_handler = external_signal_handler[SIGCHLD];
+	external_signal_handler[SIGCHLD] = &llcMIB_loop_handler;
+	external_signal_scheduled[SIGCHLD] = 1;
 #endif				/* defined MASTER */
 #endif				/* defined MODULE */
 	DEBUGMSGTL(("llcMIB", "done.\n"));
@@ -744,7 +749,7 @@ deinit_llcMIB(void)
 	DEBUGMSGTL(("llcMIB", "deinitializating...  "));
 #if defined MODULE
 #if defined MASTER
-	external_signal_handler[0] = llcMIBold_signal_handler;
+	external_signal_handler[SIGCHLD] = llcMIBold_signal_handler;
 #endif				/* defined MASTER */
 	if (sa_readfd != 0) {
 		unregister_exceptfd(sa_readfd);
@@ -806,9 +811,8 @@ llcMIB_create(void)
 		StorageNew->lLCConnection2DefaultBusyStateTimeoutValue = 0;
 		StorageNew->lLCConnection2DefaultPBitTimeoutValue = 0;
 		StorageNew->lLCConnection2DefaultRejectTimeoutValue = 0;
-		if ((StorageNew->lLCConnection2DefaultRoute = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnection2DefaultRoute = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2DefaultRouteLen = strlen("");
-		}
 		StorageNew->lLCConnection2DefaultKStep = 0;
 		StorageNew->lLCConnection2DefaultMaxSendWindowSize = 0;
 		StorageNew->lLCConnection2DefaultOptionalTolerationIPDUs = 0;
@@ -895,6 +899,7 @@ parse_llcMIB(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2DefaultBusyStateTimeoutValue, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2DefaultPBitTimeoutValue, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2DefaultRejectTimeoutValue, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCConnection2DefaultRoute);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2DefaultRoute, &StorageTmp->lLCConnection2DefaultRouteLen);
 	if (StorageTmp->lLCConnection2DefaultRoute == NULL) {
 		config_perror("invalid specification for lLCConnection2DefaultRoute");
@@ -922,7 +927,7 @@ store_llcMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct llcMIB_data *StorageTmp;
 
 	DEBUGMSGTL(("llcMIB", "storing data...  "));
-	refresh_llcMIB();
+	refresh_llcMIB(1);
 	if ((StorageTmp = llcMIBStorage) == NULL) {
 		DEBUGMSGTL(("llcMIB", "error.\n"));
 		return SNMPERR_GENERR;
@@ -955,7 +960,8 @@ store_llcMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 }
 
 /**
- * @fn void refresh_llcMIB(void)
+ * @fn void refresh_llcMIB(int force)
+ * @param force forced refresh when non-zero.
  * @brief refresh the scalar values of llcMIB.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -965,7 +971,7 @@ store_llcMIB(int majorID, int minorID, void *serverarg, void *clientarg)
  * time, or after a SIGPOLL has been received (and a scalar has been requested).
  */
 void
-refresh_llcMIB(void)
+refresh_llcMIB(int force)
 {
 	if (llcMIBStorage == NULL) {
 		struct llcMIB_data *StorageNew;
@@ -975,10 +981,10 @@ refresh_llcMIB(void)
 		llcMIBStorage = StorageNew;
 		llcMIB_refresh = 1;
 	}
-	if (llcMIB_refresh == 0)
+	if (!force && llcMIB_refresh == 0)
 		return;
-	llcMIB_refresh = 0;
 	/* XXX: Update scalars as required here... */
+	llcMIB_refresh = 0;
 }
 
 /**
@@ -1007,7 +1013,7 @@ var_llcMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *v
 	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
 	/* Refresh the MIB values if required. */
-	refresh_llcMIB();
+	refresh_llcMIB(0);
 	if ((StorageTmp = llcMIBStorage) == NULL)
 		return NULL;
 	*write_method = NULL;
@@ -1134,13 +1140,11 @@ mACDLETable_create(void)
 	DEBUGMSGTL(("mACDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mACDLELocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->mACDLELocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->mACDLELocalSapNamesLen = 2;
-		}
 		StorageNew->mACDLEOperationalState = 0;
-		if ((StorageNew->mACDLEProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->mACDLEProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->mACDLEProviderEntityNamesLen = 2;
-		}
 		StorageNew->mACDLERowStatus = 0;
 		StorageNew->mACDLERowStatus = RS_NOTREADY;
 	}
@@ -1279,17 +1283,20 @@ parse_mACDLETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->mACDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mACDLECommunicationsEntityId, &StorageTmp->mACDLECommunicationsEntityIdLen);
 	if (StorageTmp->mACDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for mACDLECommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->mACDLELocalSapNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mACDLELocalSapNames, &StorageTmp->mACDLELocalSapNamesLen);
 	if (StorageTmp->mACDLELocalSapNames == NULL) {
 		config_perror("invalid specification for mACDLELocalSapNames");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mACDLEOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->mACDLEProviderEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mACDLEProviderEntityNames, &StorageTmp->mACDLEProviderEntityNamesLen);
 	if (StorageTmp->mACDLEProviderEntityNames == NULL) {
 		config_perror("invalid specification for mACDLEProviderEntityNames");
@@ -1315,7 +1322,7 @@ store_mACDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("mACDLETable", "storing data...  "));
-	refresh_mACDLETable();
+	refresh_mACDLETable(1);
 	(void) tmpsize;
 	for (hcindex = mACDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mACDLETable_data *) hcindex->data;
@@ -1353,9 +1360,8 @@ mACTable_create(void)
 	DEBUGMSGTL(("mACTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mACDLECommunicationsEntityIdLen = strlen("");
-		}
 		StorageNew->mACOperationalState = 0;
 		StorageNew->mACRowStatus = 0;
 		StorageNew->mACRowStatus = RS_NOTREADY;
@@ -1495,12 +1501,14 @@ parse_mACTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->mACDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mACDLECommunicationsEntityId, &StorageTmp->mACDLECommunicationsEntityIdLen);
 	if (StorageTmp->mACDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for mACDLECommunicationsEntityId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mACOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->mACId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mACId, &StorageTmp->mACIdLen);
 	if (StorageTmp->mACId == NULL) {
 		config_perror("invalid specification for mACId");
@@ -1526,7 +1534,7 @@ store_mACTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("mACTable", "storing data...  "));
-	refresh_mACTable();
+	refresh_mACTable(1);
 	(void) tmpsize;
 	for (hcindex = mACTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mACTable_data *) hcindex->data;
@@ -1563,23 +1571,18 @@ resourceTypeIdTable_create(void)
 	DEBUGMSGTL(("resourceTypeIdTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mACDLECommunicationsEntityIdLen = strlen("");
-		}
 		StorageNew->resourceTypeIdName = (uint8_t *) strdup("RTID");
 		StorageNew->resourceTypeIdNameLen = strlen("RTID");
-		if ((StorageNew->resourceInfoManufacturerOUI = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->resourceInfoManufacturerOUI = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerOUILen = strlen("");
-		}
-		if ((StorageNew->resourceInfoManufacturerName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->resourceInfoManufacturerName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerNameLen = strlen("");
-		}
-		if ((StorageNew->resourceInfoManufacturerProductName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->resourceInfoManufacturerProductName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerProductNameLen = strlen("");
-		}
-		if ((StorageNew->resourceInfoManufacturerProductVersion = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->resourceInfoManufacturerProductVersion = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerProductVersionLen = strlen("");
-		}
 
 	}
 	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
@@ -1723,31 +1726,37 @@ parse_resourceTypeIdTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->mACDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mACDLECommunicationsEntityId, &StorageTmp->mACDLECommunicationsEntityIdLen);
 	if (StorageTmp->mACDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for mACDLECommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceTypeIdName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceTypeIdName, &StorageTmp->resourceTypeIdNameLen);
 	if (StorageTmp->resourceTypeIdName == NULL) {
 		config_perror("invalid specification for resourceTypeIdName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceInfoManufacturerOUI);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceInfoManufacturerOUI, &StorageTmp->resourceInfoManufacturerOUILen);
 	if (StorageTmp->resourceInfoManufacturerOUI == NULL) {
 		config_perror("invalid specification for resourceInfoManufacturerOUI");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceInfoManufacturerName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceInfoManufacturerName, &StorageTmp->resourceInfoManufacturerNameLen);
 	if (StorageTmp->resourceInfoManufacturerName == NULL) {
 		config_perror("invalid specification for resourceInfoManufacturerName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceInfoManufacturerProductName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceInfoManufacturerProductName, &StorageTmp->resourceInfoManufacturerProductNameLen);
 	if (StorageTmp->resourceInfoManufacturerProductName == NULL) {
 		config_perror("invalid specification for resourceInfoManufacturerProductName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->resourceInfoManufacturerProductVersion);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->resourceInfoManufacturerProductVersion, &StorageTmp->resourceInfoManufacturerProductVersionLen);
 	if (StorageTmp->resourceInfoManufacturerProductVersion == NULL) {
 		config_perror("invalid specification for resourceInfoManufacturerProductVersion");
@@ -1772,7 +1781,7 @@ store_resourceTypeIdTable(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("resourceTypeIdTable", "storing data...  "));
-	refresh_resourceTypeIdTable();
+	refresh_resourceTypeIdTable(1);
 	(void) tmpsize;
 	for (hcindex = resourceTypeIdTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct resourceTypeIdTable_data *) hcindex->data;
@@ -1811,13 +1820,11 @@ dLSAPTable_create(void)
 	DEBUGMSGTL(("dLSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mACDLECommunicationsEntityIdLen = strlen("");
-		}
 		StorageNew->dLSAPSap1Address = 0;
-		if ((StorageNew->dLSAPUserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->dLSAPUserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->dLSAPUserEntityNamesLen = 2;
-		}
 		StorageNew->dLSAPRowStatus = 0;
 		StorageNew->dLSAPRowStatus = RS_NOTREADY;
 	}
@@ -1958,17 +1965,20 @@ parse_dLSAPTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->mACDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mACDLECommunicationsEntityId, &StorageTmp->mACDLECommunicationsEntityIdLen);
 	if (StorageTmp->mACDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for mACDLECommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dLSAPSapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
 	if (StorageTmp->dLSAPSapId == NULL) {
 		config_perror("invalid specification for dLSAPSapId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dLSAPSap1Address, &tmpsize);
+	SNMP_FREE(StorageTmp->dLSAPUserEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->dLSAPUserEntityNames, &StorageTmp->dLSAPUserEntityNamesLen);
 	if (StorageTmp->dLSAPUserEntityNames == NULL) {
 		config_perror("invalid specification for dLSAPUserEntityNames");
@@ -1994,7 +2004,7 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("dLSAPTable", "storing data...  "));
-	refresh_dLSAPTable();
+	refresh_dLSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = dLSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dLSAPTable_data *) hcindex->data;
@@ -2032,13 +2042,11 @@ lLCDLETable_create(void)
 	DEBUGMSGTL(("lLCDLETable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCDLELocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->lLCDLELocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->lLCDLELocalSapNamesLen = 2;
-		}
 		StorageNew->lLCDLEOperationalState = 0;
-		if ((StorageNew->lLCDLEProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->lLCDLEProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->lLCDLEProviderEntityNamesLen = 2;
-		}
 		StorageNew->lLCDLERowStatus = 0;
 		StorageNew->lLCDLERowStatus = RS_NOTREADY;
 	}
@@ -2177,17 +2185,20 @@ parse_lLCDLETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 	if (StorageTmp->lLCDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lLCDLECommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCDLELocalSapNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->lLCDLELocalSapNames, &StorageTmp->lLCDLELocalSapNamesLen);
 	if (StorageTmp->lLCDLELocalSapNames == NULL) {
 		config_perror("invalid specification for lLCDLELocalSapNames");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCDLEOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCDLEProviderEntityNames);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->lLCDLEProviderEntityNames, &StorageTmp->lLCDLEProviderEntityNamesLen);
 	if (StorageTmp->lLCDLEProviderEntityNames == NULL) {
 		config_perror("invalid specification for lLCDLEProviderEntityNames");
@@ -2213,7 +2224,7 @@ store_lLCDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCDLETable", "storing data...  "));
-	refresh_lLCDLETable();
+	refresh_lLCDLETable(1);
 	(void) tmpsize;
 	for (hcindex = lLCDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCDLETable_data *) hcindex->data;
@@ -2251,20 +2262,16 @@ lLCStationTable_create(void)
 	DEBUGMSGTL(("lLCStationTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCDLECommunicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->dLSAPSapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dLSAPSapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dLSAPSapIdLen = strlen("");
-		}
-		if ((StorageNew->lLCStationLLCName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCStationLLCName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCStationLLCNameLen = strlen("");
-		}
 		StorageNew->lLCStationMaximumLSAPsConfigured = 0;
 		StorageNew->lLCStationNumberOfActiveLSAPs = 0;
-		if (memdup((u_char **) &StorageNew->lLCStationSupportedServicesTypes, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->lLCStationSupportedServicesTypes, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->lLCStationSupportedServicesTypesLen = 1;
-		}
 		StorageNew->lLCStationStatus = 0;
 		StorageNew->lLCStationType1AcknowledgeTimeoutValue = 0;
 		StorageNew->lLCStationType1MaximumRetryCount = 0;
@@ -2280,9 +2287,8 @@ lLCStationTable_create(void)
 		StorageNew->lLCStationMaxBufferUseSize = 0;
 		StorageNew->lLCStationInactiveLSAP = 0;
 		StorageNew->lLCStationPDUsDiscard = 0;
-		if (memdup((u_char **) &StorageNew->lLCStationSTRIndicator, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->lLCStationSTRIndicator, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->lLCStationSTRIndicatorLen = 1;
-		}
 		StorageNew->lLCStationVersionNumber = 0;
 		StorageNew->lLCStationType1AcknowledgmentTimerTimeouts = 0;
 
@@ -2428,16 +2434,19 @@ parse_lLCStationTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 	if (StorageTmp->lLCDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lLCDLECommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dLSAPSapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
 	if (StorageTmp->dLSAPSapId == NULL) {
 		config_perror("invalid specification for dLSAPSapId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCStationLLCName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCStationLLCName, &StorageTmp->lLCStationLLCNameLen);
 	if (StorageTmp->lLCStationLLCName == NULL) {
 		config_perror("invalid specification for lLCStationLLCName");
@@ -2445,6 +2454,7 @@ parse_lLCStationTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCStationMaximumLSAPsConfigured, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->lLCStationNumberOfActiveLSAPs, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCStationSupportedServicesTypes);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCStationSupportedServicesTypes, &StorageTmp->lLCStationSupportedServicesTypesLen);
 	if (StorageTmp->lLCStationSupportedServicesTypes == NULL) {
 		config_perror("invalid specification for lLCStationSupportedServicesTypes");
@@ -2465,6 +2475,7 @@ parse_lLCStationTable(const char *token, char *line)
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->lLCStationMaxBufferUseSize, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCStationInactiveLSAP, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCStationPDUsDiscard, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCStationSTRIndicator);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCStationSTRIndicator, &StorageTmp->lLCStationSTRIndicatorLen);
 	if (StorageTmp->lLCStationSTRIndicator == NULL) {
 		config_perror("invalid specification for lLCStationSTRIndicator");
@@ -2491,7 +2502,7 @@ store_lLCStationTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCStationTable", "storing data...  "));
-	refresh_lLCStationTable();
+	refresh_lLCStationTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCStationTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCStationTable_data *) hcindex->data;
@@ -2548,18 +2559,14 @@ lLCSAPTable_create(void)
 	DEBUGMSGTL(("lLCSAPTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCDLECommunicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->dLSAPSapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dLSAPSapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dLSAPSapIdLen = strlen("");
-		}
-		if ((StorageNew->lLCSAPName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCSAPName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCSAPNameLen = strlen("");
-		}
-		if ((StorageNew->lLCSAPAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCSAPAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCSAPAddressLen = strlen("");
-		}
 		StorageNew->lLCSAPRDE = 0;
 
 	}
@@ -2702,21 +2709,25 @@ parse_lLCSAPTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 	if (StorageTmp->lLCDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lLCDLECommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dLSAPSapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
 	if (StorageTmp->dLSAPSapId == NULL) {
 		config_perror("invalid specification for dLSAPSapId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCSAPName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCSAPName, &StorageTmp->lLCSAPNameLen);
 	if (StorageTmp->lLCSAPName == NULL) {
 		config_perror("invalid specification for lLCSAPName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCSAPAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCSAPAddress, &StorageTmp->lLCSAPAddressLen);
 	if (StorageTmp->lLCSAPAddress == NULL) {
 		config_perror("invalid specification for lLCSAPAddress");
@@ -2742,7 +2753,7 @@ store_lLCSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCSAPTable", "storing data...  "));
-	refresh_lLCSAPTable();
+	refresh_lLCSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCSAPTable_data *) hcindex->data;
@@ -2780,12 +2791,10 @@ rDESetupTable_create(void)
 	DEBUGMSGTL(("rDESetupTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCDLECommunicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->dLSAPSapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dLSAPSapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dLSAPSapIdLen = strlen("");
-		}
 		StorageNew->rDESetupAgingEnabled = 0;
 		StorageNew->rDESetupAgingValue = 0;
 		StorageNew->rDESetupEnableType2Reset = 0;
@@ -2933,11 +2942,13 @@ parse_rDESetupTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 	if (StorageTmp->lLCDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lLCDLECommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dLSAPSapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
 	if (StorageTmp->dLSAPSapId == NULL) {
 		config_perror("invalid specification for dLSAPSapId");
@@ -2972,7 +2983,7 @@ store_rDESetupTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("rDESetupTable", "storing data...  "));
-	refresh_rDESetupTable();
+	refresh_rDESetupTable(1);
 	(void) tmpsize;
 	for (hcindex = rDESetupTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct rDESetupTable_data *) hcindex->data;
@@ -3017,18 +3028,15 @@ rDEPairTable_create(void)
 	DEBUGMSGTL(("rDEPairTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCDLECommunicationsEntityIdLen = strlen("");
-		}
-		if ((StorageNew->dLSAPSapId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->dLSAPSapId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->dLSAPSapIdLen = strlen("");
-		}
 		StorageNew->rDEPairDiscardCounter = 0;
 		StorageNew->rDEPairNSRPDUCounter = 0;
 		StorageNew->rDEPairNSRSelectedCounter = 0;
-		if ((StorageNew->rDEPairRIF = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->rDEPairRIF = (uint8_t *) strdup("")) != NULL)
 			StorageNew->rDEPairRIFLen = strlen("");
-		}
 		StorageNew->rDEPairSRFPDUCounter = 0;
 		StorageNew->rDEPairQueryCounter = 0;
 
@@ -3174,16 +3182,19 @@ parse_rDEPairTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCDLECommunicationsEntityId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 	if (StorageTmp->lLCDLECommunicationsEntityId == NULL) {
 		config_perror("invalid specification for lLCDLECommunicationsEntityId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->dLSAPSapId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
 	if (StorageTmp->dLSAPSapId == NULL) {
 		config_perror("invalid specification for dLSAPSapId");
 		return;
 	}
+	SNMP_FREE(StorageTmp->rDEPairName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->rDEPairName, &StorageTmp->rDEPairNameLen);
 	if (StorageTmp->rDEPairName == NULL) {
 		config_perror("invalid specification for rDEPairName");
@@ -3192,6 +3203,7 @@ parse_rDEPairTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->rDEPairDiscardCounter, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->rDEPairNSRPDUCounter, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->rDEPairNSRSelectedCounter, &tmpsize);
+	SNMP_FREE(StorageTmp->rDEPairRIF);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->rDEPairRIF, &StorageTmp->rDEPairRIFLen);
 	if (StorageTmp->rDEPairRIF == NULL) {
 		config_perror("invalid specification for rDEPairRIF");
@@ -3218,7 +3230,7 @@ store_rDEPairTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("rDEPairTable", "storing data...  "));
-	refresh_rDEPairTable();
+	refresh_rDEPairTable(1);
 	(void) tmpsize;
 	for (hcindex = rDEPairTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct rDEPairTable_data *) hcindex->data;
@@ -3260,9 +3272,8 @@ lLCCLPMTable_create(void)
 	DEBUGMSGTL(("lLCCLPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCCLPMClProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCCLPMClProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCCLPMClProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->lLCCLPMOperationalState = 0;
 		StorageNew->lLCCLPMTotalRemoteSAPs = 0;
 		StorageNew->lLCCLPMRowStatus = 0;
@@ -3397,6 +3408,7 @@ parse_lLCCLPMTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCCLPMClProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCCLPMClProtocolMachineId, &StorageTmp->lLCCLPMClProtocolMachineIdLen);
 	if (StorageTmp->lLCCLPMClProtocolMachineId == NULL) {
 		config_perror("invalid specification for lLCCLPMClProtocolMachineId");
@@ -3424,7 +3436,7 @@ store_lLCCLPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCCLPMTable", "storing data...  "));
-	refresh_lLCCLPMTable();
+	refresh_lLCCLPMTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCCLPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCCLPMTable_data *) hcindex->data;
@@ -3461,9 +3473,8 @@ lLCConnectionLessTable_create(void)
 	DEBUGMSGTL(("lLCConnectionLessTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCConnectionlessName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnectionlessName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnectionlessNameLen = strlen("");
-		}
 		StorageNew->lLCConnectionlessMaximumLLCInformationFieldSize = 0;
 		StorageNew->lLCConnectionlessTESTReceivedABBResponse = 0;
 		StorageNew->lLCConnectionlessTESTReceivedCommand = 0;
@@ -3608,6 +3619,7 @@ parse_lLCConnectionLessTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCConnectionlessName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnectionlessName, &StorageTmp->lLCConnectionlessNameLen);
 	if (StorageTmp->lLCConnectionlessName == NULL) {
 		config_perror("invalid specification for lLCConnectionlessName");
@@ -3645,7 +3657,7 @@ store_lLCConnectionLessTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnectionLessTable", "storing data...  "));
-	refresh_lLCConnectionLessTable();
+	refresh_lLCConnectionLessTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionLessTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnectionLessTable_data *) hcindex->data;
@@ -3692,9 +3704,8 @@ lLCCOPMTable_create(void)
 	DEBUGMSGTL(("lLCCOPMTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCCOPMCoProtocolMachineId = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCCOPMCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCCOPMCoProtocolMachineIdLen = strlen("");
-		}
 		StorageNew->lLCCOPMOperationalState = 0;
 		StorageNew->lLCCOPMRowStatus = 0;
 		StorageNew->lLCCOPMRowStatus = RS_NOTREADY;
@@ -3828,6 +3839,7 @@ parse_lLCCOPMTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCCOPMCoProtocolMachineId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
 	if (StorageTmp->lLCCOPMCoProtocolMachineId == NULL) {
 		config_perror("invalid specification for lLCCOPMCoProtocolMachineId");
@@ -3854,7 +3866,7 @@ store_lLCCOPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCCOPMTable", "storing data...  "));
-	refresh_lLCCOPMTable();
+	refresh_lLCCOPMTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCCOPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCCOPMTable_data *) hcindex->data;
@@ -3890,9 +3902,8 @@ lLCConnection2Table_create(void)
 	DEBUGMSGTL(("lLCConnection2Table", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCConnection2Name = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnection2Name = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2NameLen = strlen("");
-		}
 		StorageNew->lLCConnection2MaximumRetransmissions = 0;
 		StorageNew->lLCConnection2ReceivedWindowSize = 0;
 		StorageNew->lLCConnection2SendWindowSize = 0;
@@ -3905,9 +3916,8 @@ lLCConnection2Table_create(void)
 		StorageNew->lLCConnection2RemoteReset = 0;
 		StorageNew->lLCConnection2LocalReset = 0;
 		StorageNew->lLCConnection2ProviderReset = 0;
-		if ((StorageNew->lLCConnection2Route = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnection2Route = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2RouteLen = strlen("");
-		}
 		StorageNew->lLCConnection2KStep = 0;
 		StorageNew->lLCConnection2MaxSendWindowSize = 0;
 		StorageNew->lLCConnection2ReceivedI = 0;
@@ -3940,12 +3950,10 @@ lLCConnection2Table_create(void)
 		StorageNew->lLCConnection2AdministrativeState = 0;
 		StorageNew->lLCConnection2OperationalState = 0;
 		StorageNew->lLCConnection2UsageState = 0;
-		if (memdup((u_char **) &StorageNew->lLCConnection2ProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->lLCConnection2ProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->lLCConnection2ProceduralStatusLen = 1;
-		}
-		if (memdup((u_char **) &StorageNew->lLCConnection2AlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->lLCConnection2AlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->lLCConnection2AlarmStatusLen = 1;
-		}
 
 	}
 	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
@@ -4083,6 +4091,7 @@ parse_lLCConnection2Table(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCConnection2Name);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2Name, &StorageTmp->lLCConnection2NameLen);
 	if (StorageTmp->lLCConnection2Name == NULL) {
 		config_perror("invalid specification for lLCConnection2Name");
@@ -4100,6 +4109,7 @@ parse_lLCConnection2Table(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCConnection2RemoteReset, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCConnection2LocalReset, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCConnection2ProviderReset, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCConnection2Route);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2Route, &StorageTmp->lLCConnection2RouteLen);
 	if (StorageTmp->lLCConnection2Route == NULL) {
 		config_perror("invalid specification for lLCConnection2Route");
@@ -4137,11 +4147,13 @@ parse_lLCConnection2Table(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2AdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2OperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2UsageState, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCConnection2ProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCConnection2ProceduralStatus, &StorageTmp->lLCConnection2ProceduralStatusLen);
 	if (StorageTmp->lLCConnection2ProceduralStatus == NULL) {
 		config_perror("invalid specification for lLCConnection2ProceduralStatus");
 		return;
 	}
+	SNMP_FREE(StorageTmp->lLCConnection2AlarmStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCConnection2AlarmStatus, &StorageTmp->lLCConnection2AlarmStatusLen);
 	if (StorageTmp->lLCConnection2AlarmStatus == NULL) {
 		config_perror("invalid specification for lLCConnection2AlarmStatus");
@@ -4166,7 +4178,7 @@ store_lLCConnection2Table(int majorID, int minorID, void *serverarg, void *clien
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnection2Table", "storing data...  "));
-	refresh_lLCConnection2Table();
+	refresh_lLCConnection2Table(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnection2TableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnection2Table_data *) hcindex->data;
@@ -4247,9 +4259,8 @@ lLCConnection2IVMOTable_create(void)
 	DEBUGMSGTL(("lLCConnection2IVMOTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCConnection2IVMOName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnection2IVMOName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2IVMONameLen = strlen("");
-		}
 		StorageNew->lLCConnection2IVMOMaximumRetransmissions = 0;
 		StorageNew->lLCConnection2IVMOReceivedWindowSize = 0;
 		StorageNew->lLCConnection2IVMOSendWindowSize = 0;
@@ -4392,6 +4403,7 @@ parse_lLCConnection2IVMOTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCConnection2IVMOName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2IVMOName, &StorageTmp->lLCConnection2IVMONameLen);
 	if (StorageTmp->lLCConnection2IVMOName == NULL) {
 		config_perror("invalid specification for lLCConnection2IVMOName");
@@ -4427,7 +4439,7 @@ store_lLCConnection2IVMOTable(int majorID, int minorID, void *serverarg, void *c
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnection2IVMOTable", "storing data...  "));
-	refresh_lLCConnection2IVMOTable();
+	refresh_lLCConnection2IVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnection2IVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnection2IVMOTable_data *) hcindex->data;
@@ -4472,9 +4484,8 @@ lLCConnectionlessAckTable_create(void)
 	DEBUGMSGTL(("lLCConnectionlessAckTable", "creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCConnectionlessAckName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->lLCConnectionlessAckName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnectionlessAckNameLen = strlen("");
-		}
 		StorageNew->lLCConnectionlessAckMaximumLLCInformationFieldSize = 0;
 		StorageNew->lLCConnectionlessAckMaximumRetransmissions = 0;
 		StorageNew->lLCConnectionlessAckTESTReceivedABBResponse = 0;
@@ -4641,6 +4652,7 @@ parse_lLCConnectionlessAckTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCConnectionlessAckName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnectionlessAckName, &StorageTmp->lLCConnectionlessAckNameLen);
 	if (StorageTmp->lLCConnectionlessAckName == NULL) {
 		config_perror("invalid specification for lLCConnectionlessAckName");
@@ -4700,7 +4712,7 @@ store_lLCConnectionlessAckTable(int majorID, int minorID, void *serverarg, void 
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnectionlessAckTable", "storing data...  "));
-	refresh_lLCConnectionlessAckTable();
+	refresh_lLCConnectionlessAckTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionlessAckTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnectionlessAckTable_data *) hcindex->data;
@@ -4905,6 +4917,7 @@ parse_lLCConnectionlessAckIVMOTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCConnectionlessAckIVMOName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnectionlessAckIVMOName, &StorageTmp->lLCConnectionlessAckIVMONameLen);
 	if (StorageTmp->lLCConnectionlessAckIVMOName == NULL) {
 		config_perror("invalid specification for lLCConnectionlessAckIVMOName");
@@ -4932,7 +4945,7 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "storing data...  "));
-	refresh_lLCConnectionlessAckIVMOTable();
+	refresh_lLCConnectionlessAckIVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionlessAckIVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct lLCConnectionlessAckIVMOTable_data *) hcindex->data;
@@ -4954,7 +4967,28 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
 }
 
 /**
- * @fn void refresh_mACDLETable(void)
+ * @fn void refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the mACDLETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct mACDLETable_data *
+refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->mACDLETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->mACDLETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_mACDLETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the mACDLETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -4964,28 +4998,12 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_mACDLETable(void)
+refresh_mACDLETable(int force)
 {
-	if (mACDLETable_refresh == 0)
+	if (!force && mACDLETable_refresh == 0)
 		return;
-	mACDLETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp)
- * @brief refresh the contents of the mACDLETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_mACDLETable_row(struct mACDLETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->mACDLETable_request == sa_request)
-		return;
-	StorageTmp->mACDLETable_request = sa_request;
+	mACDLETable_refresh = 0;
 }
 
 /**
@@ -5003,10 +5021,11 @@ var_mACDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	DEBUGMSGTL(("llcMIB", "var_mACDLETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_mACDLETable();
+	refresh_mACDLETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(mACDLETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_mACDLETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(mACDLETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_mACDLETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5046,7 +5065,28 @@ var_mACDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
- * @fn void refresh_mACTable(void)
+ * @fn void refresh_mACTable_row(struct mACTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the mACTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct mACTable_data *
+refresh_mACTable_row(struct mACTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->mACTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->mACTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_mACTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the mACTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5056,28 +5096,12 @@ var_mACDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_mACTable(void)
+refresh_mACTable(int force)
 {
-	if (mACTable_refresh == 0)
+	if (!force && mACTable_refresh == 0)
 		return;
-	mACTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_mACTable_row(struct mACTable_data *StorageTmp)
- * @brief refresh the contents of the mACTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_mACTable_row(struct mACTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->mACTable_request == sa_request)
-		return;
-	StorageTmp->mACTable_request = sa_request;
+	mACTable_refresh = 0;
 }
 
 /**
@@ -5095,10 +5119,11 @@ var_mACTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 
 	DEBUGMSGTL(("llcMIB", "var_mACTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_mACTable();
+	refresh_mACTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(mACTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_mACTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(mACTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_mACTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5124,7 +5149,28 @@ var_mACTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 }
 
 /**
- * @fn void refresh_resourceTypeIdTable(void)
+ * @fn void refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the resourceTypeIdTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct resourceTypeIdTable_data *
+refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->resourceTypeIdTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->resourceTypeIdTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_resourceTypeIdTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the resourceTypeIdTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5134,28 +5180,12 @@ var_mACTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_resourceTypeIdTable(void)
+refresh_resourceTypeIdTable(int force)
 {
-	if (resourceTypeIdTable_refresh == 0)
+	if (!force && resourceTypeIdTable_refresh == 0)
 		return;
-	resourceTypeIdTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp)
- * @brief refresh the contents of the resourceTypeIdTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_resourceTypeIdTable_row(struct resourceTypeIdTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->resourceTypeIdTable_request == sa_request)
-		return;
-	StorageTmp->resourceTypeIdTable_request = sa_request;
+	resourceTypeIdTable_refresh = 0;
 }
 
 /**
@@ -5173,10 +5203,11 @@ var_resourceTypeIdTable(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("llcMIB", "var_resourceTypeIdTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_resourceTypeIdTable();
+	refresh_resourceTypeIdTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(resourceTypeIdTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_resourceTypeIdTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(resourceTypeIdTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_resourceTypeIdTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5219,7 +5250,28 @@ var_resourceTypeIdTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_dLSAPTable(void)
+ * @fn void refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the dLSAPTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct dLSAPTable_data *
+refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->dLSAPTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->dLSAPTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_dLSAPTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the dLSAPTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5229,28 +5281,12 @@ var_resourceTypeIdTable(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_dLSAPTable(void)
+refresh_dLSAPTable(int force)
 {
-	if (dLSAPTable_refresh == 0)
+	if (!force && dLSAPTable_refresh == 0)
 		return;
-	dLSAPTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
- * @brief refresh the contents of the dLSAPTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_dLSAPTable_row(struct dLSAPTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->dLSAPTable_request == sa_request)
-		return;
-	StorageTmp->dLSAPTable_request = sa_request;
+	dLSAPTable_refresh = 0;
 }
 
 /**
@@ -5268,10 +5304,11 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 
 	DEBUGMSGTL(("llcMIB", "var_dLSAPTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_dLSAPTable();
+	refresh_dLSAPTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(dLSAPTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_dLSAPTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(dLSAPTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_dLSAPTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5305,7 +5342,28 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 }
 
 /**
- * @fn void refresh_lLCDLETable(void)
+ * @fn void refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCDLETable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCDLETable_data *
+refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCDLETable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCDLETable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCDLETable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCDLETable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5315,28 +5373,12 @@ var_dLSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size_
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCDLETable(void)
+refresh_lLCDLETable(int force)
 {
-	if (lLCDLETable_refresh == 0)
+	if (!force && lLCDLETable_refresh == 0)
 		return;
-	lLCDLETable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp)
- * @brief refresh the contents of the lLCDLETable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCDLETable_row(struct lLCDLETable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCDLETable_request == sa_request)
-		return;
-	StorageTmp->lLCDLETable_request = sa_request;
+	lLCDLETable_refresh = 0;
 }
 
 /**
@@ -5354,10 +5396,11 @@ var_lLCDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	DEBUGMSGTL(("llcMIB", "var_lLCDLETable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCDLETable();
+	refresh_lLCDLETable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCDLETableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCDLETable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCDLETableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCDLETable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5397,7 +5440,28 @@ var_lLCDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
- * @fn void refresh_lLCStationTable(void)
+ * @fn void refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCStationTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCStationTable_data *
+refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCStationTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCStationTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCStationTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCStationTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5407,28 +5471,12 @@ var_lLCDLETable(struct variable *vp, oid * name, size_t *length, int exact, size
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCStationTable(void)
+refresh_lLCStationTable(int force)
 {
-	if (lLCStationTable_refresh == 0)
+	if (!force && lLCStationTable_refresh == 0)
 		return;
-	lLCStationTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp)
- * @brief refresh the contents of the lLCStationTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCStationTable_row(struct lLCStationTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCStationTable_request == sa_request)
-		return;
-	StorageTmp->lLCStationTable_request = sa_request;
+	lLCStationTable_refresh = 0;
 }
 
 /**
@@ -5446,10 +5494,11 @@ var_lLCStationTable(struct variable *vp, oid * name, size_t *length, int exact, 
 
 	DEBUGMSGTL(("llcMIB", "var_lLCStationTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCStationTable();
+	refresh_lLCStationTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCStationTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCStationTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCStationTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCStationTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5606,7 +5655,28 @@ var_lLCStationTable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
- * @fn void refresh_lLCSAPTable(void)
+ * @fn void refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCSAPTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCSAPTable_data *
+refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCSAPTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCSAPTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCSAPTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCSAPTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5616,28 +5686,12 @@ var_lLCStationTable(struct variable *vp, oid * name, size_t *length, int exact, 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCSAPTable(void)
+refresh_lLCSAPTable(int force)
 {
-	if (lLCSAPTable_refresh == 0)
+	if (!force && lLCSAPTable_refresh == 0)
 		return;
-	lLCSAPTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp)
- * @brief refresh the contents of the lLCSAPTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCSAPTable_row(struct lLCSAPTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCSAPTable_request == sa_request)
-		return;
-	StorageTmp->lLCSAPTable_request = sa_request;
+	lLCSAPTable_refresh = 0;
 }
 
 /**
@@ -5655,10 +5709,11 @@ var_lLCSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	DEBUGMSGTL(("llcMIB", "var_lLCSAPTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCSAPTable();
+	refresh_lLCSAPTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCSAPTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCSAPTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCSAPTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCSAPTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5683,7 +5738,28 @@ var_lLCSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
- * @fn void refresh_rDESetupTable(void)
+ * @fn void refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the rDESetupTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct rDESetupTable_data *
+refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->rDESetupTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->rDESetupTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_rDESetupTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the rDESetupTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5693,28 +5769,12 @@ var_lLCSAPTable(struct variable *vp, oid * name, size_t *length, int exact, size
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_rDESetupTable(void)
+refresh_rDESetupTable(int force)
 {
-	if (rDESetupTable_refresh == 0)
+	if (!force && rDESetupTable_refresh == 0)
 		return;
-	rDESetupTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp)
- * @brief refresh the contents of the rDESetupTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_rDESetupTable_row(struct rDESetupTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->rDESetupTable_request == sa_request)
-		return;
-	StorageTmp->rDESetupTable_request = sa_request;
+	rDESetupTable_refresh = 0;
 }
 
 /**
@@ -5732,10 +5792,11 @@ var_rDESetupTable(struct variable *vp, oid * name, size_t *length, int exact, si
 
 	DEBUGMSGTL(("llcMIB", "var_rDESetupTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_rDESetupTable();
+	refresh_rDESetupTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(rDESetupTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_rDESetupTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(rDESetupTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_rDESetupTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5817,7 +5878,28 @@ var_rDESetupTable(struct variable *vp, oid * name, size_t *length, int exact, si
 }
 
 /**
- * @fn void refresh_rDEPairTable(void)
+ * @fn void refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the rDEPairTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct rDEPairTable_data *
+refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->rDEPairTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->rDEPairTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_rDEPairTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the rDEPairTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5827,28 +5909,12 @@ var_rDESetupTable(struct variable *vp, oid * name, size_t *length, int exact, si
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_rDEPairTable(void)
+refresh_rDEPairTable(int force)
 {
-	if (rDEPairTable_refresh == 0)
+	if (!force && rDEPairTable_refresh == 0)
 		return;
-	rDEPairTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp)
- * @brief refresh the contents of the rDEPairTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_rDEPairTable_row(struct rDEPairTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->rDEPairTable_request == sa_request)
-		return;
-	StorageTmp->rDEPairTable_request = sa_request;
+	rDEPairTable_refresh = 0;
 }
 
 /**
@@ -5866,10 +5932,11 @@ var_rDEPairTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("llcMIB", "var_rDEPairTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_rDEPairTable();
+	refresh_rDEPairTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(rDEPairTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_rDEPairTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(rDEPairTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_rDEPairTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5918,7 +5985,28 @@ var_rDEPairTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_lLCCLPMTable(void)
+ * @fn void refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCCLPMTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCCLPMTable_data *
+refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCCLPMTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCCLPMTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCCLPMTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCCLPMTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5928,28 +6016,12 @@ var_rDEPairTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCCLPMTable(void)
+refresh_lLCCLPMTable(int force)
 {
-	if (lLCCLPMTable_refresh == 0)
+	if (!force && lLCCLPMTable_refresh == 0)
 		return;
-	lLCCLPMTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp)
- * @brief refresh the contents of the lLCCLPMTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCCLPMTable_row(struct lLCCLPMTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCCLPMTable_request == sa_request)
-		return;
-	StorageTmp->lLCCLPMTable_request = sa_request;
+	lLCCLPMTable_refresh = 0;
 }
 
 /**
@@ -5967,10 +6039,11 @@ var_lLCCLPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("llcMIB", "var_lLCCLPMTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCCLPMTable();
+	refresh_lLCCLPMTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCCLPMTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCCLPMTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCCLPMTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCCLPMTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -6002,7 +6075,28 @@ var_lLCCLPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_lLCConnectionLessTable(void)
+ * @fn void refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnectionLessTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnectionLessTable_data *
+refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnectionLessTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnectionLessTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnectionLessTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnectionLessTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -6012,28 +6106,12 @@ var_lLCCLPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnectionLessTable(void)
+refresh_lLCConnectionLessTable(int force)
 {
-	if (lLCConnectionLessTable_refresh == 0)
+	if (!force && lLCConnectionLessTable_refresh == 0)
 		return;
-	lLCConnectionLessTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp)
- * @brief refresh the contents of the lLCConnectionLessTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnectionLessTable_row(struct lLCConnectionLessTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnectionLessTable_request == sa_request)
-		return;
-	StorageTmp->lLCConnectionLessTable_request = sa_request;
+	lLCConnectionLessTable_refresh = 0;
 }
 
 /**
@@ -6051,10 +6129,11 @@ var_lLCConnectionLessTable(struct variable *vp, oid * name, size_t *length, int 
 
 	DEBUGMSGTL(("llcMIB", "var_lLCConnectionLessTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnectionLessTable();
+	refresh_lLCConnectionLessTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnectionLessTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnectionLessTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnectionLessTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnectionLessTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -6153,7 +6232,28 @@ var_lLCConnectionLessTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
- * @fn void refresh_lLCCOPMTable(void)
+ * @fn void refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCCOPMTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCCOPMTable_data *
+refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCCOPMTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCCOPMTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCCOPMTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCCOPMTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -6163,28 +6263,12 @@ var_lLCConnectionLessTable(struct variable *vp, oid * name, size_t *length, int 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCCOPMTable(void)
+refresh_lLCCOPMTable(int force)
 {
-	if (lLCCOPMTable_refresh == 0)
+	if (!force && lLCCOPMTable_refresh == 0)
 		return;
-	lLCCOPMTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp)
- * @brief refresh the contents of the lLCCOPMTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCCOPMTable_row(struct lLCCOPMTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCCOPMTable_request == sa_request)
-		return;
-	StorageTmp->lLCCOPMTable_request = sa_request;
+	lLCCOPMTable_refresh = 0;
 }
 
 /**
@@ -6202,10 +6286,11 @@ var_lLCCOPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("llcMIB", "var_lLCCOPMTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCCOPMTable();
+	refresh_lLCCOPMTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCCOPMTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCCOPMTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCCOPMTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCCOPMTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -6231,7 +6316,28 @@ var_lLCCOPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_lLCConnection2Table(void)
+ * @fn void refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnection2Table row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnection2Table_data *
+refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnection2Table_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnection2Table_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnection2Table(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnection2Table.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -6241,28 +6347,12 @@ var_lLCCOPMTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnection2Table(void)
+refresh_lLCConnection2Table(int force)
 {
-	if (lLCConnection2Table_refresh == 0)
+	if (!force && lLCConnection2Table_refresh == 0)
 		return;
-	lLCConnection2Table_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp)
- * @brief refresh the contents of the lLCConnection2Table row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnection2Table_row(struct lLCConnection2Table_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnection2Table_request == sa_request)
-		return;
-	StorageTmp->lLCConnection2Table_request = sa_request;
+	lLCConnection2Table_refresh = 0;
 }
 
 /**
@@ -6280,10 +6370,11 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 
 	DEBUGMSGTL(("llcMIB", "var_lLCConnection2Table: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnection2Table();
+	refresh_lLCConnection2Table(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnection2TableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnection2Table_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnection2TableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnection2Table_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -6625,7 +6716,28 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
- * @fn void refresh_lLCConnection2IVMOTable(void)
+ * @fn void refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnection2IVMOTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnection2IVMOTable_data *
+refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnection2IVMOTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnection2IVMOTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnection2IVMOTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnection2IVMOTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -6635,28 +6747,12 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnection2IVMOTable(void)
+refresh_lLCConnection2IVMOTable(int force)
 {
-	if (lLCConnection2IVMOTable_refresh == 0)
+	if (!force && lLCConnection2IVMOTable_refresh == 0)
 		return;
-	lLCConnection2IVMOTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp)
- * @brief refresh the contents of the lLCConnection2IVMOTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnection2IVMOTable_row(struct lLCConnection2IVMOTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnection2IVMOTable_request == sa_request)
-		return;
-	StorageTmp->lLCConnection2IVMOTable_request = sa_request;
+	lLCConnection2IVMOTable_refresh = 0;
 }
 
 /**
@@ -6674,10 +6770,11 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
 
 	DEBUGMSGTL(("llcMIB", "var_lLCConnection2IVMOTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnection2IVMOTable();
+	refresh_lLCConnection2IVMOTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnection2IVMOTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnection2IVMOTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -6767,7 +6864,28 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
- * @fn void refresh_lLCConnectionlessAckTable(void)
+ * @fn void refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnectionlessAckTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnectionlessAckTable_data *
+refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnectionlessAckTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnectionlessAckTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnectionlessAckTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnectionlessAckTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -6777,28 +6895,12 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnectionlessAckTable(void)
+refresh_lLCConnectionlessAckTable(int force)
 {
-	if (lLCConnectionlessAckTable_refresh == 0)
+	if (!force && lLCConnectionlessAckTable_refresh == 0)
 		return;
-	lLCConnectionlessAckTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp)
- * @brief refresh the contents of the lLCConnectionlessAckTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnectionlessAckTable_row(struct lLCConnectionlessAckTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnectionlessAckTable_request == sa_request)
-		return;
-	StorageTmp->lLCConnectionlessAckTable_request = sa_request;
+	lLCConnectionlessAckTable_refresh = 0;
 }
 
 /**
@@ -6816,10 +6918,11 @@ var_lLCConnectionlessAckTable(struct variable *vp, oid * name, size_t *length, i
 
 	DEBUGMSGTL(("llcMIB", "var_lLCConnectionlessAckTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnectionlessAckTable();
+	refresh_lLCConnectionlessAckTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnectionlessAckTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnectionlessAckTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -7051,7 +7154,28 @@ var_lLCConnectionlessAckTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
- * @fn void refresh_lLCConnectionlessAckIVMOTable(void)
+ * @fn void refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the lLCConnectionlessAckIVMOTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct lLCConnectionlessAckIVMOTable_data *
+refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->lLCConnectionlessAckIVMOTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->lLCConnectionlessAckIVMOTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_lLCConnectionlessAckIVMOTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the lLCConnectionlessAckIVMOTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -7061,28 +7185,12 @@ var_lLCConnectionlessAckTable(struct variable *vp, oid * name, size_t *length, i
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_lLCConnectionlessAckIVMOTable(void)
+refresh_lLCConnectionlessAckIVMOTable(int force)
 {
-	if (lLCConnectionlessAckIVMOTable_refresh == 0)
+	if (!force && lLCConnectionlessAckIVMOTable_refresh == 0)
 		return;
-	lLCConnectionlessAckIVMOTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp)
- * @brief refresh the contents of the lLCConnectionlessAckIVMOTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_lLCConnectionlessAckIVMOTable_row(struct lLCConnectionlessAckIVMOTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->lLCConnectionlessAckIVMOTable_request == sa_request)
-		return;
-	StorageTmp->lLCConnectionlessAckIVMOTable_request = sa_request;
+	lLCConnectionlessAckIVMOTable_refresh = 0;
 }
 
 /**
@@ -7100,10 +7208,11 @@ var_lLCConnectionlessAckIVMOTable(struct variable *vp, oid * name, size_t *lengt
 
 	DEBUGMSGTL(("llcMIB", "var_lLCConnectionlessAckIVMOTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_lLCConnectionlessAckIVMOTable();
+	refresh_lLCConnectionlessAckIVMOTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_lLCConnectionlessAckIVMOTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_lLCConnectionlessAckIVMOTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -7157,7 +7266,8 @@ write_mACDLELocalSapNames(int action, u_char *var_val, u_char var_val_type, size
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_mACDLELocalSapNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7233,7 +7343,8 @@ write_mACDLEProviderEntityNames(int action, u_char *var_val, u_char var_val_type
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_mACDLEProviderEntityNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7308,7 +7419,8 @@ write_dLSAPSap1Address(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_dLSAPSap1Address entering action=%d...  \n", action));
-	StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7376,7 +7488,8 @@ write_dLSAPUserEntityNames(int action, u_char *var_val, u_char var_val_type, siz
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_dLSAPUserEntityNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7453,7 +7566,8 @@ write_lLCDLELocalSapNames(int action, u_char *var_val, u_char var_val_type, size
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCDLELocalSapNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7529,7 +7643,8 @@ write_lLCDLEProviderEntityNames(int action, u_char *var_val, u_char var_val_type
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCDLEProviderEntityNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7605,7 +7720,8 @@ write_lLCStationLLCName(int action, u_char *var_val, u_char var_val_type, size_t
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationLLCName entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7669,7 +7785,8 @@ write_lLCStationSupportedServicesTypes(int action, u_char *var_val, u_char var_v
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationSupportedServicesTypes entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7732,7 +7849,8 @@ write_lLCStationType1AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationType1AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7789,7 +7907,8 @@ write_lLCStationType1MaximumRetryCount(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationType1MaximumRetryCount entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7841,7 +7960,8 @@ write_lLCStationMaximumPDUN3(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationMaximumPDUN3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7893,7 +8013,8 @@ write_lLCStationMaximumRetransmissions4(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationMaximumRetransmissions4 entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7945,7 +8066,8 @@ write_lLCStationReceiveVariableLifetime(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationReceiveVariableLifetime entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8002,7 +8124,8 @@ write_lLCStationTransmitVariableLifetime(int action, u_char *var_val, u_char var
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationTransmitVariableLifetime entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8059,7 +8182,8 @@ write_lLCStationType3AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationType3AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8116,7 +8240,8 @@ write_lLCStationBufferSize(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationBufferSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8169,7 +8294,8 @@ write_lLCStationSTRIndicator(int action, u_char *var_val, u_char var_val_type, s
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationSTRIndicator entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8232,7 +8358,8 @@ write_lLCStationVersionNumber(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationVersionNumber entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8284,7 +8411,8 @@ write_rDESetupAgingEnabled(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupAgingEnabled entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8344,7 +8472,8 @@ write_rDESetupAgingValue(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupAgingValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8396,7 +8525,8 @@ write_rDESetupEnableType2Reset(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupEnableType2Reset entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8448,7 +8578,8 @@ write_rDESetupMaximumRouteDescriptors(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupMaximumRouteDescriptors entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8500,7 +8631,8 @@ write_rDESetupMaximumResponseTime(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupMaximumResponseTime entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8557,7 +8689,8 @@ write_rDESetupMinimumPDUSize(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupMinimumPDUSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8609,7 +8742,8 @@ write_rDESetupRDEHold(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupRDEHold entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8669,7 +8803,8 @@ write_rDESetupRDEReplace(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupRDEReplace entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8729,7 +8864,8 @@ write_rDESetupResetOnTestEnabled(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupResetOnTestEnabled entering action=%d...  \n", action));
-	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8790,7 +8926,8 @@ write_lLCConnectionlessName(int action, u_char *var_val, u_char var_val_type, si
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessName entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8853,7 +8990,8 @@ write_lLCConnectionlessMaximumLLCInformationFieldSize(int action, u_char *var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8906,7 +9044,8 @@ write_lLCConnection2Name(int action, u_char *var_val, u_char var_val_type, size_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2Name entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8969,7 +9108,8 @@ write_lLCConnection2MaximumRetransmissions(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2MaximumRetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9021,7 +9161,8 @@ write_lLCConnection2ReceivedWindowSize(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9073,7 +9214,8 @@ write_lLCConnection2SendWindowSize(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SendWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9125,7 +9267,8 @@ write_lLCConnection2AcknowledgeTimeoutValue(int action, u_char *var_val, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9182,7 +9325,8 @@ write_lLCConnection2BusyStateTimeoutValue(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2BusyStateTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9239,7 +9383,8 @@ write_lLCConnection2PBitTimeoutValue(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2PBitTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9296,7 +9441,8 @@ write_lLCConnection2RejectTimeoutValue(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2RejectTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9353,7 +9499,8 @@ write_lLCConnection2RemoteBusy(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2RemoteBusy entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9405,7 +9552,8 @@ write_lLCConnection2RemoteReset(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2RemoteReset entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9457,7 +9605,8 @@ write_lLCConnection2LocalReset(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2LocalReset entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9509,7 +9658,8 @@ write_lLCConnection2ProviderReset(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ProviderReset entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9562,7 +9712,8 @@ write_lLCConnection2Route(int action, u_char *var_val, u_char var_val_type, size
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2Route entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9626,7 +9777,8 @@ write_lLCConnection2KStep(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2KStep entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9678,7 +9830,8 @@ write_lLCConnection2MaxSendWindowSize(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2MaxSendWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9730,7 +9883,8 @@ write_lLCConnection2SentAcks(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentAcks entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9782,7 +9936,8 @@ write_lLCConnection2ReceivedAcks(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedAcks entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9834,7 +9989,8 @@ write_lLCConnection2ReceivedFRMR(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedFRMR entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9886,7 +10042,8 @@ write_lLCConnection2SentFRMR(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentFRMR entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9938,7 +10095,8 @@ write_lLCConnection2ReceivedRR(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedRR entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9990,7 +10148,8 @@ write_lLCConnection2SentRR(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentRR entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10042,7 +10201,8 @@ write_lLCConnection2ReceivedRNR(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedRNR entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10094,7 +10254,8 @@ write_lLCConnection2SentRNR(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentRNR entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10146,7 +10307,8 @@ write_lLCConnection2ReceivedREJ(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedREJ entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10198,7 +10360,8 @@ write_lLCConnection2SentREJ(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentREJ entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10250,7 +10413,8 @@ write_lLCConnection2ReceivedSABME(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedSABME entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10302,7 +10466,8 @@ write_lLCConnection2SentSABME(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentSABME entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10354,7 +10519,8 @@ write_lLCConnection2ReceivedUA(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedUA entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10406,7 +10572,8 @@ write_lLCConnection2SentUA(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentUA entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10458,7 +10625,8 @@ write_lLCConnection2ReceivedDISC(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedDISC entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10510,7 +10678,8 @@ write_lLCConnection2SentDISC(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentDISC entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10562,7 +10731,8 @@ write_lLCConnection2ReceivedDM(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedDM entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10614,7 +10784,8 @@ write_lLCConnection2SentDM(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentDM entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10666,7 +10837,8 @@ write_lLCConnection2PDUsDiscarded1(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2PDUsDiscarded1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10718,7 +10890,8 @@ write_lLCConnection2PDUsDiscarded2(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2PDUsDiscarded2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10770,7 +10943,8 @@ write_lLCConnection2PDURetransmissions(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2PDURetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10822,7 +10996,8 @@ write_lLCConnection2OptionalTolerationIPDUs(int action, u_char *var_val, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2OptionalTolerationIPDUs entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10882,7 +11057,8 @@ write_lLCConnection2DuplicateIPDUsReceived(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2DuplicateIPDUsReceived entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10934,7 +11110,8 @@ write_lLCConnection2Violation(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2Violation entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10986,7 +11163,8 @@ write_lLCConnection2AdministrativeState(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2AdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11048,7 +11226,8 @@ write_lLCConnection2AlarmStatus(int action, u_char *var_val, u_char var_val_type
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2AlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11111,7 +11290,8 @@ write_lLCConnection2IVMOMaximumRetransmissions(int action, u_char *var_val, u_ch
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOMaximumRetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11163,7 +11343,8 @@ write_lLCConnection2IVMOReceivedWindowSize(int action, u_char *var_val, u_char v
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOReceivedWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11215,7 +11396,8 @@ write_lLCConnection2IVMOSendWindowSize(int action, u_char *var_val, u_char var_v
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOSendWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11267,7 +11449,8 @@ write_lLCConnection2IVMOAcknowledgeTimeoutValue(int action, u_char *var_val, u_c
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOAcknowledgeTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11324,7 +11507,8 @@ write_lLCConnection2IVMOBusyStateTimeoutValue(int action, u_char *var_val, u_cha
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOBusyStateTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11381,7 +11565,8 @@ write_lLCConnection2IVMOBitTimeoutValue(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOBitTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11438,7 +11623,8 @@ write_lLCConnection2IVMORejectTimeoutValue(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMORejectTimeoutValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11495,7 +11681,8 @@ write_lLCConnection2IVMORoute(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMORoute entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11547,7 +11734,8 @@ write_lLCConnection2IVMOKStep(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOKStep entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11599,7 +11787,8 @@ write_lLCConnection2IVMOMaxSendWindowSize(int action, u_char *var_val, u_char va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOMaxSendWindowSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11651,7 +11840,8 @@ write_lLCConnection2IVMOOptionalTolerationIPDUs(int action, u_char *var_val, u_c
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOOptionalTolerationIPDUs entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11711,7 +11901,8 @@ write_lLCConnectionlessAckMaximumLLCInformationFieldSize(int action, u_char *var
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11763,7 +11954,8 @@ write_lLCConnectionlessAckMaximumRetransmissions(int action, u_char *var_val, u_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckMaximumRetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11815,7 +12007,8 @@ write_lLCConnectionlessAckReceiveResources(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckReceiveResources entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11875,7 +12068,8 @@ write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize(int action, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -11941,7 +12135,8 @@ write_lLCConnectionlessAckIVMOMaximumRetransmissions(int action, u_char *var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckIVMOMaximumRetransmissions entering action=%d...  \n", action));
-	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -13035,6 +13230,14 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* mACDLECommunicationsEntityId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACDLECommunicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = mACDLETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -13240,6 +13443,21 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* mACDLECommunicationsEntityId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACDLECommunicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* mACId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = mACTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -13448,6 +13666,21 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* mACDLECommunicationsEntityId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACDLECommunicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* dLSAPSapId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index dLSAPSapId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = dLSAPTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -13651,6 +13884,14 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* lLCDLECommunicationsEntityId */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index lLCDLECommunicationsEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lLCDLETable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -13846,6 +14087,7 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
 			if ((StorageNew = lLCCLPMTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -14038,6 +14280,7 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
 			if ((StorageNew = lLCCOPMTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -14235,6 +14478,14 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* lLCConnectionlessAckIVMOName */
+			if (vp->val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index lLCConnectionlessAckIVMOName: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lLCConnectionlessAckIVMOTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -14398,7 +14649,7 @@ send_lLCStationEvent_v2trap(struct variable_list *vars)
 #if defined MASTER
 /**
  * @fn void llcMIB_loop_handler(int dummy)
- * @param dummy signal number (always zero (0))
+ * @param sig signal number
  * @brief handle event loop interation.
  *
  * This function is registered so that, when operating as a module, snmpd will call it one per event
@@ -14412,17 +14663,25 @@ send_lLCStationEvent_v2trap(struct variable_list *vars)
  * request number but it is a temporally unique identifier for a request.
  */
 void
-llcMIB_loop_handler(int dummy)
+llcMIB_loop_handler(int sig)
 {
-	if (external_signal_scheduled[dummy] == 0)
-		external_signal_scheduled[dummy]--;
+	if (external_signal_scheduled[sig] == 0)
+		external_signal_scheduled[sig]--;
 	/* close files after each request */
-	if (sa_fclose && sa_fd != 0) {
-		close(sa_fd);
-		sa_fd = 0;
+	if (sa_fclose) {
+		if (sa_fd != 0) {
+			close(sa_fd);
+			sa_fd = 0;
+		}
+		if (my_fd != 0) {
+			close(my_fd);
+			my_fd = 0;
+		}
 	}
 	/* prepare for next request */
 	sa_request++;
+	if (llcMIBold_signal_handler != NULL)
+		(*llcMIBold_signal_handler) (sig);
 }
 #endif				/* defined MASTER */
 /**
