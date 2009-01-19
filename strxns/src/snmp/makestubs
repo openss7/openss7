@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-27 15:42:06 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2009-01-19 13:32:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-27 15:42:06 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 13:32:02 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.6  2009-01-19 13:32:02  brian
+# - updating standalone agents
+#
 # Revision 0.9.2.5  2008-12-27 15:42:06  brian
 # - correct ignore file
 #
@@ -79,7 +82,7 @@ export MIBS
 export MIBDIRS
 export MIBFILES
 
-all: simple storage openss7
+all: storage openss7
 
 check: llcMIB.tree lapbMIB.tree dlMIB.tree
 
@@ -106,7 +109,9 @@ dlMIB_simple.c dlMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-DL-MIB.mib
 	./mib2c -c ./mib2c.conf -f dlMIB_simple dlMIB
 	indent -nhnl dlMIB_simple.[ch]
 
-storage: llcMIB_storage.c llcMIB_storage.h lapbMIB_storage.c lapbMIB_storage.h dlMIB_storage.c dlMIB_storage.h
+storage: \
+	llcMIB_storage.c llcMIB_storage.h \
+	lapbMIB_storage.c lapbMIB_storage.h
 
 llcMIB_storage.c llcMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-LLC2-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f llcMIB_storage llcMIB
@@ -120,7 +125,8 @@ dlMIB_storage.c dlMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-DL-MIB.mi
 	./mib2c -c ./mib2c.storage.conf -f dlMIB_storage dlMIB
 	indent -nhnl dlMIB_storage.[ch]
 
-openss7: llcMIB_openss7.c llcMIB_openss7.h lapbMIB_openss7.c lapbMIB_openss7.h dlMIB_openss7.c dlMIB_openss7.h
+openss7: \
+	dlMIB_openss7.c dlMIB_openss7.h
 
 llcMIB_openss7.c llcMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-LLC2-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f llcMIB_openss7 llcMIB

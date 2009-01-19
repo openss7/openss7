@@ -63,6 +63,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/agent_trap.h>
 #include <ucd-snmp/callback.h>
 #include <ucd-snmp/snmp-tc.h>
 #include <ucd-snmp/default_store.h>
@@ -114,40 +115,23 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "strExtMIB.h"
-extern const char sa_program[];
-
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
-#undef MASTER
-#if !defined MODULE
-extern int sa_dump;			/* default packet dump */
-extern int sa_debug;			/* default no debug */
-extern int sa_nomead;			/* default daemon mode */
-extern int sa_output;			/* default normal output */
-extern int sa_agentx;			/* default agentx mode */
-extern int sa_alarms;			/* default application alarms */
-extern int sa_logaddr;			/* log addresses */
-extern int sa_logfillog;		/* log to sa_logfile */
-extern int sa_logstderr;		/* log to standard error */
-extern int sa_logstdout;		/* log to standard output */
-extern int sa_logsyslog;		/* log to system logs */
-extern int sa_logcallog;		/* log to callback logs */
-extern int sa_appendlog;		/* append to log file without truncating */
-extern char sa_logfile[256];
-extern char sa_pidfile[256];
-extern char sa_sysctlf[256];
-
-/* file stream for log file */
-extern FILE *stdlog;
-#endif				/* !defined MODULE */
-extern int sa_fclose;			/* default close files between requests */
-static int my_fd;			/* file descriptor for this MIB's use */
-extern int sa_fd;			/* file descriptor for MIB use */
-extern int sa_readfd;			/* file descriptor for autonomnous events */
-extern int sa_changed;			/* indication to reread MIB configuration */
-extern int sa_stats_refresh;		/* indications that statistics, the mib or its tables need to be refreshed */
-extern int sa_request;			/* request number for per-request actions */
+#if defined MODULE
+#if defined MASTER
+const char sa_program[] = "strExtMIB";
+int sa_fclose = 1;			/* default close files between requests */
+int sa_changed = 1;			/* indication to reread MIB configuration */
+int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
+int sa_request = 1;			/* request number for per-request actions */
+int sa_dump = 0;			/* default packet dump */
+int sa_debug = 0;			/* default no debug */
+#endif				/* defined MASTER */
+#endif				/* defined MODULE */
+static int my_fd = -1;			/* file descriptor for this MIB's use */
+static int my_readfd = -1;		/* file descriptor for autonomnous events */
 volatile int strExtMIB_refresh = 1;
 volatile int strExtStrlogRecordTable_refresh = 1;
+volatile int strExtTraceTable_refresh = 1;
 
 /*
  * strExtMIB_variables_oid: object identifier for strExtMIB
@@ -155,7 +139,8 @@ volatile int strExtStrlogRecordTable_refresh = 1;
  * suffix appearing in the variable below.
  */
 oid strExtMIB_variables_oid[9] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000 };
-oid strExtStrlogRecordTable_variables_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 1, 1, 1 };
+oid strExtStrlogRecordTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 1, 1, 2, 1 };
+oid strExtTraceTable_variables_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 1, 2, 1 };
 
 /*
  * Oids for use in notifications defined in this MIB.
@@ -166,15 +151,21 @@ oid strStrlogRecord_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 0, 1 };
  * Oids accessible only for notify defined in this MIB.
  */
 oid strExtStrlogIndex_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 1 };
-oid strExtStrlogTimeStamp_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 2 };
-oid strExtStrlogMid_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 3 };
-oid strExtStrlogSid_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 4 };
-oid strExtStrlogLevel_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 5 };
-oid strExtStrlogFlags_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 6 };
-oid strExtStrlogFmtString_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 7 };
-oid strExtStrlogInteger_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 8 };
-oid strExtStrlogUnsigned_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 9 };
-oid strExtStrlogString_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 10 };
+oid strExtStrlogSeqNo_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 2 };
+oid strExtStrlogDateAndTime_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 3 };
+oid strExtStrlogTimeStamp_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 4 };
+oid strExtStrlogMid_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 5 };
+oid strExtStrlogSid_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 6 };
+oid strExtStrlogLevel_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 7 };
+oid strExtStrlogFlags_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 8 };
+oid strExtStrlogFmtString_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 9 };
+oid strExtStrlogInteger_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 10 };
+oid strExtStrlogUnsigned_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 11 };
+oid strExtStrlogString_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 12 };
+oid strExtStrlogInteger64_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 13 };
+oid strExtStrlogUnsigned64_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 14 };
+oid strExtStrlogInteger128_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 15 };
+oid strExtStrlogUnsigned128_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 1, 16 };
 
 /*
  * Other oids defined in this MIB.
@@ -189,22 +180,44 @@ static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
  */
 struct variable7 strExtMIB_variables[] = {
 	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
-#define   STREXTSTRLOGRECORDTIMESTAMP  1
-	{(u_char) STREXTSTRLOGRECORDTIMESTAMP, ASN_TIMETICKS, RONLY, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 2}},
-#define   STREXTSTRLOGRECORDMID  2
-	{(u_char) STREXTSTRLOGRECORDMID, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 3}},
-#define   STREXTSTRLOGRECORDSID  3
-	{(u_char) STREXTSTRLOGRECORDSID, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 4}},
-#define   STREXTSTRLOGRECORDLEVEL  4
-	{(u_char) STREXTSTRLOGRECORDLEVEL, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 5}},
-#define   STREXTSTRLOGRECORDFLAGS  5
-	{(u_char) STREXTSTRLOGRECORDFLAGS, ASN_BIT_STR, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 6}},
-#define   STREXTSTRLOGRECORDMSGSTRING  6
-	{(u_char) STREXTSTRLOGRECORDMSGSTRING, ASN_OCTET_STR, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 7}},
-#define   STREXTSTRLOGRECORDROWSTATUS  7
-	{(u_char) STREXTSTRLOGRECORDROWSTATUS, ASN_INTEGER, RWRITE, var_strExtStrlogRecordTable, 5, {1, 1, 1, 1, 8}},
-#define   STRNLOGARGS           8
+#define   STREXTSTRLOGRECORDNEXTINDEX  1
+	{(u_char) STREXTSTRLOGRECORDNEXTINDEX, ASN_UNSIGNED, RONLY, var_strExtMIB, 4, {1, 1, 1, 1}},
+#define   STREXTSTRLOGRECORDSEQNO  2
+	{(u_char) STREXTSTRLOGRECORDSEQNO, ASN_INTEGER, RONLY, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 2}},
+#define   STREXTSTRLOGRECORDDATEANDTIME  3
+	{(u_char) STREXTSTRLOGRECORDDATEANDTIME, ASN_OCTET_STR, RONLY, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 3}},
+#define   STREXTSTRLOGRECORDTIMESTAMP  4
+	{(u_char) STREXTSTRLOGRECORDTIMESTAMP, ASN_TIMETICKS, RONLY, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 4}},
+#define   STREXTSTRLOGRECORDMID  5
+	{(u_char) STREXTSTRLOGRECORDMID, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 5}},
+#define   STREXTSTRLOGRECORDSID  6
+	{(u_char) STREXTSTRLOGRECORDSID, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 6}},
+#define   STREXTSTRLOGRECORDLEVEL  7
+	{(u_char) STREXTSTRLOGRECORDLEVEL, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 7}},
+#define   STREXTSTRLOGRECORDFLAGS  8
+	{(u_char) STREXTSTRLOGRECORDFLAGS, ASN_BIT_STR, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 8}},
+#define   STREXTSTRLOGRECORDMSGSTRING  9
+	{(u_char) STREXTSTRLOGRECORDMSGSTRING, ASN_OCTET_STR, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 9}},
+#define   STREXTSTRLOGRECORDROWSTATUS  10
+	{(u_char) STREXTSTRLOGRECORDROWSTATUS, ASN_INTEGER, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 10}},
+#define   STREXTTRACEMID        11
+	{(u_char) STREXTTRACEMID, ASN_INTEGER, RWRITE, var_strExtTraceTable, 5, {1, 1, 2, 1, 2}},
+#define   STREXTTRACESID        12
+	{(u_char) STREXTTRACESID, ASN_INTEGER, RWRITE, var_strExtTraceTable, 5, {1, 1, 2, 1, 3}},
+#define   STREXTTRACELEVEL      13
+	{(u_char) STREXTTRACELEVEL, ASN_INTEGER, RWRITE, var_strExtTraceTable, 5, {1, 1, 2, 1, 4}},
+#define   STREXTTRACEROWSTATUS  14
+	{(u_char) STREXTTRACEROWSTATUS, ASN_INTEGER, RWRITE, var_strExtTraceTable, 5, {1, 1, 2, 1, 5}},
+#define   STRNLOGARGS           15
 	{(u_char) STRNLOGARGS, ASN_UNSIGNED, RWRITE, var_strExtMIB, 3, {1, 2, 1}},
+#define   STREXTLOGMSGSIZE      16
+	{(u_char) STREXTLOGMSGSIZE, ASN_UNSIGNED, RWRITE, var_strExtMIB, 3, {1, 2, 2}},
+#define   STREXTCONSOLELOG      17
+	{(u_char) STREXTCONSOLELOG, ASN_INTEGER, RWRITE, var_strExtMIB, 3, {1, 2, 3}},
+#define   STREXTERRORLOG        18
+	{(u_char) STREXTERRORLOG, ASN_INTEGER, RWRITE, var_strExtMIB, 3, {1, 2, 4}},
+#define   STREXTTRACELOG        19
+	{(u_char) STREXTTRACELOG, ASN_INTEGER, RWRITE, var_strExtMIB, 3, {1, 2, 5}},
 };
 
 /* (L = length of the oidsuffix) */
@@ -212,12 +225,12 @@ struct strExtMIB_data *strExtMIBStorage = NULL;
 
 /* global storage of our data, saved in and configured by header_complex() */
 struct header_complex_index *strExtStrlogRecordTableStorage = NULL;
+struct header_complex_index *strExtTraceTableStorage = NULL;
 
-#if defined MODULE
 void (*strExtMIBold_signal_handler) (int) = NULL;	/* save old signal handler just in case */
 void strExtMIB_loop_handler(int);
 void strExtMIB_fd_handler(int, void *);
-#endif				/* defined MOUDLE */
+
 /**
  * @fn void init_strExtMIB(void)
  * @brief strExtMIB initialization routine.
@@ -246,30 +259,28 @@ init_strExtMIB(void)
 	(void) my_fd;
 	(void) zeroDotZero_oid;
 	(void) snmpTrapOID_oid;
-	DEBUGMSGTL(("strExtMIB", "initializing...  "));
+	DEBUGMSGTL(("strExtMIB", "init_strExtMIB: initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
 	REGISTER_MIB("strExtMIB", strExtMIB_variables, variable7, strExtMIB_variables_oid);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_SHUTDOWN, term_strExtMIB, NULL);
 	/* register our config handler(s) to deal with registrations */
 	snmpd_register_config_handler("strExtMIB", parse_strExtMIB, NULL, "HELP STRING");
 	snmpd_register_config_handler("strExtStrlogRecordTable", parse_strExtStrlogRecordTable, NULL, "HELP STRING");
+	snmpd_register_config_handler("strExtTraceTable", parse_strExtTraceTable, NULL, "HELP STRING");
 
 	/* we need to be called back later to store our data */
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strExtMIB, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strExtStrlogRecordTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strExtTraceTable, NULL);
 
 	/* place any other initialization junk you need here */
-#if defined MODULE
-	if (sa_readfd != 0) {
-		register_readfd(sa_readfd, strExtMIB_fd_handler, (void *) 0);
-		register_exceptfd(sa_readfd, strExtMIB_fd_handler, (void *) 1);
+	if (my_readfd >= 0) {
+		register_readfd(my_readfd, strExtMIB_fd_handler, (void *) 0);
+		register_exceptfd(my_readfd, strExtMIB_fd_handler, (void *) 1);
 	}
-#if defined MASTER
 	strExtMIBold_signal_handler = external_signal_handler[SIGCHLD];
 	external_signal_handler[SIGCHLD] = &strExtMIB_loop_handler;
 	external_signal_scheduled[SIGCHLD] = 1;
-#endif				/* defined MASTER */
-#endif				/* defined MODULE */
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
 }
 
@@ -288,21 +299,18 @@ init_strExtMIB(void)
 void
 deinit_strExtMIB(void)
 {
-	DEBUGMSGTL(("strExtMIB", "deinitializating...  "));
-#if defined MODULE
-#if defined MASTER
+	DEBUGMSGTL(("strExtMIB", "deinit_strExtMIB: deinitializating...  "));
 	external_signal_handler[SIGCHLD] = strExtMIBold_signal_handler;
-#endif				/* defined MASTER */
-	if (sa_readfd != 0) {
-		unregister_exceptfd(sa_readfd);
-		unregister_readfd(sa_readfd);
-		close(sa_readfd);
-		sa_readfd = 0;
+	if (my_readfd >= 0) {
+		unregister_exceptfd(my_readfd);
+		unregister_readfd(my_readfd);
+		close(my_readfd);
+		my_readfd = -1;
 	}
-#endif				/* defined MODULE */
 	unregister_mib(strExtMIB_variables_oid, sizeof(strExtMIB_variables_oid) / sizeof(oid));
 	snmpd_unregister_config_handler("strExtMIB");
 	snmpd_unregister_config_handler("strExtStrlogRecordTable");
+	snmpd_unregister_config_handler("strExtTraceTable");
 
 	/* place any other de-initialization junk you need here */
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
@@ -311,7 +319,9 @@ deinit_strExtMIB(void)
 int
 term_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	DEBUGMSGTL(("strExtMIB", "term_strExtMIB: terminating...  "));
 	deinit_strExtMIB();
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return 0;
 }
 
@@ -327,10 +337,15 @@ strExtMIB_create(void)
 {
 	struct strExtMIB_data *StorageNew = SNMP_MALLOC_STRUCT(strExtMIB_data);
 
-	DEBUGMSGTL(("strExtMIB", "creating scalars...  "));
+	DEBUGMSGTL(("strExtMIB", "strExtMIB_create: creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
-		StorageNew->strNlogargs = 0;
+		StorageNew->strExtStrlogRecordNextIndex = 0;
+		StorageNew->strNlogargs = 20;
+		StorageNew->strExtLogMsgSize = 1024;
+		StorageNew->strExtConsoleLog = TV_FALSE;
+		StorageNew->strExtErrorLog = TV_FALSE;
+		StorageNew->strExtTraceLog = TV_FALSE;
 
 	}
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
@@ -352,7 +367,7 @@ strExtMIB_destroy(struct strExtMIB_data **thedata)
 {
 	struct strExtMIB_data *StorageDel;
 
-	DEBUGMSGTL(("strExtMIB", "deleting scalars...  "));
+	DEBUGMSGTL(("strExtMIB", "strExtMIB_destroy: deleting scalars...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
@@ -372,8 +387,9 @@ strExtMIB_destroy(struct strExtMIB_data **thedata)
 int
 strExtMIB_add(struct strExtMIB_data *thedata)
 {
-	DEBUGMSGTL(("strExtMIB", "adding data...  "));
-	strExtMIBStorage = thedata;
+	DEBUGMSGTL(("strExtMIB", "strExtMIB_add: adding data...  "));
+	if (thedata)
+		strExtMIBStorage = thedata;
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
@@ -396,13 +412,18 @@ parse_strExtMIB(const char *token, char *line)
 	size_t tmpsize;
 	struct strExtMIB_data *StorageTmp = strExtMIB_create();
 
-	DEBUGMSGTL(("strExtMIB", "parsing config...  "));
+	DEBUGMSGTL(("strExtMIB", "parse_strExtMIB: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual scalars that are not persistent */
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strExtStrlogRecordNextIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strNlogargs, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strExtLogMsgSize, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtConsoleLog, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtErrorLog, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtTraceLog, &tmpsize);
 	strExtMIB_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
@@ -419,7 +440,7 @@ store_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct strExtMIB_data *StorageTmp;
 
-	DEBUGMSGTL(("strExtMIB", "storing data...  "));
+	DEBUGMSGTL(("strExtMIB", "store_strExtMIB: storing data...  "));
 	refresh_strExtMIB(1);
 	if ((StorageTmp = strExtMIBStorage) == NULL) {
 		DEBUGMSGTL(("strExtMIB", "error.\n"));
@@ -432,7 +453,12 @@ store_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		strcat(line, "strExtMIB ");
 		cptr = line + strlen(line);
 		/* XXX: remove individual scalars that are not persistent */
+		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordNextIndex, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNlogargs, &tmpsize);
+		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtLogMsgSize, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtConsoleLog, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtErrorLog, &tmpsize);
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtTraceLog, &tmpsize);
 		snmpd_store_config(line);
 	}
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
@@ -463,8 +489,10 @@ refresh_strExtMIB(int force)
 	}
 	if (!force && strExtMIB_refresh == 0)
 		return;
-	strExtMIB_refresh = 0;
+	DEBUGMSGTL(("strExtMIB", "refresh_strExtMIB: refreshing...  "));
 	/* XXX: Update scalars as required here... */
+	strExtMIB_refresh = 0;
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 }
 
 /**
@@ -490,17 +518,26 @@ var_strExtMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	struct strExtMIB_data *StorageTmp;
 	u_char *rval;
 
+	DEBUGMSGTL(("strExtMIB", "var_strExtMIB: lookup up varbind...  "));
 	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
 	/* Refresh the MIB values if required. */
 	refresh_strExtMIB(0);
-	if ((StorageTmp = strExtMIBStorage) == NULL)
+	if ((StorageTmp = strExtMIBStorage) == NULL) {
+		DEBUGMSGTL(("strExtMIB", "no datastructure.\n"));
 		return NULL;
+	}
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
+	case (u_char) STREXTSTRLOGRECORDNEXTINDEX:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtStrlogRecordNextIndex);
+		rval = (u_char *) &StorageTmp->strExtStrlogRecordNextIndex;
+		break;
 	case (u_char) STRNLOGARGS:	/* ReadWrite */
 		*write_method = write_strNlogargs;
 		if (!StorageTmp)
@@ -508,9 +545,41 @@ var_strExtMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t
 		*var_len = sizeof(StorageTmp->strNlogargs);
 		rval = (u_char *) &StorageTmp->strNlogargs;
 		break;
+	case (u_char) STREXTLOGMSGSIZE:	/* ReadWrite */
+		*write_method = write_strExtLogMsgSize;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtLogMsgSize);
+		rval = (u_char *) &StorageTmp->strExtLogMsgSize;
+		break;
+	case (u_char) STREXTCONSOLELOG:	/* ReadWrite */
+		*write_method = write_strExtConsoleLog;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtConsoleLog);
+		rval = (u_char *) &StorageTmp->strExtConsoleLog;
+		break;
+	case (u_char) STREXTERRORLOG:	/* ReadWrite */
+		*write_method = write_strExtErrorLog;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtErrorLog);
+		rval = (u_char *) &StorageTmp->strExtErrorLog;
+		break;
+	case (u_char) STREXTTRACELOG:	/* ReadWrite */
+		*write_method = write_strExtTraceLog;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtTraceLog);
+		rval = (u_char *) &StorageTmp->strExtTraceLog;
+		break;
 	default:
 		ERROR_MSG("");
 	}
+	if (rval)
+		DEBUGMSGTL(("strExtMIB", "found.\n"));
+	else
+		DEBUGMSGTL(("strExtMIB", "not found.\n"));
 	return (rval);
 }
 
@@ -527,9 +596,12 @@ strExtStrlogRecordTable_create(void)
 {
 	struct strExtStrlogRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(strExtStrlogRecordTable_data);
 
-	DEBUGMSGTL(("strExtStrlogRecordTable", "creating row...  "));
+	DEBUGMSGTL(("strExtMIB", "strExtStrlogRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		StorageNew->strExtStrlogRecordSeqNo = 0;
+		if ((StorageNew->strExtStrlogRecordDateAndTime = (uint8_t *) strdup("")) != NULL)
+			StorageNew->strExtStrlogRecordDateAndTimeLen = strlen("");
 		StorageNew->strExtStrlogRecordTimeStamp = 0;
 		StorageNew->strExtStrlogRecordMid = 0;
 		StorageNew->strExtStrlogRecordSid = 0;
@@ -541,7 +613,7 @@ strExtStrlogRecordTable_create(void)
 		StorageNew->strExtStrlogRecordRowStatus = 0;
 		StorageNew->strExtStrlogRecordRowStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -558,11 +630,11 @@ strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *thedata)
 {
 	struct strExtStrlogRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(strExtStrlogRecordTable_data);
 
-	DEBUGMSGTL(("strExtStrlogRecordTable", "duplicating row...  "));
+	DEBUGMSGTL(("strExtMIB", "strExtStrlogRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -585,8 +657,10 @@ strExtStrlogRecordTable_destroy(struct strExtStrlogRecordTable_data **thedata)
 {
 	struct strExtStrlogRecordTable_data *StorageDel;
 
-	DEBUGMSGTL(("strExtStrlogRecordTable", "deleting row...  "));
+	DEBUGMSGTL(("strExtMIB", "strExtStrlogRecordTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->strExtStrlogRecordDateAndTime);
+		StorageDel->strExtStrlogRecordDateAndTimeLen = 0;
 		SNMP_FREE(StorageDel->strExtStrlogRecordFlags);
 		StorageDel->strExtStrlogRecordFlagsLen = 0;
 		SNMP_FREE(StorageDel->strExtStrlogRecordMsgString);
@@ -594,7 +668,7 @@ strExtStrlogRecordTable_destroy(struct strExtStrlogRecordTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -612,13 +686,14 @@ strExtStrlogRecordTable_add(struct strExtStrlogRecordTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("strExtStrlogRecordTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* strExtStrlogRecordIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->strExtStrlogRecordIndex, sizeof(thedata->strExtStrlogRecordIndex));
-	header_complex_add_data(&strExtStrlogRecordTableStorage, vars, thedata);
-	DEBUGMSGTL(("strExtStrlogRecordTable", "registered an entry\n"));
-	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	DEBUGMSGTL(("strExtMIB", "strExtStrlogRecordTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* strExtStrlogRecordIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->strExtStrlogRecordIndex, sizeof(thedata->strExtStrlogRecordIndex));
+		header_complex_add_data(&strExtStrlogRecordTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("strExtMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -639,14 +714,14 @@ strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data *thedata)
 {
 	struct strExtStrlogRecordTable_data *StorageDel;
 
-	DEBUGMSGTL(("strExtStrlogRecordTable", "deleting data...  "));
+	DEBUGMSGTL(("strExtMIB", "strExtStrlogRecordTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(strExtStrlogRecordTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&strExtStrlogRecordTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -668,13 +743,20 @@ parse_strExtStrlogRecordTable(const char *token, char *line)
 	size_t tmpsize;
 	struct strExtStrlogRecordTable_data *StorageTmp = strExtStrlogRecordTable_create();
 
-	DEBUGMSGTL(("strExtStrlogRecordTable", "parsing config...  "));
+	DEBUGMSGTL(("strExtMIB", "parse_strExtStrlogRecordTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strExtStrlogRecordIndex, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtStrlogRecordSeqNo, &tmpsize);
+	SNMP_FREE(StorageTmp->strExtStrlogRecordDateAndTime);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strExtStrlogRecordDateAndTime, &StorageTmp->strExtStrlogRecordDateAndTimeLen);
+	if (StorageTmp->strExtStrlogRecordDateAndTime == NULL) {
+		config_perror("invalid specification for strExtStrlogRecordDateAndTime");
+		return;
+	}
 	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->strExtStrlogRecordTimeStamp, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strExtStrlogRecordMid, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strExtStrlogRecordSid, &tmpsize);
@@ -694,7 +776,7 @@ parse_strExtStrlogRecordTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtStrlogRecordRowStatus, &tmpsize);
 	strExtStrlogRecordTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 }
 
 /*
@@ -710,7 +792,7 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
 	struct strExtStrlogRecordTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("strExtStrlogRecordTable", "storing data...  "));
+	DEBUGMSGTL(("strExtMIB", "store_strExtStrlogRecordTable: storing data...  "));
 	refresh_strExtStrlogRecordTable(1);
 	(void) tmpsize;
 	for (hcindex = strExtStrlogRecordTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -722,6 +804,8 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordIndex, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtStrlogRecordSeqNo, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strExtStrlogRecordDateAndTime, &StorageTmp->strExtStrlogRecordDateAndTimeLen);
 			cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->strExtStrlogRecordTimeStamp, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordMid, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordSid, &tmpsize);
@@ -732,7 +816,205 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("strExtStrlogRecordTable", "done.\n"));
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn struct strExtTraceTable_data *strExtTraceTable_create(void)
+ * @brief create a fresh data structure representing a new row in the strExtTraceTable table.
+ *
+ * Creates a new strExtTraceTable_data structure by allocating dynamic memory for the structure and
+ * initializing the default values of columns in the table.  The row status object, if any, should
+ * be set to RS_NOTREADY.
+ */
+struct strExtTraceTable_data *
+strExtTraceTable_create(void)
+{
+	struct strExtTraceTable_data *StorageNew = SNMP_MALLOC_STRUCT(strExtTraceTable_data);
+
+	DEBUGMSGTL(("strExtMIB", "strExtTraceTable_create: creating row...  "));
+	if (StorageNew != NULL) {
+		/* XXX: fill in default row values here into StorageNew */
+		StorageNew->strExtTraceMid = 0;
+		StorageNew->strExtTraceSid = 0;
+		StorageNew->strExtTraceLevel = 0;
+		StorageNew->strExtTraceRowStatus = 0;
+		StorageNew->strExtTraceRowStatus = RS_NOTREADY;
+	}
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
+	return (StorageNew);
+}
+
+/**
+ * @fn struct strExtTraceTable_data *strExtTraceTable_duplicate(struct strExtTraceTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct strExtTraceTable_data *
+strExtTraceTable_duplicate(struct strExtTraceTable_data *thedata)
+{
+	struct strExtTraceTable_data *StorageNew = SNMP_MALLOC_STRUCT(strExtTraceTable_data);
+
+	DEBUGMSGTL(("strExtMIB", "strExtTraceTable_duplicate: duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	strExtTraceTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn int strExtTraceTable_destroy(struct strExtTraceTable_data **thedata)
+ * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
+ * Frees a table row that was previously removed from a table.  Note that the strings associated
+ * with octet strings, object identifiers and bit strings still attached to the structure will also
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
+ * NULL.
+ */
+int
+strExtTraceTable_destroy(struct strExtTraceTable_data **thedata)
+{
+	struct strExtTraceTable_data *StorageDel;
+
+	DEBUGMSGTL(("strExtMIB", "strExtTraceTable_destroy: deleting row...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int strExtTraceTable_add(struct strExtTraceTable_data *thedata)
+ * @param thedata the structure representing the new row in the table.
+ * @brief adds a row to the strExtTraceTable table data set.
+ *
+ * Adds a table row structure to the strExtTraceTable table.  Note that this function is necessary even
+ * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
+ * by the agent to create rows within the table autonomously.
+ */
+int
+strExtTraceTable_add(struct strExtTraceTable_data *thedata)
+{
+	struct variable_list *vars = NULL;
+
+	DEBUGMSGTL(("strExtMIB", "strExtTraceTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* strExtTraceId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->strExtTraceId, sizeof(thedata->strExtTraceId));
+		header_complex_add_data(&strExtTraceTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("strExtMIB", "registered an entry.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int strExtTraceTable_del(struct strExtTraceTable_data *thedata)
+ * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
+ * Deletes a table row structure from the strExtTraceTable table but does not free it.  Note that this
+ * function is necessary even when the table rows are not persistent.  This function can be used
+ * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
+ * structure may either be already extracted from the data set, or the structure may still exist in
+ * the data set.  This function will extract the row from the table if it has not already been
+ * performed by the caller.
+ */
+int
+strExtTraceTable_del(struct strExtTraceTable_data *thedata)
+{
+	struct strExtTraceTable_data *StorageDel;
+
+	DEBUGMSGTL(("strExtMIB", "strExtTraceTable_data: deleting data...  "));
+	if ((StorageDel = thedata) != NULL) {
+		struct header_complex_index *hciptr;
+
+		if ((hciptr = header_complex_find_entry(strExtTraceTableStorage, StorageDel)) != NULL)
+			header_complex_extract_entry(&strExtTraceTableStorage, hciptr);
+	}
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn void parse_strExtTraceTable(const char *token, char *line)
+ * @param token token used within the configuration file.
+ * @param line line from configuration file matching the token.
+ * @brief parse configuration file for strExtTraceTable entries.
+ *
+ * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * file line for the registsred token (in this case strExtTraceTable).  This routine is invoked by UCD-SNMP
+ * to read the values of each row in the table from the configuration file.  Note that this
+ * procedure may exist regardless of the persistence of the table.  If there are no configured
+ * entries in the configuration table, this function will simply not be called.
+ */
+void
+parse_strExtTraceTable(const char *token, char *line)
+{
+	size_t tmpsize;
+	struct strExtTraceTable_data *StorageTmp = strExtTraceTable_create();
+
+	DEBUGMSGTL(("strExtMIB", "parse_strExtTraceTable: parsing config...  "));
+	if (StorageTmp == NULL) {
+		config_perror("malloc failure");
+		return;
+	}
+	/* XXX: remove individual columns if not persistent */
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strExtTraceId, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtTraceMid, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtTraceSid, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtTraceLevel, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strExtTraceRowStatus, &tmpsize);
+	strExtTraceTable_add(StorageTmp);
+	(void) tmpsize;
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
+}
+
+/*
+ * store_strExtTraceTable(): store configuraiton file for strExtTraceTable
+ * stores .conf file entries needed to configure the mib.
+ */
+int
+store_strExtTraceTable(int majorID, int minorID, void *serverarg, void *clientarg)
+{
+	char line[SNMP_MAXBUF];
+	char *cptr;
+	size_t tmpsize;
+	struct strExtTraceTable_data *StorageTmp;
+	struct header_complex_index *hcindex;
+
+	DEBUGMSGTL(("strExtMIB", "store_strExtTraceTable: storing data...  "));
+	refresh_strExtTraceTable(1);
+	(void) tmpsize;
+	for (hcindex = strExtTraceTableStorage; hcindex != NULL; hcindex = hcindex->next) {
+		StorageTmp = (struct strExtTraceTable_data *) hcindex->data;
+		/* XXX: comment entire section if row not persistent */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "strExtTraceTable ");
+			cptr = line + strlen(line);
+			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtTraceId, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtTraceMid, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtTraceSid, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtTraceLevel, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtTraceRowStatus, &tmpsize);
+			snmpd_store_config(line);
+		}
+	}
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -746,12 +1028,14 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
-void
+struct strExtStrlogRecordTable_data *
 refresh_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, int force)
 {
 	if (!StorageTmp || (!force && StorageTmp->strExtStrlogRecordTable_request == sa_request))
-		return;
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
 	StorageTmp->strExtStrlogRecordTable_request = sa_request;
+	return (StorageTmp);
 }
 
 /**
@@ -770,8 +1054,8 @@ refresh_strExtStrlogRecordTable(int force)
 {
 	if (!force && strExtStrlogRecordTable_refresh == 0)
 		return;
-	strExtStrlogRecordTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
+	strExtStrlogRecordTable_refresh = 0;
 }
 
 /**
@@ -791,13 +1075,26 @@ var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
 	refresh_strExtStrlogRecordTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(strExtStrlogRecordTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_strExtStrlogRecordTable_row(StorageTmp, 0);
+	while ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_strExtStrlogRecordTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
+	case (u_char) STREXTSTRLOGRECORDSEQNO:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtStrlogRecordSeqNo);
+		rval = (u_char *) &StorageTmp->strExtStrlogRecordSeqNo;
+		break;
+	case (u_char) STREXTSTRLOGRECORDDATEANDTIME:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->strExtStrlogRecordDateAndTimeLen;
+		rval = (u_char *) StorageTmp->strExtStrlogRecordDateAndTime;
+		break;
 	case (u_char) STREXTSTRLOGRECORDTIMESTAMP:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
@@ -853,6 +1150,105 @@ var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn void refresh_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the strExtTraceTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct strExtTraceTable_data *
+refresh_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->strExtTraceTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->strExtTraceTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_strExtTraceTable(int force)
+ * @param force force refresh if non-zero.
+ * @brief refresh the scalar values of the strExtTraceTable.
+ *
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread scalars and
+ * tables from the STREAMS subsystem.  This function is used when the agent starts for the first
+ * time, or after a SIGPOLL has been received (and a row or column has been requested).
+ */
+void
+refresh_strExtTraceTable(int force)
+{
+	if (!force && strExtTraceTable_refresh == 0)
+		return;
+	/* XXX: Here, update the table as required... */
+	strExtTraceTable_refresh = 0;
+}
+
+/**
+ * @fn u_char *var_strExtTraceTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
+ * @brief locate variables in strExtTraceTable.
+ *
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_strExtMIB above.
+ */
+u_char *
+var_strExtTraceTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+{
+	struct strExtTraceTable_data *StorageTmp = NULL;
+	u_char *rval;
+
+	DEBUGMSGTL(("strExtMIB", "var_strExtTraceTable: Entering...  \n"));
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
+	refresh_strExtTraceTable(0);
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
+	while ((StorageTmp = header_complex(strExtTraceTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_strExtTraceTable_row(StorageTmp, 0)) || exact)
+			break;
+	*write_method = NULL;
+	*var_len = 0;
+	rval = NULL;
+	/* This is where we do the value assignments for the mib results. */
+	switch (vp->magic) {
+	case (u_char) STREXTTRACEMID:	/* Create */
+		*write_method = write_strExtTraceMid;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtTraceMid);
+		rval = (u_char *) &StorageTmp->strExtTraceMid;
+		break;
+	case (u_char) STREXTTRACESID:	/* Create */
+		*write_method = write_strExtTraceSid;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtTraceSid);
+		rval = (u_char *) &StorageTmp->strExtTraceSid;
+		break;
+	case (u_char) STREXTTRACELEVEL:	/* Create */
+		*write_method = write_strExtTraceLevel;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtTraceLevel);
+		rval = (u_char *) &StorageTmp->strExtTraceLevel;
+		break;
+	case (u_char) STREXTTRACEROWSTATUS:	/* Create */
+		*write_method = write_strExtTraceRowStatus;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->strExtTraceRowStatus);
+		rval = (u_char *) &StorageTmp->strExtTraceRowStatus;
+		break;
+	default:
+		ERROR_MSG("");
+	}
+	return (rval);
+}
+
+/**
  * @fn int write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
@@ -868,11 +1264,12 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 {
 	static ulong old_value;
 	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 14;
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordMid entering action=%d...  \n", action));
-	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -907,17 +1304,17 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordMid for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordMid;
 		StorageTmp->strExtStrlogRecordMid = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->strExtStrlogRecordMid = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -939,11 +1336,12 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 {
 	static ulong old_value;
 	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 14;
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordSid entering action=%d...  \n", action));
-	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -978,17 +1376,17 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordSid for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordSid;
 		StorageTmp->strExtStrlogRecordSid = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->strExtStrlogRecordSid = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1010,11 +1408,12 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 {
 	static ulong old_value;
 	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 14;
+	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordLevel entering action=%d...  \n", action));
-	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -1049,17 +1448,17 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordLevel for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordLevel;
 		StorageTmp->strExtStrlogRecordLevel = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->strExtStrlogRecordLevel = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1081,15 +1480,17 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 {
 	static uint8_t *old_value;
 	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 14;
+	size_t newlen = name_len - 15;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordFlags entering action=%d...  \n", action));
-	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->strExtStrlogRecordRowStatus) {
@@ -1120,9 +1521,6 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordFlags for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordFlags;
@@ -1130,14 +1528,17 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 		StorageTmp->strExtStrlogRecordFlags = string;
 		StorageTmp->strExtStrlogRecordFlagsLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtStrlogRecordFlags = old_value;
-		StorageTmp->strExtStrlogRecordFlagsLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtStrlogRecordFlags = old_value;
+		StorageTmp->strExtStrlogRecordFlagsLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1159,15 +1560,17 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 {
 	static uint8_t *old_value;
 	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 14;
+	size_t newlen = name_len - 15;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordMsgString entering action=%d...  \n", action));
-	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->strExtStrlogRecordRowStatus) {
@@ -1199,9 +1602,6 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordMsgString for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->strExtStrlogRecordMsgString;
@@ -1209,14 +1609,233 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 		StorageTmp->strExtStrlogRecordMsgString = string;
 		StorageTmp->strExtStrlogRecordMsgStringLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtStrlogRecordMsgString = old_value;
-		StorageTmp->strExtStrlogRecordMsgStringLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtStrlogRecordMsgString = old_value;
+		StorageTmp->strExtStrlogRecordMsgStringLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct strExtTraceTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 14;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("strExtMIB", "write_strExtTraceMid entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->strExtTraceRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceMid: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceMid not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceMid: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges -1..-1 0..16383 */
+		if (set_value != -1 && (0 > set_value || set_value > 16383)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceMid: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceMid for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
+		old_value = StorageTmp->strExtTraceMid;
+		StorageTmp->strExtTraceMid = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtTraceMid = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct strExtTraceTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 14;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("strExtMIB", "write_strExtTraceSid entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->strExtTraceRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceSid: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceSid not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceSid: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges -1..-1 0..16383 */
+		if (set_value != -1 && (0 > set_value || set_value > 16383)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceSid: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceSid for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
+		old_value = StorageTmp->strExtTraceSid;
+		StorageTmp->strExtTraceSid = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtTraceSid = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct strExtTraceTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 14;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("strExtMIB", "write_strExtTraceLevel entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->strExtTraceRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLevel: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLevel not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLevel: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: ranges -1..-1 0..255 */
+		if (set_value != -1 && (0 > set_value || set_value > 255)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLevel: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceLevel for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		old_value = StorageTmp->strExtTraceLevel;
+		StorageTmp->strExtTraceLevel = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtTraceLevel = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1253,6 +1872,7 @@ write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strNlogargs: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value 20 */
 		/* Note: ranges 0..64 */
 		if ((0 > set_value || set_value > 64)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strNlogargs: bad value\n");
@@ -1261,17 +1881,250 @@ write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->strNlogargs;
 		StorageTmp->strNlogargs = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->strNlogargs = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_strExtLogMsgSize(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Scalar write routine.
+ */
+int
+write_strExtLogMsgSize(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static ulong old_value;
+	struct strExtMIB_data *StorageTmp = NULL;
+	ulong set_value = *((ulong *) var_val);
+
+	DEBUGMSGTL(("strExtMIB", "write_strExtLogMsgSize entering action=%d...  \n", action));
+	if ((StorageTmp = strExtMIBStorage) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	switch (action) {
+	case RESERVE1:
+		if (var_val_type != ASN_UNSIGNED) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtLogMsgSize not ASN_UNSIGNED\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(uint32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtLogMsgSize: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 1024 */
+		/* Note: ranges 256..4096 */
+		if ((256 > set_value || set_value > 4096)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtLogMsgSize: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
+		old_value = StorageTmp->strExtLogMsgSize;
+		StorageTmp->strExtLogMsgSize = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtLogMsgSize = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_strExtConsoleLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Scalar write routine.
+ */
+int
+write_strExtConsoleLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct strExtMIB_data *StorageTmp = NULL;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("strExtMIB", "write_strExtConsoleLog entering action=%d...  \n", action));
+	if ((StorageTmp = strExtMIBStorage) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	switch (action) {
+	case RESERVE1:
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtConsoleLog not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtConsoleLog: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value false */
+		switch (set_value) {
+		case TV_TRUE:
+		case TV_FALSE:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtConsoleLog: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
+		old_value = StorageTmp->strExtConsoleLog;
+		StorageTmp->strExtConsoleLog = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtConsoleLog = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_strExtErrorLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Scalar write routine.
+ */
+int
+write_strExtErrorLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct strExtMIB_data *StorageTmp = NULL;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("strExtMIB", "write_strExtErrorLog entering action=%d...  \n", action));
+	if ((StorageTmp = strExtMIBStorage) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	switch (action) {
+	case RESERVE1:
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtErrorLog not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtErrorLog: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value false */
+		switch (set_value) {
+		case TV_TRUE:
+		case TV_FALSE:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtErrorLog: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
+		old_value = StorageTmp->strExtErrorLog;
+		StorageTmp->strExtErrorLog = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtErrorLog = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_strExtTraceLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Scalar write routine.
+ */
+int
+write_strExtTraceLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct strExtMIB_data *StorageTmp = NULL;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("strExtMIB", "write_strExtTraceLog entering action=%d...  \n", action));
+	if ((StorageTmp = strExtMIBStorage) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	switch (action) {
+	case RESERVE1:
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLog not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLog: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value false */
+		switch (set_value) {
+		case TV_TRUE:
+		case TV_FALSE:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLog: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+				   the UNDO case */
+		old_value = StorageTmp->strExtTraceLog;
+		StorageTmp->strExtTraceLog = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->strExtTraceLog = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1295,6 +2148,23 @@ strExtStrlogRecordTable_consistent(struct strExtStrlogRecordTable_data *thedata)
 }
 
 /**
+ * @fn int strExtTraceTable_consistent(struct strExtTraceTable_data *thedata)
+ * @param thedata the row data to check for consistency.
+ * @brief check the internal consistency of a table row.
+ *
+ * This function checks the internal consistency of a table row for the strExtTraceTable table.  If the
+ * table row is internally consistent, then this function returns true (1), otherwise the function
+ * returns false (0) and it will not be possible to activate the row until the row's internal
+ * consistency is corrected.
+ */
+int
+strExtTraceTable_consistent(struct strExtTraceTable_data *thedata)
+{
+	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
+	return (1);
+}
+
+/**
  * @fn int write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
@@ -1310,12 +2180,13 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 {
 	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
 	static struct strExtStrlogRecordTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 14;
+	size_t newlen = name_len - 15;
 	static int old_value;
 	int set_value;
 	static struct variable_list *vars, *vp;
 
-	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
+	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordRowStatus entering action=%d...  \n", action));
+	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -1329,6 +2200,8 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -1376,16 +2249,24 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[14]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[15]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* strExtStrlogRecordIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index strExtStrlogRecordIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = strExtStrlogRecordTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->strExtStrlogRecordIndex = *vp->val.integer;
+			StorageNew->strExtStrlogRecordIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&strExtStrlogRecordTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -1398,22 +2279,6 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			strExtStrlogRecordTable_del(StorageNew);
-			strExtStrlogRecordTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			strExtStrlogRecordTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -1435,16 +2300,6 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 			/* set the flag? */
 			old_value = StorageTmp->strExtStrlogRecordRowStatus;
 			StorageTmp->strExtStrlogRecordRowStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->strExtStrlogRecordRowStatus = old_value;
 			break;
 		}
 		break;
@@ -1489,6 +2344,246 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->strExtStrlogRecordRowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				strExtStrlogRecordTable_del(StorageNew);
+				strExtStrlogRecordTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				strExtStrlogRecordTable_add(StorageDel);
+			break;
+		}
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Row status write routine.
+ */
+int
+write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	struct strExtTraceTable_data *StorageTmp = NULL;
+	static struct strExtTraceTable_data *StorageNew, *StorageDel;
+	size_t newlen = name_len - 14;
+	static int old_value;
+	int set_value;
+	static struct variable_list *vars, *vp;
+
+	DEBUGMSGTL(("strExtMIB", "write_strExtTraceRowStatus entering action=%d...  \n", action));
+	StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
+	if (var_val_type != ASN_INTEGER || var_val == NULL) {
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceRowStatus not ASN_INTEGER\n");
+		return SNMP_ERR_WRONGTYPE;
+	}
+	set_value = *((long *) var_val);
+	/* check legal range, and notReady is reserved for us, not a user */
+	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY) {
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceRowStatus: bad value\n");
+		return SNMP_ERR_WRONGVALUE;
+	}
+	switch (action) {
+	case RESERVE1:
+		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->strExtTraceRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->strExtTraceTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->strExtTraceTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
+		}
+		break;
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			vars = NULL;
+			/* strExtTraceId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			if (header_complex_parse_oid(&(name[14]), newlen, vars) != SNMPERR_SUCCESS) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vars;
+			/* strExtTraceId */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index strExtTraceId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			if ((StorageNew = strExtTraceTable_create()) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			vp = vars;
+			StorageNew->strExtTraceId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			header_complex_add_data(&strExtTraceTableStorage, vars, StorageNew);	/* frees vars */
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				StorageDel = StorageTmp;
+				strExtTraceTable_del(StorageDel);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_ACTIVE:
+			old_value = StorageTmp->strExtTraceRowStatus;
+			StorageTmp->strExtTraceRowStatus = set_value;
+			if (old_value != RS_ACTIVE) {
+				/* check that activation is possible */
+				if (!strExtTraceTable_consistent(StorageTmp)) {
+					StorageTmp->strExtTraceRowStatus = old_value;
+					return SNMP_ERR_INCONSISTENTVALUE;
+				}
+			}
+			break;
+		case RS_NOTINSERVICE:
+			/* set the flag? */
+			old_value = StorageTmp->strExtTraceRowStatus;
+			StorageTmp->strExtTraceRowStatus = set_value;
+			break;
+		}
+		break;
+	case COMMIT:
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* check if row is ready, otherwise leave at RS_NOTREADY */
+			if (strExtTraceTable_consistent(StorageNew)) {
+				/* XXX: commit creation to underlying device */
+				/* XXX: activate with underlying device */
+				StorageNew->strExtTraceRowStatus = RS_ACTIVE;
+			}
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			/* check if row is ready, otherwise leave at RS_NOTREADY */
+			if (strExtTraceTable_consistent(StorageNew)) {
+				/* XXX: commit creation to underlying device, inactive */
+				StorageNew->strExtTraceRowStatus = RS_NOTINSERVICE;
+			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			if (old_value != set_value) {
+				switch (set_value) {
+				case RS_ACTIVE:
+					/* XXX: activate with underlying device */
+					break;
+				case RS_NOTINSERVICE:
+					/* XXX: deactivate with underlying device */
+					break;
+				}
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			strExtTraceTable_destroy(&StorageDel);
+			/* strExtTraceTable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->strExtTraceRowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				strExtTraceTable_del(StorageNew);
+				strExtTraceTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				strExtTraceTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -1498,6 +2593,7 @@ send_strStrlogRecord_v2trap(struct variable_list *vars)
 {
 	struct variable_list trap;
 
+	DEBUGMSGTL(("strExtMIB", "send_strStrlogRecord_v2trap: sending trap...  "));
 	trap.next_variable = vars;
 	trap.name = snmpTrapOID_oid;
 	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
@@ -1506,10 +2602,9 @@ send_strStrlogRecord_v2trap(struct variable_list *vars)
 	trap.val_len = sizeof(strStrlogRecord_oid);
 	trap.index = 0;
 	send_v2trap(&trap);
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 }
 
-#if defined MODULE
-#if defined MASTER
 /**
  * @fn void strExtMIB_loop_handler(int dummy)
  * @param sig signal number
@@ -1528,25 +2623,25 @@ send_strStrlogRecord_v2trap(struct variable_list *vars)
 void
 strExtMIB_loop_handler(int sig)
 {
-	if (external_signal_scheduled[sig] == 0)
-		external_signal_scheduled[sig]--;
+	DEBUGMSGTL(("strExtMIB", "strExtMIB_loop_handler: executing loop handler...  "));
 	/* close files after each request */
 	if (sa_fclose) {
-		if (sa_fd != 0) {
-			close(sa_fd);
-			sa_fd = 0;
-		}
-		if (my_fd != 0) {
+		if (my_fd >= 0) {
 			close(my_fd);
-			my_fd = 0;
+			my_fd = -1;
 		}
 	}
+#if defined MASTER
 	/* prepare for next request */
 	sa_request++;
+#endif				/* defined MASTER */
+	if (external_signal_scheduled[sig] == 0)
+		external_signal_scheduled[sig]--;
 	if (strExtMIBold_signal_handler != NULL)
 		(*strExtMIBold_signal_handler) (sig);
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 }
-#endif				/* defined MASTER */
+
 /**
  * @fn void strExtMIB_fd_handler(int fd, void *dummy)
  * @param fd file descriptor to read.
@@ -1562,1089 +2657,8 @@ strExtMIB_loop_handler(int sig)
 void
 strExtMIB_fd_handler(int fd, void *dummy)
 {
-	/* XXX: place actions to handle sa_readfd here... */
+	DEBUGMSGTL(("strExtMIB", "strExtMIB_fd_handler: executing fd handler...  "));
+	/* XXX: place actions to handle my_fd here... */
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return;
 }
-#endif				/* defined MOUDLE */
-#if defined MASTER
-const char sa_program[] = "strextmib";
-int sa_fclose = 1;			/* default close files between requests */
-int sa_fd = 0;				/* file descriptor for MIB use */
-int sa_readfd = 0;			/* file descriptor for autonomnous events */
-int sa_changed = 1;			/* indication to reread MIB configuration */
-int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
-int sa_request = 1;			/* request number for per-request actions */
-#endif				/* defined MASTER */
-#if defined MASTER
-#if !defined MODULE
-int sa_dump = 0;			/* default packet dump */
-int sa_debug = 0;			/* default no debug */
-int sa_nomead = 1;			/* default daemon mode */
-int sa_output = 1;			/* default normal output */
-int sa_agentx = 1;			/* default agentx mode */
-int sa_alarms = 1;			/* default application alarms */
-int sa_logaddr = 0;			/* log addresses */
-int sa_logfillog = 0;			/* log to sa_logfile */
-int sa_logstderr = 0;			/* log to standard error */
-int sa_logstdout = 0;			/* log to standard output */
-int sa_logsyslog = 0;			/* log to system logs */
-int sa_logcallog = 0;			/* log to callback logs */
-int sa_appendlog = 0;			/* append to log file without truncating */
-char sa_logfile[256] = "/var/log/strextmib.log";
-char sa_pidfile[256] = "/var/run/strextmib.pid";
-char sa_sysctlf[256] = "/etc/strextmib.conf";
-int allow_severity = LOG_ERR;
-int deny_severity = LOG_ERR;
-
-/* file stream for log file */
-FILE *stdlog = NULL;
-static void
-sa_version(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
-%2$s\n\
-Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved.\n\
-Distributed under Affero GPL Version 3, included here by reference.\n\
-See `%1$s --copying' for copying permissions.\n\
-", argv[0], ident);
-}
-static void
-sa_usage(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stderr, "\
-Usage:\n\
-    %1$s [general-options] [options] [arguments]\n\
-    %1$s {-H|--help-directives}\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
-    %1$s {-C|--copying}\n\
-", argv[0]);
-}
-static void
-sa_help(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
-Usage:\n\
-    %1$s [general-options] [options] [arguments]\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
-    %1$s {-C|--copying}\n\
-Arguments:\n\
-    None.\n\
-Options:\n\
-    -a, --log-addresses\n\
-        log addresses of connecting management stations.\n\
-    -A, --append\n\
-        append to logfiles without truncating.\n\
-    -c, --config-file CONFIGFILE\n\
-        use configuration file CONFIGFILE.\n\
-    -C, --config-only\n\
-        only load configuration given by -c option.\n\
-    -d, --dump\n\
-        dump sent and received PDUs.\n\
-    -D, --debug [LEVEL]\n\
-        set debugging verbosity to LEVEL.\n\
-    -D, --debug-tokens [TOKEN[,TOKEN]*]\n\
-        debug specified TOKEN's.\n\
-    -f, --dont-fork\n\
-        run in the foreground.\n\
-    -g, --gid, --groupid GID\n\
-        become group GID after listening.\n\
-    -h, --help, -?, --?\n\
-        print usage information and exit.\n\
-    -H, --help-directives\n\
-        print config directives and exit.\n\
-    -I, --initialize [-]MODULE[,MODULE]*\n\
-        initialize (or not, '-') these MODULE's.\n\
-    -k, --keep-open\n\
-        keep system files open between requests.\n\
-    -l, --log-file [LOGFILE]\n\
-        log to log file name LOGFILE.  [default: /var/log/strextmib.log]\n\
-    -L, --log-stderr\n\
-        log to controlling terminal standard error.\n\
-    -m, --mibs [+]MIB[,MIB]*\n\
-        load these (additional '+') MIBs.\n\
-    -M, --master\n\
-        run as SNMP master instead of AgentX sub-agent.\n\
-    -M, --mibdirs [+]MIBDIR[:MIBDIR]*\n\
-        search these (additional, '+') colon separated directories for MIBs.\n\
-    -n, --nodaemon\n\
-        run in the foreground.\n\
-    -n, --name NAME\n\
-        use NAME for configuration file base.  [default: strextmib]\n\
-    -p, --port PORTNUM\n\
-        listen on port number PORTNUM.  [default: 161]\n\
-    -p, --pidfile PIDFILE\n\
-        write daemon pid to PIDFILE.  [default: /var/run/strextmib.pid]\n\
-    -P, --pidfile PIDFILE\n\
-        write daemon pid to PIDFILE.  [default: /var/run/strextmib.pid]\n\
-    -q, --quiet\n\
-        suppress normal output.\n\
-    -q, --quick\n\
-        abbreviate output for machine readability.\n\
-    -r, --noroot\n\
-        do not require root privilege.\n\
-    -s, --log-syslog\n\
-        log to system logs.\n\
-    -S, --sysctl-file FILENAME\n\
-        write sysctl config file FILENAME.  [default: /etc/streams.conf]\n\
-    -t, --agent-alarms\n\
-        agent blocks {SIGALARM}.\n\
-    -T, --transport [TRANSPORT]\n\
-        default transport TRANSPORT.  [default: udp]\n\
-    -u, --uid, --userid UID\n\
-        become user UID after listening.\n\
-    -U, --dont-remove-pidfile\n\
-        do not remove PIDFILE when shutting down.\n\
-    -v, --version\n\
-        print version information and exit.\n\
-    -V, --verbose [LEVEL]\n\
-        be verbose to LEVEL.  [default: 1]\n\
-    -x, --agentx-socket [SOCKET]\n\
-        master AgentX on SOCKET.  [default: /var/agentx/master]\n\
-    -X, --agentx\n\
-        run as AgentX sub-agent instead of master (the default).\n\
-    -y, --copying\n\
-        print copying information and exit.\n\
-", argv[0]);
-}
-static void
-sa_copying(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
---------------------------------------------------------------------------------\n\
-%1$s\n\
---------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com>\n\
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
-\n\
-All Rights Reserved.\n\
---------------------------------------------------------------------------------\n\
-This program is free software; you can  redistribute  it and/or modify  it under\n\
-the terms of the GNU Affero General Public License as published by the Free\n\
-Software Foundation; Version 3 of the License.\n\
-\n\
-This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
-WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
-PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\
-\n\
-You should have received a copy of the GNU  Affero  General Public License along\n\
-with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the\n\
-Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
---------------------------------------------------------------------------------\n\
-U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
-of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
-the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
-as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
-Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
-regulations) and the  Government  is acquiring  only the  license rights granted\n\
-herein (the license rights customarily provided to non-Government users). If the\n\
-Software is supplied to any unit or agency of the Government  other than DoD, it\n\
-is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
-the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
-Regulations (\"FAR\")  (or any successor regulations) or, in the cases of NASA, in\n\
-paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
-regulations).\n\
---------------------------------------------------------------------------------\n\
-Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
-Corporation at a fee.  See http://www.openss7.com/\n\
---------------------------------------------------------------------------------\n\
-", ident);
-}
-
-void
-sa_help_directives(int argc, char *argv[])
-{
-	ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
-	init_agent("strExtMIB");
-	// init_mib_modules();
-	init_mib();
-	init_snmp("strExtMIB");
-	snmp_log(MY_FACILITY(LOG_INFO), "Configuration directives understood:\n");
-	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be writen to standard error and not standard output. */
-	read_config_print_usage("    ");
-}
-static int
-sa_sig_register(int signum, RETSIGTYPE(*handler) (int))
-{
-	sigset_t mask;
-	struct sigaction act;
-
-	act.sa_handler = handler ? handler : SIG_DFL;
-	act.sa_flags = handler ? SA_RESTART : 0;
-	sigemptyset(&act.sa_mask);
-	if (sigaction(signum, &act, NULL))
-		return (-1);
-	sigemptyset(&mask);
-	sigaddset(&mask, signum);
-	sigprocmask(handler ? SIG_UNBLOCK : SIG_BLOCK, &mask, NULL);
-	return (0);
-}
-static int sa_alm_signal = 0;
-static int sa_pol_signal = 0;
-static int sa_hup_signal = 0;
-static int sa_int_signal = 0;
-static int sa_trm_signal = 0;
-static int sa_alm_handle = 0;
-void
-sa_alm_callback(uint req, void *arg)
-{
-	if (req == sa_alm_handle)
-		sa_alm_handle = 0;
-	sa_alm_signal = 1;
-	return;
-}
-
-static RETSIGTYPE
-sa_alm_handler(int signum)
-{
-	sa_alm_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static void
-sa_snmp_alm_handler(uint reg, void *clientarg)
-{
-	sa_alm_signal = 1;
-	return;
-}
-static int
-sa_alm_catch(void)
-{
-	if (sa_alarms)
-		return sa_sig_register(SIGALRM, &sa_alm_handler);
-	return (-1);
-}
-static int
-sa_alm_block(void)
-{
-	if (sa_alarms)
-		return sa_sig_register(SIGALRM, NULL);
-	if (sa_alm_handle) {
-		uint handle = sa_alm_handle;
-
-		sa_alm_handle = 0;
-		snmp_alarm_unregister(handle);
-	}
-	return (0);
-}
-static int
-sa_alm_action(void)
-{
-	sa_alm_signal = 0;
-	return (0);
-}
-
-static RETSIGTYPE
-sa_pol_handler(int signum)
-{
-	sa_pol_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_pol_catch(void)
-{
-	return sa_sig_register(SIGPOLL, &sa_pol_handler);
-}
-static int
-sa_pol_block(void)
-{
-	return sa_sig_register(SIGPOLL, NULL);
-}
-
-/*
- * Both the sc(4) module and sad(4) driver issue an M_PCSIG message with
- * SIGPOLL to the stream head whenever the STREAMS configuration or autopush
- * configuration changes, indicating to the agent which has the sc(4) or
- * sad(4) Stream open that it is necessary to reread information from the
- * kernel.  This fact is merely recorded, as this information is not read each
- * time that a configuration change occurs, but only after a request from some
- * portion of that information occurs. This condition is also set when the
- * sc(4) and sad(4) Streams are first opened. The SIGPOLL will also deliver in
- * siginfo the file descriptor issuing the signal, so we could distiguish
- * between sc(4) and sad(4) signals, but since one can be pushed over the
- * other, there is little point in distinguishing.
- *
- * sc(4) or sad(4) also should be modified to provide the general streams
- * statistics supported here; even though they are available through the /proc
- * filesystem on Linux Fast-STREAMS.
- */
-static int
-sa_pol_action(void)
-{
-	sa_pol_signal = 0;
-	snmp_log(MY_FACILITY(LOG_INFO), "%s: Caught SIGPOLL, will re-read data structures", sa_program);
-	sa_changed = 1;
-	return (0);
-}
-
-static RETSIGTYPE
-sa_hup_handler(int signum)
-{
-	sa_hup_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_hup_catch(void)
-{
-	if (sa_agentx)
-		return sa_sig_register(SIGHUP, &sa_hup_handler);
-	return (-1);
-}
-static int
-sa_hup_block(void)
-{
-	return sa_sig_register(SIGHUP, NULL);
-}
-static int
-sa_hup_action(void)
-{
-	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by logrotate asking us to close and reopen our log files. */
-	sa_hup_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "Caught SIGHUP, reopening files.");
-	if (sa_output > 1)
-		snmp_log(MY_FACILITY(LOG_NOTICE), "Reopening output file %s", sa_logfile);
-	if (sa_logfillog != 0) {
-		fflush(stdlog);
-		fclose(stdlog);
-		snmp_disable_filelog();
-		if ((stdlog = freopen(sa_logfile, sa_appendlog ? "a" : "w", stdlog)) == NULL) {
-			/* I hope we have another log sink. */
-			snmp_log(MY_FACILITY(LOG_ERR), "%s", strerror(errno));
-			snmp_log(MY_FACILITY(LOG_ERR), "Could not reopen log file %s", sa_logfile);
-		}
-		snmp_enable_filelog(sa_logfile, sa_appendlog);
-	}
-	return (0);
-}
-
-static RETSIGTYPE
-sa_int_handler(int signum)
-{
-	sa_int_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_int_catch(void)
-{
-	return sa_sig_register(SIGINT, &sa_int_handler);
-}
-static int
-sa_int_block(void)
-{
-	return sa_sig_register(SIGINT, NULL);
-}
-static void sa_exit(int retval);
-static int
-sa_int_action(void)
-{
-	sa_int_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "%s: Caught SIGINT, shutting down", sa_program);
-	sa_exit(0);
-	return (0);		/* should be no return */
-}
-
-static RETSIGTYPE
-sa_trm_handler(int signum)
-{
-	sa_trm_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_trm_catch(void)
-{
-	return sa_sig_register(SIGTERM, &sa_trm_handler);
-}
-static int
-sa_trm_block(void)
-{
-	return sa_sig_register(SIGTERM, NULL);
-}
-static void sa_exit(int retval);
-static int
-sa_trm_action(void)
-{
-	sa_trm_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "%s: Caught SIGTERM, shutting down", sa_program);
-	sa_exit(0);
-	return (0);		/* should be no return */
-}
-static void
-sa_sig_catch(void)
-{
-	sa_alm_catch();
-	sa_pol_catch();
-	sa_hup_catch();
-	sa_int_catch();
-	sa_trm_catch();
-}
-static void
-sa_sig_block(void)
-{
-	sa_alm_block();
-	sa_pol_block();
-	sa_hup_block();
-	sa_int_block();
-	sa_trm_block();
-}
-
-int
-sa_start_timer(long duration)
-{
-	if (sa_alarms) {
-		struct itimerval setting = {
-			{0, 0},
-			{duration / 1000, (duration % 1000) * 1000}
-		};
-		if (sa_alm_catch())
-			return (-1);
-		if (setitimer(ITIMER_REAL, &setting, NULL))
-			return (-1);
-		sa_alm_signal = 0;
-		return (0);
-	} else {
-#if defined NETSNMP_DS_APPLICATION_ID
-		struct timeval setting = {
-			duration / 1000, (duration % 1000) * 1000
-		};
-		sa_alm_handle = snmp_alarm_register_hr(setting, 0, sa_snmp_alm_handler, NULL);
-#else
-		sa_alm_handle = snmp_alarm_register((duration + 999) / 1000, 0, sa_snmp_alm_handler, NULL);
-#endif
-		return (sa_alm_handle ? 0 : -1);
-	}
-}
-static void
-sa_exit(int retval)
-{
-	if (retval)
-		snmp_log(MY_FACILITY(LOG_ERR), "%s: Exiting %d", sa_program, retval);
-	else
-		snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Exiting %d", sa_program, retval);
-	fflush(stdout);
-	fflush(stderr);
-	sa_sig_block();
-	closelog();
-	exit(retval);
-}
-static void
-sa_init_logging(int argc, char *argv[])
-{
-	static char progname[256];
-
-	/* The purpose of this function is to bring logging up before forking (and while still in the foreground) so that we can use the snmp_log() function before and during forking if necessary.
-	   Note that the default configuration for snmp_log() is to send all logs to standard error. */
-	strncpy(progname, basename(argv[0]), sizeof(progname));
-	snmp_disable_log();
-	if (sa_logfillog) {
-		snmp_enable_filelog(sa_logfile, sa_appendlog);
-	}
-	if (sa_logstderr | sa_logstdout) {
-#if defined LOG_PERROR
-		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better 
-		   formated. */
-		if (!sa_logsyslog)
-			snmp_enable_stderrlog();
-#else				/* defined LOG_PERROR */
-		snmp_enable_stderrlog();
-#endif				/* defined LOG_PERROR */
-	}
-	if (sa_logsyslog) {
-#if !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT
-		snmp_enable_syslog();
-#else				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		snmp_enable_syslog_ident("strExtMIB", LOG_DAEMON);
-#endif				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		/* Note that the way that snmp sets up the logger is not really the way we want it, so close the log and reopen it the way we want. */
-		closelog();
-#if defined LOG_PERROR
-		openlog("strExtMIB", LOG_PID | LOG_CONS | LOG_NDELAY | (sa_logstderr ? LOG_PERROR : 0), MY_FACILITY(0));
-#else				/* defined LOG_PERROR */
-		openlog("strExtMIB", LOG_PID | LOG_CONS | LOG_NDELAY, MY_FACILITY(0));
-#endif				/* defined LOG_PERROR */
-	}
-	if (sa_logcallog) {
-		snmp_enable_calllog();
-	}
-}
-static void
-sa_enter(int argc, char *argv[])
-{
-	if (sa_nomead) {
-		pid_t pid;
-
-		if ((pid = fork()) < 0) {
-			perror(argv[0]);
-			exit(2);
-		} else if (pid != 0) {
-			/* parent exits */
-			exit(0);
-		}
-		setsid();	/* become a session leader */
-		/* fork once more for SVR4 */
-		if ((pid = fork()) < 0) {
-			perror(argv[0]);
-			exit(2);
-		} else if (pid != 0) {
-			/* parent responsible for writing pid file */
-			if (sa_nomead || sa_pidfile[0] != '\0') {
-				FILE *pidf;
-
-				/* initialize default filename */
-				if (sa_pidfile[0] == '\0')
-					snprintf(sa_pidfile, sizeof(sa_pidfile), "/var/run/%s.pid", sa_program);
-				if (sa_output > 1) {
-					snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Writing daemon pid to file %s", sa_program, sa_pidfile);
-				}
-				if ((pidf = fopen(sa_pidfile, "w+"))) {
-					fprintf(pidf, "%d", (int) pid);
-					fflush(pidf);
-					fclose(pidf);
-				} else {
-					snmp_log(MY_FACILITY(LOG_ERR), "%s: %m", sa_program);
-					snmp_log(MY_FACILITY(LOG_ERR), "%s: Could not write pid to file %s", sa_program, sa_pidfile);
-					sa_exit(2);
-					/* no return */
-				}
-			}
-			/* parent exits */
-			exit(0);
-		}
-		/* child continues */
-		/* release current directory */
-		if (chdir("/") < 0) {
-			perror(argv[0]);
-			exit(2);
-		}
-		umask(0);	/* clear file creation mask */
-		/* rearrange file streams */
-		fclose(stdin);
-	}
-	/* continue as foreground or background */
-	sa_init_logging(argc, argv);
-	sa_sig_catch();
-	snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Startup complete.", sa_program);
-}
-static void
-sa_mloop(int argc, char *argv[])
-{
-	if (sa_agentx) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as AgentX client\n", argv[0]);
-		/* run as an AgentX client */
-		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
-	} else {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as SNMP master agent\n", argv[0]);
-		/* run as SNMP master */
-		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
-	}
-	if (sa_alarms) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using application alarms\n", argv[0]);
-		/* use application alarms */
-		ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
-	}
-	/* initialize agent */
-	init_agent("strExtMIB");
-	/* initialize MIB */
-	init_strExtMIB();
-	/* initialize SNMP */
-	init_snmp("strExtMIB");
-	if (!sa_agentx) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as SNMP master\n", argv[0]);
-#if !defined NETSNMP_DS_APPLICATION_ID
-		init_master_agent(710, NULL, NULL);
-#else
-		init_master_agent();
-#endif
-	}
-	for (;;) {
-		int retval;
-
-		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of the agentx socket and add it to the fdset. */
-		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
-#if 0
-		if (snmp_select() == 0) {
-			if (sa_alarms == 0)
-				run_alarms();
-		}
-#endif
-		retval = agent_check_and_process(1);	/* 0 == don't block */
-		if (retval == 0) {
-			/* alarm occurred, alarm conditions checked */
-		} else if (retval == -1) {
-			/* error (or signal) ocurred */
-			if (sa_alm_signal) {
-				sa_alm_action();
-			}
-			if (sa_pol_signal) {
-				sa_pol_action();
-			}
-			if (sa_hup_signal) {
-				sa_hup_action();
-			}
-			if (sa_int_signal) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-				snmp_shutdown("strExtMIB");
-				sa_int_action();	/* no return */
-			}
-			if (sa_trm_signal) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-				snmp_shutdown("strExtMIB");
-				sa_trm_action();	/* no return */
-			}
-		} else if (retval > 0) {
-			/* processed packets */
-			if (sa_fclose) {
-				/* close files after each request */
-				if (sa_fd != 0) {
-					int fd = sa_fd;
-
-					sa_fd = 0;
-					close(fd);
-				}
-			}
-			sa_stats_refresh = 1;
-			sa_request++;
-		}
-	}
-	if (sa_debug)
-		snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-	snmp_shutdown("strExtMIB");
-}
-
-int
-main(int argc, char *argv[])
-{
-	for (;;) {
-		int c, val, fd;
-		char *cptr;
-		struct passwd *pw;
-		struct group *gr;
-		struct stat st;
-
-#if defined _GNU_SOURCE
-		int option_index = 0;
-                /* *INDENT-OFF* */
-                static struct option long_options[] = {
-                        {"log-addresses",	no_argument,		NULL, 'a'},
-                        {"append",		no_argument,		NULL, 'A'},
-                        {"config-file",		required_argument,	NULL, 'c'},
-                        {"no-configs",		no_argument,		NULL, 'C'},
-                        {"dump",		no_argument,		NULL, 'd'},
-                        {"debug",		optional_argument,	NULL, 'D'},
-                        {"debug-tokens",	optional_argument,	NULL, 'D'},
-                        {"dont-fork",		no_argument,		NULL, 'f'},
-                        {"gid",			required_argument,	NULL, 'g'},
-                        {"groupid",		required_argument,	NULL, 'g'},
-                        {"help",		no_argument,		NULL, 'h'},
-                        {"?",			no_argument,		NULL, 'h'},
-                        {"help-directives",	no_argument,		NULL, 'H'},
-                        {"initialize",		required_argument,	NULL, 'I'},
-                        {"init-modules",	required_argument,	NULL, 'I'},
-                        {"keep-open",		no_argument,		NULL, 'k'},
-                        {"log-file",		optional_argument,	NULL, 'l'},
-                        {"logfile",		optional_argument,	NULL, 'l'},
-                        {"Lf",			optional_argument,	NULL, 'l'},
-                        {"LF",			required_argument,	NULL, 'l'},
-                        {"log-stderr",		no_argument,		NULL, 'L'},
-                        {"Le",			no_argument,		NULL, 'L'},
-                        {"LE",			required_argument,	NULL, 'L'},
-                        {"mibs",		required_argument,	NULL, 'm'},
-                        {"master",		no_argument,		NULL, 'M'},
-                        {"mibdirs",		required_argument,	NULL, 'M'},
-                        {"nodaemon",		no_argument,		NULL, 'n'},
-                        {"name",		required_argument,	NULL, 'n'},
-                        {"dry-run",		no_argument,		NULL, 'N'},
-                        {"log-stdout",		no_argument,		NULL, 'o'},
-                        {"Lo",			no_argument,		NULL, 'o'},
-                        {"LO",			required_argument,	NULL, 'o'},
-                        {"port",		required_argument,	NULL, 'p'},
-                        {"pidfile",		required_argument,	NULL, 'P'},
-                        {"quiet",		no_argument,		NULL, 'q'},
-                        {"quick",		no_argument,		NULL, 'q'},
-                        {"noroot",		no_argument,		NULL, 'r'},
-                        {"log-syslog",		no_argument,		NULL, 's'},
-                        {"Ls",			no_argument,		NULL, 's'},
-                        {"LS",			required_argument,	NULL, 's'},
-                        {"syslog",		no_argument,		NULL, 's'},
-                        {"sysctl-file",		required_argument,	NULL, 'S'},
-                        {"agent-alarms",	no_argument,		NULL, 't'},
-                        {"transport",		optional_argument,	NULL, 'T'},
-                        {"uid",			required_argument,	NULL, 'u'},
-                        {"userid",		required_argument,	NULL, 'u'},
-                        {"dont-remove-pidfile",	no_argument,		NULL, 'U'},
-                        {"leave-pidfile",	no_argument,		NULL, 'U'},
-                        {"version",		no_argument,		NULL, 'v'},
-                        {"verbose",		optional_argument,	NULL, 'V'},
-                        {"agentx-socket",	required_argument,	NULL, 'x'},
-                        {"agentx",		no_argument,		NULL, 'X'},
-                        {"copying",		no_argument,		NULL, 'y'},
-#if 0
-                        {"directory",		required_argument,	NULL, 'd'},
-                        {"basename",		required_argument,	NULL, 'b'},
-                        {"outfile",		required_argument,	NULL, 'o'},
-                        {"errfile",		required_argument,	NULL, 'e'},
-#endif
-                        { 0, }
-                };
-                /* *INDENT-ON* */
-
-		c = getopt_long_only(argc, argv, ":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy", long_options, &option_index);
-#else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, ":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy");
-#endif				/* defined _GNU_SOURCE */
-		if (c == -1) {
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: done options processing\n", argv[0]);
-			break;
-		}
-		switch (c) {
-		case 0:
-			goto bad_usage;
-		case 'a':	/* -a, --log-addresses */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging addresses\n", argv[0]);
-			sa_logaddr++;
-			break;
-		case 'A':	/* -A, --append */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will not truncate logfile\n", argv[0]);
-#if defined NETSNMP_DS_LIB_APPEND_LOGFILES
-			ds_set_boolean(DS_LIBRARY_ID, NETSNMP_DS_LIB_APPEND_LOGFILES, 1);
-#endif				/* defined NETSNMP_DS_LIB_APPEND_LOGFILES */
-			sa_appendlog = 1;
-			break;
-		case 'c':	/* -c, --config-file CONFIGFILE */
-			if (optarg == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using configuration file %s\n", argv[0], optarg);
-			ds_set_string(DS_LIBRARY_ID, DS_LIB_OPTIONALCONFIG, optarg);
-			break;
-		case 'C':	/* -C, --no-configs */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: not reading default config files\n", argv[0]);
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DONT_READ_CONFIGS, 1);
-			break;
-		case 'd':	/* -d, --dump */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting packet dump\n", argv[0]);
-			sa_dump = 1;
-			// snmp_set_dump_packet(sa_dump);
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DUMP_PACKET, sa_dump);
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, sa_dump);
-			break;
-		case 'D':	/* -D, --debug [LEVEL], --debug-tokens [TOKENS] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: increasing debug verbosity\n", argv[0]);
-			if (optarg == NULL) {
-				/* no option: must be -D, --debug */
-				sa_debug++;
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debug level is now %d\n", argv[0], sa_debug);
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debugging all tokens\n", argv[0]);
-				if (sa_debug)
-					debug_register_tokens("ALL");
-			} else {
-				cptr = optarg;
-				if ((val = strtol(optarg, &cptr, 0)) < 0)
-					goto bad_option;
-				if (*cptr == '\0') {
-					/* it is just a number, must be -D, --debug [LEVEL] */
-					sa_debug = val;
-					if (sa_debug)
-						snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debug level is now %d\n", argv[0], sa_debug);
-				} else {
-					/* not a number, must be -D, --debug-tokens TOKENS */
-					if (sa_debug)
-						snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debugging tokens %s\n", argv[0], optarg);
-					debug_register_tokens(optarg);
-				}
-			}
-			break;
-		case 'f':	/* -f, --dont-fork */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing daemon mode\n", argv[0]);
-			sa_nomead = 0;
-			break;
-		case 'u':	/* -u, --uid, --userid UID */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0)
-				goto bad_option;
-			/* UID can be name or number */
-			if ((pw = (*cptr == '\0') ? getpwuid((uid_t) val) : getpwnam(optarg)) == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will run as uid %s(%d)\n", argv[0], pw->pw_name, pw->pw_uid);
-			ds_set_int(DS_APPLICATION_ID, DS_AGENT_USERID, pw->pw_uid);
-			break;
-		case 'g':	/* -g, --gid, --groupdid GID */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0)
-				goto bad_option;
-			/* GID can be name or number */
-			if ((gr = (*cptr == '\0') ? getgrgid((gid_t) val) : getgrnam(optarg)) == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will run as gid %s(%d)\n", argv[0], gr->gr_name, gr->gr_gid);
-			ds_set_int(DS_APPLICATION_ID, DS_AGENT_GROUPID, gr->gr_gid);
-			break;
-		case 'h':	/* -h, --help, -?, --? */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing help message\n", argv[0]);
-			sa_help(argc, argv);
-			exit(0);
-		case 'H':	/* -H, --help-directives */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing config directives\n", argv[0]);
-			sa_help_directives(argc, argv);
-			exit(0);
-		case 'I':	/* -I, --init-modules, --initialize MODULE[{,| |:}MODULE]* */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will initialize modules: %s\n", argv[0], optarg);
-			add_to_init_list(optarg);
-			break;
-		case 'k':	/* -k, --keep-open */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: keeping files open\n", argv[0]);
-			sa_fclose = 0;
-			break;
-		case 'l':	/* -l, --log-file, --logfile, -Lf, -LF p1[-p2] [LOGFILE] */
-			if (optarg != NULL)
-				strncpy(sa_logfile, optarg, sizeof(sa_logfile));
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will log to file %s\n", argv[0], sa_logfile);
-			sa_logfillog = 1;
-			break;
-		case 'L':	/* -L, --log-stderr, -Le, -LE p1[-p2] */
-			/* Note that the recent NET-SNMP version of this option is far more complicated: -Le is the same as the old version of the option; -Lf LOGFILE is like the -l option; -Ls is
-			   like the -s option; -Lo logs messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or O, logs priority p1 and above to X, or p1 thru p2 to X. */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to standard error\n", argv[0]);
-			sa_logstderr = 1;
-			break;
-		case 'm':	/* -m, --mibs MIBS */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using MIBS %s\n", argv[0], optarg);
-			break;
-		case 'M':	/* -M, --master or -M, --mibdirs MIBDIRS */
-			if (optarg) {
-				/* -M, --mibdirs MIBDIRS */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using MIBDIRS %s\n", argv[0], optarg);
-			} else {
-				/* -M, --master */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting SNMP master\n", argv[0]);
-				sa_agentx = 0;
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
-			}
-			break;
-		case 'n':	/* -n, --nodaemon or -n, --name NAME */
-			if (optarg) {
-				/* -n, --name NAME */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using name %s\n", argv[0], optarg);
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, optarg);
-			} else {
-				/* -n, --nodaemon */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing deamon mode\n", argv[0]);
-				sa_nomead = 0;
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, basename(argv[0]));
-			}
-			break;
-		case 'N':	/* -N, --dry-run */
-#if defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting for dry-runs startup\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_QUIT_IMMEDIATELY, 1);
-			break;
-#else				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: -N option not supported\n", argv[0]);
-			goto bad_option;
-#endif				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
-		case 'o':	/* -o, --log-stdout, -Lo, -LO p1[-p2] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to stdout\n", argv[0]);
-			sa_logstdout = 1;
-			break;
-		case 'p':	/* -p, --port PORTNUM or -p, --pidfile PIDFILE */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0 || val > 16383)
-				goto bad_option;
-			if (*cptr == '\0') {
-				char buf[4096];
-
-				/* -p, --port PORTNUM */
-				if ((cptr = ds_get_string(DS_APPLICATION_ID, DS_AGENT_PORTS)))
-					snprintf(buf, sizeof(buf), "%s,%s", cptr, optarg);
-				else
-					strncpy(buf, optarg, sizeof(buf));
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PORTS, buf);
-				break;
-			}
-			/* fall through */
-		case 'P':	/* -p, -P, --pidfile PIDFILE */
-			if (optarg) {
-				/* either it exists */
-				if (stat(optarg, &st) == -1) {
-					/* or we can create it */
-					if ((fd = open(optarg, O_CREAT, 0600)) == -1) {
-						perror(argv[0]);
-						goto bad_option;
-					}
-					close(fd);
-				}
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting pid file to %s\n", argv[0], optarg);
-				strncpy(sa_pidfile, optarg, sizeof(sa_pidfile));
-			}
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using pidfile %s\n", argv[0], sa_pidfile);
-			break;
-		case 'q':	/* -q, --quiet, --quick */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing normal output\n", argv[0]);
-			sa_debug = 0;
-			sa_output = 0;
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
-			// snmp_set_quick_print();
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_QUICK_PRINT, 1);
-			break;
-		case 'r':	/* -r, --noroot */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting for non-root access\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
-			break;
-		case 's':	/* -s, --log-syslog, -Ls, -LS p1[-p2] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to system logs\n", argv[0]);
-			sa_logsyslog = 1;
-			break;
-		case 'S':	/* -S, -sysctl-file FILENAME */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using %s for backing\n", argv[0], optarg);
-			strncpy(sa_sysctlf, optarg, sizeof(sa_sysctlf));
-			break;
-		case 't':	/* -t, --agent-alarms */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting agent alarms\n", argv[0]);
-			sa_alarms = 0;
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
-			break;
-		case 'T':	/* -T, --transport [TRANSPORT] */
-			if (optarg == NULL)
-				goto udp_transport;
-			if (!strcasecmp("TCP", optarg)) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting default transport to TCP\n", argv[0]);
-				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
-				val |= SNMP_FLAGS_STREAM_SOCKET;
-				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
-			} else if (!strcasecmp("UDP", optarg)) {
-			      udp_transport:
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting default transport to UDP\n", argv[0]);
-				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
-				val &= ~SNMP_FLAGS_STREAM_SOCKET;
-				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
-			} else
-				goto bad_option;
-			break;
-		case 'U':
-#if defined NETSNMP_DS_AGENT_LEAVE_PIDFILE
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will leave pidfile after shutdown\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_LEAVE_PIDFILE, 1);
-#else
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: -U option not supported\n");
-			goto bad_option;
-#endif				/* defined NETSNMP_DS_AGENT_LEAVE_PIDFILE */
-			break;
-		case 'v':	/* -v, --version */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing version message\n", argv[0]);
-			sa_version(argc, argv);
-			exit(0);
-		case 'V':	/* -V, --verbose [LEVEL] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: increasing output verbosity\n", argv[0]);
-			if (optarg == NULL) {
-				sa_output++;
-			} else {
-				if ((val = strtol(optarg, NULL, 0)) < 0)
-					goto bad_option;
-				sa_output = val;
-			}
-			if (sa_output > 1)
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 1);
-			else
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
-			break;
-		case 'x':	/* -x, --agentx-socket SOCKET */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting AgentX socket to %s\n", argv[0], optarg);
-			ds_set_string(DS_APPLICATION_ID, DS_AGENT_X_SOCKET, optarg);
-			// ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_AGENTX_MASTER, 1);
-			break;
-		case 'X':	/* -X, --agentx */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting AgentX sub-agent\n", argv[0]);
-			sa_agentx = 1;
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
-			break;
-		case 'y':	/* -y, --copying */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing copying message\n", argv[0]);
-			sa_copying(argc, argv);
-			exit(0);
-		case '?':
-		case ':':
-		default:
-		      bad_option:
-			optind--;
-			goto bad_nonopt;
-		      bad_nonopt:
-			if (sa_output || sa_debug) {
-				if (optind < argc) {
-					fprintf(stderr, "%s: syntax error near '", argv[0]);
-					while (optind < argc)
-						fprintf(stderr, "%s ", argv[optind++]);
-					fprintf(stderr, "'\n");
-				} else {
-					fprintf(stderr, "%s: missing option or argument", argv[0]);
-					fprintf(stderr, "\n");
-				}
-				fflush(stderr);
-			      bad_usage:
-				sa_usage(argc, argv);
-			}
-			exit(2);
-		}
-	}
-	if (optind < argc) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: excess non-option arguments\n", argv[0]);
-		goto bad_nonopt;
-	}
-	sa_enter(argc, argv);	/* daemonize if necessary */
-	sa_mloop(argc, argv);	/* execute main loop */
-	exit(0);
-}
-#endif				/* !defined MODULE */
-#endif				/* defined MASTER */

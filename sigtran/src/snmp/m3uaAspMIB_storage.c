@@ -63,6 +63,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/agent_trap.h>
 #include <ucd-snmp/callback.h>
 #include <ucd-snmp/snmp-tc.h>
 #include <ucd-snmp/default_store.h>
@@ -114,37 +115,20 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "m3uaAspMIB.h"
-extern const char sa_program[];
-
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
-#undef MASTER
-#if !defined MODULE
-extern int sa_dump;			/* default packet dump */
-extern int sa_debug;			/* default no debug */
-extern int sa_nomead;			/* default daemon mode */
-extern int sa_output;			/* default normal output */
-extern int sa_agentx;			/* default agentx mode */
-extern int sa_alarms;			/* default application alarms */
-extern int sa_logaddr;			/* log addresses */
-extern int sa_logfillog;		/* log to sa_logfile */
-extern int sa_logstderr;		/* log to standard error */
-extern int sa_logstdout;		/* log to standard output */
-extern int sa_logsyslog;		/* log to system logs */
-extern int sa_logcallog;		/* log to callback logs */
-extern int sa_appendlog;		/* append to log file without truncating */
-extern char sa_logfile[256];
-extern char sa_pidfile[256];
-extern char sa_sysctlf[256];
-
-/* file stream for log file */
-extern FILE *stdlog;
-#endif				/* !defined MODULE */
-extern int sa_fclose;			/* default close files between requests */
-extern int sa_fd;			/* file descriptor for MIB use */
-extern int sa_readfd;			/* file descriptor for autonomnous events */
-extern int sa_changed;			/* indication to reread MIB configuration */
-extern int sa_stats_refresh;		/* indications that statistics, the mib or its tables need to be refreshed */
-extern int sa_request;			/* request number for per-request actions */
+#if defined MODULE
+#if defined MASTER
+const char sa_program[] = "m3uaAspMIB";
+int sa_fclose = 1;			/* default close files between requests */
+int sa_changed = 1;			/* indication to reread MIB configuration */
+int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
+int sa_request = 1;			/* request number for per-request actions */
+int sa_dump = 0;			/* default packet dump */
+int sa_debug = 0;			/* default no debug */
+#endif				/* defined MASTER */
+#endif				/* defined MODULE */
+static int my_fd = -1;			/* file descriptor for this MIB's use */
+static int my_readfd = -1;		/* file descriptor for autonomnous events */
 volatile int m3uaAspMIB_refresh = 1;
 volatile int m3uaAspTable_refresh = 1;
 volatile int m3uaAspAgTable_refresh = 1;
@@ -178,7 +162,7 @@ oid m3uaAspRcTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 1, 2, 
 /*
  * Oids for use in notifications defined in this MIB.
  */
-oid m3uaAspRsAlarm_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 1, 2, 7, 0 };
+oid m3uaAspRsAlarm_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 1, 2, 7, 0, 1 };
 
 /*
  * Oids accessible only for notify defined in this MIB.
@@ -187,8 +171,8 @@ oid m3uaAspRsAlarm_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 1, 2, 7, 0 };
 /*
  * Other oids defined in this MIB.
  */
-oid m3uaAspRsEvents_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 1, 2, 7 };
-static const oid zeroDotZero_oid[2] = { 0, 0 };
+oid m3uaAspRsEvents_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 1, 2, 7, 0 };
+static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
 /*
@@ -476,11 +460,10 @@ struct header_complex_index *m3uaAspRcTableStorage = NULL;
 struct header_complex_index *m3uaAspAsTableStorage = NULL;
 struct header_complex_index *m3uaAspAfTableStorage = NULL;
 
-#if defined MODULE
 void (*m3uaAspMIBold_signal_handler) (int) = NULL;	/* save old signal handler just in case */
 void m3uaAspMIB_loop_handler(int);
 void m3uaAspMIB_fd_handler(int, void *);
-#endif				/* defined MOUDLE */
+
 /**
  * @fn void init_m3uaAspMIB(void)
  * @brief m3uaAspMIB initialization routine.
@@ -506,8 +489,10 @@ void m3uaAspMIB_fd_handler(int, void *);
 void
 init_m3uaAspMIB(void)
 {
+	(void) my_fd;
+	(void) zeroDotZero_oid;
 	(void) snmpTrapOID_oid;
-	DEBUGMSGTL(("m3uaAspMIB", "initializing...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "init_m3uaAspMIB: initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
 	REGISTER_MIB("m3uaAspMIB", m3uaAspMIB_variables, variable7, m3uaAspMIB_variables_oid);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_SHUTDOWN, term_m3uaAspMIB, NULL);
@@ -542,16 +527,13 @@ init_m3uaAspMIB(void)
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_m3uaAspAfTable, NULL);
 
 	/* place any other initialization junk you need here */
-#if defined MODULE
-	if (sa_readfd != 0) {
-		register_readfd(sa_readfd, m3uaAspMIB_fd_handler, (void *) 0);
-		register_exceptfd(sa_readfd, m3uaAspMIB_fd_handler, (void *) 1);
+	if (my_readfd >= 0) {
+		register_readfd(my_readfd, m3uaAspMIB_fd_handler, (void *) 0);
+		register_exceptfd(my_readfd, m3uaAspMIB_fd_handler, (void *) 1);
 	}
-#if defined MASTER
-	m3uaAspMIBold_signal_handler = external_signal_handler[0];
-	external_signal_handler[0] = &m3uaAspMIB_loop_handler;
-#endif				/* defined MASTER */
-#endif				/* defined MODULE */
+	m3uaAspMIBold_signal_handler = external_signal_handler[SIGCHLD];
+	external_signal_handler[SIGCHLD] = &m3uaAspMIB_loop_handler;
+	external_signal_scheduled[SIGCHLD] = 1;
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
@@ -570,18 +552,14 @@ init_m3uaAspMIB(void)
 void
 deinit_m3uaAspMIB(void)
 {
-	DEBUGMSGTL(("m3uaAspMIB", "deinitializating...  "));
-#if defined MODULE
-#if defined MASTER
-	external_signal_handler[0] = m3uaAspMIBold_signal_handler;
-#endif				/* defined MASTER */
-	if (sa_readfd != 0) {
-		unregister_exceptfd(sa_readfd);
-		unregister_readfd(sa_readfd);
-		close(sa_readfd);
-		sa_readfd = 0;
+	DEBUGMSGTL(("m3uaAspMIB", "deinit_m3uaAspMIB: deinitializating...  "));
+	external_signal_handler[SIGCHLD] = m3uaAspMIBold_signal_handler;
+	if (my_readfd >= 0) {
+		unregister_exceptfd(my_readfd);
+		unregister_readfd(my_readfd);
+		close(my_readfd);
+		my_readfd = -1;
 	}
-#endif				/* defined MODULE */
 	unregister_mib(m3uaAspMIB_variables_oid, sizeof(m3uaAspMIB_variables_oid) / sizeof(oid));
 	snmpd_unregister_config_handler("m3uaAspMIB");
 	snmpd_unregister_config_handler("m3uaAspTable");
@@ -604,7 +582,9 @@ deinit_m3uaAspMIB(void)
 int
 term_m3uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	DEBUGMSGTL(("m3uaAspMIB", "term_m3uaAspMIB: terminating...  "));
 	deinit_m3uaAspMIB();
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return 0;
 }
 
@@ -620,7 +600,7 @@ m3uaAspMIB_create(void)
 {
 	struct m3uaAspMIB_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspMIB_data);
 
-	DEBUGMSGTL(("m3uaAspMIB", "creating scalars...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMIB_create: creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
 		StorageNew->m3uaAspNextIndex = 0;
@@ -647,7 +627,7 @@ m3uaAspMIB_destroy(struct m3uaAspMIB_data **thedata)
 {
 	struct m3uaAspMIB_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspMIB", "deleting scalars...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMIB_destroy: deleting scalars...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
@@ -667,8 +647,9 @@ m3uaAspMIB_destroy(struct m3uaAspMIB_data **thedata)
 int
 m3uaAspMIB_add(struct m3uaAspMIB_data *thedata)
 {
-	DEBUGMSGTL(("m3uaAspMIB", "adding data...  "));
-	m3uaAspMIBStorage = thedata;
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMIB_add: adding data...  "));
+	if (thedata)
+		m3uaAspMIBStorage = thedata;
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
@@ -691,7 +672,7 @@ parse_m3uaAspMIB(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspMIB_data *StorageTmp = m3uaAspMIB_create();
 
-	DEBUGMSGTL(("m3uaAspMIB", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspMIB: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -716,8 +697,8 @@ store_m3uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct m3uaAspMIB_data *StorageTmp;
 
-	DEBUGMSGTL(("m3uaAspMIB", "storing data...  "));
-	refresh_m3uaAspMIB();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspMIB: storing data...  "));
+	refresh_m3uaAspMIB(1);
 	if ((StorageTmp = m3uaAspMIBStorage) == NULL) {
 		DEBUGMSGTL(("m3uaAspMIB", "error.\n"));
 		return SNMPERR_GENERR;
@@ -739,7 +720,8 @@ store_m3uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 }
 
 /**
- * @fn void refresh_m3uaAspMIB(void)
+ * @fn void refresh_m3uaAspMIB(int force)
+ * @param force forced refresh when non-zero.
  * @brief refresh the scalar values of m3uaAspMIB.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -749,7 +731,7 @@ store_m3uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
  * time, or after a SIGPOLL has been received (and a scalar has been requested).
  */
 void
-refresh_m3uaAspMIB(void)
+refresh_m3uaAspMIB(int force)
 {
 	if (m3uaAspMIBStorage == NULL) {
 		struct m3uaAspMIB_data *StorageNew;
@@ -759,10 +741,12 @@ refresh_m3uaAspMIB(void)
 		m3uaAspMIBStorage = StorageNew;
 		m3uaAspMIB_refresh = 1;
 	}
-	if (m3uaAspMIB_refresh == 0)
+	if (!force && m3uaAspMIB_refresh == 0)
 		return;
-	m3uaAspMIB_refresh = 0;
+	DEBUGMSGTL(("m3uaAspMIB", "refresh_m3uaAspMIB: refreshing...  "));
 	/* XXX: Update scalars as required here... */
+	m3uaAspMIB_refresh = 0;
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /**
@@ -788,12 +772,15 @@ var_m3uaAspMIB(struct variable *vp, oid * name, size_t *length, int exact, size_
 	struct m3uaAspMIB_data *StorageTmp;
 	u_char *rval;
 
+	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspMIB: lookup up varbind...  "));
 	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
 	/* Refresh the MIB values if required. */
-	refresh_m3uaAspMIB();
-	if ((StorageTmp = m3uaAspMIBStorage) == NULL)
+	refresh_m3uaAspMIB(0);
+	if ((StorageTmp = m3uaAspMIBStorage) == NULL) {
+		DEBUGMSGTL(("m3uaAspMIB", "no datastructure.\n"));
 		return NULL;
+	}
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -820,6 +807,10 @@ var_m3uaAspMIB(struct variable *vp, oid * name, size_t *length, int exact, size_
 	default:
 		ERROR_MSG("");
 	}
+	if (rval)
+		DEBUGMSGTL(("m3uaAspMIB", "found.\n"));
+	else
+		DEBUGMSGTL(("m3uaAspMIB", "not found.\n"));
 	return (rval);
 }
 
@@ -836,27 +827,24 @@ m3uaAspTable_create(void)
 {
 	struct m3uaAspTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspTable_data);
 
-	DEBUGMSGTL(("m3uaAspTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->m3uaAspName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspNameLen = strlen("");
-		}
-		if ((StorageNew->m3uaAspName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspNameLen = strlen("");
-		}
 		StorageNew->m3uaAspAdministrativeState = 0;
 		StorageNew->m3uaAspAdministrativeState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspCapabilities, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspCapabilities, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspCapabilitiesLen = 2;
-		}
 		StorageNew->m3uaAspIdPolicy = 0;
 		StorageNew->m3uaAspRegistrationPolicy = 0;
 		StorageNew->m3uaAspAssociationPolicy = 0;
 		StorageNew->m3uaAspStatus = 0;
 		StorageNew->m3uaAspStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -873,11 +861,11 @@ m3uaAspTable_duplicate(struct m3uaAspTable_data *thedata)
 {
 	struct m3uaAspTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspTable_data);
 
-	DEBUGMSGTL(("m3uaAspTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -900,7 +888,7 @@ m3uaAspTable_destroy(struct m3uaAspTable_data **thedata)
 {
 	struct m3uaAspTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspName);
 		StorageDel->m3uaAspNameLen = 0;
@@ -911,7 +899,7 @@ m3uaAspTable_destroy(struct m3uaAspTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -929,15 +917,16 @@ m3uaAspTable_add(struct m3uaAspTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
-	/* m3uaAspIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
-	header_complex_add_data(&m3uaAspTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
+		/* m3uaAspIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
+		header_complex_add_data(&m3uaAspTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -958,14 +947,14 @@ m3uaAspTable_del(struct m3uaAspTable_data *thedata)
 {
 	struct m3uaAspTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -987,7 +976,7 @@ parse_m3uaAspTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspTable_data *StorageTmp = m3uaAspTable_create();
 
-	DEBUGMSGTL(("m3uaAspTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -995,11 +984,13 @@ parse_m3uaAspTable(const char *token, char *line)
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspIndex, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspName, &StorageTmp->m3uaAspNameLen);
 	if (StorageTmp->m3uaAspName == NULL) {
 		config_perror("invalid specification for m3uaAspName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspName, &StorageTmp->m3uaAspNameLen);
 	if (StorageTmp->m3uaAspName == NULL) {
 		config_perror("invalid specification for m3uaAspName");
@@ -1007,6 +998,7 @@ parse_m3uaAspTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAdministrativeState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspCapabilities);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspCapabilities, &StorageTmp->m3uaAspCapabilitiesLen);
 	if (StorageTmp->m3uaAspCapabilities == NULL) {
 		config_perror("invalid specification for m3uaAspCapabilities");
@@ -1018,7 +1010,7 @@ parse_m3uaAspTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspStatus, &tmpsize);
 	m3uaAspTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -1034,8 +1026,8 @@ store_m3uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspTable", "storing data...  "));
-	refresh_m3uaAspTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspTable: storing data...  "));
+	refresh_m3uaAspTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspTable_data *) hcindex->data;
@@ -1059,7 +1051,7 @@ store_m3uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1076,15 +1068,13 @@ m3uaAspAgTable_create(void)
 {
 	struct m3uaAspAgTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspAgTable_data);
 
-	DEBUGMSGTL(("m3uaAspAgTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAgTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->m3uaAspAgProtocolVersion = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->m3uaAspAgProtocolVersion = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->m3uaAspAgProtocolVersionLen = 2;
-		}
-		if (memdup((u_char **) &StorageNew->m3uaAspAgOptions, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspAgOptions, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspAgOptionsLen = 2;
-		}
 		StorageNew->m3uaAspAgRegistrationPolicy = 0;
 		StorageNew->m3uaAspAgAspIdPolicy = 0;
 		StorageNew->m3uaAspAgAspProtocolPayloadId = 0;
@@ -1100,7 +1090,7 @@ m3uaAspAgTable_create(void)
 		StorageNew->m3uaAspAgStatus = 0;
 		StorageNew->m3uaAspAgStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspAgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -1117,11 +1107,11 @@ m3uaAspAgTable_duplicate(struct m3uaAspAgTable_data *thedata)
 {
 	struct m3uaAspAgTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspAgTable_data);
 
-	DEBUGMSGTL(("m3uaAspAgTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspAgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -1144,7 +1134,7 @@ m3uaAspAgTable_destroy(struct m3uaAspAgTable_data **thedata)
 {
 	struct m3uaAspAgTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspAgTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAgTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspAgProtocolVersion);
 		StorageDel->m3uaAspAgProtocolVersionLen = 0;
@@ -1153,7 +1143,7 @@ m3uaAspAgTable_destroy(struct m3uaAspAgTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspAgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1171,13 +1161,14 @@ m3uaAspAgTable_add(struct m3uaAspAgTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspAgTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspAgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
-	header_complex_add_data(&m3uaAspAgTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspAgTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspAgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAgTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspAgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
+		header_complex_add_data(&m3uaAspAgTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1198,14 +1189,14 @@ m3uaAspAgTable_del(struct m3uaAspAgTable_data *thedata)
 {
 	struct m3uaAspAgTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspAgTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAgTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspAgTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspAgTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspAgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1227,18 +1218,20 @@ parse_m3uaAspAgTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspAgTable_data *StorageTmp = m3uaAspAgTable_create();
 
-	DEBUGMSGTL(("m3uaAspAgTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspAgTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspAgIndex, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspAgProtocolVersion);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->m3uaAspAgProtocolVersion, &StorageTmp->m3uaAspAgProtocolVersionLen);
 	if (StorageTmp->m3uaAspAgProtocolVersion == NULL) {
 		config_perror("invalid specification for m3uaAspAgProtocolVersion");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspAgOptions);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspAgOptions, &StorageTmp->m3uaAspAgOptionsLen);
 	if (StorageTmp->m3uaAspAgOptions == NULL) {
 		config_perror("invalid specification for m3uaAspAgOptions");
@@ -1259,7 +1252,7 @@ parse_m3uaAspAgTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAgStatus, &tmpsize);
 	m3uaAspAgTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspAgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -1275,8 +1268,8 @@ store_m3uaAspAgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspAgTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspAgTable", "storing data...  "));
-	refresh_m3uaAspAgTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspAgTable: storing data...  "));
+	refresh_m3uaAspAgTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspAgTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspAgTable_data *) hcindex->data;
@@ -1305,7 +1298,7 @@ store_m3uaAspAgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspAgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1322,18 +1315,16 @@ m3uaAspSgTable_create(void)
 {
 	struct m3uaAspSgTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspSgTable_data);
 
-	DEBUGMSGTL(("m3uaAspSgTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspAgIndex = 0;
-		if ((StorageNew->m3uaAspSgName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspSgName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSgNameLen = strlen("");
-		}
 		StorageNew->m3uaAspSgAdministrativeState = 0;
 		StorageNew->m3uaAspSgOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspSgProcedurealStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspSgProcedurealStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspSgProcedurealStatusLen = 1;
-		}
 		StorageNew->m3uaAspSgUsgageState = 0;
 		StorageNew->m3uaAspSgAspState = 0;
 		StorageNew->m3uaAspSgMaxInitRetrans = 5;
@@ -1356,7 +1347,7 @@ m3uaAspSgTable_create(void)
 		StorageNew->m3uaAspSgStatus = 0;
 		StorageNew->m3uaAspSgStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspSgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -1373,11 +1364,11 @@ m3uaAspSgTable_duplicate(struct m3uaAspSgTable_data *thedata)
 {
 	struct m3uaAspSgTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspSgTable_data);
 
-	DEBUGMSGTL(("m3uaAspSgTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspSgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -1400,7 +1391,7 @@ m3uaAspSgTable_destroy(struct m3uaAspSgTable_data **thedata)
 {
 	struct m3uaAspSgTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspSgTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspSgName);
 		StorageDel->m3uaAspSgNameLen = 0;
@@ -1409,7 +1400,7 @@ m3uaAspSgTable_destroy(struct m3uaAspSgTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspSgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1427,15 +1418,16 @@ m3uaAspSgTable_add(struct m3uaAspSgTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspSgTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspAgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
-	/* m3uaAspSgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
-	header_complex_add_data(&m3uaAspSgTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspSgTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspSgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspAgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
+		/* m3uaAspSgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
+		header_complex_add_data(&m3uaAspSgTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1456,14 +1448,14 @@ m3uaAspSgTable_del(struct m3uaAspSgTable_data *thedata)
 {
 	struct m3uaAspSgTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspSgTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspSgTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspSgTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspSgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1485,7 +1477,7 @@ parse_m3uaAspSgTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspSgTable_data *StorageTmp = m3uaAspSgTable_create();
 
-	DEBUGMSGTL(("m3uaAspSgTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspSgTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -1493,6 +1485,7 @@ parse_m3uaAspSgTable(const char *token, char *line)
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSgIndex, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspSgName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSgName, &StorageTmp->m3uaAspSgNameLen);
 	if (StorageTmp->m3uaAspSgName == NULL) {
 		config_perror("invalid specification for m3uaAspSgName");
@@ -1500,6 +1493,7 @@ parse_m3uaAspSgTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspSgProcedurealStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspSgProcedurealStatus, &StorageTmp->m3uaAspSgProcedurealStatusLen);
 	if (StorageTmp->m3uaAspSgProcedurealStatus == NULL) {
 		config_perror("invalid specification for m3uaAspSgProcedurealStatus");
@@ -1527,7 +1521,7 @@ parse_m3uaAspSgTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgStatus, &tmpsize);
 	m3uaAspSgTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspSgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -1543,8 +1537,8 @@ store_m3uaAspSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspSgTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspSgTable", "storing data...  "));
-	refresh_m3uaAspSgTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspSgTable: storing data...  "));
+	refresh_m3uaAspSgTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspSgTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspSgTable_data *) hcindex->data;
@@ -1583,7 +1577,7 @@ store_m3uaAspSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspSgTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1600,31 +1594,27 @@ m3uaAspSgpTable_create(void)
 {
 	struct m3uaAspSgpTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspSgpTable_data);
 
-	DEBUGMSGTL(("m3uaAspSgpTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgpTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspAgIndex = 0;
 		StorageNew->m3uaAspSgIndex = 0;
-		if ((StorageNew->m3uaAspSgpName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspSgpName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSgpNameLen = strlen("");
-		}
 		StorageNew->m3uaAspSgpAdministrativeState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspSgpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspSgpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspSgpProceduralStatusLen = 1;
-		}
 		StorageNew->m3uaAspSgpOperationalState = 0;
 		StorageNew->m3uaAspSgpUsageState = 0;
 		StorageNew->m3uaAspSgpAspState = 0;
-		if ((StorageNew->m3uaAspSgpPrimaryAddress = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspSgpPrimaryAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSgpPrimaryAddressLen = strlen("");
-		}
-		if ((StorageNew->m3uaAspSgpHostName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspSgpHostName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSgpHostNameLen = strlen("");
-		}
 		StorageNew->m3uaAspSgpStatus = 0;
 		StorageNew->m3uaAspSgpStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspSgpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -1641,11 +1631,11 @@ m3uaAspSgpTable_duplicate(struct m3uaAspSgpTable_data *thedata)
 {
 	struct m3uaAspSgpTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspSgpTable_data);
 
-	DEBUGMSGTL(("m3uaAspSgpTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgpTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspSgpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -1668,7 +1658,7 @@ m3uaAspSgpTable_destroy(struct m3uaAspSgpTable_data **thedata)
 {
 	struct m3uaAspSgpTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspSgpTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgpTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspSgpName);
 		StorageDel->m3uaAspSgpNameLen = 0;
@@ -1681,7 +1671,7 @@ m3uaAspSgpTable_destroy(struct m3uaAspSgpTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspSgpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1699,17 +1689,18 @@ m3uaAspSgpTable_add(struct m3uaAspSgpTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspSgpTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspAgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
-	/* m3uaAspSgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
-	/* m3uaAspSgpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgpIndex, sizeof(thedata->m3uaAspSgpIndex));
-	header_complex_add_data(&m3uaAspSgpTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspSgpTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspSgpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgpTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspAgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
+		/* m3uaAspSgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
+		/* m3uaAspSgpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgpIndex, sizeof(thedata->m3uaAspSgpIndex));
+		header_complex_add_data(&m3uaAspSgpTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1730,14 +1721,14 @@ m3uaAspSgpTable_del(struct m3uaAspSgpTable_data *thedata)
 {
 	struct m3uaAspSgpTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspSgpTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgpTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspSgpTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspSgpTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspSgpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1759,7 +1750,7 @@ parse_m3uaAspSgpTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspSgpTable_data *StorageTmp = m3uaAspSgpTable_create();
 
-	DEBUGMSGTL(("m3uaAspSgpTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspSgpTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -1768,12 +1759,14 @@ parse_m3uaAspSgpTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSgIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSgpIndex, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspSgpName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSgpName, &StorageTmp->m3uaAspSgpNameLen);
 	if (StorageTmp->m3uaAspSgpName == NULL) {
 		config_perror("invalid specification for m3uaAspSgpName");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpAdministrativeState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspSgpProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspSgpProceduralStatus, &StorageTmp->m3uaAspSgpProceduralStatusLen);
 	if (StorageTmp->m3uaAspSgpProceduralStatus == NULL) {
 		config_perror("invalid specification for m3uaAspSgpProceduralStatus");
@@ -1782,11 +1775,13 @@ parse_m3uaAspSgpTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpUsageState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpAspState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspSgpPrimaryAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSgpPrimaryAddress, &StorageTmp->m3uaAspSgpPrimaryAddressLen);
 	if (StorageTmp->m3uaAspSgpPrimaryAddress == NULL) {
 		config_perror("invalid specification for m3uaAspSgpPrimaryAddress");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspSgpHostName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSgpHostName, &StorageTmp->m3uaAspSgpHostNameLen);
 	if (StorageTmp->m3uaAspSgpHostName == NULL) {
 		config_perror("invalid specification for m3uaAspSgpHostName");
@@ -1795,7 +1790,7 @@ parse_m3uaAspSgpTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpStatus, &tmpsize);
 	m3uaAspSgpTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspSgpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -1811,8 +1806,8 @@ store_m3uaAspSgpTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct m3uaAspSgpTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspSgpTable", "storing data...  "));
-	refresh_m3uaAspSgpTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspSgpTable: storing data...  "));
+	refresh_m3uaAspSgpTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspSgpTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspSgpTable_data *) hcindex->data;
@@ -1837,7 +1832,7 @@ store_m3uaAspSgpTable(int majorID, int minorID, void *serverarg, void *clientarg
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspSgpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1854,27 +1849,22 @@ m3uaAspSpTable_create(void)
 {
 	struct m3uaAspSpTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspSpTable_data);
 
-	DEBUGMSGTL(("m3uaAspSpTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSpTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->m3uaAspSpName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspSpName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSpNameLen = strlen("");
-		}
 		StorageNew->m3uaAspSpOperationalState = 0;
 		StorageNew->m3uaAspSpUsageState = 0;
 		StorageNew->m3uaAspSpAdministrativeState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspSpAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspSpAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspSpAlarmStatusLen = 1;
-		}
-		if (memdup((u_char **) &StorageNew->m3uaAspSpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspSpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspSpProceduralStatusLen = 1;
-		}
-		if (memdup((u_char **) &StorageNew->m3uaAspSpAvailabiltyStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspSpAvailabiltyStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspSpAvailabiltyStatusLen = 2;
-		}
-		if ((StorageNew->m3uaAspSpPointCode = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspSpPointCode = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSpPointCodeLen = strlen("");
-		}
 		StorageNew->m3uaAspSpTimerT1R = 0;
 		StorageNew->m3uaAspSpTimerT18 = 0;
 		StorageNew->m3uaAspSpTimerT20 = 0;
@@ -1886,7 +1876,7 @@ m3uaAspSpTable_create(void)
 		StorageNew->m3uaAspSpStatus = 0;
 		StorageNew->m3uaAspSpStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspSpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -1903,11 +1893,11 @@ m3uaAspSpTable_duplicate(struct m3uaAspSpTable_data *thedata)
 {
 	struct m3uaAspSpTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspSpTable_data);
 
-	DEBUGMSGTL(("m3uaAspSpTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSpTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspSpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -1930,7 +1920,7 @@ m3uaAspSpTable_destroy(struct m3uaAspSpTable_data **thedata)
 {
 	struct m3uaAspSpTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspSpTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSpTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspSpName);
 		StorageDel->m3uaAspSpNameLen = 0;
@@ -1945,7 +1935,7 @@ m3uaAspSpTable_destroy(struct m3uaAspSpTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspSpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1963,13 +1953,14 @@ m3uaAspSpTable_add(struct m3uaAspSpTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspSpTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspSpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
-	header_complex_add_data(&m3uaAspSpTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspSpTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspSpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSpTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspSpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
+		header_complex_add_data(&m3uaAspSpTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1990,14 +1981,14 @@ m3uaAspSpTable_del(struct m3uaAspSpTable_data *thedata)
 {
 	struct m3uaAspSpTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspSpTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSpTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspSpTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspSpTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspSpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2019,13 +2010,14 @@ parse_m3uaAspSpTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspSpTable_data *StorageTmp = m3uaAspSpTable_create();
 
-	DEBUGMSGTL(("m3uaAspSpTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspSpTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspSpName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSpName, &StorageTmp->m3uaAspSpNameLen);
 	if (StorageTmp->m3uaAspSpName == NULL) {
 		config_perror("invalid specification for m3uaAspSpName");
@@ -2034,21 +2026,25 @@ parse_m3uaAspSpTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSpOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSpUsageState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSpAdministrativeState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspSpAlarmStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspSpAlarmStatus, &StorageTmp->m3uaAspSpAlarmStatusLen);
 	if (StorageTmp->m3uaAspSpAlarmStatus == NULL) {
 		config_perror("invalid specification for m3uaAspSpAlarmStatus");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspSpProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspSpProceduralStatus, &StorageTmp->m3uaAspSpProceduralStatusLen);
 	if (StorageTmp->m3uaAspSpProceduralStatus == NULL) {
 		config_perror("invalid specification for m3uaAspSpProceduralStatus");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspSpAvailabiltyStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspSpAvailabiltyStatus, &StorageTmp->m3uaAspSpAvailabiltyStatusLen);
 	if (StorageTmp->m3uaAspSpAvailabiltyStatus == NULL) {
 		config_perror("invalid specification for m3uaAspSpAvailabiltyStatus");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspSpPointCode);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSpPointCode, &StorageTmp->m3uaAspSpPointCodeLen);
 	if (StorageTmp->m3uaAspSpPointCode == NULL) {
 		config_perror("invalid specification for m3uaAspSpPointCode");
@@ -2065,7 +2061,7 @@ parse_m3uaAspSpTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSpStatus, &tmpsize);
 	m3uaAspSpTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspSpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -2081,8 +2077,8 @@ store_m3uaAspSpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspSpTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspSpTable", "storing data...  "));
-	refresh_m3uaAspSpTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspSpTable: storing data...  "));
+	refresh_m3uaAspSpTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspSpTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspSpTable_data *) hcindex->data;
@@ -2113,7 +2109,7 @@ store_m3uaAspSpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspSpTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2130,24 +2126,22 @@ m3uaAspMtTable_create(void)
 {
 	struct m3uaAspMtTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspMtTable_data);
 
-	DEBUGMSGTL(("m3uaAspMtTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMtTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspSpIndex = 0;
-		if ((StorageNew->m3uaAspMtName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspMtName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspMtNameLen = strlen("");
-		}
 		StorageNew->m3uaAspMtAdministrativeState = 0;
 		StorageNew->m3uaAspMtOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspMtProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspMtProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspMtProceduralStatusLen = 1;
-		}
 		StorageNew->m3uaAspMtUsageState = 0;
 		StorageNew->m3uaAspMtAsState = 0;
 		StorageNew->m3uaAspMtStatus = 0;
 		StorageNew->m3uaAspMtStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspMtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -2164,11 +2158,11 @@ m3uaAspMtTable_duplicate(struct m3uaAspMtTable_data *thedata)
 {
 	struct m3uaAspMtTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspMtTable_data);
 
-	DEBUGMSGTL(("m3uaAspMtTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMtTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspMtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -2191,7 +2185,7 @@ m3uaAspMtTable_destroy(struct m3uaAspMtTable_data **thedata)
 {
 	struct m3uaAspMtTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspMtTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMtTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspMtName);
 		StorageDel->m3uaAspMtNameLen = 0;
@@ -2200,7 +2194,7 @@ m3uaAspMtTable_destroy(struct m3uaAspMtTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspMtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2218,15 +2212,16 @@ m3uaAspMtTable_add(struct m3uaAspMtTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspMtTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspSpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
-	/* m3uaAspMtIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
-	header_complex_add_data(&m3uaAspMtTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspMtTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspMtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMtTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspSpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
+		/* m3uaAspMtIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
+		header_complex_add_data(&m3uaAspMtTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2247,14 +2242,14 @@ m3uaAspMtTable_del(struct m3uaAspMtTable_data *thedata)
 {
 	struct m3uaAspMtTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspMtTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMtTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspMtTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspMtTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspMtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2276,13 +2271,14 @@ parse_m3uaAspMtTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspMtTable_data *StorageTmp = m3uaAspMtTable_create();
 
-	DEBUGMSGTL(("m3uaAspMtTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspMtTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspMtName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspMtName, &StorageTmp->m3uaAspMtNameLen);
 	if (StorageTmp->m3uaAspMtName == NULL) {
 		config_perror("invalid specification for m3uaAspMtName");
@@ -2290,6 +2286,7 @@ parse_m3uaAspMtTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspMtAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspMtOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspMtProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspMtProceduralStatus, &StorageTmp->m3uaAspMtProceduralStatusLen);
 	if (StorageTmp->m3uaAspMtProceduralStatus == NULL) {
 		config_perror("invalid specification for m3uaAspMtProceduralStatus");
@@ -2300,7 +2297,7 @@ parse_m3uaAspMtTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspMtStatus, &tmpsize);
 	m3uaAspMtTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspMtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -2316,8 +2313,8 @@ store_m3uaAspMtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspMtTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspMtTable", "storing data...  "));
-	refresh_m3uaAspMtTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspMtTable: storing data...  "));
+	refresh_m3uaAspMtTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspMtTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspMtTable_data *) hcindex->data;
@@ -2338,7 +2335,7 @@ store_m3uaAspMtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspMtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2355,41 +2352,35 @@ m3uaAspRsTable_create(void)
 {
 	struct m3uaAspRsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspRsTable_data);
 
-	DEBUGMSGTL(("m3uaAspRsTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRsTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspSpIndex = 0;
-		if ((StorageNew->m3uaAspRsName = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspRsName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspRsNameLen = strlen("");
-		}
-		if ((StorageNew->m3uaAspRsRemotePointCode = (uint8_t *) strdup("")) != NULL) {
+		if ((StorageNew->m3uaAspRsRemotePointCode = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspRsRemotePointCodeLen = strlen("");
-		}
 		StorageNew->m3uaAspRsOperationalState = 0;
 		StorageNew->m3uaAspRsAdministrativeState = 0;
 		StorageNew->m3uaAspRsUsageState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspRsAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspRsAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspRsAlarmStatusLen = 1;
-		}
-		if (memdup((u_char **) &StorageNew->m3uaAspRsProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspRsProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspRsProceduralStatusLen = 1;
-		}
 		StorageNew->m3uaAspRsTimerT8 = 0;
 		StorageNew->m3uaAspRsTimerT11 = 0;
 		StorageNew->m3uaAspRsTimerT15 = 0;
 		StorageNew->m3uaAspRsTimerT16 = 0;
 		StorageNew->m3uaAspRsTimerT18A = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspRsOptions, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspRsOptions, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspRsOptionsLen = 1;
-		}
-		if (memdup((u_char **) &StorageNew->m3uaAspRsAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspRsAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspRsAvailabilityStatusLen = 2;
-		}
 		StorageNew->m3uaAspRsCongestionLevel = 0;
 		StorageNew->m3uaAspRsStatus = 0;
 		StorageNew->m3uaAspRsStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspRsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -2406,11 +2397,11 @@ m3uaAspRsTable_duplicate(struct m3uaAspRsTable_data *thedata)
 {
 	struct m3uaAspRsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspRsTable_data);
 
-	DEBUGMSGTL(("m3uaAspRsTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspRsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -2433,7 +2424,7 @@ m3uaAspRsTable_destroy(struct m3uaAspRsTable_data **thedata)
 {
 	struct m3uaAspRsTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspRsTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRsTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspRsName);
 		StorageDel->m3uaAspRsNameLen = 0;
@@ -2450,7 +2441,7 @@ m3uaAspRsTable_destroy(struct m3uaAspRsTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspRsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2468,15 +2459,16 @@ m3uaAspRsTable_add(struct m3uaAspRsTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspRsTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspSpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
-	/* m3uaAspRsIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspRsIndex, sizeof(thedata->m3uaAspRsIndex));
-	header_complex_add_data(&m3uaAspRsTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspRsTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspRsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRsTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspSpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
+		/* m3uaAspRsIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspRsIndex, sizeof(thedata->m3uaAspRsIndex));
+		header_complex_add_data(&m3uaAspRsTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2497,14 +2489,14 @@ m3uaAspRsTable_del(struct m3uaAspRsTable_data *thedata)
 {
 	struct m3uaAspRsTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspRsTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRsTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspRsTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspRsTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspRsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2526,7 +2518,7 @@ parse_m3uaAspRsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspRsTable_data *StorageTmp = m3uaAspRsTable_create();
 
-	DEBUGMSGTL(("m3uaAspRsTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspRsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -2534,11 +2526,13 @@ parse_m3uaAspRsTable(const char *token, char *line)
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSpIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspRsIndex, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspRsName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspRsName, &StorageTmp->m3uaAspRsNameLen);
 	if (StorageTmp->m3uaAspRsName == NULL) {
 		config_perror("invalid specification for m3uaAspRsName");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspRsRemotePointCode);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspRsRemotePointCode, &StorageTmp->m3uaAspRsRemotePointCodeLen);
 	if (StorageTmp->m3uaAspRsRemotePointCode == NULL) {
 		config_perror("invalid specification for m3uaAspRsRemotePointCode");
@@ -2547,11 +2541,13 @@ parse_m3uaAspRsTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRsOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRsAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRsUsageState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspRsAlarmStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspRsAlarmStatus, &StorageTmp->m3uaAspRsAlarmStatusLen);
 	if (StorageTmp->m3uaAspRsAlarmStatus == NULL) {
 		config_perror("invalid specification for m3uaAspRsAlarmStatus");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspRsProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspRsProceduralStatus, &StorageTmp->m3uaAspRsProceduralStatusLen);
 	if (StorageTmp->m3uaAspRsProceduralStatus == NULL) {
 		config_perror("invalid specification for m3uaAspRsProceduralStatus");
@@ -2562,11 +2558,13 @@ parse_m3uaAspRsTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRsTimerT15, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRsTimerT16, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRsTimerT18A, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspRsOptions);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspRsOptions, &StorageTmp->m3uaAspRsOptionsLen);
 	if (StorageTmp->m3uaAspRsOptions == NULL) {
 		config_perror("invalid specification for m3uaAspRsOptions");
 		return;
 	}
+	SNMP_FREE(StorageTmp->m3uaAspRsAvailabilityStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspRsAvailabilityStatus, &StorageTmp->m3uaAspRsAvailabilityStatusLen);
 	if (StorageTmp->m3uaAspRsAvailabilityStatus == NULL) {
 		config_perror("invalid specification for m3uaAspRsAvailabilityStatus");
@@ -2576,7 +2574,7 @@ parse_m3uaAspRsTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRsStatus, &tmpsize);
 	m3uaAspRsTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspRsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -2592,8 +2590,8 @@ store_m3uaAspRsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspRsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspRsTable", "storing data...  "));
-	refresh_m3uaAspRsTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspRsTable: storing data...  "));
+	refresh_m3uaAspRsTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspRsTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspRsTable_data *) hcindex->data;
@@ -2624,7 +2622,7 @@ store_m3uaAspRsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspRsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2641,7 +2639,7 @@ m3uaAspRlTable_create(void)
 {
 	struct m3uaAspRlTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspRlTable_data);
 
-	DEBUGMSGTL(("m3uaAspRlTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRlTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspSpIndex = 0;
@@ -2656,7 +2654,7 @@ m3uaAspRlTable_create(void)
 		StorageNew->m3uaAspRlCost = 0;
 
 	}
-	DEBUGMSGTL(("m3uaAspRlTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -2673,11 +2671,11 @@ m3uaAspRlTable_duplicate(struct m3uaAspRlTable_data *thedata)
 {
 	struct m3uaAspRlTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspRlTable_data);
 
-	DEBUGMSGTL(("m3uaAspRlTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRlTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspRlTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -2700,12 +2698,12 @@ m3uaAspRlTable_destroy(struct m3uaAspRlTable_data **thedata)
 {
 	struct m3uaAspRlTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspRlTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRlTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspRlTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2723,17 +2721,18 @@ m3uaAspRlTable_add(struct m3uaAspRlTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspRlTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspSpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
-	/* m3uaAspRsIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspRsIndex, sizeof(thedata->m3uaAspRsIndex));
-	/* m3uaAspAgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
-	header_complex_add_data(&m3uaAspRlTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspRlTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspRlTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRlTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspSpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
+		/* m3uaAspRsIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspRsIndex, sizeof(thedata->m3uaAspRsIndex));
+		/* m3uaAspAgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
+		header_complex_add_data(&m3uaAspRlTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2754,14 +2753,14 @@ m3uaAspRlTable_del(struct m3uaAspRlTable_data *thedata)
 {
 	struct m3uaAspRlTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspRlTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRlTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspRlTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspRlTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspRlTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2783,7 +2782,7 @@ parse_m3uaAspRlTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspRlTable_data *StorageTmp = m3uaAspRlTable_create();
 
-	DEBUGMSGTL(("m3uaAspRlTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspRlTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -2801,7 +2800,7 @@ parse_m3uaAspRlTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspRlCost, &tmpsize);
 	m3uaAspRlTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspRlTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -2817,8 +2816,8 @@ store_m3uaAspRlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspRlTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspRlTable", "storing data...  "));
-	refresh_m3uaAspRlTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspRlTable: storing data...  "));
+	refresh_m3uaAspRlTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspRlTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspRlTable_data *) hcindex->data;
@@ -2841,7 +2840,7 @@ store_m3uaAspRlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspRlTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2858,7 +2857,7 @@ m3uaAspRtTable_create(void)
 {
 	struct m3uaAspRtTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspRtTable_data);
 
-	DEBUGMSGTL(("m3uaAspRtTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRtTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspSpIndex = 0;
@@ -2868,19 +2867,17 @@ m3uaAspRtTable_create(void)
 		StorageNew->m3uaAspRtCost = 0;
 		StorageNew->m3uaAspRtTimerT6 = 80;
 		StorageNew->m3uaAspRtTimerT10 = 6000;
-		if (memdup((u_char **) &StorageNew->m3uaAspRtAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspRtAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspRtAvailabilityStatusLen = 2;
-		}
 		StorageNew->m3uaAspRtAdminstrativeState = 0;
 		StorageNew->m3uaAspRtOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspRtProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspRtProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspRtProceduralStatusLen = 1;
-		}
 		StorageNew->m3uaAspRtUsageState = 0;
 		StorageNew->m3uaAspRtStatus = 0;
 		StorageNew->m3uaAspRtStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspRtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -2897,11 +2894,11 @@ m3uaAspRtTable_duplicate(struct m3uaAspRtTable_data *thedata)
 {
 	struct m3uaAspRtTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspRtTable_data);
 
-	DEBUGMSGTL(("m3uaAspRtTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRtTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspRtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -2924,7 +2921,7 @@ m3uaAspRtTable_destroy(struct m3uaAspRtTable_data **thedata)
 {
 	struct m3uaAspRtTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspRtTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRtTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspRtAvailabilityStatus);
 		StorageDel->m3uaAspRtAvailabilityStatusLen = 0;
@@ -2933,7 +2930,7 @@ m3uaAspRtTable_destroy(struct m3uaAspRtTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspRtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2951,19 +2948,20 @@ m3uaAspRtTable_add(struct m3uaAspRtTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspRtTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspSpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
-	/* m3uaAspRsIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspRsIndex, sizeof(thedata->m3uaAspRsIndex));
-	/* m3uaAspAgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
-	/* m3uaAspSgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
-	header_complex_add_data(&m3uaAspRtTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspRtTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspRtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRtTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspSpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
+		/* m3uaAspRsIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspRsIndex, sizeof(thedata->m3uaAspRsIndex));
+		/* m3uaAspAgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
+		/* m3uaAspSgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
+		header_complex_add_data(&m3uaAspRtTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2984,14 +2982,14 @@ m3uaAspRtTable_del(struct m3uaAspRtTable_data *thedata)
 {
 	struct m3uaAspRtTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspRtTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRtTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspRtTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspRtTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspRtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3013,7 +3011,7 @@ parse_m3uaAspRtTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspRtTable_data *StorageTmp = m3uaAspRtTable_create();
 
-	DEBUGMSGTL(("m3uaAspRtTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspRtTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -3026,6 +3024,7 @@ parse_m3uaAspRtTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspRtCost, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRtTimerT6, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRtTimerT10, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspRtAvailabilityStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspRtAvailabilityStatus, &StorageTmp->m3uaAspRtAvailabilityStatusLen);
 	if (StorageTmp->m3uaAspRtAvailabilityStatus == NULL) {
 		config_perror("invalid specification for m3uaAspRtAvailabilityStatus");
@@ -3033,6 +3032,7 @@ parse_m3uaAspRtTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRtAdminstrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRtOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspRtProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspRtProceduralStatus, &StorageTmp->m3uaAspRtProceduralStatusLen);
 	if (StorageTmp->m3uaAspRtProceduralStatus == NULL) {
 		config_perror("invalid specification for m3uaAspRtProceduralStatus");
@@ -3042,7 +3042,7 @@ parse_m3uaAspRtTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRtStatus, &tmpsize);
 	m3uaAspRtTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspRtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -3058,8 +3058,8 @@ store_m3uaAspRtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspRtTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspRtTable", "storing data...  "));
-	refresh_m3uaAspRtTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspRtTable: storing data...  "));
+	refresh_m3uaAspRtTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspRtTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspRtTable_data *) hcindex->data;
@@ -3085,7 +3085,7 @@ store_m3uaAspRtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspRtTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3102,7 +3102,7 @@ m3uaAspRcTable_create(void)
 {
 	struct m3uaAspRcTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspRcTable_data);
 
-	DEBUGMSGTL(("m3uaAspRcTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRcTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspIndex = 0;
@@ -3110,13 +3110,12 @@ m3uaAspRcTable_create(void)
 		StorageNew->m3uaAspAgIndex = 0;
 		StorageNew->m3uaAspRcValue = 0;
 		StorageNew->m3uaAspRcRegstrationPolicy = 0;
-		if ((StorageNew->m3uaAspRcTrafficMode = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+		if ((StorageNew->m3uaAspRcTrafficMode = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->m3uaAspRcTrafficModeLen = 2;
-		}
 		StorageNew->m3uaAspRcStatus = 0;
 		StorageNew->m3uaAspRcStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("m3uaAspRcTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -3133,11 +3132,11 @@ m3uaAspRcTable_duplicate(struct m3uaAspRcTable_data *thedata)
 {
 	struct m3uaAspRcTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspRcTable_data);
 
-	DEBUGMSGTL(("m3uaAspRcTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRcTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspRcTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -3160,14 +3159,14 @@ m3uaAspRcTable_destroy(struct m3uaAspRcTable_data **thedata)
 {
 	struct m3uaAspRcTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspRcTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRcTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspRcTrafficMode);
 		StorageDel->m3uaAspRcTrafficModeLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspRcTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3185,19 +3184,20 @@ m3uaAspRcTable_add(struct m3uaAspRcTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspRcTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
-	/* m3uaAspSpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
-	/* m3uaAspMtIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
-	/* m3uaAspAgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
-	header_complex_add_data(&m3uaAspRcTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspRcTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspRcTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRcTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
+		/* m3uaAspSpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
+		/* m3uaAspMtIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
+		/* m3uaAspAgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
+		header_complex_add_data(&m3uaAspRcTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3218,14 +3218,14 @@ m3uaAspRcTable_del(struct m3uaAspRcTable_data *thedata)
 {
 	struct m3uaAspRcTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspRcTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRcTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspRcTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspRcTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspRcTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3247,7 +3247,7 @@ parse_m3uaAspRcTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspRcTable_data *StorageTmp = m3uaAspRcTable_create();
 
-	DEBUGMSGTL(("m3uaAspRcTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspRcTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -3258,6 +3258,7 @@ parse_m3uaAspRcTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspRcValue, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRcRegstrationPolicy, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspRcTrafficMode);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->m3uaAspRcTrafficMode, &StorageTmp->m3uaAspRcTrafficModeLen);
 	if (StorageTmp->m3uaAspRcTrafficMode == NULL) {
 		config_perror("invalid specification for m3uaAspRcTrafficMode");
@@ -3266,7 +3267,7 @@ parse_m3uaAspRcTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRcStatus, &tmpsize);
 	m3uaAspRcTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspRcTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -3282,8 +3283,8 @@ store_m3uaAspRcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspRcTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspRcTable", "storing data...  "));
-	refresh_m3uaAspRcTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspRcTable: storing data...  "));
+	refresh_m3uaAspRcTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspRcTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspRcTable_data *) hcindex->data;
@@ -3303,7 +3304,7 @@ store_m3uaAspRcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspRcTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3320,7 +3321,7 @@ m3uaAspAsTable_create(void)
 {
 	struct m3uaAspAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspAsTable_data);
 
-	DEBUGMSGTL(("m3uaAspAsTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAsTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspIndex = 0;
@@ -3329,13 +3330,12 @@ m3uaAspAsTable_create(void)
 		StorageNew->m3uaAspSgIndex = 0;
 		StorageNew->m3uaAspAsAsState = 0;
 		StorageNew->m3uaAspAsOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspAsProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspAsProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspAsProceduralStatusLen = 1;
-		}
 		StorageNew->m3uaAspAsUsageState = 0;
 
 	}
-	DEBUGMSGTL(("m3uaAspAsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -3352,11 +3352,11 @@ m3uaAspAsTable_duplicate(struct m3uaAspAsTable_data *thedata)
 {
 	struct m3uaAspAsTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspAsTable_data);
 
-	DEBUGMSGTL(("m3uaAspAsTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspAsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -3379,14 +3379,14 @@ m3uaAspAsTable_destroy(struct m3uaAspAsTable_data **thedata)
 {
 	struct m3uaAspAsTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspAsTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAsTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspAsProceduralStatus);
 		StorageDel->m3uaAspAsProceduralStatusLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspAsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3404,21 +3404,22 @@ m3uaAspAsTable_add(struct m3uaAspAsTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspAsTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
-	/* m3uaAspSpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
-	/* m3uaAspMtIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
-	/* m3uaAspAgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
-	/* m3uaAspSgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
-	header_complex_add_data(&m3uaAspAsTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspAsTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspAsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAsTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
+		/* m3uaAspSpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
+		/* m3uaAspMtIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
+		/* m3uaAspAgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
+		/* m3uaAspSgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
+		header_complex_add_data(&m3uaAspAsTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3439,14 +3440,14 @@ m3uaAspAsTable_del(struct m3uaAspAsTable_data *thedata)
 {
 	struct m3uaAspAsTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspAsTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAsTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspAsTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspAsTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspAsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3468,7 +3469,7 @@ parse_m3uaAspAsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspAsTable_data *StorageTmp = m3uaAspAsTable_create();
 
-	DEBUGMSGTL(("m3uaAspAsTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspAsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -3480,6 +3481,7 @@ parse_m3uaAspAsTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSgIndex, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAsAsState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAsOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspAsProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspAsProceduralStatus, &StorageTmp->m3uaAspAsProceduralStatusLen);
 	if (StorageTmp->m3uaAspAsProceduralStatus == NULL) {
 		config_perror("invalid specification for m3uaAspAsProceduralStatus");
@@ -3488,7 +3490,7 @@ parse_m3uaAspAsTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAsUsageState, &tmpsize);
 	m3uaAspAsTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspAsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -3504,8 +3506,8 @@ store_m3uaAspAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspAsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspAsTable", "storing data...  "));
-	refresh_m3uaAspAsTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspAsTable: storing data...  "));
+	refresh_m3uaAspAsTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspAsTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspAsTable_data *) hcindex->data;
@@ -3526,7 +3528,7 @@ store_m3uaAspAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspAsTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3543,7 +3545,7 @@ m3uaAspAfTable_create(void)
 {
 	struct m3uaAspAfTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspAfTable_data);
 
-	DEBUGMSGTL(("m3uaAspAfTable", "creating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAfTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspIndex = 0;
@@ -3554,13 +3556,12 @@ m3uaAspAfTable_create(void)
 		StorageNew->m3uaAspAfAsState = 0;
 		StorageNew->m3uaAspAfAdministrativeState = 0;
 		StorageNew->m3uaAspAfOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspAfProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS) {
+		if (memdup((u_char **) &StorageNew->m3uaAspAfProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspAfProceduralStatusLen = 1;
-		}
 		StorageNew->m3uaAspAfUsageState = 0;
 
 	}
-	DEBUGMSGTL(("m3uaAspAfTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -3577,11 +3578,11 @@ m3uaAspAfTable_duplicate(struct m3uaAspAfTable_data *thedata)
 {
 	struct m3uaAspAfTable_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspAfTable_data);
 
-	DEBUGMSGTL(("m3uaAspAfTable", "duplicating row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAfTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("m3uaAspAfTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -3604,14 +3605,14 @@ m3uaAspAfTable_destroy(struct m3uaAspAfTable_data **thedata)
 {
 	struct m3uaAspAfTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspAfTable", "deleting row...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAfTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspAfProceduralStatus);
 		StorageDel->m3uaAspAfProceduralStatusLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("m3uaAspAfTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3629,23 +3630,24 @@ m3uaAspAfTable_add(struct m3uaAspAfTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("m3uaAspAfTable", "adding data...  "));
-	/* add the index variables to the varbind list, which is used by header_complex to index the data */
-	/* m3uaAspIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
-	/* m3uaAspSpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
-	/* m3uaAspMtIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
-	/* m3uaAspAgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
-	/* m3uaAspSgIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
-	/* m3uaAspSgpIndex */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgpIndex, sizeof(thedata->m3uaAspSgpIndex));
-	header_complex_add_data(&m3uaAspAfTableStorage, vars, thedata);
-	DEBUGMSGTL(("m3uaAspAfTable", "registered an entry\n"));
-	DEBUGMSGTL(("m3uaAspAfTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAfTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m3uaAspIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspIndex, sizeof(thedata->m3uaAspIndex));
+		/* m3uaAspSpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
+		/* m3uaAspMtIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
+		/* m3uaAspAgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
+		/* m3uaAspSgIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgIndex, sizeof(thedata->m3uaAspSgIndex));
+		/* m3uaAspSgpIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSgpIndex, sizeof(thedata->m3uaAspSgpIndex));
+		header_complex_add_data(&m3uaAspAfTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3666,14 +3668,14 @@ m3uaAspAfTable_del(struct m3uaAspAfTable_data *thedata)
 {
 	struct m3uaAspAfTable_data *StorageDel;
 
-	DEBUGMSGTL(("m3uaAspAfTable", "deleting data...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAfTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(m3uaAspAfTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&m3uaAspAfTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("m3uaAspAfTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3695,7 +3697,7 @@ parse_m3uaAspAfTable(const char *token, char *line)
 	size_t tmpsize;
 	struct m3uaAspAfTable_data *StorageTmp = m3uaAspAfTable_create();
 
-	DEBUGMSGTL(("m3uaAspAfTable", "parsing config...  "));
+	DEBUGMSGTL(("m3uaAspMIB", "parse_m3uaAspAfTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -3709,6 +3711,7 @@ parse_m3uaAspAfTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAfAsState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAfAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAfOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspAfProceduralStatus);
 	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->m3uaAspAfProceduralStatus, &StorageTmp->m3uaAspAfProceduralStatusLen);
 	if (StorageTmp->m3uaAspAfProceduralStatus == NULL) {
 		config_perror("invalid specification for m3uaAspAfProceduralStatus");
@@ -3717,7 +3720,7 @@ parse_m3uaAspAfTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAfUsageState, &tmpsize);
 	m3uaAspAfTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("m3uaAspAfTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
 /*
@@ -3733,8 +3736,8 @@ store_m3uaAspAfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct m3uaAspAfTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("m3uaAspAfTable", "storing data...  "));
-	refresh_m3uaAspAfTable();
+	DEBUGMSGTL(("m3uaAspMIB", "store_m3uaAspAfTable: storing data...  "));
+	refresh_m3uaAspAfTable(1);
 	(void) tmpsize;
 	for (hcindex = m3uaAspAfTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct m3uaAspAfTable_data *) hcindex->data;
@@ -3757,12 +3760,33 @@ store_m3uaAspAfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("m3uaAspAfTable", "done.\n"));
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
 /**
- * @fn void refresh_m3uaAspTable(void)
+ * @fn void refresh_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspTable_data *
+refresh_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -3772,28 +3796,12 @@ store_m3uaAspAfTable(int majorID, int minorID, void *serverarg, void *clientarg)
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspTable(void)
+refresh_m3uaAspTable(int force)
 {
-	if (m3uaAspTable_refresh == 0)
+	if (!force && m3uaAspTable_refresh == 0)
 		return;
-	m3uaAspTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspTable_request = sa_request;
+	m3uaAspTable_refresh = 0;
 }
 
 /**
@@ -3811,10 +3819,11 @@ var_m3uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspTable();
+	refresh_m3uaAspTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -3890,7 +3899,28 @@ var_m3uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
- * @fn void refresh_m3uaAspAgTable(void)
+ * @fn void refresh_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspAgTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspAgTable_data *
+refresh_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspAgTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspAgTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspAgTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspAgTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -3900,28 +3930,12 @@ var_m3uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspAgTable(void)
+refresh_m3uaAspAgTable(int force)
 {
-	if (m3uaAspAgTable_refresh == 0)
+	if (!force && m3uaAspAgTable_refresh == 0)
 		return;
-	m3uaAspAgTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspAgTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspAgTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspAgTable_request = sa_request;
+	m3uaAspAgTable_refresh = 0;
 }
 
 /**
@@ -3939,10 +3953,11 @@ var_m3uaAspAgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspAgTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspAgTable();
+	refresh_m3uaAspAgTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspAgTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspAgTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspAgTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspAgTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -4067,7 +4082,28 @@ var_m3uaAspAgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspSgTable(void)
+ * @fn void refresh_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspSgTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspSgTable_data *
+refresh_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspSgTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspSgTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspSgTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspSgTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -4077,28 +4113,12 @@ var_m3uaAspAgTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspSgTable(void)
+refresh_m3uaAspSgTable(int force)
 {
-	if (m3uaAspSgTable_refresh == 0)
+	if (!force && m3uaAspSgTable_refresh == 0)
 		return;
-	m3uaAspSgTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspSgTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspSgTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspSgTable_request = sa_request;
+	m3uaAspSgTable_refresh = 0;
 }
 
 /**
@@ -4116,10 +4136,11 @@ var_m3uaAspSgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspSgTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspSgTable();
+	refresh_m3uaAspSgTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspSgTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspSgTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspSgTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspSgTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -4295,7 +4316,28 @@ var_m3uaAspSgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspSgpTable(void)
+ * @fn void refresh_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspSgpTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspSgpTable_data *
+refresh_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspSgpTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspSgpTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspSgpTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspSgpTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -4305,28 +4347,12 @@ var_m3uaAspSgTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspSgpTable(void)
+refresh_m3uaAspSgpTable(int force)
 {
-	if (m3uaAspSgpTable_refresh == 0)
+	if (!force && m3uaAspSgpTable_refresh == 0)
 		return;
-	m3uaAspSgpTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspSgpTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspSgpTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspSgpTable_request = sa_request;
+	m3uaAspSgpTable_refresh = 0;
 }
 
 /**
@@ -4344,10 +4370,11 @@ var_m3uaAspSgpTable(struct variable *vp, oid * name, size_t *length, int exact, 
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspSgpTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspSgpTable();
+	refresh_m3uaAspSgpTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspSgpTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspSgpTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspSgpTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspSgpTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -4420,7 +4447,28 @@ var_m3uaAspSgpTable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
- * @fn void refresh_m3uaAspSpTable(void)
+ * @fn void refresh_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspSpTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspSpTable_data *
+refresh_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspSpTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspSpTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspSpTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspSpTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -4430,28 +4478,12 @@ var_m3uaAspSgpTable(struct variable *vp, oid * name, size_t *length, int exact, 
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspSpTable(void)
+refresh_m3uaAspSpTable(int force)
 {
-	if (m3uaAspSpTable_refresh == 0)
+	if (!force && m3uaAspSpTable_refresh == 0)
 		return;
-	m3uaAspSpTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspSpTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspSpTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspSpTable_request = sa_request;
+	m3uaAspSpTable_refresh = 0;
 }
 
 /**
@@ -4469,10 +4501,11 @@ var_m3uaAspSpTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspSpTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspSpTable();
+	refresh_m3uaAspSpTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspSpTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspSpTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspSpTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspSpTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -4600,7 +4633,28 @@ var_m3uaAspSpTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspMtTable(void)
+ * @fn void refresh_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspMtTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspMtTable_data *
+refresh_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspMtTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspMtTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspMtTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspMtTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -4610,28 +4664,12 @@ var_m3uaAspSpTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspMtTable(void)
+refresh_m3uaAspMtTable(int force)
 {
-	if (m3uaAspMtTable_refresh == 0)
+	if (!force && m3uaAspMtTable_refresh == 0)
 		return;
-	m3uaAspMtTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspMtTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspMtTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspMtTable_request = sa_request;
+	m3uaAspMtTable_refresh = 0;
 }
 
 /**
@@ -4649,10 +4687,11 @@ var_m3uaAspMtTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspMtTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspMtTable();
+	refresh_m3uaAspMtTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspMtTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspMtTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspMtTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspMtTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -4711,7 +4750,28 @@ var_m3uaAspMtTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspRsTable(void)
+ * @fn void refresh_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspRsTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspRsTable_data *
+refresh_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspRsTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspRsTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspRsTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspRsTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -4721,28 +4781,12 @@ var_m3uaAspMtTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspRsTable(void)
+refresh_m3uaAspRsTable(int force)
 {
-	if (m3uaAspRsTable_refresh == 0)
+	if (!force && m3uaAspRsTable_refresh == 0)
 		return;
-	m3uaAspRsTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspRsTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspRsTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspRsTable_request = sa_request;
+	m3uaAspRsTable_refresh = 0;
 }
 
 /**
@@ -4760,10 +4804,11 @@ var_m3uaAspRsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspRsTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspRsTable();
+	refresh_m3uaAspRsTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspRsTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspRsTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspRsTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspRsTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -4874,7 +4919,28 @@ var_m3uaAspRsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspRlTable(void)
+ * @fn void refresh_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspRlTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspRlTable_data *
+refresh_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspRlTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspRlTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspRlTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspRlTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -4884,28 +4950,12 @@ var_m3uaAspRsTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspRlTable(void)
+refresh_m3uaAspRlTable(int force)
 {
-	if (m3uaAspRlTable_refresh == 0)
+	if (!force && m3uaAspRlTable_refresh == 0)
 		return;
-	m3uaAspRlTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspRlTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspRlTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspRlTable_request = sa_request;
+	m3uaAspRlTable_refresh = 0;
 }
 
 /**
@@ -4923,10 +4973,11 @@ var_m3uaAspRlTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspRlTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspRlTable();
+	refresh_m3uaAspRlTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspRlTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspRlTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspRlTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspRlTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -4988,7 +5039,28 @@ var_m3uaAspRlTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspRtTable(void)
+ * @fn void refresh_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspRtTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspRtTable_data *
+refresh_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspRtTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspRtTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspRtTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspRtTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -4998,28 +5070,12 @@ var_m3uaAspRlTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspRtTable(void)
+refresh_m3uaAspRtTable(int force)
 {
-	if (m3uaAspRtTable_refresh == 0)
+	if (!force && m3uaAspRtTable_refresh == 0)
 		return;
-	m3uaAspRtTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspRtTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspRtTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspRtTable_request = sa_request;
+	m3uaAspRtTable_refresh = 0;
 }
 
 /**
@@ -5037,10 +5093,11 @@ var_m3uaAspRtTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspRtTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspRtTable();
+	refresh_m3uaAspRtTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspRtTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspRtTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspRtTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspRtTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5107,7 +5164,28 @@ var_m3uaAspRtTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspRcTable(void)
+ * @fn void refresh_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspRcTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspRcTable_data *
+refresh_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspRcTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspRcTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspRcTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspRcTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5117,28 +5195,12 @@ var_m3uaAspRtTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspRcTable(void)
+refresh_m3uaAspRcTable(int force)
 {
-	if (m3uaAspRcTable_refresh == 0)
+	if (!force && m3uaAspRcTable_refresh == 0)
 		return;
-	m3uaAspRcTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspRcTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspRcTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspRcTable_request = sa_request;
+	m3uaAspRcTable_refresh = 0;
 }
 
 /**
@@ -5156,10 +5218,11 @@ var_m3uaAspRcTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspRcTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspRcTable();
+	refresh_m3uaAspRcTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspRcTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspRcTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspRcTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspRcTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5200,7 +5263,28 @@ var_m3uaAspRcTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspAsTable(void)
+ * @fn void refresh_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspAsTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspAsTable_data *
+refresh_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspAsTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspAsTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspAsTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspAsTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5210,28 +5294,12 @@ var_m3uaAspRcTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspAsTable(void)
+refresh_m3uaAspAsTable(int force)
 {
-	if (m3uaAspAsTable_refresh == 0)
+	if (!force && m3uaAspAsTable_refresh == 0)
 		return;
-	m3uaAspAsTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspAsTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspAsTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspAsTable_request = sa_request;
+	m3uaAspAsTable_refresh = 0;
 }
 
 /**
@@ -5249,10 +5317,11 @@ var_m3uaAspAsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspAsTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspAsTable();
+	refresh_m3uaAspAsTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspAsTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspAsTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspAsTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspAsTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5289,7 +5358,28 @@ var_m3uaAspAsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
- * @fn void refresh_m3uaAspAfTable(void)
+ * @fn void refresh_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the m3uaAspAfTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct m3uaAspAfTable_data *
+refresh_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->m3uaAspAfTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->m3uaAspAfTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_m3uaAspAfTable(int force)
+ * @param force force refresh if non-zero.
  * @brief refresh the scalar values of the m3uaAspAfTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
@@ -5299,28 +5389,12 @@ var_m3uaAspAsTable(struct variable *vp, oid * name, size_t *length, int exact, s
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_m3uaAspAfTable(void)
+refresh_m3uaAspAfTable(int force)
 {
-	if (m3uaAspAfTable_refresh == 0)
+	if (!force && m3uaAspAfTable_refresh == 0)
 		return;
-	m3uaAspAfTable_refresh = 0;
 	/* XXX: Here, update the table as required... */
-}
-
-/**
- * @fn void refresh_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp)
- * @brief refresh the contents of the m3uaAspAfTable row.
- *
- * Normally the values retrieved from the operating system are cached.  However, if a row contains
- * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
- * may be necessary to refresh the row on some other basis, but normally only once per request.
- */
-void
-refresh_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp)
-{
-	if (!StorageTmp || StorageTmp->m3uaAspAfTable_request == sa_request)
-		return;
-	StorageTmp->m3uaAspAfTable_request = sa_request;
+	m3uaAspAfTable_refresh = 0;
 }
 
 /**
@@ -5338,10 +5412,11 @@ var_m3uaAspAfTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	DEBUGMSGTL(("m3uaAspMIB", "var_m3uaAspAfTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_m3uaAspAfTable();
+	refresh_m3uaAspAfTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	StorageTmp = header_complex(m3uaAspAfTableStorage, vp, name, length, exact, var_len, write_method);
-	refresh_m3uaAspAfTable_row(StorageTmp);
+	while ((StorageTmp = header_complex(m3uaAspAfTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_m3uaAspAfTable_row(StorageTmp, 0)) || exact)
+			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -5406,10 +5481,12 @@ write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspName entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspStatus) {
@@ -5441,9 +5518,6 @@ write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspName;
@@ -5451,14 +5525,17 @@ write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		StorageTmp->m3uaAspName = string;
 		StorageTmp->m3uaAspNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspName = old_value;
-		StorageTmp->m3uaAspNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspName = old_value;
+		StorageTmp->m3uaAspNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5485,10 +5562,12 @@ write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspName entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspStatus) {
@@ -5540,9 +5619,6 @@ write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspName;
@@ -5550,15 +5626,18 @@ write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		StorageTmp->m3uaAspName = string;
 		StorageTmp->m3uaAspNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspName = old_value;
-		StorageTmp->m3uaAspNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
 		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspName = old_value;
+		StorageTmp->m3uaAspNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -5583,7 +5662,8 @@ write_m3uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -5622,17 +5702,17 @@ write_m3uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAdministrativeState;
 		StorageTmp->m3uaAspAdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5658,7 +5738,8 @@ write_m3uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -5725,17 +5806,17 @@ write_m3uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAdministrativeState;
 		StorageTmp->m3uaAspAdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5762,10 +5843,12 @@ write_m3uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, size
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspCapabilities entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspStatus) {
@@ -5796,9 +5879,6 @@ write_m3uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, size
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspCapabilities for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspCapabilities;
@@ -5806,14 +5886,17 @@ write_m3uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, size
 		StorageTmp->m3uaAspCapabilities = string;
 		StorageTmp->m3uaAspCapabilitiesLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspCapabilities = old_value;
-		StorageTmp->m3uaAspCapabilitiesLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspCapabilities = old_value;
+		StorageTmp->m3uaAspCapabilitiesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5839,7 +5922,8 @@ write_m3uaAspIdPolicy(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspIdPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -5879,17 +5963,17 @@ write_m3uaAspIdPolicy(int action, u_char *var_val, u_char var_val_type, size_t v
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspIdPolicy for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspIdPolicy;
 		StorageTmp->m3uaAspIdPolicy = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspIdPolicy = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5915,7 +5999,8 @@ write_m3uaAspRegistrationPolicy(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRegistrationPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -5955,17 +6040,17 @@ write_m3uaAspRegistrationPolicy(int action, u_char *var_val, u_char var_val_type
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRegistrationPolicy for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRegistrationPolicy;
 		StorageTmp->m3uaAspRegistrationPolicy = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRegistrationPolicy = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5991,7 +6076,8 @@ write_m3uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAssociationPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6031,17 +6117,17 @@ write_m3uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_type,
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAssociationPolicy for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAssociationPolicy;
 		StorageTmp->m3uaAspAssociationPolicy = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAssociationPolicy = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6068,10 +6154,12 @@ write_m3uaAspAgProtocolVersion(int action, u_char *var_val, u_char var_val_type,
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgProtocolVersion entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspAgStatus) {
@@ -6100,9 +6188,6 @@ write_m3uaAspAgProtocolVersion(int action, u_char *var_val, u_char var_val_type,
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgProtocolVersion for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgProtocolVersion;
@@ -6110,14 +6195,17 @@ write_m3uaAspAgProtocolVersion(int action, u_char *var_val, u_char var_val_type,
 		StorageTmp->m3uaAspAgProtocolVersion = objid;
 		StorageTmp->m3uaAspAgProtocolVersionLen = var_val_len / sizeof(oid);
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgProtocolVersion = old_value;
-		StorageTmp->m3uaAspAgProtocolVersionLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspAgProtocolVersion = old_value;
+		StorageTmp->m3uaAspAgProtocolVersionLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6144,10 +6232,12 @@ write_m3uaAspAgOptions(int action, u_char *var_val, u_char var_val_type, size_t 
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgOptions entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspAgStatus) {
@@ -6178,9 +6268,6 @@ write_m3uaAspAgOptions(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgOptions for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgOptions;
@@ -6188,14 +6275,17 @@ write_m3uaAspAgOptions(int action, u_char *var_val, u_char var_val_type, size_t 
 		StorageTmp->m3uaAspAgOptions = string;
 		StorageTmp->m3uaAspAgOptionsLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgOptions = old_value;
-		StorageTmp->m3uaAspAgOptionsLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspAgOptions = old_value;
+		StorageTmp->m3uaAspAgOptionsLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6221,7 +6311,8 @@ write_m3uaAspAgRegistrationPolicy(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgRegistrationPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6261,17 +6352,17 @@ write_m3uaAspAgRegistrationPolicy(int action, u_char *var_val, u_char var_val_ty
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgRegistrationPolicy for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgRegistrationPolicy;
 		StorageTmp->m3uaAspAgRegistrationPolicy = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgRegistrationPolicy = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6297,7 +6388,8 @@ write_m3uaAspAgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgAspIdPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6337,17 +6429,17 @@ write_m3uaAspAgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, siz
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgAspIdPolicy for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgAspIdPolicy;
 		StorageTmp->m3uaAspAgAspIdPolicy = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgAspIdPolicy = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6373,7 +6465,8 @@ write_m3uaAspAgAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgAspProtocolPayloadId entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6408,17 +6501,17 @@ write_m3uaAspAgAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgAspProtocolPayloadId for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgAspProtocolPayloadId;
 		StorageTmp->m3uaAspAgAspProtocolPayloadId = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgAspProtocolPayloadId = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6443,7 +6536,8 @@ write_m3uaAspAgIpPort(int action, u_char *var_val, u_char var_val_type, size_t v
 	size_t newlen = name_len - 15;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgIpPort entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6474,14 +6568,14 @@ write_m3uaAspAgIpPort(int action, u_char *var_val, u_char var_val_type, size_t v
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgIpPort for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6507,7 +6601,8 @@ write_m3uaAspAgMinOstreams(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgMinOstreams entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6543,17 +6638,17 @@ write_m3uaAspAgMinOstreams(int action, u_char *var_val, u_char var_val_type, siz
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgMinOstreams for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgMinOstreams;
 		StorageTmp->m3uaAspAgMinOstreams = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgMinOstreams = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6579,7 +6674,8 @@ write_m3uaAspAgMaxIstreams(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgMaxIstreams entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6614,17 +6710,17 @@ write_m3uaAspAgMaxIstreams(int action, u_char *var_val, u_char var_val_type, siz
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgMaxIstreams for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgMaxIstreams;
 		StorageTmp->m3uaAspAgMaxIstreams = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgMaxIstreams = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6650,7 +6746,8 @@ write_m3uaAspAgTimerT7(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT7 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6685,17 +6782,17 @@ write_m3uaAspAgTimerT7(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT7 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgTimerT7;
 		StorageTmp->m3uaAspAgTimerT7 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgTimerT7 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6721,7 +6818,8 @@ write_m3uaAspAgTimerT19(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT19 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6756,17 +6854,17 @@ write_m3uaAspAgTimerT19(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT19 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgTimerT19;
 		StorageTmp->m3uaAspAgTimerT19 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgTimerT19 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6792,7 +6890,8 @@ write_m3uaAspAgTimerT21(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT21 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6827,17 +6926,17 @@ write_m3uaAspAgTimerT21(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT21 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgTimerT21;
 		StorageTmp->m3uaAspAgTimerT21 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgTimerT21 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6863,7 +6962,8 @@ write_m3uaAspAgTimerT25A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT25A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6898,17 +6998,17 @@ write_m3uaAspAgTimerT25A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT25A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgTimerT25A;
 		StorageTmp->m3uaAspAgTimerT25A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgTimerT25A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6934,7 +7034,8 @@ write_m3uaAspAgTimerT28A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT28A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -6969,17 +7070,17 @@ write_m3uaAspAgTimerT28A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT28A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgTimerT28A;
 		StorageTmp->m3uaAspAgTimerT28A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgTimerT28A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7005,7 +7106,8 @@ write_m3uaAspAgTimerT29A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT29A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7040,17 +7142,17 @@ write_m3uaAspAgTimerT29A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT29A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgTimerT29A;
 		StorageTmp->m3uaAspAgTimerT29A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgTimerT29A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7076,7 +7178,8 @@ write_m3uaAspAgTimerT30A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT30A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7111,17 +7214,17 @@ write_m3uaAspAgTimerT30A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT30A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAgTimerT30A;
 		StorageTmp->m3uaAspAgTimerT30A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAgTimerT30A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7148,10 +7251,12 @@ write_m3uaAspSgName(int action, u_char *var_val, u_char var_val_type, size_t var
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgName entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSgStatus) {
@@ -7183,9 +7288,6 @@ write_m3uaAspSgName(int action, u_char *var_val, u_char var_val_type, size_t var
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgName;
@@ -7193,14 +7295,17 @@ write_m3uaAspSgName(int action, u_char *var_val, u_char var_val_type, size_t var
 		StorageTmp->m3uaAspSgName = string;
 		StorageTmp->m3uaAspSgNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgName = old_value;
-		StorageTmp->m3uaAspSgNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspSgName = old_value;
+		StorageTmp->m3uaAspSgNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7226,7 +7331,8 @@ write_m3uaAspSgAdministrativeState(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7266,17 +7372,17 @@ write_m3uaAspSgAdministrativeState(int action, u_char *var_val, u_char var_val_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgAdministrativeState;
 		StorageTmp->m3uaAspSgAdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgAdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7302,7 +7408,8 @@ write_m3uaAspSgAspState(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgAspState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7342,17 +7449,17 @@ write_m3uaAspSgAspState(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgAspState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgAspState;
 		StorageTmp->m3uaAspSgAspState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgAspState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7378,7 +7485,8 @@ write_m3uaAspSgMaxInitRetrans(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgMaxInitRetrans entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7409,17 +7517,17 @@ write_m3uaAspSgMaxInitRetrans(int action, u_char *var_val, u_char var_val_type, 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgMaxInitRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgMaxInitRetrans;
 		StorageTmp->m3uaAspSgMaxInitRetrans = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgMaxInitRetrans = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7445,7 +7553,8 @@ write_m3uaAspSgMaxLifeTime(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgMaxLifeTime entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7480,17 +7589,17 @@ write_m3uaAspSgMaxLifeTime(int action, u_char *var_val, u_char var_val_type, siz
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgMaxLifeTime for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgMaxLifeTime;
 		StorageTmp->m3uaAspSgMaxLifeTime = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgMaxLifeTime = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7516,7 +7625,8 @@ write_m3uaAspSgTimerT1(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7552,17 +7662,17 @@ write_m3uaAspSgTimerT1(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT1 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT1;
 		StorageTmp->m3uaAspSgTimerT1 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT1 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7588,7 +7698,8 @@ write_m3uaAspSgTimerT2(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7624,17 +7735,17 @@ write_m3uaAspSgTimerT2(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT2 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT2;
 		StorageTmp->m3uaAspSgTimerT2 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT2 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7660,7 +7771,8 @@ write_m3uaAspSgTimerT3(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7696,17 +7808,17 @@ write_m3uaAspSgTimerT3(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT3 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT3;
 		StorageTmp->m3uaAspSgTimerT3 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT3 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7732,7 +7844,8 @@ write_m3uaAspSgTimerT4(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT4 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7768,17 +7881,17 @@ write_m3uaAspSgTimerT4(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT4 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT4;
 		StorageTmp->m3uaAspSgTimerT4 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT4 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7804,7 +7917,8 @@ write_m3uaAspSgTimerT5(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT5 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7840,17 +7954,17 @@ write_m3uaAspSgTimerT5(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT5 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT5;
 		StorageTmp->m3uaAspSgTimerT5 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT5 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7876,7 +7990,8 @@ write_m3uaAspSgTimerT5(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT5 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -7936,17 +8051,17 @@ write_m3uaAspSgTimerT5(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT5 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT5;
 		StorageTmp->m3uaAspSgTimerT5 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT5 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7972,7 +8087,8 @@ write_m3uaAspSgTimerT19A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT19A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8008,17 +8124,17 @@ write_m3uaAspSgTimerT19A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT19A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT19A;
 		StorageTmp->m3uaAspSgTimerT19A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT19A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8044,7 +8160,8 @@ write_m3uaAspSgTimerT24(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT24 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8080,17 +8197,17 @@ write_m3uaAspSgTimerT24(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT24 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT24;
 		StorageTmp->m3uaAspSgTimerT24 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT24 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8116,7 +8233,8 @@ write_m3uaAspSgTimerT31A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT31A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8152,17 +8270,17 @@ write_m3uaAspSgTimerT31A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT31A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT31A;
 		StorageTmp->m3uaAspSgTimerT31A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT31A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8188,7 +8306,8 @@ write_m3uaAspSgTimerT32A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT32A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8224,17 +8343,17 @@ write_m3uaAspSgTimerT32A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT32A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT32A;
 		StorageTmp->m3uaAspSgTimerT32A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT32A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8260,7 +8379,8 @@ write_m3uaAspSgTimerT33A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT33A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8296,17 +8416,17 @@ write_m3uaAspSgTimerT33A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT33A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT33A;
 		StorageTmp->m3uaAspSgTimerT33A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT33A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8332,7 +8452,8 @@ write_m3uaAspSgTimerT34A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT34A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8368,17 +8489,17 @@ write_m3uaAspSgTimerT34A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT34A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT34A;
 		StorageTmp->m3uaAspSgTimerT34A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT34A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8404,7 +8525,8 @@ write_m3uaAspSgTimerT1T(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT1T entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8440,17 +8562,17 @@ write_m3uaAspSgTimerT1T(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT1T for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT1T;
 		StorageTmp->m3uaAspSgTimerT1T = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT1T = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8476,7 +8598,8 @@ write_m3uaAspSgTimerT2T(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT2T entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8512,17 +8635,17 @@ write_m3uaAspSgTimerT2T(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT2T for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgTimerT2T;
 		StorageTmp->m3uaAspSgTimerT2T = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgTimerT2T = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8549,10 +8672,12 @@ write_m3uaAspSgpName(int action, u_char *var_val, u_char var_val_type, size_t va
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpName entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSgpStatus) {
@@ -8584,9 +8709,6 @@ write_m3uaAspSgpName(int action, u_char *var_val, u_char var_val_type, size_t va
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgpName;
@@ -8594,14 +8716,17 @@ write_m3uaAspSgpName(int action, u_char *var_val, u_char var_val_type, size_t va
 		StorageTmp->m3uaAspSgpName = string;
 		StorageTmp->m3uaAspSgpNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpName = old_value;
-		StorageTmp->m3uaAspSgpNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspSgpName = old_value;
+		StorageTmp->m3uaAspSgpNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8627,7 +8752,8 @@ write_m3uaAspSgpAdministrativeState(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8667,17 +8793,17 @@ write_m3uaAspSgpAdministrativeState(int action, u_char *var_val, u_char var_val_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgpAdministrativeState;
 		StorageTmp->m3uaAspSgpAdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgpAdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8703,7 +8829,8 @@ write_m3uaAspSgpAspState(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpAspState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -8743,17 +8870,17 @@ write_m3uaAspSgpAspState(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpAspState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgpAspState;
 		StorageTmp->m3uaAspSgpAspState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgpAspState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8780,10 +8907,12 @@ write_m3uaAspSgpPrimaryAddress(int action, u_char *var_val, u_char var_val_type,
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpPrimaryAddress entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSgpStatus) {
@@ -8815,9 +8944,6 @@ write_m3uaAspSgpPrimaryAddress(int action, u_char *var_val, u_char var_val_type,
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpPrimaryAddress for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgpPrimaryAddress;
@@ -8825,14 +8951,17 @@ write_m3uaAspSgpPrimaryAddress(int action, u_char *var_val, u_char var_val_type,
 		StorageTmp->m3uaAspSgpPrimaryAddress = string;
 		StorageTmp->m3uaAspSgpPrimaryAddressLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpPrimaryAddress = old_value;
-		StorageTmp->m3uaAspSgpPrimaryAddressLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspSgpPrimaryAddress = old_value;
+		StorageTmp->m3uaAspSgpPrimaryAddressLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8859,10 +8988,12 @@ write_m3uaAspSgpHostName(int action, u_char *var_val, u_char var_val_type, size_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpHostName entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSgpStatus) {
@@ -8894,9 +9025,6 @@ write_m3uaAspSgpHostName(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpHostName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSgpHostName;
@@ -8904,14 +9032,17 @@ write_m3uaAspSgpHostName(int action, u_char *var_val, u_char var_val_type, size_
 		StorageTmp->m3uaAspSgpHostName = string;
 		StorageTmp->m3uaAspSgpHostNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpHostName = old_value;
-		StorageTmp->m3uaAspSgpHostNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspSgpHostName = old_value;
+		StorageTmp->m3uaAspSgpHostNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8938,10 +9069,12 @@ write_m3uaAspSpName(int action, u_char *var_val, u_char var_val_type, size_t var
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpName entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSpStatus) {
@@ -8973,9 +9106,6 @@ write_m3uaAspSpName(int action, u_char *var_val, u_char var_val_type, size_t var
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpName;
@@ -8983,14 +9113,17 @@ write_m3uaAspSpName(int action, u_char *var_val, u_char var_val_type, size_t var
 		StorageTmp->m3uaAspSpName = string;
 		StorageTmp->m3uaAspSpNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpName = old_value;
-		StorageTmp->m3uaAspSpNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspSpName = old_value;
+		StorageTmp->m3uaAspSpNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9016,7 +9149,8 @@ write_m3uaAspSpAdministrativeState(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9055,17 +9189,17 @@ write_m3uaAspSpAdministrativeState(int action, u_char *var_val, u_char var_val_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpAdministrativeState;
 		StorageTmp->m3uaAspSpAdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpAdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9092,10 +9226,12 @@ write_m3uaAspSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpAlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSpStatus) {
@@ -9126,9 +9262,6 @@ write_m3uaAspSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpAlarmStatus;
@@ -9136,14 +9269,17 @@ write_m3uaAspSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 		StorageTmp->m3uaAspSpAlarmStatus = string;
 		StorageTmp->m3uaAspSpAlarmStatusLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpAlarmStatus = old_value;
-		StorageTmp->m3uaAspSpAlarmStatusLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspSpAlarmStatus = old_value;
+		StorageTmp->m3uaAspSpAlarmStatusLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9170,10 +9306,12 @@ write_m3uaAspSpPointCode(int action, u_char *var_val, u_char var_val_type, size_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpPointCode entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSpStatus) {
@@ -9205,9 +9343,6 @@ write_m3uaAspSpPointCode(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpPointCode for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpPointCode;
@@ -9215,14 +9350,17 @@ write_m3uaAspSpPointCode(int action, u_char *var_val, u_char var_val_type, size_
 		StorageTmp->m3uaAspSpPointCode = string;
 		StorageTmp->m3uaAspSpPointCodeLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpPointCode = old_value;
-		StorageTmp->m3uaAspSpPointCodeLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspSpPointCode = old_value;
+		StorageTmp->m3uaAspSpPointCodeLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9248,7 +9386,8 @@ write_m3uaAspSpTimerT1R(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT1R entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9283,17 +9422,17 @@ write_m3uaAspSpTimerT1R(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT1R for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpTimerT1R;
 		StorageTmp->m3uaAspSpTimerT1R = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpTimerT1R = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9319,7 +9458,8 @@ write_m3uaAspSpTimerT18(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT18 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9354,17 +9494,17 @@ write_m3uaAspSpTimerT18(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT18 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpTimerT18;
 		StorageTmp->m3uaAspSpTimerT18 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpTimerT18 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9390,7 +9530,8 @@ write_m3uaAspSpTimerT20(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT20 entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9425,17 +9566,17 @@ write_m3uaAspSpTimerT20(int action, u_char *var_val, u_char var_val_type, size_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT20 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpTimerT20;
 		StorageTmp->m3uaAspSpTimerT20 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpTimerT20 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9461,7 +9602,8 @@ write_m3uaAspSpTimerT22A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT22A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9496,17 +9638,17 @@ write_m3uaAspSpTimerT22A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT22A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpTimerT22A;
 		StorageTmp->m3uaAspSpTimerT22A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpTimerT22A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9532,7 +9674,8 @@ write_m3uaAspSpTimerT23A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT23A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9567,17 +9710,17 @@ write_m3uaAspSpTimerT23A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT23A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpTimerT23A;
 		StorageTmp->m3uaAspSpTimerT23A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpTimerT23A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9603,7 +9746,8 @@ write_m3uaAspSpTimerT24A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT24A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9638,17 +9782,17 @@ write_m3uaAspSpTimerT24A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT24A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpTimerT24A;
 		StorageTmp->m3uaAspSpTimerT24A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpTimerT24A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9674,7 +9818,8 @@ write_m3uaAspSpTimerT26A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT26A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9709,17 +9854,17 @@ write_m3uaAspSpTimerT26A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT26A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpTimerT26A;
 		StorageTmp->m3uaAspSpTimerT26A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpTimerT26A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9745,7 +9890,8 @@ write_m3uaAspSpTimerT27A(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT27A entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9780,17 +9926,17 @@ write_m3uaAspSpTimerT27A(int action, u_char *var_val, u_char var_val_type, size_
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT27A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspSpTimerT27A;
 		StorageTmp->m3uaAspSpTimerT27A = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSpTimerT27A = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9817,10 +9963,12 @@ write_m3uaAspMtName(int action, u_char *var_val, u_char var_val_type, size_t var
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspMtName entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspMtStatus) {
@@ -9852,9 +10000,6 @@ write_m3uaAspMtName(int action, u_char *var_val, u_char var_val_type, size_t var
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspMtName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspMtName;
@@ -9862,14 +10007,17 @@ write_m3uaAspMtName(int action, u_char *var_val, u_char var_val_type, size_t var
 		StorageTmp->m3uaAspMtName = string;
 		StorageTmp->m3uaAspMtNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspMtName = old_value;
-		StorageTmp->m3uaAspMtNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspMtName = old_value;
+		StorageTmp->m3uaAspMtNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9895,7 +10043,8 @@ write_m3uaAspMtAdministrativeState(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspMtAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -9935,17 +10084,17 @@ write_m3uaAspMtAdministrativeState(int action, u_char *var_val, u_char var_val_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspMtAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspMtAdministrativeState;
 		StorageTmp->m3uaAspMtAdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspMtAdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9971,7 +10120,8 @@ write_m3uaAspMtAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspMtAsState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -10015,17 +10165,17 @@ write_m3uaAspMtAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspMtAsState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspMtAsState;
 		StorageTmp->m3uaAspMtAsState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspMtAsState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10051,7 +10201,8 @@ write_m3uaAspRsAdministrativeState(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRsAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRsTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspRsTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -10090,17 +10241,17 @@ write_m3uaAspRsAdministrativeState(int action, u_char *var_val, u_char var_val_t
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRsAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRsAdministrativeState;
 		StorageTmp->m3uaAspRsAdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRsAdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10127,10 +10278,12 @@ write_m3uaAspRsAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRsAlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRsTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspRsTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspRsStatus) {
@@ -10161,9 +10314,6 @@ write_m3uaAspRsAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRsAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRsAlarmStatus;
@@ -10171,15 +10321,18 @@ write_m3uaAspRsAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 		StorageTmp->m3uaAspRsAlarmStatus = string;
 		StorageTmp->m3uaAspRsAlarmStatusLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRsAlarmStatus = old_value;
-		StorageTmp->m3uaAspRsAlarmStatusLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
 		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspRsAlarmStatus = old_value;
+		StorageTmp->m3uaAspRsAlarmStatusLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -10204,7 +10357,8 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10221,17 +10375,17 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRlCost;
 		StorageTmp->m3uaAspRlCost = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRlCost = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10257,67 +10411,7 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		/* Note: default value 0 */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
-				   be reversable in the UNDO case */
-		old_value = StorageTmp->m3uaAspRlCost;
-		StorageTmp->m3uaAspRlCost = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRlCost = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static ulong old_value;
-	struct m3uaAspRlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	ulong set_value = *((ulong *) var_val);
-
-	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
+	if ((StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10337,25 +10431,21 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
 		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRlCost;
 		StorageTmp->m3uaAspRlCost = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRlCost = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10381,8 +10471,7 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
+	if ((StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10408,25 +10497,21 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
 		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRlCost;
 		StorageTmp->m3uaAspRlCost = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRlCost = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10452,8 +10537,7 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
+	if ((StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10485,25 +10569,21 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
 		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRlCost;
 		StorageTmp->m3uaAspRlCost = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRlCost = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10529,8 +10609,7 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
+	if ((StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10568,25 +10647,21 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
 		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRlCost;
 		StorageTmp->m3uaAspRlCost = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRlCost = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10612,8 +10687,7 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
+	if ((StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10657,6 +10731,92 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value 0 */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
+		old_value = StorageTmp->m3uaAspRlCost;
+		StorageTmp->m3uaAspRlCost = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspRlCost = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static ulong old_value;
+	struct m3uaAspRlTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 15;
+	ulong set_value = *((ulong *) var_val);
+
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
+	if ((StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	switch (action) {
+	case RESERVE1:
+		if (var_val_type != ASN_UNSIGNED) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost not ASN_UNSIGNED\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(uint32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		if (var_val_len > sizeof(uint32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		if (var_val_len > sizeof(uint32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		if (var_val_len > sizeof(uint32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		if (var_val_len > sizeof(uint32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		if (var_val_len > sizeof(uint32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
 		if (var_val_len > sizeof(uint32_t)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlCost: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
@@ -10665,17 +10825,17 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRlCost;
 		StorageTmp->m3uaAspRlCost = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRlCost = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10701,7 +10861,8 @@ write_m3uaAspRcValue(int action, u_char *var_val, u_char var_val_type, size_t va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -10731,17 +10892,17 @@ write_m3uaAspRcValue(int action, u_char *var_val, u_char var_val_type, size_t va
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRcValue for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRcValue;
 		StorageTmp->m3uaAspRcValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRcValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10767,7 +10928,8 @@ write_m3uaAspRcRegstrationPolicy(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcRegstrationPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
@@ -10807,17 +10969,17 @@ write_m3uaAspRcRegstrationPolicy(int action, u_char *var_val, u_char var_val_typ
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRcRegstrationPolicy for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRcRegstrationPolicy;
 		StorageTmp->m3uaAspRcRegstrationPolicy = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspRcRegstrationPolicy = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10844,10 +11006,12 @@ write_m3uaAspRcTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcTrafficMode entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
 	case RESERVE1:
+		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspRcStatus) {
@@ -10876,9 +11040,6 @@ write_m3uaAspRcTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRcTrafficMode for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspRcTrafficMode;
@@ -10886,14 +11047,17 @@ write_m3uaAspRcTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 		StorageTmp->m3uaAspRcTrafficMode = objid;
 		StorageTmp->m3uaAspRcTrafficModeLen = var_val_len / sizeof(oid);
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRcTrafficMode = old_value;
-		StorageTmp->m3uaAspRcTrafficModeLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspRcTrafficMode = old_value;
+		StorageTmp->m3uaAspRcTrafficModeLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10919,7 +11083,8 @@ write_m3uaAspAfAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAfAsState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAfTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAfTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -10948,17 +11113,17 @@ write_m3uaAspAfAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAfAsState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAfAsState;
 		StorageTmp->m3uaAspAfAsState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAfAsState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10984,7 +11149,8 @@ write_m3uaAspAfAdministrativeState(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAfAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(m3uaAspAfTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	if ((StorageTmp = header_complex(m3uaAspAfTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11009,17 +11175,17 @@ write_m3uaAspAfAdministrativeState(int action, u_char *var_val, u_char var_val_t
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAfAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->m3uaAspAfAdministrativeState;
 		StorageTmp->m3uaAspAfAdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspAfAdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11250,6 +11416,7 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspStatus not ASN_INTEGER\n");
@@ -11264,6 +11431,8 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -11320,14 +11489,34 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspIndex = *vp->val.integer;
+			StorageNew->m3uaAspIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspIndex = *vp->val.integer;
+			StorageNew->m3uaAspIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -11340,22 +11529,6 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspTable_del(StorageNew);
-			m3uaAspTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -11377,16 +11550,6 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspStatus;
 			StorageTmp->m3uaAspStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspStatus = old_value;
 			break;
 		}
 		break;
@@ -11431,6 +11594,34 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspTable_del(StorageNew);
+				m3uaAspTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -11456,6 +11647,7 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgStatus not ASN_INTEGER\n");
@@ -11470,6 +11662,8 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -11521,12 +11715,20 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspAgIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspAgIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspAgTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspAgIndex = *vp->val.integer;
+			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspAgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -11539,22 +11741,6 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspAgTable_del(StorageNew);
-			m3uaAspAgTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspAgTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -11576,16 +11762,6 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspAgStatus;
 			StorageTmp->m3uaAspAgStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspAgStatus = old_value;
 			break;
 		}
 		break;
@@ -11630,6 +11806,34 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspAgStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspAgTable_del(StorageNew);
+				m3uaAspAgTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspAgTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -11655,6 +11859,7 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgStatus not ASN_INTEGER\n");
@@ -11669,6 +11874,8 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -11725,14 +11932,29 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspAgIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspAgIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspSgIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSgIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspSgTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspAgIndex = *vp->val.integer;
+			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspSgIndex = *vp->val.integer;
+			StorageNew->m3uaAspSgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspSgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -11745,22 +11967,6 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspSgTable_del(StorageNew);
-			m3uaAspSgTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspSgTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -11782,16 +11988,6 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspSgStatus;
 			StorageTmp->m3uaAspSgStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspSgStatus = old_value;
 			break;
 		}
 		break;
@@ -11836,6 +12032,34 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspSgStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspSgTable_del(StorageNew);
+				m3uaAspSgTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspSgTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -11861,6 +12085,7 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpStatus not ASN_INTEGER\n");
@@ -11875,6 +12100,8 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -11936,16 +12163,38 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspAgIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspAgIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspSgIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSgIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspSgpIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSgpIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspSgpTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspAgIndex = *vp->val.integer;
+			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspSgIndex = *vp->val.integer;
+			StorageNew->m3uaAspSgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspSgpIndex = *vp->val.integer;
+			StorageNew->m3uaAspSgpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspSgpTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -11958,22 +12207,6 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspSgpTable_del(StorageNew);
-			m3uaAspSgpTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspSgpTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -11995,16 +12228,6 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspSgpStatus;
 			StorageTmp->m3uaAspSgpStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspSgpStatus = old_value;
 			break;
 		}
 		break;
@@ -12049,6 +12272,34 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspSgpStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspSgpTable_del(StorageNew);
+				m3uaAspSgpTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspSgpTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -12074,6 +12325,7 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpStatus not ASN_INTEGER\n");
@@ -12088,6 +12340,8 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -12139,12 +12393,20 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspSpIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSpIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspSpTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspSpIndex = *vp->val.integer;
+			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspSpTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -12157,22 +12419,6 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspSpTable_del(StorageNew);
-			m3uaAspSpTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspSpTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -12194,16 +12440,6 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspSpStatus;
 			StorageTmp->m3uaAspSpStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspSpStatus = old_value;
 			break;
 		}
 		break;
@@ -12248,6 +12484,34 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspSpStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspSpTable_del(StorageNew);
+				m3uaAspSpTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspSpTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -12273,6 +12537,7 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspMtStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspMtStatus not ASN_INTEGER\n");
@@ -12287,6 +12552,8 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -12343,12 +12610,27 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspSpIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSpIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspMtIndex */
+			if () {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspMtIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspMtTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspSpIndex = *vp->val.integer;
+			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspMtTableStorage, vars, StorageNew);	/* frees vars */
@@ -12362,22 +12644,6 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspMtTable_del(StorageNew);
-			m3uaAspMtTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspMtTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -12399,16 +12665,6 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspMtStatus;
 			StorageTmp->m3uaAspMtStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspMtStatus = old_value;
 			break;
 		}
 		break;
@@ -12453,6 +12709,34 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspMtStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspMtTable_del(StorageNew);
+				m3uaAspMtTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspMtTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -12478,6 +12762,7 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRsStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspRsTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRsStatus not ASN_INTEGER\n");
@@ -12492,6 +12777,8 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -12548,14 +12835,29 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspSpIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSpIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspRsIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspRsIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspRsTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspSpIndex = *vp->val.integer;
+			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspRsIndex = *vp->val.integer;
+			StorageNew->m3uaAspRsIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspRsTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -12568,22 +12870,6 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspRsTable_del(StorageNew);
-			m3uaAspRsTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspRsTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -12605,16 +12891,6 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspRsStatus;
 			StorageTmp->m3uaAspRsStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspRsStatus = old_value;
 			break;
 		}
 		break;
@@ -12659,6 +12935,34 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspRsStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspRsTable_del(StorageNew);
+				m3uaAspRsTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspRsTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -12684,6 +12988,7 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRtStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspRtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRtStatus not ASN_INTEGER\n");
@@ -12698,6 +13003,8 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -12764,18 +13071,47 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspSpIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSpIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspRsIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspRsIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspAgIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspAgIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspSgIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSgIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspRtTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspSpIndex = *vp->val.integer;
+			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspRsIndex = *vp->val.integer;
+			StorageNew->m3uaAspRsIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspAgIndex = *vp->val.integer;
+			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspSgIndex = *vp->val.integer;
+			StorageNew->m3uaAspSgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspRtTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -12788,22 +13124,6 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspRtTable_del(StorageNew);
-			m3uaAspRtTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspRtTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -12825,16 +13145,6 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspRtStatus;
 			StorageTmp->m3uaAspRtStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspRtStatus = old_value;
 			break;
 		}
 		break;
@@ -12879,6 +13189,34 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspRtStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspRtTable_del(StorageNew);
+				m3uaAspRtTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspRtTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -12904,6 +13242,7 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcStatus not ASN_INTEGER\n");
@@ -12918,6 +13257,8 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -12984,17 +13325,46 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
+			vp = vars;
+			/* m3uaAspIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspSpIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspSpIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspMtIndex */
+			if () {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspMtIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m3uaAspAgIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspAgIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = m3uaAspRcTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->m3uaAspIndex = *vp->val.integer;
+			StorageNew->m3uaAspIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspSpIndex = *vp->val.integer;
+			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			vp = vp->next_variable;
-			StorageNew->m3uaAspAgIndex = *vp->val.integer;
+			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspRcTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -13007,22 +13377,6 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			} else {
 				StorageDel = NULL;
 			}
-			break;
-		}
-		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			m3uaAspRcTable_del(StorageNew);
-			m3uaAspRcTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			m3uaAspRcTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -13044,16 +13398,6 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* set the flag? */
 			old_value = StorageTmp->m3uaAspRcStatus;
 			StorageTmp->m3uaAspRcStatus = set_value;
-			break;
-		}
-		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspRcStatus = old_value;
 			break;
 		}
 		break;
@@ -13098,6 +13442,34 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m3uaAspRcStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m3uaAspRcTable_del(StorageNew);
+				m3uaAspRcTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m3uaAspRcTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -13107,6 +13479,7 @@ send_m3uaAspRsAlarm_v2trap(struct variable_list *vars)
 {
 	struct variable_list trap;
 
+	DEBUGMSGTL(("m3uaAspMIB", "send_m3uaAspRsAlarm_v2trap: sending trap...  "));
 	trap.next_variable = vars;
 	trap.name = snmpTrapOID_oid;
 	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
@@ -13115,13 +13488,12 @@ send_m3uaAspRsAlarm_v2trap(struct variable_list *vars)
 	trap.val_len = sizeof(m3uaAspRsAlarm_oid);
 	trap.index = 0;
 	send_v2trap(&trap);
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 }
 
-#if defined MODULE
-#if defined MASTER
 /**
  * @fn void m3uaAspMIB_loop_handler(int dummy)
- * @param dummy signal number (always zero (0))
+ * @param sig signal number
  * @brief handle event loop interation.
  *
  * This function is registered so that, when operating as a module, snmpd will call it one per event
@@ -13135,19 +13507,27 @@ send_m3uaAspRsAlarm_v2trap(struct variable_list *vars)
  * request number but it is a temporally unique identifier for a request.
  */
 void
-m3uaAspMIB_loop_handler(int dummy)
+m3uaAspMIB_loop_handler(int sig)
 {
-	if (external_signal_scheduled[dummy] == 0)
-		external_signal_scheduled[dummy]--;
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMIB_loop_handler: executing loop handler...  "));
 	/* close files after each request */
-	if (sa_fclose && sa_fd != 0) {
-		close(sa_fd);
-		sa_fd = 0;
+	if (sa_fclose) {
+		if (my_fd >= 0) {
+			close(my_fd);
+			my_fd = -1;
+		}
 	}
+#if defined MASTER
 	/* prepare for next request */
 	sa_request++;
-}
 #endif				/* defined MASTER */
+	if (external_signal_scheduled[sig] == 0)
+		external_signal_scheduled[sig]--;
+	if (m3uaAspMIBold_signal_handler != NULL)
+		(*m3uaAspMIBold_signal_handler) (sig);
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
+}
+
 /**
  * @fn void m3uaAspMIB_fd_handler(int fd, void *dummy)
  * @param fd file descriptor to read.
@@ -13163,1089 +13543,8 @@ m3uaAspMIB_loop_handler(int dummy)
 void
 m3uaAspMIB_fd_handler(int fd, void *dummy)
 {
-	/* XXX: place actions to handle sa_readfd here... */
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMIB_fd_handler: executing fd handler...  "));
+	/* XXX: place actions to handle my_fd here... */
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return;
 }
-#endif				/* defined MOUDLE */
-#if defined MASTER
-const char sa_program[] = "m3uaaspmib";
-int sa_fclose = 1;			/* default close files between requests */
-int sa_fd = 0;				/* file descriptor for MIB use */
-int sa_readfd = 0;			/* file descriptor for autonomnous events */
-int sa_changed = 1;			/* indication to reread MIB configuration */
-int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
-int sa_request = 1;			/* request number for per-request actions */
-#endif				/* defined MASTER */
-#if defined MASTER
-#if !defined MODULE
-int sa_dump = 0;			/* default packet dump */
-int sa_debug = 0;			/* default no debug */
-int sa_nomead = 1;			/* default daemon mode */
-int sa_output = 1;			/* default normal output */
-int sa_agentx = 1;			/* default agentx mode */
-int sa_alarms = 1;			/* default application alarms */
-int sa_logaddr = 0;			/* log addresses */
-int sa_logfillog = 0;			/* log to sa_logfile */
-int sa_logstderr = 0;			/* log to standard error */
-int sa_logstdout = 0;			/* log to standard output */
-int sa_logsyslog = 0;			/* log to system logs */
-int sa_logcallog = 0;			/* log to callback logs */
-int sa_appendlog = 0;			/* append to log file without truncating */
-char sa_logfile[256] = "/var/log/m3uaaspmib.log";
-char sa_pidfile[256] = "/var/run/m3uaaspmib.pid";
-char sa_sysctlf[256] = "/etc/m3uaaspmib.conf";
-int allow_severity = LOG_ERR;
-int deny_severity = LOG_ERR;
-
-/* file stream for log file */
-FILE *stdlog = NULL;
-static void
-sa_version(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
-%2$s\n\
-Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved.\n\
-Distributed under Affero GPL Version 3, included here by reference.\n\
-See `%1$s --copying' for copying permissions.\n\
-", argv[0], ident);
-}
-static void
-sa_usage(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stderr, "\
-Usage:\n\
-    %1$s [general-options] [options] [arguments]\n\
-    %1$s {-H|--help-directives}\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
-    %1$s {-C|--copying}\n\
-", argv[0]);
-}
-static void
-sa_help(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
-Usage:\n\
-    %1$s [general-options] [options] [arguments]\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
-    %1$s {-C|--copying}\n\
-Arguments:\n\
-    None.\n\
-Options:\n\
-    -a, --log-addresses\n\
-        log addresses of connecting management stations.\n\
-    -A, --append\n\
-        append to logfiles without truncating.\n\
-    -c, --config-file CONFIGFILE\n\
-        use configuration file CONFIGFILE.\n\
-    -C, --config-only\n\
-        only load configuration given by -c option.\n\
-    -d, --dump\n\
-        dump sent and received PDUs.\n\
-    -D, --debug [LEVEL]\n\
-        set debugging verbosity to LEVEL.\n\
-    -D, --debug-tokens [TOKEN[,TOKEN]*]\n\
-        debug specified TOKEN's.\n\
-    -f, --dont-fork\n\
-        run in the foreground.\n\
-    -g, --gid, --groupid GID\n\
-        become group GID after listening.\n\
-    -h, --help, -?, --?\n\
-        print usage information and exit.\n\
-    -H, --help-directives\n\
-        print config directives and exit.\n\
-    -I, --initialize [-]MODULE[,MODULE]*\n\
-        initialize (or not, '-') these MODULE's.\n\
-    -k, --keep-open\n\
-        keep system files open between requests.\n\
-    -l, --log-file [LOGFILE]\n\
-        log to log file name LOGFILE.  [default: /var/log/m3uaaspmib.log]\n\
-    -L, --log-stderr\n\
-        log to controlling terminal standard error.\n\
-    -m, --mibs [+]MIB[,MIB]*\n\
-        load these (additional '+') MIBs.\n\
-    -M, --master\n\
-        run as SNMP master instead of AgentX sub-agent.\n\
-    -M, --mibdirs [+]MIBDIR[:MIBDIR]*\n\
-        search these (additional, '+') colon separated directories for MIBs.\n\
-    -n, --nodaemon\n\
-        run in the foreground.\n\
-    -n, --name NAME\n\
-        use NAME for configuration file base.  [default: m3uaaspmib]\n\
-    -p, --port PORTNUM\n\
-        listen on port number PORTNUM.  [default: 161]\n\
-    -p, --pidfile PIDFILE\n\
-        write daemon pid to PIDFILE.  [default: /var/run/m3uaaspmib.pid]\n\
-    -P, --pidfile PIDFILE\n\
-        write daemon pid to PIDFILE.  [default: /var/run/m3uaaspmib.pid]\n\
-    -q, --quiet\n\
-        suppress normal output.\n\
-    -q, --quick\n\
-        abbreviate output for machine readability.\n\
-    -r, --noroot\n\
-        do not require root privilege.\n\
-    -s, --log-syslog\n\
-        log to system logs.\n\
-    -S, --sysctl-file FILENAME\n\
-        write sysctl config file FILENAME.  [default: /etc/streams.conf]\n\
-    -t, --agent-alarms\n\
-        agent blocks {SIGALARM}.\n\
-    -T, --transport [TRANSPORT]\n\
-        default transport TRANSPORT.  [default: udp]\n\
-    -u, --uid, --userid UID\n\
-        become user UID after listening.\n\
-    -U, --dont-remove-pidfile\n\
-        do not remove PIDFILE when shutting down.\n\
-    -v, --version\n\
-        print version information and exit.\n\
-    -V, --verbose [LEVEL]\n\
-        be verbose to LEVEL.  [default: 1]\n\
-    -x, --agentx-socket [SOCKET]\n\
-        master AgentX on SOCKET.  [default: /var/agentx/master]\n\
-    -X, --agentx\n\
-        run as AgentX sub-agent instead of master (the default).\n\
-    -y, --copying\n\
-        print copying information and exit.\n\
-", argv[0]);
-}
-static void
-sa_copying(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
---------------------------------------------------------------------------------\n\
-%1$s\n\
---------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com>\n\
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
-\n\
-All Rights Reserved.\n\
---------------------------------------------------------------------------------\n\
-This program is free software; you can  redistribute  it and/or modify  it under\n\
-the terms of the GNU Affero General Public License as published by the Free\n\
-Software Foundation; Version 3 of the License.\n\
-\n\
-This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
-WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
-PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\
-\n\
-You should have received a copy of the GNU  Affero  General Public License along\n\
-with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the\n\
-Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
---------------------------------------------------------------------------------\n\
-U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
-of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
-the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
-as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
-Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
-regulations) and the  Government  is acquiring  only the  license rights granted\n\
-herein (the license rights customarily provided to non-Government users). If the\n\
-Software is supplied to any unit or agency of the Government  other than DoD, it\n\
-is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
-the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
-Regulations (\"FAR\")  (or any successor regulations) or, in the cases of NASA, in\n\
-paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
-regulations).\n\
---------------------------------------------------------------------------------\n\
-Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
-Corporation at a fee.  See http://www.openss7.com/\n\
---------------------------------------------------------------------------------\n\
-", ident);
-}
-
-void
-sa_help_directives(int argc, char *argv[])
-{
-	ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
-	init_agent("m3uaAspMIB");
-	// init_mib_modules();
-	init_mib();
-	init_snmp("m3uaAspMIB");
-	snmp_log(MY_FACILITY(LOG_INFO), "Configuration directives understood:\n");
-	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be writen to standard error and not standard output. */
-	read_config_print_usage("    ");
-}
-static int
-sa_sig_register(int signum, RETSIGTYPE(*handler) (int))
-{
-	sigset_t mask;
-	struct sigaction act;
-
-	act.sa_handler = handler ? handler : SIG_DFL;
-	act.sa_flags = handler ? SA_RESTART : 0;
-	sigemptyset(&act.sa_mask);
-	if (sigaction(signum, &act, NULL))
-		return (-1);
-	sigemptyset(&mask);
-	sigaddset(&mask, signum);
-	sigprocmask(handler ? SIG_UNBLOCK : SIG_BLOCK, &mask, NULL);
-	return (0);
-}
-static int sa_alm_signal = 0;
-static int sa_pol_signal = 0;
-static int sa_hup_signal = 0;
-static int sa_int_signal = 0;
-static int sa_trm_signal = 0;
-static int sa_alm_handle = 0;
-void
-sa_alm_callback(uint req, void *arg)
-{
-	if (req == sa_alm_handle)
-		sa_alm_handle = 0;
-	sa_alm_signal = 1;
-	return;
-}
-
-static RETSIGTYPE
-sa_alm_handler(int signum)
-{
-	sa_alm_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static void
-sa_snmp_alm_handler(uint reg, void *clientarg)
-{
-	sa_alm_signal = 1;
-	return;
-}
-static int
-sa_alm_catch(void)
-{
-	if (sa_alarms)
-		return sa_sig_register(SIGALRM, &sa_alm_handler);
-	return (-1);
-}
-static int
-sa_alm_block(void)
-{
-	if (sa_alarms)
-		return sa_sig_register(SIGALRM, NULL);
-	if (sa_alm_handle) {
-		uint handle = sa_alm_handle;
-
-		sa_alm_handle = 0;
-		snmp_alarm_unregister(handle);
-	}
-	return (0);
-}
-static int
-sa_alm_action(void)
-{
-	sa_alm_signal = 0;
-	return (0);
-}
-
-static RETSIGTYPE
-sa_pol_handler(int signum)
-{
-	sa_pol_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_pol_catch(void)
-{
-	return sa_sig_register(SIGPOLL, &sa_pol_handler);
-}
-static int
-sa_pol_block(void)
-{
-	return sa_sig_register(SIGPOLL, NULL);
-}
-
-/*
- * Both the sc(4) module and sad(4) driver issue an M_PCSIG message with
- * SIGPOLL to the stream head whenever the STREAMS configuration or autopush
- * configuration changes, indicating to the agent which has the sc(4) or
- * sad(4) Stream open that it is necessary to reread information from the
- * kernel.  This fact is merely recorded, as this information is not read each
- * time that a configuration change occurs, but only after a request from some
- * portion of that information occurs. This condition is also set when the
- * sc(4) and sad(4) Streams are first opened. The SIGPOLL will also deliver in
- * siginfo the file descriptor issuing the signal, so we could distiguish
- * between sc(4) and sad(4) signals, but since one can be pushed over the
- * other, there is little point in distinguishing.
- *
- * sc(4) or sad(4) also should be modified to provide the general streams
- * statistics supported here; even though they are available through the /proc
- * filesystem on Linux Fast-STREAMS.
- */
-static int
-sa_pol_action(void)
-{
-	sa_pol_signal = 0;
-	snmp_log(MY_FACILITY(LOG_INFO), "%s: Caught SIGPOLL, will re-read data structures", sa_program);
-	sa_changed = 1;
-	return (0);
-}
-
-static RETSIGTYPE
-sa_hup_handler(int signum)
-{
-	sa_hup_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_hup_catch(void)
-{
-	if (sa_agentx)
-		return sa_sig_register(SIGHUP, &sa_hup_handler);
-	return (-1);
-}
-static int
-sa_hup_block(void)
-{
-	return sa_sig_register(SIGHUP, NULL);
-}
-static int
-sa_hup_action(void)
-{
-	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by logrotate asking us to close and reopen our log files. */
-	sa_hup_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "Caught SIGHUP, reopening files.");
-	if (sa_output > 1)
-		snmp_log(MY_FACILITY(LOG_NOTICE), "Reopening output file %s", sa_logfile);
-	if (sa_logfillog != 0) {
-		fflush(stdlog);
-		fclose(stdlog);
-		snmp_disable_filelog();
-		if ((stdlog = freopen(sa_logfile, sa_appendlog ? "a" : "w", stdlog)) == NULL) {
-			/* I hope we have another log sink. */
-			snmp_log(MY_FACILITY(LOG_ERR), "%s", strerror(errno));
-			snmp_log(MY_FACILITY(LOG_ERR), "Could not reopen log file %s", sa_logfile);
-		}
-		snmp_enable_filelog(sa_logfile, sa_appendlog);
-	}
-	return (0);
-}
-
-static RETSIGTYPE
-sa_int_handler(int signum)
-{
-	sa_int_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_int_catch(void)
-{
-	return sa_sig_register(SIGINT, &sa_int_handler);
-}
-static int
-sa_int_block(void)
-{
-	return sa_sig_register(SIGINT, NULL);
-}
-static void sa_exit(int retval);
-static int
-sa_int_action(void)
-{
-	sa_int_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "%s: Caught SIGINT, shutting down", sa_program);
-	sa_exit(0);
-	return (0);		/* should be no return */
-}
-
-static RETSIGTYPE
-sa_trm_handler(int signum)
-{
-	sa_trm_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_trm_catch(void)
-{
-	return sa_sig_register(SIGTERM, &sa_trm_handler);
-}
-static int
-sa_trm_block(void)
-{
-	return sa_sig_register(SIGTERM, NULL);
-}
-static void sa_exit(int retval);
-static int
-sa_trm_action(void)
-{
-	sa_trm_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "%s: Caught SIGTERM, shutting down", sa_program);
-	sa_exit(0);
-	return (0);		/* should be no return */
-}
-static void
-sa_sig_catch(void)
-{
-	sa_alm_catch();
-	sa_pol_catch();
-	sa_hup_catch();
-	sa_int_catch();
-	sa_trm_catch();
-}
-static void
-sa_sig_block(void)
-{
-	sa_alm_block();
-	sa_pol_block();
-	sa_hup_block();
-	sa_int_block();
-	sa_trm_block();
-}
-
-int
-sa_start_timer(long duration)
-{
-	if (sa_alarms) {
-		struct itimerval setting = {
-			{0, 0},
-			{duration / 1000, (duration % 1000) * 1000}
-		};
-		if (sa_alm_catch())
-			return (-1);
-		if (setitimer(ITIMER_REAL, &setting, NULL))
-			return (-1);
-		sa_alm_signal = 0;
-		return (0);
-	} else {
-#if defined NETSNMP_DS_APPLICATION_ID
-		struct timeval setting = {
-			duration / 1000, (duration % 1000) * 1000
-		};
-		sa_alm_handle = snmp_alarm_register_hr(setting, 0, sa_snmp_alm_handler, NULL);
-#else
-		sa_alm_handle = snmp_alarm_register((duration + 999) / 1000, 0, sa_snmp_alm_handler, NULL);
-#endif
-		return (sa_alm_handle ? 0 : -1);
-	}
-}
-static void
-sa_exit(int retval)
-{
-	if (retval)
-		snmp_log(MY_FACILITY(LOG_ERR), "%s: Exiting %d", sa_program, retval);
-	else
-		snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Exiting %d", sa_program, retval);
-	fflush(stdout);
-	fflush(stderr);
-	sa_sig_block();
-	closelog();
-	exit(retval);
-}
-static void
-sa_init_logging(int argc, char *argv[])
-{
-	static char progname[256];
-
-	/* The purpose of this function is to bring logging up before forking (and while still in the foreground) so that we can use the snmp_log() function before and during forking if necessary.
-	   Note that the default configuration for snmp_log() is to send all logs to standard error. */
-	strncpy(progname, basename(argv[0]), sizeof(progname));
-	snmp_disable_log();
-	if (sa_logfillog) {
-		snmp_enable_filelog(sa_logfile, sa_appendlog);
-	}
-	if (sa_logstderr | sa_logstdout) {
-#if defined LOG_PERROR
-		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better 
-		   formated. */
-		if (!sa_logsyslog)
-			snmp_enable_stderrlog();
-#else				/* defined LOG_PERROR */
-		snmp_enable_stderrlog();
-#endif				/* defined LOG_PERROR */
-	}
-	if (sa_logsyslog) {
-#if !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT
-		snmp_enable_syslog();
-#else				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		snmp_enable_syslog_ident("m3uaAspMIB", LOG_DAEMON);
-#endif				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		/* Note that the way that snmp sets up the logger is not really the way we want it, so close the log and reopen it the way we want. */
-		closelog();
-#if defined LOG_PERROR
-		openlog("m3uaAspMIB", LOG_PID | LOG_CONS | LOG_NDELAY | (sa_logstderr ? LOG_PERROR : 0), MY_FACILITY(0));
-#else				/* defined LOG_PERROR */
-		openlog("m3uaAspMIB", LOG_PID | LOG_CONS | LOG_NDELAY, MY_FACILITY(0));
-#endif				/* defined LOG_PERROR */
-	}
-	if (sa_logcallog) {
-		snmp_enable_calllog();
-	}
-}
-static void
-sa_enter(int argc, char *argv[])
-{
-	if (sa_nomead) {
-		pid_t pid;
-
-		if ((pid = fork()) < 0) {
-			perror(argv[0]);
-			exit(2);
-		} else if (pid != 0) {
-			/* parent exits */
-			exit(0);
-		}
-		setsid();	/* become a session leader */
-		/* fork once more for SVR4 */
-		if ((pid = fork()) < 0) {
-			perror(argv[0]);
-			exit(2);
-		} else if (pid != 0) {
-			/* parent responsible for writing pid file */
-			if (sa_nomead || sa_pidfile[0] != '\0') {
-				FILE *pidf;
-
-				/* initialize default filename */
-				if (sa_pidfile[0] == '\0')
-					snprintf(sa_pidfile, sizeof(sa_pidfile), "/var/run/%s.pid", sa_program);
-				if (sa_output > 1) {
-					snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Writing daemon pid to file %s", sa_program, sa_pidfile);
-				}
-				if ((pidf = fopen(sa_pidfile, "w+"))) {
-					fprintf(pidf, "%d", (int) pid);
-					fflush(pidf);
-					fclose(pidf);
-				} else {
-					snmp_log(MY_FACILITY(LOG_ERR), "%s: %m", sa_program);
-					snmp_log(MY_FACILITY(LOG_ERR), "%s: Could not write pid to file %s", sa_program, sa_pidfile);
-					sa_exit(2);
-					/* no return */
-				}
-			}
-			/* parent exits */
-			exit(0);
-		}
-		/* child continues */
-		/* release current directory */
-		if (chdir("/") < 0) {
-			perror(argv[0]);
-			exit(2);
-		}
-		umask(0);	/* clear file creation mask */
-		/* rearrange file streams */
-		fclose(stdin);
-	}
-	/* continue as foreground or background */
-	sa_init_logging(argc, argv);
-	sa_sig_catch();
-	snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Startup complete.", sa_program);
-}
-static void
-sa_mloop(int argc, char *argv[])
-{
-	if (sa_agentx) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as AgentX client\n", argv[0]);
-		/* run as an AgentX client */
-		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
-	} else {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as SNMP master agent\n", argv[0]);
-		/* run as SNMP master */
-		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
-	}
-	if (sa_alarms) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using application alarms\n", argv[0]);
-		/* use application alarms */
-		ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
-	}
-	/* initialize agent */
-	init_agent("m3uaAspMIB");
-	/* initialize MIB */
-	init_m3uaAspMIB();
-	/* initialize SNMP */
-	init_snmp("m3uaAspMIB");
-	if (!sa_agentx) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as SNMP master\n", argv[0]);
-#if !defined NETSNMP_DS_APPLICATION_ID
-		init_master_agent(710, NULL, NULL);
-#else
-		init_master_agent();
-#endif
-	}
-	for (;;) {
-		int retval;
-
-		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of the agentx socket and add it to the fdset. */
-		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
-#if 0
-		if (snmp_select() == 0) {
-			if (sa_alarms == 0)
-				run_alarms();
-		}
-#endif
-		retval = agent_check_and_process(1);	/* 0 == don't block */
-		if (retval == 0) {
-			/* alarm occurred, alarm conditions checked */
-		} else if (retval == -1) {
-			/* error (or signal) ocurred */
-			if (sa_alm_signal) {
-				sa_alm_action();
-			}
-			if (sa_pol_signal) {
-				sa_pol_action();
-			}
-			if (sa_hup_signal) {
-				sa_hup_action();
-			}
-			if (sa_int_signal) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-				snmp_shutdown("m3uaAspMIB");
-				sa_int_action();	/* no return */
-			}
-			if (sa_trm_signal) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-				snmp_shutdown("m3uaAspMIB");
-				sa_trm_action();	/* no return */
-			}
-		} else if (retval > 0) {
-			/* processed packets */
-			if (sa_fclose) {
-				/* close files after each request */
-				if (sa_fd != 0) {
-					int fd = sa_fd;
-
-					sa_fd = 0;
-					close(fd);
-				}
-			}
-			sa_stats_refresh = 1;
-			sa_request++;
-		}
-	}
-	if (sa_debug)
-		snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-	snmp_shutdown("m3uaAspMIB");
-}
-
-int
-main(int argc, char *argv[])
-{
-	for (;;) {
-		int c, val, fd;
-		char *cptr;
-		struct passwd *pw;
-		struct group *gr;
-		struct stat st;
-
-#if defined _GNU_SOURCE
-		int option_index = 0;
-                /* *INDENT-OFF* */
-                static struct option long_options[] = {
-                        {"log-addresses",	no_argument,		NULL, 'a'},
-                        {"append",		no_argument,		NULL, 'A'},
-                        {"config-file",		required_argument,	NULL, 'c'},
-                        {"no-configs",		no_argument,		NULL, 'C'},
-                        {"dump",		no_argument,		NULL, 'd'},
-                        {"debug",		optional_argument,	NULL, 'D'},
-                        {"debug-tokens",	optional_argument,	NULL, 'D'},
-                        {"dont-fork",		no_argument,		NULL, 'f'},
-                        {"gid",			required_argument,	NULL, 'g'},
-                        {"groupid",		required_argument,	NULL, 'g'},
-                        {"help",		no_argument,		NULL, 'h'},
-                        {"?",			no_argument,		NULL, 'h'},
-                        {"help-directives",	no_argument,		NULL, 'H'},
-                        {"initialize",		required_argument,	NULL, 'I'},
-                        {"init-modules",	required_argument,	NULL, 'I'},
-                        {"keep-open",		no_argument,		NULL, 'k'},
-                        {"log-file",		optional_argument,	NULL, 'l'},
-                        {"logfile",		optional_argument,	NULL, 'l'},
-                        {"Lf",			optional_argument,	NULL, 'l'},
-                        {"LF",			required_argument,	NULL, 'l'},
-                        {"log-stderr",		no_argument,		NULL, 'L'},
-                        {"Le",			no_argument,		NULL, 'L'},
-                        {"LE",			required_argument,	NULL, 'L'},
-                        {"mibs",		required_argument,	NULL, 'm'},
-                        {"master",		no_argument,		NULL, 'M'},
-                        {"mibdirs",		required_argument,	NULL, 'M'},
-                        {"nodaemon",		no_argument,		NULL, 'n'},
-                        {"name",		required_argument,	NULL, 'n'},
-                        {"dry-run",		no_argument,		NULL, 'N'},
-                        {"log-stdout",		no_argument,		NULL, 'o'},
-                        {"Lo",			no_argument,		NULL, 'o'},
-                        {"LO",			required_argument,	NULL, 'o'},
-                        {"port",		required_argument,	NULL, 'p'},
-                        {"pidfile",		required_argument,	NULL, 'P'},
-                        {"quiet",		no_argument,		NULL, 'q'},
-                        {"quick",		no_argument,		NULL, 'q'},
-                        {"noroot",		no_argument,		NULL, 'r'},
-                        {"log-syslog",		no_argument,		NULL, 's'},
-                        {"Ls",			no_argument,		NULL, 's'},
-                        {"LS",			required_argument,	NULL, 's'},
-                        {"syslog",		no_argument,		NULL, 's'},
-                        {"sysctl-file",		required_argument,	NULL, 'S'},
-                        {"agent-alarms",	no_argument,		NULL, 't'},
-                        {"transport",		optional_argument,	NULL, 'T'},
-                        {"uid",			required_argument,	NULL, 'u'},
-                        {"userid",		required_argument,	NULL, 'u'},
-                        {"dont-remove-pidfile",	no_argument,		NULL, 'U'},
-                        {"leave-pidfile",	no_argument,		NULL, 'U'},
-                        {"version",		no_argument,		NULL, 'v'},
-                        {"verbose",		optional_argument,	NULL, 'V'},
-                        {"agentx-socket",	required_argument,	NULL, 'x'},
-                        {"agentx",		no_argument,		NULL, 'X'},
-                        {"copying",		no_argument,		NULL, 'y'},
-#if 0
-                        {"directory",		required_argument,	NULL, 'd'},
-                        {"basename",		required_argument,	NULL, 'b'},
-                        {"outfile",		required_argument,	NULL, 'o'},
-                        {"errfile",		required_argument,	NULL, 'e'},
-#endif
-                        { 0, }
-                };
-                /* *INDENT-ON* */
-
-		c = getopt_long_only(argc, argv, ":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy", long_options, &option_index);
-#else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, ":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy");
-#endif				/* defined _GNU_SOURCE */
-		if (c == -1) {
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: done options processing\n", argv[0]);
-			break;
-		}
-		switch (c) {
-		case 0:
-			goto bad_usage;
-		case 'a':	/* -a, --log-addresses */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging addresses\n", argv[0]);
-			sa_logaddr++;
-			break;
-		case 'A':	/* -A, --append */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will not truncate logfile\n", argv[0]);
-#if defined NETSNMP_DS_LIB_APPEND_LOGFILES
-			ds_set_boolean(DS_LIBRARY_ID, NETSNMP_DS_LIB_APPEND_LOGFILES, 1);
-#endif				/* defined NETSNMP_DS_LIB_APPEND_LOGFILES */
-			sa_appendlog = 1;
-			break;
-		case 'c':	/* -c, --config-file CONFIGFILE */
-			if (optarg == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using configuration file %s\n", argv[0], optarg);
-			ds_set_string(DS_LIBRARY_ID, DS_LIB_OPTIONALCONFIG, optarg);
-			break;
-		case 'C':	/* -C, --no-configs */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: not reading default config files\n", argv[0]);
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DONT_READ_CONFIGS, 1);
-			break;
-		case 'd':	/* -d, --dump */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting packet dump\n", argv[0]);
-			sa_dump = 1;
-			// snmp_set_dump_packet(sa_dump);
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DUMP_PACKET, sa_dump);
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, sa_dump);
-			break;
-		case 'D':	/* -D, --debug [LEVEL], --debug-tokens [TOKENS] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: increasing debug verbosity\n", argv[0]);
-			if (optarg == NULL) {
-				/* no option: must be -D, --debug */
-				sa_debug++;
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debug level is now %d\n", argv[0], sa_debug);
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debugging all tokens\n", argv[0]);
-				if (sa_debug)
-					debug_register_tokens("ALL");
-			} else {
-				cptr = optarg;
-				if ((val = strtol(optarg, &cptr, 0)) < 0)
-					goto bad_option;
-				if (*cptr == '\0') {
-					/* it is just a number, must be -D, --debug [LEVEL] */
-					sa_debug = val;
-					if (sa_debug)
-						snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debug level is now %d\n", argv[0], sa_debug);
-				} else {
-					/* not a number, must be -D, --debug-tokens TOKENS */
-					if (sa_debug)
-						snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debugging tokens %s\n", argv[0], optarg);
-					debug_register_tokens(optarg);
-				}
-			}
-			break;
-		case 'f':	/* -f, --dont-fork */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing daemon mode\n", argv[0]);
-			sa_nomead = 0;
-			break;
-		case 'u':	/* -u, --uid, --userid UID */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0)
-				goto bad_option;
-			/* UID can be name or number */
-			if ((pw = (*cptr == '\0') ? getpwuid((uid_t) val) : getpwnam(optarg)) == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will run as uid %s(%d)\n", argv[0], pw->pw_name, pw->pw_uid);
-			ds_set_int(DS_APPLICATION_ID, DS_AGENT_USERID, pw->pw_uid);
-			break;
-		case 'g':	/* -g, --gid, --groupdid GID */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0)
-				goto bad_option;
-			/* GID can be name or number */
-			if ((gr = (*cptr == '\0') ? getgrgid((gid_t) val) : getgrnam(optarg)) == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will run as gid %s(%d)\n", argv[0], gr->gr_name, gr->gr_gid);
-			ds_set_int(DS_APPLICATION_ID, DS_AGENT_GROUPID, gr->gr_gid);
-			break;
-		case 'h':	/* -h, --help, -?, --? */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing help message\n", argv[0]);
-			sa_help(argc, argv);
-			exit(0);
-		case 'H':	/* -H, --help-directives */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing config directives\n", argv[0]);
-			sa_help_directives(argc, argv);
-			exit(0);
-		case 'I':	/* -I, --init-modules, --initialize MODULE[{,| |:}MODULE]* */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will initialize modules: %s\n", argv[0], optarg);
-			add_to_init_list(optarg);
-			break;
-		case 'k':	/* -k, --keep-open */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: keeping files open\n", argv[0]);
-			sa_fclose = 0;
-			break;
-		case 'l':	/* -l, --log-file, --logfile, -Lf, -LF p1[-p2] [LOGFILE] */
-			if (optarg != NULL)
-				strncpy(sa_logfile, optarg, sizeof(sa_logfile));
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will log to file %s\n", argv[0], sa_logfile);
-			sa_logfillog = 1;
-			break;
-		case 'L':	/* -L, --log-stderr, -Le, -LE p1[-p2] */
-			/* Note that the recent NET-SNMP version of this option is far more complicated: -Le is the same as the old version of the option; -Lf LOGFILE is like the -l option; -Ls is
-			   like the -s option; -Lo logs messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or O, logs priority p1 and above to X, or p1 thru p2 to X. */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to standard error\n", argv[0]);
-			sa_logstderr = 1;
-			break;
-		case 'm':	/* -m, --mibs MIBS */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using MIBS %s\n", argv[0], optarg);
-			break;
-		case 'M':	/* -M, --master or -M, --mibdirs MIBDIRS */
-			if (optarg) {
-				/* -M, --mibdirs MIBDIRS */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using MIBDIRS %s\n", argv[0], optarg);
-			} else {
-				/* -M, --master */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting SNMP master\n", argv[0]);
-				sa_agentx = 0;
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
-			}
-			break;
-		case 'n':	/* -n, --nodaemon or -n, --name NAME */
-			if (optarg) {
-				/* -n, --name NAME */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using name %s\n", argv[0], optarg);
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, optarg);
-			} else {
-				/* -n, --nodaemon */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing deamon mode\n", argv[0]);
-				sa_nomead = 0;
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, basename(argv[0]));
-			}
-			break;
-		case 'N':	/* -N, --dry-run */
-#if defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting for dry-runs startup\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_QUIT_IMMEDIATELY, 1);
-			break;
-#else				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: -N option not supported\n", argv[0]);
-			goto bad_option;
-#endif				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
-		case 'o':	/* -o, --log-stdout, -Lo, -LO p1[-p2] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to stdout\n", argv[0]);
-			sa_logstdout = 1;
-			break;
-		case 'p':	/* -p, --port PORTNUM or -p, --pidfile PIDFILE */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0 || val > 16383)
-				goto bad_option;
-			if (*cptr == '\0') {
-				char buf[4096];
-
-				/* -p, --port PORTNUM */
-				if ((cptr = ds_get_string(DS_APPLICATION_ID, DS_AGENT_PORTS)))
-					snprintf(buf, sizeof(buf), "%s,%s", cptr, optarg);
-				else
-					strncpy(buf, optarg, sizeof(buf));
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PORTS, buf);
-				break;
-			}
-			/* fall through */
-		case 'P':	/* -p, -P, --pidfile PIDFILE */
-			if (optarg) {
-				/* either it exists */
-				if (stat(optarg, &st) == -1) {
-					/* or we can create it */
-					if ((fd = open(optarg, O_CREAT, 0600)) == -1) {
-						perror(argv[0]);
-						goto bad_option;
-					}
-					close(fd);
-				}
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting pid file to %s\n", argv[0], optarg);
-				strncpy(sa_pidfile, optarg, sizeof(sa_pidfile));
-			}
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using pidfile %s\n", argv[0], sa_pidfile);
-			break;
-		case 'q':	/* -q, --quiet, --quick */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing normal output\n", argv[0]);
-			sa_debug = 0;
-			sa_output = 0;
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
-			// snmp_set_quick_print();
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_QUICK_PRINT, 1);
-			break;
-		case 'r':	/* -r, --noroot */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting for non-root access\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
-			break;
-		case 's':	/* -s, --log-syslog, -Ls, -LS p1[-p2] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to system logs\n", argv[0]);
-			sa_logsyslog = 1;
-			break;
-		case 'S':	/* -S, -sysctl-file FILENAME */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using %s for backing\n", argv[0], optarg);
-			strncpy(sa_sysctlf, optarg, sizeof(sa_sysctlf));
-			break;
-		case 't':	/* -t, --agent-alarms */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting agent alarms\n", argv[0]);
-			sa_alarms = 0;
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
-			break;
-		case 'T':	/* -T, --transport [TRANSPORT] */
-			if (optarg == NULL)
-				goto udp_transport;
-			if (!strcasecmp("TCP", optarg)) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting default transport to TCP\n", argv[0]);
-				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
-				val |= SNMP_FLAGS_STREAM_SOCKET;
-				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
-			} else if (!strcasecmp("UDP", optarg)) {
-			      udp_transport:
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting default transport to UDP\n", argv[0]);
-				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
-				val &= ~SNMP_FLAGS_STREAM_SOCKET;
-				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
-			} else
-				goto bad_option;
-			break;
-		case 'U':
-#if defined NETSNMP_DS_AGENT_LEAVE_PIDFILE
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will leave pidfile after shutdown\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_LEAVE_PIDFILE, 1);
-#else
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: -U option not supported\n");
-			goto bad_option;
-#endif				/* defined NETSNMP_DS_AGENT_LEAVE_PIDFILE */
-			break;
-		case 'v':	/* -v, --version */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing version message\n", argv[0]);
-			sa_version(argc, argv);
-			exit(0);
-		case 'V':	/* -V, --verbose [LEVEL] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: increasing output verbosity\n", argv[0]);
-			if (optarg == NULL) {
-				sa_output++;
-			} else {
-				if ((val = strtol(optarg, NULL, 0)) < 0)
-					goto bad_option;
-				sa_output = val;
-			}
-			if (sa_output > 1)
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 1);
-			else
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
-			break;
-		case 'x':	/* -x, --agentx-socket SOCKET */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting AgentX socket to %s\n", argv[0], optarg);
-			ds_set_string(DS_APPLICATION_ID, DS_AGENT_X_SOCKET, optarg);
-			// ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_AGENTX_MASTER, 1);
-			break;
-		case 'X':	/* -X, --agentx */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting AgentX sub-agent\n", argv[0]);
-			sa_agentx = 1;
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
-			break;
-		case 'y':	/* -y, --copying */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing copying message\n", argv[0]);
-			sa_copying(argc, argv);
-			exit(0);
-		case '?':
-		case ':':
-		default:
-		      bad_option:
-			optind--;
-			goto bad_nonopt;
-		      bad_nonopt:
-			if (sa_output || sa_debug) {
-				if (optind < argc) {
-					fprintf(stderr, "%s: syntax error near '", argv[0]);
-					while (optind < argc)
-						fprintf(stderr, "%s ", argv[optind++]);
-					fprintf(stderr, "'\n");
-				} else {
-					fprintf(stderr, "%s: missing option or argument", argv[0]);
-					fprintf(stderr, "\n");
-				}
-				fflush(stderr);
-			      bad_usage:
-				sa_usage(argc, argv);
-			}
-			exit(2);
-		}
-	}
-	if (optind < argc) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: excess non-option arguments\n", argv[0]);
-		goto bad_nonopt;
-	}
-	sa_enter(argc, argv);	/* daemonize if necessary */
-	sa_mloop(argc, argv);	/* execute main loop */
-	exit(0);
-}
-#endif				/* !defined MODULE */
-#endif				/* defined MASTER */

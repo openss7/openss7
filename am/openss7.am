@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2008-10-22 00:20:03 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2009-01-17 12:55:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-10-22 00:20:03 $ by $Author: brian $
+## Last Modified $Date: 2009-01-17 12:55:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -89,6 +89,14 @@ RETEST_AM		=
 MANS_AM			=
 INSTALL_MANS_AM		=
 UNINSTALL_MANS_AM	=
+
+MIBS_AM			=
+INSTALL_MIBS_AM		=
+UNINSTALL_MIBS_AM	=
+
+SNMP_AM			=
+INSTALL_SNMP_AM		=
+UNINSTALL_SNMP_AM	=
 
 ##
 # Accumulate until the end
@@ -357,6 +365,81 @@ uninstall-mans-am: $(UNINSTALL_MANS_AM)
 MY_PHONY	+= mans mans-am install-mans install-mans-am uninstall-mans uninstall-mans-am
 
 MY_RECURSIVE_TARGETS	+= mans-recursive install-mans-recursive uninstall-mans-recursive
+
+#!
+#! SNMP Agent Targets:
+#! -------------------
+#!
+#! The following targets are used to build, install and uninstall just the MIBS
+#! or SNMP agents from the distribution.  These targets are good for installing
+#! MIBS on managements systems, or when developing agents to reduce the
+#! development cycle.  When building atop multiple packages, these targets
+#! recurse down through each sub-package.
+#!
+#! mibs:
+#!     Build all of the SNMP MIBs.  This step is not usually necessary as the
+#!     MIBs are simple text files.
+#!
+#! install-mibs:
+#!     Installs just the SNMP MIBs under DESTDIR.  Specify DESTDIR or
+#!     'snmpmibdir' to place the MIBs where you see fit.  If DESTDIR or
+#!     'snmpmibdir' are not specified on the command line, the MIBs will be
+#!     installed in the normal installation directory. (@snmpmibdir@)
+#!
+#! uninstall-mibs:
+#!     Uninstalls the MIBs from DESTDIR.  Specify DESTDIR or 'snmpmibdir' to
+#!     indicate from where to remove the MIBs.  If DESTDIR or 'snmpmibdir' is
+#!     not specified on the command line, the MIBs will be removed from the
+#!     normal installation directory.
+mibs: mibs-recursive
+
+mibs-am: $(MIBS_AM)
+
+install-mibs: install-mibs-recursive
+
+install-mibs-am: $(INSTALL_MIBS_AM)
+
+unintall-mibs: uninstall-mibs-recursive
+
+uinstall-mibs-am: $(UNINSTALL_MIBS_AM)
+
+MY_PHONY	+= mibs mibs-am install-mibs install-mibs-am uninstall-mibs uninstall-mibs-am
+
+MY_RECURSIVE_TARGETS	+= mibs-recursive install-mibs-recursive uninstall-mibs-recursive
+
+#!
+#! snmp:
+#!     Build all of the SNMP agents and utilities.  This includes dynamically
+#!     loadable modules for ucd-snmp or net-snmp, and command line and perlTk
+#!     utilities.
+#!
+#! install-snmp:
+#!     Installs the SNMP agents and utilities under DESTDIR.  Specify DESTDIR to
+#!     place the SNMP agents and utilities where you see fit.  If DESTDIR is not
+#!     specified on the command line, the SNMP agents and utilities will be
+#!     installed in the normal installation directory. (@snmpdlmoddir@)
+#!
+#! uninstall-snmp:
+#!     Uninstalls the SNMP agents and utilities under DESTDIR.  Specify DESTDIR
+#!     to indicate from where to remove the SNMP agents and utilities.  If
+#!     DESTDIR is not specified no the command line, the SNMP agents and
+#!     utilities will be removed from the normal installation directory.
+#!     (@snmpdlmoddir@)
+snmp: snmp-recursive
+
+snmp-am: $(SNMP_AM)
+
+install-snmp: install-snmp-recursive
+
+install-snmp-am: $(INSTALL_SNMP_AM)
+
+unintall-snmp: uninstall-snmp-recursive
+
+uinstall-snmp-am: $(UNINSTALL_SNMP_AM)
+
+MY_PHONY	+= snmp snmp-am install-snmp install-snmp-am uninstall-snmp uninstall-snmp-am
+
+MY_RECURSIVE_TARGETS	+= snmp-recursive install-snmp-recursive uninstall-snmp-recursive
 
 #!
 #! Development Targets:
@@ -921,6 +1004,9 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.145  2009-01-17 12:55:26  brian
+## - add some targets for working with mibs and snmp agents
+##
 ## Revision 0.9.2.144  2008-10-22 00:20:03  brian
 ## - do ifnames in builddir too
 ##

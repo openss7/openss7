@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-11-26 12:23:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2009-01-19 13:31:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-26 12:23:07 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 13:31:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,6 +71,7 @@ include am/pr.am
 
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
+snmpdlmod_LTLIBRARIES		=
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -78,20 +79,41 @@ if PKG_BUILD_ARCH
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
+mxMIB_la_SOURCES		= src/snmp/ds0Bundle.c \
+				  src/snmp/ds0Bundle.h \
+				  src/snmp/ds0.c \
+				  src/snmp/ds0.h \
+				  src/snmp/ds1EXT.c \
+				  src/snmp/ds1EXT.h \
+				  src/snmp/mxMIB.c \
+				  src/snmp/mxMIB.h \
+				  src/snmp/phyMIB.c \
+				  src/snmp/phyMIB.h \
+				  src/snmp/x400pMIB.c \
+				  src/snmp/x400pMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
+mxMIB_la_LDFLAGS		= -module -avoid-version \
+				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
+mxMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+mxMIB_la_CFLAGS			= $(USER_CFLAGS)
+mxMIB_la_LIBADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
+
+if WITH_SNMP_AGENT
+snmpdlmod_LTLIBRARIES		+= mxMIB.la
+endif
+
 EXTRA_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod \
-				  x400pmib \
-				  mxmib \
-				  phymib \
+				  chand \
 				  test-chan
 
 pkglibexec_PROGRAMS		= test-chan
 
 sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
-
-if WITH_SNMP_AGENT
-sbin_PROGRAMS			+= x400pmib mxmib phymib
-endif
 
 bin_PROGRAMS			= 
 
@@ -107,41 +129,33 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-x400pmib_SOURCES		= src/snmp/x400pMIB.c \
+chand_SOURCES			= src/snmp/chand.c \
+				  src/snmp/chand.h \
+				  src/snmp/ds0Bundle.c \
+				  src/snmp/ds0Bundle.h \
+				  src/snmp/ds0.c \
+				  src/snmp/ds0.h \
+				  src/snmp/ds1EXT.c \
+				  src/snmp/ds1EXT.h \
+				  src/snmp/mxMIB.c \
+				  src/snmp/mxMIB.h \
+				  src/snmp/phyMIB.c \
+				  src/snmp/phyMIB.h \
+				  src/snmp/x400pMIB.c \
 				  src/snmp/x400pMIB.h \
 				  src/snmp/ds_agent.h \
 				  src/snmp/header_complex.h \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
 				  src/snmp/util_funcs.h
-x400pmib_LDFLAGS		= $(SNMP_LDFLAGS)
-x400pmib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
-x400pmib_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
-x400pmib_CFLAGS			= $(USER_CFLAGS)
+chand_LDFLAGS			= $(SNMP_LDFLAGS)
+chand_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
+chand_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+chand_CFLAGS			= $(USER_CFLAGS)
 
-mxmib_SOURCES			= src/snmp/mxMIB.c \
-				  src/snmp/mxMIB.h \
-				  src/snmp/ds_agent.h \
-				  src/snmp/header_complex.h \
-				  src/snmp/mib_modules.h \
-				  src/snmp/struct.h \
-				  src/snmp/util_funcs.h
-mxmib_LDFLAGS			= $(SNMP_LDFLAGS)
-mxmib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
-mxmib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
-mxmib_CFLAGS			= $(USER_CFLAGS)
-
-phymib_SOURCES			= src/snmp/phyMIB.c \
-				  src/snmp/phyMIB.h \
-				  src/snmp/ds_agent.h \
-				  src/snmp/header_complex.h \
-				  src/snmp/mib_modules.h \
-				  src/snmp/struct.h \
-				  src/snmp/util_funcs.h
-phymib_LDFLAGS			= $(SNMP_LDFLAGS)
-phymib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
-phymib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
-phymib_CFLAGS			= $(USER_CFLAGS)
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= chand
+endif
 
 test_chan_SOURCES		= src/test/test-chan.c
 test_chan_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -320,6 +334,28 @@ dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 ## INSTALL_INITSCRIPTS
 endif
 
+dist_snmpmib_DATA		=
+
+if WITH_SNMP_AGENT
+## WITH_SNMP_AGENT
+dist_snmpmib_DATA		+= \
+				  src/mibs/OPENSS7-MX-MIB.mib \
+				  src/mibs/OPENSS7-PHY-MIB.mib \
+				  src/mibs/OPENSS7-X400P-MX-MIB.mib \
+				  src/mibs/RFC2127-MIB.txt \
+				  src/mibs/RFC2128-MIB.txt \
+				  src/mibs/RFC2494-EXT-MIB.mib \
+				  src/mibs/RFC2494-MIB.txt \
+				  src/mibs/RFC2495-MIB.txt \
+				  src/mibs/RFC2496-MIB.txt \
+				  src/mibs/RFC3593-MIB.txt \
+				  src/mibs/RFC3895-MIB.txt \
+				  src/mibs/RFC3896-MIB.txt \
+				  src/mibs/RFC4805-EXT-MIB.mib \
+				  src/mibs/RFC4805-MIB.txt
+## WITH_SNMP_AGENT
+endif
+
 ## PKG_BUILD_INDEP
 endif
 
@@ -369,8 +405,8 @@ include am/doxy.am
 ##
 ## Rules for SNMP modules.
 ##
-#SNMPORDER			= 01
-#include am/snmp.am
+SNMPORDER			= 01
+include am/snmp.am
 
 EXTRA_DIST			+= \
 				  debian/README.Debian \
@@ -394,6 +430,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.17  2009-01-19 13:31:53  brian
+# - updating standalone agents
+#
 # Revision 0.9.2.16  2008-11-26 12:23:07  brian
 # - correction for FDL update
 #

@@ -66,132 +66,132 @@
 /* our storage structure(s) */
 struct lapbMIB_data {
 	uint lapbMIB_request;
-	long lapbDiscontinuityTime;
-	long sLPConnectionDefaultInterfaceType;
-	long sLPConnectionDefaultK;
-	long sLPConnectionDefaultN1;
-	long sLPConnectionDefaultN2;
-	long sLPConnectionDefaultSequenceModulus;
-	long sLPConnectionDefaultT1Timer;
-	long sLPConnectionDefaultT2Timer;
-	long sLPConnectionDefaultT3Timer;
-	long sLPConnectionDefaultT4Timer;
+	long lapbDiscontinuityTime;	/* ReadOnly */
+	long sLPConnectionDefaultInterfaceType;	/* ReadWrite */
+	long sLPConnectionDefaultK;	/* ReadWrite */
+	long sLPConnectionDefaultN1;	/* ReadWrite */
+	long sLPConnectionDefaultN2;	/* ReadWrite */
+	long sLPConnectionDefaultSequenceModulus;	/* ReadWrite */
+	long sLPConnectionDefaultT1Timer;	/* ReadWrite */
+	long sLPConnectionDefaultT2Timer;	/* ReadWrite */
+	long sLPConnectionDefaultT3Timer;	/* ReadWrite */
+	long sLPConnectionDefaultT4Timer;	/* ReadWrite */
 };
 struct lAPBDLETable_data {
 	uint lAPBDLETable_request;
 	uint lAPBDLETable_refs;
-	uint8_t *lAPBDLEcommunicationsEntityId;
+	uint8_t *lAPBDLEcommunicationsEntityId;	/* NoAccess */
 	size_t lAPBDLEcommunicationsEntityIdLen;
-	oid *lAPBDLElocalSapNames;
+	oid *lAPBDLElocalSapNames;	/* Create */
 	size_t lAPBDLElocalSapNamesLen;
-	long lAPBDLEoperationalState;
-	oid *lAPBDLEproviderEntityNames;
+	long lAPBDLEoperationalState;	/* Create */
+	oid *lAPBDLEproviderEntityNames;	/* Create */
 	size_t lAPBDLEproviderEntityNamesLen;
-	long lAPBDLEmT1Timer;
-	long lAPBDLEmT3Timer;
-	long lAPBDLEmW;
-	long lAPBDLEmXSend;
-	long lAPBDLEmXReceive;
-	long lAPBDLEmT2Timer;
-	long lAPBDLEreceivedMlpResets;
-	long lAPBDLEtimesMT1Expired;
-	long lAPBDLEIframesReassignments;
-	long lAPBDLEmlpFramesReceived;
-	long lAPBDLEmlpFramesSent;
-	long lAPBDLEmlpFramesOutsideWindowGuard;
-	long lAPBDLEreceivedMlpFramesInGuardRegion;
-	long lAPBDLERowStatus;
+	long lAPBDLEmT1Timer;		/* Create */
+	long lAPBDLEmT3Timer;		/* Create */
+	long lAPBDLEmW;			/* Create */
+	long lAPBDLEmXSend;		/* Create */
+	long lAPBDLEmXReceive;		/* Create */
+	long lAPBDLEmT2Timer;		/* Create */
+	long lAPBDLEreceivedMlpResets;	/* ReadOnly */
+	long lAPBDLEtimesMT1Expired;	/* ReadOnly */
+	long lAPBDLEIframesReassignments;	/* ReadOnly */
+	long lAPBDLEmlpFramesReceived;	/* ReadOnly */
+	long lAPBDLEmlpFramesSent;	/* ReadOnly */
+	long lAPBDLEmlpFramesOutsideWindowGuard;	/* ReadOnly */
+	long lAPBDLEreceivedMlpFramesInGuardRegion;	/* ReadOnly */
+	long lAPBDLERowStatus;		/* Create */
 };
 struct dLSAPTable_data {
 	uint dLSAPTable_request;
 	uint dLSAPTable_refs;
-	uint8_t *lAPBDLEcommunicationsEntityId;
+	uint8_t *lAPBDLEcommunicationsEntityId;	/* NoAccess */
 	size_t lAPBDLEcommunicationsEntityIdLen;
-	uint8_t *dLSAPsapId;
+	uint8_t *dLSAPsapId;		/* NoAccess */
 	size_t dLSAPsapIdLen;
-	ulong dLSAPsap1Address;
-	oid *dLSAPuserEntityNames;
+	ulong dLSAPsap1Address;		/* ReadOnly */
+	oid *dLSAPuserEntityNames;	/* ReadOnly */
 	size_t dLSAPuserEntityNamesLen;
-	long dLSAPRowStatus;
+	long dLSAPRowStatus;		/* Create */
 };
 struct sLPPMTable_data {
 	uint sLPPMTable_request;
 	uint sLPPMTable_refs;
-	uint8_t *lAPBDLEcommunicationsEntityId;
+	uint8_t *lAPBDLEcommunicationsEntityId;	/* NoAccess */
 	size_t lAPBDLEcommunicationsEntityIdLen;
-	uint8_t *sLPPMcoProtocolMachineId;
+	uint8_t *sLPPMcoProtocolMachineId;	/* NoAccess */
 	size_t sLPPMcoProtocolMachineIdLen;
-	long sLPPMoperationalState;
-	long sLPPMadministrativeState;
-	long sLPPMRowStatus;
+	long sLPPMoperationalState;	/* ReadOnly */
+	long sLPPMadministrativeState;	/* Create */
+	long sLPPMRowStatus;		/* Create */
 };
 struct sLPConnectionTable_data {
 	uint sLPConnectionTable_request;
 	uint sLPConnectionTable_refs;
-	uint8_t *sLPConnectionConnectionId;
+	uint8_t *sLPConnectionConnectionId;	/* NoAccess */
 	size_t sLPConnectionConnectionIdLen;
-	oid *sLPConnectionUnderlyingConnectionNames;
+	oid *sLPConnectionUnderlyingConnectionNames;	/* Create */
 	size_t sLPConnectionUnderlyingConnectionNamesLen;
-	oid *sLPConnectionSupportedConnectionNames;
+	oid *sLPConnectionSupportedConnectionNames;	/* Create */
 	size_t sLPConnectionSupportedConnectionNamesLen;
-	long sLPConnectionInterfaceType;
-	long sLPConnectionK;
-	long sLPConnectionN1;
-	long sLPConnectionN2;
-	long sLPConnectionSequenceModulus;
-	long sLPConnectionT1Timer;
-	long sLPConnectionT2Timer;
-	long sLPConnectionFCSErrorsReceived;
-	long sLPConnectionFRMRsReceived;
-	long sLPConnectionFRMRsSent;
-	long sLPConnectionIFrameDataOctetsReceived;
-	long sLPConnectionIFrameDataOctetsSent;
-	long sLPConnectionIFramesReceived;
-	long sLPConnectionIFramesSent;
-	long sLPConnectionPollsReceived;
-	long sLPConnectionREJsReceived;
-	long sLPConnectionREJsSent;
-	long sLPConnectionRNRsReceived;
-	long sLPConnectionRNRsSent;
-	long sLPConnectionSABMsReceived;
-	long sLPConnectionSABMsSent;
-	long sLPConnectionProtocolState;
-	long sLPConnectionTimesT1Expired;
-	long sLPConnectionT3Timer;
-	long sLPConnectionTimesT3Expired;
-	long sLPConnectionT4Timer;
-	long sLPConnectionTimesT4Expired;
-	long sLPConnectionAbnormalLinkDisconnectsReceived;
-	long sLPConnectionAbnormalLinkDisconnectsSent;
-	long sLPConnectionLinkResetsReceived;
-	long sLPConnectionLinkResetsSent;
-	long sLPConnectionTimesN2Reached;
-	long sLPConnectionAdministrativeState;
-	long sLPConnectionOperationalState;
-	long sLPConnectionUsageState;
-	uint8_t *sLPConnectionProceduralStatus;
+	long sLPConnectionInterfaceType;	/* Create */
+	long sLPConnectionK;		/* Create */
+	long sLPConnectionN1;		/* Create */
+	long sLPConnectionN2;		/* Create */
+	long sLPConnectionSequenceModulus;	/* Create */
+	long sLPConnectionT1Timer;	/* Create */
+	long sLPConnectionT2Timer;	/* Create */
+	long sLPConnectionFCSErrorsReceived;	/* ReadOnly */
+	long sLPConnectionFRMRsReceived;	/* ReadOnly */
+	long sLPConnectionFRMRsSent;	/* ReadOnly */
+	long sLPConnectionIFrameDataOctetsReceived;	/* ReadOnly */
+	long sLPConnectionIFrameDataOctetsSent;	/* ReadOnly */
+	long sLPConnectionIFramesReceived;	/* ReadOnly */
+	long sLPConnectionIFramesSent;	/* ReadOnly */
+	long sLPConnectionPollsReceived;	/* ReadOnly */
+	long sLPConnectionREJsReceived;	/* ReadOnly */
+	long sLPConnectionREJsSent;	/* ReadOnly */
+	long sLPConnectionRNRsReceived;	/* ReadOnly */
+	long sLPConnectionRNRsSent;	/* ReadOnly */
+	long sLPConnectionSABMsReceived;	/* ReadOnly */
+	long sLPConnectionSABMsSent;	/* ReadOnly */
+	long sLPConnectionProtocolState;	/* ReadOnly */
+	long sLPConnectionTimesT1Expired;	/* ReadOnly */
+	long sLPConnectionT3Timer;	/* Create */
+	long sLPConnectionTimesT3Expired;	/* ReadOnly */
+	long sLPConnectionT4Timer;	/* Create */
+	long sLPConnectionTimesT4Expired;	/* ReadOnly */
+	long sLPConnectionAbnormalLinkDisconnectsReceived;	/* ReadOnly */
+	long sLPConnectionAbnormalLinkDisconnectsSent;	/* ReadOnly */
+	long sLPConnectionLinkResetsReceived;	/* ReadOnly */
+	long sLPConnectionLinkResetsSent;	/* ReadOnly */
+	long sLPConnectionTimesN2Reached;	/* ReadOnly */
+	long sLPConnectionAdministrativeState;	/* Create */
+	long sLPConnectionOperationalState;	/* ReadOnly */
+	long sLPConnectionUsageState;	/* ReadOnly */
+	uint8_t *sLPConnectionProceduralStatus;	/* ReadOnly */
 	size_t sLPConnectionProceduralStatusLen;
-	uint8_t *sLPConnectionAlarmStatus;
+	uint8_t *sLPConnectionAlarmStatus;	/* ReadOnly */
 	size_t sLPConnectionAlarmStatusLen;
-	long sLPConnectionRowStatus;
+	long sLPConnectionRowStatus;	/* Create */
 };
 struct sLPConnectionIVMOTable_data {
 	uint sLPConnectionIVMOTable_request;
 	uint sLPConnectionIVMOTable_refs;
-	uint8_t *sLPConnectionConnectionId;
+	uint8_t *sLPConnectionConnectionId;	/* NoAccess */
 	size_t sLPConnectionConnectionIdLen;
-	uint8_t *sLPConnectionIVMOid;
+	uint8_t *sLPConnectionIVMOid;	/* ReadOnly */
 	size_t sLPConnectionIVMOidLen;
-	long sLPConnectionIVMOinterfaceType;
-	long sLPConnectionIVMOk;
-	long sLPConnectionIVMOn1;
-	long sLPConnectionIVMOn2;
-	long sLPConnectionIVMOsequenceModulus;
-	long sLPConnectionIVMOt1Timer;
-	long sLPConnectionIVMOt2Timer;
-	long sLPConnectionIVMOt3Timer;
-	long sLPConnectionIVMOt4Timer;
-	long sLPConnectionIVMORowStatus;
+	long sLPConnectionIVMOinterfaceType;	/* Create */
+	long sLPConnectionIVMOk;	/* Create */
+	long sLPConnectionIVMOn1;	/* Create */
+	long sLPConnectionIVMOn2;	/* Create */
+	long sLPConnectionIVMOsequenceModulus;	/* Create */
+	long sLPConnectionIVMOt1Timer;	/* Create */
+	long sLPConnectionIVMOt2Timer;	/* Create */
+	long sLPConnectionIVMOt3Timer;	/* Create */
+	long sLPConnectionIVMOt4Timer;	/* Create */
+	long sLPConnectionIVMORowStatus;	/* Create */
 };
 
 /* storage declarations */
@@ -258,7 +258,7 @@ extern struct header_complex_index *sLPConnectionIVMOTableStorage;
 /* notifications */
 
 /* scalars accessible only for notify */
-extern oid fRMR_oid[11];
+extern oid fRMR_oid[12];
 
 /* object id definitions */
 
@@ -272,7 +272,7 @@ int term_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_lapbMIB;
 void parse_lapbMIB(const char *, char *);
 SNMPCallback store_lapbMIB;
-void refresh_lapbMIB(void);
+void refresh_lapbMIB(int);
 FindVarMethod var_lAPBDLETable;
 struct lAPBDLETable_data *lAPBDLETable_create(void);
 struct lAPBDLETable_data *lAPBDLETable_duplicate(struct lAPBDLETable_data *);
@@ -281,7 +281,7 @@ int lAPBDLETable_add(struct lAPBDLETable_data *);
 int lAPBDLETable_del(struct lAPBDLETable_data *);
 void parse_lAPBDLETable(const char *, char *);
 SNMPCallback store_lAPBDLETable;
-void refresh_lAPBDLETable(void);
+void refresh_lAPBDLETable(int);
 FindVarMethod var_dLSAPTable;
 struct dLSAPTable_data *dLSAPTable_create(void);
 struct dLSAPTable_data *dLSAPTable_duplicate(struct dLSAPTable_data *);
@@ -290,7 +290,7 @@ int dLSAPTable_add(struct dLSAPTable_data *);
 int dLSAPTable_del(struct dLSAPTable_data *);
 void parse_dLSAPTable(const char *, char *);
 SNMPCallback store_dLSAPTable;
-void refresh_dLSAPTable(void);
+void refresh_dLSAPTable(int);
 FindVarMethod var_sLPPMTable;
 struct sLPPMTable_data *sLPPMTable_create(void);
 struct sLPPMTable_data *sLPPMTable_duplicate(struct sLPPMTable_data *);
@@ -299,7 +299,7 @@ int sLPPMTable_add(struct sLPPMTable_data *);
 int sLPPMTable_del(struct sLPPMTable_data *);
 void parse_sLPPMTable(const char *, char *);
 SNMPCallback store_sLPPMTable;
-void refresh_sLPPMTable(void);
+void refresh_sLPPMTable(int);
 FindVarMethod var_sLPConnectionTable;
 struct sLPConnectionTable_data *sLPConnectionTable_create(void);
 struct sLPConnectionTable_data *sLPConnectionTable_duplicate(struct sLPConnectionTable_data *);
@@ -308,7 +308,7 @@ int sLPConnectionTable_add(struct sLPConnectionTable_data *);
 int sLPConnectionTable_del(struct sLPConnectionTable_data *);
 void parse_sLPConnectionTable(const char *, char *);
 SNMPCallback store_sLPConnectionTable;
-void refresh_sLPConnectionTable(void);
+void refresh_sLPConnectionTable(int);
 FindVarMethod var_sLPConnectionIVMOTable;
 struct sLPConnectionIVMOTable_data *sLPConnectionIVMOTable_create(void);
 struct sLPConnectionIVMOTable_data *sLPConnectionIVMOTable_duplicate(struct sLPConnectionIVMOTable_data *);
@@ -317,7 +317,7 @@ int sLPConnectionIVMOTable_add(struct sLPConnectionIVMOTable_data *);
 int sLPConnectionIVMOTable_del(struct sLPConnectionIVMOTable_data *);
 void parse_sLPConnectionIVMOTable(const char *, char *);
 SNMPCallback store_sLPConnectionIVMOTable;
-void refresh_sLPConnectionIVMOTable(void);
+void refresh_sLPConnectionIVMOTable(int);
 
 WriteMethod write_lAPBDLElocalSapNames;
 WriteMethod write_lAPBDLEoperationalState;

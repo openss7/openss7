@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2009-01-14 14:29:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2009-01-19 13:31:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-14 14:29:56 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 13:31:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -165,7 +165,9 @@ endif
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"@PACKAGE_TARNAME@_mknod\"
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-ss7confd_SOURCES		= src/snmp/ss7MIB.c \
+ss7confd_SOURCES		= src/snmp/ss7confd.c \
+				  src/snmp/ss7confd.h \
+				  src/snmp/ss7MIB.c \
 				  src/snmp/ss7MIB.h \
 				  src/snmp/ds1EXT.c \
 				  src/snmp/ds1EXT.h \
@@ -1085,9 +1087,9 @@ ss7MIB_la_SOURCES		= src/snmp/ss7MIB.c \
 				  src/snmp/util_funcs.h
 ss7MIB_la_DEPENDENCIES		=
 ss7MIB_la_LDFLAGS		= -module -avoid-version -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
-ss7MIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
 ss7MIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
 ss7MIB_la_CFLAGS		= $(USER_CFLAGS)
+ss7MIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
 
 test_timod_SOURCES		= src/test/tli/test-timod.c
 test_timod_LDADD		= libxnet.la
@@ -1609,6 +1611,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.114  2009-01-19 13:31:38  brian
+## - updating standalone agents
+##
 ## Revision 0.9.2.113  2009-01-14 14:29:56  brian
 ## - working up agents
 ##

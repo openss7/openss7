@@ -10,4 +10,8 @@
 *_storage.c
 *_storage.h~
 *_storage.h
+*_master.c~
+*_master.c
+*_master.h~
+*_master.h
 *.tree

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:10:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-01-19 13:31:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 07:10:41 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 13:31:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,6 +67,37 @@ if PKG_BUILD_ARCH
 
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
+
+ss7MIB_la_SOURCES		= $(top_srcdir)/src/snmp/ss7MIB.c \
+				  $(top_srcdir)/src/snmp/ss7MIB.h \
+				  $(top_srcdir)/src/snmp/ds1EXT.c \
+				  $(top_srcdir)/src/snmp/ds1EXT.h \
+				  $(top_srcdir)/src/snmp/mxMIB.c \
+				  $(top_srcdir)/src/snmp/mxMIB.h \
+				  $(top_srcdir)/src/snmp/x400pMIB.c \
+				  $(top_srcdir)/src/snmp/x400pMIB.h \
+				  $(top_srcdir)/src/snmp/mtpMIB.c \
+				  $(top_srcdir)/src/snmp/mtpMIB.h \
+				  $(top_srcdir)/src/snmp/mtpOmMIB.c \
+				  $(top_srcdir)/src/snmp/mtpOmMIB.h \
+				  $(top_srcdir)/src/snmp/sccpMIB.c \
+				  $(top_srcdir)/src/snmp/sccpMIB.h \
+				  $(top_srcdir)/src/snmp/sccpOmMIB.c \
+				  $(top_srcdir)/src/snmp/sccpOmMIB.h \
+				  $(top_srcdir)/src/snmp/tcapMIB.c \
+				  $(top_srcdir)/src/snmp/tcapMIB.h \
+				  $(top_srcdir)/src/snmp/tcapOmMIB.c \
+				  $(top_srcdir)/src/snmp/tcapOmMIB.h \
+				  $(top_srcdir)/src/snmp/ds_agent.h \
+				  $(top_srcdir)/src/snmp/header_complex.h \
+				  $(top_srcdir)/src/snmp/mib_modules.h \
+				  $(top_srcdir)/src/snmp/struct.h \
+				  $(top_srcdir)/src/snmp/util_funcs.h
+ss7MIB_la_DEPENDENCIES		=
+ss7MIB_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS) -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
+ss7MIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+ss7MIB_la_CFLAGS		= $(USER_CFLAGS)
+ss7MIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
 
 test_timod_SOURCES		= $(top_srcdir)/src/test/tli/test-timod.c
 test_timod_LDADD		= libxnet.la
@@ -371,6 +402,11 @@ endif
 #perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"perftest\"
 #perftest_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+#if WITH_SNMP_AGENT
+#snmpdlmod32_LTLIBRARIES	+= ss7MIB.la
+#endif
+EXTRA_LTLIBRARIES		= ss7MIB.la
+
 ## RPM_BUILD_USER
 endif
 
@@ -385,6 +421,9 @@ include ../am/libraries.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.13  2009-01-19 13:31:39  brian
+## - updating standalone agents
+##
 ## Revision 0.9.2.12  2008-04-29 07:10:41  brian
 ## - updating headers for release
 ##

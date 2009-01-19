@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: snmp.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2009-01-06 13:02:40 $
+# @(#) $RCSfile: snmp.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2009-01-17 12:55:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-01-06 13:02:40 $ by $Author: brian $
+## Last Modified $Date: 2009-01-17 12:55:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -66,14 +66,14 @@ if RPM_BUILD_USER
 ##
 
 
-install-snmp: src/util/sysconfig/snmp
+install-snmp-conf: src/util/sysconfig/snmp
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/snmp/snmp.d
 	$(INSTALL_DATA) $< $(DESTDIR)$(sysconfdir)/snmp/snmp.d/$(SNMPORDER)$(PACKAGE_LCNAME)
 
 ##
-# The post-snmp target checks for a fully configured install directory by checking for the existence
+# The post-snmp-conf target checks for a fully configured install directory by checking for the existence
 # of the /etc/snmp/snmpd.conf file in the target install directory $(DESTDIR).
 ##
 # If it exists, then we are doing a non-rpm (autoconf) install and need to configure
@@ -98,7 +98,7 @@ install-snmp: src/util/sysconfig/snmp
 # /etc/snmpd.local.conf to /etc/snmp/snmpd.local.conf.
 ##
 
-post-snmp:
+post-snmp-conf:
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@snmp_dir=$(DESTDIR)$(sysconfdir)/snmp ; \
 	if test ! -f $$snmp_dir/snmpd.conf ; then \
@@ -190,7 +190,7 @@ post-snmp:
 	$(ECHO) "killall -HUP snmpd" ; \
 	killall -HUP snmpd || : ;
 
-uninstall-snmp:
+uninstall-snmp-conf:
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	rm -f $(DESTDIR)$(sysconfdir)/snmp/snmp.d/$(SNMPORDER)$(PACKAGE_LCNAME)
@@ -201,13 +201,13 @@ if INSTALL_INITSCRIPTS
 if WITH_SNMP_AGENT
 ## WITH_SNMP_AGENT
 
-INSTALL_DATA_HOOK	+= install-snmp
+INSTALL_DATA_HOOK	+= install-snmp-conf
 
-POST_INSTALL_AM		+= post-snmp
+POST_INSTALL_AM		+= post-snmp-conf
 
-UNINSTALL_LOCAL		+= uninstall-snmp
+UNINSTALL_LOCAL		+= uninstall-snmp-conf
 
-POST_UNINSTALL_AM	+= post-snmp
+POST_UNINSTALL_AM	+= post-snmp-conf
 
 ## WITH_SNMP_AGENT
 endif
@@ -222,13 +222,32 @@ endif
 
 EXTRA_DIST		+= src/util/sysconfig/snmp
 
-install-agents: install-snmpdlmodLTLIBRARIES install-dist_snmpmibDATA install-snmp post-snmp
+INSTALL_MIBS_AM		+= install-dist_snmpmibDATA
 
-uninstall-agents: uninstall-snmpdlmodLTLIBRARIES uninstall-dist_snmpmibDATA uninstall-snmp post-snmp
+UNINSTALL_MIBS_AM	+= uninstall-dist_snmpmibDATA
+
+SNMP_AM			+=
+
+INSTALL_SNMP_AM		+= install-dist_snmpmibDATA \
+			   install-snmpdlmodLTLIBRARIES \
+			   install-snmp-conf \
+			   post-snmp-conf
+
+UNINSTALL_SNMP_AM	+= uninstall-snmp-conf \
+			   post-snmp-conf \
+			   uninstall-snmpdlmodLTLIBRARIES \
+			   uninstall-dist_snmpmibDATA
+
+install-agents: install-snmp
+
+uninstall-agents: uninstall-snmp
 
 ## =============================================================================
 ##
 ## $Log: snmp.am,v $
+## Revision 0.9.2.6  2009-01-17 12:55:26  brian
+## - add some targets for working with mibs and snmp agents
+##
 ## Revision 0.9.2.5  2009-01-06 13:02:40  brian
 ## - convenience targets for testing agents
 ##
