@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-27 15:36:41 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2009-01-19 10:39:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-27 15:36:41 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 10:39:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.6  2009-01-19 10:39:40  brian
+# - added new standalone agent
+#
 # Revision 0.9.2.5  2008-12-27 15:36:41  brian
 # - added extention mib
 #
@@ -76,7 +79,7 @@ export MIBS
 export MIBDIRS
 export MIBFILES
 
-all: simple storage openss7
+all: storage openss7 master
 
 check: strMIB.tree strExtMIB.tree
 
@@ -96,7 +99,7 @@ strExtMIB_simple.c strExtMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-STREAMS-EXT
 	./mib2c -c ./mib2c.conf -f strExtMIB_simple strExtMIB
 	indent -nhnl strExtMIB_simple.[ch]
 
-storage: strMIB_storage.c strMIB_storage.h strExtMIB_storage.c strExtMIB_storage.h
+storage: strExtMIB_storage.c strExtMIB_storage.h
 
 strMIB_storage.c strMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f strMIB_storage strMIB
@@ -106,7 +109,7 @@ strExtMIB_storage.c strExtMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-S
 	./mib2c -c ./mib2c.storage.conf -f strExtMIB_storage strExtMIB
 	indent -nhnl strExtMIB_storage.[ch]
 
-openss7: strMIB_openss7.c strMIB_openss7.h strExtMIB_openss7.c strExtMIB_openss7.h
+openss7: strMIB_openss7.c strMIB_openss7.h
 
 strMIB_openss7.c strMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f strMIB_openss7 strMIB
@@ -115,6 +118,13 @@ strMIB_openss7.c strMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-STREAMS
 strExtMIB_openss7.c strExtMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-STREAMS-EXT-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f strExtMIB_openss7 strExtMIB
 	indent -nhnl strExtMIB_openss7.[ch]
+
+master: \
+	streamsd_master.c streamsd_master.h
+
+streamsd_master.c streamsd_master.h: mib2c mib2c.master.conf mibs/OPENSS7-STREAMS-MIB.mib
+	./mib2c -c ./mib2c.master.conf -f streamsd_master strMIB
+	indent -nhnl streamsd_master.[ch]
 
 tables:
 	./mib2c -c ./mib2c.storage.conf strModTable
@@ -125,6 +135,8 @@ tables:
 	indent -nhnl str*Table.[ch]
 
 clean:
+	rm -f streamsd_master.[ch]
+	rm -f streamsd_master.[ch]~
 	rm -f strMIB_simple.[ch]
 	rm -f strMIB_storage.[ch]
 	rm -f strMIB_openss7.[ch]

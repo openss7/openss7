@@ -1,6 +1,6 @@
 # =============================================================================
 #
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2009-01-16 20:25:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2009-01-19 10:39:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-16 20:25:46 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 10:39:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -948,7 +948,7 @@ util_pages += \
 endif
 if WITH_SNMP_AGENT
 util_pages += \
-	man8/strmib.8
+	man8/streamsd.8
 endif
 
 MANS_UNUSED = \
@@ -2108,7 +2108,7 @@ dist_noinst_util_pages = \
 	man8/strload.8.man \
 	man8/strsetup.8.man \
 	man8/strvf.8.man \
-	man8/strmib.8.man
+	man8/streamsd.8.man
 
 dist_noinst_MANS = \
 	man2/fattach.2.man \
@@ -2535,6 +2535,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.95  2009-01-19 10:39:39  brian
+# - added new standalone agent
+#
 # Revision 0.9.2.94  2009-01-16 20:25:46  brian
 # - working up streams mibs and agents
 #

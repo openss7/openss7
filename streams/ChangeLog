@@ -1,3 +1,26 @@
+2009-01-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: make new standalone agent
+	* doc/man/Makefile.am: added streamsd documentation
+	* lib32/Makefile.am: make new standalone agent
+	* src/snmp/.cvsignore: ignore new master files
+	* src/snmp/makestubs: add new standalone agent
+	* src/snmp/mib2c.main.conf: better standalone agents
+	* src/snmp/mib2c.master.conf: better standalone agents
+	* src/snmp/mib2c.openss7.conf: better standalone agents
+	* src/snmp/mib2c.storage.conf: better standalone agents
+	* src/snmp/strExtMIB.c: updated agent
+	* src/snmp/strExtMIB.h: updated agent
+	* src/snmp/strMIB.c: updated agent
+	* src/snmp/strMIB.h: updated agent
+	* src/snmp/mibs/OPENSS7-STREAMS-EXT-MIB.mib: updated MIB
+	* src/util/strerr.c: indentation and copyright headers
+	* src/util/sysconfig/snmp: added access rights
+
+	* src/snmp/streamsd.c: new standalone agent
+	* src/snmp/streamsd.h: new standalone agent
+	* doc/man/man8/streamsd.8.man: new standalone agent
+
 2009-01-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: correct libadds

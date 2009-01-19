@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2009-01-16 20:25:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-01-19 10:39:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-16 20:25:48 $ by $Author: brian $
+# Last Modified $Date: 2009-01-19 10:39:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -325,7 +325,9 @@ libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 EXTRA_LTLIBRARIES		= strMIB.la
 
 strMIB_la_SOURCES		= $(top_srcdir)/src/snmp/strMIB.c \
-				  $(top_srcdir)/src/snmp/strMIB.h
+				  $(top_srcdir)/src/snmp/strMIB.h \
+				  $(top_srcdir)/src/snmp/strExtMIB.c \
+				  $(top_srcdir)/src/snmp/strExtMIB.h
 strMIB_la_DEPENDENCIES		= libstreams.la
 strMIB_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS) \
 				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
@@ -347,6 +349,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2009-01-19 10:39:40  brian
+# - added new standalone agent
+#
 # Revision 0.9.2.11  2009-01-16 20:25:48  brian
 # - working up streams mibs and agents
 #
