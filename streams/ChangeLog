@@ -1,3 +1,12 @@
+2009-02-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: updated agents
+	* src/perl/mibbrowser: updated agents
+	* src/snmp/strExtMIB.c: updated agents
+	* src/snmp/strExtMIB.h: updated agents
+	* src/snmp/strMIB.c: updated agents
+	* src/snmp/strMIB.h: updated agents
+
 2009-01-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: make new standalone agent

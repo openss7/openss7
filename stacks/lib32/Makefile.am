@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-01-19 13:31:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2009-02-18 20:18:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-19 13:31:39 $ by $Author: brian $
+# Last Modified $Date: 2009-02-18 20:18:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,12 +70,6 @@ if RPM_BUILD_USER
 
 ss7MIB_la_SOURCES		= $(top_srcdir)/src/snmp/ss7MIB.c \
 				  $(top_srcdir)/src/snmp/ss7MIB.h \
-				  $(top_srcdir)/src/snmp/ds1EXT.c \
-				  $(top_srcdir)/src/snmp/ds1EXT.h \
-				  $(top_srcdir)/src/snmp/mxMIB.c \
-				  $(top_srcdir)/src/snmp/mxMIB.h \
-				  $(top_srcdir)/src/snmp/x400pMIB.c \
-				  $(top_srcdir)/src/snmp/x400pMIB.h \
 				  $(top_srcdir)/src/snmp/mtpMIB.c \
 				  $(top_srcdir)/src/snmp/mtpMIB.h \
 				  $(top_srcdir)/src/snmp/mtpOmMIB.c \
@@ -421,6 +415,9 @@ include ../am/libraries.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.14  2009-02-18 20:18:44  brian
+## - updated agents
+##
 ## Revision 0.9.2.13  2009-01-19 13:31:39  brian
 ## - updating standalone agents
 ##

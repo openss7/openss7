@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2009-01-19 13:31:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2009-02-18 20:18:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-19 13:31:38 $ by $Author: brian $
+# Last Modified $Date: 2009-02-18 20:18:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -169,12 +169,6 @@ ss7confd_SOURCES		= src/snmp/ss7confd.c \
 				  src/snmp/ss7confd.h \
 				  src/snmp/ss7MIB.c \
 				  src/snmp/ss7MIB.h \
-				  src/snmp/ds1EXT.c \
-				  src/snmp/ds1EXT.h \
-				  src/snmp/mxMIB.c \
-				  src/snmp/mxMIB.h \
-				  src/snmp/x400pMIB.c \
-				  src/snmp/x400pMIB.h \
 				  src/snmp/mtpMIB.c \
 				  src/snmp/mtpMIB.h \
 				  src/snmp/mtpOmMIB.c \
@@ -1062,12 +1056,6 @@ if RPM_BUILD_USER
 
 ss7MIB_la_SOURCES		= src/snmp/ss7MIB.c \
 				  src/snmp/ss7MIB.h \
-				  src/snmp/ds1EXT.c \
-				  src/snmp/ds1EXT.h \
-				  src/snmp/mxMIB.c \
-				  src/snmp/mxMIB.h \
-				  src/snmp/x400pMIB.c \
-				  src/snmp/x400pMIB.h \
 				  src/snmp/mtpMIB.c \
 				  src/snmp/mtpMIB.h \
 				  src/snmp/mtpOmMIB.c \
@@ -1502,29 +1490,22 @@ dist_snmpmib_DATA		=
 if WITH_SNMP_AGENT
 ## WITH_SNMP_AGENT
 dist_snmpmib_DATA		+= \
-				src/snmp/mibs/HC-PerfHist-TC-MIB.mib \
-				src/snmp/mibs/PerfHist-TC-MIB.mib \
+				src/snmp/mibs/OPENSS7-TC.mib \
 				src/snmp/mibs/OPENSS7-MIB.mib \
 				src/snmp/mibs/OPENSS7-SMI.mib \
-				src/snmp/mibs/OPENSS7-TC.mib \
-				src/snmp/mibs/OPENSS7-TMN-SMI.mib \
-				src/snmp/mibs/OPENSS7-TMN-TC.mib \
 				src/snmp/mibs/OPENSS7-GMI-MIB.mib \
 				src/snmp/mibs/OPENSS7-SMI-MIB.mib \
 				src/snmp/mibs/OPENSS7-CLNS-MIB.mib \
 				src/snmp/mibs/OPENSS7-CONS-MIB.mib \
 				src/snmp/mibs/OPENSS7-METRIC-MIB.mib \
 				src/snmp/mibs/OPENSS7-UMC-MIB.mib \
-				src/snmp/mibs/OPENSS7-SS7-MIB.mib \
 				src/snmp/mibs/OPENSS7-SS7-TC.mib \
-				src/snmp/mibs/OPENSS7-MX-MIB.mib \
-				src/snmp/mibs/OPENSS7-X400P-MIB.mib \
+				src/snmp/mibs/OPENSS7-SS7-MIB.mib \
+				src/snmp/mibs/OPENSS7-SS7-OM-MIB.mib \
 				src/snmp/mibs/OPENSS7-SL-MIB.mib \
 				src/snmp/mibs/OPENSS7-SL-MUX-MIB.mib \
-				src/snmp/mibs/OPENSS7-SS7-OM-MIB.mib \
 				src/snmp/mibs/OPENSS7-MTP-MIB.mib \
 				src/snmp/mibs/OPENSS7-MTP-TC.mib \
-				src/snmp/mibs/OPENSS7-MTP-OM-MIB.mib \
 				src/snmp/mibs/OPENSS7-MTP-OM-MIB2.mib \
 				src/snmp/mibs/OPENSS7-SCCP-MIB.mib \
 				src/snmp/mibs/OPENSS7-SCCP-OM-MIB.mib \
@@ -1533,7 +1514,9 @@ dist_snmpmib_DATA		+= \
 				src/snmp/mibs/OPENSS7-ISUP-MIB.mib \
 				src/snmp/mibs/OPENSS7-ISUP-OM-MIB.mib \
 				src/snmp/mibs/OPENSS7-CDR-MIB.mib \
-				src/snmp/mibs/OPENSS7-CDR2-MIB.mib
+				src/snmp/mibs/OPENSS7-CDR2-MIB.mib \
+				src/snmp/mibs/HC-PerfHist-TC-MIB.mib \
+				src/snmp/mibs/PerfHist-TC-MIB.mib
 ## WITH_SNMP_AGENT
 endif
 
@@ -1586,7 +1569,7 @@ include am/doxy.am
 ##
 ## Rules for SNMP modules.
 ##
-SNMPORDER			= 01
+SNMPORDER			= 05
 include am/snmp.am
 
 EXTRA_DIST			+= \
@@ -1611,6 +1594,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.115  2009-02-18 20:18:44  brian
+## - updated agents
+##
 ## Revision 0.9.2.114  2009-01-19 13:31:38  brian
 ## - updating standalone agents
 ##

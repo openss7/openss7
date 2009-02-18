@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2009-01-19 10:39:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2009-02-18 20:19:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-19 10:39:39 $ by $Author: brian $
+# Last Modified $Date: 2009-02-18 20:19:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1044,8 +1044,6 @@ dist_snmpmib_DATA		+= \
 				  src/snmp/mibs/OPENSS7-MIB.mib \
 				  src/snmp/mibs/OPENSS7-SMI.mib \
 				  src/snmp/mibs/OPENSS7-TC.mib \
-				  src/snmp/mibs/OPENSS7-TMN-SMI.mib \
-				  src/snmp/mibs/OPENSS7-TMN-TC.mib \
 				  src/snmp/mibs/OPENSS7-STREAMS-MIB.mib \
 				  src/snmp/mibs/OPENSS7-STREAMS-EXT-MIB.mib
 ## WITH_SNMP_AGENT
@@ -1126,6 +1124,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.162  2009-02-18 20:19:00  brian
+# - updated agents
+#
 # Revision 0.9.2.161  2009-01-19 10:39:39  brian
 # - added new standalone agent
 #

@@ -1,3 +1,38 @@
+2009-02-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: update agents
+	* lib32/Makefile.am: update agents
+	* src/snmp/cdr2MIB.c: update agents
+	* src/snmp/cdr2MIB.h: update agents
+	* src/snmp/ds1EXT.c: update agents
+	* src/snmp/ds1EXT.h: update agents
+	* src/snmp/gmiMIB.c: update agents
+	* src/snmp/gmiMIB.h: update agents
+	* src/snmp/mtpMIB.c: update agents
+	* src/snmp/mtpMIB.h: update agents
+	* src/snmp/mtpOmMIB.c: update agents
+	* src/snmp/mtpOmMIB.h: update agents
+	* src/snmp/mxMIB.c: update agents
+	* src/snmp/mxMIB.h: update agents
+	* src/snmp/sccpMIB.c: update agents
+	* src/snmp/sccpMIB.h: update agents
+	* src/snmp/sccpOmMIB.c: update agents
+	* src/snmp/sccpOmMIB.h: update agents
+	* src/snmp/slMIB.c: update agents
+	* src/snmp/slMIB.h: update agents
+	* src/snmp/smiMIB.c: update agents
+	* src/snmp/smiMIB.h: update agents
+	* src/snmp/ss7MIB.c: update agents
+	* src/snmp/ss7MIB.h: update agents
+	* src/snmp/ss7OmMIB.c: update agents
+	* src/snmp/ss7OmMIB.h: update agents
+	* src/snmp/tcapMIB.c: update agents
+	* src/snmp/tcapMIB.h: update agents
+	* src/snmp/tcapOmMIB.c: update agents
+	* src/snmp/tcapOmMIB.h: update agents
+	* src/snmp/x400pMIB.c: update agents
+	* src/snmp/x400pMIB.h: update agents
+
 2009-01-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: working up agents

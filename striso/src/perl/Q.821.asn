@@ -1,4 +1,4 @@
---@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ GDMOCHECK $Revision: 0.9.2.3 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
@@ -7,8 +7,8 @@
 --@@ Date: Fri Sep 14 12:46:53 MDT 2007
 --@@ 
 --< GDMO.Document "ITU-T Rec. Q.821 (2000)"
---  { ccitt(0) recommendation(0) q(17) q821(821) informationMode(0) } >--
-MODULE "ITU-T Rec. Q.821 (2000)" { ccitt(0) recommendation(0) q(17) q821(821) informationMode(0) }
+--  { ccitt(0) recommendation(0) q(17) q821(821) informationModel(0) } >--
+MODULE "ITU-T Rec. Q.821 (2000)" { ccitt(0) recommendation(0) q(17) q821(821) informationModel(0) }
 --< ASN1.Version 1994 Q821-ASN1Module
 --  { ccitt(0) recommendation(0) q(17) q821(821) asn1Module(2) q821ASN1Module(0) } >--
 -- ITU-T Q.821 (02/2000) 63
@@ -34,7 +34,7 @@ EventTime
 	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
 ObjectClass, ObjectInstance, EventTypeId, InvokeIDType, Scope, CMISFilter
 	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) };
-q821InformationModel OBJECT IDENTIFIER ::= { ccitt(0) recommendation(0) q(17) q821(821) informationMode(0) }
+q821InformationModel OBJECT IDENTIFIER ::= { ccitt(0) recommendation(0) q(17) q821(821) informationModel(0) }
 -- 64 ITU-T Q.821 (02/2000)
 q821StandardSpecificExtension OBJECT IDENTIFIER ::= { q821InformationModel standardSpecificExtension(0) }
 q821ObjectClass OBJECT IDENTIFIER ::= { q821InformationModel managedObjectClass(3) }
@@ -188,7 +188,7 @@ END
 
 END
 --< GDMO.EndDocument "ITU-T Rec. Q.821 (2000)"
---  { ccitt(0) recommendation(0) q(17) q821(821) informationMode(0) } >--
+--  { ccitt(0) recommendation(0) q(17) q821(821) informationModel(0) } >--
 --@@ 
 --@@ end of gdmos
 --@@ 
