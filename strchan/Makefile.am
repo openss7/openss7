@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2009-01-19 13:31:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-02-18 20:18:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-01-19 13:31:53 $ by $Author: brian $
+# Last Modified $Date: 2009-02-18 20:18:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,8 +89,6 @@ mxMIB_la_SOURCES		= src/snmp/ds0Bundle.c \
 				  src/snmp/mxMIB.h \
 				  src/snmp/phyMIB.c \
 				  src/snmp/phyMIB.h \
-				  src/snmp/x400pMIB.c \
-				  src/snmp/x400pMIB.h \
 				  src/snmp/ds_agent.h \
 				  src/snmp/header_complex.h \
 				  src/snmp/mib_modules.h \
@@ -141,8 +139,6 @@ chand_SOURCES			= src/snmp/chand.c \
 				  src/snmp/mxMIB.h \
 				  src/snmp/phyMIB.c \
 				  src/snmp/phyMIB.h \
-				  src/snmp/x400pMIB.c \
-				  src/snmp/x400pMIB.h \
 				  src/snmp/ds_agent.h \
 				  src/snmp/header_complex.h \
 				  src/snmp/mib_modules.h \
@@ -341,7 +337,6 @@ if WITH_SNMP_AGENT
 dist_snmpmib_DATA		+= \
 				  src/mibs/OPENSS7-MX-MIB.mib \
 				  src/mibs/OPENSS7-PHY-MIB.mib \
-				  src/mibs/OPENSS7-X400P-MX-MIB.mib \
 				  src/mibs/RFC2127-MIB.txt \
 				  src/mibs/RFC2128-MIB.txt \
 				  src/mibs/RFC2494-EXT-MIB.mib \
@@ -405,7 +400,7 @@ include am/doxy.am
 ##
 ## Rules for SNMP modules.
 ##
-SNMPORDER			= 01
+SNMPORDER			= 02
 include am/snmp.am
 
 EXTRA_DIST			+= \
@@ -430,6 +425,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.18  2009-02-18 20:18:57  brian
+# - updated agents
+#
 # Revision 0.9.2.17  2009-01-19 13:31:53  brian
 # - updating standalone agents
 #

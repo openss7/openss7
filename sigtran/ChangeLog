@@ -1,3 +1,20 @@
+2009-02-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: updated mibs
+	* acinclude.m4: updated mibs
+	* src/snmp/m2paMIB.c: updated mibs
+	* src/snmp/m2paMIB.h: updated mibs
+	* src/snmp/m2uaAspMIB.c: updated mibs
+	* src/snmp/m2uaAspMIB.h: updated mibs
+	* src/snmp/m2uaMIB.c: updated mibs
+	* src/snmp/m2uaMIB.h: updated mibs
+	* src/snmp/m3uaAspMIB.c: updated mibs
+	* src/snmp/m3uaAspMIB.h: updated mibs
+	* src/snmp/m3uaSgpMIB.c: updated mibs
+	* src/snmp/m3uaSgpMIB.h: updated mibs
+	* src/snmp/sigtranMIB.c: updated mibs
+	* src/snmp/sigtranMIB.h: updated mibs
+
 2009-01-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/mibs/OPENSS7-M2UA-SL-MIB.mib: added experimental MIB

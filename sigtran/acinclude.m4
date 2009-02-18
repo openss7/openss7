@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-12-07 10:40:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2009-02-18 20:18:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-07 10:40:16 $ by $Author: brian $
+# Last Modified $Date: 2009-02-18 20:18:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,6 +81,10 @@ m4_include([m4/isdn.m4])
 m4_include([m4/atm.m4])
 m4_include([m4/ss7.m4])
 m4_include([m4/doxy.m4])
+m4_include([m4/lib32.m4])
+m4_include([m4/perl.m4])
+m4_include([m4/snmp.m4])
+m4_include([m4/agent.m4])
 
 # =============================================================================
 # AC_SIGTRAN
@@ -184,6 +188,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     CPPFLAGS=
     CFLAGS=
     _SIGTRAN_OUTPUT
+    _AGENT
     _AUTOTEST
     _DOXY
 ])# AC_SIGTRAN
@@ -470,6 +475,9 @@ AC_DEFUN([_SIGTRAN_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.20  2009-02-18 20:18:41  brian
+# - updated agents
+#
 # Revision 0.9.2.19  2008-12-07 10:40:16  brian
 # - new stratm package
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-11-26 12:23:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2009-02-18 20:18:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-26 12:23:04 $ by $Author: brian $
+# Last Modified $Date: 2009-02-18 20:18:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,6 +71,7 @@ include am/pr.am
 
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
+snmpdlmod_LTLIBRARIES		=
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -419,6 +420,21 @@ dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 ## INSTALL_INITSCRIPTS
 endif
 
+dist_snmpmib_DATA		=
+
+if WITH_SNMP_AGENT
+## WITH_SNMP_AGENT
+dist_snmpmib_DATA		+= \
+				  src/mibs/OPENSS7-M2PA-MIB.mib \
+				  src/mibs/OPENSS7-M2UA-ASP-MIB.mib \
+				  src/mibs/OPENSS7-M2UA-MIB.mib \
+				  src/mibs/OPENSS7-M3UA-ASP-MIB.mib \
+				  src/mibs/OPENSS7-M3UA-SGP-MIB.mib \
+				  src/mibs/OPENSS7-SIGTRAN-MIB.mib \
+				  src/mibs/OPENSS7-SIGTRAN-TC.mib
+## WITH_SNMP_AGENT
+endif
+
 ## PKG_BUILD_INDEP
 endif
 
@@ -465,6 +481,12 @@ include am/release.am
 ##
 include am/doxy.am
 
+##
+## Rules for SNMP modules.
+##
+SNMPORDER			= 06
+include am/snmp.am
+
 EXTRA_DIST			+= \
 				  debian/README.Debian \
 				  debian/TODO.Debian
@@ -487,6 +509,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.22  2009-02-18 20:18:41  brian
+# - updated agents
+#
 # Revision 0.9.2.21  2008-11-26 12:23:04  brian
 # - correction for FDL update
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x400pMIB.h,v 0.9.2.10 2009-01-19 13:31:52 brian Exp $
+ @(#) $Id: x400pMIB.h,v 0.9.2.11 2009-02-18 20:18:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-19 13:31:52 $ by $Author: brian $
+ Last Modified $Date: 2009-02-18 20:18:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400pMIB.h,v $
+ Revision 0.9.2.11  2009-02-18 20:18:57  brian
+ - updated agents
+
  Revision 0.9.2.10  2009-01-19 13:31:52  brian
  - updating standalone agents
 
@@ -84,7 +87,7 @@
 #ifndef __LOCAL_X400PMIB_H__
 #define __LOCAL_X400PMIB_H__
 
-#ident "@(#) $RCSfile: x400pMIB.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: x400pMIB.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -98,7 +101,6 @@
  * for the ucd-snmp snmpd agent.
  */
 
-#undef MASTER
 extern const char sa_program[];
 extern int sa_fclose;			/* default close files between requests */
 extern int sa_changed;			/* indication to reread MIB configuration */
@@ -202,7 +204,7 @@ struct x400pSpanTable_data {
 	long x400pSpanType;		/* Create */
 	ulong x400pSpanNumber;		/* Create */
 	long x400pSpanRate;		/* ReadOnly */
-	uint8_t *x400pSpanMode;		/* ReadOnly */
+	uint8_t *x400pSpanMode;		/* Create */
 	size_t x400pSpanModeLen;
 	long x400pSpanCrc;		/* Create */
 	long x400pSpanClocking;		/* Create */
@@ -251,65 +253,6 @@ struct x400pSpanTable_data {
 	ulong x400pSpanReceiveLevel;	/* ReadOnly */
 	ulong x400pSpanReceiveThreshold;	/* Create */
 	long x400pSpanRowStatus;	/* Create */
-};
-struct x400pNearEndIntervalTable_data {
-	uint x400pNearEndIntervalTable_request;
-	uint x400pNearEndIntervalTable_refs;
-	uint8_t *x400pDrivName;		/* NoAccess */
-	size_t x400pDrivNameLen;
-	ulong x400pCardIndex;		/* NoAccess */
-	ulong x400pSpanIndex;		/* NoAccess */
-	ulong x400pNearEndIntervalIndex;	/* NoAccess */
-	long x400pNearEndIntervalESs;	/* ReadOnly */
-	long x400pNearEndIntervalSESs;	/* ReadOnly */
-	long x400pNearEndIntervalSEFSs;	/* ReadOnly */
-	long x400pNearEndIntervalUASs;	/* ReadOnly */
-	long x400pNearEndIntervalCSSs;	/* ReadOnly */
-	long x400pNearEndIntervalPCVs;	/* ReadOnly */
-	long x400pNearEndIntervalLESs;	/* ReadOnly */
-	long x400pNearEndIntervalBESs;	/* ReadOnly */
-	long x400pNearEndIntervalDMs;	/* ReadOnly */
-	long x400pNearEndIntervalLCVs;	/* ReadOnly */
-	long x400pNearEndIntervalValidData;	/* ReadOnly */
-};
-struct x400pNearEndTotalTable_data {
-	uint x400pNearEndTotalTable_request;
-	uint x400pNearEndTotalTable_refs;
-	uint8_t *x400pDrivName;		/* NoAccess */
-	size_t x400pDrivNameLen;
-	ulong x400pCardIndex;		/* NoAccess */
-	ulong x400pSpanIndex;		/* NoAccess */
-	long x400pNearEndTotalValidIntervals;	/* ReadOnly */
-	long x400pNearEndTotalInvalidIntervals;	/* ReadOnly */
-	long x400pNearEndTotalESs;	/* ReadOnly */
-	long x400pNearEndTotalSESs;	/* ReadOnly */
-	long x400pNearEndTotalSEFSs;	/* ReadOnly */
-	long x400pNearEndTotalUASs;	/* ReadOnly */
-	long x400pNearEndTotalCSSs;	/* ReadOnly */
-	long x400pNearEndTotalPCVs;	/* ReadOnly */
-	long x400pNearEndTotalLESs;	/* ReadOnly */
-	long x400pNearEndTotalBESs;	/* ReadOnly */
-	long x400pNearEndTotalDMs;	/* ReadOnly */
-	long x400pNearEndTotalLCVs;	/* ReadOnly */
-};
-struct x400pFarEndIntervalTable_data {
-	uint x400pFarEndIntervalTable_request;
-	uint x400pFarEndIntervalTable_refs;
-	uint8_t *x400pDrivName;		/* NoAccess */
-	size_t x400pDrivNameLen;
-	ulong x400pCardIndex;		/* NoAccess */
-	ulong x400pSpanIndex;		/* NoAccess */
-	ulong x400pFarEndIntervalIndex;	/* NoAccess */
-	long x400pFarEndIntervalESs;	/* ReadOnly */
-	long x400pFarEndIntervalSESs;	/* ReadOnly */
-	long x400pFarEndIntervalSEFSs;	/* ReadOnly */
-	long x400pFarEndIntervalUASs;	/* ReadOnly */
-	long x400pFarEndIntervalCSSs;	/* ReadOnly */
-	long x400pFarEndIntervalPCVs;	/* ReadOnly */
-	long x400pFarEndIntervalLESs;	/* ReadOnly */
-	long x400pFarEndIntervalBESs;	/* ReadOnly */
-	long x400pFarEndIntervalDMs;	/* ReadOnly */
-	long x400pFarEndIntervalValidData;	/* ReadOnly */
 };
 struct x400pBertTable_data {
 	uint x400pBertTable_request;
@@ -390,6 +333,46 @@ struct x400pNearEndCurrentTable_data {
 	long x400pNearEndCurrentDMs;	/* ReadOnly */
 	long x400pNearEndCurrentLCVs;	/* ReadOnly */
 };
+struct x400pNearEndIntervalTable_data {
+	uint x400pNearEndIntervalTable_request;
+	uint x400pNearEndIntervalTable_refs;
+	uint8_t *x400pDrivName;		/* NoAccess */
+	size_t x400pDrivNameLen;
+	ulong x400pCardIndex;		/* NoAccess */
+	ulong x400pSpanIndex;		/* NoAccess */
+	ulong x400pNearEndIntervalIndex;	/* NoAccess */
+	long x400pNearEndIntervalESs;	/* ReadOnly */
+	long x400pNearEndIntervalSESs;	/* ReadOnly */
+	long x400pNearEndIntervalSEFSs;	/* ReadOnly */
+	long x400pNearEndIntervalUASs;	/* ReadOnly */
+	long x400pNearEndIntervalCSSs;	/* ReadOnly */
+	long x400pNearEndIntervalPCVs;	/* ReadOnly */
+	long x400pNearEndIntervalLESs;	/* ReadOnly */
+	long x400pNearEndIntervalBESs;	/* ReadOnly */
+	long x400pNearEndIntervalDMs;	/* ReadOnly */
+	long x400pNearEndIntervalLCVs;	/* ReadOnly */
+	long x400pNearEndIntervalValidData;	/* ReadOnly */
+};
+struct x400pNearEndTotalTable_data {
+	uint x400pNearEndTotalTable_request;
+	uint x400pNearEndTotalTable_refs;
+	uint8_t *x400pDrivName;		/* NoAccess */
+	size_t x400pDrivNameLen;
+	ulong x400pCardIndex;		/* NoAccess */
+	ulong x400pSpanIndex;		/* NoAccess */
+	long x400pNearEndTotalValidIntervals;	/* ReadOnly */
+	long x400pNearEndTotalInvalidIntervals;	/* ReadOnly */
+	long x400pNearEndTotalESs;	/* ReadOnly */
+	long x400pNearEndTotalSESs;	/* ReadOnly */
+	long x400pNearEndTotalSEFSs;	/* ReadOnly */
+	long x400pNearEndTotalUASs;	/* ReadOnly */
+	long x400pNearEndTotalCSSs;	/* ReadOnly */
+	long x400pNearEndTotalPCVs;	/* ReadOnly */
+	long x400pNearEndTotalLESs;	/* ReadOnly */
+	long x400pNearEndTotalBESs;	/* ReadOnly */
+	long x400pNearEndTotalDMs;	/* ReadOnly */
+	long x400pNearEndTotalLCVs;	/* ReadOnly */
+};
 struct x400pFarEndCurrentTable_data {
 	uint x400pFarEndCurrentTable_request;
 	uint x400pFarEndCurrentTable_refs;
@@ -407,6 +390,25 @@ struct x400pFarEndCurrentTable_data {
 	long x400pFarEndCurrentLESs;	/* ReadOnly */
 	long x400pFarEndCurrentBESs;	/* ReadOnly */
 	long x400pFarEndCurrentDMs;	/* ReadOnly */
+};
+struct x400pFarEndIntervalTable_data {
+	uint x400pFarEndIntervalTable_request;
+	uint x400pFarEndIntervalTable_refs;
+	uint8_t *x400pDrivName;		/* NoAccess */
+	size_t x400pDrivNameLen;
+	ulong x400pCardIndex;		/* NoAccess */
+	ulong x400pSpanIndex;		/* NoAccess */
+	ulong x400pFarEndIntervalIndex;	/* NoAccess */
+	long x400pFarEndIntervalESs;	/* ReadOnly */
+	long x400pFarEndIntervalSESs;	/* ReadOnly */
+	long x400pFarEndIntervalSEFSs;	/* ReadOnly */
+	long x400pFarEndIntervalUASs;	/* ReadOnly */
+	long x400pFarEndIntervalCSSs;	/* ReadOnly */
+	long x400pFarEndIntervalPCVs;	/* ReadOnly */
+	long x400pFarEndIntervalLESs;	/* ReadOnly */
+	long x400pFarEndIntervalBESs;	/* ReadOnly */
+	long x400pFarEndIntervalDMs;	/* ReadOnly */
+	long x400pFarEndIntervalValidData;	/* ReadOnly */
 };
 struct x400pFarEndTotalTable_data {
 	uint x400pFarEndTotalTable_request;
@@ -434,14 +436,14 @@ extern struct header_complex_index *x400pSyncTableStorage;
 extern struct header_complex_index *x400pDrivTableStorage;
 extern struct header_complex_index *x400pCardTableStorage;
 extern struct header_complex_index *x400pSpanTableStorage;
-extern struct header_complex_index *x400pNearEndIntervalTableStorage;
-extern struct header_complex_index *x400pNearEndTotalTableStorage;
-extern struct header_complex_index *x400pFarEndIntervalTableStorage;
 extern struct header_complex_index *x400pBertTableStorage;
 extern struct header_complex_index *x400pChanTableStorage;
 extern struct header_complex_index *x400pXconTableStorage;
 extern struct header_complex_index *x400pNearEndCurrentTableStorage;
+extern struct header_complex_index *x400pNearEndIntervalTableStorage;
+extern struct header_complex_index *x400pNearEndTotalTableStorage;
 extern struct header_complex_index *x400pFarEndCurrentTableStorage;
+extern struct header_complex_index *x400pFarEndIntervalTableStorage;
 extern struct header_complex_index *x400pFarEndTotalTableStorage;
 
 /* enum definitions from the covered mib sections */
@@ -700,12 +702,6 @@ extern struct header_complex_index *x400pFarEndTotalTableStorage;
 #define X400PSPANEVENTS_TOCD                     12
 #define X400PSPANEVENTS_TCLE                     13
 
-#define X400PNEARENDINTERVALVALIDDATA_TRUE       1
-#define X400PNEARENDINTERVALVALIDDATA_FALSE      2
-
-#define X400PFARENDINTERVALVALIDDATA_TRUE        1
-#define X400PFARENDINTERVALVALIDDATA_FALSE       2
-
 #define X400PBERTMODE_NONE                       0
 #define X400PBERTMODE_SPAN                       1
 #define X400PBERTMODE_CHANNEL                    2
@@ -797,6 +793,12 @@ extern struct header_complex_index *x400pFarEndTotalTableStorage;
 #define X400PXCONTYPE_SWITCHED                   1
 #define X400PXCONTYPE_SEMIPERMANENT              2
 #define X400PXCONTYPE_PERMANENT                  3
+
+#define X400PNEARENDINTERVALVALIDDATA_TRUE       1
+#define X400PNEARENDINTERVALVALIDDATA_FALSE      2
+
+#define X400PFARENDINTERVALVALIDDATA_TRUE        1
+#define X400PFARENDINTERVALVALIDDATA_FALSE       2
 
 /* notifications */
 
@@ -890,33 +892,6 @@ int x400pSpanTable_del(struct x400pSpanTable_data *);
 void parse_x400pSpanTable(const char *, char *);
 SNMPCallback store_x400pSpanTable;
 void refresh_x400pSpanTable(int);
-FindVarMethod var_x400pNearEndIntervalTable;
-struct x400pNearEndIntervalTable_data *x400pNearEndIntervalTable_create(void);
-struct x400pNearEndIntervalTable_data *x400pNearEndIntervalTable_duplicate(struct x400pNearEndIntervalTable_data *);
-int x400pNearEndIntervalTable_destroy(struct x400pNearEndIntervalTable_data **);
-int x400pNearEndIntervalTable_add(struct x400pNearEndIntervalTable_data *);
-int x400pNearEndIntervalTable_del(struct x400pNearEndIntervalTable_data *);
-void parse_x400pNearEndIntervalTable(const char *, char *);
-SNMPCallback store_x400pNearEndIntervalTable;
-void refresh_x400pNearEndIntervalTable(int);
-FindVarMethod var_x400pNearEndTotalTable;
-struct x400pNearEndTotalTable_data *x400pNearEndTotalTable_create(void);
-struct x400pNearEndTotalTable_data *x400pNearEndTotalTable_duplicate(struct x400pNearEndTotalTable_data *);
-int x400pNearEndTotalTable_destroy(struct x400pNearEndTotalTable_data **);
-int x400pNearEndTotalTable_add(struct x400pNearEndTotalTable_data *);
-int x400pNearEndTotalTable_del(struct x400pNearEndTotalTable_data *);
-void parse_x400pNearEndTotalTable(const char *, char *);
-SNMPCallback store_x400pNearEndTotalTable;
-void refresh_x400pNearEndTotalTable(int);
-FindVarMethod var_x400pFarEndIntervalTable;
-struct x400pFarEndIntervalTable_data *x400pFarEndIntervalTable_create(void);
-struct x400pFarEndIntervalTable_data *x400pFarEndIntervalTable_duplicate(struct x400pFarEndIntervalTable_data *);
-int x400pFarEndIntervalTable_destroy(struct x400pFarEndIntervalTable_data **);
-int x400pFarEndIntervalTable_add(struct x400pFarEndIntervalTable_data *);
-int x400pFarEndIntervalTable_del(struct x400pFarEndIntervalTable_data *);
-void parse_x400pFarEndIntervalTable(const char *, char *);
-SNMPCallback store_x400pFarEndIntervalTable;
-void refresh_x400pFarEndIntervalTable(int);
 FindVarMethod var_x400pBertTable;
 struct x400pBertTable_data *x400pBertTable_create(void);
 struct x400pBertTable_data *x400pBertTable_duplicate(struct x400pBertTable_data *);
@@ -953,6 +928,24 @@ int x400pNearEndCurrentTable_del(struct x400pNearEndCurrentTable_data *);
 void parse_x400pNearEndCurrentTable(const char *, char *);
 SNMPCallback store_x400pNearEndCurrentTable;
 void refresh_x400pNearEndCurrentTable(int);
+FindVarMethod var_x400pNearEndIntervalTable;
+struct x400pNearEndIntervalTable_data *x400pNearEndIntervalTable_create(void);
+struct x400pNearEndIntervalTable_data *x400pNearEndIntervalTable_duplicate(struct x400pNearEndIntervalTable_data *);
+int x400pNearEndIntervalTable_destroy(struct x400pNearEndIntervalTable_data **);
+int x400pNearEndIntervalTable_add(struct x400pNearEndIntervalTable_data *);
+int x400pNearEndIntervalTable_del(struct x400pNearEndIntervalTable_data *);
+void parse_x400pNearEndIntervalTable(const char *, char *);
+SNMPCallback store_x400pNearEndIntervalTable;
+void refresh_x400pNearEndIntervalTable(int);
+FindVarMethod var_x400pNearEndTotalTable;
+struct x400pNearEndTotalTable_data *x400pNearEndTotalTable_create(void);
+struct x400pNearEndTotalTable_data *x400pNearEndTotalTable_duplicate(struct x400pNearEndTotalTable_data *);
+int x400pNearEndTotalTable_destroy(struct x400pNearEndTotalTable_data **);
+int x400pNearEndTotalTable_add(struct x400pNearEndTotalTable_data *);
+int x400pNearEndTotalTable_del(struct x400pNearEndTotalTable_data *);
+void parse_x400pNearEndTotalTable(const char *, char *);
+SNMPCallback store_x400pNearEndTotalTable;
+void refresh_x400pNearEndTotalTable(int);
 FindVarMethod var_x400pFarEndCurrentTable;
 struct x400pFarEndCurrentTable_data *x400pFarEndCurrentTable_create(void);
 struct x400pFarEndCurrentTable_data *x400pFarEndCurrentTable_duplicate(struct x400pFarEndCurrentTable_data *);
@@ -962,6 +955,15 @@ int x400pFarEndCurrentTable_del(struct x400pFarEndCurrentTable_data *);
 void parse_x400pFarEndCurrentTable(const char *, char *);
 SNMPCallback store_x400pFarEndCurrentTable;
 void refresh_x400pFarEndCurrentTable(int);
+FindVarMethod var_x400pFarEndIntervalTable;
+struct x400pFarEndIntervalTable_data *x400pFarEndIntervalTable_create(void);
+struct x400pFarEndIntervalTable_data *x400pFarEndIntervalTable_duplicate(struct x400pFarEndIntervalTable_data *);
+int x400pFarEndIntervalTable_destroy(struct x400pFarEndIntervalTable_data **);
+int x400pFarEndIntervalTable_add(struct x400pFarEndIntervalTable_data *);
+int x400pFarEndIntervalTable_del(struct x400pFarEndIntervalTable_data *);
+void parse_x400pFarEndIntervalTable(const char *, char *);
+SNMPCallback store_x400pFarEndIntervalTable;
+void refresh_x400pFarEndIntervalTable(int);
 FindVarMethod var_x400pFarEndTotalTable;
 struct x400pFarEndTotalTable_data *x400pFarEndTotalTable_create(void);
 struct x400pFarEndTotalTable_data *x400pFarEndTotalTable_duplicate(struct x400pFarEndTotalTable_data *);
@@ -988,6 +990,7 @@ WriteMethod write_x400pSpanDevice;
 WriteMethod write_x400pSpanEquipmentId;
 WriteMethod write_x400pSpanType;
 WriteMethod write_x400pSpanNumber;
+WriteMethod write_x400pSpanMode;
 WriteMethod write_x400pSpanCrc;
 WriteMethod write_x400pSpanClocking;
 WriteMethod write_x400pSpanPriority;

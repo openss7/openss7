@@ -1,3 +1,22 @@
+2009-02-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: updated agents
+	* doc/specs/mxi/Makefile.am: updated agents
+	* src/snmp/ds0.c: updated agents
+	* src/snmp/ds0.h: updated agents
+	* src/snmp/ds0Bundle.c: updated agents
+	* src/snmp/ds0Bundle.h: updated agents
+	* src/snmp/ds1.c: updated agents
+	* src/snmp/ds1.h: updated agents
+	* src/snmp/ds1EXT.c: updated agents
+	* src/snmp/ds1EXT.h: updated agents
+	* src/snmp/mxMIB.c: updated agents
+	* src/snmp/mxMIB.h: updated agents
+	* src/snmp/phyMIB.c: updated agents
+	* src/snmp/phyMIB.h: updated agents
+	* src/snmp/x400pMIB.c: updated agents
+	* src/snmp/x400pMIB.h: updated agents
+
 2009-01-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/ds1.c: working up agents
