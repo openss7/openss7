@@ -168,9 +168,10 @@ static int my_fd = -1;			/* file descriptor for this MIB's use */
 static int my_readfd = -1;		/* file descriptor for autonomnous events */
 volatile int sccpMIB_refresh = 1;
 volatile int sccpNetworkEntityTable_refresh = 1;
-volatile int sccpSapNameTable_refresh = 1;
+volatile int sccpLocalSapNamesTable_refresh = 1;
 volatile int sccpAccessPointTable_refresh = 1;
 volatile int sccpLinkageTable_refresh = 1;
+volatile int sccpMtpTable_refresh = 1;
 volatile int sccpSclcTable_refresh = 1;
 volatile int sccpScocTable_refresh = 1;
 volatile int sccpScrcTable_refresh = 1;
@@ -191,21 +192,22 @@ volatile int sccpSrvtTable_refresh = 1;
  */
 oid sccpMIB_variables_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2 };
 oid sccpNetworkEntityTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 1, 1, 1 };
-oid sccpSapNameTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 2, 1, 1 };
-oid sccpAccessPointTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 3, 1, 1 };
-oid sccpLinkageTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 4, 1, 1 };
+oid sccpLocalSapNamesTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 1, 2, 1 };
+oid sccpAccessPointTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 2, 1, 1 };
+oid sccpLinkageTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 3, 1, 1 };
+oid sccpMtpTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 4, 1, 1 };
 oid sccpSclcTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 5, 1, 1 };
 oid sccpScocTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 6, 1, 1 };
 oid sccpScrcTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 7, 1, 1 };
 oid sccpEntitySetTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 8, 1, 1 };
-oid sccpEntitySetSapTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 9, 1, 1 };
-oid sccpConcernedAreaTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 10, 1, 1 };
-oid sccpRemoteSCCPTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 11, 1, 1 };
-oid sccpGtConversionRuleTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 12, 1, 1 };
-oid sccpAddressInfoTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 13, 1, 1 };
-oid sccpGtTranslatorTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 14, 1, 1 };
-oid sccpGtRuleTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 15, 1, 1 };
-oid sccpSrvtTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 16, 1, 1 };
+oid sccpEntitySetSapTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 8, 2, 1 };
+oid sccpConcernedAreaTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 9, 1, 1 };
+oid sccpRemoteSCCPTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 9, 2, 1 };
+oid sccpGtConversionRuleTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 10, 1, 1 };
+oid sccpAddressInfoTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 10, 2, 1 };
+oid sccpGtTranslatorTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 11, 1, 1 };
+oid sccpGtRuleTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 12, 1, 1 };
+oid sccpSrvtTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 1, 13, 1, 1 };
 
 /*
  * Oids for use in notifications defined in this MIB.
@@ -226,13 +228,36 @@ oid globalTitle_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 3, 7 };
 /*
  * Other oids defined in this MIB.
  */
-oid sccpLoadSharingRoundRobin_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 1 };
-oid sccpLoadSharingSlsSplitting_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 2 };
+oid hopCounterViolation_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 1 };
+oid localSubsystemProhibited_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 2 };
+oid localSccpUnavailable_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 3 };
+oid noReassemblySpace_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 4 };
+oid noRuleForAddress_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 5 };
+oid noSegmentationSupport_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 6 };
+oid noTranslatorForAddress_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 7 };
+oid pointCodeCongested_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 8 };
+oid pointCodeNotAvailable_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 9 };
+oid reassemblyFailure_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 10 };
+oid reassemblyTimeOut_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 11 };
+oid routingFailureNoReasonOrUnqualified_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 12 };
+oid sccpCongested_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 13 };
+oid segmentationFailure_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 14 };
+oid segmentOutOfOrder_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 15 };
+oid subsystemCongested_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 16 };
+oid subsystemOoSdenied_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 17 };
+oid subsystemOoSgranted_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 18 };
+oid subsystemProhibited_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 19 };
+oid subsystemUnavailable_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 20 };
+oid syntaxErrorDetected_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 21 };
+oid tooLargeForSegmentation_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 22 };
+oid unequippedSubsystem_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 4, 23 };
+oid sccpLoadSharingRoundRobin_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 5, 1 };
+oid sccpLoadSharingSlsSplitting_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 1, 4, 5, 2 };
 oid sccpMIBCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 1, 1 };
 oid sccpNetworkEntityGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 1 };
-oid sccpSapNameGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 2 };
-oid sccpAccessPointGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 3 };
-oid sccpRemoteSAPGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 4 };
+oid sccpAccessPointGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 2 };
+oid sccpRemoteSAPGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 3 };
+oid sccpAlarmSeverityAssignmentPointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 4 };
 oid sccpAvailableAfterSpRestartPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 5 };
 oid sccpLinkageGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 6 };
 oid sccpSclcGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 7 };
@@ -257,255 +282,299 @@ static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 struct variable7 sccpMIB_variables[] = {
 	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
 #define   SCCPNETWORKENTITYALARMSTATUS  1
-	{(u_char) SCCPNETWORKENTITYALARMSTATUS, ASN_BIT_STR, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 2}},
-#define   SCCPSYSTEMTYPES       2
-	{(u_char) SCCPSYSTEMTYPES, ASN_BIT_STR, RONLY, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 6}},
-#define   SCCPVERSION           3
-	{(u_char) SCCPVERSION, ASN_OBJECT_ID, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 7}},
-#define   SCCPLUDTANDLUDTSSUPPORTED  4
-	{(u_char) SCCPLUDTANDLUDTSSUPPORTED, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 8}},
-#define   SCCPCOORDCHANGETIMER  5
-	{(u_char) SCCPCOORDCHANGETIMER, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 9}},
-#define   SCCPIGNORESSTTIMER    6
-	{(u_char) SCCPIGNORESSTTIMER, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 10}},
-#define   SCCPMAXSTATINFOTIMER  7
-	{(u_char) SCCPMAXSTATINFOTIMER, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 11}},
-#define   SCCPNETWORKENTITYNAME  8
-	{(u_char) SCCPNETWORKENTITYNAME, ASN_OCTET_STR, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 12}},
-#define   SCCPROWSTATUS         9
-	{(u_char) SCCPROWSTATUS, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 13}},
-#define   SCCPSAPNAMEROWSTATUS  10
-	{(u_char) SCCPSAPNAMEROWSTATUS, ASN_INTEGER, RWRITE, var_sccpSapNameTable, 6, {1, 1, 2, 1, 1, 1}},
-#define   SCCPACCESSPOINTALARMSTATUS  11
-	{(u_char) SCCPACCESSPOINTALARMSTATUS, ASN_BIT_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 2}},
-#define   SCCPSAP2ADDRESS       12
-	{(u_char) SCCPSAP2ADDRESS, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 3}},
-#define   SCCPUSERENTITYNAMES   13
-	{(u_char) SCCPUSERENTITYNAMES, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 4}},
-#define   SCCPPROVIDERENTITYNAMES  14
-	{(u_char) SCCPPROVIDERENTITYNAMES, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 5}},
-#define   SCCPAVAILABILITYSTATUS  15
-	{(u_char) SCCPAVAILABILITYSTATUS, ASN_BIT_STR, RONLY, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 6}},
-#define   SCCPCONCERNEDAREAPOINTER  16
-	{(u_char) SCCPCONCERNEDAREAPOINTER, ASN_UNSIGNED, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 7}},
-#define   SCCPLINKAGEPOINTER    17
-	{(u_char) SCCPLINKAGEPOINTER, ASN_UNSIGNED, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 8}},
-#define   SCCPSSAVAILABLEAFTERSPRESTART  18
-	{(u_char) SCCPSSAVAILABLEAFTERSPRESTART, ASN_INTEGER, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 9}},
-#define   SCCPACCESSPOINTNAME   19
-	{(u_char) SCCPACCESSPOINTNAME, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 10}},
-#define   SCCPACCESSPOINTROWSTATUS  20
-	{(u_char) SCCPACCESSPOINTROWSTATUS, ASN_INTEGER, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 3, 1, 1, 11}},
-#define   SCCPOPERATIONALPROTOCOLS  21
-	{(u_char) SCCPOPERATIONALPROTOCOLS, ASN_BIT_STR, RONLY, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 2}},
-#define   SCCPSNSAP             22
-	{(u_char) SCCPSNSAP, ASN_OBJECT_ID, RONLY, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 3}},
-#define   SCCPATTACKTIMERVALUE  23
-	{(u_char) SCCPATTACKTIMERVALUE, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 4}},
-#define   SCCPDECAYTIMERVALUE   24
-	{(u_char) SCCPDECAYTIMERVALUE, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 5}},
-#define   SCCPNROFRESTRICTIONLEVELS  25
-	{(u_char) SCCPNROFRESTRICTIONLEVELS, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 6}},
-#define   SCCPNROFSUBLEVELS     26
-	{(u_char) SCCPNROFSUBLEVELS, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 7}},
-#define   SCCPCLS               27
-	{(u_char) SCCPCLS, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 8}},
-#define   SCCPCONGESTIONTIMERVALUE  28
-	{(u_char) SCCPCONGESTIONTIMERVALUE, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 9}},
-#define   SCCPP                 29
-	{(u_char) SCCPP, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 10}},
-#define   SCCPIMPORTANCELEVELCR  30
-	{(u_char) SCCPIMPORTANCELEVELCR, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 11}},
-#define   SCCPIMPORTANCELEVELCC  31
-	{(u_char) SCCPIMPORTANCELEVELCC, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 12}},
-#define   SCCPIMPORTANCELEVELCREF  32
-	{(u_char) SCCPIMPORTANCELEVELCREF, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 13}},
-#define   SCCPIMPORTANCELEVELDT1  33
-	{(u_char) SCCPIMPORTANCELEVELDT1, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 14}},
-#define   SCCPIMPORTANCELEVELDT2  34
-	{(u_char) SCCPIMPORTANCELEVELDT2, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 15}},
-#define   SCCPIMPORTANCELEVELAK  35
-	{(u_char) SCCPIMPORTANCELEVELAK, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 16}},
-#define   SCCPIMPORTANCELEVELIT  36
-	{(u_char) SCCPIMPORTANCELEVELIT, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 17}},
-#define   SCCPIMPORTANCELEVELED  37
-	{(u_char) SCCPIMPORTANCELEVELED, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 18}},
-#define   SCCPIMPORTANCELEVELEA  38
-	{(u_char) SCCPIMPORTANCELEVELEA, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 19}},
-#define   SCCPIMPORTANCELEVELRSR  39
-	{(u_char) SCCPIMPORTANCELEVELRSR, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 20}},
-#define   SCCPIMPORTANCELEVELRSC  40
-	{(u_char) SCCPIMPORTANCELEVELRSC, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 21}},
-#define   SCCPIMPORTANCELEVELERR  41
-	{(u_char) SCCPIMPORTANCELEVELERR, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 22}},
-#define   SCCPIMPORTANCELEVELRLC  42
-	{(u_char) SCCPIMPORTANCELEVELRLC, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 23}},
-#define   SCCPIMPORTANCELEVELRLSD  43
-	{(u_char) SCCPIMPORTANCELEVELRLSD, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 24}},
-#define   SCCPIMPORTANCELEVELUDT  44
-	{(u_char) SCCPIMPORTANCELEVELUDT, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 25}},
-#define   SCCPIMPORTANCELEVELUDTS  45
-	{(u_char) SCCPIMPORTANCELEVELUDTS, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 26}},
-#define   SCCPIMPORTANCELEVELXUDT  46
-	{(u_char) SCCPIMPORTANCELEVELXUDT, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 27}},
-#define   SCCPIMPORTANCELEVELXUDTS  47
-	{(u_char) SCCPIMPORTANCELEVELXUDTS, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 28}},
-#define   SCCPIMPORTANCELEVELLUDT  48
-	{(u_char) SCCPIMPORTANCELEVELLUDT, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 29}},
-#define   SCCPIMPORTANCELEVELLUDTS  49
-	{(u_char) SCCPIMPORTANCELEVELLUDTS, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 30}},
-#define   SCCPRLM               50
-	{(u_char) SCCPRLM, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 31}},
-#define   SCCPRSLM              51
-	{(u_char) SCCPRSLM, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 32}},
-#define   SCCPLINKAGECONCERNEDAREAPOINTER  52
-	{(u_char) SCCPLINKAGECONCERNEDAREAPOINTER, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 33}},
-#define   SCCPLOWERLIMITFORSEGMENTATION  53
-	{(u_char) SCCPLOWERLIMITFORSEGMENTATION, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 34}},
-#define   SCCPUPPERLIMITFORSEGMENTATION  54
-	{(u_char) SCCPUPPERLIMITFORSEGMENTATION, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 35}},
-#define   SCCPLINKAGENAME       55
-	{(u_char) SCCPLINKAGENAME, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 36}},
-#define   SCCPLINKAGEROWSTATUS  56
-	{(u_char) SCCPLINKAGEROWSTATUS, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 4, 1, 1, 37}},
-#define   SCCPSCLCALARMSTATUS   57
-	{(u_char) SCCPSCLCALARMSTATUS, ASN_BIT_STR, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 1}},
-#define   SCCPSCLCOPERATIONALSTATE  58
+	{(u_char) SCCPNETWORKENTITYALARMSTATUS, ASN_OCTET_STR, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 2}},
+#define   SCCPNETWORKENTITYOPERATIONALSTATE  2
+	{(u_char) SCCPNETWORKENTITYOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 4}},
+#define   SCCPNETWORKENTITYSYSTEMTYPES  3
+	{(u_char) SCCPNETWORKENTITYSYSTEMTYPES, ASN_OCTET_STR, RONLY, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 6}},
+#define   SCCPNETWORKENTITYVERSION  4
+	{(u_char) SCCPNETWORKENTITYVERSION, ASN_OBJECT_ID, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 7}},
+#define   SCCPNETWORKENTITYLUDTANDLUDTSSUPPORTED  5
+	{(u_char) SCCPNETWORKENTITYLUDTANDLUDTSSUPPORTED, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 8}},
+#define   SCCPNETWORKENTITYCOORDCHANGETIMER  6
+	{(u_char) SCCPNETWORKENTITYCOORDCHANGETIMER, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 9}},
+#define   SCCPNETWORKENTITYIGNORESSTTIMER  7
+	{(u_char) SCCPNETWORKENTITYIGNORESSTTIMER, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 10}},
+#define   SCCPNETWORKENTITYMAXSTATINFOTIMER  8
+	{(u_char) SCCPNETWORKENTITYMAXSTATINFOTIMER, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 11}},
+#define   SCCPNETWORKENTITYASAPROFILEPOINTER  9
+	{(u_char) SCCPNETWORKENTITYASAPROFILEPOINTER, ASN_OBJECT_ID, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 12}},
+#define   SCCPNETWORKENTITYNAME  10
+	{(u_char) SCCPNETWORKENTITYNAME, ASN_OCTET_STR, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 13}},
+#define   SCCPNETWORKENTITYROWSTATUS  11
+	{(u_char) SCCPNETWORKENTITYROWSTATUS, ASN_INTEGER, RWRITE, var_sccpNetworkEntityTable, 6, {1, 1, 1, 1, 1, 14}},
+#define   SCCPLOCALSAPNAMESPOINTER  12
+	{(u_char) SCCPLOCALSAPNAMESPOINTER, ASN_UNSIGNED, RWRITE, var_sccpLocalSapNamesTable, 6, {1, 1, 1, 2, 1, 2}},
+#define   SCCPLOCALSAPNAMESROWSTATUS  13
+	{(u_char) SCCPLOCALSAPNAMESROWSTATUS, ASN_INTEGER, RWRITE, var_sccpLocalSapNamesTable, 6, {1, 1, 1, 2, 1, 3}},
+#define   SCCPACCESSPOINTALARMSTATUS  14
+	{(u_char) SCCPACCESSPOINTALARMSTATUS, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 2}},
+#define   SCCPACCESSPOINTSAP2ADDRESS  15
+	{(u_char) SCCPACCESSPOINTSAP2ADDRESS, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 3}},
+#define   SCCPACCESSPOINTUSERENTITYNAMES  16
+	{(u_char) SCCPACCESSPOINTUSERENTITYNAMES, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 4}},
+#define   SCCPACCESSPOINTPROVIDERENTITYNAMES  17
+	{(u_char) SCCPACCESSPOINTPROVIDERENTITYNAMES, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 5}},
+#define   SCCPACCESSPOINTAVAILABILITYSTATUS  18
+	{(u_char) SCCPACCESSPOINTAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 6}},
+#define   SCCPACCESSPOINTCONCERNEDAREAPOINTER  19
+	{(u_char) SCCPACCESSPOINTCONCERNEDAREAPOINTER, ASN_UNSIGNED, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 7}},
+#define   SCCPACCESSPOINTLINKAGEPOINTER  20
+	{(u_char) SCCPACCESSPOINTLINKAGEPOINTER, ASN_UNSIGNED, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 8}},
+#define   SCCPACCESSPOINTSSAVAILABLEAFTERSPRESTART  21
+	{(u_char) SCCPACCESSPOINTSSAVAILABLEAFTERSPRESTART, ASN_INTEGER, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 9}},
+#define   SCCPACCESSPOINTASAPROFILEPOINTER  22
+	{(u_char) SCCPACCESSPOINTASAPROFILEPOINTER, ASN_OBJECT_ID, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 10}},
+#define   SCCPACCESSPOINTNAME   23
+	{(u_char) SCCPACCESSPOINTNAME, ASN_OCTET_STR, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 11}},
+#define   SCCPACCESSPOINTROWSTATUS  24
+	{(u_char) SCCPACCESSPOINTROWSTATUS, ASN_INTEGER, RWRITE, var_sccpAccessPointTable, 6, {1, 1, 2, 1, 1, 12}},
+#define   SCCPLINKAGEOPERATIONALPROTOCOLS  25
+	{(u_char) SCCPLINKAGEOPERATIONALPROTOCOLS, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 2}},
+#define   SCCPLINKAGESNSAP      26
+	{(u_char) SCCPLINKAGESNSAP, ASN_OBJECT_ID, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 3}},
+#define   SCCPLINKAGEATTACKTIMERVALUE  27
+	{(u_char) SCCPLINKAGEATTACKTIMERVALUE, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 4}},
+#define   SCCPLINKAGEDECAYTIMERVALUE  28
+	{(u_char) SCCPLINKAGEDECAYTIMERVALUE, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 5}},
+#define   SCCPLINKAGENROFRESTRICTIONLEVELS  29
+	{(u_char) SCCPLINKAGENROFRESTRICTIONLEVELS, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 6}},
+#define   SCCPLINKAGENROFSUBLEVELS  30
+	{(u_char) SCCPLINKAGENROFSUBLEVELS, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 7}},
+#define   SCCPLINKAGECLS        31
+	{(u_char) SCCPLINKAGECLS, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 8}},
+#define   SCCPLINKAGECONGESTIONTIMERVALUE  32
+	{(u_char) SCCPLINKAGECONGESTIONTIMERVALUE, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 9}},
+#define   SCCPLINKAGEP          33
+	{(u_char) SCCPLINKAGEP, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 10}},
+#define   SCCPLINKAGEIMPORTANCELEVELCR  34
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELCR, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 11}},
+#define   SCCPLINKAGEIMPORTANCELEVELCC  35
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELCC, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 12}},
+#define   SCCPLINKAGEIMPORTANCELEVELCREF  36
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELCREF, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 13}},
+#define   SCCPLINKAGEIMPORTANCELEVELDT1  37
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELDT1, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 14}},
+#define   SCCPLINKAGEIMPORTANCELEVELDT2  38
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELDT2, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 15}},
+#define   SCCPLINKAGEIMPORTANCELEVELAK  39
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELAK, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 16}},
+#define   SCCPLINKAGEIMPORTANCELEVELIT  40
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELIT, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 17}},
+#define   SCCPLINKAGEIMPORTANCELEVELED  41
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELED, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 18}},
+#define   SCCPLINKAGEIMPORTANCELEVELEA  42
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELEA, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 19}},
+#define   SCCPLINKAGEIMPORTANCELEVELRSR  43
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELRSR, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 20}},
+#define   SCCPLINKAGEIMPORTANCELEVELRSC  44
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELRSC, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 21}},
+#define   SCCPLINKAGEIMPORTANCELEVELERR  45
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELERR, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 22}},
+#define   SCCPLINKAGEIMPORTANCELEVELRLC  46
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELRLC, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 23}},
+#define   SCCPLINKAGEIMPORTANCELEVELRLSD  47
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELRLSD, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 24}},
+#define   SCCPLINKAGEIMPORTANCELEVELUDT  48
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELUDT, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 25}},
+#define   SCCPLINKAGEIMPORTANCELEVELUDTS  49
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELUDTS, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 26}},
+#define   SCCPLINKAGEIMPORTANCELEVELXUDT  50
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELXUDT, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 27}},
+#define   SCCPLINKAGEIMPORTANCELEVELXUDTS  51
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELXUDTS, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 28}},
+#define   SCCPLINKAGEIMPORTANCELEVELLUDT  52
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELLUDT, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 29}},
+#define   SCCPLINKAGEIMPORTANCELEVELLUDTS  53
+	{(u_char) SCCPLINKAGEIMPORTANCELEVELLUDTS, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 30}},
+#define   SCCPLINKAGERLM        54
+	{(u_char) SCCPLINKAGERLM, ASN_INTEGER, RONLY, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 31}},
+#define   SCCPLINKAGERSLM       55
+	{(u_char) SCCPLINKAGERSLM, ASN_INTEGER, RONLY, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 32}},
+#define   SCCPLINKAGECONCERNEDAREAPOINTER  56
+	{(u_char) SCCPLINKAGECONCERNEDAREAPOINTER, ASN_UNSIGNED, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 33}},
+#define   SCCPLINKAGELOWERLIMITFORSEGMENTATION  57
+	{(u_char) SCCPLINKAGELOWERLIMITFORSEGMENTATION, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 34}},
+#define   SCCPLINKAGEUPPERLIMITFORSEGMENTATION  58
+	{(u_char) SCCPLINKAGEUPPERLIMITFORSEGMENTATION, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 35}},
+#define   SCCPLINKAGENAME       59
+	{(u_char) SCCPLINKAGENAME, ASN_OCTET_STR, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 36}},
+#define   SCCPLINKAGEROWSTATUS  60
+	{(u_char) SCCPLINKAGEROWSTATUS, ASN_INTEGER, RWRITE, var_sccpLinkageTable, 6, {1, 1, 3, 1, 1, 37}},
+#define   SCCPMTPSAP2ADDRESS    61
+	{(u_char) SCCPMTPSAP2ADDRESS, ASN_OCTET_STR, RWRITE, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 2}},
+#define   SCCPMTPUSERPART       62
+	{(u_char) SCCPMTPUSERPART, ASN_INTEGER, RWRITE, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 3}},
+#define   SCCPMTPUSERPARTSTATUS  63
+	{(u_char) SCCPMTPUSERPARTSTATUS, ASN_INTEGER, RONLY, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 4}},
+#define   SCCPMTPUSERENTITYNAMES  64
+	{(u_char) SCCPMTPUSERENTITYNAMES, ASN_OBJECT_ID, RWRITE, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 5}},
+#define   SCCPMTPPROVIDERENTITYNAMES  65
+	{(u_char) SCCPMTPPROVIDERENTITYNAMES, ASN_OBJECT_ID, RWRITE, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 6}},
+#define   SCCPMTPUSAGESTATE     66
+	{(u_char) SCCPMTPUSAGESTATE, ASN_INTEGER, RONLY, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 7}},
+#define   SCCPMTPADMINISTRATIVESTATE  67
+	{(u_char) SCCPMTPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 8}},
+#define   SCCPMTPOPERATIONALSTATE  68
+	{(u_char) SCCPMTPOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 9}},
+#define   SCCPMTPCONGESTEDSTATE  69
+	{(u_char) SCCPMTPCONGESTEDSTATE, ASN_INTEGER, RONLY, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 10}},
+#define   SCCPMTPCONGESTIONLEVEL  70
+	{(u_char) SCCPMTPCONGESTIONLEVEL, ASN_INTEGER, RONLY, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 11}},
+#define   SCCPMTPREMOTEEXCHANGELABEL  71
+	{(u_char) SCCPMTPREMOTEEXCHANGELABEL, ASN_OCTET_STR, RWRITE, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 12}},
+#define   SCCPMTPNAME           72
+	{(u_char) SCCPMTPNAME, ASN_OCTET_STR, RWRITE, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 13}},
+#define   SCCPMTPROWSTATUS      73
+	{(u_char) SCCPMTPROWSTATUS, ASN_INTEGER, RWRITE, var_sccpMtpTable, 6, {1, 1, 4, 1, 1, 14}},
+#define   SCCPSCLCALARMSTATUS   74
+	{(u_char) SCCPSCLCALARMSTATUS, ASN_OCTET_STR, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 1}},
+#define   SCCPSCLCCLPROTOCOLMACHINEID  75
+	{(u_char) SCCPSCLCCLPROTOCOLMACHINEID, ASN_OCTET_STR, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 2}},
+#define   SCCPSCLCOPERATIONALSTATE  76
 	{(u_char) SCCPSCLCOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 3}},
-#define   SCCPTOTALREMOTESAPS   59
-	{(u_char) SCCPTOTALREMOTESAPS, ASN_INTEGER, RONLY, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 4}},
-#define   SCCPSCLCADMINISTRATIVESTATE  60
+#define   SCCPSCLCTOTALREMOTESAPS  77
+	{(u_char) SCCPSCLCTOTALREMOTESAPS, ASN_INTEGER, RONLY, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 4}},
+#define   SCCPSCLCADMINISTRATIVESTATE  78
 	{(u_char) SCCPSCLCADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 5}},
-#define   SCCPSCLCSUPPORTEDPROTOCOLS  61
-	{(u_char) SCCPSCLCSUPPORTEDPROTOCOLS, ASN_BIT_STR, RONLY, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 6}},
-#define   SCCPSCLCOPERATIONALSYSTEMTYPE  62
+#define   SCCPSCLCSUPPORTEDPROTOCOLS  79
+	{(u_char) SCCPSCLCSUPPORTEDPROTOCOLS, ASN_OCTET_STR, RONLY, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 6}},
+#define   SCCPSCLCOPERATIONALSYSTEMTYPE  80
 	{(u_char) SCCPSCLCOPERATIONALSYSTEMTYPE, ASN_INTEGER, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 7}},
-#define   SCCPINITIALVALUEREASSTIMER  63
-	{(u_char) SCCPINITIALVALUEREASSTIMER, ASN_INTEGER, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 8}},
-#define   SCCPSCLCNAME          64
-	{(u_char) SCCPSCLCNAME, ASN_OCTET_STR, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 9}},
-#define   SCCPSCLCROWSTATUS     65
-	{(u_char) SCCPSCLCROWSTATUS, ASN_INTEGER, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 10}},
-#define   SCCPCOPROTOCOLMACHINEID  66
-	{(u_char) SCCPCOPROTOCOLMACHINEID, ASN_OCTET_STR, RWRITE, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 1}},
-#define   SCCPSCOCOPERATIONALSTATE  67
+#define   SCCPSCLCINITIALVALUEREASSTIMER  81
+	{(u_char) SCCPSCLCINITIALVALUEREASSTIMER, ASN_INTEGER, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 8}},
+#define   SCCPSCLCASAPROFILEPOINTER  82
+	{(u_char) SCCPSCLCASAPROFILEPOINTER, ASN_OBJECT_ID, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 9}},
+#define   SCCPSCLCNAME          83
+	{(u_char) SCCPSCLCNAME, ASN_OCTET_STR, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 10}},
+#define   SCCPSCLCROWSTATUS     84
+	{(u_char) SCCPSCLCROWSTATUS, ASN_INTEGER, RWRITE, var_sccpSclcTable, 6, {1, 1, 5, 1, 1, 11}},
+#define   SCCPSCOCCOPROTOCOLMACHINEID  85
+	{(u_char) SCCPSCOCCOPROTOCOLMACHINEID, ASN_OCTET_STR, RWRITE, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 1}},
+#define   SCCPSCOCOPERATIONALSTATE  86
 	{(u_char) SCCPSCOCOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 2}},
-#define   SCCPSCOCADMINISTRATIVESTATE  68
+#define   SCCPSCOCADMINISTRATIVESTATE  87
 	{(u_char) SCCPSCOCADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 3}},
-#define   SCCPSCOCOPERATIONALSYSTEMTYPE  69
+#define   SCCPSCOCOPERATIONALSYSTEMTYPE  88
 	{(u_char) SCCPSCOCOPERATIONALSYSTEMTYPE, ASN_INTEGER, RWRITE, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 4}},
-#define   SCCPSCOCSUPPORTEDPROTOCOLS  70
-	{(u_char) SCCPSCOCSUPPORTEDPROTOCOLS, ASN_BIT_STR, RONLY, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 5}},
-#define   SCCPSCOCNAME          71
+#define   SCCPSCOCSUPPORTEDPROTOCOLS  89
+	{(u_char) SCCPSCOCSUPPORTEDPROTOCOLS, ASN_OCTET_STR, RONLY, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 5}},
+#define   SCCPSCOCNAME          90
 	{(u_char) SCCPSCOCNAME, ASN_OCTET_STR, RWRITE, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 6}},
-#define   SCCPSCOCROWSTATUS     72
+#define   SCCPSCOCROWSTATUS     91
 	{(u_char) SCCPSCOCROWSTATUS, ASN_INTEGER, RWRITE, var_sccpScocTable, 6, {1, 1, 6, 1, 1, 7}},
-#define   SCCPSCRCID            73
+#define   SCCPSCRCID            92
 	{(u_char) SCCPSCRCID, ASN_OCTET_STR, RWRITE, var_sccpScrcTable, 6, {1, 1, 7, 1, 1, 1}},
-#define   SCCPSCRCALARMSTATUS   74
-	{(u_char) SCCPSCRCALARMSTATUS, ASN_BIT_STR, RWRITE, var_sccpScrcTable, 6, {1, 1, 7, 1, 1, 2}},
-#define   SCCPSCRCNAME          75
-	{(u_char) SCCPSCRCNAME, ASN_OCTET_STR, RWRITE, var_sccpScrcTable, 6, {1, 1, 7, 1, 1, 3}},
-#define   SCCPSCRCROWSTATUS     76
-	{(u_char) SCCPSCRCROWSTATUS, ASN_INTEGER, RWRITE, var_sccpScrcTable, 6, {1, 1, 7, 1, 1, 4}},
-#define   SCCPSHARINGMODE       77
-	{(u_char) SCCPSHARINGMODE, ASN_INTEGER, RWRITE, var_sccpEntitySetTable, 6, {1, 1, 8, 1, 1, 2}},
-#define   SCCPLOADSHARINGALGPOINTER  78
-	{(u_char) SCCPLOADSHARINGALGPOINTER, ASN_OBJECT_ID, RWRITE, var_sccpEntitySetTable, 6, {1, 1, 8, 1, 1, 3}},
-#define   SCCPENTITYSETNAME     79
+#define   SCCPSCRCALARMSTATUS   93
+	{(u_char) SCCPSCRCALARMSTATUS, ASN_OCTET_STR, RWRITE, var_sccpScrcTable, 6, {1, 1, 7, 1, 1, 2}},
+#define   SCCPSCRCASAPROFILEPOINTER  94
+	{(u_char) SCCPSCRCASAPROFILEPOINTER, ASN_OBJECT_ID, RWRITE, var_sccpScrcTable, 6, {1, 1, 7, 1, 1, 3}},
+#define   SCCPSCRCNAME          95
+	{(u_char) SCCPSCRCNAME, ASN_OCTET_STR, RWRITE, var_sccpScrcTable, 6, {1, 1, 7, 1, 1, 4}},
+#define   SCCPSCRCROWSTATUS     96
+	{(u_char) SCCPSCRCROWSTATUS, ASN_INTEGER, RWRITE, var_sccpScrcTable, 6, {1, 1, 7, 1, 1, 5}},
+#define   SCCPENTITYSETSHARINGMODE  97
+	{(u_char) SCCPENTITYSETSHARINGMODE, ASN_INTEGER, RWRITE, var_sccpEntitySetTable, 6, {1, 1, 8, 1, 1, 2}},
+#define   SCCPENTITYSETLOADSHARINGALGPOINTER  98
+	{(u_char) SCCPENTITYSETLOADSHARINGALGPOINTER, ASN_OBJECT_ID, RWRITE, var_sccpEntitySetTable, 6, {1, 1, 8, 1, 1, 3}},
+#define   SCCPENTITYSETNAME     99
 	{(u_char) SCCPENTITYSETNAME, ASN_OCTET_STR, RWRITE, var_sccpEntitySetTable, 6, {1, 1, 8, 1, 1, 4}},
-#define   SCCPENTITYSETTYPE     80
+#define   SCCPENTITYSETTYPE     100
 	{(u_char) SCCPENTITYSETTYPE, ASN_INTEGER, RWRITE, var_sccpEntitySetTable, 6, {1, 1, 8, 1, 1, 5}},
-#define   SCCPENTITYSETSSN      81
+#define   SCCPENTITYSETSSN      101
 	{(u_char) SCCPENTITYSETSSN, ASN_OCTET_STR, RWRITE, var_sccpEntitySetTable, 6, {1, 1, 8, 1, 1, 6}},
-#define   SCCPENTITYSETROWSTATUS  82
+#define   SCCPENTITYSETROWSTATUS  102
 	{(u_char) SCCPENTITYSETROWSTATUS, ASN_INTEGER, RWRITE, var_sccpEntitySetTable, 6, {1, 1, 8, 1, 1, 7}},
-#define   SCCPENTITYSETSAPTYPE  83
-	{(u_char) SCCPENTITYSETSAPTYPE, ASN_INTEGER, RWRITE, var_sccpEntitySetSapTable, 6, {1, 1, 9, 1, 1, 2}},
-#define   SCCPENTITYSETSAPPOINTER  84
-	{(u_char) SCCPENTITYSETSAPPOINTER, ASN_OBJECT_ID, RWRITE, var_sccpEntitySetSapTable, 6, {1, 1, 9, 1, 1, 3}},
-#define   SCCPENTITYSETSAPROWSTATUS  85
-	{(u_char) SCCPENTITYSETSAPROWSTATUS, ASN_INTEGER, RWRITE, var_sccpEntitySetSapTable, 6, {1, 1, 9, 1, 1, 4}},
-#define   SCCPREMOTESCCPMTPACCESSPOINT  86
-	{(u_char) SCCPREMOTESCCPMTPACCESSPOINT, ASN_OBJECT_ID, RWRITE, var_sccpRemoteSCCPTable, 6, {1, 1, 11, 1, 1, 2}},
-#define   SCCPREMOTESCCPNAME    87
-	{(u_char) SCCPREMOTESCCPNAME, ASN_OCTET_STR, RWRITE, var_sccpRemoteSCCPTable, 6, {1, 1, 11, 1, 1, 3}},
-#define   SCCPREMOTESCCPROWSTATUS  88
-	{(u_char) SCCPREMOTESCCPROWSTATUS, ASN_INTEGER, RWRITE, var_sccpRemoteSCCPTable, 6, {1, 1, 11, 1, 1, 4}},
-#define   SCCPGTNEWENCODINGSCHEME  89
-	{(u_char) SCCPGTNEWENCODINGSCHEME, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 12, 1, 1, 2}},
-#define   SCCPGTNEWNATUREOFADDRESS  90
-	{(u_char) SCCPGTNEWNATUREOFADDRESS, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 12, 1, 1, 3}},
-#define   SCCPGTNEWNUMBERINGPLAN  91
-	{(u_char) SCCPGTNEWNUMBERINGPLAN, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 12, 1, 1, 4}},
-#define   SCCPGTNEWTRANSLATIONTYPE  92
-	{(u_char) SCCPGTNEWTRANSLATIONTYPE, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 12, 1, 1, 5}},
-#define   SCCPGTCONVERSIONRULENAME  93
-	{(u_char) SCCPGTCONVERSIONRULENAME, ASN_OCTET_STR, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 12, 1, 1, 6}},
-#define   SCCPGTCONVERSIONRULEROWSTATUS  94
-	{(u_char) SCCPGTCONVERSIONRULEROWSTATUS, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 12, 1, 1, 7}},
-#define   SCCPADDRESSINFOOPERATION  95
-	{(u_char) SCCPADDRESSINFOOPERATION, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 13, 1, 1, 2}},
-#define   SCCPADDRESSINFOADDRESSELEMENT  96
-	{(u_char) SCCPADDRESSINFOADDRESSELEMENT, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 13, 1, 1, 3}},
-#define   SCCPADDRESSINFONROFADDRESSELEMENTS  97
-	{(u_char) SCCPADDRESSINFONROFADDRESSELEMENTS, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 13, 1, 1, 4}},
-#define   SCCPADDRESSINFOROWSTATUS  98
-	{(u_char) SCCPADDRESSINFOROWSTATUS, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 13, 1, 1, 5}},
-#define   SCCPGTINDICATOR       99
-	{(u_char) SCCPGTINDICATOR, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 14, 1, 1, 2}},
-#define   SCCPGTNATUREOFADDRESS  100
-	{(u_char) SCCPGTNATUREOFADDRESS, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 14, 1, 1, 3}},
-#define   SCCPGTNUMBERINGPLAN   101
-	{(u_char) SCCPGTNUMBERINGPLAN, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 14, 1, 1, 4}},
-#define   SCCPGTTRANSLATIONTYPE  102
-	{(u_char) SCCPGTTRANSLATIONTYPE, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 14, 1, 1, 5}},
-#define   SCCPGTTRANSLATORADMINISTRATIVESTATE  103
-	{(u_char) SCCPGTTRANSLATORADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 14, 1, 1, 6}},
-#define   SCCPGTTRANSLATORNAME  104
-	{(u_char) SCCPGTTRANSLATORNAME, ASN_OCTET_STR, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 14, 1, 1, 7}},
-#define   SCCPGTTRANSLATORROWSTATUS  105
-	{(u_char) SCCPGTTRANSLATORROWSTATUS, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 14, 1, 1, 8}},
-#define   SCCPGTRULEADMINISTRATIVESTATE  106
-	{(u_char) SCCPGTRULEADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 15, 1, 1, 2}},
-#define   SCCPGTADDRESSINFORMATION  107
-	{(u_char) SCCPGTADDRESSINFORMATION, ASN_OCTET_STR, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 15, 1, 1, 3}},
-#define   SCCPGTCONVRULEPOINTER  108
-	{(u_char) SCCPGTCONVRULEPOINTER, ASN_OCTET_STR, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 15, 1, 1, 4}},
-#define   SCCPGTENCODINGSCHEME  109
-	{(u_char) SCCPGTENCODINGSCHEME, ASN_INTEGER, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 15, 1, 1, 5}},
-#define   SCCPENTITYSETPOINTER  110
-	{(u_char) SCCPENTITYSETPOINTER, ASN_OCTET_STR, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 15, 1, 1, 6}},
-#define   SCCPGTRULENAME        111
-	{(u_char) SCCPGTRULENAME, ASN_OCTET_STR, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 15, 1, 1, 7}},
-#define   SCCPGTRULEROWSTATUS   112
-	{(u_char) SCCPGTRULEROWSTATUS, ASN_INTEGER, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 15, 1, 1, 8}},
-#define   SCCPDSRVT             113
-	{(u_char) SCCPDSRVT, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 2}},
-#define   SCCPNSRVT             114
-	{(u_char) SCCPNSRVT, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 3}},
-#define   SCCPSRVTNAME          115
-	{(u_char) SCCPSRVTNAME, ASN_OCTET_STR, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 4}},
-#define   SCCPADMINISTRATIVESTATE  116
-	{(u_char) SCCPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 5}},
-#define   SCCPOPERATIONALSTATE  117
-	{(u_char) SCCPOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 6}},
-#define   SCCPPROCEDURALSTATUS  118
-	{(u_char) SCCPPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 7}},
-#define   SCCPTRACEREQUESTED    119
-	{(u_char) SCCPTRACEREQUESTED, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 8}},
-#define   SCCPTHRESHOLD         120
-	{(u_char) SCCPTHRESHOLD, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 9}},
-#define   SCCPMTPBACKWARDROUTINGREQUESTED  121
-	{(u_char) SCCPMTPBACKWARDROUTINGREQUESTED, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 10}},
-#define   SCCPORIGINALGT        122
-	{(u_char) SCCPORIGINALGT, ASN_OCTET_STR, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 11}},
-#define   SCCPINFOREQUEST       123
-	{(u_char) SCCPINFOREQUEST, ASN_BIT_STR, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 12}},
-#define   SCCPRETURNUNKNOWNPARAMS  124
-	{(u_char) SCCPRETURNUNKNOWNPARAMS, ASN_BIT_STR, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 13}},
-#define   SCCPROUTETESTROWSTATUS  125
-	{(u_char) SCCPROUTETESTROWSTATUS, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 16, 1, 1, 14}},
+#define   SCCPENTITYSETSAPTYPE  103
+	{(u_char) SCCPENTITYSETSAPTYPE, ASN_INTEGER, RWRITE, var_sccpEntitySetSapTable, 6, {1, 1, 8, 2, 1, 2}},
+#define   SCCPENTITYSETSAPPOINTER  104
+	{(u_char) SCCPENTITYSETSAPPOINTER, ASN_OBJECT_ID, RWRITE, var_sccpEntitySetSapTable, 6, {1, 1, 8, 2, 1, 3}},
+#define   SCCPENTITYSETSAPROWSTATUS  105
+	{(u_char) SCCPENTITYSETSAPROWSTATUS, ASN_INTEGER, RWRITE, var_sccpEntitySetSapTable, 6, {1, 1, 8, 2, 1, 4}},
+#define   SCCPCONCERNEDAREAREMOTESCCPLIST  106
+	{(u_char) SCCPCONCERNEDAREAREMOTESCCPLIST, ASN_UNSIGNED, RONLY, var_sccpConcernedAreaTable, 6, {1, 1, 9, 1, 1, 2}},
+#define   SCCPCONCERNEDAREAROWSTATUS  107
+	{(u_char) SCCPCONCERNEDAREAROWSTATUS, ASN_INTEGER, RWRITE, var_sccpConcernedAreaTable, 6, {1, 1, 9, 1, 1, 3}},
+#define   SCCPREMOTESCCPMTPACCESSPOINT  108
+	{(u_char) SCCPREMOTESCCPMTPACCESSPOINT, ASN_OBJECT_ID, RWRITE, var_sccpRemoteSCCPTable, 6, {1, 1, 9, 2, 1, 2}},
+#define   SCCPREMOTESCCPNAME    109
+	{(u_char) SCCPREMOTESCCPNAME, ASN_OCTET_STR, RWRITE, var_sccpRemoteSCCPTable, 6, {1, 1, 9, 2, 1, 3}},
+#define   SCCPREMOTESCCPROWSTATUS  110
+	{(u_char) SCCPREMOTESCCPROWSTATUS, ASN_INTEGER, RWRITE, var_sccpRemoteSCCPTable, 6, {1, 1, 9, 2, 1, 4}},
+#define   SCCPGTCONVERSIONRULENEWENCODINGSCHEME  111
+	{(u_char) SCCPGTCONVERSIONRULENEWENCODINGSCHEME, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 10, 1, 1, 2}},
+#define   SCCPGTCONVERSIONRULENEWNATUREOFADDRESS  112
+	{(u_char) SCCPGTCONVERSIONRULENEWNATUREOFADDRESS, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 10, 1, 1, 3}},
+#define   SCCPGTCONVERSIONRULENEWNUMBERINGPLAN  113
+	{(u_char) SCCPGTCONVERSIONRULENEWNUMBERINGPLAN, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 10, 1, 1, 4}},
+#define   SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE  114
+	{(u_char) SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 10, 1, 1, 5}},
+#define   SCCPGTCONVERSIONRULENAME  115
+	{(u_char) SCCPGTCONVERSIONRULENAME, ASN_OCTET_STR, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 10, 1, 1, 6}},
+#define   SCCPGTCONVERSIONRULEROWSTATUS  116
+	{(u_char) SCCPGTCONVERSIONRULEROWSTATUS, ASN_INTEGER, RWRITE, var_sccpGtConversionRuleTable, 6, {1, 1, 10, 1, 1, 7}},
+#define   SCCPADDRESSINFOOPERATION  117
+	{(u_char) SCCPADDRESSINFOOPERATION, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 10, 2, 1, 2}},
+#define   SCCPADDRESSINFOADDRESSELEMENT  118
+	{(u_char) SCCPADDRESSINFOADDRESSELEMENT, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 10, 2, 1, 3}},
+#define   SCCPADDRESSINFONROFADDRESSELEMENTS  119
+	{(u_char) SCCPADDRESSINFONROFADDRESSELEMENTS, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 10, 2, 1, 4}},
+#define   SCCPADDRESSINFOROWSTATUS  120
+	{(u_char) SCCPADDRESSINFOROWSTATUS, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 10, 2, 1, 5}},
+#define   SCCPGTTRANSLATORGTINDICATOR  121
+	{(u_char) SCCPGTTRANSLATORGTINDICATOR, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 11, 1, 1, 2}},
+#define   SCCPGTTRANSLATORNATUREOFADDRESS  122
+	{(u_char) SCCPGTTRANSLATORNATUREOFADDRESS, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 11, 1, 1, 3}},
+#define   SCCPGTTRANSLATORNUMBERINGPLAN  123
+	{(u_char) SCCPGTTRANSLATORNUMBERINGPLAN, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 11, 1, 1, 4}},
+#define   SCCPGTTRANSLATORTRANSLATIONTYPE  124
+	{(u_char) SCCPGTTRANSLATORTRANSLATIONTYPE, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 11, 1, 1, 5}},
+#define   SCCPGTTRANSLATORADMINISTRATIVESTATE  125
+	{(u_char) SCCPGTTRANSLATORADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 11, 1, 1, 6}},
+#define   SCCPGTTRANSLATORNAME  126
+	{(u_char) SCCPGTTRANSLATORNAME, ASN_OCTET_STR, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 11, 1, 1, 7}},
+#define   SCCPGTTRANSLATORROWSTATUS  127
+	{(u_char) SCCPGTTRANSLATORROWSTATUS, ASN_INTEGER, RWRITE, var_sccpGtTranslatorTable, 6, {1, 1, 11, 1, 1, 8}},
+#define   SCCPGTRULEADMINISTRATIVESTATE  128
+	{(u_char) SCCPGTRULEADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 12, 1, 1, 2}},
+#define   SCCPGTRULEADDRESSINFORMATION  129
+	{(u_char) SCCPGTRULEADDRESSINFORMATION, ASN_OCTET_STR, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 12, 1, 1, 3}},
+#define   SCCPGTRULEGTCONVERSIONRULEPOINTER  130
+	{(u_char) SCCPGTRULEGTCONVERSIONRULEPOINTER, ASN_OCTET_STR, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 12, 1, 1, 4}},
+#define   SCCPGTRULEENCODINGSCHEME  131
+	{(u_char) SCCPGTRULEENCODINGSCHEME, ASN_INTEGER, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 12, 1, 1, 5}},
+#define   SCCPGTRULEENTITYSETPOINTER  132
+	{(u_char) SCCPGTRULEENTITYSETPOINTER, ASN_OCTET_STR, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 12, 1, 1, 6}},
+#define   SCCPGTRULENAME        133
+	{(u_char) SCCPGTRULENAME, ASN_OCTET_STR, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 12, 1, 1, 7}},
+#define   SCCPGTRULEROWSTATUS   134
+	{(u_char) SCCPGTRULEROWSTATUS, ASN_INTEGER, RWRITE, var_sccpGtRuleTable, 6, {1, 1, 12, 1, 1, 8}},
+#define   SCCPSRVTDSRVT         135
+	{(u_char) SCCPSRVTDSRVT, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 2}},
+#define   SCCPSRVTNSRVT         136
+	{(u_char) SCCPSRVTNSRVT, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 3}},
+#define   SCCPSRVTNAME          137
+	{(u_char) SCCPSRVTNAME, ASN_OCTET_STR, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 4}},
+#define   SCCPSRVTADMINISTRATIVESTATE  138
+	{(u_char) SCCPSRVTADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 5}},
+#define   SCCPSRVTOPERATIONALSTATE  139
+	{(u_char) SCCPSRVTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 6}},
+#define   SCCPSRVTPROCEDURALSTATUS  140
+	{(u_char) SCCPSRVTPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 7}},
+#define   SCCPSRVTTRACEREQUESTED  141
+	{(u_char) SCCPSRVTTRACEREQUESTED, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 8}},
+#define   SCCPSRVTTHRESHOLD     142
+	{(u_char) SCCPSRVTTHRESHOLD, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 9}},
+#define   SCCPSRVTMTPBACKWARDROUTINGREQUESTED  143
+	{(u_char) SCCPSRVTMTPBACKWARDROUTINGREQUESTED, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 10}},
+#define   SCCPSRVTORIGINALGT    144
+	{(u_char) SCCPSRVTORIGINALGT, ASN_OCTET_STR, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 11}},
+#define   SCCPSRVTINFOREQUEST   145
+	{(u_char) SCCPSRVTINFOREQUEST, ASN_OCTET_STR, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 12}},
+#define   SCCPSRVTRETURNUNKNOWNPARAMS  146
+	{(u_char) SCCPSRVTRETURNUNKNOWNPARAMS, ASN_OCTET_STR, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 13}},
+#define   SCCPSRVTROWSTATUS     147
+	{(u_char) SCCPSRVTROWSTATUS, ASN_INTEGER, RWRITE, var_sccpSrvtTable, 6, {1, 1, 13, 1, 1, 14}},
 };
 
 /* (L = length of the oidsuffix) */
@@ -513,9 +582,10 @@ struct sccpMIB_data *sccpMIBStorage = NULL;
 
 /* global storage of our data, saved in and configured by header_complex() */
 struct header_complex_index *sccpNetworkEntityTableStorage = NULL;
-struct header_complex_index *sccpSapNameTableStorage = NULL;
+struct header_complex_index *sccpLocalSapNamesTableStorage = NULL;
 struct header_complex_index *sccpAccessPointTableStorage = NULL;
 struct header_complex_index *sccpLinkageTableStorage = NULL;
+struct header_complex_index *sccpMtpTableStorage = NULL;
 struct header_complex_index *sccpSclcTableStorage = NULL;
 struct header_complex_index *sccpScocTableStorage = NULL;
 struct header_complex_index *sccpScrcTableStorage = NULL;
@@ -568,9 +638,10 @@ init_sccpMIB(void)
 	/* register our config handler(s) to deal with registrations */
 	snmpd_register_config_handler("sccpMIB", parse_sccpMIB, NULL, "HELP STRING");
 	snmpd_register_config_handler("sccpNetworkEntityTable", parse_sccpNetworkEntityTable, NULL, "HELP STRING");
-	snmpd_register_config_handler("sccpSapNameTable", parse_sccpSapNameTable, NULL, "HELP STRING");
+	snmpd_register_config_handler("sccpLocalSapNamesTable", parse_sccpLocalSapNamesTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("sccpAccessPointTable", parse_sccpAccessPointTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("sccpLinkageTable", parse_sccpLinkageTable, NULL, "HELP STRING");
+	snmpd_register_config_handler("sccpMtpTable", parse_sccpMtpTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("sccpSclcTable", parse_sccpSclcTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("sccpScocTable", parse_sccpScocTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("sccpScrcTable", parse_sccpScrcTable, NULL, "HELP STRING");
@@ -587,9 +658,10 @@ init_sccpMIB(void)
 	/* we need to be called back later to store our data */
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpMIB, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpNetworkEntityTable, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpSapNameTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpLocalSapNamesTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpAccessPointTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpLinkageTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpMtpTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpSclcTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpScocTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sccpScrcTable, NULL);
@@ -640,9 +712,10 @@ deinit_sccpMIB(void)
 	unregister_mib(sccpMIB_variables_oid, sizeof(sccpMIB_variables_oid) / sizeof(oid));
 	snmpd_unregister_config_handler("sccpMIB");
 	snmpd_unregister_config_handler("sccpNetworkEntityTable");
-	snmpd_unregister_config_handler("sccpSapNameTable");
+	snmpd_unregister_config_handler("sccpLocalSapNamesTable");
 	snmpd_unregister_config_handler("sccpAccessPointTable");
 	snmpd_unregister_config_handler("sccpLinkageTable");
+	snmpd_unregister_config_handler("sccpMtpTable");
 	snmpd_unregister_config_handler("sccpSclcTable");
 	snmpd_unregister_config_handler("sccpScocTable");
 	snmpd_unregister_config_handler("sccpScrcTable");
@@ -884,25 +957,28 @@ sccpNetworkEntityTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpNetworkEntityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		StorageNew->mtpMsId = 0;
 		if (memdup((u_char **) &StorageNew->sccpNetworkEntityAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sccpNetworkEntityAlarmStatusLen = 1;
-		StorageNew->sccpCommunicationsEntityId = 0;
-		if ((StorageNew->sccpLocalSapNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpLocalSapNamesLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityLocalSapNames = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityLocalSapNamesLen = strlen("");
+		StorageNew->sccpNetworkEntityOperationalState = SCCPNETWORKENTITYOPERATIONALSTATE_DISABLED;
 		if ((StorageNew->sccpNetworkEntityTitles = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpNetworkEntityTitlesLen = strlen("");
-		if (memdup((u_char **) &StorageNew->sccpSystemTypes, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->sccpSystemTypesLen = 1;
-		if ((StorageNew->sccpVersion = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpVersionLen = 2;
-		StorageNew->sccpLUDTandLUDTSSupported = 0;
-		StorageNew->sccpCoordChangeTimer = 0;
-		StorageNew->sccpIgnoreSSTTimer = 0;
-		StorageNew->sccpMaxStatInfoTimer = 0;
+		if (memdup((u_char **) &StorageNew->sccpNetworkEntitySystemTypes, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+			StorageNew->sccpNetworkEntitySystemTypesLen = 1;
+		if ((StorageNew->sccpNetworkEntityVersion = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpNetworkEntityVersionLen = 2;
+		StorageNew->sccpNetworkEntityLUDTandLUDTSSupported = TV_FALSE;
+		StorageNew->sccpNetworkEntityCoordChangeTimer = 3000;
+		StorageNew->sccpNetworkEntityIgnoreSSTTimer = 3000;
+		StorageNew->sccpNetworkEntityMaxStatInfoTimer = 3000;
+		if ((StorageNew->sccpNetworkEntityAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpNetworkEntityAsaProfilePointerLen = 2;
 		if ((StorageNew->sccpNetworkEntityName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpNetworkEntityNameLen = strlen("");
-		StorageNew->sccpRowStatus = 0;
-		StorageNew->sccpRowStatus = RS_NOTREADY;
+		StorageNew->sccpNetworkEntityRowStatus = 0;
+		StorageNew->sccpNetworkEntityRowStatus = RS_NOTREADY;
 	}
 	DEBUGMSGTL(("sccpMIB", "done.\n"));
 	return (StorageNew);
@@ -950,16 +1026,20 @@ sccpNetworkEntityTable_destroy(struct sccpNetworkEntityTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpNetworkEntityTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpNetworkEntityAlarmStatus);
 		StorageDel->sccpNetworkEntityAlarmStatusLen = 0;
-		SNMP_FREE(StorageDel->sccpLocalSapNames);
-		StorageDel->sccpLocalSapNamesLen = 0;
+		SNMP_FREE(StorageDel->sccpNetworkEntityLocalSapNames);
+		StorageDel->sccpNetworkEntityLocalSapNamesLen = 0;
 		SNMP_FREE(StorageDel->sccpNetworkEntityTitles);
 		StorageDel->sccpNetworkEntityTitlesLen = 0;
-		SNMP_FREE(StorageDel->sccpSystemTypes);
-		StorageDel->sccpSystemTypesLen = 0;
-		SNMP_FREE(StorageDel->sccpVersion);
-		StorageDel->sccpVersionLen = 0;
+		SNMP_FREE(StorageDel->sccpNetworkEntitySystemTypes);
+		StorageDel->sccpNetworkEntitySystemTypesLen = 0;
+		SNMP_FREE(StorageDel->sccpNetworkEntityVersion);
+		StorageDel->sccpNetworkEntityVersionLen = 0;
+		SNMP_FREE(StorageDel->sccpNetworkEntityAsaProfilePointer);
+		StorageDel->sccpNetworkEntityAsaProfilePointerLen = 0;
 		SNMP_FREE(StorageDel->sccpNetworkEntityName);
 		StorageDel->sccpNetworkEntityNameLen = 0;
 		SNMP_FREE(StorageDel);
@@ -986,8 +1066,10 @@ sccpNetworkEntityTable_add(struct sccpNetworkEntityTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpNetworkEntityTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		header_complex_add_data(&sccpNetworkEntityTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("sccpMIB", "registered an entry.\n"));
@@ -1046,49 +1128,61 @@ parse_sccpNetworkEntityTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpNetworkEntityAlarmStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpNetworkEntityAlarmStatus, &StorageTmp->sccpNetworkEntityAlarmStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityAlarmStatus, &StorageTmp->sccpNetworkEntityAlarmStatusLen);
 	if (StorageTmp->sccpNetworkEntityAlarmStatus == NULL) {
 		config_perror("invalid specification for sccpNetworkEntityAlarmStatus");
 		return;
 	}
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpCommunicationsEntityId, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpLocalSapNames);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLocalSapNames, &StorageTmp->sccpLocalSapNamesLen);
-	if (StorageTmp->sccpLocalSapNames == NULL) {
-		config_perror("invalid specification for sccpLocalSapNames");
+	SNMP_FREE(StorageTmp->sccpNetworkEntityLocalSapNames);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityLocalSapNames, &StorageTmp->sccpNetworkEntityLocalSapNamesLen);
+	if (StorageTmp->sccpNetworkEntityLocalSapNames == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityLocalSapNames");
 		return;
 	}
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNetworkEntityOperationalState, &tmpsize);
 	SNMP_FREE(StorageTmp->sccpNetworkEntityTitles);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityTitles, &StorageTmp->sccpNetworkEntityTitlesLen);
 	if (StorageTmp->sccpNetworkEntityTitles == NULL) {
 		config_perror("invalid specification for sccpNetworkEntityTitles");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpSystemTypes);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpSystemTypes, &StorageTmp->sccpSystemTypesLen);
-	if (StorageTmp->sccpSystemTypes == NULL) {
-		config_perror("invalid specification for sccpSystemTypes");
+	SNMP_FREE(StorageTmp->sccpNetworkEntitySystemTypes);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntitySystemTypes, &StorageTmp->sccpNetworkEntitySystemTypesLen);
+	if (StorageTmp->sccpNetworkEntitySystemTypes == NULL) {
+		config_perror("invalid specification for sccpNetworkEntitySystemTypes");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpVersion);
-	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpVersion, &StorageTmp->sccpVersionLen);
-	if (StorageTmp->sccpVersion == NULL) {
-		config_perror("invalid specification for sccpVersion");
+	SNMP_FREE(StorageTmp->sccpNetworkEntityVersion);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpNetworkEntityVersion, &StorageTmp->sccpNetworkEntityVersionLen);
+	if (StorageTmp->sccpNetworkEntityVersion == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityVersion");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLUDTandLUDTSSupported, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpCoordChangeTimer, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpIgnoreSSTTimer, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMaxStatInfoTimer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNetworkEntityLUDTandLUDTSSupported, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNetworkEntityCoordChangeTimer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNetworkEntityIgnoreSSTTimer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNetworkEntityMaxStatInfoTimer, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityAsaProfilePointer);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpNetworkEntityAsaProfilePointer, &StorageTmp->sccpNetworkEntityAsaProfilePointerLen);
+	if (StorageTmp->sccpNetworkEntityAsaProfilePointer == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityAsaProfilePointer");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpNetworkEntityName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityName, &StorageTmp->sccpNetworkEntityNameLen);
 	if (StorageTmp->sccpNetworkEntityName == NULL) {
 		config_perror("invalid specification for sccpNetworkEntityName");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpRowStatus, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNetworkEntityRowStatus, &tmpsize);
 	sccpNetworkEntityTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("sccpMIB", "done.\n"));
@@ -1118,19 +1212,21 @@ store_sccpNetworkEntityTable(int majorID, int minorID, void *serverarg, void *cl
 			strcat(line, "sccpNetworkEntityTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpNetworkEntityAlarmStatus, &StorageTmp->sccpNetworkEntityAlarmStatusLen);
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpCommunicationsEntityId, &tmpsize);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLocalSapNames, &StorageTmp->sccpLocalSapNamesLen);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityAlarmStatus, &StorageTmp->sccpNetworkEntityAlarmStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityLocalSapNames, &StorageTmp->sccpNetworkEntityLocalSapNamesLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNetworkEntityOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityTitles, &StorageTmp->sccpNetworkEntityTitlesLen);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpSystemTypes, &StorageTmp->sccpSystemTypesLen);
-			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpVersion, &StorageTmp->sccpVersionLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLUDTandLUDTSSupported, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpCoordChangeTimer, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpIgnoreSSTTimer, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMaxStatInfoTimer, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntitySystemTypes, &StorageTmp->sccpNetworkEntitySystemTypesLen);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpNetworkEntityVersion, &StorageTmp->sccpNetworkEntityVersionLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNetworkEntityLUDTandLUDTSSupported, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNetworkEntityCoordChangeTimer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNetworkEntityIgnoreSSTTimer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNetworkEntityMaxStatInfoTimer, &tmpsize);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpNetworkEntityAsaProfilePointer, &StorageTmp->sccpNetworkEntityAsaProfilePointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityName, &StorageTmp->sccpNetworkEntityNameLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpRowStatus, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNetworkEntityRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -1139,44 +1235,46 @@ store_sccpNetworkEntityTable(int majorID, int minorID, void *serverarg, void *cl
 }
 
 /**
- * @fn struct sccpSapNameTable_data *sccpSapNameTable_create(void)
- * @brief create a fresh data structure representing a new row in the sccpSapNameTable table.
+ * @fn struct sccpLocalSapNamesTable_data *sccpLocalSapNamesTable_create(void)
+ * @brief create a fresh data structure representing a new row in the sccpLocalSapNamesTable table.
  *
- * Creates a new sccpSapNameTable_data structure by allocating dynamic memory for the structure and
+ * Creates a new sccpLocalSapNamesTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
  */
-struct sccpSapNameTable_data *
-sccpSapNameTable_create(void)
+struct sccpLocalSapNamesTable_data *
+sccpLocalSapNamesTable_create(void)
 {
-	struct sccpSapNameTable_data *StorageNew = SNMP_MALLOC_STRUCT(sccpSapNameTable_data);
+	struct sccpLocalSapNamesTable_data *StorageNew = SNMP_MALLOC_STRUCT(sccpLocalSapNamesTable_data);
 
-	DEBUGMSGTL(("sccpMIB", "sccpSapNameTable_create: creating row...  "));
+	DEBUGMSGTL(("sccpMIB", "sccpLocalSapNamesTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		StorageNew->sccpSapId = 0;
-		StorageNew->sccpSapNameRowStatus = 0;
-		StorageNew->sccpSapNameRowStatus = RS_NOTREADY;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		/* StorageNew->sccpLocalSapNamesPointer = { zeroDotZero }; *//* DEFVAL { zeroDotZero } */
+		StorageNew->sccpLocalSapNamesRowStatus = RS_NOTREADY;
+		StorageNew->sccpLocalSapNamesRowStatus = RS_NOTREADY;
 	}
 	DEBUGMSGTL(("sccpMIB", "done.\n"));
 	return (StorageNew);
 }
 
 /**
- * @fn struct sccpSapNameTable_data *sccpSapNameTable_duplicate(struct sccpSapNameTable_data *thedata)
+ * @fn struct sccpLocalSapNamesTable_data *sccpLocalSapNamesTable_duplicate(struct sccpLocalSapNamesTable_data *thedata)
  * @param thedata the row structure to duplicate.
  * @brief duplicat a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
  */
-struct sccpSapNameTable_data *
-sccpSapNameTable_duplicate(struct sccpSapNameTable_data *thedata)
+struct sccpLocalSapNamesTable_data *
+sccpLocalSapNamesTable_duplicate(struct sccpLocalSapNamesTable_data *thedata)
 {
-	struct sccpSapNameTable_data *StorageNew = SNMP_MALLOC_STRUCT(sccpSapNameTable_data);
+	struct sccpLocalSapNamesTable_data *StorageNew = SNMP_MALLOC_STRUCT(sccpLocalSapNamesTable_data);
 
-	DEBUGMSGTL(("sccpMIB", "sccpSapNameTable_duplicate: duplicating row...  "));
+	DEBUGMSGTL(("sccpMIB", "sccpLocalSapNamesTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
@@ -1184,12 +1282,12 @@ sccpSapNameTable_duplicate(struct sccpSapNameTable_data *thedata)
 	return (StorageNew);
 	goto destroy;
       destroy:
-	sccpSapNameTable_destroy(&StorageNew);
+	sccpLocalSapNamesTable_destroy(&StorageNew);
 	goto done;
 }
 
 /**
- * @fn int sccpSapNameTable_destroy(struct sccpSapNameTable_data **thedata)
+ * @fn int sccpLocalSapNamesTable_destroy(struct sccpLocalSapNamesTable_data **thedata)
  * @param thedata pointer to the extracted or existing data structure in the table.
  * @brief delete a row structure from a table.
  *
@@ -1199,12 +1297,14 @@ sccpSapNameTable_duplicate(struct sccpSapNameTable_data *thedata)
  * NULL.
  */
 int
-sccpSapNameTable_destroy(struct sccpSapNameTable_data **thedata)
+sccpLocalSapNamesTable_destroy(struct sccpLocalSapNamesTable_data **thedata)
 {
-	struct sccpSapNameTable_data *StorageDel;
+	struct sccpLocalSapNamesTable_data *StorageDel;
 
-	DEBUGMSGTL(("sccpMIB", "sccpSapNameTable_destroy: deleting row...  "));
+	DEBUGMSGTL(("sccpMIB", "sccpLocalSapNamesTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -1213,38 +1313,40 @@ sccpSapNameTable_destroy(struct sccpSapNameTable_data **thedata)
 }
 
 /**
- * @fn int sccpSapNameTable_add(struct sccpSapNameTable_data *thedata)
+ * @fn int sccpLocalSapNamesTable_add(struct sccpLocalSapNamesTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
- * @brief adds a row to the sccpSapNameTable table data set.
+ * @brief adds a row to the sccpLocalSapNamesTable table data set.
  *
- * Adds a table row structure to the sccpSapNameTable table.  Note that this function is necessary even
+ * Adds a table row structure to the sccpLocalSapNamesTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
  */
 int
-sccpSapNameTable_add(struct sccpSapNameTable_data *thedata)
+sccpLocalSapNamesTable_add(struct sccpLocalSapNamesTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "sccpSapNameTable_add: adding data...  "));
+	DEBUGMSGTL(("sccpMIB", "sccpLocalSapNamesTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
-		/* sccpSapId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpSapId, sizeof(thedata->sccpSapId));
-		header_complex_add_data(&sccpSapNameTableStorage, vars, thedata);
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		/* sccpLocalSapNamesId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpLocalSapNamesId, sizeof(thedata->sccpLocalSapNamesId));
+		header_complex_add_data(&sccpLocalSapNamesTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("sccpMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
 /**
- * @fn int sccpSapNameTable_del(struct sccpSapNameTable_data *thedata)
+ * @fn int sccpLocalSapNamesTable_del(struct sccpLocalSapNamesTable_data *thedata)
  * @param thedata pointer to the extracted or existing data structure in the table.
  * @brief delete a row structure from a table.
  *
- * Deletes a table row structure from the sccpSapNameTable table but does not free it.  Note that this
+ * Deletes a table row structure from the sccpLocalSapNamesTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
  * structure may either be already extracted from the data set, or the structure may still exist in
@@ -1252,80 +1354,89 @@ sccpSapNameTable_add(struct sccpSapNameTable_data *thedata)
  * performed by the caller.
  */
 int
-sccpSapNameTable_del(struct sccpSapNameTable_data *thedata)
+sccpLocalSapNamesTable_del(struct sccpLocalSapNamesTable_data *thedata)
 {
-	struct sccpSapNameTable_data *StorageDel;
+	struct sccpLocalSapNamesTable_data *StorageDel;
 
-	DEBUGMSGTL(("sccpMIB", "sccpSapNameTable_data: deleting data...  "));
+	DEBUGMSGTL(("sccpMIB", "sccpLocalSapNamesTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
-		if ((hciptr = header_complex_find_entry(sccpSapNameTableStorage, StorageDel)) != NULL)
-			header_complex_extract_entry(&sccpSapNameTableStorage, hciptr);
+		if ((hciptr = header_complex_find_entry(sccpLocalSapNamesTableStorage, StorageDel)) != NULL)
+			header_complex_extract_entry(&sccpLocalSapNamesTableStorage, hciptr);
 	}
 	DEBUGMSGTL(("sccpMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
 /**
- * @fn void parse_sccpSapNameTable(const char *token, char *line)
+ * @fn void parse_sccpLocalSapNamesTable(const char *token, char *line)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
- * @brief parse configuration file for sccpSapNameTable entries.
+ * @brief parse configuration file for sccpLocalSapNamesTable entries.
  *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
- * file line for the registsred token (in this case sccpSapNameTable).  This routine is invoked by UCD-SNMP
+ * file line for the registsred token (in this case sccpLocalSapNamesTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
  * entries in the configuration table, this function will simply not be called.
  */
 void
-parse_sccpSapNameTable(const char *token, char *line)
+parse_sccpLocalSapNamesTable(const char *token, char *line)
 {
 	size_t tmpsize;
-	struct sccpSapNameTable_data *StorageTmp = sccpSapNameTable_create();
+	struct sccpLocalSapNamesTable_data *StorageTmp = sccpLocalSapNamesTable_create();
 
-	DEBUGMSGTL(("sccpMIB", "parse_sccpSapNameTable: parsing config...  "));
+	DEBUGMSGTL(("sccpMIB", "parse_sccpLocalSapNamesTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpSapId, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSapNameRowStatus, &tmpsize);
-	sccpSapNameTable_add(StorageTmp);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpLocalSapNamesId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpLocalSapNamesPointer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLocalSapNamesRowStatus, &tmpsize);
+	sccpLocalSapNamesTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("sccpMIB", "done.\n"));
 }
 
 /*
- * store_sccpSapNameTable(): store configuraiton file for sccpSapNameTable
+ * store_sccpLocalSapNamesTable(): store configuraiton file for sccpLocalSapNamesTable
  * stores .conf file entries needed to configure the mib.
  */
 int
-store_sccpSapNameTable(int majorID, int minorID, void *serverarg, void *clientarg)
+store_sccpLocalSapNamesTable(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
 	size_t tmpsize;
-	struct sccpSapNameTable_data *StorageTmp;
+	struct sccpLocalSapNamesTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("sccpMIB", "store_sccpSapNameTable: storing data...  "));
-	refresh_sccpSapNameTable(1);
+	DEBUGMSGTL(("sccpMIB", "store_sccpLocalSapNamesTable: storing data...  "));
+	refresh_sccpLocalSapNamesTable(1);
 	(void) tmpsize;
-	for (hcindex = sccpSapNameTableStorage; hcindex != NULL; hcindex = hcindex->next) {
-		StorageTmp = (struct sccpSapNameTable_data *) hcindex->data;
+	for (hcindex = sccpLocalSapNamesTableStorage; hcindex != NULL; hcindex = hcindex->next) {
+		StorageTmp = (struct sccpLocalSapNamesTable_data *) hcindex->data;
 		/* XXX: comment entire section if row not persistent */
 		{
 			memset(line, 0, sizeof(line));
-			strcat(line, "sccpSapNameTable ");
+			strcat(line, "sccpLocalSapNamesTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpSapId, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSapNameRowStatus, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpLocalSapNamesId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpLocalSapNamesPointer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLocalSapNamesRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -1349,20 +1460,24 @@ sccpAccessPointTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpAccessPointTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		if (memdup((u_char **) &StorageNew->sccpAccessPointAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sccpAccessPointAlarmStatusLen = 1;
-		if ((StorageNew->sccpSap2Address = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpSap2AddressLen = strlen("");
-		if ((StorageNew->sccpUserEntityNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpUserEntityNamesLen = strlen("");
-		if ((StorageNew->sccpProviderEntityNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpProviderEntityNamesLen = strlen("");
-		if (memdup((u_char **) &StorageNew->sccpAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpAvailabilityStatusLen = 2;
-		StorageNew->sccpConcernedAreaPointer = 0;
-		StorageNew->sccpLinkagePointer = 0;
-		StorageNew->sccpSsAvailableAfterSpRestart = 2;
+		if ((StorageNew->sccpAccessPointSap2Address = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpAccessPointSap2AddressLen = strlen("");
+		if ((StorageNew->sccpAccessPointUserEntityNames = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpAccessPointUserEntityNamesLen = strlen("");
+		if ((StorageNew->sccpAccessPointProviderEntityNames = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpAccessPointProviderEntityNamesLen = strlen("");
+		if (memdup((u_char **) &StorageNew->sccpAccessPointAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpAccessPointAvailabilityStatusLen = 2;
+		StorageNew->sccpAccessPointConcernedAreaPointer = 0;
+		StorageNew->sccpAccessPointLinkagePointer = 0;
+		StorageNew->sccpAccessPointSsAvailableAfterSpRestart = 2;
+		if ((StorageNew->sccpAccessPointAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpAccessPointAsaProfilePointerLen = 2;
 		if ((StorageNew->sccpAccessPointName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpAccessPointNameLen = strlen("");
 		StorageNew->sccpAccessPointRowStatus = 0;
@@ -1414,16 +1529,20 @@ sccpAccessPointTable_destroy(struct sccpAccessPointTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpAccessPointTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpAccessPointAlarmStatus);
 		StorageDel->sccpAccessPointAlarmStatusLen = 0;
-		SNMP_FREE(StorageDel->sccpSap2Address);
-		StorageDel->sccpSap2AddressLen = 0;
-		SNMP_FREE(StorageDel->sccpUserEntityNames);
-		StorageDel->sccpUserEntityNamesLen = 0;
-		SNMP_FREE(StorageDel->sccpProviderEntityNames);
-		StorageDel->sccpProviderEntityNamesLen = 0;
-		SNMP_FREE(StorageDel->sccpAvailabilityStatus);
-		StorageDel->sccpAvailabilityStatusLen = 0;
+		SNMP_FREE(StorageDel->sccpAccessPointSap2Address);
+		StorageDel->sccpAccessPointSap2AddressLen = 0;
+		SNMP_FREE(StorageDel->sccpAccessPointUserEntityNames);
+		StorageDel->sccpAccessPointUserEntityNamesLen = 0;
+		SNMP_FREE(StorageDel->sccpAccessPointProviderEntityNames);
+		StorageDel->sccpAccessPointProviderEntityNamesLen = 0;
+		SNMP_FREE(StorageDel->sccpAccessPointAvailabilityStatus);
+		StorageDel->sccpAccessPointAvailabilityStatusLen = 0;
+		SNMP_FREE(StorageDel->sccpAccessPointAsaProfilePointer);
+		StorageDel->sccpAccessPointAsaProfilePointerLen = 0;
 		SNMP_FREE(StorageDel->sccpAccessPointName);
 		StorageDel->sccpAccessPointNameLen = 0;
 		SNMP_FREE(StorageDel);
@@ -1450,10 +1569,12 @@ sccpAccessPointTable_add(struct sccpAccessPointTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpAccessPointTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
-		/* sccpSapId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpSapId, sizeof(thedata->sccpSapId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		/* sccpAccessPointSapId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpAccessPointSapId, sizeof(thedata->sccpAccessPointSapId));
 		header_complex_add_data(&sccpAccessPointTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("sccpMIB", "registered an entry.\n"));
@@ -1512,41 +1633,53 @@ parse_sccpAccessPointTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpSapId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpAccessPointSapId, &tmpsize);
 	SNMP_FREE(StorageTmp->sccpAccessPointAlarmStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpAccessPointAlarmStatus, &StorageTmp->sccpAccessPointAlarmStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpAccessPointAlarmStatus, &StorageTmp->sccpAccessPointAlarmStatusLen);
 	if (StorageTmp->sccpAccessPointAlarmStatus == NULL) {
 		config_perror("invalid specification for sccpAccessPointAlarmStatus");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpSap2Address);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSap2Address, &StorageTmp->sccpSap2AddressLen);
-	if (StorageTmp->sccpSap2Address == NULL) {
-		config_perror("invalid specification for sccpSap2Address");
+	SNMP_FREE(StorageTmp->sccpAccessPointSap2Address);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpAccessPointSap2Address, &StorageTmp->sccpAccessPointSap2AddressLen);
+	if (StorageTmp->sccpAccessPointSap2Address == NULL) {
+		config_perror("invalid specification for sccpAccessPointSap2Address");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpUserEntityNames);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpUserEntityNames, &StorageTmp->sccpUserEntityNamesLen);
-	if (StorageTmp->sccpUserEntityNames == NULL) {
-		config_perror("invalid specification for sccpUserEntityNames");
+	SNMP_FREE(StorageTmp->sccpAccessPointUserEntityNames);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpAccessPointUserEntityNames, &StorageTmp->sccpAccessPointUserEntityNamesLen);
+	if (StorageTmp->sccpAccessPointUserEntityNames == NULL) {
+		config_perror("invalid specification for sccpAccessPointUserEntityNames");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpProviderEntityNames);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpProviderEntityNames, &StorageTmp->sccpProviderEntityNamesLen);
-	if (StorageTmp->sccpProviderEntityNames == NULL) {
-		config_perror("invalid specification for sccpProviderEntityNames");
+	SNMP_FREE(StorageTmp->sccpAccessPointProviderEntityNames);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpAccessPointProviderEntityNames, &StorageTmp->sccpAccessPointProviderEntityNamesLen);
+	if (StorageTmp->sccpAccessPointProviderEntityNames == NULL) {
+		config_perror("invalid specification for sccpAccessPointProviderEntityNames");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpAvailabilityStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpAvailabilityStatus, &StorageTmp->sccpAvailabilityStatusLen);
-	if (StorageTmp->sccpAvailabilityStatus == NULL) {
-		config_perror("invalid specification for sccpAvailabilityStatus");
+	SNMP_FREE(StorageTmp->sccpAccessPointAvailabilityStatus);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpAccessPointAvailabilityStatus, &StorageTmp->sccpAccessPointAvailabilityStatusLen);
+	if (StorageTmp->sccpAccessPointAvailabilityStatus == NULL) {
+		config_perror("invalid specification for sccpAccessPointAvailabilityStatus");
 		return;
 	}
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpConcernedAreaPointer, &tmpsize);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpLinkagePointer, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSsAvailableAfterSpRestart, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpAccessPointConcernedAreaPointer, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpAccessPointLinkagePointer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpAccessPointSsAvailableAfterSpRestart, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpAccessPointAsaProfilePointer);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpAccessPointAsaProfilePointer, &StorageTmp->sccpAccessPointAsaProfilePointerLen);
+	if (StorageTmp->sccpAccessPointAsaProfilePointer == NULL) {
+		config_perror("invalid specification for sccpAccessPointAsaProfilePointer");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpAccessPointName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpAccessPointName, &StorageTmp->sccpAccessPointNameLen);
 	if (StorageTmp->sccpAccessPointName == NULL) {
@@ -1583,16 +1716,18 @@ store_sccpAccessPointTable(int majorID, int minorID, void *serverarg, void *clie
 			strcat(line, "sccpAccessPointTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpSapId, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpAccessPointAlarmStatus, &StorageTmp->sccpAccessPointAlarmStatusLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSap2Address, &StorageTmp->sccpSap2AddressLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpUserEntityNames, &StorageTmp->sccpUserEntityNamesLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpProviderEntityNames, &StorageTmp->sccpProviderEntityNamesLen);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpAvailabilityStatus, &StorageTmp->sccpAvailabilityStatusLen);
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpConcernedAreaPointer, &tmpsize);
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpLinkagePointer, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSsAvailableAfterSpRestart, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpAccessPointSapId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpAccessPointAlarmStatus, &StorageTmp->sccpAccessPointAlarmStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpAccessPointSap2Address, &StorageTmp->sccpAccessPointSap2AddressLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpAccessPointUserEntityNames, &StorageTmp->sccpAccessPointUserEntityNamesLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpAccessPointProviderEntityNames, &StorageTmp->sccpAccessPointProviderEntityNamesLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpAccessPointAvailabilityStatus, &StorageTmp->sccpAccessPointAvailabilityStatusLen);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpAccessPointConcernedAreaPointer, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpAccessPointLinkagePointer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAccessPointSsAvailableAfterSpRestart, &tmpsize);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpAccessPointAsaProfilePointer, &StorageTmp->sccpAccessPointAsaProfilePointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpAccessPointName, &StorageTmp->sccpAccessPointNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAccessPointRowStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -1618,64 +1753,65 @@ sccpLinkageTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpLinkageTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		if (memdup((u_char **) &StorageNew->sccpOperationalProtocols, (u_char *) "\xF0", 1) == SNMPERR_SUCCESS)
-			StorageNew->sccpOperationalProtocolsLen = 1;
-		if ((StorageNew->sccpSnSAP = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpSnSAPLen = 2;
-		StorageNew->sccpAttackTimerValue = 0;
-		StorageNew->sccpDecayTimerValue = 0;
-		StorageNew->sccpNrOfRestrictionLevels = 8;
-		StorageNew->sccpNrOfSubLevels = 4;
-		StorageNew->sccpCLS = 8;
-		StorageNew->sccpCongestionTimerValue = 0;
-		StorageNew->sccpp = 8;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelCR, (u_char *) "\x02\x04", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelCRLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelCC, (u_char *) "\x03\x04", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelCCLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelCREF, (u_char *) "\x02\x04", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelCREFLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelDT1, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelDT1Len = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelDT2, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelDT2Len = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelAK, (u_char *) "\x06\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelAKLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelIT, (u_char *) "\x06\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelITLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelED, (u_char *) "\x07\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelEDLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelEA, (u_char *) "\x07\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelEALen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelRSR, (u_char *) "\x06\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelRSRLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelRSC, (u_char *) "\x06\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelRSCLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelERR, (u_char *) "\x07\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelERRLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelRLC, (u_char *) "\x04\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelRLCLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelRLSD, (u_char *) "\x06\x06", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelRLSDLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelUDT, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelUDTLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelUDTS, (u_char *) "\x03\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelUDTSLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelXUDT, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelXUDTLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelXUDTS, (u_char *) "\x03\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelXUDTSLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelLUDT, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelLUDTLen = 2;
-		if (memdup((u_char **) &StorageNew->sccpImportanceLevelLUDTS, (u_char *) "\x03\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->sccpImportanceLevelLUDTSLen = 2;
-		StorageNew->sccpRLM = 0;
-		StorageNew->sccpRSLM = 0;
-		if ((StorageNew->sccpLinkageConcernedAreaPointer = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpLinkageConcernedAreaPointerLen = strlen("");
-		StorageNew->sccpLowerLimitForSegmentation = 0;
-		StorageNew->sccpUpperLimitForSegmentation = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if (memdup((u_char **) &StorageNew->sccpLinkageOperationalProtocols, (u_char *) "\xF0", 1) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageOperationalProtocolsLen = 1;
+		if ((StorageNew->sccpLinkageSnSAP = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpLinkageSnSAPLen = 2;
+		StorageNew->sccpLinkageAttackTimerValue = 25;
+		StorageNew->sccpLinkageDecayTimerValue = 500;
+		StorageNew->sccpLinkageNrOfRestrictionLevels = 8;
+		StorageNew->sccpLinkageNrOfSubLevels = 4;
+		StorageNew->sccpLinkageCLS = 8;
+		StorageNew->sccpLinkageCongestionTimerValue = 500;
+		StorageNew->sccpLinkageP = 8;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelCR, (u_char *) "\x02\x04", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelCRLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelCC, (u_char *) "\x03\x04", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelCCLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelCREF, (u_char *) "\x02\x04", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelCREFLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelDT1, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelDT1Len = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelDT2, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelDT2Len = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelAK, (u_char *) "\x06\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelAKLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelIT, (u_char *) "\x06\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelITLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelED, (u_char *) "\x07\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelEDLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelEA, (u_char *) "\x07\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelEALen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelRSR, (u_char *) "\x06\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelRSRLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelRSC, (u_char *) "\x06\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelRSCLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelERR, (u_char *) "\x07\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelERRLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelRLC, (u_char *) "\x04\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelRLCLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelRLSD, (u_char *) "\x06\x06", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelRLSDLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelUDT, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelUDTLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelUDTS, (u_char *) "\x03\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelUDTSLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelXUDT, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelXUDTLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelXUDTS, (u_char *) "\x03\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelXUDTSLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelLUDT, (u_char *) "\x04\x06", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelLUDTLen = 2;
+		if (memdup((u_char **) &StorageNew->sccpLinkageImportanceLevelLUDTS, (u_char *) "\x03\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->sccpLinkageImportanceLevelLUDTSLen = 2;
+		StorageNew->sccpLinkageRLM = 0;
+		StorageNew->sccpLinkageRSLM = 0;
+		StorageNew->sccpLinkageConcernedAreaPointer = 0;
+		StorageNew->sccpLinkageLowerLimitForSegmentation = 0;
+		StorageNew->sccpLinkageUpperLimitForSegmentation = 0;
 		if ((StorageNew->sccpLinkageName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpLinkageNameLen = strlen("");
 		StorageNew->sccpLinkageRowStatus = 0;
@@ -1727,52 +1863,52 @@ sccpLinkageTable_destroy(struct sccpLinkageTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpLinkageTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
-		SNMP_FREE(StorageDel->sccpOperationalProtocols);
-		StorageDel->sccpOperationalProtocolsLen = 0;
-		SNMP_FREE(StorageDel->sccpSnSAP);
-		StorageDel->sccpSnSAPLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelCR);
-		StorageDel->sccpImportanceLevelCRLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelCC);
-		StorageDel->sccpImportanceLevelCCLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelCREF);
-		StorageDel->sccpImportanceLevelCREFLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelDT1);
-		StorageDel->sccpImportanceLevelDT1Len = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelDT2);
-		StorageDel->sccpImportanceLevelDT2Len = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelAK);
-		StorageDel->sccpImportanceLevelAKLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelIT);
-		StorageDel->sccpImportanceLevelITLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelED);
-		StorageDel->sccpImportanceLevelEDLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelEA);
-		StorageDel->sccpImportanceLevelEALen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelRSR);
-		StorageDel->sccpImportanceLevelRSRLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelRSC);
-		StorageDel->sccpImportanceLevelRSCLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelERR);
-		StorageDel->sccpImportanceLevelERRLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelRLC);
-		StorageDel->sccpImportanceLevelRLCLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelRLSD);
-		StorageDel->sccpImportanceLevelRLSDLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelUDT);
-		StorageDel->sccpImportanceLevelUDTLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelUDTS);
-		StorageDel->sccpImportanceLevelUDTSLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelXUDT);
-		StorageDel->sccpImportanceLevelXUDTLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelXUDTS);
-		StorageDel->sccpImportanceLevelXUDTSLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelLUDT);
-		StorageDel->sccpImportanceLevelLUDTLen = 0;
-		SNMP_FREE(StorageDel->sccpImportanceLevelLUDTS);
-		StorageDel->sccpImportanceLevelLUDTSLen = 0;
-		SNMP_FREE(StorageDel->sccpLinkageConcernedAreaPointer);
-		StorageDel->sccpLinkageConcernedAreaPointerLen = 0;
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageOperationalProtocols);
+		StorageDel->sccpLinkageOperationalProtocolsLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageSnSAP);
+		StorageDel->sccpLinkageSnSAPLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelCR);
+		StorageDel->sccpLinkageImportanceLevelCRLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelCC);
+		StorageDel->sccpLinkageImportanceLevelCCLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelCREF);
+		StorageDel->sccpLinkageImportanceLevelCREFLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelDT1);
+		StorageDel->sccpLinkageImportanceLevelDT1Len = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelDT2);
+		StorageDel->sccpLinkageImportanceLevelDT2Len = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelAK);
+		StorageDel->sccpLinkageImportanceLevelAKLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelIT);
+		StorageDel->sccpLinkageImportanceLevelITLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelED);
+		StorageDel->sccpLinkageImportanceLevelEDLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelEA);
+		StorageDel->sccpLinkageImportanceLevelEALen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelRSR);
+		StorageDel->sccpLinkageImportanceLevelRSRLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelRSC);
+		StorageDel->sccpLinkageImportanceLevelRSCLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelERR);
+		StorageDel->sccpLinkageImportanceLevelERRLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelRLC);
+		StorageDel->sccpLinkageImportanceLevelRLCLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelRLSD);
+		StorageDel->sccpLinkageImportanceLevelRLSDLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelUDT);
+		StorageDel->sccpLinkageImportanceLevelUDTLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelUDTS);
+		StorageDel->sccpLinkageImportanceLevelUDTSLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelXUDT);
+		StorageDel->sccpLinkageImportanceLevelXUDTLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelXUDTS);
+		StorageDel->sccpLinkageImportanceLevelXUDTSLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelLUDT);
+		StorageDel->sccpLinkageImportanceLevelLUDTLen = 0;
+		SNMP_FREE(StorageDel->sccpLinkageImportanceLevelLUDTS);
+		StorageDel->sccpLinkageImportanceLevelLUDTSLen = 0;
 		SNMP_FREE(StorageDel->sccpLinkageName);
 		StorageDel->sccpLinkageNameLen = 0;
 		SNMP_FREE(StorageDel);
@@ -1799,8 +1935,10 @@ sccpLinkageTable_add(struct sccpLinkageTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpLinkageTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpLinkageId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpLinkageId, sizeof(thedata->sccpLinkageId));
 		header_complex_add_data(&sccpLinkageTableStorage, vars, thedata);
@@ -1861,157 +1999,158 @@ parse_sccpLinkageTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpLinkageId, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpOperationalProtocols);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpOperationalProtocols, &StorageTmp->sccpOperationalProtocolsLen);
-	if (StorageTmp->sccpOperationalProtocols == NULL) {
-		config_perror("invalid specification for sccpOperationalProtocols");
+	SNMP_FREE(StorageTmp->sccpLinkageOperationalProtocols);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageOperationalProtocols, &StorageTmp->sccpLinkageOperationalProtocolsLen);
+	if (StorageTmp->sccpLinkageOperationalProtocols == NULL) {
+		config_perror("invalid specification for sccpLinkageOperationalProtocols");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpSnSAP);
-	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpSnSAP, &StorageTmp->sccpSnSAPLen);
-	if (StorageTmp->sccpSnSAP == NULL) {
-		config_perror("invalid specification for sccpSnSAP");
+	SNMP_FREE(StorageTmp->sccpLinkageSnSAP);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpLinkageSnSAP, &StorageTmp->sccpLinkageSnSAPLen);
+	if (StorageTmp->sccpLinkageSnSAP == NULL) {
+		config_perror("invalid specification for sccpLinkageSnSAP");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpAttackTimerValue, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpDecayTimerValue, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNrOfRestrictionLevels, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNrOfSubLevels, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpCLS, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpCongestionTimerValue, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpp, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpImportanceLevelCR);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelCR, &StorageTmp->sccpImportanceLevelCRLen);
-	if (StorageTmp->sccpImportanceLevelCR == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelCR");
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageAttackTimerValue, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageDecayTimerValue, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageNrOfRestrictionLevels, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageNrOfSubLevels, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageCLS, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageCongestionTimerValue, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageP, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelCR);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelCR, &StorageTmp->sccpLinkageImportanceLevelCRLen);
+	if (StorageTmp->sccpLinkageImportanceLevelCR == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelCR");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelCC);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelCC, &StorageTmp->sccpImportanceLevelCCLen);
-	if (StorageTmp->sccpImportanceLevelCC == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelCC");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelCC);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelCC, &StorageTmp->sccpLinkageImportanceLevelCCLen);
+	if (StorageTmp->sccpLinkageImportanceLevelCC == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelCC");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelCREF);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelCREF, &StorageTmp->sccpImportanceLevelCREFLen);
-	if (StorageTmp->sccpImportanceLevelCREF == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelCREF");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelCREF);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelCREF, &StorageTmp->sccpLinkageImportanceLevelCREFLen);
+	if (StorageTmp->sccpLinkageImportanceLevelCREF == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelCREF");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelDT1);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelDT1, &StorageTmp->sccpImportanceLevelDT1Len);
-	if (StorageTmp->sccpImportanceLevelDT1 == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelDT1");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelDT1);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelDT1, &StorageTmp->sccpLinkageImportanceLevelDT1Len);
+	if (StorageTmp->sccpLinkageImportanceLevelDT1 == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelDT1");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelDT2);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelDT2, &StorageTmp->sccpImportanceLevelDT2Len);
-	if (StorageTmp->sccpImportanceLevelDT2 == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelDT2");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelDT2);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelDT2, &StorageTmp->sccpLinkageImportanceLevelDT2Len);
+	if (StorageTmp->sccpLinkageImportanceLevelDT2 == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelDT2");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelAK);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelAK, &StorageTmp->sccpImportanceLevelAKLen);
-	if (StorageTmp->sccpImportanceLevelAK == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelAK");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelAK);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelAK, &StorageTmp->sccpLinkageImportanceLevelAKLen);
+	if (StorageTmp->sccpLinkageImportanceLevelAK == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelAK");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelIT);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelIT, &StorageTmp->sccpImportanceLevelITLen);
-	if (StorageTmp->sccpImportanceLevelIT == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelIT");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelIT);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelIT, &StorageTmp->sccpLinkageImportanceLevelITLen);
+	if (StorageTmp->sccpLinkageImportanceLevelIT == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelIT");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelED);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelED, &StorageTmp->sccpImportanceLevelEDLen);
-	if (StorageTmp->sccpImportanceLevelED == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelED");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelED);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelED, &StorageTmp->sccpLinkageImportanceLevelEDLen);
+	if (StorageTmp->sccpLinkageImportanceLevelED == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelED");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelEA);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelEA, &StorageTmp->sccpImportanceLevelEALen);
-	if (StorageTmp->sccpImportanceLevelEA == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelEA");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelEA);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelEA, &StorageTmp->sccpLinkageImportanceLevelEALen);
+	if (StorageTmp->sccpLinkageImportanceLevelEA == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelEA");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelRSR);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelRSR, &StorageTmp->sccpImportanceLevelRSRLen);
-	if (StorageTmp->sccpImportanceLevelRSR == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelRSR");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelRSR);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelRSR, &StorageTmp->sccpLinkageImportanceLevelRSRLen);
+	if (StorageTmp->sccpLinkageImportanceLevelRSR == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelRSR");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelRSC);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelRSC, &StorageTmp->sccpImportanceLevelRSCLen);
-	if (StorageTmp->sccpImportanceLevelRSC == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelRSC");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelRSC);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelRSC, &StorageTmp->sccpLinkageImportanceLevelRSCLen);
+	if (StorageTmp->sccpLinkageImportanceLevelRSC == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelRSC");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelERR);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelERR, &StorageTmp->sccpImportanceLevelERRLen);
-	if (StorageTmp->sccpImportanceLevelERR == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelERR");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelERR);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelERR, &StorageTmp->sccpLinkageImportanceLevelERRLen);
+	if (StorageTmp->sccpLinkageImportanceLevelERR == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelERR");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelRLC);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelRLC, &StorageTmp->sccpImportanceLevelRLCLen);
-	if (StorageTmp->sccpImportanceLevelRLC == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelRLC");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelRLC);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelRLC, &StorageTmp->sccpLinkageImportanceLevelRLCLen);
+	if (StorageTmp->sccpLinkageImportanceLevelRLC == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelRLC");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelRLSD);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelRLSD, &StorageTmp->sccpImportanceLevelRLSDLen);
-	if (StorageTmp->sccpImportanceLevelRLSD == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelRLSD");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelRLSD);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelRLSD, &StorageTmp->sccpLinkageImportanceLevelRLSDLen);
+	if (StorageTmp->sccpLinkageImportanceLevelRLSD == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelRLSD");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelUDT);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelUDT, &StorageTmp->sccpImportanceLevelUDTLen);
-	if (StorageTmp->sccpImportanceLevelUDT == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelUDT");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelUDT);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelUDT, &StorageTmp->sccpLinkageImportanceLevelUDTLen);
+	if (StorageTmp->sccpLinkageImportanceLevelUDT == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelUDT");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelUDTS);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelUDTS, &StorageTmp->sccpImportanceLevelUDTSLen);
-	if (StorageTmp->sccpImportanceLevelUDTS == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelUDTS");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelUDTS);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelUDTS, &StorageTmp->sccpLinkageImportanceLevelUDTSLen);
+	if (StorageTmp->sccpLinkageImportanceLevelUDTS == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelUDTS");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelXUDT);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelXUDT, &StorageTmp->sccpImportanceLevelXUDTLen);
-	if (StorageTmp->sccpImportanceLevelXUDT == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelXUDT");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelXUDT);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelXUDT, &StorageTmp->sccpLinkageImportanceLevelXUDTLen);
+	if (StorageTmp->sccpLinkageImportanceLevelXUDT == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelXUDT");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelXUDTS);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelXUDTS, &StorageTmp->sccpImportanceLevelXUDTSLen);
-	if (StorageTmp->sccpImportanceLevelXUDTS == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelXUDTS");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelXUDTS);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelXUDTS, &StorageTmp->sccpLinkageImportanceLevelXUDTSLen);
+	if (StorageTmp->sccpLinkageImportanceLevelXUDTS == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelXUDTS");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelLUDT);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelLUDT, &StorageTmp->sccpImportanceLevelLUDTLen);
-	if (StorageTmp->sccpImportanceLevelLUDT == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelLUDT");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelLUDT);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelLUDT, &StorageTmp->sccpLinkageImportanceLevelLUDTLen);
+	if (StorageTmp->sccpLinkageImportanceLevelLUDT == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelLUDT");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpImportanceLevelLUDTS);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpImportanceLevelLUDTS, &StorageTmp->sccpImportanceLevelLUDTSLen);
-	if (StorageTmp->sccpImportanceLevelLUDTS == NULL) {
-		config_perror("invalid specification for sccpImportanceLevelLUDTS");
+	SNMP_FREE(StorageTmp->sccpLinkageImportanceLevelLUDTS);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageImportanceLevelLUDTS, &StorageTmp->sccpLinkageImportanceLevelLUDTSLen);
+	if (StorageTmp->sccpLinkageImportanceLevelLUDTS == NULL) {
+		config_perror("invalid specification for sccpLinkageImportanceLevelLUDTS");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpRLM, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpRSLM, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpLinkageConcernedAreaPointer);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageConcernedAreaPointer, &StorageTmp->sccpLinkageConcernedAreaPointerLen);
-	if (StorageTmp->sccpLinkageConcernedAreaPointer == NULL) {
-		config_perror("invalid specification for sccpLinkageConcernedAreaPointer");
-		return;
-	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLowerLimitForSegmentation, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpUpperLimitForSegmentation, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageRLM, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageRSLM, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpLinkageConcernedAreaPointer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageLowerLimitForSegmentation, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpLinkageUpperLimitForSegmentation, &tmpsize);
 	SNMP_FREE(StorageTmp->sccpLinkageName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpLinkageName, &StorageTmp->sccpLinkageNameLen);
 	if (StorageTmp->sccpLinkageName == NULL) {
@@ -2048,44 +2187,328 @@ store_sccpLinkageTable(int majorID, int minorID, void *serverarg, void *clientar
 			strcat(line, "sccpLinkageTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpLinkageId, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpOperationalProtocols, &StorageTmp->sccpOperationalProtocolsLen);
-			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpSnSAP, &StorageTmp->sccpSnSAPLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAttackTimerValue, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpDecayTimerValue, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNrOfRestrictionLevels, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNrOfSubLevels, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpCLS, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpCongestionTimerValue, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpp, &tmpsize);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelCR, &StorageTmp->sccpImportanceLevelCRLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelCC, &StorageTmp->sccpImportanceLevelCCLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelCREF, &StorageTmp->sccpImportanceLevelCREFLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelDT1, &StorageTmp->sccpImportanceLevelDT1Len);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelDT2, &StorageTmp->sccpImportanceLevelDT2Len);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelAK, &StorageTmp->sccpImportanceLevelAKLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelIT, &StorageTmp->sccpImportanceLevelITLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelED, &StorageTmp->sccpImportanceLevelEDLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelEA, &StorageTmp->sccpImportanceLevelEALen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelRSR, &StorageTmp->sccpImportanceLevelRSRLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelRSC, &StorageTmp->sccpImportanceLevelRSCLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelERR, &StorageTmp->sccpImportanceLevelERRLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelRLC, &StorageTmp->sccpImportanceLevelRLCLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelRLSD, &StorageTmp->sccpImportanceLevelRLSDLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelUDT, &StorageTmp->sccpImportanceLevelUDTLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelUDTS, &StorageTmp->sccpImportanceLevelUDTSLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelXUDT, &StorageTmp->sccpImportanceLevelXUDTLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelXUDTS, &StorageTmp->sccpImportanceLevelXUDTSLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelLUDT, &StorageTmp->sccpImportanceLevelLUDTLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpImportanceLevelLUDTS, &StorageTmp->sccpImportanceLevelLUDTSLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpRLM, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpRSLM, &tmpsize);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageConcernedAreaPointer, &StorageTmp->sccpLinkageConcernedAreaPointerLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLowerLimitForSegmentation, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpUpperLimitForSegmentation, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageOperationalProtocols, &StorageTmp->sccpLinkageOperationalProtocolsLen);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpLinkageSnSAP, &StorageTmp->sccpLinkageSnSAPLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageAttackTimerValue, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageDecayTimerValue, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageNrOfRestrictionLevels, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageNrOfSubLevels, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageCLS, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageCongestionTimerValue, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageP, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelCR, &StorageTmp->sccpLinkageImportanceLevelCRLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelCC, &StorageTmp->sccpLinkageImportanceLevelCCLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelCREF, &StorageTmp->sccpLinkageImportanceLevelCREFLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelDT1, &StorageTmp->sccpLinkageImportanceLevelDT1Len);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelDT2, &StorageTmp->sccpLinkageImportanceLevelDT2Len);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelAK, &StorageTmp->sccpLinkageImportanceLevelAKLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelIT, &StorageTmp->sccpLinkageImportanceLevelITLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelED, &StorageTmp->sccpLinkageImportanceLevelEDLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelEA, &StorageTmp->sccpLinkageImportanceLevelEALen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelRSR, &StorageTmp->sccpLinkageImportanceLevelRSRLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelRSC, &StorageTmp->sccpLinkageImportanceLevelRSCLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelERR, &StorageTmp->sccpLinkageImportanceLevelERRLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelRLC, &StorageTmp->sccpLinkageImportanceLevelRLCLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelRLSD, &StorageTmp->sccpLinkageImportanceLevelRLSDLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelUDT, &StorageTmp->sccpLinkageImportanceLevelUDTLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelUDTS, &StorageTmp->sccpLinkageImportanceLevelUDTSLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelXUDT, &StorageTmp->sccpLinkageImportanceLevelXUDTLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelXUDTS, &StorageTmp->sccpLinkageImportanceLevelXUDTSLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelLUDT, &StorageTmp->sccpLinkageImportanceLevelLUDTLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageImportanceLevelLUDTS, &StorageTmp->sccpLinkageImportanceLevelLUDTSLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageRLM, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageRSLM, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpLinkageConcernedAreaPointer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageLowerLimitForSegmentation, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageUpperLimitForSegmentation, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpLinkageName, &StorageTmp->sccpLinkageNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpLinkageRowStatus, &tmpsize);
+			snmpd_store_config(line);
+		}
+	}
+	DEBUGMSGTL(("sccpMIB", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn struct sccpMtpTable_data *sccpMtpTable_create(void)
+ * @brief create a fresh data structure representing a new row in the sccpMtpTable table.
+ *
+ * Creates a new sccpMtpTable_data structure by allocating dynamic memory for the structure and
+ * initializing the default values of columns in the table.  The row status object, if any, should
+ * be set to RS_NOTREADY.
+ */
+struct sccpMtpTable_data *
+sccpMtpTable_create(void)
+{
+	struct sccpMtpTable_data *StorageNew = SNMP_MALLOC_STRUCT(sccpMtpTable_data);
+
+	DEBUGMSGTL(("sccpMIB", "sccpMtpTable_create: creating row...  "));
+	if (StorageNew != NULL) {
+		/* XXX: fill in default row values here into StorageNew */
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpMtpSap2Address = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpMtpSap2AddressLen = strlen("");
+		StorageNew->sccpMtpUserPart = 0;
+		StorageNew->sccpMtpUserPartStatus = 0;
+		if ((StorageNew->sccpMtpUserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpMtpUserEntityNamesLen = 2;
+		if ((StorageNew->sccpMtpProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpMtpProviderEntityNamesLen = 2;
+		StorageNew->sccpMtpUsageState = 0;
+		StorageNew->sccpMtpAdministrativeState = 0;
+		StorageNew->sccpMtpOperationalState = 0;
+		StorageNew->sccpMtpCongestedState = 0;
+		StorageNew->sccpMtpCongestionLevel = 0;
+		if ((StorageNew->sccpMtpRemoteExchangeLabel = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpMtpRemoteExchangeLabelLen = strlen("");
+		if ((StorageNew->sccpMtpName = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpMtpNameLen = strlen("");
+		StorageNew->sccpMtpRowStatus = 0;
+		StorageNew->sccpMtpRowStatus = RS_NOTREADY;
+	}
+	DEBUGMSGTL(("sccpMIB", "done.\n"));
+	return (StorageNew);
+}
+
+/**
+ * @fn struct sccpMtpTable_data *sccpMtpTable_duplicate(struct sccpMtpTable_data *thedata)
+ * @param thedata the row structure to duplicate.
+ * @brief duplicat a row structure for a table.
+ *
+ * Duplicates the specified row structure @param thedata and returns a pointer to the newly
+ * allocated row structure on success, or NULL on failure.
+ */
+struct sccpMtpTable_data *
+sccpMtpTable_duplicate(struct sccpMtpTable_data *thedata)
+{
+	struct sccpMtpTable_data *StorageNew = SNMP_MALLOC_STRUCT(sccpMtpTable_data);
+
+	DEBUGMSGTL(("sccpMIB", "sccpMtpTable_duplicate: duplicating row...  "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("sccpMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	sccpMtpTable_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn int sccpMtpTable_destroy(struct sccpMtpTable_data **thedata)
+ * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
+ * Frees a table row that was previously removed from a table.  Note that the strings associated
+ * with octet strings, object identifiers and bit strings still attached to the structure will also
+ * be freed.  The pointer that was passed in @param thedata will be set to NULL if it is not already
+ * NULL.
+ */
+int
+sccpMtpTable_destroy(struct sccpMtpTable_data **thedata)
+{
+	struct sccpMtpTable_data *StorageDel;
+
+	DEBUGMSGTL(("sccpMIB", "sccpMtpTable_destroy: deleting row...  "));
+	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
+		SNMP_FREE(StorageDel->sccpMtpSap2Address);
+		StorageDel->sccpMtpSap2AddressLen = 0;
+		SNMP_FREE(StorageDel->sccpMtpUserEntityNames);
+		StorageDel->sccpMtpUserEntityNamesLen = 0;
+		SNMP_FREE(StorageDel->sccpMtpProviderEntityNames);
+		StorageDel->sccpMtpProviderEntityNamesLen = 0;
+		SNMP_FREE(StorageDel->sccpMtpRemoteExchangeLabel);
+		StorageDel->sccpMtpRemoteExchangeLabelLen = 0;
+		SNMP_FREE(StorageDel->sccpMtpName);
+		StorageDel->sccpMtpNameLen = 0;
+		SNMP_FREE(StorageDel);
+		*thedata = StorageDel;
+	}
+	DEBUGMSGTL(("sccpMIB", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int sccpMtpTable_add(struct sccpMtpTable_data *thedata)
+ * @param thedata the structure representing the new row in the table.
+ * @brief adds a row to the sccpMtpTable table data set.
+ *
+ * Adds a table row structure to the sccpMtpTable table.  Note that this function is necessary even
+ * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
+ * by the agent to create rows within the table autonomously.
+ */
+int
+sccpMtpTable_add(struct sccpMtpTable_data *thedata)
+{
+	struct variable_list *vars = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "sccpMtpTable_add: adding data...  "));
+	if (thedata) {
+		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
+		/* sccpNetworkEntityId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		/* sccpMtpSapId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpMtpSapId, sizeof(thedata->sccpMtpSapId));
+		header_complex_add_data(&sccpMtpTableStorage, vars, thedata);
+	}
+	DEBUGMSGTL(("sccpMIB", "registered an entry.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int sccpMtpTable_del(struct sccpMtpTable_data *thedata)
+ * @param thedata pointer to the extracted or existing data structure in the table.
+ * @brief delete a row structure from a table.
+ *
+ * Deletes a table row structure from the sccpMtpTable table but does not free it.  Note that this
+ * function is necessary even when the table rows are not persistent.  This function can be used
+ * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
+ * structure may either be already extracted from the data set, or the structure may still exist in
+ * the data set.  This function will extract the row from the table if it has not already been
+ * performed by the caller.
+ */
+int
+sccpMtpTable_del(struct sccpMtpTable_data *thedata)
+{
+	struct sccpMtpTable_data *StorageDel;
+
+	DEBUGMSGTL(("sccpMIB", "sccpMtpTable_data: deleting data...  "));
+	if ((StorageDel = thedata) != NULL) {
+		struct header_complex_index *hciptr;
+
+		if ((hciptr = header_complex_find_entry(sccpMtpTableStorage, StorageDel)) != NULL)
+			header_complex_extract_entry(&sccpMtpTableStorage, hciptr);
+	}
+	DEBUGMSGTL(("sccpMIB", "done.\n"));
+	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn void parse_sccpMtpTable(const char *token, char *line)
+ * @param token token used within the configuration file.
+ * @param line line from configuration file matching the token.
+ * @brief parse configuration file for sccpMtpTable entries.
+ *
+ * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * file line for the registsred token (in this case sccpMtpTable).  This routine is invoked by UCD-SNMP
+ * to read the values of each row in the table from the configuration file.  Note that this
+ * procedure may exist regardless of the persistence of the table.  If there are no configured
+ * entries in the configuration table, this function will simply not be called.
+ */
+void
+parse_sccpMtpTable(const char *token, char *line)
+{
+	size_t tmpsize;
+	struct sccpMtpTable_data *StorageTmp = sccpMtpTable_create();
+
+	DEBUGMSGTL(("sccpMIB", "parse_sccpMtpTable: parsing config...  "));
+	if (StorageTmp == NULL) {
+		config_perror("malloc failure");
+		return;
+	}
+	/* XXX: remove individual columns if not persistent */
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpMtpSapId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpMtpSap2Address);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpMtpSap2Address, &StorageTmp->sccpMtpSap2AddressLen);
+	if (StorageTmp->sccpMtpSap2Address == NULL) {
+		config_perror("invalid specification for sccpMtpSap2Address");
+		return;
+	}
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpUserPart, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpUserPartStatus, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpMtpUserEntityNames);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpMtpUserEntityNames, &StorageTmp->sccpMtpUserEntityNamesLen);
+	if (StorageTmp->sccpMtpUserEntityNames == NULL) {
+		config_perror("invalid specification for sccpMtpUserEntityNames");
+		return;
+	}
+	SNMP_FREE(StorageTmp->sccpMtpProviderEntityNames);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpMtpProviderEntityNames, &StorageTmp->sccpMtpProviderEntityNamesLen);
+	if (StorageTmp->sccpMtpProviderEntityNames == NULL) {
+		config_perror("invalid specification for sccpMtpProviderEntityNames");
+		return;
+	}
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpUsageState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpAdministrativeState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpOperationalState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpCongestedState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpCongestionLevel, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpMtpRemoteExchangeLabel);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpMtpRemoteExchangeLabel, &StorageTmp->sccpMtpRemoteExchangeLabelLen);
+	if (StorageTmp->sccpMtpRemoteExchangeLabel == NULL) {
+		config_perror("invalid specification for sccpMtpRemoteExchangeLabel");
+		return;
+	}
+	SNMP_FREE(StorageTmp->sccpMtpName);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpMtpName, &StorageTmp->sccpMtpNameLen);
+	if (StorageTmp->sccpMtpName == NULL) {
+		config_perror("invalid specification for sccpMtpName");
+		return;
+	}
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpRowStatus, &tmpsize);
+	sccpMtpTable_add(StorageTmp);
+	(void) tmpsize;
+	DEBUGMSGTL(("sccpMIB", "done.\n"));
+}
+
+/*
+ * store_sccpMtpTable(): store configuraiton file for sccpMtpTable
+ * stores .conf file entries needed to configure the mib.
+ */
+int
+store_sccpMtpTable(int majorID, int minorID, void *serverarg, void *clientarg)
+{
+	char line[SNMP_MAXBUF];
+	char *cptr;
+	size_t tmpsize;
+	struct sccpMtpTable_data *StorageTmp;
+	struct header_complex_index *hcindex;
+
+	DEBUGMSGTL(("sccpMIB", "store_sccpMtpTable: storing data...  "));
+	refresh_sccpMtpTable(1);
+	(void) tmpsize;
+	for (hcindex = sccpMtpTableStorage; hcindex != NULL; hcindex = hcindex->next) {
+		StorageTmp = (struct sccpMtpTable_data *) hcindex->data;
+		/* XXX: comment entire section if row not persistent */
+		{
+			memset(line, 0, sizeof(line));
+			strcat(line, "sccpMtpTable ");
+			cptr = line + strlen(line);
+			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpMtpSapId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpMtpSap2Address, &StorageTmp->sccpMtpSap2AddressLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpUserPart, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpUserPartStatus, &tmpsize);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpMtpUserEntityNames, &StorageTmp->sccpMtpUserEntityNamesLen);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpMtpProviderEntityNames, &StorageTmp->sccpMtpProviderEntityNamesLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpUsageState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpAdministrativeState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpOperationalState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpCongestedState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpCongestionLevel, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpMtpRemoteExchangeLabel, &StorageTmp->sccpMtpRemoteExchangeLabelLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpMtpName, &StorageTmp->sccpMtpNameLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -2109,18 +2532,22 @@ sccpSclcTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpSclcTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		if (memdup((u_char **) &StorageNew->sccpSclcAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sccpSclcAlarmStatusLen = 1;
-		if ((StorageNew->sccpClProtocolMachineId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpClProtocolMachineIdLen = strlen("");
-		StorageNew->sccpSclcOperationalState = 0;
-		StorageNew->sccpTotalRemoteSAPs = 0;
-		StorageNew->sccpSclcAdministrativeState = 0;
+		if ((StorageNew->sccpSclcClProtocolMachineId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpSclcClProtocolMachineIdLen = strlen("");
+		StorageNew->sccpSclcOperationalState = SCCPSCLCOPERATIONALSTATE_DISABLED;
+		StorageNew->sccpSclcTotalRemoteSAPs = 0;
+		StorageNew->sccpSclcAdministrativeState = SCCPSCLCADMINISTRATIVESTATE_LOCKED;
 		if (memdup((u_char **) &StorageNew->sccpSclcSupportedProtocols, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sccpSclcSupportedProtocolsLen = 1;
 		StorageNew->sccpSclcOperationalSystemType = 0;
-		StorageNew->sccpInitialValueReassTimer = 0;
+		StorageNew->sccpSclcInitialValueReassTimer = 0;
+		if ((StorageNew->sccpSclcAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpSclcAsaProfilePointerLen = 2;
 		if ((StorageNew->sccpSclcName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpSclcNameLen = strlen("");
 		StorageNew->sccpSclcRowStatus = 0;
@@ -2172,12 +2599,16 @@ sccpSclcTable_destroy(struct sccpSclcTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpSclcTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpSclcAlarmStatus);
 		StorageDel->sccpSclcAlarmStatusLen = 0;
-		SNMP_FREE(StorageDel->sccpClProtocolMachineId);
-		StorageDel->sccpClProtocolMachineIdLen = 0;
+		SNMP_FREE(StorageDel->sccpSclcClProtocolMachineId);
+		StorageDel->sccpSclcClProtocolMachineIdLen = 0;
 		SNMP_FREE(StorageDel->sccpSclcSupportedProtocols);
 		StorageDel->sccpSclcSupportedProtocolsLen = 0;
+		SNMP_FREE(StorageDel->sccpSclcAsaProfilePointer);
+		StorageDel->sccpSclcAsaProfilePointerLen = 0;
 		SNMP_FREE(StorageDel->sccpSclcName);
 		StorageDel->sccpSclcNameLen = 0;
 		SNMP_FREE(StorageDel);
@@ -2204,8 +2635,10 @@ sccpSclcTable_add(struct sccpSclcTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpSclcTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		header_complex_add_data(&sccpSclcTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("sccpMIB", "registered an entry.\n"));
@@ -2264,30 +2697,42 @@ parse_sccpSclcTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpSclcAlarmStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpSclcAlarmStatus, &StorageTmp->sccpSclcAlarmStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSclcAlarmStatus, &StorageTmp->sccpSclcAlarmStatusLen);
 	if (StorageTmp->sccpSclcAlarmStatus == NULL) {
 		config_perror("invalid specification for sccpSclcAlarmStatus");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpClProtocolMachineId);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpClProtocolMachineId, &StorageTmp->sccpClProtocolMachineIdLen);
-	if (StorageTmp->sccpClProtocolMachineId == NULL) {
-		config_perror("invalid specification for sccpClProtocolMachineId");
+	SNMP_FREE(StorageTmp->sccpSclcClProtocolMachineId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSclcClProtocolMachineId, &StorageTmp->sccpSclcClProtocolMachineIdLen);
+	if (StorageTmp->sccpSclcClProtocolMachineId == NULL) {
+		config_perror("invalid specification for sccpSclcClProtocolMachineId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSclcOperationalState, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpTotalRemoteSAPs, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSclcTotalRemoteSAPs, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSclcAdministrativeState, &tmpsize);
 	SNMP_FREE(StorageTmp->sccpSclcSupportedProtocols);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpSclcSupportedProtocols, &StorageTmp->sccpSclcSupportedProtocolsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSclcSupportedProtocols, &StorageTmp->sccpSclcSupportedProtocolsLen);
 	if (StorageTmp->sccpSclcSupportedProtocols == NULL) {
 		config_perror("invalid specification for sccpSclcSupportedProtocols");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSclcOperationalSystemType, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpInitialValueReassTimer, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSclcInitialValueReassTimer, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpSclcAsaProfilePointer);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpSclcAsaProfilePointer, &StorageTmp->sccpSclcAsaProfilePointerLen);
+	if (StorageTmp->sccpSclcAsaProfilePointer == NULL) {
+		config_perror("invalid specification for sccpSclcAsaProfilePointer");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpSclcName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSclcName, &StorageTmp->sccpSclcNameLen);
 	if (StorageTmp->sccpSclcName == NULL) {
@@ -2324,15 +2769,17 @@ store_sccpSclcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			strcat(line, "sccpSclcTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpSclcAlarmStatus, &StorageTmp->sccpSclcAlarmStatusLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpClProtocolMachineId, &StorageTmp->sccpClProtocolMachineIdLen);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSclcAlarmStatus, &StorageTmp->sccpSclcAlarmStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSclcClProtocolMachineId, &StorageTmp->sccpSclcClProtocolMachineIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSclcOperationalState, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpTotalRemoteSAPs, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSclcTotalRemoteSAPs, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSclcAdministrativeState, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpSclcSupportedProtocols, &StorageTmp->sccpSclcSupportedProtocolsLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSclcSupportedProtocols, &StorageTmp->sccpSclcSupportedProtocolsLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSclcOperationalSystemType, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpInitialValueReassTimer, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSclcInitialValueReassTimer, &tmpsize);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpSclcAsaProfilePointer, &StorageTmp->sccpSclcAsaProfilePointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSclcName, &StorageTmp->sccpSclcNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSclcRowStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -2358,11 +2805,13 @@ sccpScocTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpScocTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		if ((StorageNew->sccpCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpCoProtocolMachineIdLen = strlen("");
-		StorageNew->sccpScocOperationalState = 0;
-		StorageNew->sccpScocAdministrativeState = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpScocCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpScocCoProtocolMachineIdLen = strlen("");
+		StorageNew->sccpScocOperationalState = SCCPSCOCOPERATIONALSTATE_DISABLED;
+		StorageNew->sccpScocAdministrativeState = SCCPSCOCADMINISTRATIVESTATE_LOCKED;
 		StorageNew->sccpScocOperationalSystemType = 0;
 		if (memdup((u_char **) &StorageNew->sccpScocSupportedProtocols, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sccpScocSupportedProtocolsLen = 1;
@@ -2417,8 +2866,10 @@ sccpScocTable_destroy(struct sccpScocTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpScocTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
-		SNMP_FREE(StorageDel->sccpCoProtocolMachineId);
-		StorageDel->sccpCoProtocolMachineIdLen = 0;
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
+		SNMP_FREE(StorageDel->sccpScocCoProtocolMachineId);
+		StorageDel->sccpScocCoProtocolMachineIdLen = 0;
 		SNMP_FREE(StorageDel->sccpScocSupportedProtocols);
 		StorageDel->sccpScocSupportedProtocolsLen = 0;
 		SNMP_FREE(StorageDel->sccpScocName);
@@ -2447,8 +2898,10 @@ sccpScocTable_add(struct sccpScocTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpScocTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		header_complex_add_data(&sccpScocTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("sccpMIB", "registered an entry.\n"));
@@ -2507,18 +2960,24 @@ parse_sccpScocTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpCoProtocolMachineId);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpCoProtocolMachineId, &StorageTmp->sccpCoProtocolMachineIdLen);
-	if (StorageTmp->sccpCoProtocolMachineId == NULL) {
-		config_perror("invalid specification for sccpCoProtocolMachineId");
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->sccpScocCoProtocolMachineId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpScocCoProtocolMachineId, &StorageTmp->sccpScocCoProtocolMachineIdLen);
+	if (StorageTmp->sccpScocCoProtocolMachineId == NULL) {
+		config_perror("invalid specification for sccpScocCoProtocolMachineId");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpScocOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpScocAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpScocOperationalSystemType, &tmpsize);
 	SNMP_FREE(StorageTmp->sccpScocSupportedProtocols);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpScocSupportedProtocols, &StorageTmp->sccpScocSupportedProtocolsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpScocSupportedProtocols, &StorageTmp->sccpScocSupportedProtocolsLen);
 	if (StorageTmp->sccpScocSupportedProtocols == NULL) {
 		config_perror("invalid specification for sccpScocSupportedProtocols");
 		return;
@@ -2559,12 +3018,13 @@ store_sccpScocTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			strcat(line, "sccpScocTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpCoProtocolMachineId, &StorageTmp->sccpCoProtocolMachineIdLen);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpScocCoProtocolMachineId, &StorageTmp->sccpScocCoProtocolMachineIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpScocOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpScocAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpScocOperationalSystemType, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpScocSupportedProtocols, &StorageTmp->sccpScocSupportedProtocolsLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpScocSupportedProtocols, &StorageTmp->sccpScocSupportedProtocolsLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpScocName, &StorageTmp->sccpScocNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpScocRowStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -2590,11 +3050,15 @@ sccpScrcTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpScrcTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		if ((StorageNew->sccpScrcId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpScrcIdLen = strlen("");
 		if (memdup((u_char **) &StorageNew->sccpScrcAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->sccpScrcAlarmStatusLen = 1;
+		if ((StorageNew->sccpScrcAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpScrcAsaProfilePointerLen = 2;
 		if ((StorageNew->sccpScrcName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpScrcNameLen = strlen("");
 		StorageNew->sccpScrcRowStatus = 0;
@@ -2646,10 +3110,14 @@ sccpScrcTable_destroy(struct sccpScrcTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpScrcTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpScrcId);
 		StorageDel->sccpScrcIdLen = 0;
 		SNMP_FREE(StorageDel->sccpScrcAlarmStatus);
 		StorageDel->sccpScrcAlarmStatusLen = 0;
+		SNMP_FREE(StorageDel->sccpScrcAsaProfilePointer);
+		StorageDel->sccpScrcAsaProfilePointerLen = 0;
 		SNMP_FREE(StorageDel->sccpScrcName);
 		StorageDel->sccpScrcNameLen = 0;
 		SNMP_FREE(StorageDel);
@@ -2676,8 +3144,10 @@ sccpScrcTable_add(struct sccpScrcTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpScrcTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		header_complex_add_data(&sccpScrcTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("sccpMIB", "registered an entry.\n"));
@@ -2736,7 +3206,13 @@ parse_sccpScrcTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpScrcId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpScrcId, &StorageTmp->sccpScrcIdLen);
 	if (StorageTmp->sccpScrcId == NULL) {
@@ -2744,9 +3220,15 @@ parse_sccpScrcTable(const char *token, char *line)
 		return;
 	}
 	SNMP_FREE(StorageTmp->sccpScrcAlarmStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpScrcAlarmStatus, &StorageTmp->sccpScrcAlarmStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpScrcAlarmStatus, &StorageTmp->sccpScrcAlarmStatusLen);
 	if (StorageTmp->sccpScrcAlarmStatus == NULL) {
 		config_perror("invalid specification for sccpScrcAlarmStatus");
+		return;
+	}
+	SNMP_FREE(StorageTmp->sccpScrcAsaProfilePointer);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpScrcAsaProfilePointer, &StorageTmp->sccpScrcAsaProfilePointerLen);
+	if (StorageTmp->sccpScrcAsaProfilePointer == NULL) {
+		config_perror("invalid specification for sccpScrcAsaProfilePointer");
 		return;
 	}
 	SNMP_FREE(StorageTmp->sccpScrcName);
@@ -2785,9 +3267,11 @@ store_sccpScrcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			strcat(line, "sccpScrcTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpScrcId, &StorageTmp->sccpScrcIdLen);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpScrcAlarmStatus, &StorageTmp->sccpScrcAlarmStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpScrcAlarmStatus, &StorageTmp->sccpScrcAlarmStatusLen);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpScrcAsaProfilePointer, &StorageTmp->sccpScrcAsaProfilePointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpScrcName, &StorageTmp->sccpScrcNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpScrcRowStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -2813,10 +3297,12 @@ sccpEntitySetTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpEntitySetTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		StorageNew->sccpSharingMode = 0;
-		if ((StorageNew->sccpLoadSharingAlgPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpLoadSharingAlgPointerLen = 2;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		StorageNew->sccpEntitySetSharingMode = 0;
+		if ((StorageNew->sccpEntitySetLoadSharingAlgPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->sccpEntitySetLoadSharingAlgPointerLen = 2;
 		if ((StorageNew->sccpEntitySetName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpEntitySetNameLen = strlen("");
 		StorageNew->sccpEntitySetType = 0;
@@ -2871,10 +3357,12 @@ sccpEntitySetTable_destroy(struct sccpEntitySetTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpEntitySetTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpEntitySetId);
 		StorageDel->sccpEntitySetIdLen = 0;
-		SNMP_FREE(StorageDel->sccpLoadSharingAlgPointer);
-		StorageDel->sccpLoadSharingAlgPointerLen = 0;
+		SNMP_FREE(StorageDel->sccpEntitySetLoadSharingAlgPointer);
+		StorageDel->sccpEntitySetLoadSharingAlgPointerLen = 0;
 		SNMP_FREE(StorageDel->sccpEntitySetName);
 		StorageDel->sccpEntitySetNameLen = 0;
 		SNMP_FREE(StorageDel->sccpEntitySetSsn);
@@ -2903,8 +3391,10 @@ sccpEntitySetTable_add(struct sccpEntitySetTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpEntitySetTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpEntitySetId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpEntitySetId, thedata->sccpEntitySetIdLen);
 		header_complex_add_data(&sccpEntitySetTableStorage, vars, thedata);
@@ -2965,18 +3455,24 @@ parse_sccpEntitySetTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpEntitySetId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpEntitySetId, &StorageTmp->sccpEntitySetIdLen);
 	if (StorageTmp->sccpEntitySetId == NULL) {
 		config_perror("invalid specification for sccpEntitySetId");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSharingMode, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpLoadSharingAlgPointer);
-	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpLoadSharingAlgPointer, &StorageTmp->sccpLoadSharingAlgPointerLen);
-	if (StorageTmp->sccpLoadSharingAlgPointer == NULL) {
-		config_perror("invalid specification for sccpLoadSharingAlgPointer");
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpEntitySetSharingMode, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpEntitySetLoadSharingAlgPointer);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->sccpEntitySetLoadSharingAlgPointer, &StorageTmp->sccpEntitySetLoadSharingAlgPointerLen);
+	if (StorageTmp->sccpEntitySetLoadSharingAlgPointer == NULL) {
+		config_perror("invalid specification for sccpEntitySetLoadSharingAlgPointer");
 		return;
 	}
 	SNMP_FREE(StorageTmp->sccpEntitySetName);
@@ -3022,10 +3518,11 @@ store_sccpEntitySetTable(int majorID, int minorID, void *serverarg, void *client
 			strcat(line, "sccpEntitySetTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpEntitySetId, &StorageTmp->sccpEntitySetIdLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSharingMode, &tmpsize);
-			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpLoadSharingAlgPointer, &StorageTmp->sccpLoadSharingAlgPointerLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpEntitySetSharingMode, &tmpsize);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpEntitySetLoadSharingAlgPointer, &StorageTmp->sccpEntitySetLoadSharingAlgPointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpEntitySetName, &StorageTmp->sccpEntitySetNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpEntitySetType, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpEntitySetSsn, &StorageTmp->sccpEntitySetSsnLen);
@@ -3053,7 +3550,9 @@ sccpEntitySetSapTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpEntitySetSapTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		if ((StorageNew->sccpEntitySetId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpEntitySetIdLen = strlen("");
 		StorageNew->sccpEntitySetSapType = 0;
@@ -3108,6 +3607,8 @@ sccpEntitySetSapTable_destroy(struct sccpEntitySetSapTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpEntitySetSapTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpEntitySetId);
 		StorageDel->sccpEntitySetIdLen = 0;
 		SNMP_FREE(StorageDel->sccpEntitySetSapId);
@@ -3138,8 +3639,10 @@ sccpEntitySetSapTable_add(struct sccpEntitySetSapTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpEntitySetSapTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpEntitySetId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpEntitySetId, thedata->sccpEntitySetIdLen);
 		/* sccpEntitySetSapId */
@@ -3202,7 +3705,13 @@ parse_sccpEntitySetSapTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpEntitySetId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpEntitySetId, &StorageTmp->sccpEntitySetIdLen);
 	if (StorageTmp->sccpEntitySetId == NULL) {
@@ -3252,7 +3761,8 @@ store_sccpEntitySetSapTable(int majorID, int minorID, void *serverarg, void *cli
 			strcat(line, "sccpEntitySetSapTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpEntitySetId, &StorageTmp->sccpEntitySetIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpEntitySetSapId, &StorageTmp->sccpEntitySetSapIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpEntitySetSapType, &tmpsize);
@@ -3281,7 +3791,10 @@ sccpConcernedAreaTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpConcernedAreaTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		StorageNew->sccpConcernedAreaRemoteSCCPList = 0;
 		StorageNew->sccpConcernedAreaRowStatus = 0;
 		StorageNew->sccpConcernedAreaRowStatus = RS_NOTREADY;
 	}
@@ -3331,6 +3844,8 @@ sccpConcernedAreaTable_destroy(struct sccpConcernedAreaTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpConcernedAreaTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpConcernedAreaId);
 		StorageDel->sccpConcernedAreaIdLen = 0;
 		SNMP_FREE(StorageDel);
@@ -3357,8 +3872,10 @@ sccpConcernedAreaTable_add(struct sccpConcernedAreaTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpConcernedAreaTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpConcernedAreaId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpConcernedAreaId, thedata->sccpConcernedAreaIdLen);
 		header_complex_add_data(&sccpConcernedAreaTableStorage, vars, thedata);
@@ -3419,13 +3936,20 @@ parse_sccpConcernedAreaTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpConcernedAreaId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpConcernedAreaId, &StorageTmp->sccpConcernedAreaIdLen);
 	if (StorageTmp->sccpConcernedAreaId == NULL) {
 		config_perror("invalid specification for sccpConcernedAreaId");
 		return;
 	}
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpConcernedAreaRemoteSCCPList, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpConcernedAreaRowStatus, &tmpsize);
 	sccpConcernedAreaTable_add(StorageTmp);
 	(void) tmpsize;
@@ -3456,8 +3980,10 @@ store_sccpConcernedAreaTable(int majorID, int minorID, void *serverarg, void *cl
 			strcat(line, "sccpConcernedAreaTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpConcernedAreaId, &StorageTmp->sccpConcernedAreaIdLen);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpConcernedAreaRemoteSCCPList, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpConcernedAreaRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -3482,7 +4008,9 @@ sccpRemoteSCCPTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpRemoteSCCPTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		if ((StorageNew->sccpConcernedAreaId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpConcernedAreaIdLen = strlen("");
 		if ((StorageNew->sccpRemoteSCCPMTPAccessPoint = snmp_duplicate_objid(zeroDotZero_oid, 2)))
@@ -3538,6 +4066,8 @@ sccpRemoteSCCPTable_destroy(struct sccpRemoteSCCPTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpRemoteSCCPTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpConcernedAreaId);
 		StorageDel->sccpConcernedAreaIdLen = 0;
 		SNMP_FREE(StorageDel->sccpRemoteSCCPId);
@@ -3570,8 +4100,10 @@ sccpRemoteSCCPTable_add(struct sccpRemoteSCCPTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpRemoteSCCPTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpConcernedAreaId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpConcernedAreaId, thedata->sccpConcernedAreaIdLen);
 		/* sccpRemoteSCCPId */
@@ -3634,7 +4166,13 @@ parse_sccpRemoteSCCPTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpConcernedAreaId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpConcernedAreaId, &StorageTmp->sccpConcernedAreaIdLen);
 	if (StorageTmp->sccpConcernedAreaId == NULL) {
@@ -3689,7 +4227,8 @@ store_sccpRemoteSCCPTable(int majorID, int minorID, void *serverarg, void *clien
 			strcat(line, "sccpRemoteSCCPTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpConcernedAreaId, &StorageTmp->sccpConcernedAreaIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpRemoteSCCPId, &StorageTmp->sccpRemoteSCCPIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpRemoteSCCPMTPAccessPoint, &StorageTmp->sccpRemoteSCCPMTPAccessPointLen);
@@ -3718,11 +4257,13 @@ sccpGtConversionRuleTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpGtConversionRuleTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		StorageNew->sccpGtNewEncodingScheme = 256;
-		StorageNew->sccpGtNewNatureOfAddress = 256;
-		StorageNew->sccpGtNewNumberingPlan = 256;
-		StorageNew->sccpGtNewTranslationType = 256;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		StorageNew->sccpGtConversionRuleNewEncodingScheme = 256;
+		StorageNew->sccpGtConversionRuleNewNatureOfAddress = 256;
+		StorageNew->sccpGtConversionRuleNewNumberingPlan = 256;
+		StorageNew->sccpGtConversionRuleNewTranslationType = 256;
 		if ((StorageNew->sccpGtConversionRuleName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpGtConversionRuleNameLen = strlen("");
 		StorageNew->sccpGtConversionRuleRowStatus = 0;
@@ -3774,6 +4315,8 @@ sccpGtConversionRuleTable_destroy(struct sccpGtConversionRuleTable_data **thedat
 
 	DEBUGMSGTL(("sccpMIB", "sccpGtConversionRuleTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpGtConversionRuleId);
 		StorageDel->sccpGtConversionRuleIdLen = 0;
 		SNMP_FREE(StorageDel->sccpGtConversionRuleName);
@@ -3802,8 +4345,10 @@ sccpGtConversionRuleTable_add(struct sccpGtConversionRuleTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpGtConversionRuleTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpGtConversionRuleId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpGtConversionRuleId, thedata->sccpGtConversionRuleIdLen);
 		header_complex_add_data(&sccpGtConversionRuleTableStorage, vars, thedata);
@@ -3864,17 +4409,23 @@ parse_sccpGtConversionRuleTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpGtConversionRuleId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtConversionRuleId, &StorageTmp->sccpGtConversionRuleIdLen);
 	if (StorageTmp->sccpGtConversionRuleId == NULL) {
 		config_perror("invalid specification for sccpGtConversionRuleId");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtNewEncodingScheme, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtNewNatureOfAddress, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtNewNumberingPlan, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtNewTranslationType, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtConversionRuleNewEncodingScheme, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtConversionRuleNewNatureOfAddress, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtConversionRuleNewNumberingPlan, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtConversionRuleNewTranslationType, &tmpsize);
 	SNMP_FREE(StorageTmp->sccpGtConversionRuleName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtConversionRuleName, &StorageTmp->sccpGtConversionRuleNameLen);
 	if (StorageTmp->sccpGtConversionRuleName == NULL) {
@@ -3911,12 +4462,13 @@ store_sccpGtConversionRuleTable(int majorID, int minorID, void *serverarg, void 
 			strcat(line, "sccpGtConversionRuleTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtConversionRuleId, &StorageTmp->sccpGtConversionRuleIdLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtNewEncodingScheme, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtNewNatureOfAddress, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtNewNumberingPlan, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtNewTranslationType, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtConversionRuleNewEncodingScheme, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtConversionRuleNewNatureOfAddress, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtConversionRuleNewNumberingPlan, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtConversionRuleNewTranslationType, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtConversionRuleName, &StorageTmp->sccpGtConversionRuleNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtConversionRuleRowStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -3942,7 +4494,9 @@ sccpAddressInfoTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpAddressInfoTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		if ((StorageNew->sccpGtConversionRuleId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpGtConversionRuleIdLen = strlen("");
 		StorageNew->sccpAddressInfoOperation = 0;
@@ -3997,6 +4551,8 @@ sccpAddressInfoTable_destroy(struct sccpAddressInfoTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpAddressInfoTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpGtConversionRuleId);
 		StorageDel->sccpGtConversionRuleIdLen = 0;
 		SNMP_FREE(StorageDel->sccpAddressInfoOperationId);
@@ -4025,8 +4581,10 @@ sccpAddressInfoTable_add(struct sccpAddressInfoTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpAddressInfoTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpGtConversionRuleId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpGtConversionRuleId, thedata->sccpGtConversionRuleIdLen);
 		/* sccpAddressInfoOperationId */
@@ -4089,7 +4647,13 @@ parse_sccpAddressInfoTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpGtConversionRuleId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtConversionRuleId, &StorageTmp->sccpGtConversionRuleIdLen);
 	if (StorageTmp->sccpGtConversionRuleId == NULL) {
@@ -4135,7 +4699,8 @@ store_sccpAddressInfoTable(int majorID, int minorID, void *serverarg, void *clie
 			strcat(line, "sccpAddressInfoTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtConversionRuleId, &StorageTmp->sccpGtConversionRuleIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpAddressInfoOperationId, &StorageTmp->sccpAddressInfoOperationIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAddressInfoOperation, &tmpsize);
@@ -4165,12 +4730,14 @@ sccpGtTranslatorTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpGtTranslatorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		StorageNew->sccpGtIndicator = 0;
-		StorageNew->sccpGtNatureOfAddress = 0;
-		StorageNew->sccpGtNumberingPlan = 0;
-		StorageNew->sccpGtTranslationType = 0;
-		StorageNew->sccpGtTranslatorAdministrativeState = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		StorageNew->sccpGtTranslatorGtIndicator = 0;
+		StorageNew->sccpGtTranslatorNatureOfAddress = 0;
+		StorageNew->sccpGtTranslatorNumberingPlan = 0;
+		StorageNew->sccpGtTranslatorTranslationType = 0;
+		StorageNew->sccpGtTranslatorAdministrativeState = SCCPGTTRANSLATORADMINISTRATIVESTATE_LOCKED;
 		if ((StorageNew->sccpGtTranslatorName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpGtTranslatorNameLen = strlen("");
 		StorageNew->sccpGtTranslatorRowStatus = 0;
@@ -4222,6 +4789,8 @@ sccpGtTranslatorTable_destroy(struct sccpGtTranslatorTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpGtTranslatorTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpGtTranslatorId);
 		StorageDel->sccpGtTranslatorIdLen = 0;
 		SNMP_FREE(StorageDel->sccpGtTranslatorName);
@@ -4250,8 +4819,10 @@ sccpGtTranslatorTable_add(struct sccpGtTranslatorTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpGtTranslatorTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpGtTranslatorId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpGtTranslatorId, thedata->sccpGtTranslatorIdLen);
 		header_complex_add_data(&sccpGtTranslatorTableStorage, vars, thedata);
@@ -4312,17 +4883,23 @@ parse_sccpGtTranslatorTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpGtTranslatorId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtTranslatorId, &StorageTmp->sccpGtTranslatorIdLen);
 	if (StorageTmp->sccpGtTranslatorId == NULL) {
 		config_perror("invalid specification for sccpGtTranslatorId");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtIndicator, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtNatureOfAddress, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtNumberingPlan, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtTranslationType, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtTranslatorGtIndicator, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtTranslatorNatureOfAddress, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtTranslatorNumberingPlan, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtTranslatorTranslationType, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtTranslatorAdministrativeState, &tmpsize);
 	SNMP_FREE(StorageTmp->sccpGtTranslatorName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtTranslatorName, &StorageTmp->sccpGtTranslatorNameLen);
@@ -4360,12 +4937,13 @@ store_sccpGtTranslatorTable(int majorID, int minorID, void *serverarg, void *cli
 			strcat(line, "sccpGtTranslatorTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtTranslatorId, &StorageTmp->sccpGtTranslatorIdLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtIndicator, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtNatureOfAddress, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtNumberingPlan, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtTranslationType, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtTranslatorGtIndicator, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtTranslatorNatureOfAddress, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtTranslatorNumberingPlan, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtTranslatorTranslationType, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtTranslatorAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtTranslatorName, &StorageTmp->sccpGtTranslatorNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtTranslatorRowStatus, &tmpsize);
@@ -4392,17 +4970,19 @@ sccpGtRuleTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpGtRuleTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		if ((StorageNew->sccpGtTranslatorId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpGtTranslatorIdLen = strlen("");
-		StorageNew->sccpGtRuleAdministrativeState = 0;
-		if ((StorageNew->sccpGtAddressInformation = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpGtAddressInformationLen = strlen("");
-		if ((StorageNew->sccpGtConvRulePointer = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpGtConvRulePointerLen = strlen("");
-		StorageNew->sccpGtEncodingScheme = 0;
-		if ((StorageNew->sccpEntitySetPointer = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpEntitySetPointerLen = strlen("");
+		StorageNew->sccpGtRuleAdministrativeState = SCCPGTRULEADMINISTRATIVESTATE_LOCKED;
+		if ((StorageNew->sccpGtRuleAddressInformation = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpGtRuleAddressInformationLen = strlen("");
+		if ((StorageNew->sccpGtRuleGtConversionRulePointer = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpGtRuleGtConversionRulePointerLen = strlen("");
+		StorageNew->sccpGtRuleEncodingScheme = 0;
+		if ((StorageNew->sccpGtRuleEntitySetPointer = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpGtRuleEntitySetPointerLen = strlen("");
 		if ((StorageNew->sccpGtRuleName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpGtRuleNameLen = strlen("");
 		StorageNew->sccpGtRuleRowStatus = 0;
@@ -4454,16 +5034,18 @@ sccpGtRuleTable_destroy(struct sccpGtRuleTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpGtRuleTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel->sccpGtTranslatorId);
 		StorageDel->sccpGtTranslatorIdLen = 0;
 		SNMP_FREE(StorageDel->sccpGtRuleId);
 		StorageDel->sccpGtRuleIdLen = 0;
-		SNMP_FREE(StorageDel->sccpGtAddressInformation);
-		StorageDel->sccpGtAddressInformationLen = 0;
-		SNMP_FREE(StorageDel->sccpGtConvRulePointer);
-		StorageDel->sccpGtConvRulePointerLen = 0;
-		SNMP_FREE(StorageDel->sccpEntitySetPointer);
-		StorageDel->sccpEntitySetPointerLen = 0;
+		SNMP_FREE(StorageDel->sccpGtRuleAddressInformation);
+		StorageDel->sccpGtRuleAddressInformationLen = 0;
+		SNMP_FREE(StorageDel->sccpGtRuleGtConversionRulePointer);
+		StorageDel->sccpGtRuleGtConversionRulePointerLen = 0;
+		SNMP_FREE(StorageDel->sccpGtRuleEntitySetPointer);
+		StorageDel->sccpGtRuleEntitySetPointerLen = 0;
 		SNMP_FREE(StorageDel->sccpGtRuleName);
 		StorageDel->sccpGtRuleNameLen = 0;
 		SNMP_FREE(StorageDel);
@@ -4490,8 +5072,10 @@ sccpGtRuleTable_add(struct sccpGtRuleTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpGtRuleTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* sccpGtTranslatorId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpGtTranslatorId, thedata->sccpGtTranslatorIdLen);
 		/* sccpGtRuleId */
@@ -4554,7 +5138,13 @@ parse_sccpGtRuleTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->sccpGtTranslatorId);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtTranslatorId, &StorageTmp->sccpGtTranslatorIdLen);
 	if (StorageTmp->sccpGtTranslatorId == NULL) {
@@ -4568,23 +5158,23 @@ parse_sccpGtRuleTable(const char *token, char *line)
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtRuleAdministrativeState, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpGtAddressInformation);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtAddressInformation, &StorageTmp->sccpGtAddressInformationLen);
-	if (StorageTmp->sccpGtAddressInformation == NULL) {
-		config_perror("invalid specification for sccpGtAddressInformation");
+	SNMP_FREE(StorageTmp->sccpGtRuleAddressInformation);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtRuleAddressInformation, &StorageTmp->sccpGtRuleAddressInformationLen);
+	if (StorageTmp->sccpGtRuleAddressInformation == NULL) {
+		config_perror("invalid specification for sccpGtRuleAddressInformation");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpGtConvRulePointer);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtConvRulePointer, &StorageTmp->sccpGtConvRulePointerLen);
-	if (StorageTmp->sccpGtConvRulePointer == NULL) {
-		config_perror("invalid specification for sccpGtConvRulePointer");
+	SNMP_FREE(StorageTmp->sccpGtRuleGtConversionRulePointer);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtRuleGtConversionRulePointer, &StorageTmp->sccpGtRuleGtConversionRulePointerLen);
+	if (StorageTmp->sccpGtRuleGtConversionRulePointer == NULL) {
+		config_perror("invalid specification for sccpGtRuleGtConversionRulePointer");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtEncodingScheme, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpEntitySetPointer);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpEntitySetPointer, &StorageTmp->sccpEntitySetPointerLen);
-	if (StorageTmp->sccpEntitySetPointer == NULL) {
-		config_perror("invalid specification for sccpEntitySetPointer");
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpGtRuleEncodingScheme, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpGtRuleEntitySetPointer);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpGtRuleEntitySetPointer, &StorageTmp->sccpGtRuleEntitySetPointerLen);
+	if (StorageTmp->sccpGtRuleEntitySetPointer == NULL) {
+		config_perror("invalid specification for sccpGtRuleEntitySetPointer");
 		return;
 	}
 	SNMP_FREE(StorageTmp->sccpGtRuleName);
@@ -4623,14 +5213,15 @@ store_sccpGtRuleTable(int majorID, int minorID, void *serverarg, void *clientarg
 			strcat(line, "sccpGtRuleTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtTranslatorId, &StorageTmp->sccpGtTranslatorIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtRuleId, &StorageTmp->sccpGtRuleIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtRuleAdministrativeState, &tmpsize);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtAddressInformation, &StorageTmp->sccpGtAddressInformationLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtConvRulePointer, &StorageTmp->sccpGtConvRulePointerLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtEncodingScheme, &tmpsize);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpEntitySetPointer, &StorageTmp->sccpEntitySetPointerLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtRuleAddressInformation, &StorageTmp->sccpGtRuleAddressInformationLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtRuleGtConversionRulePointer, &StorageTmp->sccpGtRuleGtConversionRulePointerLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtRuleEncodingScheme, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtRuleEntitySetPointer, &StorageTmp->sccpGtRuleEntitySetPointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpGtRuleName, &StorageTmp->sccpGtRuleNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpGtRuleRowStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -4656,26 +5247,28 @@ sccpSrvtTable_create(void)
 	DEBUGMSGTL(("sccpMIB", "sccpSrvtTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		StorageNew->sccpDSRVT = 0;
-		StorageNew->sccpNSRVT = 0;
+		StorageNew->mtpMsId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		StorageNew->sccpSrvtDSRVT = 0;
+		StorageNew->sccpSrvtNSRVT = 0;
 		if ((StorageNew->sccpSrvtName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpSrvtNameLen = strlen("");
-		StorageNew->sccpAdministrativeState = 0;
-		StorageNew->sccpOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->sccpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->sccpProceduralStatusLen = 1;
-		StorageNew->sccpTraceRequested = 0;
-		StorageNew->sccpThreshold = 0;
-		StorageNew->sccpMtpBackwardRoutingRequested = 2;
-		if ((StorageNew->sccpOriginalGT = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpOriginalGTLen = strlen("");
-		if (memdup((u_char **) &StorageNew->sccpInfoRequest, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->sccpInfoRequestLen = 1;
-		if (memdup((u_char **) &StorageNew->sccpReturnUnknownParams, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->sccpReturnUnknownParamsLen = 1;
-		StorageNew->sccpRouteTestRowStatus = 0;
-		StorageNew->sccpRouteTestRowStatus = RS_NOTREADY;
+		StorageNew->sccpSrvtAdministrativeState = SCCPSRVTADMINISTRATIVESTATE_LOCKED;
+		StorageNew->sccpSrvtOperationalState = SCCPSRVTOPERATIONALSTATE_DISABLED;
+		if (memdup((u_char **) &StorageNew->sccpSrvtProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+			StorageNew->sccpSrvtProceduralStatusLen = 1;
+		StorageNew->sccpSrvtTraceRequested = 0;
+		StorageNew->sccpSrvtThreshold = 0;
+		StorageNew->sccpSrvtMtpBackwardRoutingRequested = 2;
+		if ((StorageNew->sccpSrvtOriginalGT = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpSrvtOriginalGTLen = strlen("");
+		if (memdup((u_char **) &StorageNew->sccpSrvtInfoRequest, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+			StorageNew->sccpSrvtInfoRequestLen = 1;
+		if (memdup((u_char **) &StorageNew->sccpSrvtReturnUnknownParams, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+			StorageNew->sccpSrvtReturnUnknownParamsLen = 1;
+		StorageNew->sccpSrvtRowStatus = 0;
+		StorageNew->sccpSrvtRowStatus = RS_NOTREADY;
 	}
 	DEBUGMSGTL(("sccpMIB", "done.\n"));
 	return (StorageNew);
@@ -4723,18 +5316,20 @@ sccpSrvtTable_destroy(struct sccpSrvtTable_data **thedata)
 
 	DEBUGMSGTL(("sccpMIB", "sccpSrvtTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
-		SNMP_FREE(StorageDel->sccpRouteTestId);
-		StorageDel->sccpRouteTestIdLen = 0;
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
+		SNMP_FREE(StorageDel->sccpSrvtId);
+		StorageDel->sccpSrvtIdLen = 0;
 		SNMP_FREE(StorageDel->sccpSrvtName);
 		StorageDel->sccpSrvtNameLen = 0;
-		SNMP_FREE(StorageDel->sccpProceduralStatus);
-		StorageDel->sccpProceduralStatusLen = 0;
-		SNMP_FREE(StorageDel->sccpOriginalGT);
-		StorageDel->sccpOriginalGTLen = 0;
-		SNMP_FREE(StorageDel->sccpInfoRequest);
-		StorageDel->sccpInfoRequestLen = 0;
-		SNMP_FREE(StorageDel->sccpReturnUnknownParams);
-		StorageDel->sccpReturnUnknownParamsLen = 0;
+		SNMP_FREE(StorageDel->sccpSrvtProceduralStatus);
+		StorageDel->sccpSrvtProceduralStatusLen = 0;
+		SNMP_FREE(StorageDel->sccpSrvtOriginalGT);
+		StorageDel->sccpSrvtOriginalGTLen = 0;
+		SNMP_FREE(StorageDel->sccpSrvtInfoRequest);
+		StorageDel->sccpSrvtInfoRequestLen = 0;
+		SNMP_FREE(StorageDel->sccpSrvtReturnUnknownParams);
+		StorageDel->sccpSrvtReturnUnknownParamsLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -4759,10 +5354,12 @@ sccpSrvtTable_add(struct sccpSrvtTable_data *thedata)
 	DEBUGMSGTL(("sccpMIB", "sccpSrvtTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* mtpMsId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->mtpMsId, sizeof(thedata->mtpMsId));
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
-		/* sccpRouteTestId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpRouteTestId, thedata->sccpRouteTestIdLen);
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		/* sccpSrvtId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpSrvtId, thedata->sccpSrvtIdLen);
 		header_complex_add_data(&sccpSrvtTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("sccpMIB", "registered an entry.\n"));
@@ -4821,51 +5418,57 @@ parse_sccpSrvtTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpRouteTestId);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpRouteTestId, &StorageTmp->sccpRouteTestIdLen);
-	if (StorageTmp->sccpRouteTestId == NULL) {
-		config_perror("invalid specification for sccpRouteTestId");
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpDSRVT, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpNSRVT, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpSrvtId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSrvtId, &StorageTmp->sccpSrvtIdLen);
+	if (StorageTmp->sccpSrvtId == NULL) {
+		config_perror("invalid specification for sccpSrvtId");
+		return;
+	}
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSrvtDSRVT, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSrvtNSRVT, &tmpsize);
 	SNMP_FREE(StorageTmp->sccpSrvtName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSrvtName, &StorageTmp->sccpSrvtNameLen);
 	if (StorageTmp->sccpSrvtName == NULL) {
 		config_perror("invalid specification for sccpSrvtName");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpAdministrativeState, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpOperationalState, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpProceduralStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpProceduralStatus, &StorageTmp->sccpProceduralStatusLen);
-	if (StorageTmp->sccpProceduralStatus == NULL) {
-		config_perror("invalid specification for sccpProceduralStatus");
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSrvtAdministrativeState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSrvtOperationalState, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpSrvtProceduralStatus);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSrvtProceduralStatus, &StorageTmp->sccpSrvtProceduralStatusLen);
+	if (StorageTmp->sccpSrvtProceduralStatus == NULL) {
+		config_perror("invalid specification for sccpSrvtProceduralStatus");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpTraceRequested, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpThreshold, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpMtpBackwardRoutingRequested, &tmpsize);
-	SNMP_FREE(StorageTmp->sccpOriginalGT);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpOriginalGT, &StorageTmp->sccpOriginalGTLen);
-	if (StorageTmp->sccpOriginalGT == NULL) {
-		config_perror("invalid specification for sccpOriginalGT");
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSrvtTraceRequested, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSrvtThreshold, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSrvtMtpBackwardRoutingRequested, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpSrvtOriginalGT);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSrvtOriginalGT, &StorageTmp->sccpSrvtOriginalGTLen);
+	if (StorageTmp->sccpSrvtOriginalGT == NULL) {
+		config_perror("invalid specification for sccpSrvtOriginalGT");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpInfoRequest);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpInfoRequest, &StorageTmp->sccpInfoRequestLen);
-	if (StorageTmp->sccpInfoRequest == NULL) {
-		config_perror("invalid specification for sccpInfoRequest");
+	SNMP_FREE(StorageTmp->sccpSrvtInfoRequest);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSrvtInfoRequest, &StorageTmp->sccpSrvtInfoRequestLen);
+	if (StorageTmp->sccpSrvtInfoRequest == NULL) {
+		config_perror("invalid specification for sccpSrvtInfoRequest");
 		return;
 	}
-	SNMP_FREE(StorageTmp->sccpReturnUnknownParams);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->sccpReturnUnknownParams, &StorageTmp->sccpReturnUnknownParamsLen);
-	if (StorageTmp->sccpReturnUnknownParams == NULL) {
-		config_perror("invalid specification for sccpReturnUnknownParams");
+	SNMP_FREE(StorageTmp->sccpSrvtReturnUnknownParams);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpSrvtReturnUnknownParams, &StorageTmp->sccpSrvtReturnUnknownParamsLen);
+	if (StorageTmp->sccpSrvtReturnUnknownParams == NULL) {
+		config_perror("invalid specification for sccpSrvtReturnUnknownParams");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpRouteTestRowStatus, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpSrvtRowStatus, &tmpsize);
 	sccpSrvtTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("sccpMIB", "done.\n"));
@@ -4895,21 +5498,22 @@ store_sccpSrvtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			strcat(line, "sccpSrvtTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpRouteTestId, &StorageTmp->sccpRouteTestIdLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpDSRVT, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpNSRVT, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSrvtId, &StorageTmp->sccpSrvtIdLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSrvtDSRVT, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSrvtNSRVT, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSrvtName, &StorageTmp->sccpSrvtNameLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAdministrativeState, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpOperationalState, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpProceduralStatus, &StorageTmp->sccpProceduralStatusLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpTraceRequested, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpThreshold, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpMtpBackwardRoutingRequested, &tmpsize);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpOriginalGT, &StorageTmp->sccpOriginalGTLen);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpInfoRequest, &StorageTmp->sccpInfoRequestLen);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->sccpReturnUnknownParams, &StorageTmp->sccpReturnUnknownParamsLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpRouteTestRowStatus, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSrvtAdministrativeState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSrvtOperationalState, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSrvtProceduralStatus, &StorageTmp->sccpSrvtProceduralStatusLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSrvtTraceRequested, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSrvtThreshold, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSrvtMtpBackwardRoutingRequested, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSrvtOriginalGT, &StorageTmp->sccpSrvtOriginalGTLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSrvtInfoRequest, &StorageTmp->sccpSrvtInfoRequestLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpSrvtReturnUnknownParams, &StorageTmp->sccpSrvtReturnUnknownParamsLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpSrvtRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -4989,46 +5593,59 @@ var_sccpNetworkEntityTable(struct variable *vp, oid * name, size_t *length, int 
 		*var_len = StorageTmp->sccpNetworkEntityAlarmStatusLen;
 		rval = (u_char *) StorageTmp->sccpNetworkEntityAlarmStatus;
 		break;
-	case (u_char) SCCPSYSTEMTYPES:	/* ReadOnly */
+	case (u_char) SCCPNETWORKENTITYOPERATIONALSTATE:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpSystemTypesLen;
-		rval = (u_char *) StorageTmp->sccpSystemTypes;
+		*var_len = sizeof(StorageTmp->sccpNetworkEntityOperationalState);
+		rval = (u_char *) &StorageTmp->sccpNetworkEntityOperationalState;
 		break;
-	case (u_char) SCCPVERSION:	/* Create */
-		*write_method = write_sccpVersion;
+	case (u_char) SCCPNETWORKENTITYSYSTEMTYPES:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpVersionLen * sizeof(oid);
-		rval = (u_char *) StorageTmp->sccpVersion;
+		*var_len = StorageTmp->sccpNetworkEntitySystemTypesLen;
+		rval = (u_char *) StorageTmp->sccpNetworkEntitySystemTypes;
 		break;
-	case (u_char) SCCPLUDTANDLUDTSSUPPORTED:	/* Create */
-		*write_method = write_sccpLUDTandLUDTSSupported;
+	case (u_char) SCCPNETWORKENTITYVERSION:	/* Create */
+		*write_method = write_sccpNetworkEntityVersion;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpLUDTandLUDTSSupported);
-		rval = (u_char *) &StorageTmp->sccpLUDTandLUDTSSupported;
+		*var_len = StorageTmp->sccpNetworkEntityVersionLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpNetworkEntityVersion;
 		break;
-	case (u_char) SCCPCOORDCHANGETIMER:	/* Create */
-		*write_method = write_sccpCoordChangeTimer;
+	case (u_char) SCCPNETWORKENTITYLUDTANDLUDTSSUPPORTED:	/* Create */
+		*write_method = write_sccpNetworkEntityLUDTandLUDTSSupported;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpCoordChangeTimer);
-		rval = (u_char *) &StorageTmp->sccpCoordChangeTimer;
+		*var_len = sizeof(StorageTmp->sccpNetworkEntityLUDTandLUDTSSupported);
+		rval = (u_char *) &StorageTmp->sccpNetworkEntityLUDTandLUDTSSupported;
 		break;
-	case (u_char) SCCPIGNORESSTTIMER:	/* Create */
-		*write_method = write_sccpIgnoreSSTTimer;
+	case (u_char) SCCPNETWORKENTITYCOORDCHANGETIMER:	/* Create */
+		*write_method = write_sccpNetworkEntityCoordChangeTimer;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpIgnoreSSTTimer);
-		rval = (u_char *) &StorageTmp->sccpIgnoreSSTTimer;
+		*var_len = sizeof(StorageTmp->sccpNetworkEntityCoordChangeTimer);
+		rval = (u_char *) &StorageTmp->sccpNetworkEntityCoordChangeTimer;
 		break;
-	case (u_char) SCCPMAXSTATINFOTIMER:	/* Create */
-		*write_method = write_sccpMaxStatInfoTimer;
+	case (u_char) SCCPNETWORKENTITYIGNORESSTTIMER:	/* Create */
+		*write_method = write_sccpNetworkEntityIgnoreSSTTimer;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpMaxStatInfoTimer);
-		rval = (u_char *) &StorageTmp->sccpMaxStatInfoTimer;
+		*var_len = sizeof(StorageTmp->sccpNetworkEntityIgnoreSSTTimer);
+		rval = (u_char *) &StorageTmp->sccpNetworkEntityIgnoreSSTTimer;
+		break;
+	case (u_char) SCCPNETWORKENTITYMAXSTATINFOTIMER:	/* Create */
+		*write_method = write_sccpNetworkEntityMaxStatInfoTimer;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpNetworkEntityMaxStatInfoTimer);
+		rval = (u_char *) &StorageTmp->sccpNetworkEntityMaxStatInfoTimer;
+		break;
+	case (u_char) SCCPNETWORKENTITYASAPROFILEPOINTER:	/* Create */
+		*write_method = write_sccpNetworkEntityAsaProfilePointer;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpNetworkEntityAsaProfilePointerLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpNetworkEntityAsaProfilePointer;
 		break;
 	case (u_char) SCCPNETWORKENTITYNAME:	/* Create */
 		*write_method = write_sccpNetworkEntityName;
@@ -5037,12 +5654,12 @@ var_sccpNetworkEntityTable(struct variable *vp, oid * name, size_t *length, int 
 		*var_len = StorageTmp->sccpNetworkEntityNameLen;
 		rval = (u_char *) StorageTmp->sccpNetworkEntityName;
 		break;
-	case (u_char) SCCPROWSTATUS:	/* Create */
-		*write_method = write_sccpRowStatus;
+	case (u_char) SCCPNETWORKENTITYROWSTATUS:	/* Create */
+		*write_method = write_sccpNetworkEntityRowStatus;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpRowStatus);
-		rval = (u_char *) &StorageTmp->sccpRowStatus;
+		*var_len = sizeof(StorageTmp->sccpNetworkEntityRowStatus);
+		rval = (u_char *) &StorageTmp->sccpNetworkEntityRowStatus;
 		break;
 	default:
 		ERROR_MSG("");
@@ -5051,29 +5668,29 @@ var_sccpNetworkEntityTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
- * @fn void refresh_sccpSapNameTable_row(struct sccpSapNameTable_data *StorageTmp, int force)
+ * @fn void refresh_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
- * @brief refresh the contents of the sccpSapNameTable row.
+ * @brief refresh the contents of the sccpLocalSapNamesTable row.
  *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
-struct sccpSapNameTable_data *
-refresh_sccpSapNameTable_row(struct sccpSapNameTable_data *StorageTmp, int force)
+struct sccpLocalSapNamesTable_data *
+refresh_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp, int force)
 {
-	if (!StorageTmp || (!force && StorageTmp->sccpSapNameTable_request == sa_request))
+	if (!StorageTmp || (!force && StorageTmp->sccpLocalSapNamesTable_request == sa_request))
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
-	StorageTmp->sccpSapNameTable_request = sa_request;
+	StorageTmp->sccpLocalSapNamesTable_request = sa_request;
 	return (StorageTmp);
 }
 
 /**
- * @fn void refresh_sccpSapNameTable(int force)
+ * @fn void refresh_sccpLocalSapNamesTable(int force)
  * @param force force refresh if non-zero.
- * @brief refresh the scalar values of the sccpSapNameTable.
+ * @brief refresh the scalar values of the sccpLocalSapNamesTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
@@ -5082,45 +5699,52 @@ refresh_sccpSapNameTable_row(struct sccpSapNameTable_data *StorageTmp, int force
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_sccpSapNameTable(int force)
+refresh_sccpLocalSapNamesTable(int force)
 {
-	if (!force && sccpSapNameTable_refresh == 0)
+	if (!force && sccpLocalSapNamesTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
-	sccpSapNameTable_refresh = 0;
+	sccpLocalSapNamesTable_refresh = 0;
 }
 
 /**
- * @fn u_char *var_sccpSapNameTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
- * @brief locate variables in sccpSapNameTable.
+ * @fn u_char *var_sccpLocalSapNamesTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
+ * @brief locate variables in sccpLocalSapNamesTable.
  *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_sccpMIB above.
  */
 u_char *
-var_sccpSapNameTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+var_sccpLocalSapNamesTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
-	struct sccpSapNameTable_data *StorageTmp = NULL;
+	struct sccpLocalSapNamesTable_data *StorageTmp = NULL;
 	u_char *rval;
 
-	DEBUGMSGTL(("sccpMIB", "var_sccpSapNameTable: Entering...  \n"));
+	DEBUGMSGTL(("sccpMIB", "var_sccpLocalSapNamesTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_sccpSapNameTable(0);
+	refresh_sccpLocalSapNamesTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	while ((StorageTmp = header_complex(sccpSapNameTableStorage, vp, name, length, exact, var_len, write_method)))
-		if ((StorageTmp = refresh_sccpSapNameTable_row(StorageTmp, 0)) || exact)
+	while ((StorageTmp = header_complex(sccpLocalSapNamesTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sccpLocalSapNamesTable_row(StorageTmp, 0)) || exact)
 			break;
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) SCCPSAPNAMEROWSTATUS:	/* Create */
-		*write_method = write_sccpSapNameRowStatus;
+	case (u_char) SCCPLOCALSAPNAMESPOINTER:	/* Create */
+		*write_method = write_sccpLocalSapNamesPointer;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpSapNameRowStatus);
-		rval = (u_char *) &StorageTmp->sccpSapNameRowStatus;
+		*var_len = sizeof(StorageTmp->sccpLocalSapNamesPointer);
+		rval = (u_char *) &StorageTmp->sccpLocalSapNamesPointer;
+		break;
+	case (u_char) SCCPLOCALSAPNAMESROWSTATUS:	/* Create */
+		*write_method = write_sccpLocalSapNamesRowStatus;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpLocalSapNamesRowStatus);
+		rval = (u_char *) &StorageTmp->sccpLocalSapNamesRowStatus;
 		break;
 	default:
 		ERROR_MSG("");
@@ -5200,53 +5824,60 @@ var_sccpAccessPointTable(struct variable *vp, oid * name, size_t *length, int ex
 		*var_len = StorageTmp->sccpAccessPointAlarmStatusLen;
 		rval = (u_char *) StorageTmp->sccpAccessPointAlarmStatus;
 		break;
-	case (u_char) SCCPSAP2ADDRESS:	/* Create */
-		*write_method = write_sccpSap2Address;
+	case (u_char) SCCPACCESSPOINTSAP2ADDRESS:	/* Create */
+		*write_method = write_sccpAccessPointSap2Address;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpSap2AddressLen;
-		rval = (u_char *) StorageTmp->sccpSap2Address;
+		*var_len = StorageTmp->sccpAccessPointSap2AddressLen;
+		rval = (u_char *) StorageTmp->sccpAccessPointSap2Address;
 		break;
-	case (u_char) SCCPUSERENTITYNAMES:	/* Create */
-		*write_method = write_sccpUserEntityNames;
+	case (u_char) SCCPACCESSPOINTUSERENTITYNAMES:	/* Create */
+		*write_method = write_sccpAccessPointUserEntityNames;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpUserEntityNamesLen;
-		rval = (u_char *) StorageTmp->sccpUserEntityNames;
+		*var_len = StorageTmp->sccpAccessPointUserEntityNamesLen;
+		rval = (u_char *) StorageTmp->sccpAccessPointUserEntityNames;
 		break;
-	case (u_char) SCCPPROVIDERENTITYNAMES:	/* Create */
-		*write_method = write_sccpProviderEntityNames;
+	case (u_char) SCCPACCESSPOINTPROVIDERENTITYNAMES:	/* Create */
+		*write_method = write_sccpAccessPointProviderEntityNames;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpProviderEntityNamesLen;
-		rval = (u_char *) StorageTmp->sccpProviderEntityNames;
+		*var_len = StorageTmp->sccpAccessPointProviderEntityNamesLen;
+		rval = (u_char *) StorageTmp->sccpAccessPointProviderEntityNames;
 		break;
-	case (u_char) SCCPAVAILABILITYSTATUS:	/* ReadOnly */
+	case (u_char) SCCPACCESSPOINTAVAILABILITYSTATUS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpAvailabilityStatusLen;
-		rval = (u_char *) StorageTmp->sccpAvailabilityStatus;
+		*var_len = StorageTmp->sccpAccessPointAvailabilityStatusLen;
+		rval = (u_char *) StorageTmp->sccpAccessPointAvailabilityStatus;
 		break;
-	case (u_char) SCCPCONCERNEDAREAPOINTER:	/* Create */
-		*write_method = write_sccpConcernedAreaPointer;
+	case (u_char) SCCPACCESSPOINTCONCERNEDAREAPOINTER:	/* Create */
+		*write_method = write_sccpAccessPointConcernedAreaPointer;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpConcernedAreaPointer);
-		rval = (u_char *) &StorageTmp->sccpConcernedAreaPointer;
+		*var_len = sizeof(StorageTmp->sccpAccessPointConcernedAreaPointer);
+		rval = (u_char *) &StorageTmp->sccpAccessPointConcernedAreaPointer;
 		break;
-	case (u_char) SCCPLINKAGEPOINTER:	/* Create */
-		*write_method = write_sccpLinkagePointer;
+	case (u_char) SCCPACCESSPOINTLINKAGEPOINTER:	/* Create */
+		*write_method = write_sccpAccessPointLinkagePointer;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpLinkagePointer);
-		rval = (u_char *) &StorageTmp->sccpLinkagePointer;
+		*var_len = sizeof(StorageTmp->sccpAccessPointLinkagePointer);
+		rval = (u_char *) &StorageTmp->sccpAccessPointLinkagePointer;
 		break;
-	case (u_char) SCCPSSAVAILABLEAFTERSPRESTART:	/* Create */
-		*write_method = write_sccpSsAvailableAfterSpRestart;
+	case (u_char) SCCPACCESSPOINTSSAVAILABLEAFTERSPRESTART:	/* Create */
+		*write_method = write_sccpAccessPointSsAvailableAfterSpRestart;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpSsAvailableAfterSpRestart);
-		rval = (u_char *) &StorageTmp->sccpSsAvailableAfterSpRestart;
+		*var_len = sizeof(StorageTmp->sccpAccessPointSsAvailableAfterSpRestart);
+		rval = (u_char *) &StorageTmp->sccpAccessPointSsAvailableAfterSpRestart;
+		break;
+	case (u_char) SCCPACCESSPOINTASAPROFILEPOINTER:	/* Create */
+		*write_method = write_sccpAccessPointAsaProfilePointer;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpAccessPointAsaProfilePointerLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpAccessPointAsaProfilePointer;
 		break;
 	case (u_char) SCCPACCESSPOINTNAME:	/* Create */
 		*write_method = write_sccpAccessPointName;
@@ -5333,241 +5964,241 @@ var_sccpLinkageTable(struct variable *vp, oid * name, size_t *length, int exact,
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) SCCPOPERATIONALPROTOCOLS:	/* ReadOnly */
+	case (u_char) SCCPLINKAGEOPERATIONALPROTOCOLS:	/* Create */
+		*write_method = write_sccpLinkageOperationalProtocols;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpOperationalProtocolsLen;
-		rval = (u_char *) StorageTmp->sccpOperationalProtocols;
+		*var_len = StorageTmp->sccpLinkageOperationalProtocolsLen;
+		rval = (u_char *) StorageTmp->sccpLinkageOperationalProtocols;
 		break;
-	case (u_char) SCCPSNSAP:	/* ReadOnly */
+	case (u_char) SCCPLINKAGESNSAP:	/* Create */
+		*write_method = write_sccpLinkageSnSAP;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpSnSAPLen * sizeof(oid);
-		rval = (u_char *) StorageTmp->sccpSnSAP;
+		*var_len = StorageTmp->sccpLinkageSnSAPLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpLinkageSnSAP;
 		break;
-	case (u_char) SCCPATTACKTIMERVALUE:	/* Create */
-		*write_method = write_sccpAttackTimerValue;
+	case (u_char) SCCPLINKAGEATTACKTIMERVALUE:	/* Create */
+		*write_method = write_sccpLinkageAttackTimerValue;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpAttackTimerValue);
-		rval = (u_char *) &StorageTmp->sccpAttackTimerValue;
+		*var_len = sizeof(StorageTmp->sccpLinkageAttackTimerValue);
+		rval = (u_char *) &StorageTmp->sccpLinkageAttackTimerValue;
 		break;
-	case (u_char) SCCPDECAYTIMERVALUE:	/* Create */
-		*write_method = write_sccpDecayTimerValue;
+	case (u_char) SCCPLINKAGEDECAYTIMERVALUE:	/* Create */
+		*write_method = write_sccpLinkageDecayTimerValue;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpDecayTimerValue);
-		rval = (u_char *) &StorageTmp->sccpDecayTimerValue;
+		*var_len = sizeof(StorageTmp->sccpLinkageDecayTimerValue);
+		rval = (u_char *) &StorageTmp->sccpLinkageDecayTimerValue;
 		break;
-	case (u_char) SCCPNROFRESTRICTIONLEVELS:	/* Create */
-		*write_method = write_sccpNrOfRestrictionLevels;
+	case (u_char) SCCPLINKAGENROFRESTRICTIONLEVELS:	/* Create */
+		*write_method = write_sccpLinkageNrOfRestrictionLevels;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpNrOfRestrictionLevels);
-		rval = (u_char *) &StorageTmp->sccpNrOfRestrictionLevels;
+		*var_len = sizeof(StorageTmp->sccpLinkageNrOfRestrictionLevels);
+		rval = (u_char *) &StorageTmp->sccpLinkageNrOfRestrictionLevels;
 		break;
-	case (u_char) SCCPNROFSUBLEVELS:	/* Create */
-		*write_method = write_sccpNrOfSubLevels;
+	case (u_char) SCCPLINKAGENROFSUBLEVELS:	/* Create */
+		*write_method = write_sccpLinkageNrOfSubLevels;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpNrOfSubLevels);
-		rval = (u_char *) &StorageTmp->sccpNrOfSubLevels;
+		*var_len = sizeof(StorageTmp->sccpLinkageNrOfSubLevels);
+		rval = (u_char *) &StorageTmp->sccpLinkageNrOfSubLevels;
 		break;
-	case (u_char) SCCPCLS:	/* Create */
-		*write_method = write_sccpCLS;
+	case (u_char) SCCPLINKAGECLS:	/* Create */
+		*write_method = write_sccpLinkageCLS;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpCLS);
-		rval = (u_char *) &StorageTmp->sccpCLS;
+		*var_len = sizeof(StorageTmp->sccpLinkageCLS);
+		rval = (u_char *) &StorageTmp->sccpLinkageCLS;
 		break;
-	case (u_char) SCCPCONGESTIONTIMERVALUE:	/* Create */
-		*write_method = write_sccpCongestionTimerValue;
+	case (u_char) SCCPLINKAGECONGESTIONTIMERVALUE:	/* Create */
+		*write_method = write_sccpLinkageCongestionTimerValue;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpCongestionTimerValue);
-		rval = (u_char *) &StorageTmp->sccpCongestionTimerValue;
+		*var_len = sizeof(StorageTmp->sccpLinkageCongestionTimerValue);
+		rval = (u_char *) &StorageTmp->sccpLinkageCongestionTimerValue;
 		break;
-	case (u_char) SCCPP:	/* Create */
-		*write_method = write_sccpp;
+	case (u_char) SCCPLINKAGEP:	/* Create */
+		*write_method = write_sccpLinkageP;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpp);
-		rval = (u_char *) &StorageTmp->sccpp;
+		*var_len = sizeof(StorageTmp->sccpLinkageP);
+		rval = (u_char *) &StorageTmp->sccpLinkageP;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELCR:	/* Create */
-		*write_method = write_sccpImportanceLevelCR;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELCR:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelCR;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelCRLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelCR;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelCRLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelCR;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELCC:	/* Create */
-		*write_method = write_sccpImportanceLevelCC;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELCC:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelCC;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelCCLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelCC;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelCCLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelCC;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELCREF:	/* Create */
-		*write_method = write_sccpImportanceLevelCREF;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELCREF:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelCREF;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelCREFLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelCREF;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelCREFLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelCREF;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELDT1:	/* Create */
-		*write_method = write_sccpImportanceLevelDT1;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELDT1:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelDT1;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelDT1Len;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelDT1;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelDT1Len;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelDT1;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELDT2:	/* Create */
-		*write_method = write_sccpImportanceLevelDT2;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELDT2:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelDT2;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelDT2Len;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelDT2;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelDT2Len;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelDT2;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELAK:	/* Create */
-		*write_method = write_sccpImportanceLevelAK;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELAK:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelAK;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelAKLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelAK;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelAKLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelAK;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELIT:	/* Create */
-		*write_method = write_sccpImportanceLevelIT;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELIT:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelIT;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelITLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelIT;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelITLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelIT;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELED:	/* Create */
-		*write_method = write_sccpImportanceLevelED;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELED:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelED;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelEDLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelED;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelEDLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelED;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELEA:	/* Create */
-		*write_method = write_sccpImportanceLevelEA;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELEA:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelEA;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelEALen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelEA;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelEALen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelEA;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELRSR:	/* Create */
-		*write_method = write_sccpImportanceLevelRSR;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELRSR:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelRSR;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelRSRLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelRSR;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelRSRLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelRSR;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELRSC:	/* Create */
-		*write_method = write_sccpImportanceLevelRSC;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELRSC:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelRSC;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelRSCLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelRSC;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelRSCLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelRSC;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELERR:	/* Create */
-		*write_method = write_sccpImportanceLevelERR;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELERR:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelERR;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelERRLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelERR;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelERRLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelERR;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELRLC:	/* Create */
-		*write_method = write_sccpImportanceLevelRLC;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELRLC:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelRLC;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelRLCLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelRLC;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelRLCLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelRLC;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELRLSD:	/* Create */
-		*write_method = write_sccpImportanceLevelRLSD;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELRLSD:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelRLSD;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelRLSDLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelRLSD;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelRLSDLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelRLSD;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELUDT:	/* Create */
-		*write_method = write_sccpImportanceLevelUDT;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELUDT:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelUDT;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelUDTLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelUDT;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelUDTLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelUDT;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELUDTS:	/* Create */
-		*write_method = write_sccpImportanceLevelUDTS;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELUDTS:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelUDTS;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelUDTSLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelUDTS;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelUDTSLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelUDTS;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELXUDT:	/* Create */
-		*write_method = write_sccpImportanceLevelXUDT;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELXUDT:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelXUDT;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelXUDTLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelXUDT;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelXUDTLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelXUDT;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELXUDTS:	/* Create */
-		*write_method = write_sccpImportanceLevelXUDTS;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELXUDTS:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelXUDTS;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelXUDTSLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelXUDTS;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelXUDTSLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelXUDTS;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELLUDT:	/* Create */
-		*write_method = write_sccpImportanceLevelLUDT;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELLUDT:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelLUDT;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelLUDTLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelLUDT;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelLUDTLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelLUDT;
 		break;
-	case (u_char) SCCPIMPORTANCELEVELLUDTS:	/* Create */
-		*write_method = write_sccpImportanceLevelLUDTS;
+	case (u_char) SCCPLINKAGEIMPORTANCELEVELLUDTS:	/* Create */
+		*write_method = write_sccpLinkageImportanceLevelLUDTS;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpImportanceLevelLUDTSLen;
-		rval = (u_char *) StorageTmp->sccpImportanceLevelLUDTS;
+		*var_len = StorageTmp->sccpLinkageImportanceLevelLUDTSLen;
+		rval = (u_char *) StorageTmp->sccpLinkageImportanceLevelLUDTS;
 		break;
-	case (u_char) SCCPRLM:	/* Create */
-		*write_method = write_sccpRLM;
+	case (u_char) SCCPLINKAGERLM:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpRLM);
-		rval = (u_char *) &StorageTmp->sccpRLM;
+		*var_len = sizeof(StorageTmp->sccpLinkageRLM);
+		rval = (u_char *) &StorageTmp->sccpLinkageRLM;
 		break;
-	case (u_char) SCCPRSLM:	/* Create */
-		*write_method = write_sccpRSLM;
+	case (u_char) SCCPLINKAGERSLM:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpRSLM);
-		rval = (u_char *) &StorageTmp->sccpRSLM;
+		*var_len = sizeof(StorageTmp->sccpLinkageRSLM);
+		rval = (u_char *) &StorageTmp->sccpLinkageRSLM;
 		break;
 	case (u_char) SCCPLINKAGECONCERNEDAREAPOINTER:	/* Create */
 		*write_method = write_sccpLinkageConcernedAreaPointer;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpLinkageConcernedAreaPointerLen;
-		rval = (u_char *) StorageTmp->sccpLinkageConcernedAreaPointer;
+		*var_len = sizeof(StorageTmp->sccpLinkageConcernedAreaPointer);
+		rval = (u_char *) &StorageTmp->sccpLinkageConcernedAreaPointer;
 		break;
-	case (u_char) SCCPLOWERLIMITFORSEGMENTATION:	/* Create */
-		*write_method = write_sccpLowerLimitForSegmentation;
+	case (u_char) SCCPLINKAGELOWERLIMITFORSEGMENTATION:	/* Create */
+		*write_method = write_sccpLinkageLowerLimitForSegmentation;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpLowerLimitForSegmentation);
-		rval = (u_char *) &StorageTmp->sccpLowerLimitForSegmentation;
+		*var_len = sizeof(StorageTmp->sccpLinkageLowerLimitForSegmentation);
+		rval = (u_char *) &StorageTmp->sccpLinkageLowerLimitForSegmentation;
 		break;
-	case (u_char) SCCPUPPERLIMITFORSEGMENTATION:	/* Create */
-		*write_method = write_sccpUpperLimitForSegmentation;
+	case (u_char) SCCPLINKAGEUPPERLIMITFORSEGMENTATION:	/* Create */
+		*write_method = write_sccpLinkageUpperLimitForSegmentation;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpUpperLimitForSegmentation);
-		rval = (u_char *) &StorageTmp->sccpUpperLimitForSegmentation;
+		*var_len = sizeof(StorageTmp->sccpLinkageUpperLimitForSegmentation);
+		rval = (u_char *) &StorageTmp->sccpLinkageUpperLimitForSegmentation;
 		break;
 	case (u_char) SCCPLINKAGENAME:	/* Create */
 		*write_method = write_sccpLinkageName;
@@ -5582,6 +6213,163 @@ var_sccpLinkageTable(struct variable *vp, oid * name, size_t *length, int exact,
 			break;
 		*var_len = sizeof(StorageTmp->sccpLinkageRowStatus);
 		rval = (u_char *) &StorageTmp->sccpLinkageRowStatus;
+		break;
+	default:
+		ERROR_MSG("");
+	}
+	return (rval);
+}
+
+/**
+ * @fn void refresh_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp, int force)
+ * @param StorageTmp the data row to refresh.
+ * @param force force refresh if non-zero.
+ * @brief refresh the contents of the sccpMtpTable row.
+ *
+ * Normally the values retrieved from the operating system are cached.  However, if a row contains
+ * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
+ * may be necessary to refresh the row on some other basis, but normally only once per request.
+ */
+struct sccpMtpTable_data *
+refresh_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp, int force)
+{
+	if (!StorageTmp || (!force && StorageTmp->sccpMtpTable_request == sa_request))
+		return (StorageTmp);
+	/* XXX: update row; delete it and return NULL if the row has disappeared */
+	StorageTmp->sccpMtpTable_request = sa_request;
+	return (StorageTmp);
+}
+
+/**
+ * @fn void refresh_sccpMtpTable(int force)
+ * @param force force refresh if non-zero.
+ * @brief refresh the scalar values of the sccpMtpTable.
+ *
+ * Normally the values retrieved from the operating system are cached.  When the agent receives a
+ * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
+ * indicates to the agent that the cache has been invalidated and that it should reread scalars and
+ * tables from the STREAMS subsystem.  This function is used when the agent starts for the first
+ * time, or after a SIGPOLL has been received (and a row or column has been requested).
+ */
+void
+refresh_sccpMtpTable(int force)
+{
+	if (!force && sccpMtpTable_refresh == 0)
+		return;
+	/* XXX: Here, update the table as required... */
+	sccpMtpTable_refresh = 0;
+}
+
+/**
+ * @fn u_char *var_sccpMtpTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
+ * @brief locate variables in sccpMtpTable.
+ *
+ * Handle this table separately from the scalar value case.  The workings of this are basically the
+ * same as for var_sccpMIB above.
+ */
+u_char *
+var_sccpMtpTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+{
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	u_char *rval;
+
+	DEBUGMSGTL(("sccpMIB", "var_sccpMtpTable: Entering...  \n"));
+	/* Make sure that the storage data does not need to be refreshed before checking the header. */
+	refresh_sccpMtpTable(0);
+	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
+	while ((StorageTmp = header_complex(sccpMtpTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_sccpMtpTable_row(StorageTmp, 0)) || exact)
+			break;
+	*write_method = NULL;
+	*var_len = 0;
+	rval = NULL;
+	/* This is where we do the value assignments for the mib results. */
+	switch (vp->magic) {
+	case (u_char) SCCPMTPSAP2ADDRESS:	/* Create */
+		*write_method = write_sccpMtpSap2Address;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpMtpSap2AddressLen;
+		rval = (u_char *) StorageTmp->sccpMtpSap2Address;
+		break;
+	case (u_char) SCCPMTPUSERPART:	/* Create */
+		*write_method = write_sccpMtpUserPart;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpMtpUserPart);
+		rval = (u_char *) &StorageTmp->sccpMtpUserPart;
+		break;
+	case (u_char) SCCPMTPUSERPARTSTATUS:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpMtpUserPartStatus);
+		rval = (u_char *) &StorageTmp->sccpMtpUserPartStatus;
+		break;
+	case (u_char) SCCPMTPUSERENTITYNAMES:	/* Create */
+		*write_method = write_sccpMtpUserEntityNames;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpMtpUserEntityNamesLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpMtpUserEntityNames;
+		break;
+	case (u_char) SCCPMTPPROVIDERENTITYNAMES:	/* Create */
+		*write_method = write_sccpMtpProviderEntityNames;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpMtpProviderEntityNamesLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpMtpProviderEntityNames;
+		break;
+	case (u_char) SCCPMTPUSAGESTATE:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpMtpUsageState);
+		rval = (u_char *) &StorageTmp->sccpMtpUsageState;
+		break;
+	case (u_char) SCCPMTPADMINISTRATIVESTATE:	/* Create */
+		*write_method = write_sccpMtpAdministrativeState;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpMtpAdministrativeState);
+		rval = (u_char *) &StorageTmp->sccpMtpAdministrativeState;
+		break;
+	case (u_char) SCCPMTPOPERATIONALSTATE:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpMtpOperationalState);
+		rval = (u_char *) &StorageTmp->sccpMtpOperationalState;
+		break;
+	case (u_char) SCCPMTPCONGESTEDSTATE:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpMtpCongestedState);
+		rval = (u_char *) &StorageTmp->sccpMtpCongestedState;
+		break;
+	case (u_char) SCCPMTPCONGESTIONLEVEL:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpMtpCongestionLevel);
+		rval = (u_char *) &StorageTmp->sccpMtpCongestionLevel;
+		break;
+	case (u_char) SCCPMTPREMOTEEXCHANGELABEL:	/* Create */
+		*write_method = write_sccpMtpRemoteExchangeLabel;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpMtpRemoteExchangeLabelLen;
+		rval = (u_char *) StorageTmp->sccpMtpRemoteExchangeLabel;
+		break;
+	case (u_char) SCCPMTPNAME:	/* Create */
+		*write_method = write_sccpMtpName;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpMtpNameLen;
+		rval = (u_char *) StorageTmp->sccpMtpName;
+		break;
+	case (u_char) SCCPMTPROWSTATUS:	/* Create */
+		*write_method = write_sccpMtpRowStatus;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpMtpRowStatus);
+		rval = (u_char *) &StorageTmp->sccpMtpRowStatus;
 		break;
 	default:
 		ERROR_MSG("");
@@ -5661,17 +6449,24 @@ var_sccpSclcTable(struct variable *vp, oid * name, size_t *length, int exact, si
 		*var_len = StorageTmp->sccpSclcAlarmStatusLen;
 		rval = (u_char *) StorageTmp->sccpSclcAlarmStatus;
 		break;
+	case (u_char) SCCPSCLCCLPROTOCOLMACHINEID:	/* Create */
+		*write_method = write_sccpSclcClProtocolMachineId;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpSclcClProtocolMachineIdLen;
+		rval = (u_char *) StorageTmp->sccpSclcClProtocolMachineId;
+		break;
 	case (u_char) SCCPSCLCOPERATIONALSTATE:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->sccpSclcOperationalState);
 		rval = (u_char *) &StorageTmp->sccpSclcOperationalState;
 		break;
-	case (u_char) SCCPTOTALREMOTESAPS:	/* ReadOnly */
+	case (u_char) SCCPSCLCTOTALREMOTESAPS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpTotalRemoteSAPs);
-		rval = (u_char *) &StorageTmp->sccpTotalRemoteSAPs;
+		*var_len = sizeof(StorageTmp->sccpSclcTotalRemoteSAPs);
+		rval = (u_char *) &StorageTmp->sccpSclcTotalRemoteSAPs;
 		break;
 	case (u_char) SCCPSCLCADMINISTRATIVESTATE:	/* Create */
 		*write_method = write_sccpSclcAdministrativeState;
@@ -5693,12 +6488,19 @@ var_sccpSclcTable(struct variable *vp, oid * name, size_t *length, int exact, si
 		*var_len = sizeof(StorageTmp->sccpSclcOperationalSystemType);
 		rval = (u_char *) &StorageTmp->sccpSclcOperationalSystemType;
 		break;
-	case (u_char) SCCPINITIALVALUEREASSTIMER:	/* Create */
-		*write_method = write_sccpInitialValueReassTimer;
+	case (u_char) SCCPSCLCINITIALVALUEREASSTIMER:	/* Create */
+		*write_method = write_sccpSclcInitialValueReassTimer;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpInitialValueReassTimer);
-		rval = (u_char *) &StorageTmp->sccpInitialValueReassTimer;
+		*var_len = sizeof(StorageTmp->sccpSclcInitialValueReassTimer);
+		rval = (u_char *) &StorageTmp->sccpSclcInitialValueReassTimer;
+		break;
+	case (u_char) SCCPSCLCASAPROFILEPOINTER:	/* Create */
+		*write_method = write_sccpSclcAsaProfilePointer;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpSclcAsaProfilePointerLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpSclcAsaProfilePointer;
 		break;
 	case (u_char) SCCPSCLCNAME:	/* Create */
 		*write_method = write_sccpSclcName;
@@ -5785,12 +6587,12 @@ var_sccpScocTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) SCCPCOPROTOCOLMACHINEID:	/* Create */
-		*write_method = write_sccpCoProtocolMachineId;
+	case (u_char) SCCPSCOCCOPROTOCOLMACHINEID:	/* Create */
+		*write_method = write_sccpScocCoProtocolMachineId;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpCoProtocolMachineIdLen;
-		rval = (u_char *) StorageTmp->sccpCoProtocolMachineId;
+		*var_len = StorageTmp->sccpScocCoProtocolMachineIdLen;
+		rval = (u_char *) StorageTmp->sccpScocCoProtocolMachineId;
 		break;
 	case (u_char) SCCPSCOCOPERATIONALSTATE:	/* ReadOnly */
 		if (!StorageTmp)
@@ -5917,6 +6719,13 @@ var_sccpScrcTable(struct variable *vp, oid * name, size_t *length, int exact, si
 		*var_len = StorageTmp->sccpScrcAlarmStatusLen;
 		rval = (u_char *) StorageTmp->sccpScrcAlarmStatus;
 		break;
+	case (u_char) SCCPSCRCASAPROFILEPOINTER:	/* Create */
+		*write_method = write_sccpScrcAsaProfilePointer;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->sccpScrcAsaProfilePointerLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpScrcAsaProfilePointer;
+		break;
 	case (u_char) SCCPSCRCNAME:	/* Create */
 		*write_method = write_sccpScrcName;
 		if (!StorageTmp)
@@ -6002,19 +6811,19 @@ var_sccpEntitySetTable(struct variable *vp, oid * name, size_t *length, int exac
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) SCCPSHARINGMODE:	/* Create */
-		*write_method = write_sccpSharingMode;
+	case (u_char) SCCPENTITYSETSHARINGMODE:	/* Create */
+		*write_method = write_sccpEntitySetSharingMode;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpSharingMode);
-		rval = (u_char *) &StorageTmp->sccpSharingMode;
+		*var_len = sizeof(StorageTmp->sccpEntitySetSharingMode);
+		rval = (u_char *) &StorageTmp->sccpEntitySetSharingMode;
 		break;
-	case (u_char) SCCPLOADSHARINGALGPOINTER:	/* Create */
-		*write_method = write_sccpLoadSharingAlgPointer;
+	case (u_char) SCCPENTITYSETLOADSHARINGALGPOINTER:	/* Create */
+		*write_method = write_sccpEntitySetLoadSharingAlgPointer;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpLoadSharingAlgPointerLen * sizeof(oid);
-		rval = (u_char *) StorageTmp->sccpLoadSharingAlgPointer;
+		*var_len = StorageTmp->sccpEntitySetLoadSharingAlgPointerLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->sccpEntitySetLoadSharingAlgPointer;
 		break;
 	case (u_char) SCCPENTITYSETNAME:	/* Create */
 		*write_method = write_sccpEntitySetName;
@@ -6207,6 +7016,19 @@ var_sccpConcernedAreaTable(struct variable *vp, oid * name, size_t *length, int 
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
+	case (u_char) SCCPCONCERNEDAREAREMOTESCCPLIST:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpConcernedAreaRemoteSCCPList);
+		rval = (u_char *) &StorageTmp->sccpConcernedAreaRemoteSCCPList;
+		break;
+	case (u_char) SCCPCONCERNEDAREAROWSTATUS:	/* Create */
+		*write_method = write_sccpConcernedAreaRowStatus;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->sccpConcernedAreaRowStatus);
+		rval = (u_char *) &StorageTmp->sccpConcernedAreaRowStatus;
+		break;
 	default:
 		ERROR_MSG("");
 	}
@@ -6370,33 +7192,33 @@ var_sccpGtConversionRuleTable(struct variable *vp, oid * name, size_t *length, i
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) SCCPGTNEWENCODINGSCHEME:	/* Create */
-		*write_method = write_sccpGtNewEncodingScheme;
+	case (u_char) SCCPGTCONVERSIONRULENEWENCODINGSCHEME:	/* Create */
+		*write_method = write_sccpGtConversionRuleNewEncodingScheme;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtNewEncodingScheme);
-		rval = (u_char *) &StorageTmp->sccpGtNewEncodingScheme;
+		*var_len = sizeof(StorageTmp->sccpGtConversionRuleNewEncodingScheme);
+		rval = (u_char *) &StorageTmp->sccpGtConversionRuleNewEncodingScheme;
 		break;
-	case (u_char) SCCPGTNEWNATUREOFADDRESS:	/* Create */
-		*write_method = write_sccpGtNewNatureOfAddress;
+	case (u_char) SCCPGTCONVERSIONRULENEWNATUREOFADDRESS:	/* Create */
+		*write_method = write_sccpGtConversionRuleNewNatureOfAddress;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtNewNatureOfAddress);
-		rval = (u_char *) &StorageTmp->sccpGtNewNatureOfAddress;
+		*var_len = sizeof(StorageTmp->sccpGtConversionRuleNewNatureOfAddress);
+		rval = (u_char *) &StorageTmp->sccpGtConversionRuleNewNatureOfAddress;
 		break;
-	case (u_char) SCCPGTNEWNUMBERINGPLAN:	/* Create */
-		*write_method = write_sccpGtNewNumberingPlan;
+	case (u_char) SCCPGTCONVERSIONRULENEWNUMBERINGPLAN:	/* Create */
+		*write_method = write_sccpGtConversionRuleNewNumberingPlan;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtNewNumberingPlan);
-		rval = (u_char *) &StorageTmp->sccpGtNewNumberingPlan;
+		*var_len = sizeof(StorageTmp->sccpGtConversionRuleNewNumberingPlan);
+		rval = (u_char *) &StorageTmp->sccpGtConversionRuleNewNumberingPlan;
 		break;
-	case (u_char) SCCPGTNEWTRANSLATIONTYPE:	/* Create */
-		*write_method = write_sccpGtNewTranslationType;
+	case (u_char) SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE:	/* Create */
+		*write_method = write_sccpGtConversionRuleNewTranslationType;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtNewTranslationType);
-		rval = (u_char *) &StorageTmp->sccpGtNewTranslationType;
+		*var_len = sizeof(StorageTmp->sccpGtConversionRuleNewTranslationType);
+		rval = (u_char *) &StorageTmp->sccpGtConversionRuleNewTranslationType;
 		break;
 	case (u_char) SCCPGTCONVERSIONRULENAME:	/* Create */
 		*write_method = write_sccpGtConversionRuleName;
@@ -6582,33 +7404,33 @@ var_sccpGtTranslatorTable(struct variable *vp, oid * name, size_t *length, int e
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) SCCPGTINDICATOR:	/* Create */
-		*write_method = write_sccpGtIndicator;
+	case (u_char) SCCPGTTRANSLATORGTINDICATOR:	/* Create */
+		*write_method = write_sccpGtTranslatorGtIndicator;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtIndicator);
-		rval = (u_char *) &StorageTmp->sccpGtIndicator;
+		*var_len = sizeof(StorageTmp->sccpGtTranslatorGtIndicator);
+		rval = (u_char *) &StorageTmp->sccpGtTranslatorGtIndicator;
 		break;
-	case (u_char) SCCPGTNATUREOFADDRESS:	/* Create */
-		*write_method = write_sccpGtNatureOfAddress;
+	case (u_char) SCCPGTTRANSLATORNATUREOFADDRESS:	/* Create */
+		*write_method = write_sccpGtTranslatorNatureOfAddress;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtNatureOfAddress);
-		rval = (u_char *) &StorageTmp->sccpGtNatureOfAddress;
+		*var_len = sizeof(StorageTmp->sccpGtTranslatorNatureOfAddress);
+		rval = (u_char *) &StorageTmp->sccpGtTranslatorNatureOfAddress;
 		break;
-	case (u_char) SCCPGTNUMBERINGPLAN:	/* Create */
-		*write_method = write_sccpGtNumberingPlan;
+	case (u_char) SCCPGTTRANSLATORNUMBERINGPLAN:	/* Create */
+		*write_method = write_sccpGtTranslatorNumberingPlan;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtNumberingPlan);
-		rval = (u_char *) &StorageTmp->sccpGtNumberingPlan;
+		*var_len = sizeof(StorageTmp->sccpGtTranslatorNumberingPlan);
+		rval = (u_char *) &StorageTmp->sccpGtTranslatorNumberingPlan;
 		break;
-	case (u_char) SCCPGTTRANSLATIONTYPE:	/* Create */
-		*write_method = write_sccpGtTranslationType;
+	case (u_char) SCCPGTTRANSLATORTRANSLATIONTYPE:	/* Create */
+		*write_method = write_sccpGtTranslatorTranslationType;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtTranslationType);
-		rval = (u_char *) &StorageTmp->sccpGtTranslationType;
+		*var_len = sizeof(StorageTmp->sccpGtTranslatorTranslationType);
+		rval = (u_char *) &StorageTmp->sccpGtTranslatorTranslationType;
 		break;
 	case (u_char) SCCPGTTRANSLATORADMINISTRATIVESTATE:	/* Create */
 		*write_method = write_sccpGtTranslatorAdministrativeState;
@@ -6709,33 +7531,33 @@ var_sccpGtRuleTable(struct variable *vp, oid * name, size_t *length, int exact, 
 		*var_len = sizeof(StorageTmp->sccpGtRuleAdministrativeState);
 		rval = (u_char *) &StorageTmp->sccpGtRuleAdministrativeState;
 		break;
-	case (u_char) SCCPGTADDRESSINFORMATION:	/* Create */
-		*write_method = write_sccpGtAddressInformation;
+	case (u_char) SCCPGTRULEADDRESSINFORMATION:	/* Create */
+		*write_method = write_sccpGtRuleAddressInformation;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpGtAddressInformationLen;
-		rval = (u_char *) StorageTmp->sccpGtAddressInformation;
+		*var_len = StorageTmp->sccpGtRuleAddressInformationLen;
+		rval = (u_char *) StorageTmp->sccpGtRuleAddressInformation;
 		break;
-	case (u_char) SCCPGTCONVRULEPOINTER:	/* Create */
-		*write_method = write_sccpGtConvRulePointer;
+	case (u_char) SCCPGTRULEGTCONVERSIONRULEPOINTER:	/* Create */
+		*write_method = write_sccpGtRuleGtConversionRulePointer;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpGtConvRulePointerLen;
-		rval = (u_char *) StorageTmp->sccpGtConvRulePointer;
+		*var_len = StorageTmp->sccpGtRuleGtConversionRulePointerLen;
+		rval = (u_char *) StorageTmp->sccpGtRuleGtConversionRulePointer;
 		break;
-	case (u_char) SCCPGTENCODINGSCHEME:	/* Create */
-		*write_method = write_sccpGtEncodingScheme;
+	case (u_char) SCCPGTRULEENCODINGSCHEME:	/* Create */
+		*write_method = write_sccpGtRuleEncodingScheme;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpGtEncodingScheme);
-		rval = (u_char *) &StorageTmp->sccpGtEncodingScheme;
+		*var_len = sizeof(StorageTmp->sccpGtRuleEncodingScheme);
+		rval = (u_char *) &StorageTmp->sccpGtRuleEncodingScheme;
 		break;
-	case (u_char) SCCPENTITYSETPOINTER:	/* Create */
-		*write_method = write_sccpEntitySetPointer;
+	case (u_char) SCCPGTRULEENTITYSETPOINTER:	/* Create */
+		*write_method = write_sccpGtRuleEntitySetPointer;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpEntitySetPointerLen;
-		rval = (u_char *) StorageTmp->sccpEntitySetPointer;
+		*var_len = StorageTmp->sccpGtRuleEntitySetPointerLen;
+		rval = (u_char *) StorageTmp->sccpGtRuleEntitySetPointer;
 		break;
 	case (u_char) SCCPGTRULENAME:	/* Create */
 		*write_method = write_sccpGtRuleName;
@@ -6822,19 +7644,19 @@ var_sccpSrvtTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) SCCPDSRVT:	/* Create */
-		*write_method = write_sccpDSRVT;
+	case (u_char) SCCPSRVTDSRVT:	/* Create */
+		*write_method = write_sccpSrvtDSRVT;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpDSRVT);
-		rval = (u_char *) &StorageTmp->sccpDSRVT;
+		*var_len = sizeof(StorageTmp->sccpSrvtDSRVT);
+		rval = (u_char *) &StorageTmp->sccpSrvtDSRVT;
 		break;
-	case (u_char) SCCPNSRVT:	/* Create */
-		*write_method = write_sccpNSRVT;
+	case (u_char) SCCPSRVTNSRVT:	/* Create */
+		*write_method = write_sccpSrvtNSRVT;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpNSRVT);
-		rval = (u_char *) &StorageTmp->sccpNSRVT;
+		*var_len = sizeof(StorageTmp->sccpSrvtNSRVT);
+		rval = (u_char *) &StorageTmp->sccpSrvtNSRVT;
 		break;
 	case (u_char) SCCPSRVTNAME:	/* Create */
 		*write_method = write_sccpSrvtName;
@@ -6843,73 +7665,73 @@ var_sccpSrvtTable(struct variable *vp, oid * name, size_t *length, int exact, si
 		*var_len = StorageTmp->sccpSrvtNameLen;
 		rval = (u_char *) StorageTmp->sccpSrvtName;
 		break;
-	case (u_char) SCCPADMINISTRATIVESTATE:	/* Create */
-		*write_method = write_sccpAdministrativeState;
+	case (u_char) SCCPSRVTADMINISTRATIVESTATE:	/* Create */
+		*write_method = write_sccpSrvtAdministrativeState;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpAdministrativeState);
-		rval = (u_char *) &StorageTmp->sccpAdministrativeState;
+		*var_len = sizeof(StorageTmp->sccpSrvtAdministrativeState);
+		rval = (u_char *) &StorageTmp->sccpSrvtAdministrativeState;
 		break;
-	case (u_char) SCCPOPERATIONALSTATE:	/* ReadOnly */
+	case (u_char) SCCPSRVTOPERATIONALSTATE:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpOperationalState);
-		rval = (u_char *) &StorageTmp->sccpOperationalState;
+		*var_len = sizeof(StorageTmp->sccpSrvtOperationalState);
+		rval = (u_char *) &StorageTmp->sccpSrvtOperationalState;
 		break;
-	case (u_char) SCCPPROCEDURALSTATUS:	/* ReadOnly */
+	case (u_char) SCCPSRVTPROCEDURALSTATUS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpProceduralStatusLen;
-		rval = (u_char *) StorageTmp->sccpProceduralStatus;
+		*var_len = StorageTmp->sccpSrvtProceduralStatusLen;
+		rval = (u_char *) StorageTmp->sccpSrvtProceduralStatus;
 		break;
-	case (u_char) SCCPTRACEREQUESTED:	/* Create */
-		*write_method = write_sccpTraceRequested;
+	case (u_char) SCCPSRVTTRACEREQUESTED:	/* Create */
+		*write_method = write_sccpSrvtTraceRequested;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpTraceRequested);
-		rval = (u_char *) &StorageTmp->sccpTraceRequested;
+		*var_len = sizeof(StorageTmp->sccpSrvtTraceRequested);
+		rval = (u_char *) &StorageTmp->sccpSrvtTraceRequested;
 		break;
-	case (u_char) SCCPTHRESHOLD:	/* Create */
-		*write_method = write_sccpThreshold;
+	case (u_char) SCCPSRVTTHRESHOLD:	/* Create */
+		*write_method = write_sccpSrvtThreshold;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpThreshold);
-		rval = (u_char *) &StorageTmp->sccpThreshold;
+		*var_len = sizeof(StorageTmp->sccpSrvtThreshold);
+		rval = (u_char *) &StorageTmp->sccpSrvtThreshold;
 		break;
-	case (u_char) SCCPMTPBACKWARDROUTINGREQUESTED:	/* Create */
-		*write_method = write_sccpMtpBackwardRoutingRequested;
+	case (u_char) SCCPSRVTMTPBACKWARDROUTINGREQUESTED:	/* Create */
+		*write_method = write_sccpSrvtMtpBackwardRoutingRequested;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpMtpBackwardRoutingRequested);
-		rval = (u_char *) &StorageTmp->sccpMtpBackwardRoutingRequested;
+		*var_len = sizeof(StorageTmp->sccpSrvtMtpBackwardRoutingRequested);
+		rval = (u_char *) &StorageTmp->sccpSrvtMtpBackwardRoutingRequested;
 		break;
-	case (u_char) SCCPORIGINALGT:	/* Create */
-		*write_method = write_sccpOriginalGT;
+	case (u_char) SCCPSRVTORIGINALGT:	/* Create */
+		*write_method = write_sccpSrvtOriginalGT;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpOriginalGTLen;
-		rval = (u_char *) StorageTmp->sccpOriginalGT;
+		*var_len = StorageTmp->sccpSrvtOriginalGTLen;
+		rval = (u_char *) StorageTmp->sccpSrvtOriginalGT;
 		break;
-	case (u_char) SCCPINFOREQUEST:	/* Create */
-		*write_method = write_sccpInfoRequest;
+	case (u_char) SCCPSRVTINFOREQUEST:	/* Create */
+		*write_method = write_sccpSrvtInfoRequest;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpInfoRequestLen;
-		rval = (u_char *) StorageTmp->sccpInfoRequest;
+		*var_len = StorageTmp->sccpSrvtInfoRequestLen;
+		rval = (u_char *) StorageTmp->sccpSrvtInfoRequest;
 		break;
-	case (u_char) SCCPRETURNUNKNOWNPARAMS:	/* Create */
-		*write_method = write_sccpReturnUnknownParams;
+	case (u_char) SCCPSRVTRETURNUNKNOWNPARAMS:	/* Create */
+		*write_method = write_sccpSrvtReturnUnknownParams;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->sccpReturnUnknownParamsLen;
-		rval = (u_char *) StorageTmp->sccpReturnUnknownParams;
+		*var_len = StorageTmp->sccpSrvtReturnUnknownParamsLen;
+		rval = (u_char *) StorageTmp->sccpSrvtReturnUnknownParams;
 		break;
-	case (u_char) SCCPROUTETESTROWSTATUS:	/* Create */
-		*write_method = write_sccpRouteTestRowStatus;
+	case (u_char) SCCPSRVTROWSTATUS:	/* Create */
+		*write_method = write_sccpSrvtRowStatus;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->sccpRouteTestRowStatus);
-		rval = (u_char *) &StorageTmp->sccpRouteTestRowStatus;
+		*var_len = sizeof(StorageTmp->sccpSrvtRowStatus);
+		rval = (u_char *) &StorageTmp->sccpSrvtRowStatus;
 		break;
 	default:
 		ERROR_MSG("");
@@ -6944,7 +7766,7 @@ write_sccpNetworkEntityAlarmStatus(int action, u_char *var_val, u_char var_val_t
 		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRowStatus) {
+			switch (StorageTmp->sccpNetworkEntityRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
 				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAlarmStatus: but column non-existent\n");
@@ -6956,12 +7778,20 @@ write_sccpNetworkEntityAlarmStatus(int action, u_char *var_val, u_char var_val_t
 			}
 		}
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAlarmStatus not ASN_BIT_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAlarmStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAlarmStatus: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -6996,7 +7826,7 @@ write_sccpNetworkEntityAlarmStatus(int action, u_char *var_val, u_char var_val_t
 }
 
 /**
- * @fn int write_sccpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpNetworkEntityVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7007,7 +7837,7 @@ write_sccpNetworkEntityAlarmStatus(int action, u_char *var_val, u_char var_val_t
  * @brief Table row and column write routine.
  */
 int
-write_sccpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpNetworkEntityVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static oid *old_value;
 	struct sccpNetworkEntityTable_data *StorageTmp = NULL;
@@ -7015,17 +7845,17 @@ write_sccpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpVersion entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityVersion entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpNetworkEntityTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRowStatus) {
+			switch (StorageTmp->sccpNetworkEntityRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpVersion: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityVersion: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7034,12 +7864,12 @@ write_sccpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			}
 		}
 		if (var_val_type != ASN_OBJECT_ID) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpVersion not ASN_OBJECT_ID\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityVersion not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 14..15 */
 		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid) || ((14 * sizeof(oid) > var_val_len || var_val_len > 15 * sizeof(oid)))) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpVersion: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityVersion: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -7047,14 +7877,14 @@ write_sccpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpVersion for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpNetworkEntityVersion for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpVersion;
-		old_length = StorageTmp->sccpVersionLen;
-		StorageTmp->sccpVersion = objid;
-		StorageTmp->sccpVersionLen = var_val_len / sizeof(oid);
+		old_value = StorageTmp->sccpNetworkEntityVersion;
+		old_length = StorageTmp->sccpNetworkEntityVersionLen;
+		StorageTmp->sccpNetworkEntityVersion = objid;
+		StorageTmp->sccpNetworkEntityVersionLen = var_val_len / sizeof(oid);
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -7062,8 +7892,8 @@ write_sccpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		objid = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpVersion = old_value;
-		StorageTmp->sccpVersionLen = old_length;
+		StorageTmp->sccpNetworkEntityVersion = old_value;
+		StorageTmp->sccpNetworkEntityVersionLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(objid);
@@ -7073,7 +7903,7 @@ write_sccpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_v
 }
 
 /**
- * @fn int write_sccpLUDTandLUDTSSupported(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpNetworkEntityLUDTandLUDTSSupported(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7084,23 +7914,23 @@ write_sccpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_v
  * @brief Table row and column write routine.
  */
 int
-write_sccpLUDTandLUDTSSupported(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpNetworkEntityLUDTandLUDTSSupported(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpNetworkEntityTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpLUDTandLUDTSSupported entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityLUDTandLUDTSSupported entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpNetworkEntityTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRowStatus) {
+			switch (StorageTmp->sccpNetworkEntityRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLUDTandLUDTSSupported: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityLUDTandLUDTSSupported: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7109,35 +7939,36 @@ write_sccpLUDTandLUDTSSupported(int action, u_char *var_val, u_char var_val_type
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLUDTandLUDTSSupported not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityLUDTandLUDTSSupported not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLUDTandLUDTSSupported: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityLUDTandLUDTSSupported: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value false */
 		switch (set_value) {
 		case TV_TRUE:
 		case TV_FALSE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLUDTandLUDTSSupported: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityLUDTandLUDTSSupported: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpLUDTandLUDTSSupported for you to use, and you have just been asked to do something with it.  Note that anything done 
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpNetworkEntityLUDTandLUDTSSupported for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpLUDTandLUDTSSupported;
-		StorageTmp->sccpLUDTandLUDTSSupported = set_value;
+		old_value = StorageTmp->sccpNetworkEntityLUDTandLUDTSSupported;
+		StorageTmp->sccpNetworkEntityLUDTandLUDTSSupported = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpLUDTandLUDTSSupported = old_value;
+		StorageTmp->sccpNetworkEntityLUDTandLUDTSSupported = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -7146,7 +7977,7 @@ write_sccpLUDTandLUDTSSupported(int action, u_char *var_val, u_char var_val_type
 }
 
 /**
- * @fn int write_sccpCoordChangeTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpNetworkEntityCoordChangeTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7157,23 +7988,23 @@ write_sccpLUDTandLUDTSSupported(int action, u_char *var_val, u_char var_val_type
  * @brief Table row and column write routine.
  */
 int
-write_sccpCoordChangeTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpNetworkEntityCoordChangeTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpNetworkEntityTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpCoordChangeTimer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityCoordChangeTimer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpNetworkEntityTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRowStatus) {
+			switch (StorageTmp->sccpNetworkEntityRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCoordChangeTimer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityCoordChangeTimer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7182,32 +8013,33 @@ write_sccpCoordChangeTimer(int action, u_char *var_val, u_char var_val_type, siz
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCoordChangeTimer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityCoordChangeTimer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCoordChangeTimer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityCoordChangeTimer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: ranges 0..2147483647 */
-		if ((0 > set_value || set_value > 2147483647)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCoordChangeTimer: bad value\n");
+		/* Note: default value 3000 */
+		/* Note: ranges 3000..12000 */
+		if ((3000 > set_value || set_value > 12000)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityCoordChangeTimer: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpCoordChangeTimer for you to use, and you have just been asked to do something with it.  Note that anything done here 
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpNetworkEntityCoordChangeTimer for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpCoordChangeTimer;
-		StorageTmp->sccpCoordChangeTimer = set_value;
+		old_value = StorageTmp->sccpNetworkEntityCoordChangeTimer;
+		StorageTmp->sccpNetworkEntityCoordChangeTimer = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpCoordChangeTimer = old_value;
+		StorageTmp->sccpNetworkEntityCoordChangeTimer = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -7216,7 +8048,7 @@ write_sccpCoordChangeTimer(int action, u_char *var_val, u_char var_val_type, siz
 }
 
 /**
- * @fn int write_sccpIgnoreSSTTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpNetworkEntityIgnoreSSTTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7227,23 +8059,23 @@ write_sccpCoordChangeTimer(int action, u_char *var_val, u_char var_val_type, siz
  * @brief Table row and column write routine.
  */
 int
-write_sccpIgnoreSSTTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpNetworkEntityIgnoreSSTTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpNetworkEntityTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpIgnoreSSTTimer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityIgnoreSSTTimer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpNetworkEntityTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRowStatus) {
+			switch (StorageTmp->sccpNetworkEntityRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpIgnoreSSTTimer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityIgnoreSSTTimer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7252,32 +8084,33 @@ write_sccpIgnoreSSTTimer(int action, u_char *var_val, u_char var_val_type, size_
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpIgnoreSSTTimer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityIgnoreSSTTimer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpIgnoreSSTTimer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityIgnoreSSTTimer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value 3000 */
 		/* Note: ranges 0..2147483647 */
 		if ((0 > set_value || set_value > 2147483647)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpIgnoreSSTTimer: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityIgnoreSSTTimer: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpIgnoreSSTTimer for you to use, and you have just been asked to do something with it.  Note that anything done here
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpNetworkEntityIgnoreSSTTimer for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpIgnoreSSTTimer;
-		StorageTmp->sccpIgnoreSSTTimer = set_value;
+		old_value = StorageTmp->sccpNetworkEntityIgnoreSSTTimer;
+		StorageTmp->sccpNetworkEntityIgnoreSSTTimer = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpIgnoreSSTTimer = old_value;
+		StorageTmp->sccpNetworkEntityIgnoreSSTTimer = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -7286,7 +8119,7 @@ write_sccpIgnoreSSTTimer(int action, u_char *var_val, u_char var_val_type, size_
 }
 
 /**
- * @fn int write_sccpMaxStatInfoTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpNetworkEntityMaxStatInfoTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7297,23 +8130,23 @@ write_sccpIgnoreSSTTimer(int action, u_char *var_val, u_char var_val_type, size_
  * @brief Table row and column write routine.
  */
 int
-write_sccpMaxStatInfoTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpNetworkEntityMaxStatInfoTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpNetworkEntityTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpMaxStatInfoTimer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityMaxStatInfoTimer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpNetworkEntityTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRowStatus) {
+			switch (StorageTmp->sccpNetworkEntityRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMaxStatInfoTimer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityMaxStatInfoTimer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7322,34 +8155,112 @@ write_sccpMaxStatInfoTimer(int action, u_char *var_val, u_char var_val_type, siz
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMaxStatInfoTimer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityMaxStatInfoTimer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMaxStatInfoTimer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityMaxStatInfoTimer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: ranges 0..2147483647 */
-		if ((0 > set_value || set_value > 2147483647)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMaxStatInfoTimer: bad value\n");
+		/* Note: default value 3000 */
+		/* Note: ranges 500..120000 */
+		if ((500 > set_value || set_value > 120000)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityMaxStatInfoTimer: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpMaxStatInfoTimer for you to use, and you have just been asked to do something with it.  Note that anything done here 
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpNetworkEntityMaxStatInfoTimer for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpMaxStatInfoTimer;
-		StorageTmp->sccpMaxStatInfoTimer = set_value;
+		old_value = StorageTmp->sccpNetworkEntityMaxStatInfoTimer;
+		StorageTmp->sccpNetworkEntityMaxStatInfoTimer = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpMaxStatInfoTimer = old_value;
+		StorageTmp->sccpNetworkEntityMaxStatInfoTimer = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpNetworkEntityAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpNetworkEntityAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static oid *old_value;
+	struct sccpNetworkEntityTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static oid *objid = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityAsaProfilePointer entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpNetworkEntityTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		objid = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpNetworkEntityRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAsaProfilePointer: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OBJECT_ID) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAsaProfilePointer not ASN_OBJECT_ID\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAsaProfilePointer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value { zeroDotZero } */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpNetworkEntityAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpNetworkEntityAsaProfilePointer;
+		old_length = StorageTmp->sccpNetworkEntityAsaProfilePointerLen;
+		StorageTmp->sccpNetworkEntityAsaProfilePointer = objid;
+		StorageTmp->sccpNetworkEntityAsaProfilePointerLen = var_val_len / sizeof(oid);
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpNetworkEntityAsaProfilePointer = old_value;
+		StorageTmp->sccpNetworkEntityAsaProfilePointerLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7382,7 +8293,7 @@ write_sccpNetworkEntityName(int action, u_char *var_val, u_char var_val_type, si
 		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRowStatus) {
+			switch (StorageTmp->sccpNetworkEntityRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
 				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityName: but column non-existent\n");
@@ -7435,6 +8346,72 @@ write_sccpNetworkEntityName(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
+ * @fn int write_sccpLocalSapNamesPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLocalSapNamesPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static ulong old_value;
+	struct sccpLocalSapNamesTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	ulong set_value = *((ulong *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLocalSapNamesPointer entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLocalSapNamesTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLocalSapNamesRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLocalSapNamesPointer: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_UNSIGNED) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLocalSapNamesPointer not ASN_UNSIGNED\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(uint32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLocalSapNamesPointer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value { zeroDotZero } */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLocalSapNamesPointer for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLocalSapNamesPointer;
+		StorageTmp->sccpLocalSapNamesPointer = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLocalSapNamesPointer = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
  * @fn int write_sccpAccessPointAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
@@ -7473,12 +8450,20 @@ write_sccpAccessPointAlarmStatus(int action, u_char *var_val, u_char var_val_typ
 			}
 		}
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAlarmStatus not ASN_BIT_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAlarmStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAlarmStatus: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -7513,7 +8498,7 @@ write_sccpAccessPointAlarmStatus(int action, u_char *var_val, u_char var_val_typ
 }
 
 /**
- * @fn int write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpAccessPointSap2Address(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7524,7 +8509,7 @@ write_sccpAccessPointAlarmStatus(int action, u_char *var_val, u_char var_val_typ
  * @brief Table row and column write routine.
  */
 int
-write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpAccessPointSap2Address(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpAccessPointTable_data *StorageTmp = NULL;
@@ -7532,7 +8517,7 @@ write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t v
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpSap2Address entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointSap2Address entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAccessPointTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7542,7 +8527,7 @@ write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t v
 			switch (StorageTmp->sccpAccessPointRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSap2Address: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSap2Address: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7551,12 +8536,12 @@ write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSap2Address not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSap2Address not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..1 */
 		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 1))) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSap2Address: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSap2Address: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -7566,14 +8551,14 @@ write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t v
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpSap2Address for you to use, and you have just been asked to do something with it.  Note that anything done here must 
-				   be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpAccessPointSap2Address for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpSap2Address;
-		old_length = StorageTmp->sccpSap2AddressLen;
-		StorageTmp->sccpSap2Address = string;
-		StorageTmp->sccpSap2AddressLen = var_val_len;
+		old_value = StorageTmp->sccpAccessPointSap2Address;
+		old_length = StorageTmp->sccpAccessPointSap2AddressLen;
+		StorageTmp->sccpAccessPointSap2Address = string;
+		StorageTmp->sccpAccessPointSap2AddressLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -7581,8 +8566,8 @@ write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t v
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpSap2Address = old_value;
-		StorageTmp->sccpSap2AddressLen = old_length;
+		StorageTmp->sccpAccessPointSap2Address = old_value;
+		StorageTmp->sccpAccessPointSap2AddressLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -7592,7 +8577,7 @@ write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t v
 }
 
 /**
- * @fn int write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpAccessPointUserEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7603,7 +8588,7 @@ write_sccpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t v
  * @brief Table row and column write routine.
  */
 int
-write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpAccessPointUserEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpAccessPointTable_data *StorageTmp = NULL;
@@ -7611,7 +8596,7 @@ write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpUserEntityNames entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointUserEntityNames entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAccessPointTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7621,7 +8606,7 @@ write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size
 			switch (StorageTmp->sccpAccessPointRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpUserEntityNames: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointUserEntityNames: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7630,11 +8615,11 @@ write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpUserEntityNames not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointUserEntityNames not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > SPRINT_MAX_LEN) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpUserEntityNames: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointUserEntityNames: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -7644,14 +8629,14 @@ write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpUserEntityNames for you to use, and you have just been asked to do something with it.  Note that anything done here
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpAccessPointUserEntityNames for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpUserEntityNames;
-		old_length = StorageTmp->sccpUserEntityNamesLen;
-		StorageTmp->sccpUserEntityNames = string;
-		StorageTmp->sccpUserEntityNamesLen = var_val_len;
+		old_value = StorageTmp->sccpAccessPointUserEntityNames;
+		old_length = StorageTmp->sccpAccessPointUserEntityNamesLen;
+		StorageTmp->sccpAccessPointUserEntityNames = string;
+		StorageTmp->sccpAccessPointUserEntityNamesLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -7659,8 +8644,8 @@ write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpUserEntityNames = old_value;
-		StorageTmp->sccpUserEntityNamesLen = old_length;
+		StorageTmp->sccpAccessPointUserEntityNames = old_value;
+		StorageTmp->sccpAccessPointUserEntityNamesLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -7670,7 +8655,7 @@ write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size
 }
 
 /**
- * @fn int write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpAccessPointProviderEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7681,7 +8666,7 @@ write_sccpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size
  * @brief Table row and column write routine.
  */
 int
-write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpAccessPointProviderEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpAccessPointTable_data *StorageTmp = NULL;
@@ -7689,7 +8674,7 @@ write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, 
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpProviderEntityNames entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointProviderEntityNames entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAccessPointTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7699,7 +8684,7 @@ write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, 
 			switch (StorageTmp->sccpAccessPointRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpProviderEntityNames: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointProviderEntityNames: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7708,11 +8693,11 @@ write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpProviderEntityNames not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointProviderEntityNames not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > SPRINT_MAX_LEN) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpProviderEntityNames: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointProviderEntityNames: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -7722,14 +8707,14 @@ write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, 
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpProviderEntityNames for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpAccessPointProviderEntityNames for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpProviderEntityNames;
-		old_length = StorageTmp->sccpProviderEntityNamesLen;
-		StorageTmp->sccpProviderEntityNames = string;
-		StorageTmp->sccpProviderEntityNamesLen = var_val_len;
+		old_value = StorageTmp->sccpAccessPointProviderEntityNames;
+		old_length = StorageTmp->sccpAccessPointProviderEntityNamesLen;
+		StorageTmp->sccpAccessPointProviderEntityNames = string;
+		StorageTmp->sccpAccessPointProviderEntityNamesLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -7737,8 +8722,8 @@ write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, 
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpProviderEntityNames = old_value;
-		StorageTmp->sccpProviderEntityNamesLen = old_length;
+		StorageTmp->sccpAccessPointProviderEntityNames = old_value;
+		StorageTmp->sccpAccessPointProviderEntityNamesLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -7748,7 +8733,7 @@ write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
- * @fn int write_sccpConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpAccessPointConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7759,14 +8744,14 @@ write_sccpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, 
  * @brief Table row and column write routine.
  */
 int
-write_sccpConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpAccessPointConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static ulong old_value;
 	struct sccpAccessPointTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpConcernedAreaPointer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointConcernedAreaPointer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAccessPointTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7775,7 +8760,7 @@ write_sccpConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type,
 			switch (StorageTmp->sccpAccessPointRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpConcernedAreaPointer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointConcernedAreaPointer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7784,28 +8769,28 @@ write_sccpConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type,
 			}
 		}
 		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpConcernedAreaPointer not ASN_UNSIGNED\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointConcernedAreaPointer not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpConcernedAreaPointer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointConcernedAreaPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpConcernedAreaPointer for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpAccessPointConcernedAreaPointer for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpConcernedAreaPointer;
-		StorageTmp->sccpConcernedAreaPointer = set_value;
+		old_value = StorageTmp->sccpAccessPointConcernedAreaPointer;
+		StorageTmp->sccpAccessPointConcernedAreaPointer = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpConcernedAreaPointer = old_value;
+		StorageTmp->sccpAccessPointConcernedAreaPointer = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -7814,7 +8799,7 @@ write_sccpConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type,
 }
 
 /**
- * @fn int write_sccpLinkagePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpAccessPointLinkagePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7825,14 +8810,14 @@ write_sccpConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type,
  * @brief Table row and column write routine.
  */
 int
-write_sccpLinkagePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpAccessPointLinkagePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static ulong old_value;
 	struct sccpAccessPointTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpLinkagePointer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointLinkagePointer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAccessPointTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7841,7 +8826,7 @@ write_sccpLinkagePointer(int action, u_char *var_val, u_char var_val_type, size_
 			switch (StorageTmp->sccpAccessPointRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkagePointer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointLinkagePointer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7850,27 +8835,27 @@ write_sccpLinkagePointer(int action, u_char *var_val, u_char var_val_type, size_
 			}
 		}
 		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkagePointer not ASN_UNSIGNED\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointLinkagePointer not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkagePointer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointLinkagePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkagePointer for you to use, and you have just been asked to do something with it.  Note that anything done here
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpAccessPointLinkagePointer for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpLinkagePointer;
-		StorageTmp->sccpLinkagePointer = set_value;
+		old_value = StorageTmp->sccpAccessPointLinkagePointer;
+		StorageTmp->sccpAccessPointLinkagePointer = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpLinkagePointer = old_value;
+		StorageTmp->sccpAccessPointLinkagePointer = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -7879,7 +8864,7 @@ write_sccpLinkagePointer(int action, u_char *var_val, u_char var_val_type, size_
 }
 
 /**
- * @fn int write_sccpSsAvailableAfterSpRestart(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpAccessPointSsAvailableAfterSpRestart(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -7890,14 +8875,14 @@ write_sccpLinkagePointer(int action, u_char *var_val, u_char var_val_type, size_
  * @brief Table row and column write routine.
  */
 int
-write_sccpSsAvailableAfterSpRestart(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpAccessPointSsAvailableAfterSpRestart(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpAccessPointTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpSsAvailableAfterSpRestart entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointSsAvailableAfterSpRestart entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAccessPointTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7906,7 +8891,7 @@ write_sccpSsAvailableAfterSpRestart(int action, u_char *var_val, u_char var_val_
 			switch (StorageTmp->sccpAccessPointRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSsAvailableAfterSpRestart: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSsAvailableAfterSpRestart: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -7915,11 +8900,11 @@ write_sccpSsAvailableAfterSpRestart(int action, u_char *var_val, u_char var_val_
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSsAvailableAfterSpRestart not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSsAvailableAfterSpRestart not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSsAvailableAfterSpRestart: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSsAvailableAfterSpRestart: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 2 */
@@ -7928,25 +8913,102 @@ write_sccpSsAvailableAfterSpRestart(int action, u_char *var_val, u_char var_val_
 		case TV_FALSE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSsAvailableAfterSpRestart: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSsAvailableAfterSpRestart: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpSsAvailableAfterSpRestart for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpAccessPointSsAvailableAfterSpRestart for you to use, and you have just been asked to do something with it.  Note
+				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpSsAvailableAfterSpRestart;
-		StorageTmp->sccpSsAvailableAfterSpRestart = set_value;
+		old_value = StorageTmp->sccpAccessPointSsAvailableAfterSpRestart;
+		StorageTmp->sccpAccessPointSsAvailableAfterSpRestart = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpSsAvailableAfterSpRestart = old_value;
+		StorageTmp->sccpAccessPointSsAvailableAfterSpRestart = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpAccessPointAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpAccessPointAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static oid *old_value;
+	struct sccpAccessPointTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static oid *objid = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointAsaProfilePointer entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpAccessPointTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		objid = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpAccessPointRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAsaProfilePointer: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OBJECT_ID) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAsaProfilePointer not ASN_OBJECT_ID\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAsaProfilePointer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value { zeroDotZero } */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpAccessPointAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpAccessPointAsaProfilePointer;
+		old_length = StorageTmp->sccpAccessPointAsaProfilePointerLen;
+		StorageTmp->sccpAccessPointAsaProfilePointer = objid;
+		StorageTmp->sccpAccessPointAsaProfilePointerLen = var_val_len / sizeof(oid);
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpAccessPointAsaProfilePointer = old_value;
+		StorageTmp->sccpAccessPointAsaProfilePointerLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8032,7 +9094,7 @@ write_sccpAccessPointName(int action, u_char *var_val, u_char var_val_type, size
 }
 
 /**
- * @fn int write_sccpAttackTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageOperationalProtocols(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -8043,481 +9105,7 @@ write_sccpAccessPointName(int action, u_char *var_val, u_char var_val_type, size
  * @brief Table row and column write routine.
  */
 int
-write_sccpAttackTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpAttackTimerValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAttackTimerValue: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAttackTimerValue not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAttackTimerValue: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		/* Note: ranges 0..2147483647 */
-		if ((0 > set_value || set_value > 2147483647)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAttackTimerValue: bad value\n");
-			return SNMP_ERR_WRONGVALUE;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpAttackTimerValue for you to use, and you have just been asked to do something with it.  Note that anything done here 
-				   must be reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpAttackTimerValue;
-		StorageTmp->sccpAttackTimerValue = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpAttackTimerValue = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpDecayTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpDecayTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpDecayTimerValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpDecayTimerValue: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpDecayTimerValue not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpDecayTimerValue: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		/* Note: ranges 0..2147483647 */
-		if ((0 > set_value || set_value > 2147483647)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpDecayTimerValue: bad value\n");
-			return SNMP_ERR_WRONGVALUE;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpDecayTimerValue for you to use, and you have just been asked to do something with it.  Note that anything done here
-				   must be reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpDecayTimerValue;
-		StorageTmp->sccpDecayTimerValue = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpDecayTimerValue = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpNrOfRestrictionLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpNrOfRestrictionLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpNrOfRestrictionLevels entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNrOfRestrictionLevels: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNrOfRestrictionLevels not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNrOfRestrictionLevels: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		/* Note: default value 8 */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpNrOfRestrictionLevels for you to use, and you have just been asked to do something with it.  Note that anything done 
-				   here must be reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpNrOfRestrictionLevels;
-		StorageTmp->sccpNrOfRestrictionLevels = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpNrOfRestrictionLevels = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpNrOfSubLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpNrOfSubLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpNrOfSubLevels entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNrOfSubLevels: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNrOfSubLevels not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNrOfSubLevels: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		/* Note: default value 4 */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpNrOfSubLevels for you to use, and you have just been asked to do something with it.  Note that anything done here
-				   must be reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpNrOfSubLevels;
-		StorageTmp->sccpNrOfSubLevels = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpNrOfSubLevels = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpCLS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpCLS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpCLS entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCLS: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCLS not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCLS: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		/* Note: default value 8 */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpCLS for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpCLS;
-		StorageTmp->sccpCLS = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpCLS = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpCongestionTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpCongestionTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpCongestionTimerValue entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCongestionTimerValue: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCongestionTimerValue not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCongestionTimerValue: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		/* Note: ranges 0..2147483647 */
-		if ((0 > set_value || set_value > 2147483647)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCongestionTimerValue: bad value\n");
-			return SNMP_ERR_WRONGVALUE;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpCongestionTimerValue for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpCongestionTimerValue;
-		StorageTmp->sccpCongestionTimerValue = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpCongestionTimerValue = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpp(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpp(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpp entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpp: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpp not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpp: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		/* Note: default value 8 */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpp for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpp;
-		StorageTmp->sccpp = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpp = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageOperationalProtocols(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -8525,7 +9113,7 @@ write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, si
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelCR entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageOperationalProtocols entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8535,7 +9123,647 @@ write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCR: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageOperationalProtocols: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageOperationalProtocols not ASN_OCTET_STR\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageOperationalProtocols: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageOperationalProtocols: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		/* Note: default value { class0 , class1 , class2 , class3 } */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len + 1)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageOperationalProtocols for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageOperationalProtocols;
+		old_length = StorageTmp->sccpLinkageOperationalProtocolsLen;
+		StorageTmp->sccpLinkageOperationalProtocols = string;
+		StorageTmp->sccpLinkageOperationalProtocolsLen = var_val_len;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageOperationalProtocols = old_value;
+		StorageTmp->sccpLinkageOperationalProtocolsLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageSnSAP(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageSnSAP(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static oid *old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static oid *objid = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageSnSAP entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		objid = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageSnSAP: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OBJECT_ID) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageSnSAP not ASN_OBJECT_ID\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageSnSAP: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageSnSAP for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageSnSAP;
+		old_length = StorageTmp->sccpLinkageSnSAPLen;
+		StorageTmp->sccpLinkageSnSAP = objid;
+		StorageTmp->sccpLinkageSnSAPLen = var_val_len / sizeof(oid);
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageSnSAP = old_value;
+		StorageTmp->sccpLinkageSnSAPLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageAttackTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageAttackTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageAttackTimerValue entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageAttackTimerValue: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageAttackTimerValue not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageAttackTimerValue: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 25 */
+		/* Note: ranges 6..60 */
+		if ((6 > set_value || set_value > 60)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageAttackTimerValue: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageAttackTimerValue for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageAttackTimerValue;
+		StorageTmp->sccpLinkageAttackTimerValue = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageAttackTimerValue = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageDecayTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageDecayTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageDecayTimerValue entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageDecayTimerValue: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageDecayTimerValue not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageDecayTimerValue: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 500 */
+		/* Note: ranges 100..1000 */
+		if ((100 > set_value || set_value > 1000)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageDecayTimerValue: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageDecayTimerValue for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageDecayTimerValue;
+		StorageTmp->sccpLinkageDecayTimerValue = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageDecayTimerValue = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageNrOfRestrictionLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageNrOfRestrictionLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageNrOfRestrictionLevels entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageNrOfRestrictionLevels: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageNrOfRestrictionLevels not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageNrOfRestrictionLevels: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 8 */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageNrOfRestrictionLevels for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageNrOfRestrictionLevels;
+		StorageTmp->sccpLinkageNrOfRestrictionLevels = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageNrOfRestrictionLevels = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageNrOfSubLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageNrOfSubLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageNrOfSubLevels entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageNrOfSubLevels: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageNrOfSubLevels not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageNrOfSubLevels: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 4 */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageNrOfSubLevels for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageNrOfSubLevels;
+		StorageTmp->sccpLinkageNrOfSubLevels = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageNrOfSubLevels = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageCLS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageCLS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageCLS entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageCLS: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageCLS not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageCLS: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 8 */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageCLS for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageCLS;
+		StorageTmp->sccpLinkageCLS = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageCLS = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageCongestionTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageCongestionTimerValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageCongestionTimerValue entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageCongestionTimerValue: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageCongestionTimerValue not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageCongestionTimerValue: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 500 */
+		/* Note: ranges 100..1000 */
+		if ((100 > set_value || set_value > 1000)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageCongestionTimerValue: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageCongestionTimerValue for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageCongestionTimerValue;
+		StorageTmp->sccpLinkageCongestionTimerValue = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageCongestionTimerValue = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageP(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageP(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageP entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageP: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageP not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageP: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value 8 */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageP for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
+				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpLinkageP;
+		StorageTmp->sccpLinkageP = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpLinkageP = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpLinkageImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpLinkageImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static uint8_t *old_value;
+	struct sccpLinkageTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelCR entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		string = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpLinkageRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCR: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -8544,12 +9772,12 @@ write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCR not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCR not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCR: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCR: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0204'X */
@@ -8560,14 +9788,14 @@ write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, si
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelCR for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelCR for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelCR;
-		old_length = StorageTmp->sccpImportanceLevelCRLen;
-		StorageTmp->sccpImportanceLevelCR = string;
-		StorageTmp->sccpImportanceLevelCRLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelCR;
+		old_length = StorageTmp->sccpLinkageImportanceLevelCRLen;
+		StorageTmp->sccpLinkageImportanceLevelCR = string;
+		StorageTmp->sccpLinkageImportanceLevelCRLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -8575,8 +9803,8 @@ write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, si
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelCR = old_value;
-		StorageTmp->sccpImportanceLevelCRLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelCR = old_value;
+		StorageTmp->sccpLinkageImportanceLevelCRLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -8586,7 +9814,7 @@ write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
- * @fn int write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -8597,7 +9825,7 @@ write_sccpImportanceLevelCR(int action, u_char *var_val, u_char var_val_type, si
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -8605,7 +9833,7 @@ write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, si
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelCC entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelCC entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8615,7 +9843,7 @@ write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCC: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCC: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -8624,12 +9852,12 @@ write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCC not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCC not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCC: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCC: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0304'X */
@@ -8640,14 +9868,14 @@ write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, si
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelCC for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelCC for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelCC;
-		old_length = StorageTmp->sccpImportanceLevelCCLen;
-		StorageTmp->sccpImportanceLevelCC = string;
-		StorageTmp->sccpImportanceLevelCCLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelCC;
+		old_length = StorageTmp->sccpLinkageImportanceLevelCCLen;
+		StorageTmp->sccpLinkageImportanceLevelCC = string;
+		StorageTmp->sccpLinkageImportanceLevelCCLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -8655,8 +9883,8 @@ write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, si
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelCC = old_value;
-		StorageTmp->sccpImportanceLevelCCLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelCC = old_value;
+		StorageTmp->sccpLinkageImportanceLevelCCLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -8666,7 +9894,7 @@ write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
- * @fn int write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -8677,7 +9905,7 @@ write_sccpImportanceLevelCC(int action, u_char *var_val, u_char var_val_type, si
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -8685,7 +9913,7 @@ write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, 
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelCREF entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelCREF entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8695,7 +9923,7 @@ write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, 
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCREF: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCREF: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -8704,12 +9932,12 @@ write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCREF not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCREF not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelCREF: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCREF: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0204'X */
@@ -8720,14 +9948,14 @@ write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, 
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelCREF for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelCREF for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelCREF;
-		old_length = StorageTmp->sccpImportanceLevelCREFLen;
-		StorageTmp->sccpImportanceLevelCREF = string;
-		StorageTmp->sccpImportanceLevelCREFLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelCREF;
+		old_length = StorageTmp->sccpLinkageImportanceLevelCREFLen;
+		StorageTmp->sccpLinkageImportanceLevelCREF = string;
+		StorageTmp->sccpLinkageImportanceLevelCREFLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -8735,8 +9963,8 @@ write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, 
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelCREF = old_value;
-		StorageTmp->sccpImportanceLevelCREFLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelCREF = old_value;
+		StorageTmp->sccpLinkageImportanceLevelCREFLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -8746,7 +9974,7 @@ write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
- * @fn int write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -8757,7 +9985,7 @@ write_sccpImportanceLevelCREF(int action, u_char *var_val, u_char var_val_type, 
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -8765,7 +9993,7 @@ write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, s
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelDT1 entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelDT1 entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8775,7 +10003,7 @@ write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, s
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelDT1: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelDT1: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -8784,12 +10012,12 @@ write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelDT1 not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelDT1 not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelDT1: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelDT1: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0406'X */
@@ -8800,14 +10028,14 @@ write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, s
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelDT1 for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelDT1 for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelDT1;
-		old_length = StorageTmp->sccpImportanceLevelDT1Len;
-		StorageTmp->sccpImportanceLevelDT1 = string;
-		StorageTmp->sccpImportanceLevelDT1Len = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelDT1;
+		old_length = StorageTmp->sccpLinkageImportanceLevelDT1Len;
+		StorageTmp->sccpLinkageImportanceLevelDT1 = string;
+		StorageTmp->sccpLinkageImportanceLevelDT1Len = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -8815,8 +10043,8 @@ write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, s
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelDT1 = old_value;
-		StorageTmp->sccpImportanceLevelDT1Len = old_length;
+		StorageTmp->sccpLinkageImportanceLevelDT1 = old_value;
+		StorageTmp->sccpLinkageImportanceLevelDT1Len = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -8826,7 +10054,7 @@ write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, s
 }
 
 /**
- * @fn int write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -8837,7 +10065,7 @@ write_sccpImportanceLevelDT1(int action, u_char *var_val, u_char var_val_type, s
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -8845,7 +10073,7 @@ write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, s
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelDT2 entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelDT2 entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8855,7 +10083,7 @@ write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, s
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelDT2: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelDT2: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -8864,12 +10092,12 @@ write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelDT2 not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelDT2 not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelDT2: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelDT2: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0406'X */
@@ -8880,14 +10108,14 @@ write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, s
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelDT2 for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelDT2 for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelDT2;
-		old_length = StorageTmp->sccpImportanceLevelDT2Len;
-		StorageTmp->sccpImportanceLevelDT2 = string;
-		StorageTmp->sccpImportanceLevelDT2Len = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelDT2;
+		old_length = StorageTmp->sccpLinkageImportanceLevelDT2Len;
+		StorageTmp->sccpLinkageImportanceLevelDT2 = string;
+		StorageTmp->sccpLinkageImportanceLevelDT2Len = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -8895,8 +10123,8 @@ write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, s
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelDT2 = old_value;
-		StorageTmp->sccpImportanceLevelDT2Len = old_length;
+		StorageTmp->sccpLinkageImportanceLevelDT2 = old_value;
+		StorageTmp->sccpLinkageImportanceLevelDT2Len = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -8906,7 +10134,7 @@ write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, s
 }
 
 /**
- * @fn int write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -8917,7 +10145,7 @@ write_sccpImportanceLevelDT2(int action, u_char *var_val, u_char var_val_type, s
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -8925,7 +10153,7 @@ write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, si
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelAK entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelAK entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8935,7 +10163,7 @@ write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelAK: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelAK: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -8944,12 +10172,12 @@ write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelAK not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelAK not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelAK: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelAK: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0600'X */
@@ -8960,14 +10188,14 @@ write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, si
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelAK for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelAK for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelAK;
-		old_length = StorageTmp->sccpImportanceLevelAKLen;
-		StorageTmp->sccpImportanceLevelAK = string;
-		StorageTmp->sccpImportanceLevelAKLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelAK;
+		old_length = StorageTmp->sccpLinkageImportanceLevelAKLen;
+		StorageTmp->sccpLinkageImportanceLevelAK = string;
+		StorageTmp->sccpLinkageImportanceLevelAKLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -8975,8 +10203,8 @@ write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, si
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelAK = old_value;
-		StorageTmp->sccpImportanceLevelAKLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelAK = old_value;
+		StorageTmp->sccpLinkageImportanceLevelAKLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -8986,7 +10214,7 @@ write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
- * @fn int write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -8997,7 +10225,7 @@ write_sccpImportanceLevelAK(int action, u_char *var_val, u_char var_val_type, si
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9005,7 +10233,7 @@ write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, si
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelIT entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelIT entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9015,7 +10243,7 @@ write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelIT: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelIT: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9024,12 +10252,12 @@ write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelIT not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelIT not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelIT: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelIT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0600'X */
@@ -9040,14 +10268,14 @@ write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, si
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelIT for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelIT for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelIT;
-		old_length = StorageTmp->sccpImportanceLevelITLen;
-		StorageTmp->sccpImportanceLevelIT = string;
-		StorageTmp->sccpImportanceLevelITLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelIT;
+		old_length = StorageTmp->sccpLinkageImportanceLevelITLen;
+		StorageTmp->sccpLinkageImportanceLevelIT = string;
+		StorageTmp->sccpLinkageImportanceLevelITLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9055,8 +10283,8 @@ write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, si
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelIT = old_value;
-		StorageTmp->sccpImportanceLevelITLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelIT = old_value;
+		StorageTmp->sccpLinkageImportanceLevelITLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9066,7 +10294,7 @@ write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
- * @fn int write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelED(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9077,7 +10305,7 @@ write_sccpImportanceLevelIT(int action, u_char *var_val, u_char var_val_type, si
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelED(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9085,7 +10313,7 @@ write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, si
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelED entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelED entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9095,7 +10323,7 @@ write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelED: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelED: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9104,12 +10332,12 @@ write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelED not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelED not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelED: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelED: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0700'X */
@@ -9120,14 +10348,14 @@ write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, si
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelED for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelED for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelED;
-		old_length = StorageTmp->sccpImportanceLevelEDLen;
-		StorageTmp->sccpImportanceLevelED = string;
-		StorageTmp->sccpImportanceLevelEDLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelED;
+		old_length = StorageTmp->sccpLinkageImportanceLevelEDLen;
+		StorageTmp->sccpLinkageImportanceLevelED = string;
+		StorageTmp->sccpLinkageImportanceLevelEDLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9135,8 +10363,8 @@ write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, si
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelED = old_value;
-		StorageTmp->sccpImportanceLevelEDLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelED = old_value;
+		StorageTmp->sccpLinkageImportanceLevelEDLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9146,7 +10374,7 @@ write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
- * @fn int write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9157,7 +10385,7 @@ write_sccpImportanceLevelED(int action, u_char *var_val, u_char var_val_type, si
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9165,7 +10393,7 @@ write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, si
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelEA entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelEA entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9175,7 +10403,7 @@ write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelEA: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelEA: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9184,12 +10412,12 @@ write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelEA not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelEA not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelEA: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelEA: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0700'X */
@@ -9200,14 +10428,14 @@ write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, si
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelEA for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelEA for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelEA;
-		old_length = StorageTmp->sccpImportanceLevelEALen;
-		StorageTmp->sccpImportanceLevelEA = string;
-		StorageTmp->sccpImportanceLevelEALen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelEA;
+		old_length = StorageTmp->sccpLinkageImportanceLevelEALen;
+		StorageTmp->sccpLinkageImportanceLevelEA = string;
+		StorageTmp->sccpLinkageImportanceLevelEALen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9215,8 +10443,8 @@ write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, si
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelEA = old_value;
-		StorageTmp->sccpImportanceLevelEALen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelEA = old_value;
+		StorageTmp->sccpLinkageImportanceLevelEALen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9226,7 +10454,7 @@ write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
- * @fn int write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9237,7 +10465,7 @@ write_sccpImportanceLevelEA(int action, u_char *var_val, u_char var_val_type, si
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9245,7 +10473,7 @@ write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, s
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelRSR entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelRSR entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9255,7 +10483,7 @@ write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, s
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRSR: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRSR: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9264,12 +10492,12 @@ write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRSR not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRSR not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRSR: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRSR: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0600'X */
@@ -9280,14 +10508,14 @@ write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, s
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelRSR for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelRSR for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelRSR;
-		old_length = StorageTmp->sccpImportanceLevelRSRLen;
-		StorageTmp->sccpImportanceLevelRSR = string;
-		StorageTmp->sccpImportanceLevelRSRLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelRSR;
+		old_length = StorageTmp->sccpLinkageImportanceLevelRSRLen;
+		StorageTmp->sccpLinkageImportanceLevelRSR = string;
+		StorageTmp->sccpLinkageImportanceLevelRSRLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9295,8 +10523,8 @@ write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, s
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelRSR = old_value;
-		StorageTmp->sccpImportanceLevelRSRLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelRSR = old_value;
+		StorageTmp->sccpLinkageImportanceLevelRSRLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9306,7 +10534,7 @@ write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, s
 }
 
 /**
- * @fn int write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9317,7 +10545,7 @@ write_sccpImportanceLevelRSR(int action, u_char *var_val, u_char var_val_type, s
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9325,7 +10553,7 @@ write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, s
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelRSC entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelRSC entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9335,7 +10563,7 @@ write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, s
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRSC: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRSC: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9344,12 +10572,12 @@ write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRSC not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRSC not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRSC: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRSC: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0600'X */
@@ -9360,14 +10588,14 @@ write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, s
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelRSC for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelRSC for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelRSC;
-		old_length = StorageTmp->sccpImportanceLevelRSCLen;
-		StorageTmp->sccpImportanceLevelRSC = string;
-		StorageTmp->sccpImportanceLevelRSCLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelRSC;
+		old_length = StorageTmp->sccpLinkageImportanceLevelRSCLen;
+		StorageTmp->sccpLinkageImportanceLevelRSC = string;
+		StorageTmp->sccpLinkageImportanceLevelRSCLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9375,8 +10603,8 @@ write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, s
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelRSC = old_value;
-		StorageTmp->sccpImportanceLevelRSCLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelRSC = old_value;
+		StorageTmp->sccpLinkageImportanceLevelRSCLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9386,7 +10614,7 @@ write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, s
 }
 
 /**
- * @fn int write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9397,7 +10625,7 @@ write_sccpImportanceLevelRSC(int action, u_char *var_val, u_char var_val_type, s
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9405,7 +10633,7 @@ write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, s
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelERR entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelERR entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9415,7 +10643,7 @@ write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, s
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelERR: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelERR: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9424,12 +10652,12 @@ write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelERR not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelERR not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelERR: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelERR: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0700'X */
@@ -9440,14 +10668,14 @@ write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, s
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelERR for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelERR for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelERR;
-		old_length = StorageTmp->sccpImportanceLevelERRLen;
-		StorageTmp->sccpImportanceLevelERR = string;
-		StorageTmp->sccpImportanceLevelERRLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelERR;
+		old_length = StorageTmp->sccpLinkageImportanceLevelERRLen;
+		StorageTmp->sccpLinkageImportanceLevelERR = string;
+		StorageTmp->sccpLinkageImportanceLevelERRLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9455,8 +10683,8 @@ write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, s
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelERR = old_value;
-		StorageTmp->sccpImportanceLevelERRLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelERR = old_value;
+		StorageTmp->sccpLinkageImportanceLevelERRLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9466,7 +10694,7 @@ write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, s
 }
 
 /**
- * @fn int write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9477,7 +10705,7 @@ write_sccpImportanceLevelERR(int action, u_char *var_val, u_char var_val_type, s
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9485,7 +10713,7 @@ write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, s
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelRLC entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelRLC entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9495,7 +10723,7 @@ write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, s
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRLC: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRLC: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9504,12 +10732,12 @@ write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRLC not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRLC not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRLC: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRLC: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0400'X */
@@ -9520,14 +10748,14 @@ write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, s
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelRLC for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelRLC for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelRLC;
-		old_length = StorageTmp->sccpImportanceLevelRLCLen;
-		StorageTmp->sccpImportanceLevelRLC = string;
-		StorageTmp->sccpImportanceLevelRLCLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelRLC;
+		old_length = StorageTmp->sccpLinkageImportanceLevelRLCLen;
+		StorageTmp->sccpLinkageImportanceLevelRLC = string;
+		StorageTmp->sccpLinkageImportanceLevelRLCLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9535,8 +10763,8 @@ write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, s
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelRLC = old_value;
-		StorageTmp->sccpImportanceLevelRLCLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelRLC = old_value;
+		StorageTmp->sccpLinkageImportanceLevelRLCLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9546,7 +10774,7 @@ write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, s
 }
 
 /**
- * @fn int write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9557,7 +10785,7 @@ write_sccpImportanceLevelRLC(int action, u_char *var_val, u_char var_val_type, s
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9565,7 +10793,7 @@ write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, 
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelRLSD entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelRLSD entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9575,7 +10803,7 @@ write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, 
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRLSD: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRLSD: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9584,12 +10812,12 @@ write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRLSD not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRLSD not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelRLSD: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRLSD: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0606'X */
@@ -9600,14 +10828,14 @@ write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, 
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelRLSD for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelRLSD for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelRLSD;
-		old_length = StorageTmp->sccpImportanceLevelRLSDLen;
-		StorageTmp->sccpImportanceLevelRLSD = string;
-		StorageTmp->sccpImportanceLevelRLSDLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelRLSD;
+		old_length = StorageTmp->sccpLinkageImportanceLevelRLSDLen;
+		StorageTmp->sccpLinkageImportanceLevelRLSD = string;
+		StorageTmp->sccpLinkageImportanceLevelRLSDLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9615,8 +10843,8 @@ write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, 
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelRLSD = old_value;
-		StorageTmp->sccpImportanceLevelRLSDLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelRLSD = old_value;
+		StorageTmp->sccpLinkageImportanceLevelRLSDLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9626,7 +10854,7 @@ write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
- * @fn int write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9637,7 +10865,7 @@ write_sccpImportanceLevelRLSD(int action, u_char *var_val, u_char var_val_type, 
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9645,7 +10873,7 @@ write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, s
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelUDT entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelUDT entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9655,7 +10883,7 @@ write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, s
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelUDT: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelUDT: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9664,12 +10892,12 @@ write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelUDT not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelUDT not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelUDT: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelUDT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0406'X */
@@ -9680,14 +10908,14 @@ write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, s
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelUDT for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelUDT for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelUDT;
-		old_length = StorageTmp->sccpImportanceLevelUDTLen;
-		StorageTmp->sccpImportanceLevelUDT = string;
-		StorageTmp->sccpImportanceLevelUDTLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelUDT;
+		old_length = StorageTmp->sccpLinkageImportanceLevelUDTLen;
+		StorageTmp->sccpLinkageImportanceLevelUDT = string;
+		StorageTmp->sccpLinkageImportanceLevelUDTLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9695,8 +10923,8 @@ write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, s
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelUDT = old_value;
-		StorageTmp->sccpImportanceLevelUDTLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelUDT = old_value;
+		StorageTmp->sccpLinkageImportanceLevelUDTLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9706,7 +10934,7 @@ write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, s
 }
 
 /**
- * @fn int write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9717,7 +10945,7 @@ write_sccpImportanceLevelUDT(int action, u_char *var_val, u_char var_val_type, s
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9725,7 +10953,7 @@ write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, 
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelUDTS entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelUDTS entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9735,7 +10963,7 @@ write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, 
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelUDTS: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelUDTS: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9744,12 +10972,12 @@ write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelUDTS not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelUDTS not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelUDTS: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelUDTS: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0300'X */
@@ -9760,14 +10988,14 @@ write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, 
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelUDTS for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelUDTS for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelUDTS;
-		old_length = StorageTmp->sccpImportanceLevelUDTSLen;
-		StorageTmp->sccpImportanceLevelUDTS = string;
-		StorageTmp->sccpImportanceLevelUDTSLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelUDTS;
+		old_length = StorageTmp->sccpLinkageImportanceLevelUDTSLen;
+		StorageTmp->sccpLinkageImportanceLevelUDTS = string;
+		StorageTmp->sccpLinkageImportanceLevelUDTSLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9775,8 +11003,8 @@ write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, 
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelUDTS = old_value;
-		StorageTmp->sccpImportanceLevelUDTSLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelUDTS = old_value;
+		StorageTmp->sccpLinkageImportanceLevelUDTSLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9786,7 +11014,7 @@ write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
- * @fn int write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9797,7 +11025,7 @@ write_sccpImportanceLevelUDTS(int action, u_char *var_val, u_char var_val_type, 
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9805,7 +11033,7 @@ write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, 
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelXUDT entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelXUDT entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9815,7 +11043,7 @@ write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, 
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelXUDT: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelXUDT: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9824,12 +11052,12 @@ write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelXUDT not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelXUDT not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelXUDT: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelXUDT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0406'X */
@@ -9840,14 +11068,14 @@ write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, 
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelXUDT for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelXUDT for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelXUDT;
-		old_length = StorageTmp->sccpImportanceLevelXUDTLen;
-		StorageTmp->sccpImportanceLevelXUDT = string;
-		StorageTmp->sccpImportanceLevelXUDTLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelXUDT;
+		old_length = StorageTmp->sccpLinkageImportanceLevelXUDTLen;
+		StorageTmp->sccpLinkageImportanceLevelXUDT = string;
+		StorageTmp->sccpLinkageImportanceLevelXUDTLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9855,8 +11083,8 @@ write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, 
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelXUDT = old_value;
-		StorageTmp->sccpImportanceLevelXUDTLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelXUDT = old_value;
+		StorageTmp->sccpLinkageImportanceLevelXUDTLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9866,7 +11094,7 @@ write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
- * @fn int write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9877,7 +11105,7 @@ write_sccpImportanceLevelXUDT(int action, u_char *var_val, u_char var_val_type, 
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9885,7 +11113,7 @@ write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type,
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelXUDTS entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelXUDTS entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9895,7 +11123,7 @@ write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type,
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelXUDTS: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelXUDTS: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9904,12 +11132,12 @@ write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type,
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelXUDTS not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelXUDTS not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelXUDTS: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelXUDTS: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0300'X */
@@ -9920,14 +11148,14 @@ write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type,
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelXUDTS for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelXUDTS for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelXUDTS;
-		old_length = StorageTmp->sccpImportanceLevelXUDTSLen;
-		StorageTmp->sccpImportanceLevelXUDTS = string;
-		StorageTmp->sccpImportanceLevelXUDTSLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelXUDTS;
+		old_length = StorageTmp->sccpLinkageImportanceLevelXUDTSLen;
+		StorageTmp->sccpLinkageImportanceLevelXUDTS = string;
+		StorageTmp->sccpLinkageImportanceLevelXUDTSLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9935,8 +11163,8 @@ write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type,
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelXUDTS = old_value;
-		StorageTmp->sccpImportanceLevelXUDTSLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelXUDTS = old_value;
+		StorageTmp->sccpLinkageImportanceLevelXUDTSLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -9946,7 +11174,7 @@ write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type,
 }
 
 /**
- * @fn int write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9957,7 +11185,7 @@ write_sccpImportanceLevelXUDTS(int action, u_char *var_val, u_char var_val_type,
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -9965,7 +11193,7 @@ write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, 
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelLUDT entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelLUDT entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9975,7 +11203,7 @@ write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, 
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelLUDT: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelLUDT: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9984,12 +11212,12 @@ write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelLUDT not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelLUDT not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelLUDT: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelLUDT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0406'X */
@@ -10000,14 +11228,14 @@ write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, 
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelLUDT for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelLUDT for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelLUDT;
-		old_length = StorageTmp->sccpImportanceLevelLUDTLen;
-		StorageTmp->sccpImportanceLevelLUDT = string;
-		StorageTmp->sccpImportanceLevelLUDTLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelLUDT;
+		old_length = StorageTmp->sccpLinkageImportanceLevelLUDTLen;
+		StorageTmp->sccpLinkageImportanceLevelLUDT = string;
+		StorageTmp->sccpLinkageImportanceLevelLUDTLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -10015,8 +11243,8 @@ write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, 
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelLUDT = old_value;
-		StorageTmp->sccpImportanceLevelLUDTLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelLUDT = old_value;
+		StorageTmp->sccpLinkageImportanceLevelLUDTLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -10026,7 +11254,7 @@ write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
- * @fn int write_sccpImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -10037,7 +11265,7 @@ write_sccpImportanceLevelLUDT(int action, u_char *var_val, u_char var_val_type, 
  * @brief Table row and column write routine.
  */
 int
-write_sccpImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
@@ -10045,7 +11273,7 @@ write_sccpImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type,
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpImportanceLevelLUDTS entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelLUDTS entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10055,7 +11283,7 @@ write_sccpImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type,
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelLUDTS: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelLUDTS: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -10064,12 +11292,12 @@ write_sccpImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type,
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelLUDTS not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelLUDTS not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 2..2 */
 		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 2)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpImportanceLevelLUDTS: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelLUDTS: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value '0300'X */
@@ -10080,14 +11308,14 @@ write_sccpImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type,
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpImportanceLevelLUDTS for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageImportanceLevelLUDTS for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpImportanceLevelLUDTS;
-		old_length = StorageTmp->sccpImportanceLevelLUDTSLen;
-		StorageTmp->sccpImportanceLevelLUDTS = string;
-		StorageTmp->sccpImportanceLevelLUDTSLen = var_val_len;
+		old_value = StorageTmp->sccpLinkageImportanceLevelLUDTS;
+		old_length = StorageTmp->sccpLinkageImportanceLevelLUDTSLen;
+		StorageTmp->sccpLinkageImportanceLevelLUDTS = string;
+		StorageTmp->sccpLinkageImportanceLevelLUDTSLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -10095,141 +11323,11 @@ write_sccpImportanceLevelLUDTS(int action, u_char *var_val, u_char var_val_type,
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpImportanceLevelLUDTS = old_value;
-		StorageTmp->sccpImportanceLevelLUDTSLen = old_length;
+		StorageTmp->sccpLinkageImportanceLevelLUDTS = old_value;
+		StorageTmp->sccpLinkageImportanceLevelLUDTSLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpRLM(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpRLM(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpRLM entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRLM: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRLM not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRLM: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpRLM for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpRLM;
-		StorageTmp->sccpRLM = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpRLM = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_sccpRSLM(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_sccpRSLM(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct sccpLinkageTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("sccpMIB", "write_sccpRSLM entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->sccpLinkageRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRSLM: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRSLM not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRSLM: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpRSLM for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpRSLM;
-		StorageTmp->sccpRSLM = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpRSLM = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10249,17 +11347,15 @@ write_sccpRSLM(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 int
 write_sccpLinkageConcernedAreaPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
+	static ulong old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageConcernedAreaPointer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->sccpLinkageRowStatus) {
@@ -10273,49 +11369,37 @@ write_sccpLinkageConcernedAreaPointer(int action, u_char *var_val, u_char var_va
 				break;
 			}
 		}
-		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageConcernedAreaPointer not ASN_OCTET_STR\n");
+		if (var_val_type != ASN_UNSIGNED) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageConcernedAreaPointer not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		/* Note: ranges 1..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((1 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > sizeof(uint32_t)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageConcernedAreaPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if ((string = malloc(var_val_len + 1)) == NULL)
-			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		memcpy((void *) string, (void *) var_val, var_val_len);
-		string[var_val_len] = 0;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageConcernedAreaPointer for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sccpLinkageConcernedAreaPointer;
-		old_length = StorageTmp->sccpLinkageConcernedAreaPointerLen;
-		StorageTmp->sccpLinkageConcernedAreaPointer = string;
-		StorageTmp->sccpLinkageConcernedAreaPointerLen = var_val_len;
+		StorageTmp->sccpLinkageConcernedAreaPointer = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sccpLinkageConcernedAreaPointer = old_value;
-		StorageTmp->sccpLinkageConcernedAreaPointerLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int write_sccpLowerLimitForSegmentation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageLowerLimitForSegmentation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -10326,14 +11410,14 @@ write_sccpLinkageConcernedAreaPointer(int action, u_char *var_val, u_char var_va
  * @brief Table row and column write routine.
  */
 int
-write_sccpLowerLimitForSegmentation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageLowerLimitForSegmentation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpLowerLimitForSegmentation entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageLowerLimitForSegmentation entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10342,7 +11426,7 @@ write_sccpLowerLimitForSegmentation(int action, u_char *var_val, u_char var_val_
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLowerLimitForSegmentation: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageLowerLimitForSegmentation: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -10351,32 +11435,32 @@ write_sccpLowerLimitForSegmentation(int action, u_char *var_val, u_char var_val_
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLowerLimitForSegmentation not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageLowerLimitForSegmentation not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLowerLimitForSegmentation: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageLowerLimitForSegmentation: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 150..3592 */
 		if ((150 > set_value || set_value > 3592)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLowerLimitForSegmentation: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageLowerLimitForSegmentation: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpLowerLimitForSegmentation for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageLowerLimitForSegmentation for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpLowerLimitForSegmentation;
-		StorageTmp->sccpLowerLimitForSegmentation = set_value;
+		old_value = StorageTmp->sccpLinkageLowerLimitForSegmentation;
+		StorageTmp->sccpLinkageLowerLimitForSegmentation = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpLowerLimitForSegmentation = old_value;
+		StorageTmp->sccpLinkageLowerLimitForSegmentation = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -10385,7 +11469,7 @@ write_sccpLowerLimitForSegmentation(int action, u_char *var_val, u_char var_val_
 }
 
 /**
- * @fn int write_sccpUpperLimitForSegmentation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLinkageUpperLimitForSegmentation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -10396,14 +11480,14 @@ write_sccpLowerLimitForSegmentation(int action, u_char *var_val, u_char var_val_
  * @brief Table row and column write routine.
  */
 int
-write_sccpUpperLimitForSegmentation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLinkageUpperLimitForSegmentation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpLinkageTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpUpperLimitForSegmentation entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageUpperLimitForSegmentation entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10412,7 +11496,7 @@ write_sccpUpperLimitForSegmentation(int action, u_char *var_val, u_char var_val_
 			switch (StorageTmp->sccpLinkageRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpUpperLimitForSegmentation: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageUpperLimitForSegmentation: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -10421,32 +11505,32 @@ write_sccpUpperLimitForSegmentation(int action, u_char *var_val, u_char var_val_
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpUpperLimitForSegmentation not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageUpperLimitForSegmentation not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpUpperLimitForSegmentation: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageUpperLimitForSegmentation: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 150..3592 */
 		if ((150 > set_value || set_value > 3592)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpUpperLimitForSegmentation: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageUpperLimitForSegmentation: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpUpperLimitForSegmentation for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpLinkageUpperLimitForSegmentation for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpUpperLimitForSegmentation;
-		StorageTmp->sccpUpperLimitForSegmentation = set_value;
+		old_value = StorageTmp->sccpLinkageUpperLimitForSegmentation;
+		StorageTmp->sccpLinkageUpperLimitForSegmentation = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpUpperLimitForSegmentation = old_value;
+		StorageTmp->sccpLinkageUpperLimitForSegmentation = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -10534,6 +11618,556 @@ write_sccpLinkageName(int action, u_char *var_val, u_char var_val_type, size_t v
 }
 
 /**
+ * @fn int write_sccpMtpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpMtpSap2Address(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static uint8_t *old_value;
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpMtpSap2Address entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		string = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpMtpRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpSap2Address: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OCTET_STR) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpSap2Address not ASN_OCTET_STR\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		/* Note: ranges 5..5 */
+		if (var_val_len > SPRINT_MAX_LEN || (var_val_len != 5)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpSap2Address: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len + 1)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpMtpSap2Address for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpMtpSap2Address;
+		old_length = StorageTmp->sccpMtpSap2AddressLen;
+		StorageTmp->sccpMtpSap2Address = string;
+		StorageTmp->sccpMtpSap2AddressLen = var_val_len;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpMtpSap2Address = old_value;
+		StorageTmp->sccpMtpSap2AddressLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpMtpUserPart(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpMtpUserPart(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpMtpUserPart entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpMtpRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpUserPart: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpUserPart not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpUserPart: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case SCCPMTPUSERPART_SNMM:
+		case SCCPMTPUSERPART_SNTM:
+		case SCCPMTPUSERPART_SNSM:
+		case SCCPMTPUSERPART_SCCP:
+		case SCCPMTPUSERPART_TUP:
+		case SCCPMTPUSERPART_ISUP:
+		case SCCPMTPUSERPART_DUP1:
+		case SCCPMTPUSERPART_DUP2:
+		case SCCPMTPUSERPART_MTUP:
+		case SCCPMTPUSERPART_BISUP:
+		case SCCPMTPUSERPART_SIUP:
+		case SCCPMTPUSERPART_SPNEUP:
+		case SCCPMTPUSERPART_STC:
+		case SCCPMTPUSERPART_USER13:
+		case SCCPMTPUSERPART_USER14:
+		case SCCPMTPUSERPART_USER15:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpUserPart: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpMtpUserPart for you to use, and you have just been asked to do something with it.  Note that anything done here must 
+				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpMtpUserPart;
+		StorageTmp->sccpMtpUserPart = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpMtpUserPart = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpMtpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpMtpUserEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static oid *old_value;
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static oid *objid = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpMtpUserEntityNames entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		objid = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpMtpRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpUserEntityNames: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OBJECT_ID) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpUserEntityNames not ASN_OBJECT_ID\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpUserEntityNames: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpMtpUserEntityNames for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpMtpUserEntityNames;
+		old_length = StorageTmp->sccpMtpUserEntityNamesLen;
+		StorageTmp->sccpMtpUserEntityNames = objid;
+		StorageTmp->sccpMtpUserEntityNamesLen = var_val_len / sizeof(oid);
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpMtpUserEntityNames = old_value;
+		StorageTmp->sccpMtpUserEntityNamesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpMtpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpMtpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static oid *old_value;
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static oid *objid = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpMtpProviderEntityNames entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		objid = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpMtpRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpProviderEntityNames: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OBJECT_ID) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpProviderEntityNames not ASN_OBJECT_ID\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpProviderEntityNames: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpMtpProviderEntityNames for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpMtpProviderEntityNames;
+		old_length = StorageTmp->sccpMtpProviderEntityNamesLen;
+		StorageTmp->sccpMtpProviderEntityNames = objid;
+		StorageTmp->sccpMtpProviderEntityNamesLen = var_val_len / sizeof(oid);
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpMtpProviderEntityNames = old_value;
+		StorageTmp->sccpMtpProviderEntityNamesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpMtpAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpMtpAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpMtpAdministrativeState entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpMtpRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpAdministrativeState: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpAdministrativeState not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpAdministrativeState: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case SCCPMTPADMINISTRATIVESTATE_LOCKED:
+		case SCCPMTPADMINISTRATIVESTATE_UNLOCKED:
+		case SCCPMTPADMINISTRATIVESTATE_SHUTTINGDOWN:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpAdministrativeState: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpMtpAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpMtpAdministrativeState;
+		StorageTmp->sccpMtpAdministrativeState = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpMtpAdministrativeState = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpMtpRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpMtpRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static uint8_t *old_value;
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpMtpRemoteExchangeLabel entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		string = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpMtpRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpRemoteExchangeLabel: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OCTET_STR) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpRemoteExchangeLabel not ASN_OCTET_STR\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		/* Note: ranges 0..32 */
+		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpRemoteExchangeLabel: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len + 1)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpMtpRemoteExchangeLabel for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpMtpRemoteExchangeLabel;
+		old_length = StorageTmp->sccpMtpRemoteExchangeLabelLen;
+		StorageTmp->sccpMtpRemoteExchangeLabel = string;
+		StorageTmp->sccpMtpRemoteExchangeLabelLen = var_val_len;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpMtpRemoteExchangeLabel = old_value;
+		StorageTmp->sccpMtpRemoteExchangeLabelLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpMtpName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpMtpName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static uint8_t *old_value;
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpMtpName entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		string = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpMtpRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpName: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OCTET_STR) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpName not ASN_OCTET_STR\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		/* Note: ranges 1..32 */
+		if (var_val_len > SPRINT_MAX_LEN || ((1 > var_val_len || var_val_len > 32))) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpName: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len + 1)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpMtpName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpMtpName;
+		old_length = StorageTmp->sccpMtpNameLen;
+		StorageTmp->sccpMtpName = string;
+		StorageTmp->sccpMtpNameLen = var_val_len;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpMtpName = old_value;
+		StorageTmp->sccpMtpNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
  * @fn int write_sccpSclcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
@@ -10572,12 +12206,20 @@ write_sccpSclcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 		}
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAlarmStatus not ASN_BIT_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAlarmStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAlarmStatus: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -10603,6 +12245,85 @@ write_sccpSclcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->sccpSclcAlarmStatus = old_value;
 		StorageTmp->sccpSclcAlarmStatusLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpSclcClProtocolMachineId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpSclcClProtocolMachineId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static uint8_t *old_value;
+	struct sccpSclcTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpSclcClProtocolMachineId entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpSclcTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		string = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpSclcRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcClProtocolMachineId: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OCTET_STR) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcClProtocolMachineId not ASN_OCTET_STR\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		/* Note: ranges 1..32 */
+		if (var_val_len > SPRINT_MAX_LEN || ((1 > var_val_len || var_val_len > 32))) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcClProtocolMachineId: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((string = malloc(var_val_len + 1)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSclcClProtocolMachineId for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpSclcClProtocolMachineId;
+		old_length = StorageTmp->sccpSclcClProtocolMachineIdLen;
+		StorageTmp->sccpSclcClProtocolMachineId = string;
+		StorageTmp->sccpSclcClProtocolMachineIdLen = var_val_len;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpSclcClProtocolMachineId = old_value;
+		StorageTmp->sccpSclcClProtocolMachineIdLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -10655,6 +12376,7 @@ write_sccpSclcAdministrativeState(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value locked */
 		switch (set_value) {
 		case SCCPSCLCADMINISTRATIVESTATE_LOCKED:
 		case SCCPSCLCADMINISTRATIVESTATE_UNLOCKED:
@@ -10759,7 +12481,7 @@ write_sccpSclcOperationalSystemType(int action, u_char *var_val, u_char var_val_
 }
 
 /**
- * @fn int write_sccpInitialValueReassTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSclcInitialValueReassTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -10770,14 +12492,14 @@ write_sccpSclcOperationalSystemType(int action, u_char *var_val, u_char var_val_
  * @brief Table row and column write routine.
  */
 int
-write_sccpInitialValueReassTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSclcInitialValueReassTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpSclcTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpInitialValueReassTimer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSclcInitialValueReassTimer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSclcTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10786,7 +12508,7 @@ write_sccpInitialValueReassTimer(int action, u_char *var_val, u_char var_val_typ
 			switch (StorageTmp->sccpSclcRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpInitialValueReassTimer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcInitialValueReassTimer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -10795,34 +12517,111 @@ write_sccpInitialValueReassTimer(int action, u_char *var_val, u_char var_val_typ
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpInitialValueReassTimer not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcInitialValueReassTimer not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpInitialValueReassTimer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcInitialValueReassTimer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..2147483647 */
 		if ((0 > set_value || set_value > 2147483647)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpInitialValueReassTimer: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcInitialValueReassTimer: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpInitialValueReassTimer for you to use, and you have just been asked to do something with it.  Note that anything
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSclcInitialValueReassTimer for you to use, and you have just been asked to do something with it.  Note that anything 
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpInitialValueReassTimer;
-		StorageTmp->sccpInitialValueReassTimer = set_value;
+		old_value = StorageTmp->sccpSclcInitialValueReassTimer;
+		StorageTmp->sccpSclcInitialValueReassTimer = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpInitialValueReassTimer = old_value;
+		StorageTmp->sccpSclcInitialValueReassTimer = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpSclcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpSclcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static oid *old_value;
+	struct sccpSclcTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static oid *objid = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpSclcAsaProfilePointer entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpSclcTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		objid = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpSclcRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAsaProfilePointer: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OBJECT_ID) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAsaProfilePointer not ASN_OBJECT_ID\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAsaProfilePointer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value { zeroDotZero } */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSclcAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that anything done 
+				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpSclcAsaProfilePointer;
+		old_length = StorageTmp->sccpSclcAsaProfilePointerLen;
+		StorageTmp->sccpSclcAsaProfilePointer = objid;
+		StorageTmp->sccpSclcAsaProfilePointerLen = var_val_len / sizeof(oid);
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpSclcAsaProfilePointer = old_value;
+		StorageTmp->sccpSclcAsaProfilePointerLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10908,7 +12707,7 @@ write_sccpSclcName(int action, u_char *var_val, u_char var_val_type, size_t var_
 }
 
 /**
- * @fn int write_sccpCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpScocCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -10919,7 +12718,7 @@ write_sccpSclcName(int action, u_char *var_val, u_char var_val_type, size_t var_
  * @brief Table row and column write routine.
  */
 int
-write_sccpCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpScocCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpScocTable_data *StorageTmp = NULL;
@@ -10927,7 +12726,7 @@ write_sccpCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, 
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpCoProtocolMachineId entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpScocCoProtocolMachineId entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpScocTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10937,7 +12736,7 @@ write_sccpCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, 
 			switch (StorageTmp->sccpScocRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCoProtocolMachineId: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScocCoProtocolMachineId: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -10946,12 +12745,12 @@ write_sccpCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCoProtocolMachineId not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScocCoProtocolMachineId not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 1..32 */
 		if (var_val_len > SPRINT_MAX_LEN || ((1 > var_val_len || var_val_len > 32))) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpCoProtocolMachineId: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScocCoProtocolMachineId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -10961,14 +12760,14 @@ write_sccpCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, 
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpCoProtocolMachineId for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpScocCoProtocolMachineId for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpCoProtocolMachineId;
-		old_length = StorageTmp->sccpCoProtocolMachineIdLen;
-		StorageTmp->sccpCoProtocolMachineId = string;
-		StorageTmp->sccpCoProtocolMachineIdLen = var_val_len;
+		old_value = StorageTmp->sccpScocCoProtocolMachineId;
+		old_length = StorageTmp->sccpScocCoProtocolMachineIdLen;
+		StorageTmp->sccpScocCoProtocolMachineId = string;
+		StorageTmp->sccpScocCoProtocolMachineIdLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -10976,8 +12775,8 @@ write_sccpCoProtocolMachineId(int action, u_char *var_val, u_char var_val_type, 
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpCoProtocolMachineId = old_value;
-		StorageTmp->sccpCoProtocolMachineIdLen = old_length;
+		StorageTmp->sccpScocCoProtocolMachineId = old_value;
+		StorageTmp->sccpScocCoProtocolMachineIdLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -11030,6 +12829,7 @@ write_sccpScocAdministrativeState(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScocAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value locked */
 		switch (set_value) {
 		case SCCPSCOCADMINISTRATIVESTATE_LOCKED:
 		case SCCPSCOCADMINISTRATIVESTATE_UNLOCKED:
@@ -11332,12 +13132,20 @@ write_sccpScrcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 		}
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAlarmStatus not ASN_BIT_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAlarmStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAlarmStatus: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		/* Note: default value */
 		break;
@@ -11367,6 +13175,83 @@ write_sccpScrcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_sccpScrcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_sccpScrcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static oid *old_value;
+	struct sccpScrcTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 16;
+	static size_t old_length = 0;
+	static oid *objid = NULL;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpScrcAsaProfilePointer entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpScrcTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		objid = NULL;
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->sccpScrcRowStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAsaProfilePointer: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_OBJECT_ID) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAsaProfilePointer not ASN_OBJECT_ID\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAsaProfilePointer: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* Note: default value { zeroDotZero } */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpScrcAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that anything done 
+				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->sccpScrcAsaProfilePointer;
+		old_length = StorageTmp->sccpScrcAsaProfilePointerLen;
+		StorageTmp->sccpScrcAsaProfilePointer = objid;
+		StorageTmp->sccpScrcAsaProfilePointerLen = var_val_len / sizeof(oid);
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->sccpScrcAsaProfilePointer = old_value;
+		StorageTmp->sccpScrcAsaProfilePointerLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11453,7 +13338,7 @@ write_sccpScrcName(int action, u_char *var_val, u_char var_val_type, size_t var_
 }
 
 /**
- * @fn int write_sccpSharingMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpEntitySetSharingMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -11464,14 +13349,14 @@ write_sccpScrcName(int action, u_char *var_val, u_char var_val_type, size_t var_
  * @brief Table row and column write routine.
  */
 int
-write_sccpSharingMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpEntitySetSharingMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpEntitySetTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpSharingMode entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetSharingMode entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpEntitySetTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11480,7 +13365,7 @@ write_sccpSharingMode(int action, u_char *var_val, u_char var_val_type, size_t v
 			switch (StorageTmp->sccpEntitySetRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSharingMode: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetSharingMode: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -11489,37 +13374,37 @@ write_sccpSharingMode(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSharingMode not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetSharingMode not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSharingMode: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetSharingMode: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		switch (set_value) {
-		case SCCPSHARINGMODE_SOLITARY:
-		case SCCPSHARINGMODE_DUPLIDOMINANT:
-		case SCCPSHARINGMODE_DUPLIREPLACEMENT:
-		case SCCPSHARINGMODE_DUPLILOADSHARED:
+		case SCCPENTITYSETSHARINGMODE_SOLITARY:
+		case SCCPENTITYSETSHARINGMODE_DUPLIDOMINANT:
+		case SCCPENTITYSETSHARINGMODE_DUPLIREPLACEMENT:
+		case SCCPENTITYSETSHARINGMODE_DUPLILOADSHARED:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSharingMode: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetSharingMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpSharingMode for you to use, and you have just been asked to do something with it.  Note that anything done here must 
-				   be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpEntitySetSharingMode for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpSharingMode;
-		StorageTmp->sccpSharingMode = set_value;
+		old_value = StorageTmp->sccpEntitySetSharingMode;
+		StorageTmp->sccpEntitySetSharingMode = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpSharingMode = old_value;
+		StorageTmp->sccpEntitySetSharingMode = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -11528,7 +13413,7 @@ write_sccpSharingMode(int action, u_char *var_val, u_char var_val_type, size_t v
 }
 
 /**
- * @fn int write_sccpLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpEntitySetLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -11539,7 +13424,7 @@ write_sccpSharingMode(int action, u_char *var_val, u_char var_val_type, size_t v
  * @brief Table row and column write routine.
  */
 int
-write_sccpLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpEntitySetLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static oid *old_value;
 	struct sccpEntitySetTable_data *StorageTmp = NULL;
@@ -11547,7 +13432,7 @@ write_sccpLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpLoadSharingAlgPointer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetLoadSharingAlgPointer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpEntitySetTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11557,7 +13442,7 @@ write_sccpLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type
 			switch (StorageTmp->sccpEntitySetRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLoadSharingAlgPointer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetLoadSharingAlgPointer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -11566,11 +13451,11 @@ write_sccpLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type
 			}
 		}
 		if (var_val_type != ASN_OBJECT_ID) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLoadSharingAlgPointer not ASN_OBJECT_ID\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetLoadSharingAlgPointer not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLoadSharingAlgPointer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetLoadSharingAlgPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -11578,14 +13463,14 @@ write_sccpLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpLoadSharingAlgPointer for you to use, and you have just been asked to do something with it.  Note that anything done 
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpEntitySetLoadSharingAlgPointer for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpLoadSharingAlgPointer;
-		old_length = StorageTmp->sccpLoadSharingAlgPointerLen;
-		StorageTmp->sccpLoadSharingAlgPointer = objid;
-		StorageTmp->sccpLoadSharingAlgPointerLen = var_val_len / sizeof(oid);
+		old_value = StorageTmp->sccpEntitySetLoadSharingAlgPointer;
+		old_length = StorageTmp->sccpEntitySetLoadSharingAlgPointerLen;
+		StorageTmp->sccpEntitySetLoadSharingAlgPointer = objid;
+		StorageTmp->sccpEntitySetLoadSharingAlgPointerLen = var_val_len / sizeof(oid);
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -11593,8 +13478,8 @@ write_sccpLoadSharingAlgPointer(int action, u_char *var_val, u_char var_val_type
 		objid = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpLoadSharingAlgPointer = old_value;
-		StorageTmp->sccpLoadSharingAlgPointerLen = old_length;
+		StorageTmp->sccpEntitySetLoadSharingAlgPointer = old_value;
+		StorageTmp->sccpEntitySetLoadSharingAlgPointerLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(objid);
@@ -12143,7 +14028,7 @@ write_sccpRemoteSCCPName(int action, u_char *var_val, u_char var_val_type, size_
 }
 
 /**
- * @fn int write_sccpGtNewEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtConversionRuleNewEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -12154,14 +14039,14 @@ write_sccpRemoteSCCPName(int action, u_char *var_val, u_char var_val_type, size_
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtNewEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtConversionRuleNewEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtConversionRuleTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtNewEncodingScheme entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleNewEncodingScheme entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtConversionRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12170,7 +14055,7 @@ write_sccpGtNewEncodingScheme(int action, u_char *var_val, u_char var_val_type, 
 			switch (StorageTmp->sccpGtConversionRuleRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewEncodingScheme: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewEncodingScheme: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -12179,39 +14064,39 @@ write_sccpGtNewEncodingScheme(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewEncodingScheme not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewEncodingScheme not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewEncodingScheme: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewEncodingScheme: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 256 */
 		switch (set_value) {
-		case SCCPGTNEWENCODINGSCHEME_UNKNOWN:
-		case SCCPGTNEWENCODINGSCHEME_BCDODD:
-		case SCCPGTNEWENCODINGSCHEME_BCDEVEN:
-		case SCCPGTNEWENCODINGSCHEME_NATIONALSPECIFIC:
-		case SCCPGTNEWENCODINGSCHEME_NOTUSEDORNOOVERWITE:
+		case SCCPGTCONVERSIONRULENEWENCODINGSCHEME_UNKNOWN:
+		case SCCPGTCONVERSIONRULENEWENCODINGSCHEME_BCDODD:
+		case SCCPGTCONVERSIONRULENEWENCODINGSCHEME_BCDEVEN:
+		case SCCPGTCONVERSIONRULENEWENCODINGSCHEME_NATIONALSPECIFIC:
+		case SCCPGTCONVERSIONRULENEWENCODINGSCHEME_NOTUSEDORNOOVERWITE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewEncodingScheme: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewEncodingScheme: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtNewEncodingScheme for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtConversionRuleNewEncodingScheme for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtNewEncodingScheme;
-		StorageTmp->sccpGtNewEncodingScheme = set_value;
+		old_value = StorageTmp->sccpGtConversionRuleNewEncodingScheme;
+		StorageTmp->sccpGtConversionRuleNewEncodingScheme = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtNewEncodingScheme = old_value;
+		StorageTmp->sccpGtConversionRuleNewEncodingScheme = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -12220,7 +14105,7 @@ write_sccpGtNewEncodingScheme(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
- * @fn int write_sccpGtNewNatureOfAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtConversionRuleNewNatureOfAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -12231,14 +14116,14 @@ write_sccpGtNewEncodingScheme(int action, u_char *var_val, u_char var_val_type, 
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtNewNatureOfAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtConversionRuleNewNatureOfAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtConversionRuleTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtNewNatureOfAddress entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleNewNatureOfAddress entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtConversionRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12247,7 +14132,7 @@ write_sccpGtNewNatureOfAddress(int action, u_char *var_val, u_char var_val_type,
 			switch (StorageTmp->sccpGtConversionRuleRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewNatureOfAddress: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNatureOfAddress: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -12256,44 +14141,44 @@ write_sccpGtNewNatureOfAddress(int action, u_char *var_val, u_char var_val_type,
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewNatureOfAddress not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNatureOfAddress not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewNatureOfAddress: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNatureOfAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 256 */
 		switch (set_value) {
-		case SCCPGTNEWNATUREOFADDRESS_UNKNOWN:
-		case SCCPGTNEWNATUREOFADDRESS_ISDNTNP:
-		case SCCPGTNEWNATUREOFADDRESS_GENERICNUMBERINGPLAN:
-		case SCCPGTNEWNATUREOFADDRESS_DNP:
-		case SCCPGTNEWNATUREOFADDRESS_TNP:
-		case SCCPGTNEWNATUREOFADDRESS_MMNP:
-		case SCCPGTNEWNATUREOFADDRESS_LMNP:
-		case SCCPGTNEWNATUREOFADDRESS_ISDNMNP:
-		case SCCPGTNEWNATUREOFADDRESS_PRIVATENUMBERINGPLAN:
-		case SCCPGTNEWNATUREOFADDRESS_NOTUSEDORNOOVERWITE:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_UNKNOWN:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_ISDNTNP:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_GENERICNUMBERINGPLAN:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_DNP:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_TNP:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_MMNP:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_LMNP:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_ISDNMNP:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_PRIVATENUMBERINGPLAN:
+		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_NOTUSEDORNOOVERWITE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewNatureOfAddress: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNatureOfAddress: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtNewNatureOfAddress for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtConversionRuleNewNatureOfAddress for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtNewNatureOfAddress;
-		StorageTmp->sccpGtNewNatureOfAddress = set_value;
+		old_value = StorageTmp->sccpGtConversionRuleNewNatureOfAddress;
+		StorageTmp->sccpGtConversionRuleNewNatureOfAddress = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtNewNatureOfAddress = old_value;
+		StorageTmp->sccpGtConversionRuleNewNatureOfAddress = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -12302,7 +14187,7 @@ write_sccpGtNewNatureOfAddress(int action, u_char *var_val, u_char var_val_type,
 }
 
 /**
- * @fn int write_sccpGtNewNumberingPlan(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtConversionRuleNewNumberingPlan(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -12313,14 +14198,14 @@ write_sccpGtNewNatureOfAddress(int action, u_char *var_val, u_char var_val_type,
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtNewNumberingPlan(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtConversionRuleNewNumberingPlan(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtConversionRuleTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtNewNumberingPlan entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleNewNumberingPlan entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtConversionRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12329,7 +14214,7 @@ write_sccpGtNewNumberingPlan(int action, u_char *var_val, u_char var_val_type, s
 			switch (StorageTmp->sccpGtConversionRuleRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewNumberingPlan: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNumberingPlan: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -12338,39 +14223,39 @@ write_sccpGtNewNumberingPlan(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewNumberingPlan not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNumberingPlan not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewNumberingPlan: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNumberingPlan: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 256 */
 		switch (set_value) {
-		case SCCPGTNEWNUMBERINGPLAN_UNKNOWN:
-		case SCCPGTNEWNUMBERINGPLAN_SUBSCRIBER:
-		case SCCPGTNEWNUMBERINGPLAN_NATIONAL:
-		case SCCPGTNEWNUMBERINGPLAN_INTERNATIONAL:
-		case SCCPGTNEWNUMBERINGPLAN_NOTUSEDORNOOVERWRITE:
+		case SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_UNKNOWN:
+		case SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_SUBSCRIBER:
+		case SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_NATIONAL:
+		case SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_INTERNATIONAL:
+		case SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_NOTUSEDORNOOVERWRITE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewNumberingPlan: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNumberingPlan: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtNewNumberingPlan for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtConversionRuleNewNumberingPlan for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtNewNumberingPlan;
-		StorageTmp->sccpGtNewNumberingPlan = set_value;
+		old_value = StorageTmp->sccpGtConversionRuleNewNumberingPlan;
+		StorageTmp->sccpGtConversionRuleNewNumberingPlan = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtNewNumberingPlan = old_value;
+		StorageTmp->sccpGtConversionRuleNewNumberingPlan = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -12379,7 +14264,7 @@ write_sccpGtNewNumberingPlan(int action, u_char *var_val, u_char var_val_type, s
 }
 
 /**
- * @fn int write_sccpGtNewTranslationType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtConversionRuleNewTranslationType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -12390,14 +14275,14 @@ write_sccpGtNewNumberingPlan(int action, u_char *var_val, u_char var_val_type, s
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtNewTranslationType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtConversionRuleNewTranslationType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtConversionRuleTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtNewTranslationType entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleNewTranslationType entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtConversionRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12406,7 +14291,7 @@ write_sccpGtNewTranslationType(int action, u_char *var_val, u_char var_val_type,
 			switch (StorageTmp->sccpGtConversionRuleRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewTranslationType: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewTranslationType: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -12415,39 +14300,39 @@ write_sccpGtNewTranslationType(int action, u_char *var_val, u_char var_val_type,
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewTranslationType not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewTranslationType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewTranslationType: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewTranslationType: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 256 */
 		switch (set_value) {
-		case SCCPGTNEWTRANSLATIONTYPE_UNKNOWN:
-		case SCCPGTNEWTRANSLATIONTYPE_ITCC:
-		case SCCPGTNEWTRANSLATIONTYPE_GENERICNUMBERINGPLAN:
-		case SCCPGTNEWTRANSLATIONTYPE_IEESS:
-		case SCCPGTNEWTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE:
+		case SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_UNKNOWN:
+		case SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_ITCC:
+		case SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_GENERICNUMBERINGPLAN:
+		case SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_IEESS:
+		case SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNewTranslationType: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewTranslationType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtNewTranslationType for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtConversionRuleNewTranslationType for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtNewTranslationType;
-		StorageTmp->sccpGtNewTranslationType = set_value;
+		old_value = StorageTmp->sccpGtConversionRuleNewTranslationType;
+		StorageTmp->sccpGtConversionRuleNewTranslationType = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtNewTranslationType = old_value;
+		StorageTmp->sccpGtConversionRuleNewTranslationType = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -12748,7 +14633,7 @@ write_sccpAddressInfoNrOfAddressElements(int action, u_char *var_val, u_char var
 }
 
 /**
- * @fn int write_sccpGtIndicator(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtTranslatorGtIndicator(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -12759,14 +14644,14 @@ write_sccpAddressInfoNrOfAddressElements(int action, u_char *var_val, u_char var
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtIndicator(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtTranslatorGtIndicator(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtTranslatorTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtIndicator entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorGtIndicator entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtTranslatorTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12775,7 +14660,7 @@ write_sccpGtIndicator(int action, u_char *var_val, u_char var_val_type, size_t v
 			switch (StorageTmp->sccpGtTranslatorRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtIndicator: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorGtIndicator: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -12784,38 +14669,38 @@ write_sccpGtIndicator(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtIndicator not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorGtIndicator not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtIndicator: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorGtIndicator: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		switch (set_value) {
-		case SCCPGTINDICATOR_NOGLOBALTITLE:
-		case SCCPGTINDICATOR_NOAONLY:
-		case SCCPGTINDICATOR_TTONLY:
-		case SCCPGTINDICATOR_TT_NP_ES:
-		case SCCPGTINDICATOR_TT_NP_ES_NOA:
+		case SCCPGTTRANSLATORGTINDICATOR_NOGLOBALTITLE:
+		case SCCPGTTRANSLATORGTINDICATOR_NOAONLY:
+		case SCCPGTTRANSLATORGTINDICATOR_TTONLY:
+		case SCCPGTTRANSLATORGTINDICATOR_TT_NP_ES:
+		case SCCPGTTRANSLATORGTINDICATOR_TT_NP_ES_NOA:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtIndicator: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorGtIndicator: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtIndicator for you to use, and you have just been asked to do something with it.  Note that anything done here must 
-				   be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtTranslatorGtIndicator for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtIndicator;
-		StorageTmp->sccpGtIndicator = set_value;
+		old_value = StorageTmp->sccpGtTranslatorGtIndicator;
+		StorageTmp->sccpGtTranslatorGtIndicator = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtIndicator = old_value;
+		StorageTmp->sccpGtTranslatorGtIndicator = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -12824,7 +14709,7 @@ write_sccpGtIndicator(int action, u_char *var_val, u_char var_val_type, size_t v
 }
 
 /**
- * @fn int write_sccpGtNatureOfAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtTranslatorNatureOfAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -12835,14 +14720,14 @@ write_sccpGtIndicator(int action, u_char *var_val, u_char var_val_type, size_t v
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtNatureOfAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtTranslatorNatureOfAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtTranslatorTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtNatureOfAddress entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorNatureOfAddress entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtTranslatorTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12851,7 +14736,7 @@ write_sccpGtNatureOfAddress(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpGtTranslatorRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNatureOfAddress: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorNatureOfAddress: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -12860,43 +14745,43 @@ write_sccpGtNatureOfAddress(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNatureOfAddress not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorNatureOfAddress not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNatureOfAddress: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorNatureOfAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		switch (set_value) {
-		case SCCPGTNATUREOFADDRESS_UNKNOWN:
-		case SCCPGTNATUREOFADDRESS_ISDNTNP:
-		case SCCPGTNATUREOFADDRESS_GENERICNUMBERINGPLAN:
-		case SCCPGTNATUREOFADDRESS_DNP:
-		case SCCPGTNATUREOFADDRESS_TNP:
-		case SCCPGTNATUREOFADDRESS_MMNP:
-		case SCCPGTNATUREOFADDRESS_LMNP:
-		case SCCPGTNATUREOFADDRESS_ISDNMNP:
-		case SCCPGTNATUREOFADDRESS_PRIVATENUMBERINGPLAN:
-		case SCCPGTNATUREOFADDRESS_NOTUSEDORNOOVERWITE:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_UNKNOWN:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_ISDNTNP:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_GENERICNUMBERINGPLAN:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_DNP:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_TNP:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_MMNP:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_LMNP:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_ISDNMNP:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_PRIVATENUMBERINGPLAN:
+		case SCCPGTTRANSLATORNATUREOFADDRESS_NOTUSEDORNOOVERWITE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNatureOfAddress: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorNatureOfAddress: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtNatureOfAddress for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtTranslatorNatureOfAddress for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtNatureOfAddress;
-		StorageTmp->sccpGtNatureOfAddress = set_value;
+		old_value = StorageTmp->sccpGtTranslatorNatureOfAddress;
+		StorageTmp->sccpGtTranslatorNatureOfAddress = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtNatureOfAddress = old_value;
+		StorageTmp->sccpGtTranslatorNatureOfAddress = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -12905,7 +14790,7 @@ write_sccpGtNatureOfAddress(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
- * @fn int write_sccpGtNumberingPlan(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtTranslatorNumberingPlan(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -12916,14 +14801,14 @@ write_sccpGtNatureOfAddress(int action, u_char *var_val, u_char var_val_type, si
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtNumberingPlan(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtTranslatorNumberingPlan(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtTranslatorTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtNumberingPlan entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorNumberingPlan entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtTranslatorTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12932,7 +14817,7 @@ write_sccpGtNumberingPlan(int action, u_char *var_val, u_char var_val_type, size
 			switch (StorageTmp->sccpGtTranslatorRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNumberingPlan: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorNumberingPlan: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -12941,38 +14826,38 @@ write_sccpGtNumberingPlan(int action, u_char *var_val, u_char var_val_type, size
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNumberingPlan not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorNumberingPlan not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNumberingPlan: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorNumberingPlan: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		switch (set_value) {
-		case SCCPGTNUMBERINGPLAN_UNKNOWN:
-		case SCCPGTNUMBERINGPLAN_SUBSCRIBER:
-		case SCCPGTNUMBERINGPLAN_NATIONAL:
-		case SCCPGTNUMBERINGPLAN_INTERNATIONAL:
-		case SCCPGTNUMBERINGPLAN_NOTUSEDORNOOVERWRITE:
+		case SCCPGTTRANSLATORNUMBERINGPLAN_UNKNOWN:
+		case SCCPGTTRANSLATORNUMBERINGPLAN_SUBSCRIBER:
+		case SCCPGTTRANSLATORNUMBERINGPLAN_NATIONAL:
+		case SCCPGTTRANSLATORNUMBERINGPLAN_INTERNATIONAL:
+		case SCCPGTTRANSLATORNUMBERINGPLAN_NOTUSEDORNOOVERWRITE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtNumberingPlan: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorNumberingPlan: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtNumberingPlan for you to use, and you have just been asked to do something with it.  Note that anything done here
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtTranslatorNumberingPlan for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtNumberingPlan;
-		StorageTmp->sccpGtNumberingPlan = set_value;
+		old_value = StorageTmp->sccpGtTranslatorNumberingPlan;
+		StorageTmp->sccpGtTranslatorNumberingPlan = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtNumberingPlan = old_value;
+		StorageTmp->sccpGtTranslatorNumberingPlan = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -12981,7 +14866,7 @@ write_sccpGtNumberingPlan(int action, u_char *var_val, u_char var_val_type, size
 }
 
 /**
- * @fn int write_sccpGtTranslationType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtTranslatorTranslationType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -12992,14 +14877,14 @@ write_sccpGtNumberingPlan(int action, u_char *var_val, u_char var_val_type, size
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtTranslationType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtTranslatorTranslationType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtTranslatorTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslationType entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorTranslationType entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtTranslatorTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13008,7 +14893,7 @@ write_sccpGtTranslationType(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpGtTranslatorRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslationType: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorTranslationType: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -13017,38 +14902,38 @@ write_sccpGtTranslationType(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslationType not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorTranslationType not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslationType: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorTranslationType: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		switch (set_value) {
-		case SCCPGTTRANSLATIONTYPE_UNKNOWN:
-		case SCCPGTTRANSLATIONTYPE_ITCC:
-		case SCCPGTTRANSLATIONTYPE_GENERICNUMBERINGPLAN:
-		case SCCPGTTRANSLATIONTYPE_IEESS:
-		case SCCPGTTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE:
+		case SCCPGTTRANSLATORTRANSLATIONTYPE_UNKNOWN:
+		case SCCPGTTRANSLATORTRANSLATIONTYPE_ITCC:
+		case SCCPGTTRANSLATORTRANSLATIONTYPE_GENERICNUMBERINGPLAN:
+		case SCCPGTTRANSLATORTRANSLATIONTYPE_IEESS:
+		case SCCPGTTRANSLATORTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslationType: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorTranslationType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtTranslationType for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtTranslatorTranslationType for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtTranslationType;
-		StorageTmp->sccpGtTranslationType = set_value;
+		old_value = StorageTmp->sccpGtTranslatorTranslationType;
+		StorageTmp->sccpGtTranslatorTranslationType = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtTranslationType = old_value;
+		StorageTmp->sccpGtTranslatorTranslationType = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -13100,6 +14985,7 @@ write_sccpGtTranslatorAdministrativeState(int action, u_char *var_val, u_char va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value locked */
 		switch (set_value) {
 		case SCCPGTTRANSLATORADMINISTRATIVESTATE_LOCKED:
 		case SCCPGTTRANSLATORADMINISTRATIVESTATE_UNLOCKED:
@@ -13254,6 +15140,7 @@ write_sccpGtRuleAdministrativeState(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value locked */
 		switch (set_value) {
 		case SCCPGTRULEADMINISTRATIVESTATE_LOCKED:
 		case SCCPGTRULEADMINISTRATIVESTATE_UNLOCKED:
@@ -13285,7 +15172,7 @@ write_sccpGtRuleAdministrativeState(int action, u_char *var_val, u_char var_val_
 }
 
 /**
- * @fn int write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtRuleAddressInformation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -13296,7 +15183,7 @@ write_sccpGtRuleAdministrativeState(int action, u_char *var_val, u_char var_val_
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtRuleAddressInformation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpGtRuleTable_data *StorageTmp = NULL;
@@ -13304,7 +15191,7 @@ write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type,
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtAddressInformation entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleAddressInformation entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13314,7 +15201,7 @@ write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type,
 			switch (StorageTmp->sccpGtRuleRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtAddressInformation: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleAddressInformation: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -13323,11 +15210,11 @@ write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type,
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtAddressInformation not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleAddressInformation not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > SPRINT_MAX_LEN) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtAddressInformation: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleAddressInformation: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -13337,14 +15224,14 @@ write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type,
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtAddressInformation for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtRuleAddressInformation for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtAddressInformation;
-		old_length = StorageTmp->sccpGtAddressInformationLen;
-		StorageTmp->sccpGtAddressInformation = string;
-		StorageTmp->sccpGtAddressInformationLen = var_val_len;
+		old_value = StorageTmp->sccpGtRuleAddressInformation;
+		old_length = StorageTmp->sccpGtRuleAddressInformationLen;
+		StorageTmp->sccpGtRuleAddressInformation = string;
+		StorageTmp->sccpGtRuleAddressInformationLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -13352,8 +15239,8 @@ write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type,
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtAddressInformation = old_value;
-		StorageTmp->sccpGtAddressInformationLen = old_length;
+		StorageTmp->sccpGtRuleAddressInformation = old_value;
+		StorageTmp->sccpGtRuleAddressInformationLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -13363,7 +15250,7 @@ write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type,
 }
 
 /**
- * @fn int write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtRuleGtConversionRulePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -13374,7 +15261,7 @@ write_sccpGtAddressInformation(int action, u_char *var_val, u_char var_val_type,
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtRuleGtConversionRulePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpGtRuleTable_data *StorageTmp = NULL;
@@ -13382,7 +15269,7 @@ write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, si
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtConvRulePointer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleGtConversionRulePointer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13392,7 +15279,7 @@ write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, si
 			switch (StorageTmp->sccpGtRuleRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConvRulePointer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleGtConversionRulePointer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -13401,12 +15288,12 @@ write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConvRulePointer not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleGtConversionRulePointer not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 1..32 */
 		if (var_val_len > SPRINT_MAX_LEN || ((1 > var_val_len || var_val_len > 32))) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConvRulePointer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleGtConversionRulePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -13416,14 +15303,14 @@ write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, si
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtConvRulePointer for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtRuleGtConversionRulePointer for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtConvRulePointer;
-		old_length = StorageTmp->sccpGtConvRulePointerLen;
-		StorageTmp->sccpGtConvRulePointer = string;
-		StorageTmp->sccpGtConvRulePointerLen = var_val_len;
+		old_value = StorageTmp->sccpGtRuleGtConversionRulePointer;
+		old_length = StorageTmp->sccpGtRuleGtConversionRulePointerLen;
+		StorageTmp->sccpGtRuleGtConversionRulePointer = string;
+		StorageTmp->sccpGtRuleGtConversionRulePointerLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -13431,8 +15318,8 @@ write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, si
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtConvRulePointer = old_value;
-		StorageTmp->sccpGtConvRulePointerLen = old_length;
+		StorageTmp->sccpGtRuleGtConversionRulePointer = old_value;
+		StorageTmp->sccpGtRuleGtConversionRulePointerLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -13442,7 +15329,7 @@ write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, si
 }
 
 /**
- * @fn int write_sccpGtEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtRuleEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -13453,14 +15340,14 @@ write_sccpGtConvRulePointer(int action, u_char *var_val, u_char var_val_type, si
  * @brief Table row and column write routine.
  */
 int
-write_sccpGtEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtRuleEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpGtRuleTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpGtEncodingScheme entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleEncodingScheme entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13469,7 +15356,7 @@ write_sccpGtEncodingScheme(int action, u_char *var_val, u_char var_val_type, siz
 			switch (StorageTmp->sccpGtRuleRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtEncodingScheme: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleEncodingScheme: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -13478,38 +15365,38 @@ write_sccpGtEncodingScheme(int action, u_char *var_val, u_char var_val_type, siz
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtEncodingScheme not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleEncodingScheme not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtEncodingScheme: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleEncodingScheme: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		switch (set_value) {
-		case SCCPGTENCODINGSCHEME_UNKNOWN:
-		case SCCPGTENCODINGSCHEME_BCDODD:
-		case SCCPGTENCODINGSCHEME_BCDEVEN:
-		case SCCPGTENCODINGSCHEME_NATIONALSPECIFIC:
-		case SCCPGTENCODINGSCHEME_NOTUSEDORNOOVERWITE:
+		case SCCPGTRULEENCODINGSCHEME_UNKNOWN:
+		case SCCPGTRULEENCODINGSCHEME_BCDODD:
+		case SCCPGTRULEENCODINGSCHEME_BCDEVEN:
+		case SCCPGTRULEENCODINGSCHEME_NATIONALSPECIFIC:
+		case SCCPGTRULEENCODINGSCHEME_NOTUSEDORNOOVERWITE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtEncodingScheme: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleEncodingScheme: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtEncodingScheme for you to use, and you have just been asked to do something with it.  Note that anything done here 
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtRuleEncodingScheme for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpGtEncodingScheme;
-		StorageTmp->sccpGtEncodingScheme = set_value;
+		old_value = StorageTmp->sccpGtRuleEncodingScheme;
+		StorageTmp->sccpGtRuleEncodingScheme = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpGtEncodingScheme = old_value;
+		StorageTmp->sccpGtRuleEncodingScheme = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -13518,7 +15405,7 @@ write_sccpGtEncodingScheme(int action, u_char *var_val, u_char var_val_type, siz
 }
 
 /**
- * @fn int write_sccpEntitySetPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpGtRuleEntitySetPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -13529,7 +15416,7 @@ write_sccpGtEncodingScheme(int action, u_char *var_val, u_char var_val_type, siz
  * @brief Table row and column write routine.
  */
 int
-write_sccpEntitySetPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpGtRuleEntitySetPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpGtRuleTable_data *StorageTmp = NULL;
@@ -13537,7 +15424,7 @@ write_sccpEntitySetPointer(int action, u_char *var_val, u_char var_val_type, siz
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetPointer entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleEntitySetPointer entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13547,7 +15434,7 @@ write_sccpEntitySetPointer(int action, u_char *var_val, u_char var_val_type, siz
 			switch (StorageTmp->sccpGtRuleRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetPointer: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleEntitySetPointer: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -13556,12 +15443,12 @@ write_sccpEntitySetPointer(int action, u_char *var_val, u_char var_val_type, siz
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetPointer not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleEntitySetPointer not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 1..32 */
 		if (var_val_len > SPRINT_MAX_LEN || ((1 > var_val_len || var_val_len > 32))) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetPointer: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleEntitySetPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -13571,14 +15458,14 @@ write_sccpEntitySetPointer(int action, u_char *var_val, u_char var_val_type, siz
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpEntitySetPointer for you to use, and you have just been asked to do something with it.  Note that anything done here 
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpGtRuleEntitySetPointer for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpEntitySetPointer;
-		old_length = StorageTmp->sccpEntitySetPointerLen;
-		StorageTmp->sccpEntitySetPointer = string;
-		StorageTmp->sccpEntitySetPointerLen = var_val_len;
+		old_value = StorageTmp->sccpGtRuleEntitySetPointer;
+		old_length = StorageTmp->sccpGtRuleEntitySetPointerLen;
+		StorageTmp->sccpGtRuleEntitySetPointer = string;
+		StorageTmp->sccpGtRuleEntitySetPointerLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -13586,8 +15473,8 @@ write_sccpEntitySetPointer(int action, u_char *var_val, u_char var_val_type, siz
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpEntitySetPointer = old_value;
-		StorageTmp->sccpEntitySetPointerLen = old_length;
+		StorageTmp->sccpGtRuleEntitySetPointer = old_value;
+		StorageTmp->sccpGtRuleEntitySetPointerLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -13677,7 +15564,7 @@ write_sccpGtRuleName(int action, u_char *var_val, u_char var_val_type, size_t va
 }
 
 /**
- * @fn int write_sccpDSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtDSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -13688,23 +15575,23 @@ write_sccpGtRuleName(int action, u_char *var_val, u_char var_val_type, size_t va
  * @brief Table row and column write routine.
  */
 int
-write_sccpDSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtDSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpDSRVT entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtDSRVT entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpDSRVT: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtDSRVT: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -13713,32 +15600,32 @@ write_sccpDSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpDSRVT not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtDSRVT not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpDSRVT: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtDSRVT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..2147483647 */
 		if ((0 > set_value || set_value > 2147483647)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpDSRVT: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtDSRVT: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpDSRVT for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtDSRVT for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpDSRVT;
-		StorageTmp->sccpDSRVT = set_value;
+		old_value = StorageTmp->sccpSrvtDSRVT;
+		StorageTmp->sccpSrvtDSRVT = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpDSRVT = old_value;
+		StorageTmp->sccpSrvtDSRVT = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -13747,7 +15634,7 @@ write_sccpDSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val
 }
 
 /**
- * @fn int write_sccpNSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtNSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -13758,23 +15645,23 @@ write_sccpDSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val
  * @brief Table row and column write routine.
  */
 int
-write_sccpNSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtNSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpNSRVT entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtNSRVT entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNSRVT: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtNSRVT: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -13783,27 +15670,27 @@ write_sccpNSRVT(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNSRVT not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtNSRVT not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNSRVT: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtNSRVT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpNSRVT for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtNSRVT for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpNSRVT;
-		StorageTmp->sccpNSRVT = set_value;
+		old_value = StorageTmp->sccpSrvtNSRVT;
+		StorageTmp->sccpSrvtNSRVT = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpNSRVT = old_value;
+		StorageTmp->sccpSrvtNSRVT = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -13838,7 +15725,7 @@ write_sccpSrvtName(int action, u_char *var_val, u_char var_val_type, size_t var_
 		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
 				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtName: but column non-existent\n");
@@ -13892,7 +15779,7 @@ write_sccpSrvtName(int action, u_char *var_val, u_char var_val_type, size_t var_
 }
 
 /**
- * @fn int write_sccpAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -13903,23 +15790,23 @@ write_sccpSrvtName(int action, u_char *var_val, u_char var_val_type, size_t var_
  * @brief Table row and column write routine.
  */
 int
-write_sccpAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpAdministrativeState entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtAdministrativeState entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAdministrativeState: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtAdministrativeState: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -13928,37 +15815,37 @@ write_sccpAdministrativeState(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAdministrativeState not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtAdministrativeState not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAdministrativeState: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
-		case SCCPADMINISTRATIVESTATE_LOCKED:
-		case SCCPADMINISTRATIVESTATE_UNLOCKED:
-		case SCCPADMINISTRATIVESTATE_SHUTTINGDOWN:
+		case SCCPSRVTADMINISTRATIVESTATE_LOCKED:
+		case SCCPSRVTADMINISTRATIVESTATE_UNLOCKED:
+		case SCCPSRVTADMINISTRATIVESTATE_SHUTTINGDOWN:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAdministrativeState: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpAdministrativeState;
-		StorageTmp->sccpAdministrativeState = set_value;
+		old_value = StorageTmp->sccpSrvtAdministrativeState;
+		StorageTmp->sccpSrvtAdministrativeState = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpAdministrativeState = old_value;
+		StorageTmp->sccpSrvtAdministrativeState = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -13967,7 +15854,7 @@ write_sccpAdministrativeState(int action, u_char *var_val, u_char var_val_type, 
 }
 
 /**
- * @fn int write_sccpTraceRequested(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtTraceRequested(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -13978,23 +15865,23 @@ write_sccpAdministrativeState(int action, u_char *var_val, u_char var_val_type, 
  * @brief Table row and column write routine.
  */
 int
-write_sccpTraceRequested(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtTraceRequested(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpTraceRequested entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtTraceRequested entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpTraceRequested: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtTraceRequested: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -14003,11 +15890,11 @@ write_sccpTraceRequested(int action, u_char *var_val, u_char var_val_type, size_
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpTraceRequested not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtTraceRequested not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpTraceRequested: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtTraceRequested: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		switch (set_value) {
@@ -14015,23 +15902,23 @@ write_sccpTraceRequested(int action, u_char *var_val, u_char var_val_type, size_
 		case TV_FALSE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpTraceRequested: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtTraceRequested: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpTraceRequested for you to use, and you have just been asked to do something with it.  Note that anything done here
-				   must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtTraceRequested for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpTraceRequested;
-		StorageTmp->sccpTraceRequested = set_value;
+		old_value = StorageTmp->sccpSrvtTraceRequested;
+		StorageTmp->sccpSrvtTraceRequested = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpTraceRequested = old_value;
+		StorageTmp->sccpSrvtTraceRequested = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -14040,7 +15927,7 @@ write_sccpTraceRequested(int action, u_char *var_val, u_char var_val_type, size_
 }
 
 /**
- * @fn int write_sccpThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -14051,23 +15938,23 @@ write_sccpTraceRequested(int action, u_char *var_val, u_char var_val_type, size_
  * @brief Table row and column write routine.
  */
 int
-write_sccpThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpThreshold entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtThreshold entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpThreshold: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtThreshold: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -14076,27 +15963,27 @@ write_sccpThreshold(int action, u_char *var_val, u_char var_val_type, size_t var
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpThreshold not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtThreshold not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpThreshold: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtThreshold: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpThreshold for you to use, and you have just been asked to do something with it.  Note that anything done here must
-				   be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtThreshold for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpThreshold;
-		StorageTmp->sccpThreshold = set_value;
+		old_value = StorageTmp->sccpSrvtThreshold;
+		StorageTmp->sccpSrvtThreshold = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpThreshold = old_value;
+		StorageTmp->sccpSrvtThreshold = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -14105,7 +15992,7 @@ write_sccpThreshold(int action, u_char *var_val, u_char var_val_type, size_t var
 }
 
 /**
- * @fn int write_sccpMtpBackwardRoutingRequested(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtMtpBackwardRoutingRequested(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -14116,23 +16003,23 @@ write_sccpThreshold(int action, u_char *var_val, u_char var_val_type, size_t var
  * @brief Table row and column write routine.
  */
 int
-write_sccpMtpBackwardRoutingRequested(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtMtpBackwardRoutingRequested(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpMtpBackwardRoutingRequested entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtMtpBackwardRoutingRequested entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpBackwardRoutingRequested: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtMtpBackwardRoutingRequested: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -14141,11 +16028,11 @@ write_sccpMtpBackwardRoutingRequested(int action, u_char *var_val, u_char var_va
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpBackwardRoutingRequested not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtMtpBackwardRoutingRequested not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpBackwardRoutingRequested: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtMtpBackwardRoutingRequested: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 2 */
@@ -14154,23 +16041,23 @@ write_sccpMtpBackwardRoutingRequested(int action, u_char *var_val, u_char var_va
 		case TV_FALSE:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpBackwardRoutingRequested: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtMtpBackwardRoutingRequested: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpMtpBackwardRoutingRequested for you to use, and you have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtMtpBackwardRoutingRequested for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpMtpBackwardRoutingRequested;
-		StorageTmp->sccpMtpBackwardRoutingRequested = set_value;
+		old_value = StorageTmp->sccpSrvtMtpBackwardRoutingRequested;
+		StorageTmp->sccpSrvtMtpBackwardRoutingRequested = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpMtpBackwardRoutingRequested = old_value;
+		StorageTmp->sccpSrvtMtpBackwardRoutingRequested = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -14179,7 +16066,7 @@ write_sccpMtpBackwardRoutingRequested(int action, u_char *var_val, u_char var_va
 }
 
 /**
- * @fn int write_sccpOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -14190,7 +16077,7 @@ write_sccpMtpBackwardRoutingRequested(int action, u_char *var_val, u_char var_va
  * @brief Table row and column write routine.
  */
 int
-write_sccpOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
@@ -14198,17 +16085,17 @@ write_sccpOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t va
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpOriginalGT entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtOriginalGT entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOriginalGT: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtOriginalGT: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -14217,11 +16104,11 @@ write_sccpOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 		}
 		if (var_val_type != ASN_OCTET_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOriginalGT not ASN_OCTET_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtOriginalGT not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > SPRINT_MAX_LEN) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOriginalGT: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtOriginalGT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value */
@@ -14232,14 +16119,14 @@ write_sccpOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t va
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpOriginalGT for you to use, and you have just been asked to do something with it.  Note that anything done here must
-				   be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtOriginalGT for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpOriginalGT;
-		old_length = StorageTmp->sccpOriginalGTLen;
-		StorageTmp->sccpOriginalGT = string;
-		StorageTmp->sccpOriginalGTLen = var_val_len;
+		old_value = StorageTmp->sccpSrvtOriginalGT;
+		old_length = StorageTmp->sccpSrvtOriginalGTLen;
+		StorageTmp->sccpSrvtOriginalGT = string;
+		StorageTmp->sccpSrvtOriginalGTLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -14247,8 +16134,8 @@ write_sccpOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t va
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOriginalGT = old_value;
-		StorageTmp->sccpOriginalGTLen = old_length;
+		StorageTmp->sccpSrvtOriginalGT = old_value;
+		StorageTmp->sccpSrvtOriginalGTLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -14258,7 +16145,7 @@ write_sccpOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t va
 }
 
 /**
- * @fn int write_sccpInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -14269,7 +16156,7 @@ write_sccpOriginalGT(int action, u_char *var_val, u_char var_val_type, size_t va
  * @brief Table row and column write routine.
  */
 int
-write_sccpInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
@@ -14277,17 +16164,17 @@ write_sccpInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t v
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpInfoRequest entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtInfoRequest entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpInfoRequest: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtInfoRequest: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -14296,12 +16183,20 @@ write_sccpInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 		}
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpInfoRequest not ASN_BIT_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtInfoRequest not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpInfoRequest: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtInfoRequest: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtInfoRequest: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		/* Note: default value */
 		break;
@@ -14311,14 +16206,14 @@ write_sccpInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t v
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpInfoRequest for you to use, and you have just been asked to do something with it.  Note that anything done here must 
-				   be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtInfoRequest for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpInfoRequest;
-		old_length = StorageTmp->sccpInfoRequestLen;
-		StorageTmp->sccpInfoRequest = string;
-		StorageTmp->sccpInfoRequestLen = var_val_len;
+		old_value = StorageTmp->sccpSrvtInfoRequest;
+		old_length = StorageTmp->sccpSrvtInfoRequestLen;
+		StorageTmp->sccpSrvtInfoRequest = string;
+		StorageTmp->sccpSrvtInfoRequestLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -14326,8 +16221,8 @@ write_sccpInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t v
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpInfoRequest = old_value;
-		StorageTmp->sccpInfoRequestLen = old_length;
+		StorageTmp->sccpSrvtInfoRequest = old_value;
+		StorageTmp->sccpSrvtInfoRequestLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -14337,7 +16232,7 @@ write_sccpInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t v
 }
 
 /**
- * @fn int write_sccpReturnUnknownParams(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtReturnUnknownParams(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -14348,7 +16243,7 @@ write_sccpInfoRequest(int action, u_char *var_val, u_char var_val_type, size_t v
  * @brief Table row and column write routine.
  */
 int
-write_sccpReturnUnknownParams(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtReturnUnknownParams(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static uint8_t *old_value;
 	struct sccpSrvtTable_data *StorageTmp = NULL;
@@ -14356,17 +16251,17 @@ write_sccpReturnUnknownParams(int action, u_char *var_val, u_char var_val_type, 
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpReturnUnknownParams entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtReturnUnknownParams entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
-			switch (StorageTmp->sccpRouteTestRowStatus) {
+			switch (StorageTmp->sccpSrvtRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpReturnUnknownParams: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtReturnUnknownParams: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -14375,12 +16270,20 @@ write_sccpReturnUnknownParams(int action, u_char *var_val, u_char var_val_type, 
 			}
 		}
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpReturnUnknownParams not ASN_BIT_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtReturnUnknownParams not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpReturnUnknownParams: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtReturnUnknownParams: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtReturnUnknownParams: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		/* Note: default value */
 		break;
@@ -14390,14 +16293,14 @@ write_sccpReturnUnknownParams(int action, u_char *var_val, u_char var_val_type, 
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->sccpReturnUnknownParams for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpSrvtReturnUnknownParams for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->sccpReturnUnknownParams;
-		old_length = StorageTmp->sccpReturnUnknownParamsLen;
-		StorageTmp->sccpReturnUnknownParams = string;
-		StorageTmp->sccpReturnUnknownParamsLen = var_val_len;
+		old_value = StorageTmp->sccpSrvtReturnUnknownParams;
+		old_length = StorageTmp->sccpSrvtReturnUnknownParamsLen;
+		StorageTmp->sccpSrvtReturnUnknownParams = string;
+		StorageTmp->sccpSrvtReturnUnknownParamsLen = var_val_len;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -14405,8 +16308,8 @@ write_sccpReturnUnknownParams(int action, u_char *var_val, u_char var_val_type, 
 		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpReturnUnknownParams = old_value;
-		StorageTmp->sccpReturnUnknownParamsLen = old_length;
+		StorageTmp->sccpSrvtReturnUnknownParams = old_value;
+		StorageTmp->sccpSrvtReturnUnknownParamsLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(string);
@@ -14434,18 +16337,18 @@ sccpNetworkEntityTable_consistent(struct sccpNetworkEntityTable_data *thedata)
 }
 
 /**
- * @fn int sccpSapNameTable_consistent(struct sccpSapNameTable_data *thedata)
+ * @fn int sccpLocalSapNamesTable_consistent(struct sccpLocalSapNamesTable_data *thedata)
  * @param thedata the row data to check for consistency.
  * @brief check the internal consistency of a table row.
  *
- * This function checks the internal consistency of a table row for the sccpSapNameTable table.  If the
+ * This function checks the internal consistency of a table row for the sccpLocalSapNamesTable table.  If the
  * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
  * function returns an SNMP error code and it will not be possible to activate the row until the
  * row's internal consistency is corrected.  This function might use a 'test' operation against the
  * driver to ensure that the commit phase will succeed.
  */
 int
-sccpSapNameTable_consistent(struct sccpSapNameTable_data *thedata)
+sccpLocalSapNamesTable_consistent(struct sccpLocalSapNamesTable_data *thedata)
 {
 	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
 	return (SNMP_ERR_NOERROR);
@@ -14482,6 +16385,24 @@ sccpAccessPointTable_consistent(struct sccpAccessPointTable_data *thedata)
  */
 int
 sccpLinkageTable_consistent(struct sccpLinkageTable_data *thedata)
+{
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
+}
+
+/**
+ * @fn int sccpMtpTable_consistent(struct sccpMtpTable_data *thedata)
+ * @param thedata the row data to check for consistency.
+ * @brief check the internal consistency of a table row.
+ *
+ * This function checks the internal consistency of a table row for the sccpMtpTable table.  If the
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
+ */
+int
+sccpMtpTable_consistent(struct sccpMtpTable_data *thedata)
 {
 	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
 	return (SNMP_ERR_NOERROR);
@@ -14704,7 +16625,7 @@ sccpSrvtTable_consistent(struct sccpSrvtTable_data *thedata)
 }
 
 /**
- * @fn int write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpNetworkEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -14715,7 +16636,7 @@ sccpSrvtTable_consistent(struct sccpSrvtTable_data *thedata)
  * @brief Row status write routine.
  */
 int
-write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpNetworkEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct sccpNetworkEntityTable_data *StorageTmp = NULL;
 	static struct sccpNetworkEntityTable_data *StorageNew, *StorageDel;
@@ -14724,16 +16645,16 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpRowStatus entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpNetworkEntityTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
-		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRowStatus not ASN_INTEGER\n");
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
 	}
 	set_value = *((long *) var_val);
 	/* check legal range, and notReady is reserved for us, not a user */
 	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY) {
-		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRowStatus: bad value\n");
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityRowStatus: bad value\n");
 		return SNMP_ERR_WRONGVALUE;
 	}
 	switch (action) {
@@ -14753,7 +16674,7 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			if (StorageTmp == NULL)
 				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->sccpRowStatus == RS_NOTREADY)
+			if (StorageTmp->sccpNetworkEntityRowStatus == RS_NOTREADY)
 				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
 			/* XXX: interaction with row storage type needed */
@@ -14783,8 +16704,13 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -14793,8 +16719,16 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -14805,7 +16739,10 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&sccpNetworkEntityTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -14833,20 +16770,20 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->sccpRowStatus;
-			StorageTmp->sccpRowStatus = set_value;
+			old_value = StorageTmp->sccpNetworkEntityRowStatus;
+			StorageTmp->sccpNetworkEntityRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
 				if ((ret = sccpNetworkEntityTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->sccpRowStatus = old_value;
+					StorageTmp->sccpNetworkEntityRowStatus = old_value;
 					return (ret);
 				}
 			}
 			break;
 		case RS_NOTINSERVICE:
 			/* set the flag? */
-			old_value = StorageTmp->sccpRowStatus;
-			StorageTmp->sccpRowStatus = set_value;
+			old_value = StorageTmp->sccpNetworkEntityRowStatus;
+			StorageTmp->sccpNetworkEntityRowStatus = set_value;
 			break;
 		}
 		break;
@@ -14857,11 +16794,11 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			/* row creation, set final state */
 			/* XXX: commit creation to underlying device */
 			/* XXX: activate with underlying device */
-			StorageNew->sccpRowStatus = RS_ACTIVE;
+			StorageNew->sccpNetworkEntityRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			StorageNew->sccpRowStatus = RS_NOTINSERVICE;
+			StorageNew->sccpNetworkEntityRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -14890,7 +16827,7 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
 			/* restore state */
-			StorageTmp->sccpRowStatus = old_value;
+			StorageTmp->sccpNetworkEntityRowStatus = old_value;
 			break;
 		}
 		/* fall through */
@@ -14917,7 +16854,7 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 }
 
 /**
- * @fn int write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpLocalSapNamesRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -14928,25 +16865,25 @@ write_sccpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
  * @brief Row status write routine.
  */
 int
-write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpLocalSapNamesRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct sccpSapNameTable_data *StorageTmp = NULL;
-	static struct sccpSapNameTable_data *StorageNew, *StorageDel;
+	struct sccpLocalSapNamesTable_data *StorageTmp = NULL;
+	static struct sccpLocalSapNamesTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpSapNameRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(sccpSapNameTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	DEBUGMSGTL(("sccpMIB", "write_sccpLocalSapNamesRowStatus entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpLocalSapNamesTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
-		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSapNameRowStatus not ASN_INTEGER\n");
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLocalSapNamesRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
 	}
 	set_value = *((long *) var_val);
 	/* check legal range, and notReady is reserved for us, not a user */
 	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY) {
-		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSapNameRowStatus: bad value\n");
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLocalSapNamesRowStatus: bad value\n");
 		return SNMP_ERR_WRONGVALUE;
 	}
 	switch (action) {
@@ -14966,11 +16903,11 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp == NULL)
 				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->sccpSapNameRowStatus == RS_NOTREADY)
+			if (StorageTmp->sccpLocalSapNamesRowStatus == RS_NOTREADY)
 				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
 			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->sccpSapNameTable_refs > 0)
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sccpLocalSapNamesTable_refs > 0)
 				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
 				return SNMP_ERR_INCONSISTENTVALUE;
 			break;
@@ -14979,7 +16916,7 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp == NULL)
 				break;
 			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->sccpSapNameTable_refs > 0)
+			if (StorageTmp->sccpLocalSapNamesTable_refs > 0)
 				/* row is busy and cannot be deleted */
 				return SNMP_ERR_INCONSISTENTVALUE;
 			break;
@@ -14996,12 +16933,17 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			/* sccpSapId */
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpLocalSapNamesId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -15011,37 +16953,48 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vp->next_variable;
-			/* sccpSapId */
+			/* sccpLocalSapNamesId */
 			if (vp->val_len > sizeof(uint32_t)) {
-				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpSapId: bad length\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpLocalSapNamesId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vp->next_variable;
-			if ((StorageNew = sccpSapNameTable_create()) == NULL) {
+			if ((StorageNew = sccpLocalSapNamesTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->sccpSapId = (ulong) *vp->val.integer;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
-			header_complex_add_data(&sccpSapNameTableStorage, vars, StorageNew);	/* frees vars */
+			StorageNew->sccpLocalSapNamesId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			header_complex_add_data(&sccpLocalSapNamesTableStorage, vars, StorageNew);	/* frees vars */
 			break;
 		case RS_DESTROY:
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
 				StorageDel = StorageTmp;
-				sccpSapNameTable_del(StorageDel);
+				sccpLocalSapNamesTable_del(StorageDel);
 			} else {
 				StorageDel = NULL;
 			}
@@ -15053,27 +17006,27 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = sccpSapNameTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = sccpLocalSapNamesTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
 			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->sccpSapNameRowStatus;
-			StorageTmp->sccpSapNameRowStatus = set_value;
+			old_value = StorageTmp->sccpLocalSapNamesRowStatus;
+			StorageTmp->sccpLocalSapNamesRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = sccpSapNameTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->sccpSapNameRowStatus = old_value;
+				if ((ret = sccpLocalSapNamesTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
+					StorageTmp->sccpLocalSapNamesRowStatus = old_value;
 					return (ret);
 				}
 			}
 			break;
 		case RS_NOTINSERVICE:
 			/* set the flag? */
-			old_value = StorageTmp->sccpSapNameRowStatus;
-			StorageTmp->sccpSapNameRowStatus = set_value;
+			old_value = StorageTmp->sccpLocalSapNamesRowStatus;
+			StorageTmp->sccpLocalSapNamesRowStatus = set_value;
 			break;
 		}
 		break;
@@ -15084,11 +17037,11 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			/* row creation, set final state */
 			/* XXX: commit creation to underlying device */
 			/* XXX: activate with underlying device */
-			StorageNew->sccpSapNameRowStatus = RS_ACTIVE;
+			StorageNew->sccpLocalSapNamesRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			StorageNew->sccpSapNameRowStatus = RS_NOTINSERVICE;
+			StorageNew->sccpLocalSapNamesRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -15106,8 +17059,8 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			break;
 		case RS_DESTROY:
 			/* row deletion, free it its dead */
-			sccpSapNameTable_destroy(&StorageDel);
-			/* sccpSapNameTable_destroy() can handle NULL pointers. */
+			sccpLocalSapNamesTable_destroy(&StorageDel);
+			/* sccpLocalSapNamesTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
@@ -15117,7 +17070,7 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
 			/* restore state */
-			StorageTmp->sccpSapNameRowStatus = old_value;
+			StorageTmp->sccpLocalSapNamesRowStatus = old_value;
 			break;
 		}
 		/* fall through */
@@ -15128,14 +17081,14 @@ write_sccpSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		case RS_CREATEANDWAIT:
 			/* creation */
 			if (StorageNew) {
-				sccpSapNameTable_del(StorageNew);
-				sccpSapNameTable_destroy(&StorageNew);
+				sccpLocalSapNamesTable_del(StorageNew);
+				sccpLocalSapNamesTable_destroy(&StorageNew);
 			}
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
 			if (StorageDel)
-				sccpSapNameTable_add(StorageDel);
+				sccpLocalSapNamesTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -15223,12 +17176,17 @@ write_sccpAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			/* sccpSapId */
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpAccessPointSapId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -15238,16 +17196,24 @@ write_sccpAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vp->next_variable;
-			/* sccpSapId */
+			/* sccpAccessPointSapId */
 			if (vp->val_len > sizeof(uint32_t)) {
-				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpSapId: bad length\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpAccessPointSapId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -15257,9 +17223,12 @@ write_sccpAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			StorageNew->sccpSapId = (ulong) *vp->val.integer;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
+			vp = vp->next_variable;
+			StorageNew->sccpAccessPointSapId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&sccpAccessPointTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -15450,8 +17419,13 @@ write_sccpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -15465,8 +17439,16 @@ write_sccpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -15484,7 +17466,10 @@ write_sccpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			StorageNew->sccpLinkageId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -15598,6 +17583,249 @@ write_sccpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 }
 
 /**
+ * @fn int write_sccpMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Row status write routine.
+ */
+int
+write_sccpMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	struct sccpMtpTable_data *StorageTmp = NULL;
+	static struct sccpMtpTable_data *StorageNew, *StorageDel;
+	size_t newlen = name_len - 16;
+	static int old_value;
+	int set_value, ret;
+	static struct variable_list *vars, *vp;
+
+	DEBUGMSGTL(("sccpMIB", "write_sccpMtpRowStatus entering action=%d...  \n", action));
+	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	if (var_val_type != ASN_INTEGER || var_val == NULL) {
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpRowStatus not ASN_INTEGER\n");
+		return SNMP_ERR_WRONGTYPE;
+	}
+	set_value = *((long *) var_val);
+	/* check legal range, and notReady is reserved for us, not a user */
+	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY) {
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpRowStatus: bad value\n");
+		return SNMP_ERR_WRONGVALUE;
+	}
+	switch (action) {
+	case RESERVE1:
+		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->sccpMtpRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sccpMtpTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sccpMtpTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
+		}
+		break;
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			vars = NULL;
+			/* mtpMsId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpMtpSapId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vars;
+			/* mtpMsId */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpMtpSapId */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpMtpSapId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			if ((StorageNew = sccpMtpTable_create()) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			vp = vars;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
+			vp = vp->next_variable;
+			StorageNew->sccpMtpSapId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			header_complex_add_data(&sccpMtpTableStorage, vars, StorageNew);	/* frees vars */
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				StorageDel = StorageTmp;
+				sccpMtpTable_del(StorageDel);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = sccpMtpTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
+		case RS_ACTIVE:
+			old_value = StorageTmp->sccpMtpRowStatus;
+			StorageTmp->sccpMtpRowStatus = set_value;
+			if (old_value != RS_ACTIVE) {
+				/* check that activation is possible */
+				if ((ret = sccpMtpTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
+					StorageTmp->sccpMtpRowStatus = old_value;
+					return (ret);
+				}
+			}
+			break;
+		case RS_NOTINSERVICE:
+			/* set the flag? */
+			old_value = StorageTmp->sccpMtpRowStatus;
+			StorageTmp->sccpMtpRowStatus = set_value;
+			break;
+		}
+		break;
+	case COMMIT:
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: commit creation to underlying device */
+			/* XXX: activate with underlying device */
+			StorageNew->sccpMtpRowStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			StorageNew->sccpMtpRowStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			if (old_value != set_value) {
+				switch (set_value) {
+				case RS_ACTIVE:
+					/* XXX: activate with underlying device */
+					break;
+				case RS_NOTINSERVICE:
+					/* XXX: deactivate with underlying device */
+					break;
+				}
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			sccpMtpTable_destroy(&StorageDel);
+			/* sccpMtpTable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->sccpMtpRowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				sccpMtpTable_del(StorageNew);
+				sccpMtpTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				sccpMtpTable_add(StorageDel);
+			break;
+		}
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
  * @fn int write_sccpSclcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
@@ -15677,8 +17905,13 @@ write_sccpSclcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -15687,8 +17920,16 @@ write_sccpSclcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -15699,7 +17940,10 @@ write_sccpSclcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&sccpSclcTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -15890,8 +18134,13 @@ write_sccpScocRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -15900,8 +18149,16 @@ write_sccpScocRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -15912,7 +18169,10 @@ write_sccpScocRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&sccpScocTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -16103,8 +18363,13 @@ write_sccpScrcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -16113,8 +18378,16 @@ write_sccpScrcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -16125,7 +18398,10 @@ write_sccpScrcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&sccpScrcTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -16316,8 +18592,13 @@ write_sccpEntitySetRowStatus(int action, u_char *var_val, u_char var_val_type, s
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -16331,8 +18612,16 @@ write_sccpEntitySetRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -16351,7 +18640,10 @@ write_sccpEntitySetRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->sccpEntitySetId, vp->val.string, vp->val_len);
 			StorageNew->sccpEntitySetIdLen = vp->val_len;
@@ -16545,8 +18837,13 @@ write_sccpEntitySetSapRowStatus(int action, u_char *var_val, u_char var_val_type
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -16565,8 +18862,16 @@ write_sccpEntitySetSapRowStatus(int action, u_char *var_val, u_char var_val_type
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -16593,7 +18898,10 @@ write_sccpEntitySetSapRowStatus(int action, u_char *var_val, u_char var_val_type
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->sccpEntitySetId, vp->val.string, vp->val_len);
 			StorageNew->sccpEntitySetIdLen = vp->val_len;
@@ -16790,8 +19098,13 @@ write_sccpConcernedAreaRowStatus(int action, u_char *var_val, u_char var_val_typ
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -16805,8 +19118,16 @@ write_sccpConcernedAreaRowStatus(int action, u_char *var_val, u_char var_val_typ
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -16825,7 +19146,10 @@ write_sccpConcernedAreaRowStatus(int action, u_char *var_val, u_char var_val_typ
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->sccpConcernedAreaId, vp->val.string, vp->val_len);
 			StorageNew->sccpConcernedAreaIdLen = vp->val_len;
@@ -17019,8 +19343,13 @@ write_sccpRemoteSCCPRowStatus(int action, u_char *var_val, u_char var_val_type, 
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -17039,8 +19368,16 @@ write_sccpRemoteSCCPRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -17067,7 +19404,10 @@ write_sccpRemoteSCCPRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->sccpConcernedAreaId, vp->val.string, vp->val_len);
 			StorageNew->sccpConcernedAreaIdLen = vp->val_len;
@@ -17264,8 +19604,13 @@ write_sccpGtConversionRuleRowStatus(int action, u_char *var_val, u_char var_val_
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -17279,8 +19624,16 @@ write_sccpGtConversionRuleRowStatus(int action, u_char *var_val, u_char var_val_
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -17299,7 +19652,10 @@ write_sccpGtConversionRuleRowStatus(int action, u_char *var_val, u_char var_val_
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->sccpGtConversionRuleId, vp->val.string, vp->val_len);
 			StorageNew->sccpGtConversionRuleIdLen = vp->val_len;
@@ -17493,8 +19849,13 @@ write_sccpAddressInfoRowStatus(int action, u_char *var_val, u_char var_val_type,
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -17513,8 +19874,16 @@ write_sccpAddressInfoRowStatus(int action, u_char *var_val, u_char var_val_type,
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -17541,7 +19910,10 @@ write_sccpAddressInfoRowStatus(int action, u_char *var_val, u_char var_val_type,
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->sccpGtConversionRuleId, vp->val.string, vp->val_len);
 			StorageNew->sccpGtConversionRuleIdLen = vp->val_len;
@@ -17738,8 +20110,13 @@ write_sccpGtTranslatorRowStatus(int action, u_char *var_val, u_char var_val_type
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -17753,8 +20130,16 @@ write_sccpGtTranslatorRowStatus(int action, u_char *var_val, u_char var_val_type
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -17773,7 +20158,10 @@ write_sccpGtTranslatorRowStatus(int action, u_char *var_val, u_char var_val_type
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->sccpGtTranslatorId, vp->val.string, vp->val_len);
 			StorageNew->sccpGtTranslatorIdLen = vp->val_len;
@@ -17967,8 +20355,13 @@ write_sccpGtRuleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -17987,8 +20380,16 @@ write_sccpGtRuleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -18015,7 +20416,10 @@ write_sccpGtRuleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
 			memdup((void *) &StorageNew->sccpGtTranslatorId, vp->val.string, vp->val_len);
 			StorageNew->sccpGtTranslatorIdLen = vp->val_len;
@@ -18133,7 +20537,7 @@ write_sccpGtRuleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 }
 
 /**
- * @fn int write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_sccpSrvtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -18144,7 +20548,7 @@ write_sccpGtRuleRowStatus(int action, u_char *var_val, u_char var_val_type, size
  * @brief Row status write routine.
  */
 int
-write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_sccpSrvtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	struct sccpSrvtTable_data *StorageTmp = NULL;
 	static struct sccpSrvtTable_data *StorageNew, *StorageDel;
@@ -18153,16 +20557,16 @@ write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, s
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
-	DEBUGMSGTL(("sccpMIB", "write_sccpRouteTestRowStatus entering action=%d...  \n", action));
+	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
-		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRouteTestRowStatus not ASN_INTEGER\n");
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
 	}
 	set_value = *((long *) var_val);
 	/* check legal range, and notReady is reserved for us, not a user */
 	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY) {
-		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRouteTestRowStatus: bad value\n");
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtRowStatus: bad value\n");
 		return SNMP_ERR_WRONGVALUE;
 	}
 	switch (action) {
@@ -18182,7 +20586,7 @@ write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			if (StorageTmp == NULL)
 				/* cannot change state of non-existent row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->sccpRouteTestRowStatus == RS_NOTREADY)
+			if (StorageTmp->sccpSrvtRowStatus == RS_NOTREADY)
 				/* cannot change state of row that is not ready */
 				return SNMP_ERR_INCONSISTENTVALUE;
 			/* XXX: interaction with row storage type needed */
@@ -18212,12 +20616,17 @@ write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, s
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			/* sccpRouteTestId */
+			/* sccpNetworkEntityId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* sccpSrvtId */
 			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
@@ -18227,17 +20636,25 @@ write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
-			/* sccpNetworkEntityId */
+			/* mtpMsId */
 			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index mtpMsId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* sccpNetworkEntityId */
+			/* Note: ranges 1..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpNetworkEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vp->next_variable;
-			/* sccpRouteTestId */
+			/* sccpSrvtId */
 			/* Note: ranges 1..32 */
 			if (vp->val_len > SPRINT_MAX_LEN || ((1 > vp->val_len || vp->val_len > 32))) {
-				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpRouteTestId: bad length\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index sccpSrvtId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -18247,10 +20664,13 @@ write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
-			StorageNew->sccpNetworkEntityId = (ulong) *vp->val.integer;
+			StorageNew->mtpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
-			memdup((void *) &StorageNew->sccpRouteTestId, vp->val.string, vp->val_len);
-			StorageNew->sccpRouteTestIdLen = vp->val_len;
+			memdup((void *) &StorageNew->sccpNetworkEntityId, vp->val.string, vp->val_len);
+			StorageNew->sccpNetworkEntityIdLen = vp->val_len;
+			vp = vp->next_variable;
+			memdup((void *) &StorageNew->sccpSrvtId, vp->val.string, vp->val_len);
+			StorageNew->sccpSrvtIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&sccpSrvtTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -18278,20 +20698,20 @@ write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->sccpRouteTestRowStatus;
-			StorageTmp->sccpRouteTestRowStatus = set_value;
+			old_value = StorageTmp->sccpSrvtRowStatus;
+			StorageTmp->sccpSrvtRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
 				if ((ret = sccpSrvtTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->sccpRouteTestRowStatus = old_value;
+					StorageTmp->sccpSrvtRowStatus = old_value;
 					return (ret);
 				}
 			}
 			break;
 		case RS_NOTINSERVICE:
 			/* set the flag? */
-			old_value = StorageTmp->sccpRouteTestRowStatus;
-			StorageTmp->sccpRouteTestRowStatus = set_value;
+			old_value = StorageTmp->sccpSrvtRowStatus;
+			StorageTmp->sccpSrvtRowStatus = set_value;
 			break;
 		}
 		break;
@@ -18302,11 +20722,11 @@ write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			/* row creation, set final state */
 			/* XXX: commit creation to underlying device */
 			/* XXX: activate with underlying device */
-			StorageNew->sccpRouteTestRowStatus = RS_ACTIVE;
+			StorageNew->sccpSrvtRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			StorageNew->sccpRouteTestRowStatus = RS_NOTINSERVICE;
+			StorageNew->sccpSrvtRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -18335,7 +20755,7 @@ write_sccpRouteTestRowStatus(int action, u_char *var_val, u_char var_val_type, s
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
 			/* restore state */
-			StorageTmp->sccpRouteTestRowStatus = old_value;
+			StorageTmp->sccpSrvtRowStatus = old_value;
 			break;
 		}
 		/* fall through */

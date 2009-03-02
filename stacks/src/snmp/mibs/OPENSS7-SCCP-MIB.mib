@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SCCP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2009-01-10 17:09:26 $
+-- @(#) $RCSfile: OPENSS7-SCCP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-02-21 08:16:37 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,23 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 17:09:26 $ by $Author: brian $
+-- Last Modified $Date: 2009-02-21 08:16:37 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SCCP-MIB.mib,v $
+-- Revision 0.9.2.15  2009-02-21 08:16:37  brian
+-- - updates
+--
+-- Revision 0.9.2.14  2009-02-19 12:06:03  brian
+-- - correction
+--
+-- Revision 0.9.2.13  2009-02-19 11:44:38  brian
+-- - timer corrections
+--
+-- Revision 0.9.2.12  2009-02-19 10:47:49  brian
+-- - some cleanup of SCCP MIB
+--
 -- Revision 0.9.2.11  2009-01-10 17:09:26  brian
 -- - updated agents
 --
@@ -102,13 +114,16 @@ IMPORTS
 	FROM SNMPv2-TC
     CommonLanguageName
 	FROM OPENSS7-TC
-    AdministrativeState, OperationalState, UsageState, ProceduralStatus, 
-    AvailabilityStatus, AlarmStatus, SimpleNameType
+    AdministrativeState, OperationalState, ProceduralStatus, 
+    AvailabilityStatus, AlarmStatus, SimpleNameType, UsageState
 	FROM OPENSS7-SMI-MIB
     NEntitySystemTypes, NEntitySystemType
 	FROM OPENSS7-CLNS-MIB
     Ss7ProtocolVariant
 	FROM OPENSS7-SS7-MIB
+    mtpMsId, MtpSapAddress, MtpUserPart, MtpUserPartStatus, 
+    MtpCongestedState, MtpCongestionLevel
+	FROM OPENSS7-MTP-MIB
     openss7, openss7Q, openss7Q751
 	FROM OPENSS7-SMI;
 
@@ -127,7 +142,7 @@ sccpMIB MODULE-IDENTITY
 	 mailto:bidulock@openss7.org"
     DESCRIPTION
 	"This MIB provides configuration and status information of an 
-	 SCCP subsystem, where SCCP is in accordance with ITU-T Rec. 
+	 SCCP subsystem, where SCCP is in accordance with ITU-T Rec.  
 	 Q.711 and managed according to ITU-T Rec.  Q.751.2 or ANSI 
 	 T1.116.2."
     REVISION "200812201153Z"
@@ -135,10 +150,10 @@ sccpMIB MODULE-IDENTITY
 	"Additional workup."
     REVISION "200812082322Z"
     DESCRIPTION
-	"This is an update to the MIB that includes changes mostly to the 
-	 descriptions of the managed objects.  Added missing TruthValue 
-	 import.  Type name corrections to AdminstrativeState, 
-	 SystemTypes and GtNumeringPlan."
+	"This is an update to the MIB that includes changes mostly to 
+	 the descriptions of the managed objects.  Added missing 
+	 TruthValue import.  Type name corrections to 
+	 AdminstrativeState, SystemTypes and GtNumeringPlan."
     REVISION "200711281740Z"
     DESCRIPTION
 	"This is the initial revision of this MIB that was released with 
@@ -159,22 +174,25 @@ sccpOids		OBJECT IDENTIFIER ::= { sccpObjects  4 }
 sccpCompliance		OBJECT IDENTIFIER ::= { sccpConformance  1 }
 sccpGroups		OBJECT IDENTIFIER ::= { sccpConformance  2 }
 
+sccpProtocols		OBJECT IDENTIFIER ::= { sccpOids  1 }
+sccpProbableCauses	OBJECT IDENTIFIER ::= { sccpOids  2 }
+sccpSpecificProblems	OBJECT IDENTIFIER ::= { sccpOids  3 }
+sccpSpecificExtensions	OBJECT IDENTIFIER ::= { sccpOids  4 }
+sccpLoadSharing		OBJECT IDENTIFIER ::= { sccpOids  5 }
+
 sccpNetworkEntity	OBJECT IDENTIFIER ::= { sccpTables   1 } -- SCCP_OBJ_TYPE_SP
-sccpSapName		OBJECT IDENTIFIER ::= { sccpTables   2 }
-sccpAccessPoint		OBJECT IDENTIFIER ::= { sccpTables   3 } -- SCCP_OBJ_TYPE_SS, SCCP_OBJ_TYPE_RS
-sccpLinkage		OBJECT IDENTIFIER ::= { sccpTables   4 } -- SCCP_OBJ_TYPE_MT
+sccpAccessPoint		OBJECT IDENTIFIER ::= { sccpTables   2 } -- SCCP_OBJ_TYPE_SS, SCCP_OBJ_TYPE_RS
+sccpLinkage		OBJECT IDENTIFIER ::= { sccpTables   3 } -- SCCP_OBJ_TYPE_MT, SCCP_OBJ_TYPE_SR
+sccpMtp			OBJECT IDENTIFIER ::= { sccpTables   4 } -- SCCP_OBJ_TYPE_SR
 sccpSclc		OBJECT IDENTIFIER ::= { sccpTables   5 }
 sccpScoc		OBJECT IDENTIFIER ::= { sccpTables   6 }
 sccpScrc		OBJECT IDENTIFIER ::= { sccpTables   7 }
 sccpEntitySet		OBJECT IDENTIFIER ::= { sccpTables   8 }
-sccpEntitySetSap	OBJECT IDENTIFIER ::= { sccpTables   9 }
-sccpConcernedArea	OBJECT IDENTIFIER ::= { sccpTables  10 }
-sccpRemoteSCCP		OBJECT IDENTIFIER ::= { sccpTables  11 } -- SCCP_OBJ_TYPE_SR
-sccpGtConversionRule	OBJECT IDENTIFIER ::= { sccpTables  12 }
-sccpAddressInfo		OBJECT IDENTIFIER ::= { sccpTables  13 }
-sccpGtTranslator	OBJECT IDENTIFIER ::= { sccpTables  14 }
-sccpGtRule		OBJECT IDENTIFIER ::= { sccpTables  15 }
-sccpSrvt		OBJECT IDENTIFIER ::= { sccpTables  16 }
+sccpConcernedArea	OBJECT IDENTIFIER ::= { sccpTables   9 }
+sccpGtConversionRule	OBJECT IDENTIFIER ::= { sccpTables  10 }
+sccpGtTranslator	OBJECT IDENTIFIER ::= { sccpTables  11 }
+sccpGtRule		OBJECT IDENTIFIER ::= { sccpTables  12 }
+sccpSrvt		OBJECT IDENTIFIER ::= { sccpTables  13 }
 
 -- (1.3.6.1.4.1.29591.1.1) openss7
 -- |__(xx) sccpMIB
@@ -186,100 +204,122 @@ sccpSrvt		OBJECT IDENTIFIER ::= { sccpTables  16 }
 --    |  |__(1) sccpTables
 --    |  |  |__( 1) sccpNetworkEntity
 --    |  |  |  |__(1) sccpNetworkEntityTable
---    |  |  |     |__(1) sccpNetworkEntityEntry
---    |  |  |         |__( 1) sccpNetworkEntityId
---    |  |  |         |__( 2) sccpNetworkEntityAlarmStatus
---    |  |  |         |__( 3) sccpCommunicationsEntityId
---    |  |  |         |__( 4) sccpLocalSapNames
---    |  |  |         |__( 5) sccpNetworkEntityTitles
---    |  |  |         |__( 6) sccpSystemTypes
---    |  |  |         |__( 7) sccpVersion
---    |  |  |         |__( 8) sccpLUDTandLUDTSSupported
---    |  |  |         |__( 9) sccpCoordChangeTimer
---    |  |  |         |__(10) sccpIgnoreSSTTimer
---    |  |  |         |__(11) sccpMaxStatInfoTimer
---    |  |  |         |__(12) sccpNetworkEntityName
---    |  |  |         |__(13) sccpRowStatus
+--    |  |  |  |  |__(1) sccpNetworkEntityEntry
+--    |  |  |  |      |__( 1) sccpNetworkEntityId
+--    |  |  |  |      |__( 2) sccpNetworkEntityAlarmStatus
+--    |  |  |  |      |__( 3) sccpNetworkEntityLocalSapNames
+--    |  |  |  |      |__( 4) sccpNetworkEntityOperationalState
+--    |  |  |  |      |__( 5) sccpNetworkEntityTitles
+--    |  |  |  |      |__( 6) sccpNetworkEntitySystemTypes
+--    |  |  |  |      |__( 7) sccpNetworkEntityVersion
+--    |  |  |  |      |__( 8) sccpNetworkEntityLUDTandLUDTSSupported
+--    |  |  |  |      |__( 9) sccpNetworkEntityCoordChangeTimer
+--    |  |  |  |      |__(10) sccpNetworkEntityIgnoreSSTTimer
+--    |  |  |  |      |__(11) sccpNetworkEntityMaxStatInfoTimer
+--    |  |  |  |      |__(12) sccpNetworkEntityAsaProfilePointer
+--    |  |  |  |      |__(13) sccpNetworkEntityName
+--    |  |  |  |      |__(14) sccpNetworkEntityRowStatus
+--    |  |  |  |
+--    |  |  |  |__(2) sccpLocalSapNamesTable
+--    |  |  |     |__(1) sccpLocalSapNamesEntry
+--    |  |  |         |__( 1) sccpLocalSapNamesId
+--    |  |  |         |__( 2) sccpLocalSapNamesPointer
+--    |  |  |         |__( 3) sccpLocalSapNamesRowStatus
 --    |  |  |
---    |  |  |__( 2) sccpSapName
---    |  |  |  |__(1) sccpSapNameTable
---    |  |  |     |__(1) sccpSapNameEntry
---    |  |  |         |__( 1) sccpSapNameRowStatus
---    |  |  |
---    |  |  |__( 3) sccpAccessPoint
+--    |  |  |__( 2) sccpAccessPoint
 --    |  |  |  |__(1) sccpAccessPointTable
 --    |  |  |     |__(1) sccpAccessPointEntry
---    |  |  |         |__( 1) sccpSapId
+--    |  |  |         |__( 1) sccpAccessPointSapId
 --    |  |  |         |__( 2) sccpAccessPointAlarmStatus
---    |  |  |         |__( 3) sccpSap2Address
---    |  |  |         |__( 4) sccpUserEntityNames
---    |  |  |         |__( 5) sccpProviderEntityNames
---    |  |  |         |__( 6) sccpAvailabilityStatus
---    |  |  |         |__( 7) sccpConcernedAreaPointer
---    |  |  |         |__( 8) sccpLinkagePointer
---    |  |  |         |__( 9) sccpSsAvailableAfterSpRestart
---    |  |  |         |__(10) sccpAccessPointName
---    |  |  |         |__(11) sccpAccessPointRowStatus
+--    |  |  |         |__( 3) sccpAccessPointSap2Address
+--    |  |  |         |__( 4) sccpAccessPointUserEntityNames
+--    |  |  |         |__( 5) sccpAccessPointProviderEntityNames
+--    |  |  |         |__( 6) sccpAccessPointAvailabilityStatus
+--    |  |  |         |__( 7) sccpAccessPointConcernedAreaPointer
+--    |  |  |         |__( 8) sccpAccessPointLinkagePointer
+--    |  |  |         |__( 9) sccpAccessPointSsAvailableAfterSpRestart
+--    |  |  |         |__(10) sccpAccessPointAsaProfilePointer
+--    |  |  |         |__(11) sccpAccessPointName
+--    |  |  |         |__(12) sccpAccessPointRowStatus
 --    |  |  |
---    |  |  |__( 4) sccpLinkage
+--    |  |  |__( 3) sccpLinkage
 --    |  |  |  |__(1) sccpLinkageTable
 --    |  |  |     |__(1) sccpLinkageEntry
 --    |  |  |         |__( 1) sccpLinkageId
---    |  |  |         |__( 2) sccpOperationalProtocols
---    |  |  |         |__( 3) sccpSnSAP
---    |  |  |         |__( 4) sccpAttackTimerValue
---    |  |  |         |__( 5) sccpDecayTimerValue
---    |  |  |         |__( 6) sccpNrOfRestrictionLevels
---    |  |  |         |__( 7) sccpNrOfSubLevels
---    |  |  |         |__( 8) sccpCLS
---    |  |  |         |__( 9) sccpCongestionTimerValue
---    |  |  |         |__(10) sccpp
---    |  |  |         |__(11) sccpImportanceLevelCR
---    |  |  |         |__(12) sccpImportanceLevelCC
---    |  |  |         |__(13) sccpImportanceLevelCREF
---    |  |  |         |__(14) sccpImportanceLevelDT1
---    |  |  |         |__(15) sccpImportanceLevelDT2
---    |  |  |         |__(16) sccpImportanceLevelAK
---    |  |  |         |__(17) sccpImportanceLevelIT
---    |  |  |         |__(18) sccpImportanceLevelED
---    |  |  |         |__(19) sccpImportanceLevelEA
---    |  |  |         |__(20) sccpImportanceLevelRSR
---    |  |  |         |__(21) sccpImportanceLevelRSC
---    |  |  |         |__(22) sccpImportanceLevelERR
---    |  |  |         |__(23) sccpImportanceLevelRLC
---    |  |  |         |__(24) sccpImportanceLevelRLSD
---    |  |  |         |__(25) sccpImportanceLevelUDT
---    |  |  |         |__(26) sccpImportanceLevelUDTS
---    |  |  |         |__(27) sccpImportanceLevelXUDT
---    |  |  |         |__(28) sccpImportanceLevelXUDTS
---    |  |  |         |__(29) sccpImportanceLevelLUDT
---    |  |  |         |__(30) sccpImportanceLevelLUDTS
---    |  |  |         |__(31) sccpRLM
---    |  |  |         |__(32) sccpRSLM
+--    |  |  |         |__( 2) sccpLinkageOperationalProtocols
+--    |  |  |         |__( 3) sccpLinkageSnSAP
+--    |  |  |         |__( 4) sccpLinkageAttackTimerValue
+--    |  |  |         |__( 5) sccpLinkageDecayTimerValue
+--    |  |  |         |__( 6) sccpLinkageNrOfRestrictionLevels
+--    |  |  |         |__( 7) sccpLinkageNrOfSubLevels
+--    |  |  |         |__( 8) sccpLinkageCLS
+--    |  |  |         |__( 9) sccpLinkageCongestionTimerValue
+--    |  |  |         |__(10) sccpLinkageP
+--    |  |  |         |__(11) sccpLinkageImportanceLevelCR
+--    |  |  |         |__(12) sccpLinkageImportanceLevelCC
+--    |  |  |         |__(13) sccpLinkageImportanceLevelCREF
+--    |  |  |         |__(14) sccpLinkageImportanceLevelDT1
+--    |  |  |         |__(15) sccpLinkageImportanceLevelDT2
+--    |  |  |         |__(16) sccpLinkageImportanceLevelAK
+--    |  |  |         |__(17) sccpLinkageImportanceLevelIT
+--    |  |  |         |__(18) sccpLinkageImportanceLevelED
+--    |  |  |         |__(19) sccpLinkageImportanceLevelEA
+--    |  |  |         |__(20) sccpLinkageImportanceLevelRSR
+--    |  |  |         |__(21) sccpLinkageImportanceLevelRSC
+--    |  |  |         |__(22) sccpLinkageImportanceLevelERR
+--    |  |  |         |__(23) sccpLinkageImportanceLevelRLC
+--    |  |  |         |__(24) sccpLinkageImportanceLevelRLSD
+--    |  |  |         |__(25) sccpLinkageImportanceLevelUDT
+--    |  |  |         |__(26) sccpLinkageImportanceLevelUDTS
+--    |  |  |         |__(27) sccpLinkageImportanceLevelXUDT
+--    |  |  |         |__(28) sccpLinkageImportanceLevelXUDTS
+--    |  |  |         |__(29) sccpLinkageImportanceLevelLUDT
+--    |  |  |         |__(30) sccpLinkageImportanceLevelLUDTS
+--    |  |  |         |__(31) sccpLinkageRLM
+--    |  |  |         |__(32) sccpLinkageRSLM
 --    |  |  |         |__(33) sccpLinkageConcernedAreaPointer
---    |  |  |         |__(34) sccpLowerLimitForSegmentation
---    |  |  |         |__(35) sccpUpperLimitForSegmentation
+--    |  |  |         |__(34) sccpLinkageLowerLimitForSegmentation
+--    |  |  |         |__(35) sccpLinkageUpperLimitForSegmentation
 --    |  |  |         |__(36) sccpLinkageName
 --    |  |  |         |__(37) sccpLinkageRowStatus
+--    |  |  |
+--    |  |  |__( 4) sccpMtp
+--    |  |  |  |__(1) sccpMtpTable
+--    |  |  |     |__(1) sccpMtpEntry
+--    |  |  |         |__( 1) sccpMtpSapId
+--    |  |  |         |__( 2) sccpMtpSap2Address
+--    |  |  |         |__( 3) sccpMtpUserPart
+--    |  |  |         |__( 4) sccpMtpUserPartStatus
+--    |  |  |         |__( 5) sccpMtpUserEntityNames
+--    |  |  |         |__( 6) sccpMtpProviderEntityNames
+--    |  |  |         |__( 7) sccpMtpUsageState
+--    |  |  |         |__( 8) sccpMtpAdministrativeState
+--    |  |  |         |__( 9) sccpMtpOperationalState
+--    |  |  |         |__(10) sccpMtpCongestedState
+--    |  |  |         |__(11) sccpMtpCongestionLevel
+--    |  |  |         |__(12) sccpMtpRemoteExchangeLabel
+--    |  |  |         |__(13) sccpMtpName
+--    |  |  |         |__(14) sccpMtpRowStatus
 --    |  |  |
 --    |  |  |__( 5) sccpSclc
 --    |  |  |  |__(1) sccpSclcTable
 --    |  |  |     |__(1) sccpSclcEntry
 --    |  |  |         |__( 1) sccpSclcAlarmStatus
---    |  |  |         |__( 2) sccpClProtocolMachineId
+--    |  |  |         |__( 2) sccpSclcClProtocolMachineId
 --    |  |  |         |__( 3) sccpSclcOperationalState
---    |  |  |         |__( 4) sccpTotalRemoteSAPs
+--    |  |  |         |__( 4) sccpSclcTotalRemoteSAPs
 --    |  |  |         |__( 5) sccpSclcAdministrativeState
 --    |  |  |         |__( 6) sccpSclcSupportedProtocols
 --    |  |  |         |__( 7) sccpSclcOperationalSystemType
---    |  |  |         |__( 8) sccpInitialValueReassTimer
---    |  |  |         |__( 9) sccpSclcName
---    |  |  |         |__(10) sccpSclcRowStatus
+--    |  |  |         |__( 8) sccpSclcInitialValueReassTimer
+--    |  |  |         |__( 9) sccpSclcAsaProfilePointer
+--    |  |  |         |__(10) sccpSclcName
+--    |  |  |         |__(11) sccpSclcRowStatus
 --    |  |  |
 --    |  |  |__( 6) sccpScoc
 --    |  |  |  |__(1) sccpScocTable
 --    |  |  |     |__(1) sccpScocEntry
---    |  |  |         |__( 1) sccpCoProtocolMachineId
+--    |  |  |         |__( 1) sccpScocCoProtocolMachineId
 --    |  |  |         |__( 2) sccpScocOperationalState
 --    |  |  |         |__( 3) sccpScocAdministrativeState
 --    |  |  |         |__( 4) sccpScocOperationalSystemType
@@ -292,55 +332,53 @@ sccpSrvt		OBJECT IDENTIFIER ::= { sccpTables  16 }
 --    |  |  |     |__(1) sccpScrcEntry
 --    |  |  |         |__( 1) sccpScrcId
 --    |  |  |         |__( 2) sccpScrcAlarmStatus
---    |  |  |         |__( 3) sccpScrcName
---    |  |  |         |__( 4) sccpScrcRowStatus
+--    |  |  |         |__( 3) sccpScrcAsaProfilePointer
+--    |  |  |         |__( 4) sccpScrcName
+--    |  |  |         |__( 5) sccpScrcRowStatus
 --    |  |  |
 --    |  |  |__( 8) sccpEntitySet
 --    |  |  |  |__(1) sccpEntitySetTable
---    |  |  |     |__(1) sccpEntitySetEntry
---    |  |  |         |__( 1) sccpEntitySetId
---    |  |  |         |__( 2) sccpSharingMode
---    |  |  |         |__( 3) sccpLoadSharingAlgPointer
---    |  |  |         |__( 4) sccpEntitySetName
---    |  |  |         |__( 5) sccpEntitySetType
---    |  |  |         |__( 6) sccpEntitySetSsn
---    |  |  |         |__( 7) sccpEntitySetRowStatus
---    |  |  |
---    |  |  |__( 9) sccpEntitySetSap
---    |  |  |  |__(1) sccpEntitySetSapTable
+--    |  |  |  |  |__(1) sccpEntitySetEntry
+--    |  |  |  |      |__( 1) sccpEntitySetId
+--    |  |  |  |      |__( 2) sccpEntitySetSharingMode
+--    |  |  |  |      |__( 3) sccpEntitySetLoadSharingAlgPointer
+--    |  |  |  |      |__( 4) sccpEntitySetName
+--    |  |  |  |      |__( 5) sccpEntitySetType
+--    |  |  |  |      |__( 6) sccpEntitySetSsn
+--    |  |  |  |      |__( 7) sccpEntitySetRowStatus
+--    |  |  |  |
+--    |  |  |  |__(2) sccpEntitySetSapTable
 --    |  |  |     |__(1) sccpEntitySetSapEntry
 --    |  |  |         |__( 1) sccpEntitySetSapId
 --    |  |  |         |__( 2) sccpEntitySetSapType
 --    |  |  |         |__( 3) sccpEntitySetSapPointer
 --    |  |  |         |__( 4) sccpEntitySetSapRowStatus
 --    |  |  |
---    |  |  |__(10) sccpConcernedArea
+--    |  |  |__( 9) sccpConcernedArea
 --    |  |  |  |__(1) sccpConcernedAreaTable
---    |  |  |     |__(1) sccpConcernedAreaEntry
---    |  |  |         |__( 1) sccpConcernedAreaId
---    |  |  |         |__( 2) sccpConcernedAreaRowStatus
---    |  |  |
---    |  |  |__(11) sccpRemoteSCCP
---    |  |  |  |__(1) sccpRemoteSCCPTable
+--    |  |  |  |  |__(1) sccpConcernedAreaEntry
+--    |  |  |  |      |__( 1) sccpConcernedAreaId
+--    |  |  |  |      |__( 2) sccpConcernedAreaRowStatus
+--    |  |  |  |
+--    |  |  |  |__(2) sccpRemoteSCCPTable
 --    |  |  |     |__(1) sccpRemoteSCCPEntry
 --    |  |  |         |__( 1) sccpRemoteSCCPId
 --    |  |  |         |__( 2) sccpRemoteSCCPMTPAccessPoint
 --    |  |  |         |__( 3) sccpRemoteSCCPName
 --    |  |  |         |__( 4) sccpRemoteSCCPRowStatus
 --    |  |  |
---    |  |  |__(12) sccpGtConversionRule
+--    |  |  |__(10) sccpGtConversionRule
 --    |  |  |  |__(1) sccpGtConversionRuleTable
---    |  |  |     |__(1) sccpGtConversionRuleEntry
---    |  |  |         |__( 1) sccpGtConversionRuleId
---    |  |  |         |__( 2) sccpGtNewEncodingScheme
---    |  |  |         |__( 3) sccpGtNewNatureOfAddress
---    |  |  |         |__( 4) sccpGtNewNumberingPlan
---    |  |  |         |__( 5) sccpGtNewTranslationType
---    |  |  |         |__( 6) sccpGtConversionRuleName
---    |  |  |         |__( 7) sccpGtConversionRuleRowStatus
---    |  |  |
---    |  |  |__(13) sccpAddressInfo
---    |  |  |  |__(1) sccpAddressInfoTable
+--    |  |  |  |  |__(1) sccpGtConversionRuleEntry
+--    |  |  |  |      |__( 1) sccpGtConversionRuleId
+--    |  |  |  |      |__( 2) sccpGtConversionRuleNewEncodingScheme
+--    |  |  |  |      |__( 3) sccpGtConversionRuleNewNatureOfAddress
+--    |  |  |  |      |__( 4) sccpGtConversionRuleNewNumberingPlan
+--    |  |  |  |      |__( 5) sccpGtConversionRuleNewTranslationType
+--    |  |  |  |      |__( 6) sccpGtConversionRuleName
+--    |  |  |  |      |__( 7) sccpGtConversionRuleRowStatus
+--    |  |  |  |
+--    |  |  |  |__(2) sccpAddressInfoTable
 --    |  |  |     |__(1) sccpAddressInfoEntry
 --    |  |  |         |__( 1) sccpAddressInfoOperationId
 --    |  |  |         |__( 2) sccpAddressInfoOperation
@@ -348,47 +386,47 @@ sccpSrvt		OBJECT IDENTIFIER ::= { sccpTables  16 }
 --    |  |  |         |__( 4) sccpAddressInfoNrOfAddressElements
 --    |  |  |         |__( 5) sccpAddressInfoRowStatus
 --    |  |  |
---    |  |  |__(14) sccpGtTranslator
+--    |  |  |__(11) sccpGtTranslator
 --    |  |  |  |__(1) sccpGtTranslatorTable
 --    |  |  |     |__(1) sccpGtTranslatorEntry
 --    |  |  |         |__( 1) sccpGtTranslatorId
---    |  |  |         |__( 2) sccpGtIndicator
---    |  |  |         |__( 3) sccpGtNatureOfAddress
---    |  |  |         |__( 4) sccpGtNumberingPlan
---    |  |  |         |__( 5) sccpGtTranslationType
+--    |  |  |         |__( 2) sccpGtTranslatorGtIndicator
+--    |  |  |         |__( 3) sccpGtTranslatorNatureOfAddress
+--    |  |  |         |__( 4) sccpGtTranslatorNumberingPlan
+--    |  |  |         |__( 5) sccpGtTranslatorTranslationType
 --    |  |  |         |__( 6) sccpGtTranslatorAdministrativeState
 --    |  |  |         |__( 7) sccpGtTranslatorName
 --    |  |  |         |__( 8) sccpGtTranslatorRowStatus
 --    |  |  |
---    |  |  |__(15) sccpGtRule
+--    |  |  |__(12) sccpGtRule
 --    |  |  |  |__(1) sccpGtRuleTable
 --    |  |  |     |__(1) sccpGtRuleEntry
 --    |  |  |         |__( 1) sccpGtRuleId
 --    |  |  |         |__( 2) sccpGtRuleAdministrativeState
---    |  |  |         |__( 3) sccpGtAddressInformation
---    |  |  |         |__( 4) sccpGtConvRulePointer
---    |  |  |         |__( 5) sccpGtEncodingScheme
---    |  |  |         |__( 6) sccpEntitySetPointer
+--    |  |  |         |__( 3) sccpGtRuleAddressInformation
+--    |  |  |         |__( 4) sccpGtRuleGtConversionRulePointer
+--    |  |  |         |__( 5) sccpGtRuleEncodingScheme
+--    |  |  |         |__( 6) sccpGtRuleEntitySetPointer
 --    |  |  |         |__( 7) sccpGtRuleName
 --    |  |  |         |__( 8) sccpGtRuleRowStatus
 --    |  |  |
---    |  |  |__(16) sccpSrvt
+--    |  |  |__(13) sccpSrvt
 --    |  |     |__(1) sccpSrvtTable
 --    |  |        |__(1) sccpSrvtEntry
---    |  |            |__( 1) sccpRouteTestId
---    |  |            |__( 2) sccpDSRVT
---    |  |            |__( 3) sccpNSRVT
+--    |  |            |__( 1) sccpSrvtId
+--    |  |            |__( 2) sccpSrvtDSRVT
+--    |  |            |__( 3) sccpSrvtNSRVT
 --    |  |            |__( 4) sccpSrvtName
---    |  |            |__( 5) sccpAdministrativeState
---    |  |            |__( 6) sccpOperationalState
---    |  |            |__( 7) sccpProceduralStatus
---    |  |            |__( 8) sccpTraceRequested
---    |  |            |__( 9) sccpThreshold
---    |  |            |__(10) sccpMtpBackwardRoutingRequested
---    |  |            |__(11) sccpOriginalGT
---    |  |            |__(12) sccpInfoRequest
---    |  |            |__(13) sccpReturnUnknownParams
---    |  |            |__(14) sccpRouteTestRowStatus
+--    |  |            |__( 5) sccpSrvtAdministrativeState
+--    |  |            |__( 6) sccpSrvtOperationalState
+--    |  |            |__( 7) sccpSrvtProceduralStatus
+--    |  |            |__( 8) sccpSrvtTraceRequested
+--    |  |            |__( 9) sccpSrvtThreshold
+--    |  |            |__(10) sccpSrvtMtpBackwardRoutingRequested
+--    |  |            |__(11) sccpSrvtOriginalGT
+--    |  |            |__(12) sccpSrvtInfoRequest
+--    |  |            |__(13) sccpSrvtReturnUnknownParams
+--    |  |            |__(14) sccpSrvtRowStatus
 --    |  |
 --    |  |__(2) sccpScalars
 --    |  |
@@ -450,7 +488,30 @@ sccpSrvt		OBJECT IDENTIFIER ::= { sccpTables  16 }
 FailureString ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION
-	""
+	"This textual convetion models a set of failure reasons for the 
+	 failure of an SCCP Route Verification Test (SRVT) modelled as a 
+	 BITS construct.  The reasons for failure are as follows:
+	 
+	 - detectedLoop(0),
+	 - excessiveLengthRoute(1),
+	 - unknownDestination(2),
+	 - routeInaccesible(3),
+	 - processingFailure(4),
+	 - unknownInitiatingSP(5),
+	 - timerExpired(6),
+	 - wrongSP(7),
+	 - incorrectTranslation-Primary(8),
+	 - incorrectTranslation-Secondary(9),
+	 - incorrectTranslation-Intermediate(10),
+	 - notPrimaryDestination(11),
+	 - notSecondaryDestination(12),
+	 - notRecognizedPrimary(13),
+	 - notRecognizedSecondary(14),
+	 - routingProblem(15),
+	 - maxNrSRVTTestsAlready(16),
+	 - indirectRoute(17),
+	 
+	 "
     REFERENCE
 	""
     SYNTAX BITS {
@@ -642,6 +703,7 @@ GtAddressInformation ::= TEXTUAL-CONVENTION
     SYNTAX OCTET STRING
 
 SubSystemNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
     STATUS current
     DESCRIPTION
 	"Provides a specification of an SCCP subsystem number (SSN) to 
@@ -650,14 +712,35 @@ SubSystemNumber ::= TEXTUAL-CONVENTION
 	"ITU-T Rec. Q.751.2 sap2Address, 3.4/Q.713."
     SYNTAX OCTET STRING(SIZE(0..1))
 
+SubSystemNumbers ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of list of SCCP subsystem numbers 
+	 represented as an octet string.  Each octet in the string 
+	 represents one SCCP subsystem number (SSN).  Because only the 
+	 range of values from 1 to 255 are usable, the octet string can 
+	 be no longer than 255."
+    REFERENCE
+	"ITU-T Rec. Q.751.2 sap2Addresses, 3.4/Q.713."
+    SYNTAX OCTET STRING(SIZE(0..255))
+
 ImportanceLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d-1d"
     STATUS current
     DESCRIPTION
 	"Provides a set values specification of the importance level.  
 	 The first octet in the two-octet string is the default 
 	 importance level, the second octet in the two-octet string is 
 	 the maximum importance level.  Importance levels are only 
-	 allowed to range from 0 to 255."
+	 allowed to range from 0 to 255.
+	 
+	 Not all uses of this textual convention will specify both 
+	 default and maximum values.  When a value is not to be 
+	 specified, the corresponding octet is coded zero by the 
+	 management station and ignored by the agent on write.  When a 
+	 value is not to be sepcified, the returned value from the agent 
+	 will always have zero in the corresponding octet."
     REFERENCE
 	"ITU-T Rec. Q.751.2 ASN.1 ImportanceLevel, 2.6.2/Q.714."
     SYNTAX OCTET STRING(SIZE(2))
@@ -729,7 +812,6 @@ SharingMode ::= TEXTUAL-CONVENTION
 	    dupliLoadShared(3)
 	}
 
-
 SccpNAddress ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1d:1d-1d-1d[1d]"
     STATUS current
@@ -751,7 +833,7 @@ SccpNAddress ::= TEXTUAL-CONVENTION
 	 e.g. 1:5-1-2[5]."
     REFERENCE
 	"ITU-T Rec. X.283 (1992) | ISO/IEC 10733 : 1993 ASN.1 
-	 NLM.NAddress."
+	     NLM.NAddress."
     SYNTAX OCTET STRING(SIZE(5))
 
 SccpNAddresses ::= TEXTUAL-CONVENTION
@@ -766,7 +848,7 @@ SccpNAddresses ::= TEXTUAL-CONVENTION
 	 length."
     REFERENCE
 	"ITU-T Rec. X.283 (1992) | ISO/IEC 10733 : 1993 ASN.1 
-	 NLM.NAddresses."
+	     NLM.NAddresses."
     SYNTAX OCTET STRING(SIZE(0|5|10|..))
 
 -- =====================================================================
@@ -794,15 +876,15 @@ sccpRouteTestResult NOTIFICATION-TYPE
 	 RowPointer into the sccpSrvtTable table that indicates the 
 	 specific SCCP Route Verification test that has succeeded or 
 	 failed.
-
+	 
 	 When the notification indicates success, the notification may 
 	 include a pointCodeList, routePriorityList and copyData 
 	 parameters, depending upon what was requested in the test (see 
-	 the sccpTraceRequested and sccpInfoRequest columns in the 
-	 sccpSrvtTable); or it could indicate failure, in which case the 
-	 notifcation must include failureType and traceSent parameters 
-	 and might optionally include the copyData parameter depending 
-	 upon the failure and the requested information."
+	 the sccpSrvtTraceRequested and sccpSrvtInfoRequest columns in 
+	 the sccpSrvtTable); or it could indicate failure, in which case 
+	 the notifcation must include failureType and traceSent 
+	 parameters and might optionally include the copyData parameter 
+	 depending upon the failure and the requested information."
     REFERENCE
 	"ITU-T Recommendation Q.751.2 (1992) sccpRouteTestResult."
     ::= { sccpNotifications 1 }
@@ -854,8 +936,7 @@ routePriorityList OBJECT-TYPE
     MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
-	"
-	 This notification parameter uses the RoutePriorityList textual 
+	"This notification parameter uses the RoutePriorityList textual 
 	 convention for representing lists of route priorities.  The 
 	 RoutePriorityList textual convention is also defined in this 
 	 OPENSS7-SCCP-MIB module."
@@ -868,8 +949,7 @@ copyData OBJECT-TYPE
     MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
-	"
-	 This notification parameter is a rather arbitrary octet string 
+	"This notification parameter is a rather arbitrary octet string 
 	 containing requested returned information or additional failure 
 	 information.  It should be displayed in hexadecimal."
     REFERENCE
@@ -904,7 +984,7 @@ globalTitle OBJECT-TYPE
 -- =====================================================================
 
 -- Module specific object identifiers for use with the 
--- sccpLoadSharingAlgPointer autonomous type.
+-- sccpEntitySetLoadSharingAlgPointer autonomous type.
 
 sccpLoadSharingRoundRobin OBJECT-IDENTITY
     STATUS current
@@ -924,7 +1004,7 @@ sccpLoadSharingRoundRobin OBJECT-IDENTITY
 	 sharing is required between entities in the entity set."
     REFERENCE
 	"ITU-T Rec. Q.751.2 loadSharingAlgPointer."
-    ::= { sccpOids 1 }
+    ::= { sccpLoadSharing 1 }
 
 sccpLoadSharingSlsSplitting OBJECT-IDENTITY
     STATUS current
@@ -943,7 +1023,7 @@ sccpLoadSharingSlsSplitting OBJECT-IDENTITY
 	 distribution between the entities in the entity set."
     REFERENCE
 	"ITU-T Rec. Q.751.2 loadSharingAlgPointer."
-    ::= { sccpOids 2 }
+    ::= { sccpLoadSharing 2 }
 
 -- =====================================================================
 --
@@ -957,8 +1037,8 @@ sccpLoadSharingSlsSplitting OBJECT-IDENTITY
 --
 
 -- ITU-T Rec. Q.751.2 sccpSpecificExtensions
-sccpSpecificExtensions OBJECT IDENTIFIER
-    ::= { ccitt(0) recommendation(0) q(17) omap(751) sccp(2) informationModel(0) specificExtensions(0) }
+-- sccpSpecificExtensions OBJECT IDENTIFIER
+--     ::= { ccitt(0) recommendation(0) q(17) omap(751) sccp(2) informationModel(0) specificExtensions(0) }
 
 hopCounterViolation OBJECT-IDENTITY
     STATUS current
@@ -998,12 +1078,12 @@ localSccpUnavailable OBJECT-IDENTITY
     DESCRIPTION
 	"ProbableCause.  Used as the ProbableCause with the 
 	 communicationsAlarm.  Prameters include the RowPointer of the 
-	 sccpNetworkEntityTable entry that generated the error.  Also 
-	 included is SpecificProblems which can either be Failure, 
-	 Maintenance or Congestion.  When the PerceivedSeverity is 
-	 Major/Minor/Warning, it corresponds to measurement Q.752 8.3.  
-	 When the PerceivedSeverity is Cleared, it corresponds to 
-	 measurement Q.752 8.4."
+	 sccpNetworkEntityTable entry that generated the error.  Also included is 
+	 SpecificProblems which can either be Failure, Maintenance or 
+	 Congestion.  When the PerceivedSeverity is Major/Minor/Warning, 
+	 it corresponds to measurement Q.752 8.3.  When the 
+	 PerceivedSeverity is Cleared, it corresponds to measurement 
+	 Q.752 8.4."
     REFERENCE
 	"ITU-T Rec. Q.751.2 (1996) : localSccpUnavailable,
 	 ITU-T Rec. Q.752 8.1, 8.3 and 8.4."
@@ -1073,8 +1153,7 @@ noTranslatorForAddress OBJECT-IDENTITY
 	 
 	 The failure occurs when the translation of the Global Title 
 	 fails because the type of address is unknown to the translation 
-	 function.
-	 "
+	 function."
     REFERENCE
 	"ITU-T Rec. Q.751.2 (1996) : noTranslatorForAddress,
 	 ITU-T Rec. Q.752 7.1."
@@ -1157,7 +1236,7 @@ routingFailureNoReasonOrUnqualified OBJECT-IDENTITY
 	 may be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 (1996) : 
-	 routingFailureNoReasonOrUnqualified, ITU-T Rec. Q.752 7.9."
+	     routingFailureNoReasonOrUnqualified, ITU-T Rec. Q.752 7.9."
     ::= { sccpSpecificExtensions 12 }
 
 sccpCongested OBJECT-IDENTITY
@@ -1237,7 +1316,7 @@ subsystemOoSgranted OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
 	"ProbableCause.  Used as the ProbableCause in the 
-	 communicationsAlarm.  Parameter include the RowPointer of the 
+	 communicationsAlarm.  Parameters include the RowPointer of the 
 	 sccpNetworkEntityTable entry that generated the alarm."
     REFERENCE
 	"ITU-T Rec. Q.751.2 (1996) : subsystemOoSgranted,
@@ -1333,7 +1412,7 @@ unequippedSubsystem OBJECT-IDENTITY
 --
 -- These four object identifier correspond to the classes that are 
 -- available or can be operationally supported by an instance.  They are 
--- used with the sccpOperationalProtocols attribute of the 
+-- used with the sccpLinkageOperationalProtocols attribute of the 
 -- sccpLinkageTable entry.
 --
 sccpProtocolClass0 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 24 }-- basic connectionless
@@ -1345,7 +1424,7 @@ sccpProtocolClass3 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 27 }-- flow co
 -- =====================================================================
 
 sccpNetworkEntityTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF SccpNetworkEntityEntry
+    SYNTAX SEQUENCE OF SccpEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -1355,61 +1434,86 @@ sccpNetworkEntityTable OBJECT-TYPE
     ::= { sccpNetworkEntity 1 }
 
 sccpNetworkEntityEntry OBJECT-TYPE
-    SYNTAX SccpNetworkEntityEntry
+    SYNTAX SccpEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	"The sccpNetworkEntityEntry is the placeholder for all SCCP 
-	 related maanged objects.  No specific management aspects have 
-	 been identified.
-	 
-	 The communicationsEntityId is use for naming.
+	"The sccpNetworkEntityEntry is the placeholder for all SCCP related managed 
+	 objects.  No specific management aspects have been identified.
 	 
 	 The localSapNames attribute contains a set of distinguished 
 	 names of SCCP SAPs at which services are provided to the 
 	 entity.
 	 
-	 The systemTypes attributs is a set-valued attribute with 
+	 The systemTypes attributes is a set-valued attribute with 
 	 possible values: End System (ES) indicates an SCCP destination 
 	 node, Intermediate System (IS) indicates an SCCP relay node.
 	 
 	 The networkEntityTitles attribute unambiguously identifies the 
 	 name of the SCCP in an end or intermediate node.  The value may 
 	 be entered by a system management operation or it may be 
-	 derived by some local means, for example by auto 
-	 configuration."
+	 derived by some local means, for example by auto configuration.
+	 
+	 A communications entity supports the disabled and enabled 
+	 values of the operationalState attribute as described in ITU-T 
+	 Rec.  X.731 (1992) | ISO/IEC 10164-2:1992 as follows:
+	 
+	 - an entity is disabled if it is inoperable or a resource on 
+	   which it depends is inoperable,
+	   
+	 - an entity is enabled if it is operable.
+	 
+	 The communicationsEntityId is use for naming.
+
+	 The communicationsAlarm can have the following probable causes:
+
+	 - ProbableCause = localSccpUnavailable which represents 
+	   measurements Q.752/8.1 measurement Q.752/8.3 
+	   (SpecificProblems = Failure, Maintenance, Congestion) 
+	   (PerceivedSeverity = Major/Minor/Warning) and measurement 
+	   Q.752/8.4 (PerceivedSeverity = Cleared),
+	 
+	 - ProbableCause = subsystemOoSgranted which represents 
+	   measurement Q.752/8.6, and
+	 
+	 - ProbableCause = subsystemOoSdenied which represents 
+	   measurement Q.752/8.7."
     REFERENCE
 	"ITU-T Rec. Q.751.2 sccp MO."
     INDEX   {
-	    sccpNetworkEntityId
+	    mtpMsId,	 -- shared index
+	    sccpNetworkEntityId	 -- index
 	}
     ::= { sccpNetworkEntityTable 1 }
 	
 
-SccpNetworkEntityEntry ::=
+SccpEntry ::=
     SEQUENCE {
-	sccpNetworkEntityId			Unsigned32, -- index
+	sccpNetworkEntityId			SimpleNameType, -- index
 	sccpNetworkEntityAlarmStatus		AlarmStatus,
-	sccpCommunicationsEntityId		Unsigned32,
-	sccpLocalSapNames			OCTET STRING, -- needs to be a sidetable
+	sccpNetworkEntityLocalSapNames		OCTET STRING, -- needs to be a sidetable
+	sccpNetworkEntityOperationalState	OperationalState,
 	sccpNetworkEntityTitles			SccpNAddresses,
-	sccpSystemTypes				NEntitySystemTypes,
-	sccpVersion				Ss7ProtocolVariant,
-	sccpLUDTandLUDTSSupported		TruthValue,
-	sccpCoordChangeTimer			TimeInterval,
-	sccpIgnoreSSTTimer			TimeInterval,
-	sccpMaxStatInfoTimer			TimeInterval,
+	sccpNetworkEntitySystemTypes		NEntitySystemTypes,
+	sccpNetworkEntityVersion		Ss7ProtocolVariant,
+	sccpNetworkEntityLUDTandLUDTSSupported	TruthValue,
+	sccpNetworkEntityCoordChangeTimer	TimeInterval,
+	sccpNetworkEntityIgnoreSSTTimer		TimeInterval,
+	sccpNetworkEntityMaxStatInfoTimer	TimeInterval,
+	sccpNetworkEntityAsaProfilePointer	RowPointer,
 	sccpNetworkEntityName			CommonLanguageName,
-	sccpRowStatus				RowStatus
+	sccpNetworkEntityRowStatus		RowStatus
     }
 
 sccpNetworkEntityId OBJECT-TYPE
-    SYNTAX Unsigned32
+    SYNTAX SimpleNameType
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	"Provides a idetifier of the Network Entity.  Each network 
+	"Provides a identifier of the Network Entity.  Each network 
 	 entity corresponds to an instance of SCCP."
+    REFERENCE
+	"ITU-T Rec. X.723 communicationsEntityId."
     ::= { sccpNetworkEntityEntry 1 }
 
 sccpNetworkEntityAlarmStatus OBJECT-TYPE
@@ -1421,45 +1525,68 @@ sccpNetworkEntityAlarmStatus OBJECT-TYPE
 	 convention of the OPENSS7-SMI-MIB module, of the SCCP network 
 	 entity corresponding to the conceptual row in which the status 
 	 occurs.  This managed object generates the following alarms:
-
+	 
 	 The communicationsAlarm can have the following probable causes:
-
+	 
 	 - ProbableCause = localSccpUnavailable which represents 
 	   measurements Q.752/8.1 measurement Q.752/8.3 
 	   (SpecificProblems = Failure, Maintenance, Congestion) 
 	   (PerceivedSeverity = Major/Minor/Warning) and measurement 
 	   Q.752/8.4 (PerceivedSeverity = Cleared),
-
+	 
 	 - ProbableCause = subsystemOoSgranted which represents 
 	   measurement Q.752/8.6, and
-
+	 
 	 - ProbableCause = subsystemOoSdenied which represents 
 	   measurement Q.752/8.7."
     REFERENCE
-	"ITU-T Rec. X.731 (1993) : 8.1.2.1, ITU-T Rec. X.721 (1882) : 
-	 alarmStatus"
+	"ITU-T Rec. X.731 (1993) : 8.1.2.1,
+	 ITU-T Rec. X.721 (1992) : ISO/IEC 10165-2 : 1992, alarmStatus 
+	     attribute."
     ::= { sccpNetworkEntityEntry 2 }
 
-
-sccpCommunicationsEntityId OBJECT-TYPE
-    SYNTAX Unsigned32
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	"ITU-T Rec. X.723 communicationsEntityId."
-    ::= { sccpNetworkEntityEntry 3 }
-
 -- need to implement as side-table
-sccpLocalSapNames OBJECT-TYPE
+sccpNetworkEntityLocalSapNames OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"The localSapNames attribute contains a set of distinguished 
+	 names of SCCP SAPs at which services are provided to the 
+	 entity."
     REFERENCE
 	"ITU-T Rec. X.723 localSapNames."
+    ::= { sccpNetworkEntityEntry 3 }
+
+sccpNetworkEntityOperationalState OBJECT-TYPE
+    SYNTAX OperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the operational state of the SCCP network entity 
+	 following the OperationalState textual convention and ITU-T 
+	 Rec. X.721 | ISO/IEC 10165-2.  This object is single-valued and 
+	 can assume one of the following values:
+	 
+	 - disabled(0), the SCCP network entity is not operational or a 
+	   resource upon which the SCCP network entity depends is 
+	   unavailable;
+	 
+	 - enabled(1), the SCCP network entity is operational.
+	 
+	 The operational state is read-only to the management station 
+	 and can only be altered by the agent or from within the managed 
+	 system."
+    REFERENCE
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.OperationalState.
+	 ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+	     communicationsEntity:operationalState.
+	 ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+	     Section 8.1.1.1., operationalState.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     operationalState attribute."
+    DEFVAL { disabled }
     ::= { sccpNetworkEntityEntry 4 }
 
 sccpNetworkEntityTitles OBJECT-TYPE
@@ -1467,12 +1594,16 @@ sccpNetworkEntityTitles OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"The networkEntityTitles attribute unambiguously identifies the 
+	 name of the SCCP in an end or intermediate node. The value may 
+	 be entered by a system management operation or it may be 
+	 derived by some local means, for example by auto 
+	 configuration."
     REFERENCE
 	"ITU-T Rec. X.283 networkEntityTitles."
     ::= { sccpNetworkEntityEntry 5 }
 
-sccpSystemTypes OBJECT-TYPE
+sccpNetworkEntitySystemTypes OBJECT-TYPE
     SYNTAX NEntitySystemTypes
     MAX-ACCESS read-only
     STATUS current
@@ -1490,12 +1621,16 @@ sccpSystemTypes OBJECT-TYPE
 	 This reports the capabilities of the SCCP Network Entity.  It 
 	 is set by the agent and cannot be written by the management 
 	 system.  Typically SCCP implementations support eS(0) or both 
-	 es(0) and iS(1)."
+	 es(0) and iS(1).
+	 
+	 The systemTypes attribute is a set-valued attribute with 
+	 possible values: End System (ES) indicates an SCCP destination 
+	 node, Intermediate System indicates an SCCP relay node."
     REFERENCE
 	"ITU-T Rec. X.283 systemTypes."
     ::= { sccpNetworkEntityEntry 6 }
 
-sccpVersion OBJECT-TYPE
+sccpNetworkEntityVersion OBJECT-TYPE
     SYNTAX Ss7ProtocolVariant
     MAX-ACCESS read-create
     STATUS current
@@ -1507,31 +1642,42 @@ sccpVersion OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 sccpVersion."
     ::= { sccpNetworkEntityEntry 7 }
 
-sccpLUDTandLUDTSSupported OBJECT-TYPE
+sccpNetworkEntityLUDTandLUDTSSupported OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute indicates whether the implementation supports 
-	 LUTD(S) messages."
+	 LUTD(S) messages.  The provisional default is false(2)."
     REFERENCE
 	"ITU-T Rec. Q.751.2 lUDTandLUDTSSupported."
+    DEFVAL  { false } -- provisional
     ::= { sccpNetworkEntityEntry 8 }
 
-sccpCoordChangeTimer OBJECT-TYPE
-    SYNTAX TimeInterval
+sccpNetworkEntityCoordChangeTimer OBJECT-TYPE
+    SYNTAX TimeInterval(3000..12000)
     UNITS       "seconds"
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute represents the initial value of timer tCoordChg: 
 	 waiting for grant for subsystem to go out of service, as 
-	 defined in 5.3.5.2/Q.714."
+	 defined in 5.3.5.2/Q.714.  This timer is started when the 
+	 subsystem out of service request is issued to the duplicate 
+	 subsystem and is stopped when a subsystem out of service grant 
+	 is received.  When the timer expires, the subsystem out of 
+	 service request is implicitly denied.
+	 
+	 ITU-T Q.714 (05/2001) D.4 specifies a range of 1 to 2 minutes.
+	 ANSI T1.112.4/2000 6.8 recommends a value of 30 seconds.  A 
+	 provisional value of 30 seconds is used."
     REFERENCE
-	"ITU-T Rec. Q.751.2 coordChangeTimer."
+	"ITU-T Rec. Q.751.2 coordChangeTimer.
+	 ANSI T1.112.4/2000 6.8."
+    DEFVAL  { 3000 } -- 30.00 seconds
     ::= { sccpNetworkEntityEntry 9 }
 
-sccpIgnoreSSTTimer OBJECT-TYPE
+sccpNetworkEntityIgnoreSSTTimer OBJECT-TYPE
     SYNTAX TimeInterval
     UNITS       "seconds"
     MAX-ACCESS read-create
@@ -1540,23 +1686,59 @@ sccpIgnoreSSTTimer OBJECT-TYPE
 	"This attribute represents the initial value of timer 
 	 TignoreSST: delay for subsystem between receiving grant to go 
 	 out of service and actually going out of service, as defined in 
-	 3.5.2/Q.714."
+	 3.5.2/Q.714.  This timer is started when the subsystem out of 
+	 service grant is issued to the local subsystem.  While the 
+	 timer is running, subsystem status test messages for the 
+	 granted subsystem are ignored (in preparation for going out of 
+	 service).
+	 
+	 This timer is largely a local matter and no range or default is 
+	 specified in ITU-T/Q.714 D.4.  ANSI T1.112.4/2000 6.8 
+	 recommends a value of 30 seconds."
     REFERENCE
-	"ITU-T Rec. Q.751.2 ignoreSSTTimer."
+	"ITU-T Rec. Q.751.2 ignoreSSTTimer.
+	 ANSI T1.112.4/2000 6.8."
+    DEFVAL  { 3000 } -- 30.00 seconds
     ::= { sccpNetworkEntityEntry 10 }
 
-sccpMaxStatInfoTimer OBJECT-TYPE
-    SYNTAX TimeInterval
+sccpNetworkEntityMaxStatInfoTimer OBJECT-TYPE
+    SYNTAX TimeInterval(500..120000)
     UNITS       "seconds"
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute represents the maximum value of timer TstatInfo: 
 	 delay between requests for subsystem status information, as 
-	 defined in 5.3.4.2/Q.714."
+	 defined in 5.3.4.2/Q.714.  This timer is started when a 
+	 subsystem status test message is sent to a remote SCCP and 
+	 cancelled when a subsystem status response message (SSA, SSP) 
+	 is received.
+	 
+	 ITU-TQ.714 (05/2001) D.4 specifies an increasing value, 
+	 starting from 5 to 10 seconds to a maximum of 10 to 20 minutes.  
+	 ANSI T1.112/2000 6.8 recommends a value of 30 seconds."
     REFERENCE
-	"ITU-T Rec. Q.751.2 maxStatInfoTimer."
+	"ITU-T Rec. Q.751.2 maxStatInfoTimer.
+	 ANSI T1.112.4/2000 6.8."
+    DEFVAL  { 3000 } -- 30.00 seconds
     ::= { sccpNetworkEntityEntry 11 }
+
+sccpNetworkEntityAsaProfilePointer OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a pointer to an alarm severity assignment profile to 
+	 be used for alarms generated by this SCCP network entity, or 
+	 zeroDotZero."
+    REFERENCE
+	"ITU-T Rec. Q.751.2 (1997), ANSI T1.116.1 (2000), 
+	     alarmSeverityAssignmentProfilePointer attribute.
+	 ITU-T Rec. M.3100 (1995), 
+	     alarmSeverityAssignmentProfilePointer.
+	 ITU-T Rec. M.3100 (1995), ASN1DefinedTypesModule:PointerOrNull."
+    DEFVAL { { zeroDotZero } }
+    ::= { sccpNetworkEntityEntry 12 }
 
 sccpNetworkEntityName OBJECT-TYPE
     SYNTAX CommonLanguageName
@@ -1568,9 +1750,9 @@ sccpNetworkEntityName OBJECT-TYPE
 	 convention."
     REFERENCE
 	"ITU-T Rec. Q.751.2 (1992) networkEntityName."
-    ::= { sccpNetworkEntityEntry 12 }
+    ::= { sccpNetworkEntityEntry 13 }
 
-sccpRowStatus OBJECT-TYPE
+sccpNetworkEntityRowStatus OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS current
@@ -1581,47 +1763,69 @@ sccpRowStatus OBJECT-TYPE
 	 in this table have no other entries in other tables associated 
 	 with the newly created SCCP network entity.  Before an entry 
 	 may be deleted by a management station, all side-tables that 
-	 use the sccpNetworkEntityId as an index or which reference this 
-	 row in the table using the RowPointer or SimpleNameType textual 
-	 convention must be deleted or altered respectively."
+	 use the sccpNetworkEntityId as an index or which reference this row in the 
+	 table using the RowPointer or SimpleNameType textual convention 
+	 must be deleted or altered respectively."
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus"
-    ::= { sccpNetworkEntityEntry 13 }
+    ::= { sccpNetworkEntityEntry 14 }
 
-sccpSapNameTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF SccpSapNameEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	"This is a side-table to the sccpNetworkEntity table that 
-	 provides a list of localSapNames that are associated with each 
-	 entity.  This is a convenience side-table that provides 
-	 information that is also contained in the sccpAccessPointTable, 
-	 but which is organized also by sccpNetworkEntityId."
-    REFERENCE
-	""
-    ::= { sccpSapName 1 }
+-- sidetable for localSapNames
 
-sccpSapNameEntry OBJECT-TYPE
-    SYNTAX SccpSapNameEntry
+sccpLocalSapNamesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SccpLocalSapNamesEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
 	""
-    INDEX   {
+    ::= { sccpNetworkEntity 2 }
+
+sccpLocalSapNamesEntry OBJECT-TYPE
+    SYNTAX SccpLocalSapNamesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	    mtpMsId,		 -- shared index
 	    sccpNetworkEntityId, -- shared index
-	    sccpSapId -- shared index
-	}
-    ::= { sccpSapNameTable 1 }
+	    sccpLocalSapNamesId	 -- index
+    }
+    ::= { sccpLocalSapNamesTable 1 }
 
-SccpSapNameEntry ::=
+SccpLocalSapNamesEntry ::=
     SEQUENCE {
-	sccpSapNameRowStatus			RowStatus
+	sccpLocalSapNamesId			Unsigned32,
+	sccpLocalSapNamesPointer		Unsigned32,
+	sccpLocalSapNamesRowStatus		RowStatus
     }
 
-sccpSapNameRowStatus OBJECT-TYPE
+sccpLocalSapNamesId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible -- index
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sccpLocalSapNamesEntry 1 }
+
+sccpLocalSapNamesPointer OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sccpLocalSapNamesEntry 2 }
+
+sccpLocalSapNamesRowStatus OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS current
@@ -1629,7 +1833,8 @@ sccpSapNameRowStatus OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { sccpSapNameEntry 1 }
+    DEFVAL { notReady }
+    ::= { sccpLocalSapNamesEntry 3 }
 
 -- =====================================================================
 
@@ -1639,7 +1844,20 @@ sccpAccessPointTable OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The SCCP access point table provides a table of SCCP-SAP 
-	 instances belonging to each SCCP network entity."
+	 instances.  Each SCCP-SAP represents an instance of an SCCP 
+	 subsystem.  SCCP-SAPs may represent either local or remote SCCP 
+	 subsystems.
+	 
+	 Local SCCP-SAPs represent instances of SCCP subsystems that are 
+	 local to the managed element.  Remote SCCP-SAPs represent 
+	 instances of SCCP subsystems that are remote to the managed 
+	 element.
+	 
+	 An SCCP subsystem number is used for the address associated 
+	 with the SCCP-SAP.  The SCCP subsystem number used is the 
+	 actual subsystem number.  That is, it follows the SCCP 
+	 subsystem numbering scheme used by the SCCP at the local or 
+	 remote SCCP."
     REFERENCE
 	"ITU-T Rec. Q.751.2 sccpAccessPoint,
 	 ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992 nSAP,
@@ -1652,55 +1870,120 @@ sccpAccessPointEntry OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"This is an SCCP-SAP table entry that is indexed by 
-	 sccpNetworkEntityId and sccpSapId.  It provides information on 
-	 each of the SCCP-SAPs that are associated with an SCCP Network 
-	 Entity.
+	 sccpAccessPointSapId.  It provides information on each of the 
+	 SCCP-SAPs in the system.
 	 
 	 Each entry in this table is either a local SCCP-SAP (one for 
 	 which there is a local SCCP-User at a SCCP end-system) or a 
 	 remote SCCP-SAP (representing a remote SCCP-User at an SCCP 
 	 intermediate or end system).  Each SCCP-SAP, whether local or 
-	 remote, can be part of zero or more concerned areas."
+	 remote, can be part of zero or more concerned areas.
+	 
+	 The sapId attribute is used in naming instances of the 
+	 sccpAccessPoint managed object class.
+	 
+	 The sap2Address attribute contains the address of the 
+	 sccpAccessPoint. The address contains the SubSystem Number 
+	 (SSN). The sap2Address is of type SET OF OCTETSTRING. For 
+	 sccpAccessPoints, the set size is 1.  For SCCP-SAPs defined 
+	 across multiple networks, this is always the actual local or 
+	 remote SSN.
+	 
+	 The userEntityNames attribute contains the distinguished names 
+	 of the managed objects that represent the user entities that 
+	 are using the sccpAccessPoint, i.e. instances of the SCCP 
+	 subsystem.
+	 
+	 The providerEntityNames attribute contains the distinguished 
+	 names of the managed objects that represent the provider 
+	 entities that are supporting the sccpAccessPoint, i.e. the 
+	 instance of the SCCP.
+	 
+	 The status of the sccpAccessPoint is represented by the 
+	 availability status attribute. A subsystem can have the status: 
+	 allowed, the sccpAccessPoint is reachable and is functioning 
+	 normally (availability status = available) prohibited, the 
+	 sccpAccessPoint not reachable (availability status = 
+	 unavailable) congested (availability status = degraded)
+	 
+	 The optional (national network provider option) 
+	 ssAvailableAfterSpRestart attribute holds the default subsystem 
+	 status as described in the procedure of 5.2.3/Q.714.
+	 
+	 The concernedAreaPointer specifies the concerned area to be 
+	 used by SCCP Management for primary broadcast in case this 
+	 access point is local. In case of a remote access point, the 
+	 pointed concerned area will be used by SCCP Management for the 
+	 secondary broadcast. The concernedAreaPointer has value 'NULL' 
+	 if no concerned area is pointed at.
+	 
+	 The sccpAccessPointLinkagePointer specifies the sccpLinkage 
+	 that is associated with remote sccpAccessPoints only. In case 
+	 of a local sccpAccessPoint, the sccpAccessPointLinkagePointer 
+	 has value NULL. A remote sccpAccessPoint cannot be created 
+	 without a valid pointer to an sccpLinkage.
+	 
+	 The qualityofServiceAlarm can have the following probable 
+	 cause:
+
+	 - ProbableCause = TooLargeForSegmentation which represents 
+	   measurement Q.752/7.14 (PerceivedSeverity = 
+	   Major/Minor/Warning).
+
+	 - ProbableCause = subsystemProhibited which represents 
+	   measurement Q.752/8.11 and Q.752/8.12 (PerceivedSeverity = 
+	   Major/Minor/Warning/Cleared).
+
+	 The communicationsAlarm can have the following probable causes:
+
+	 - ProbableCause = sccpCongested which represents measurement 
+	   Q.752/8.8 (PerceivedSeverity = Major/Minor/Warning). The 
+	   congestion level is given as a parameter of the notification.
+
+	 - ProbableCause = localSubsystemProhibited which represents 
+	   measurements Q.752/8.9 and Q.752/8.10 (PerceivedSeverity = 
+	   Major/Minor/Warning/Cleared)"
     REFERENCE
 	"ITU-T Rec. Q.751.2 sccpAccessPoint,
 	 ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992 nSAP,
 	 ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993 sap2."
     INDEX   {
-	    sccpNetworkEntityId, -- shared index
-	    sccpSapId -- index
+	    mtpMsId,		  -- shared index
+	    sccpNetworkEntityId,  -- shared index
+	    sccpAccessPointSapId  -- index
 	}
     ::= { sccpAccessPointTable 1 }
 
 SccpAccessPointEntry ::=
     SEQUENCE {
 	-- sap2 attributes:
-	sccpSapId				Unsigned32,
+	sccpAccessPointSapId			Unsigned32,
 	sccpAccessPointAlarmStatus		AlarmStatus,
-	sccpSap2Address				SubSystemNumber,
-	sccpUserEntityNames			OCTET STRING,
-	sccpProviderEntityNames			PointCodeList,
+	sccpAccessPointSap2Address		SubSystemNumber,
+	sccpAccessPointUserEntityNames		OCTET STRING,
+	sccpAccessPointProviderEntityNames	PointCodeList,
 	-- nSAP attributes: (none)
 	-- sccpAccessPoint attributes:
-	sccpAvailabilityStatus			AvailabilityStatus,
-	sccpConcernedAreaPointer		Unsigned32,
-	sccpLinkagePointer			Unsigned32,
+	sccpAccessPointAvailabilityStatus	AvailabilityStatus,
+	sccpAccessPointConcernedAreaPointer	Unsigned32,
+	sccpAccessPointLinkagePointer		Unsigned32,
 	-- ssAvailableAfterSpRestartPackage
-	sccpSsAvailableAfterSpRestart		TruthValue,
+	sccpAccessPointSsAvailableAfterSpRestart TruthValue,
+	sccpAccessPointAsaProfilePointer	RowPointer,
 	sccpAccessPointName			CommonLanguageName,
 	sccpAccessPointRowStatus		RowStatus
     }
 
-sccpSapId OBJECT-TYPE
+sccpAccessPointSapId OBJECT-TYPE
     SYNTAX Unsigned32
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	"The sapId attribute is used in naming instances of this 
-	 sccpAccessPoint managed object class following the 
-	 SimpleNameType textual convention."
+	"Provides a non-zero ordinal index into the SCCP-SAP table.  The 
+	 sapId attribute is used in naming instances of the 
+	 sccpAccessPoint managed object class."
     REFERENCE
-	"ITU-T Rec. X.723 (1992) | ISO/IEC 10165-5 : 1992 
-	 sapId."
+	"ITU-T Rec. X.723 (1992) | ISO/IEC 10165-5 : 1992 sapId."
     ::= { sccpAccessPointEntry 1 }
 
 sccpAccessPointAlarmStatus OBJECT-TYPE
@@ -1708,56 +1991,68 @@ sccpAccessPointAlarmStatus OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the alarm status, following the AlarmStatus textual 
-	 convetion of the OPENSS7-SMI-MIB module, of the access point 
-	 corresponding to the conceptual row in which this status 
-	 occurs.  This managed object generates the following alarms:
-
+	"Provides the alarm status of this SCCP access point, following 
+	 the AlarmStatus textual convention of the OPENSS7-SMI-MIB 
+	 module and ITU-T Rec. X.721 | ISO/IEC 10165-2.  SCCP access 
+	 points generate the following alarms:
+	 
 	 The qualityofServiceAlarm can have the following probable 
 	 cause:
-
+	 
 	 - ProbableCause = tooLargeForSegmentation which represents 
 	   measurement Q.752/7.14 (Perceived Severity = 
 	   Major/Minor/Warning).
-
+	 
 	 - ProbableCause = subsystemProhibited which represents 
 	   measurement Q.752/8.11 and Q.752/8.12 (Perceived Severity = 
 	   Major/Minor/Warning/Cleared).
-
+	 
 	 The communicationsAlarm can have the following probable causes:
-
+	 
 	 - ProbableCause = sccpCongested which represents measurement 
 	   Q.752/8.8 (Perceived Severity = Major/Minor/Warning).  The 
 	   congestion level is given as a parameter of the notification.
-
+	 
 	 - ProbableCause = localSubsystemProhibited which represents 
 	   measurements Q.752/8.9 and Q.752/8.10 (PerceivedSeverity = 
 	   Major/Minor/Warning/Cleared)."
     REFERENCE
-	"ITU-T Rec. X.731 (1993) : 8.1.2.1, ITU-T Rec. X.721 (1882) : 
-	     alarmStatus"
+	"ITU-T Rec. X.731 (1993) : 8.1.2.1,
+	 ITU-T Rec. X.721 (1992) : ISO/IEC 10165-2 : 1992, alarmStatus 
+	     attribute."
     ::= { sccpAccessPointEntry 2 }
 
-sccpSap2Address OBJECT-TYPE
+sccpAccessPointSap2Address OBJECT-TYPE
     SYNTAX SubSystemNumber
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"The set of addresses associated with an (N) SAP, in this case 
-	 an SCCP-SAP.  An SCCP-SAP is ultimately a SCCP network entity 
-	 and a list of subsystem numbers.  This set-valued attribute is 
-	 modelled here as an octet string, with each octet in the string 
-	 representing a subsystem number.
-
+	"The set of addresses associated with the SCCP-SAP.  An SCCP-SAP 
+	 is ultimately a SCCP network entity and a list of subsystem 
+	 numbers.  This set-valued attribute is modelled here as an 
+	 octet string, with each octet in the string representing a 
+	 subsystem number.
+	 
 	 The sap2Address attribute contains the address of the 
 	 sccpAccessPoint.  The address contains the SubSystem Number 
 	 (SSN).  The sap2Address is of type SET OF OCTET STRING.  For 
-	 sccpAccessPoints, the set size is 1."
+	 sccpAccessPoints, the set size is 1.
+	 
+	 This SCCP subsystem number (SSN) is the actual SSN.  That is, 
+	 it is the SCCP subsystem number using the numbering scheme of 
+	 the local or remote SCCP instance.
+	 
+	 For a local SCCP-SAP, the subsystem number is associated with 
+	 the local SCCP entity indexed by this entry and the 
+	 sccpAccessPointLinkagePointer is 0.0.
+	 
+	 For a remote SCCP-SAP, the subsystem number is associated with 
+	 the remote SCCP entity for the sccpAccessPointLinkagePointer."
     REFERENCE
 	"ITU-T Rec. X.723 | ISO/IEC 10165-5 asp2Address."
     ::= { sccpAccessPointEntry 3 }
 
-sccpUserEntityNames OBJECT-TYPE
+sccpAccessPointUserEntityNames OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS read-create
     STATUS current
@@ -1768,7 +2063,7 @@ sccpUserEntityNames OBJECT-TYPE
 	 subsystem."
     ::= { sccpAccessPointEntry 4 }
 
-sccpProviderEntityNames OBJECT-TYPE
+sccpAccessPointProviderEntityNames OBJECT-TYPE
     SYNTAX PointCodeList
     MAX-ACCESS read-create
     STATUS current
@@ -1776,17 +2071,18 @@ sccpProviderEntityNames OBJECT-TYPE
 	"The providerEntityNames attribute contains the distinguished 
 	 names of the managed objects that represent the provider 
 	 entities that are supporting the sccpAccessPoint, i.e. the 
-	 instance of the SCCP.  The value uses the PointCodeList textual 
-	 convention and the value represents the list of MTP Point Codes 
-	 that represent the MTP systems providing network access to 
-	 this SCCP-SAP.
+	 instance of the SCCP.
+	 
+	 The value uses the PointCodeList textual convention and the 
+	 value represents the list of MTP Point Codes that represent the 
+	 MTP systems providing network access to this SCCP-SAP.
 	 
 	 Typically there is no need to have more than one point code for 
 	 an SCCP entity; therefore, this list will normally contain a 
 	 single point code."
     ::= { sccpAccessPointEntry 5 }
 
-sccpAvailabilityStatus OBJECT-TYPE
+sccpAccessPointAvailabilityStatus OBJECT-TYPE
     SYNTAX AvailabilityStatus
     MAX-ACCESS read-only
     STATUS current
@@ -1796,25 +2092,25 @@ sccpAvailabilityStatus OBJECT-TYPE
 	 
 	 - allowed, the sccpAccessPoint is reachable and is functioning 
 	   normally (availability status = available)
-
+	 
 	 - prohibited, the sccpAccessPoint not reachable (availability 
 	   status = unavailable)
-
+	 
 	 - congested (avaiability status = degraded).
-
+	 
 	 This attribute uses the AvailabilityStatus textual convention 
 	 of the OPENSS7-SMI-MIB module."
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 
-	 availabilityStatus."
+	     availabilityStatus attribute."
     ::= { sccpAccessPointEntry 6 }
 
 --
--- sccpConcernedAreaPointer could have been implemented as a RowPointer, 
--- however, because the only table referenced is the 
+-- sccpAccessPointConcernedAreaPointer could have been implemented as a 
+-- RowPointer, however, because the only table referenced is the 
 -- sccpConcernedAreaTable, using the index is sufficient.
 --
-sccpConcernedAreaPointer OBJECT-TYPE
+sccpAccessPointConcernedAreaPointer OBJECT-TYPE
     SYNTAX Unsigned32  -- was RowPointer
     MAX-ACCESS read-create
     STATUS current
@@ -1825,10 +2121,10 @@ sccpConcernedAreaPointer OBJECT-TYPE
 	 pointer to concerned area will be used by SCCP Management for 
 	 the secondary broadcast.  The concernedAreaPointer has value 
 	 zero (0) if no concerned area is pointed at.
-
+	 
 	 There are two levels of concerned area: one at the SCCP level, 
-	 and one at the SCCP subsystem level.  This concerned area 
-	 is at the SCCP subsystem level.  For the indexed SCCP-SAP, this 
+	 and one at the SCCP subsystem level.  This concerned area is at 
+	 the SCCP subsystem level.  For the indexed SCCP-SAP, this 
 	 concerned area contains all of the SCCP-SAPs that are to 
 	 receive broadcast SCCP management messages concerning the SCCP 
 	 subsystem.  Concerned areas are an optional concept in SCCP and 
@@ -1842,20 +2138,21 @@ sccpConcernedAreaPointer OBJECT-TYPE
     ::= { sccpAccessPointEntry 7 }
 
 --
--- sccpLinkagePointer could have been implemented as a RowPointer, 
+-- sccpAccessPointLinkagePointer could have been implemented as a RowPointer, 
 -- however, because the only table referenced is the sccpLinkageTable, 
 -- using the index is sufficient.
 --
-sccpLinkagePointer OBJECT-TYPE
+sccpAccessPointLinkagePointer OBJECT-TYPE
     SYNTAX Unsigned32  -- was RowPointer
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"The sccpLinkagePointer specifies the sccpLinkage that is 
-	 associated with the remote sccpAccessPoints only.  In case of a 
-	 local sccpAccessPoint, the sccpLinkagePointer has value zero 
-	 (0).  A remote sccpAccessPoint cannot be created without a 
-	 valid pointer to an sccpLinkage.
+	"The sccpAccessPointLinkagePointer specifies the sccpLinkage 
+	 that is associated with the remote sccpAccessPoints only.  In 
+	 case of a local sccpAccessPoint, the 
+	 sccpAccessPointLinkagePointer has value zero (0).  A remote 
+	 sccpAccessPoint cannot be created without a valid pointer to an 
+	 sccpLinkage.
 	 
 	 Each remote SCCP-SAP needs an MTP-SAP through which the remote 
 	 SCCP-SAP is accessed.  The linkage index identifies the MTP-SAP  
@@ -1864,7 +2161,7 @@ sccpLinkagePointer OBJECT-TYPE
 	 for local SCCP-SAPs this pointer is zero (0)."
     ::= { sccpAccessPointEntry 8 }
 
-sccpSsAvailableAfterSpRestart OBJECT-TYPE
+sccpAccessPointSsAvailableAfterSpRestart OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-create
     STATUS current
@@ -1885,10 +2182,26 @@ sccpSsAvailableAfterSpRestart OBJECT-TYPE
 	 
 	 This value is only meaningful for remote SCCP-SAPs.  Local 
 	 SCCP-SAPs are always assumed available and the value for a 
-	 local SCCP-SAP is pinned at true(2).
-	 "
+	 local SCCP-SAP is pinned at true(2)."
     DEFVAL { 2 }
     ::= { sccpAccessPointEntry 9 }
+
+sccpAccessPointAsaProfilePointer OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a pointer to an alarm severity assignment profile to 
+	 be used for alarms generated by this SCCP access point, or 
+	 zeroDotZero."
+    REFERENCE
+	"ITU-T Rec. Q.751.2 (1997), ANSI T1.116.1 (2000), 
+	     alarmSeverityAssignmentProfilePointer attribute.
+	 ITU-T Rec. M.3100 (1995), 
+	     alarmSeverityAssignmentProfilePointer.
+	 ITU-T Rec. M.3100 (1995), ASN1DefinedTypesModule:PointerOrNull."
+    DEFVAL { { zeroDotZero } }
+    ::= { sccpAccessPointEntry 10 }
 
 sccpAccessPointName OBJECT-TYPE
     SYNTAX CommonLanguageName
@@ -1899,7 +2212,7 @@ sccpAccessPointName OBJECT-TYPE
 	 is an administrative name."
     REFERENCE
 	"ITU-T Rec. Q.751.2 sccpAccessPointName."
-    ::= { sccpAccessPointEntry 10 }
+    ::= { sccpAccessPointEntry 11 }
 
 sccpAccessPointRowStatus OBJECT-TYPE
     SYNTAX RowStatus
@@ -1911,8 +2224,7 @@ sccpAccessPointRowStatus OBJECT-TYPE
 	 and survive an agent reboot."
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus"
-    ::= { sccpAccessPointEntry 11 }
-
+    ::= { sccpAccessPointEntry 12 }
 
 -- =====================================================================
 
@@ -1921,7 +2233,13 @@ sccpLinkageTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"The SCCP linkage table contains SCCP linkages.  An SCCP linkage 
+	 is a relationship between an SCCP network entity and another 
+	 SCCP network entity.  Linkages can either be local or remote.  
+	 Local linkages represent the relationship between a local 
+	 MTP-SAP and the local SCCP entity.  Remote linkages represent 
+	 the relationship between a remote MTP-SAP and the remote SCCP 
+	 entity."
     REFERENCE
 	""
     ::= { sccpLinkage 1 }
@@ -1943,7 +2261,7 @@ sccpLinkageEntry OBJECT-TYPE
 	 The operationalProtocols attribute indicates the protocol 
 	 classes actually supported by this MTP network.  The 'version' 
 	 field of the attribute is always 'empty'.
-
+	 
 	 The concernedAreaPointer attribute indicates the concerned area 
 	 to be used for broadcasting the SCCP status after completion of 
 	 SCCP Restart.  It has value 'NULL' if no concerned area is 
@@ -1952,50 +2270,51 @@ sccpLinkageEntry OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 sccpLinkage,
 	 ITU-T Rec. X.283 | ISO/IEC 10733 linkage."
     INDEX   {
-	    sccpNetworkEntityId,    -- shared index
-	    sccpLinkageId       -- index
+	    mtpMsId,		 -- shared index
+	    sccpNetworkEntityId, -- shared index
+	    sccpLinkageId	 -- index
 	}
     ::= { sccpLinkageTable 1 }
 
 SccpLinkageEntry ::=
     SEQUENCE {
 	sccpLinkageId				Unsigned32,
-	sccpOperationalProtocols		OperationalProtocols,
-	sccpSnSAP				RowPointer,
+	sccpLinkageOperationalProtocols		OperationalProtocols,
+	sccpLinkageSnSAP			RowPointer,
 	-- congestion package
-	sccpAttackTimerValue			TimeInterval,
-	sccpDecayTimerValue			TimeInterval,
-	sccpNrOfRestrictionLevels		INTEGER,
-	sccpNrOfSubLevels			INTEGER,
-	sccpCLS					INTEGER,
-	sccpCongestionTimerValue		TimeInterval,
-	sccpp					INTEGER,
-	sccpImportanceLevelCR			ImportanceLevel,
-	sccpImportanceLevelCC			ImportanceLevel,
-	sccpImportanceLevelCREF			ImportanceLevel,
-	sccpImportanceLevelDT1			ImportanceLevel,
-	sccpImportanceLevelDT2			ImportanceLevel,
-	sccpImportanceLevelAK			ImportanceLevel,
-	sccpImportanceLevelIT			ImportanceLevel,
-	sccpImportanceLevelED			ImportanceLevel,
-	sccpImportanceLevelEA			ImportanceLevel,
-	sccpImportanceLevelRSR			ImportanceLevel,
-	sccpImportanceLevelRSC			ImportanceLevel,
-	sccpImportanceLevelERR			ImportanceLevel,
-	sccpImportanceLevelRLC			ImportanceLevel,
-	sccpImportanceLevelRLSD			ImportanceLevel,
-	sccpImportanceLevelUDT			ImportanceLevel,
-	sccpImportanceLevelUDTS			ImportanceLevel,
-	sccpImportanceLevelXUDT			ImportanceLevel,
-	sccpImportanceLevelXUDTS		ImportanceLevel,
-	sccpImportanceLevelLUDT			ImportanceLevel,
-	sccpImportanceLevelLUDTS		ImportanceLevel,
-	sccpRLM					INTEGER,
-	sccpRSLM				INTEGER,
+	sccpLinkageAttackTimerValue		TimeInterval,
+	sccpLinkageDecayTimerValue		TimeInterval,
+	sccpLinkageNrOfRestrictionLevels	INTEGER,
+	sccpLinkageNrOfSubLevels		INTEGER,
+	sccpLinkageCLS				INTEGER,
+	sccpLinkageCongestionTimerValue		TimeInterval,
+	sccpLinkageP				INTEGER,
+	sccpLinkageImportanceLevelCR		ImportanceLevel,
+	sccpLinkageImportanceLevelCC		ImportanceLevel,
+	sccpLinkageImportanceLevelCREF		ImportanceLevel,
+	sccpLinkageImportanceLevelDT1		ImportanceLevel,
+	sccpLinkageImportanceLevelDT2		ImportanceLevel,
+	sccpLinkageImportanceLevelAK		ImportanceLevel,
+	sccpLinkageImportanceLevelIT		ImportanceLevel,
+	sccpLinkageImportanceLevelED		ImportanceLevel,
+	sccpLinkageImportanceLevelEA		ImportanceLevel,
+	sccpLinkageImportanceLevelRSR		ImportanceLevel,
+	sccpLinkageImportanceLevelRSC		ImportanceLevel,
+	sccpLinkageImportanceLevelERR		ImportanceLevel,
+	sccpLinkageImportanceLevelRLC		ImportanceLevel,
+	sccpLinkageImportanceLevelRLSD		ImportanceLevel,
+	sccpLinkageImportanceLevelUDT		ImportanceLevel,
+	sccpLinkageImportanceLevelUDTS		ImportanceLevel,
+	sccpLinkageImportanceLevelXUDT		ImportanceLevel,
+	sccpLinkageImportanceLevelXUDTS		ImportanceLevel,
+	sccpLinkageImportanceLevelLUDT		ImportanceLevel,
+	sccpLinkageImportanceLevelLUDTS		ImportanceLevel,
+	sccpLinkageRLM				INTEGER,
+	sccpLinkageRSLM				INTEGER,
 	-- localSccpLinkagePackage
 	sccpLinkageConcernedAreaPointer		Unsigned32,
-	sccpLowerLimitForSegmentation		INTEGER,
-	sccpUpperLimitForSegmentation		INTEGER,
+	sccpLinkageLowerLimitForSegmentation	INTEGER,
+	sccpLinkageUpperLimitForSegmentation	INTEGER,
 	sccpLinkageName				CommonLanguageName,
 	sccpLinkageRowStatus			RowStatus
     }
@@ -2006,48 +2325,74 @@ sccpLinkageId OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Provides a non-zero ordinal index for this SCCP Linkage 
+	 (MTP-SAP) within a given SCCP network entity.  It is 
+	 recommended that these indices be generated in a contiguous 
+	 ascending order beginning at 1.  Linkage indexes can be 
+	 generated either by the management station when creating 
+	 entries, or by the managed system when creating entries 
+	 locally."
     REFERENCE
 	""
     ::= { sccpLinkageEntry 1 }
 
-sccpOperationalProtocols OBJECT-TYPE
+sccpLinkageOperationalProtocols OBJECT-TYPE
     SYNTAX OperationalProtocols
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"Indicates the operational protocols (protocol classses) that 
-	 are supported.  When class0(0) is present, protocol class 0, 
-	 the basic connectionless class, is supported; class1(1), the 
-	 sequenced connectionless class; class2(2), basic 
+	 are supported on this linkage.  When class0(0) is present, 
+	 protocol class 0, the basic connectionless class, is supported; 
+	 class1(1), the sequenced connectionless class; class2(2), basic 
 	 connection-oriented class; class3(3), the flow control 
 	 connection-oriented class.
-
+	 
 	 The operationalProtocols attribute indicates the protocol 
-	 classes actually supported by this MTP network.  The 'version' 
-	 field of the attribute is always 'empty'."
+	 classes supported by this MTP network linkage.  The 'version' 
+	 field of the corresponding X.283 attribute is always 'empty'."
     REFERENCE
 	"ITU-T Rec. Q.751.2, ITU-T Rec. X.283 | ISO/IEC 10733 
-	 operationalProtocols"
+	     operationalProtocols"
     DEFVAL { { class0, class1, class2, class3 } }
-    -- DEFVAL { { class0(0), class1(1), class2(2), class3(3) } }
-    -- DEFVAL { '1111'B }
     ::= { sccpLinkageEntry 2 }
 
-sccpSnSAP OBJECT-TYPE
+sccpLinkageSnSAP OBJECT-TYPE
     -- Because this object could reference one of many different 
     -- tables, the RowPointer textual convention is used  rather 
     -- than the index of any given table.
     SYNTAX RowPointer
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Distinguished name of the service provider SAP MO (if present).  
+	"Specifies the MTP-SAP providing this linkage to the MTP 
+	 sub-network (SnSAP) using the RowPointer textual convention.  
+	 
+	 SCCP linkages can be local or remote:
+	 
+	 - A local SCCP linkage references an MTP-SAP in the same 
+	   managed switching element to which the local SCCP belongs.  
+	   In this case, the pointer is a pointer to an 
+	   OPENSS7-MTP-MIB::mtpSapTable instance.
+	 
+	 - A remote SCCP linkage references an MTP-SAP in another 
+	   managed switching element.  The managed switching element 
+	   referenced may be local (under control of the agent) or 
+	   remote (under the control of another agent).
+	 
+	 For example, this might be a pointer to an entry in the 
+	 mtpSapTable in the OPENSS7-MTP-MIB, or a pointer into the 
+	 m3uaSapTable in the OPENSS7-M3UA-MIB.  Reference to entries in 
+	 some tables might be restricted to those supported by the 
+	 specific agent.
+	 
+	 Under ITU-T Rec. X.283 | ISO/IEC 10733, this is the 
+	 distinguished name of the service provider SAP MO (if present).  
 	 This is obtained via an internal interface when the linkage is 
 	 enabled.  The sN-SAP may be a relationship to an SAP MO in the 
 	 Datalink Layer, or it may be a relationship to another Managed 
 	 Object within the network layer which is not an SAP MO.  For 
-	 example, when operating ITU-T Rec. X.233 |ISO/IEC 8473-1 over 
+	 example, when operating ITU-T Rec.  X.233 |ISO/IEC 8473-1 over 
 	 the ISO/IEC 8208 or ITU-T Rec. X.25 SNDCF, it is a relationship 
 	 to the same x25PLE-DTE MO which is pointed to by the 
 	 sN-ServiceProvider Attribute.
@@ -2060,418 +2405,515 @@ sccpSnSAP OBJECT-TYPE
 
 -- congestion package
 --
-sccpAttackTimerValue OBJECT-TYPE
-    SYNTAX TimeInterval
+sccpLinkageAttackTimerValue OBJECT-TYPE
+    SYNTAX TimeInterval(6..60)
     UNITS       "seconds"
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute models the congestion control parameter Ta, as 
-	 described in 5.2.4/Q.714.  It is only applicable if congestion 
-	 is supported."
+	 described in 5.2.4/Q.714.  This is the time during which the 
+	 MTP-STATUS primitive are ignored for setting the RLm and RSLm.  
+	 It is only applicable if congestion is supported and the MTP 
+	 uses the International method of congestion indication.
+	 
+	 The attack timer determines the rate at which SCCP will 
+	 increase the restricted importance level for outbound messages 
+	 while congestion continues to be indicated by MTP.  (Messages 
+	 with an importance level of less than the restricted importance 
+	 level will not be issued.)  Under full congestion, the 
+	 restricted importance level will be increased by one for each M 
+	 expiries of the attack timer, where M is the number of 
+	 sublevels specified in sccpNrOfSublevels.  It will therefore 
+	 take Ta x M x N seconds for the full congestion signal to be 
+	 applied (8 seconds using default values).
+	 
+	 In general, a more stable network results from decay timers 
+	 that are longer than attack timers.
+	 
+	 ITU-T/Q.714 D.4 specifies a range of 60 to 600 milliseconds.  A 
+	 provisional value of 250 milliseconds is used."
     REFERENCE
 	"ITU-T Rec. Q.751.2 attackTimerValue, 5.2.4/Q.714 Ta."
+    DEFVAL  { 25 } -- 0.25 seconds
     ::= { sccpLinkageEntry 4 }
 
-sccpDecayTimerValue OBJECT-TYPE
-    SYNTAX TimeInterval
+sccpLinkageDecayTimerValue OBJECT-TYPE
+    SYNTAX TimeInterval(100..1000)
     UNITS       "seconds"
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute models the congestion control parameter Td, as 
 	 described in 5.2.4/Q.714.  It is only applicable if congestion 
-	 is supported."
+	 is supported and the MTP uses the International method of 
+	 congestion indication.
+	 
+	 The decay timer determines the rate at which SCCP will decrease 
+	 the restricted importance level for outbound messages when 
+	 congestion is no longer indicated by MTP.  (Messages with an 
+	 importance level of less than the restricted imporance level 
+	 will not be issued.)  Under full congestion abatement, the 
+	 restricted importance level will be decreased by on for each M 
+	 expiries of the decay timer, where M is the number of sublevels 
+	 specified in sccpNrOfSublevels.  It will therefore take Td x M 
+	 x N seconds for full congestion abatement to occur (160 seconds 
+	 using default values).
+	 
+	 In general, a more stable network results from decay timers 
+	 that are longer than attack timers.
+	 
+	 ITU-T/Q.714 D.4 specifies a range of 1 to 10 seconds.  A 
+	 provisional value of 5 seconds is used."
     REFERENCE
 	"ITU-T Rec. Q.751.2 decayTimeValue, 5.2.4/Q.714 Td."
+    DEFVAL  { 500 } -- 5.00 seconds
     ::= { sccpLinkageEntry 5 }
 
-sccpNrOfRestrictionLevels OBJECT-TYPE
+sccpLinkageNrOfRestrictionLevels OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute models the congestion control parameter N, as 
-	 described in 5.2.7/Q.714.  It is only applicable if congestion 
-	 is supported."
+	 described in 5.2.7/Q.714.  It is only applicable if the 
+	 international method of congestion is provided by MTP.
+	 
+	 Default values are not specified by ITU-T/Q.714 so the default 
+	 value of 8 is provsional."
     REFERENCE
 	"ITU-T Rec. Q.751.2 nrOfRestrictionLevels, 5.2.7/Q.714 N."
     DEFVAL { 8 }
     ::= { sccpLinkageEntry 6 }
 
-sccpNrOfSubLevels OBJECT-TYPE
+sccpLinkageNrOfSubLevels OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute models the congestion control parameter M, as 
-	 described in 5.2.7/Q.714.  It is only applicable if congestion 
-	 is supported."
+	 described in 5.2.7/Q.714.  It is only applicable if the 
+	 international method of congestion is provided by MTP.
+	 
+	 Default values are not specified by ITU-T/Q.714 so the default 
+	 value of 4 is provsional."
     REFERENCE
 	"ITU-T Rec. Q.751.2 nrOfSubLevels, 5.2.7/Q.714 M."
     DEFVAL { 4 }
     ::= { sccpLinkageEntry 7 }
 
-sccpCLS OBJECT-TYPE
+sccpLinkageCLS OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute models the congestion control parameter CLS, as 
-	 described in 5.2.7/Q.714.  It is only applicable if congestion 
-	 is supported."
+	 described in 5.2.7/Q.714.  It is only applicable if the 
+	 international congestion method is supported.
+	 
+	 This parameter specifies the range of SCCP congestion levels 
+	 the may be inicated in a subsystem congested message.  
+	 ITU-T/Q,714 specifies a value of 8.  This number should not be 
+	 changed."
     REFERENCE
 	"ITU-T Rec. Q.751.2 cLS, 5.2.7/Q.714 CLS."
     DEFVAL { 8 }
     ::= { sccpLinkageEntry 8 }
 
-sccpCongestionTimerValue OBJECT-TYPE
-    SYNTAX TimeInterval
+sccpLinkageCongestionTimerValue OBJECT-TYPE
+    SYNTAX TimeInterval(100..1000)
     UNITS       "seconds"
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute modesl the congestion control parameter Tcon, as 
-	 described in 5.2.7/Q.714.  It is only applicable if congestion 
-	 is supported."
+	 described in 5.2.7/Q.714.  It is only applicable if the 
+	 international congestion method is supported.
+	 
+	 When congestion abates at the remote SCCP, the local CLs 
+	 parameter is decremented once for each expiry of Tcon.  
+	 Therefore, it will take Tcon x CLs for the congestion to fully 
+	 abate (16 seconds with default values).
+	 
+	 Caution should be applied when modifying this congestion 
+	 parameter: coordination within and between networks might be 
+	 required.
+	 
+	 ITU-T/Q.714 D.4 specifies a range of 1 to 10 seconds.  A 
+	 provisional value of 5 seconds is used."
     REFERENCE
 	"ITU-T Rec. Q.751.2 congestionTimerValue, 5.2.7/Q.714 Tcon."
+    DEFVAL { 500 } -- 5.00 seconds
     ::= { sccpLinkageEntry 9 }
 
-sccpp OBJECT-TYPE
+sccpLinkageP OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"This attribute models the congestion control parameter P, as 
-	 described in 5.2.7/Q.714.  It is only applicable if congestion 
-	 is supported."
+	 described in 5.2.7/Q.714.  It is only applicable if the 
+	 international congestion method is supported.
+	 
+	 When an SCCP experiences local congestion due to receipt of an 
+	 SCCP message, it will send an SSC (subsystem-congested) message 
+	 with the appropriate CLs parameter toward the originator of the 
+	 message that triggered congestion.  While congestion perists, 
+	 it will send an SSC message with the CLs parameter upon receipt 
+	 of each Pth additional message to the originator of that 
+	 message.
+	 
+	 Caution should be applied when modifying this congestion 
+	 parameter: coordination within and between networks might be 
+	 required.
+	 
+	 The default value is 8 and is provisionally specified in 
+	 ITU-T/Q.714."
     REFERENCE
 	"ITU-T Rec. Q.751.2 p, 5.2.7/Q.714 P."
     DEFVAL { 8 }
     ::= { sccpLinkageEntry 10 }
 
-sccpImportanceLevelCR OBJECT-TYPE
+sccpLinkageImportanceLevelCR OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"Provides the default and maximum importance levels for the CR 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-CR, Table 2/2.6.2/Q.714."
     DEFVAL { '0204'X }
     ::= { sccpLinkageEntry 11 }
 
-sccpImportanceLevelCC OBJECT-TYPE
+sccpLinkageImportanceLevelCC OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"Provides the default and maximum importance levels for the CC 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-CC, Table 2/2.6.2/Q.714."
     DEFVAL { '0304'X }
     ::= { sccpLinkageEntry 12 }
 
-sccpImportanceLevelCREF OBJECT-TYPE
+sccpLinkageImportanceLevelCREF OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"Provides the default and maximum importance levels for the CREF 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
-	"ITU-T Rec. Q.751.2 importanceLevel-CREF, Table 
-	 2/2.6.2/Q.714."
+	"ITU-T Rec. Q.751.2 importanceLevel-CREF, Table 2/2.6.2/Q.714."
     DEFVAL { '0204'X }
     ::= { sccpLinkageEntry 13 }
 
-sccpImportanceLevelDT1 OBJECT-TYPE
+sccpLinkageImportanceLevelDT1 OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"Provides the default and maximum importance levels for the DT1 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-DT1, Table 2/2.6.2/Q.714."
     DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 14 }
 
-sccpImportanceLevelDT2 OBJECT-TYPE
+sccpLinkageImportanceLevelDT2 OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the DT2 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the default and maximum importance levels for the DT2 
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-DT2, Table 2/2.6.2/Q.714."
     DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 15 }
 
-sccpImportanceLevelAK OBJECT-TYPE
+sccpLinkageImportanceLevelAK OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the AK 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the AK message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels: 
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-AK, Table 2/2.6.2/Q.714."
     DEFVAL { '0600'X }
     ::= { sccpLinkageEntry 16 }
 
-sccpImportanceLevelIT OBJECT-TYPE
+sccpLinkageImportanceLevelIT OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the IT 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the IT message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-IT, Table 2/2.6.2/Q.714."
     DEFVAL { '0600'X }
     ::= { sccpLinkageEntry 17 }
 
-sccpImportanceLevelED OBJECT-TYPE
+sccpLinkageImportanceLevelED OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the ED 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the ED message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-ED, Table 2/2.6.2/Q.714."
     DEFVAL { '0700'X }
     ::= { sccpLinkageEntry 18 }
 
-sccpImportanceLevelEA OBJECT-TYPE
+sccpLinkageImportanceLevelEA OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the EA 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the EA message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-EA, Table 2/2.6.2/Q.714."
     DEFVAL { '0700'X }
     ::= { sccpLinkageEntry 19 }
 
-sccpImportanceLevelRSR OBJECT-TYPE
+sccpLinkageImportanceLevelRSR OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the RSR 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the RSR message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-RSR, Table 2/2.6.2/Q.714."
     DEFVAL { '0600'X }
     ::= { sccpLinkageEntry 20 }
 
-sccpImportanceLevelRSC OBJECT-TYPE
+sccpLinkageImportanceLevelRSC OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the RSC 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the RSC message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-RSC, Table 2/2.6.2/Q.714."
     DEFVAL { '0600'X }
     ::= { sccpLinkageEntry 21 }
 
-sccpImportanceLevelERR OBJECT-TYPE
+sccpLinkageImportanceLevelERR OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the ERR 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the ERR message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-ERR, Table 2/2.6.2/Q.714."
     DEFVAL { '0700'X }
     ::= { sccpLinkageEntry 22 }
 
-sccpImportanceLevelRLC OBJECT-TYPE
+sccpLinkageImportanceLevelRLC OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the RLC 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance levels for the RLC message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-RLC, Table 2/2.6.2/Q.714."
     DEFVAL { '0400'X }
     ::= { sccpLinkageEntry 23 }
 
-sccpImportanceLevelRLSD OBJECT-TYPE
+sccpLinkageImportanceLevelRLSD OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the RLSD 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the default and maximum importance levels for the RLSD 
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-RLSD, Table 2/2.6.2/Q.714."
     DEFVAL { '0606'X }
     ::= { sccpLinkageEntry 24 }
 
-sccpImportanceLevelUDT OBJECT-TYPE
+sccpLinkageImportanceLevelUDT OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the UDT 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the default and maximum importance levels for the UDT 
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-UDT, Table 2/2.6.2/Q.714."
     DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 25 }
 
-sccpImportanceLevelUDTS OBJECT-TYPE
+sccpLinkageImportanceLevelUDTS OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the UDTS 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the UDTS message.  It is only 
+	 applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-UDTS, Table 2/2.6.2/Q.714."
     DEFVAL { '0300'X }
     ::= { sccpLinkageEntry 26 }
 
-sccpImportanceLevelXUDT OBJECT-TYPE
+sccpLinkageImportanceLevelXUDT OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the XUDT 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the default and maximum importance levels for the XUDT 
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-XUDT, Table 2/2.6.2/Q.714."
     DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 27 }
 
-sccpImportanceLevelXUDTS OBJECT-TYPE
+sccpLinkageImportanceLevelXUDTS OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the XUDTS 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the XUDTS message.  It is 
+	 only applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-XUDTS, Table 2/2.6.2/Q.714."
     DEFVAL { '0300'X }
     ::= { sccpLinkageEntry 28 }
 
-sccpImportanceLevelLUDT OBJECT-TYPE
+sccpLinkageImportanceLevelLUDT OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the LUDT 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the default and maximum importance levels for the LUDT 
+	 message.  It is only applicable if the international method of 
+	 congestion is supported.  For recommended values, see 
+	 2.6.2/Q.714.  Caution should be taken when modifying the 
+	 importance levels: co-ordination within and in between 
+	 different networks might be required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-LUDT, Table 2/2.6.2/Q.714."
     DEFVAL { '0406'X }
     ::= { sccpLinkageEntry 29 }
 
-sccpImportanceLevelLUDTS OBJECT-TYPE
+sccpLinkageImportanceLevelLUDTS OBJECT-TYPE
     SYNTAX ImportanceLevel
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	"Provides the default and maximum importance leves for the LDUTS 
-	 message.  It is only applicable if congestion is supported.  
-	 For recommended values, see 2.6.2/Q.714.  Caution should be 
-	 taken when modifying the importance levels.  Co-ordination 
-	 within and in between different networks might be required."
+	"Provides the importance level for the LDUTS message.  It is 
+	 only applicable if the international method of congestion is 
+	 supported.  For recommended values, see 2.6.2/Q.714.  Caution 
+	 should be taken when modifying the importance levels.  
+	 co-ordination within and in between different networks might be 
+	 required."
     REFERENCE
 	"ITU-T Rec. Q.751.2 importanceLevel-LUDTS, Table 2/2.6.2/Q.714."
     DEFVAL { '0300'X }
     ::= { sccpLinkageEntry 30 }
 
-sccpRLM OBJECT-TYPE
+sccpLinkageRLM OBJECT-TYPE
     SYNTAX INTEGER
-    MAX-ACCESS read-create
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	"This attribute models the restriction level parameter RLm as 
-	 defined in 5.2.4/Q.714.  It is only applicable if congestion is 
-	 supported."
+	 defined in 5.2.4/Q.714.  It is only applicable if the 
+	 international method of congestion is supported."
     REFERENCE
 	"ITU-T Rec. Q.751.2 rLM, 5.2.4/Q.714."
     ::= { sccpLinkageEntry 31 }
 
-sccpRSLM OBJECT-TYPE
+sccpLinkageRSLM OBJECT-TYPE
     SYNTAX INTEGER
-    MAX-ACCESS read-create
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	"This attribute models the restriction sub-level parameter RSLm 
-	 as defined in 5.2.4/Q.714.  It is only applicable if congestion 
-	 is supported."
+	 as defined in 5.2.4/Q.714.  It is only applicable if the 
+	 international method of congestion is supported."
     REFERENCE
 	"ITU-T Rec. Q.751.2 rSLM, 5.2.4/Q.714."
     ::= { sccpLinkageEntry 32 }
@@ -2483,7 +2925,7 @@ sccpLinkageConcernedAreaPointer OBJECT-TYPE
     -- RowPointer, however, as the columnar object never refers to 
     -- other than entries in the sccpLinkageTable, the index to that 
     -- table is sufficient.
-    SYNTAX SimpleNameType  -- was RowPointer
+    SYNTAX Unsigned32  -- was RowPointer
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -2495,7 +2937,7 @@ sccpLinkageConcernedAreaPointer OBJECT-TYPE
 	 Specifies the concerned area to be used for broadcasting the 
 	 SCCP status after completion of SCCP Restart.  It has value 
 	 'NULL' if no concerned area is pointed at.
-
+	 
 	 The concernedAreaPointer attribute indicates the concerned area 
 	 to be used for broadcasting the SCCP status after completion of 
 	 SCCP Restart.  It has value 'NULL' if no concerned area is 
@@ -2508,7 +2950,7 @@ sccpLinkageConcernedAreaPointer OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 concernedAreaPointer."
     ::= { sccpLinkageEntry 33 }
 
-sccpLowerLimitForSegmentation OBJECT-TYPE
+sccpLinkageLowerLimitForSegmentation OBJECT-TYPE
     SYNTAX INTEGER (150..3592)
     UNITS "octets"
     MAX-ACCESS read-create
@@ -2517,16 +2959,18 @@ sccpLowerLimitForSegmentation OBJECT-TYPE
 	"This attributes represents a number of octets.  If the length 
 	 of the user data exceeds this length then it depends on the 
 	 status of the network whether the message is segmented or not.  
-	 The attribute coressponds to the parameter Z as described in 
-	 4.1.1.1.1/Q.714.  The value of this attribute shall obey the 
-	 relation 150 <= lowerLimitForSegmenetation <= 
-	 upperLimitForSegmentation, as described in 4.1.1.1.1/Q.714.  It 
-	 is only applicable if this is a local linkage."
+	 The attribute coresponds to the parameter Z as described in 
+	 ITU-T 4.1.1.1.1/Q.714 or the parameter X as described in ANSI 
+	 T1.112/4.1.1.1.1.  The value of this attribute shall obey the 
+	 relation 150 <= Z <= Y <= 3592, as described in 4.1.1.1.1/Q.714 
+	 and the relation 0 <= X <= Y <= 3904 described in ANSI 
+	 T1.112/2000 4.1.1.1.1.  It is only applicable if this is a 
+	 local linkage."
     REFERENCE
 	"ITU-T Rec. Q.751.2 lowerLimitForSegmentation."
     ::= { sccpLinkageEntry 34 }
 
-sccpUpperLimitForSegmentation OBJECT-TYPE
+sccpLinkageUpperLimitForSegmentation OBJECT-TYPE
     SYNTAX INTEGER (150..3592)
     UNITS "octets"
     MAX-ACCESS read-create
@@ -2535,11 +2979,11 @@ sccpUpperLimitForSegmentation OBJECT-TYPE
 	"This attribute represents a number of octets.  If the length of 
 	 the user data exceeds this length then the message is always 
 	 segmented.  The attribute coresponds to the parameter Y as 
-	 described in 4.1.1.1.1/Q.714.  The value of this attribute shall 
-	 obey the relation lowerLimitForSegmentation <= 
-	 upperLimitForSegumentation <= 3592, as described in 
-	 4.1.1.1.1/Q.714.  It is only applicable if this is a local 
-	 linkage."
+	 described in ITU-T 4.1.1.1.1/Q.714 and ANSI T1.112/4.1.1.1.1.  
+	 The value of this attribute shall obey the relation 160 <= Z <= 
+	 Y <= 3592, as described in 4.1.1.1.1/Q.714 or 0 <= X <= Y <= 
+	 3904, as described in ANSI T1.112/4.1.1.1.1.  It is only 
+	 applicable if this is a local linkage."
     REFERENCE
 	"ITU-T Rec. Q.751.2 upperLimitForSegmentation."
     ::= { sccpLinkageEntry 35 }
@@ -2564,6 +3008,345 @@ sccpLinkageRowStatus OBJECT-TYPE
 
 -- =====================================================================
 
+sccpMtpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SccpMtpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"The MTP layer does not maintain the availability of MTP user parts 
+	 at remote signalling points.  This is the responsibility of the 
+	 local MTP user.  This table contains the known remote MTP-SAPs 
+	 (remote SCCP) and maintains their MTP user part status.  The 
+	 SCCP layer updates the status of the MTP-SAP based on the 
+	 receipt of MTP-STATUS primitives from the MTP layer.
+	 
+	 ITU-T Rec. Q.751.2 (1996) provides an sN-SAP pointer that 
+	 points to a sN-SAP managed object from ITU-T Rec. X.283 | 
+	 ISO/IEC 10733; however, it does not define the pointed to 
+	 managed object class.  ITU-T Rec. Q.751.1 (1997) and ANSI 
+	 T1.116.1 (2000) provide an mtpAccessPoint managed object; 
+	 however, this managed object is only for local MTP-SAPs.
+	 
+	 This table represents the sN-SAP managed object class for 
+	 remote MTP-SAPs."
+    REFERENCE
+	"ITU-T Rec. X.283 (1992) | ISO/IEC 10733 : 1993.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000).
+	 ITU-T Rec. Q.751.2 (1996), ANSI T1.116.2 (2000)."
+    ::= { sccpMtp 1 }
+
+sccpMtpEntry OBJECT-TYPE
+    SYNTAX SccpMtpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This is an MTP-SAP entry that defines the MTP-SAPs (SCCP) that 
+	 are available at a remote signalling point.
+	 
+	 The sapId attribute is used in indexing entries of the remote 
+	 MTP-SAP table.
+	 
+	 The sap2Address attribute containes the address of the remote 
+	 MTP-SAP.  It contains the global Network Identifier (NI), 
+	 Signalling Point Code (SPC), and Service Indicator (SI).
+
+	 The userEntityNames attribute contains the distinguished names 
+	 of the managed objects that represent the user entities that 
+	 are using the remote MTP-SAP, e.g. the local SCCP instance.
+
+	 The providerEntityNames attribute contains the distinguished 
+	 names of the managed objects that represent the provider 
+	 entities that are supporting the remote MTP-SAP, i.e. the 
+	 instance of the local SCCP linkage which the remote MTP-SAP is 
+	 accessed."
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), mtpAccessPoint 
+	     MO."
+    INDEX {
+	    mtpMsId,		 -- shared index
+	    sccpNetworkEntityId, -- shared index
+	    sccpMtpSapId	 -- index
+    }
+    ::= { sccpMtpTable 1 }
+
+SccpMtpEntry ::= 
+    SEQUENCE {
+	sccpMtpSapId				Unsigned32,
+	sccpMtpSap2Address			MtpSapAddress,
+	sccpMtpUserPart				MtpUserPart,
+	sccpMtpUserPartStatus			MtpUserPartStatus,
+	sccpMtpUserEntityNames			RowPointer,
+	sccpMtpProviderEntityNames		RowPointer,
+	sccpMtpUsageState			UsageState,
+	sccpMtpAdministrativeState		AdministrativeState,
+	sccpMtpOperationalState			OperationalState,
+	sccpMtpCongestedState			MtpCongestedState,
+	sccpMtpCongestionLevel			MtpCongestionLevel,
+	sccpMtpRemoteExchangeLabel		CommonLanguageName,
+	sccpMtpName				SimpleNameType,
+	sccpMtpRowStatus			RowStatus
+    }
+
+sccpMtpSapId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible -- index
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000),
+	 ITU-T Rec. X.723 | ISO/IEC 10165-5, sapId attibute."
+    ::= { sccpMtpEntry 1 }
+
+sccpMtpSap2Address OBJECT-TYPE
+    SYNTAX MtpSapAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides the global MTP-SAP address of the remote MTP-SAP using 
+	 the MtpSapAddress textual convention of the OPENSS7-MTP-MIB.  
+	 This textual convention provides the global network identifier 
+	 (NI), Signalling Point Code (SPC), and Service Indicator (SI) 
+	 associated with the remote MTP-SAP."
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000),
+	 ITU-T Rec. X.723 | ISO/IEC 10165-5, sap2Address attibute."
+    ::= { sccpMtpEntry 2 }
+
+sccpMtpUserPart OBJECT-TYPE
+    SYNTAX MtpUserPart
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides the MTP user part (Service Indicator or SI value) 
+	 associated with the MTP-SAP using the MtpUserPart textual 
+	 convention from the OPENSS7-MTP-MIB module."
+    REFERENCE
+	""
+    ::= { sccpMtpEntry 3 }
+
+sccpMtpUserPartStatus OBJECT-TYPE
+    SYNTAX MtpUserPartStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides, using the MtpUserPartStatus textual convention, the 
+	 status of the remote MTP-SAP.  The object is single-valued and 
+	 can assume one of the following values:
+	 
+	 - unknown(0), the status of the remote user is unknown;
+	 - inaccessible(1), the remote user is equipped but inaccessible;
+	 - unequipped(2), the remote user is unequipped.
+	 
+	 When the remote user part is present but currently unavaiable, 
+	 the value is inaccessible(1)."
+    REFERENCE
+	"sccpMtpUsageState"
+    ::= { sccpMtpEntry 4 }
+
+sccpMtpUserEntityNames OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides the local user entity names for the users of the 
+	 remote MTP-SAP (signalling relation).  In this case it is the 
+	 local SCCP entity and therefore a pointer into the 
+	 sccpNetworkEntityTable."
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000),
+	 ITU-T Rec. X.723 | ISO/IEC 10165-5, userEntityNames attibute."
+    ::= { sccpMtpEntry 5 }
+
+sccpMtpProviderEntityNames OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides the local provider entity names for the providers of 
+	 the remote MTP-SAP (signalling relation).  In this case, it is 
+	 the local SCCP linkage that provides access to the remote 
+	 MTP-SAP (signalling relation) and therefore a pointer into the 
+	 sccpLinkageTable."
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000),
+	 ITU-T Rec. X.723 | ISO/IEC 10165-5, providerEntityNames 
+	     attibute."
+    ::= { sccpMtpEntry 6 }
+
+sccpMtpUsageState OBJECT-TYPE
+    SYNTAX UsageState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the usage state of the remote MTP-SAP following the 
+	 UsageState textual convention and ITU-T Rec. X.721 | ISO/IEC 
+	 10165-2.
+	 
+	 - idle(0), no local SCCP is using the remote MTP-SAP,
+	 
+	 - active(1), a local SCCP is using the remote MTP-SAP,
+	 
+	 - busy(2), a local SCCP is passing traffic to a remote MTP-SAP, 
+	   however, congestion exists in the path toward the remote 
+	   MTP-SAP.
+	   
+	 Note that a usage state of active(1) or busy(2) does not mean 
+	 that traffic is currently being passed to the remote MTP-SAP."
+    REFERENCE
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2 usageState attribute."
+    ::= { sccpMtpEntry 7 }
+
+sccpMtpAdministrativeState OBJECT-TYPE
+    SYNTAX AdministrativeState
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides the administrative state of the remote SCCP following 
+	 the AdministrativeState textual convention and ITU-T Rec. X.721 
+	 | ISO/IEC 10165-2.
+
+	 - locked(0), the remote SCCP is administratively prohibited 
+	   from use,
+	 - unlocked(1), the remote SCCP is administratively permitted 
+	   for use,
+	 - shuttingDown(2), not used.
+	"
+    REFERENCE
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.AdministrativeState.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     administrativeState attribute."
+    ::= { sccpMtpEntry 8 }
+
+sccpMtpOperationalState OBJECT-TYPE
+    SYNTAX OperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the operational state of the remote SCCP following the 
+	 OperationalState textual convention and ITU-T Rec. X.721 | 
+	 ISO/IEC 10165-2.
+	 
+	 - disabled(0), the remote SCCP SPC is inaccessible due to the 
+	   associated SPC being prohibited;
+	 
+	 - enabled(1), the remote SCCP SPC is accessible: the associated 
+	   SCP is allowed;
+	
+	 This operational state only reflects the operational state of 
+	 the remote signalling point code associated with the remote 
+	 SCCP.  The state is altered based on MTP-PAUSE and MTP-RESUME 
+	 primitive received from the associated MTP layer."
+    REFERENCE
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.OperationalState.
+	 ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+	     Section 8.1.1.1.
+	 ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     operationalState attribute."
+    ::= { sccpMtpEntry 9 }
+
+sccpMtpCongestedState OBJECT-TYPE
+    SYNTAX MtpCongestedState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute is used to reflect MTP congestion toward the 
+	 remote SCCP, when multiple congestion levels are not used.  Its 
+	 value is:
+	 
+	 - congested(1) in case of MTP congestion, and
+	 - notCongested(0) otherwise.
+	 
+	 Its value is changed by the local SCCP upon receipt of 
+	 MTP-STATUS primitives indicating congestion toward the remote 
+	 SCPC.  Note that the remote SCCP can be administratively locked 
+	 and still congested."
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), congestedState 
+	     attribute."
+    ::= { sccpMtpEntry 10 }
+
+sccpMtpCongestionLevel OBJECT-TYPE
+    SYNTAX MtpCongestionLevel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute is used to reflect MTP congestion toward the 
+	 remote SCCP, when multiple congestion levels are used.  Its 
+	 value is:
+	 
+	 - none(0), no congestion exists toward the remote SCCP;
+	 
+	 - congestionlevel1(1), congestion exists at level 1 toward the 
+	   remote SCCP;
+	 
+	 - congestionlevel2(2), congestion exists at level 2 toward the 
+	   remote SCCP;
+	 
+	 - congestionlevel3(3), congestion exists at level 3 toward the 
+	   remote SCCP.
+	 
+	 Its value is changed by the local SCCP upon receipt of 
+	 MTP-STATUS primitives indicating congestion toward the remote 
+	 SPC.  Note that the remote SCCP can be administratively locked 
+	 and still congested."
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), congestedState 
+	     attribute."
+    ::= { sccpMtpEntry 11 }
+
+sccpMtpRemoteExchangeLabel OBJECT-TYPE
+    SYNTAX CommonLanguageName
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides an optional administrative name for the remote SCCP.  
+	 It is typical to name remote SCCP using the common language 
+	 name of the managed switching element at which the remote SCCP  
+	 exists (e.g. EDTNAB01DS1)."
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+	     signRouteSetNePartName attribute."
+    ::= { sccpMtpEntry 12 }
+
+sccpMtpName OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides an additional administrative name for the remote MTP 
+	 access point.  This name also identifies a remote SCCP; its 
+	 value is unique within the sccpMtpTable.  If at creation time 
+	 the value of this attribute given for the sccpMtpEntry to be 
+	 created already exists in another sccpMtpEntry, then the 
+	 creation is rejected."
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000),
+	     mtpAccessPointName attibute."
+    ::= { sccpMtpEntry 13 }
+
+sccpMtpRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a mechanism whereby management stations may create and 
+	 delete entries in this table.  Rows may also be created and 
+	 deleted by the managed system as a part of system operation.
+	 
+	 If the name package is supported: a create request with a value 
+	 for the name attribute that is already used by another instance 
+	 of the same object class will be rejected."
+    REFERENCE
+	"STD 58, SNMPv2-TC RowStatus.
+	 ITU-T Rec. Q.751.1 (1997) : mtpSignPoint-mtpAccessPoint NAME 
+	     BINDING."
+    ::= { sccpMtpEntry 14 }
+
+-- =====================================================================
+
 sccpSclcTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpSclcEntry
     MAX-ACCESS not-accessible
@@ -2573,10 +3356,10 @@ sccpSclcTable OBJECT-TYPE
 	 concerning the SCCP connectionless services.  The managed 
 	 object class is derived from ITU-T Rec. X.283 | ISO/IEC 10733 
 	 cLNS.
-
+	 
 	 The following states of the administrative state are 
 	 appropriate: locked and unlocked.
-
+	 
 	 The operationalSystem Type attribute is an attribute with 
 	 possible values: End System (ES) indicates an ScCP destination 
 	 node, Intermediate System (IS) indicates an SCCP relay node.  
@@ -2587,14 +3370,14 @@ sccpSclcTable OBJECT-TYPE
 	 perform forwarding operations, but the decision to forward 
 	 individual SCCP messages or not to forward them, shall be taken 
 	 on the basis of the available routing information.
-
+	 
 	 If the managed object is created by management operation, the 
 	 initial value of the operationalSystemType shall be specified 
 	 in the CMIP create.  Otherwise, the value shall be determined 
 	 in an implementation specific manner.  The value shall be one 
 	 of those present in the systemTypes attribute of the superior 
 	 SCCP managed object.
-
+	 
 	 The set of connectionless network protocols supported by this 
 	 instance of the sclc protocol machine is represented by the 
 	 supportedProtocols attribute.  For the connectionless protocol, 
@@ -2612,7 +3395,8 @@ sccpSclcEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX   {
-	    sccpNetworkEntityId -- shared index
+	    mtpMsId,		 -- shared index
+	    sccpNetworkEntityId	 -- shared index
 	}
     ::= { sccpSclcTable 1 }
 
@@ -2620,15 +3404,16 @@ SccpSclcEntry ::=
     SEQUENCE {
 	sccpSclcAlarmStatus			AlarmStatus,
 	-- clProtocolMachine attributes
-	sccpClProtocolMachineId			SimpleNameType,
+	sccpSclcClProtocolMachineId		SimpleNameType,
 	sccpSclcOperationalState		OperationalState,
-	sccpTotalRemoteSAPs			INTEGER,
+	sccpSclcTotalRemoteSAPs			INTEGER,
 	-- cLNS attributes
 	sccpSclcAdministrativeState		AdministrativeState,
 	sccpSclcSupportedProtocols		OperationalProtocols,
 	sccpSclcOperationalSystemType		NEntitySystemType,
 	-- sclc attributes
-	sccpInitialValueReassTimer		TimeInterval,
+	sccpSclcInitialValueReassTimer		TimeInterval,
+	sccpSclcAsaProfilePointer		RowPointer,
 	sccpSclcName				CommonLanguageName,
 	sccpSclcRowStatus			RowStatus
     }
@@ -2642,46 +3427,50 @@ sccpSclcAlarmStatus OBJECT-TYPE
 	 convention of the OPENSS7-SMI-MIB module, of the SCCP SCLC 
 	 corresponding to the conceptual row in which the status occurs.  
 	 This managed object generates the folowing alarms:
-
+	 
 	 The qualityofServiceAlarm can have the following probable 
 	 causes:
-
+	 
 	 - ProbableCause = reassemblyTimeOut which represents 
 	   measurement Q.752/7.10 (PerceivedSeverty = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = segmentOutOfOrder which represents 
 	   measurement Q.752/7.11 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = noReassemblySpace which represents 
 	   measurement Q.752/7.12 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = noSegmentationSupport which represents 
 	   measurement Q.752/7.19 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = segmentationFailure which represents 
 	   measurement Q.752/7.20 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = reassemblyFailure which represents 
 	   measurement Q.752/7.21 (PerceivedSeverity = 
 	   Major/Minor/Warning)."
     REFERENCE
-	"ITU-T Rec. X.731 (1993) : 8.1.2.1, ITU-T Rec. X.721 (1882) : 
-	 alarmStatus"
+	"ITU-T Rec. X.731 (1993) : 8.1.2.1,
+	 ITU-T Rec. X.721 (1992) : ISO/IEC 10165-2 : 1992, alarmStatus 
+	     attribute."
     ::= { sccpSclcEntry 1 }
 
-sccpClProtocolMachineId OBJECT-TYPE
+sccpSclcClProtocolMachineId OBJECT-TYPE
     SYNTAX SimpleNameType
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	""
+	"Provides an identifier for the base clProtocolMachine managed 
+	 object represented by the conceptual row.  This value is not 
+	 used as an index because there is a one-to-one relationship 
+	 between SCCP (network entities) and SCLC (clProtocolMachine)."
     REFERENCE
-	""
+	"ITU-T Rec. X.723 | ISO/IEC 10165-5 clProtocolMachineId."
     ::= { sccpSclcEntry 2 }
 
 sccpSclcOperationalState OBJECT-TYPE
@@ -2692,9 +3481,10 @@ sccpSclcOperationalState OBJECT-TYPE
 	""
     REFERENCE
 	""
+    DEFVAL { disabled }
     ::= { sccpSclcEntry 3 }
 
-sccpTotalRemoteSAPs OBJECT-TYPE
+sccpSclcTotalRemoteSAPs OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-only
     STATUS current
@@ -2715,7 +3505,9 @@ sccpSclcAdministrativeState OBJECT-TYPE
 	 appropriate: locked and unlocked.
 	"
     REFERENCE
-	""
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     administrativeState attribute."
+    DEFVAL { locked }
     ::= { sccpSclcEntry 5 }
 
 sccpSclcSupportedProtocols OBJECT-TYPE
@@ -2733,7 +3525,7 @@ sccpSclcSupportedProtocols OBJECT-TYPE
 	 operationalProtocols attribute.  The value of the 
 	 supportedProtocols attribute is determined by the 
 	 implementation.
-
+	 
 	 The set of connectionless network protocols supported by this 
 	 instance of the sclc protocol machine is represented by the 
 	 supportedProtocols attribute.  For the connectionless protocol, 
@@ -2754,7 +3546,7 @@ sccpSclcOperationalSystemType OBJECT-TYPE
 	 the decision to forward individual PDUs, or not to forward 
 	 them, shall be taken on the basis of the available routing 
 	 information.
-
+	 
 	 The operationalSystem Type attribute is an attribute with 
 	 possible values: End System (ES) indicates an ScCP destination 
 	 node, Intermediate System (IS) indicates an SCCP relay node.  
@@ -2770,7 +3562,7 @@ sccpSclcOperationalSystemType OBJECT-TYPE
     ::= { sccpSclcEntry 7 }
 
 -- sclc attributes
-sccpInitialValueReassTimer OBJECT-TYPE
+sccpSclcInitialValueReassTimer OBJECT-TYPE
     SYNTAX TimeInterval
     UNITS       "seconds"
     MAX-ACCESS read-create
@@ -2782,6 +3574,23 @@ sccpInitialValueReassTimer OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 initialValueReassTimer."
     ::= { sccpSclcEntry 8 }
 
+sccpSclcAsaProfilePointer OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a pointer to an alarm severity assignment profile to 
+	 be used for alarms generated by this SCCP connectionless 
+	 protocol state machine, or zeroDotZero."
+    REFERENCE
+	"ITU-T Rec. Q.751.2 (1997), ANSI T1.116.1 (2000), 
+	     alarmSeverityAssignmentProfilePointer attribute.
+	 ITU-T Rec. M.3100 (1995), 
+	     alarmSeverityAssignmentProfilePointer.
+	 ITU-T Rec. M.3100 (1995), ASN1DefinedTypesModule:PointerOrNull."
+    DEFVAL { { zeroDotZero } }
+    ::= { sccpSclcEntry 9 }
+
 sccpSclcName OBJECT-TYPE
     SYNTAX CommonLanguageName
     MAX-ACCESS read-create
@@ -2790,7 +3599,7 @@ sccpSclcName OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { sccpSclcEntry 9 }
+    ::= { sccpSclcEntry 10 }
 
 sccpSclcRowStatus OBJECT-TYPE
     SYNTAX RowStatus
@@ -2805,7 +3614,7 @@ sccpSclcRowStatus OBJECT-TYPE
 	 SCCP managed object."
     REFERENCE
 	""
-    ::= { sccpSclcEntry 10 }
+    ::= { sccpSclcEntry 11 }
 
 -- =====================================================================
 
@@ -2834,21 +3643,22 @@ sccpScocEntry OBJECT-TYPE
 	 in an implementation specific manner.  The value shall be one 
 	 of those present in the systemTypes attribute of the superior 
 	 SCCP managed object.
-
+	 
 	 There can only be one SCOC per SCCP (network entity) and the 
 	 table is indexed by sccpNetworkEntityId to reflect that 
 	 one-to-one relationship."
     REFERENCE
 	"ITU-T Rec. Q.751.2 scoc MO."
     INDEX   {
-	    sccpNetworkEntityId, -- shared index
+	    mtpMsId,		 -- shared index
+	    sccpNetworkEntityId	 -- shared index
 	}
     ::= { sccpScocTable 1 }
 
 SccpScocEntry ::=
     SEQUENCE {
 	-- coProtocolMachine attributes
-	sccpCoProtocolMachineId			SimpleNameType,
+	sccpScocCoProtocolMachineId		SimpleNameType,
 	sccpScocOperationalState		OperationalState,
 	sccpScocAdministrativeState		AdministrativeState,
 	sccpScocOperationalSystemType		NEntitySystemType,
@@ -2857,7 +3667,7 @@ SccpScocEntry ::=
 	sccpScocRowStatus			RowStatus
     }
 
-sccpCoProtocolMachineId OBJECT-TYPE
+sccpScocCoProtocolMachineId OBJECT-TYPE
     SYNTAX SimpleNameType
     MAX-ACCESS read-create
     STATUS current
@@ -2883,6 +3693,7 @@ sccpScocOperationalState OBJECT-TYPE
 	 or fully operable and available for use."
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
+    DEFVAL { disabled }
     ::= { sccpScocEntry 2 }
 
 sccpScocAdministrativeState OBJECT-TYPE
@@ -2901,8 +3712,9 @@ sccpScocAdministrativeState OBJECT-TYPE
 	 the extent that existing uses of the SCOC are allowed but new 
 	 instances of use will be refused."
     REFERENCE
-	"ITU-T Rec. X.721 | ISO/IEC 10165-2 
-	 administrativeState."
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     administrativeState attribute."
+    DEFVAL { locked }
     ::= { sccpScocEntry 3 }
 
 sccpScocOperationalSystemType OBJECT-TYPE
@@ -2937,7 +3749,7 @@ sccpScocSupportedProtocols OBJECT-TYPE
 	 protocol, it can either be class 2 or 3, or both.
 	 This is a read-only value which reflects the capabilities of 
 	 the underlying implementation.
-
+	 
 	 Under the TMN, this attribute is a complex set valued attribute 
 	 that contains a protocol OBJECT IDENTIFIER followed by an 
 	 optional version number and updates applied filed for each 
@@ -2949,7 +3761,7 @@ sccpScocSupportedProtocols OBJECT-TYPE
 	 class(2) and class3(3) values for it."
     REFERENCE
 	"ITU-T Rec. Q.751.2, ITU-T Rec. X.283 | ISO/IEC 10733 
-	 supportedProtocols."
+	     supportedProtocols."
     ::= { sccpScocEntry 5 }
 
 sccpScocName OBJECT-TYPE
@@ -3009,13 +3821,17 @@ sccpScrcEntry OBJECT-TYPE
 	 create entries in this table."
     REFERENCE
 	"ITU-T Rec. Q.751.2 scrc MO."
-    INDEX       { sccpNetworkEntityId } -- shared index
+    INDEX   {
+	    mtpMsId,		 -- shared index
+	    sccpNetworkEntityId	 -- shared index
+	}
     ::= { sccpScrcTable 1 }
 
 SccpScrcEntry ::=
     SEQUENCE {
 	sccpScrcId				SimpleNameType,
 	sccpScrcAlarmStatus			AlarmStatus,
+	sccpScrcAsaProfilePointer		RowPointer,
 	sccpScrcName				CommonLanguageName,
 	sccpScrcRowStatus			RowStatus
     }
@@ -3044,53 +3860,71 @@ sccpScrcAlarmStatus OBJECT-TYPE
 	 machine corresponding to the conceptual row in which this 
 	 status occurs.  This managed object generates the following 
 	 alarms:
-
+	 
 	 The qualityofServiceAlarm can have the following probably 
 	 causes:
-
+	 
 	 - ProbableCause = noTranslatorForAddress which represents 
 	   measurement Q.752/7.1 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = noRuleForAddress which represents measurement 
 	   Q.752/7.2 (PerceivedSeverity = Major/Minor/Warning),
-
+	 
 	 - ProbableCause = pointCodeNotAvailable which represents 
 	   measurement Q.752/7.3 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = pointCodeCongested which represents 
 	   measurement Q.752/7.4 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = subsystemUnavailable which represents 
 	   measurement Q.752/7.5 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = subsystemCongested which represents 
 	   measurement Q.752/7.6 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = unequippedSubsystem which represents 
 	   measurement Q.752/7.7 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = syntaxErrorDetected which represents 
 	   measurement Q.752/7.8 (PerceivedSeverity = 
 	   Major/Minor/Warning),
-
+	 
 	 - ProbableCause = routingFailureNoReasonOrUnqualified which 
 	   represents measurement Q.752/7.9 (PerceivedSeverity = 
 	   Major/Minor/Warning), and
-
+	 
 	 - ProbableCause = hopCounterViolation which represents 
 	   measurement Q.752/7.13 (PerceivedSeverity = 
 	   Major/Minor/Warning)."
     REFERENCE
-	"ITU-T Rec. X.731 (1993) : 8.1.2.1, ITU-T Rec. X.721 
-	 (1882) : alarmStatus"
+	"ITU-T Rec. X.731 (1993) : 8.1.2.1,
+	 ITU-T Rec. X.721 (1992) : ISO/IEC 10165-2 : 1992, alarmStatus 
+	     attribute."
     DEFVAL { } -- '0000'B
     ::= { sccpScrcEntry 2 }
+
+sccpScrcAsaProfilePointer OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a pointer to an alarm severity assignment profile to 
+	 be used for alarms generated by this SCCP routing control state 
+	 machine, or zeroDotZero."
+    REFERENCE
+	"ITU-T Rec. Q.751.2 (1997), ANSI T1.116.1 (2000), 
+	     alarmSeverityAssignmentProfilePointer attribute.
+	 ITU-T Rec. M.3100 (1995), 
+	     alarmSeverityAssignmentProfilePointer.
+	 ITU-T Rec. M.3100 (1995), ASN1DefinedTypesModule:PointerOrNull."
+    DEFVAL { { zeroDotZero } }
+    ::= { sccpScrcEntry 3 }
 
 sccpScrcName OBJECT-TYPE
     SYNTAX CommonLanguageName
@@ -3103,7 +3937,7 @@ sccpScrcName OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.2 scrcName."
     DEFVAL { }
-    ::= { sccpScrcEntry 3 }
+    ::= { sccpScrcEntry 4 }
 
 sccpScrcRowStatus OBJECT-TYPE
     SYNTAX RowStatus
@@ -3116,7 +3950,7 @@ sccpScrcRowStatus OBJECT-TYPE
 	 table."
     REFERENCE
 	"STD 58, SNMPv2-TC RowStatus"
-    ::= { sccpScrcEntry 4 }
+    ::= { sccpScrcEntry 5 }
 
 -- =====================================================================
 
@@ -3135,9 +3969,9 @@ sccpEntitySetEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	"An Entity Set is a group of redundant set of SCCP subsystems 
-	 of the same Subsystem Identifier (SSN) belonging to separate 
-	 SCCP entities.  The entity set describes a set of redundant 
+	"An Entity Set is a group of redundant set of SCCP subsystems of 
+	 the same Subsystem Identifier (SSN) belonging to separate SCCP 
+	 entities.  The entity set describes a set of redundant 
 	 subsystems over which a redundancy algorithm (load sharing 
 	 mechanism) is described.  An SCCP Entity Set can be the target 
 	 of a Global Title Translation, in which case, the SCCP 
@@ -3153,16 +3987,17 @@ sccpEntitySetEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX   {
+	    mtpMsId,		 -- shared index
 	    sccpNetworkEntityId, -- shared index
-	    sccpEntitySetId -- index
+	    sccpEntitySetId	 -- index
 	}
     ::= { sccpEntitySetTable 1 }
 
 SccpEntitySetEntry ::=
     SEQUENCE {
 	sccpEntitySetId				SimpleNameType,
-	sccpSharingMode				SharingMode,
-	sccpLoadSharingAlgPointer		AutonomousType,
+	sccpEntitySetSharingMode		SharingMode,
+	sccpEntitySetLoadSharingAlgPointer	AutonomousType,
 	sccpEntitySetName			CommonLanguageName,
 	sccpEntitySetType			INTEGER,
 	sccpEntitySetSsn			SubSystemNumber,
@@ -3180,7 +4015,7 @@ sccpEntitySetId OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 entitySetId."
     ::= { sccpEntitySetEntry 1 }
 
-sccpSharingMode OBJECT-TYPE
+sccpEntitySetSharingMode OBJECT-TYPE
     SYNTAX SharingMode
     MAX-ACCESS read-create
     STATUS current
@@ -3205,7 +4040,7 @@ sccpSharingMode OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 sharingMode."
     ::= { sccpEntitySetEntry 2 }
 
-sccpLoadSharingAlgPointer OBJECT-TYPE
+sccpEntitySetLoadSharingAlgPointer OBJECT-TYPE
     SYNTAX AutonomousType
     MAX-ACCESS read-create
     STATUS current
@@ -3226,9 +4061,9 @@ sccpLoadSharingAlgPointer OBJECT-TYPE
 	 - sccpLoadSharingSlsSplitting, the entity in the entity set is 
 	   selected using a significant bit in the SLS (Signalling Link 
 	   Selection) contained in the MTP portion of the message.
-
-	 The sccpLoadSharingAlgPointer is only significant when the 
-	 sccpSharingMode is set to duplicated-loadshared."
+	 
+	 The sccpEntitySetLoadSharingAlgPointer is only significant when 
+	 the sccpEntitySetSharingMode is set to duplicated-loadshared."
     REFERENCE
 	"ITU-T Rec. Q.751.2 loadSharingAlgPointer."
     ::= { sccpEntitySetEntry 3 }
@@ -3258,19 +4093,19 @@ sccpEntitySetType OBJECT-TYPE
 	"These type are represented by derivation in TNM, however, here 
 	 they are respresented by this attribute and one other.  The 
 	 values are as follows:
-
+	 
 	 - endNodeEntitySetWithoutSSN(2): This maanged object class is 
 	   an sccpEntitySet that indentifies SCCP end nodes.  Because of 
 	   this, the entitySetSapPointer attribute is only allowed to 
 	   refer to instances of the sccpLinkage class.  A subsystem 
 	   number is not specified by this entity set, but routing is on 
 	   SSN.
-
+	 
 	 - endNodeEntitySetWithSSN(3): This managed object class is an 
 	   sccpEntitySet that identifies SCCP Access Points.  Because of 
 	   this, the SAP pointer attribute is only allowed to refer to 
 	   instances of the sccpAccessPoint class.
-
+	 
 	 - relayNodeEntitySet(7): This managed object class is a 
 	   sccpEntitySet that identifies SCCP relay nodes, i.e.  MTP 
 	   Access Points.  Because of this, the entitySetSapPointer 
@@ -3331,7 +4166,7 @@ sccpEntitySetSapTable OBJECT-TYPE
 	 sccpEntitySetId in this table must first be destroyed."
     REFERENCE
 	""
-    ::= { sccpEntitySetSap 1 }
+    ::= { sccpEntitySet 2 }
 
 sccpEntitySetSapEntry OBJECT-TYPE
     SYNTAX SccpEntitySetSapEntry
@@ -3342,9 +4177,10 @@ sccpEntitySetSapEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX   {
-	    sccpNetworkEntityId,    -- shared index
-	    sccpEntitySetId,    -- shared index
-	    sccpEntitySetSapId  -- index
+	    mtpMsId,		 -- shared index
+	    sccpNetworkEntityId, -- shared index
+	    sccpEntitySetId,	 -- shared index
+	    sccpEntitySetSapId	 -- index
 	}
     ::= { sccpEntitySetSapTable 1 }
 
@@ -3430,9 +4266,12 @@ sccpConcernedAreaTable OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"A concernedArea contains a list of remote SCCP's 
-	 (mtpAccessPoints) to be informed of local (primary broadcast) 
-	 or remote (secondary broadcast) SCCP subsystem changes, or to 
-	 informed of the SCCP status after completion of SCCP Restart."
+	 (mtpAccessPoints) to be informed of local (primary broadcast), 
+	 or remote (secondary broadcast), SCCP subsystem changes, or to 
+	 informed of the SCCP status after completion of SCCP Restart.  
+	 The concernedArea may also optionally be used as an access 
+	 control list for the local (end-system) or remote (intermediate 
+	 system) SCCP subsystem."
     REFERENCE
 	"ITU-T Rec. Q.751.2, ANSI T1.116.2 concernedArea."
     ::= { sccpConcernedArea 1 }
@@ -3444,23 +4283,25 @@ sccpConcernedAreaEntry OBJECT-TYPE
     DESCRIPTION
 	"Rows may be added to this table.  Rows need to be added to the 
 	 sccpRemoteSCCPTable to add remote SCCP to the concerned area.  
-	 Rows may not be removed from this table unless all of the rows 
-	 corresponding to this index have also been removed from the 
-	 corresponding index entries in the sccpRemoteSCCPTable; that 
-	 is, the concerned are must be empty before it can be deleted.  
-	 Concerned areas are specific to a SCRC protocol module and its 
-	 associated SCCP network entity."
+	 Rows removed from this table will remove all the rows 
+	 corresponding to this index from the corresponding index 
+	 entries in the sccpRemoteSCCPTable; that is, the concerned area 
+	 will be emptied before it is deleted.  Concerned areas are 
+	 specific to a SCRC protocol module and its associated SCCP 
+	 network entity."
     REFERENCE
 	"ITU-T Rec. Q.751.2, ANSI T1.116.2 concernedArea."
     INDEX   {
+	    mtpMsId,		 -- shared index
 	    sccpNetworkEntityId, -- shared index
-	    sccpConcernedAreaId -- index
+	    sccpConcernedAreaId	 -- index
 	}
     ::= { sccpConcernedAreaTable 1 }
 
 SccpConcernedAreaEntry ::=
     SEQUENCE {
 	sccpConcernedAreaId			SimpleNameType, -- index
+	sccpConcernedAreaRemoteSCCPList		Unsigned32,
 	sccpConcernedAreaRowStatus		RowStatus
     }
 
@@ -3476,22 +4317,35 @@ sccpConcernedAreaId OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 concernedAreaId."
     ::= { sccpConcernedAreaEntry 1 }
 
+sccpConcernedAreaRemoteSCCPList OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the number of entries, corresponding to this concerned 
+	 area index, in the corresponding indexed entries of the 
+	 sccpRemoteSCCPTable."
+    REFERENCE
+	"ITU-T Rec. Q.751.2 remoteSCCPList."
+    ::= { sccpConcernedAreaEntry 2 }
+
 sccpConcernedAreaRowStatus OBJECT-TYPE
     SYNTAX RowStatus
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"Provides a mechanism according to the RowStatus textual  
 	 convention by which management stations may create and destroy 
 	 entries in this table.  New entires are created empty: that is, 
 	 they have no remote SCCP MTP-SAPs associated with them.  Before 
-	 entries can be deleted, they must have all remote MTP-SAPs 
-	 removed by removing the corresponding entries in the 
-	 sccpRemoteSCCPTable for the corresponding sccpNetworkEntityId 
-	 and sccpConcernedAreaId indices."
+	 entries can be deleted, all remote MTP-SAPs will be removed by 
+	 removing the corresponding entries in the sccpRemoteSCCPTable 
+	 for the corresponding sccpNetworkEntityId and 
+	 sccpConcernedAreaId indices."
     REFERENCE
-	""
-    ::= { sccpConcernedAreaEntry 2 }
+	"STD 58, SNMPv2-TC RowStatus.
+	 ITU-T Rec. Q.751.2 (1992): scrc-concernedArea NAME BINDING."
+    ::= { sccpConcernedAreaEntry 3 }
 
 -- remoteSCCPList side-table
 
@@ -3504,16 +4358,17 @@ sccpRemoteSCCPTable OBJECT-TYPE
 	 entitites that belong to a concerned area."
     REFERENCE
 	"ITU-T Rec. Q.751.2 remoteSCCPList."
-    ::= { sccpRemoteSCCP 1 }
+    ::= { sccpConcernedArea 2 }
 
 sccpRemoteSCCPEntry OBJECT-TYPE
     SYNTAX SccpRemoteSCCPEntry
     MAX-ACCESS not-accessible
     STATUS current
     INDEX   {
-	    sccpNetworkEntityId,    -- shared index
-	    sccpConcernedAreaId,    -- shared index
-	    sccpRemoteSCCPId    -- index
+	    mtpMsId,		 -- shared index
+	    sccpNetworkEntityId, -- shared index
+	    sccpConcernedAreaId, -- shared index
+	    sccpRemoteSCCPId	 -- index
 	}
     ::= { sccpRemoteSCCPTable 1 }
 
@@ -3614,18 +4469,19 @@ sccpGtConversionRuleEntry OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.2 gtConversionRule."
     INDEX   {
-	    sccpNetworkEntityId,        -- shared index
-	    sccpGtConversionRuleId  -- index
+	    mtpMsId,		   -- shared index
+	    sccpNetworkEntityId,   -- shared index
+	    sccpGtConversionRuleId -- index
 	}
     ::= { sccpGtConversionRuleTable 1 }
 
 SccpGtConversionRuleEntry ::=
     SEQUENCE {
 	sccpGtConversionRuleId			SimpleNameType,
-	sccpGtNewEncodingScheme			GtEncodingScheme,
-	sccpGtNewNatureOfAddress		GtNatureOfAddress,
-	sccpGtNewNumberingPlan			GtNumberingPlan,
-	sccpGtNewTranslationType		GtTranslationType,
+	sccpGtConversionRuleNewEncodingScheme	GtEncodingScheme,
+	sccpGtConversionRuleNewNatureOfAddress	GtNatureOfAddress,
+	sccpGtConversionRuleNewNumberingPlan	GtNumberingPlan,
+	sccpGtConversionRuleNewTranslationType	GtTranslationType,
 	sccpGtConversionRuleName		CommonLanguageName,
 	sccpGtConversionRuleRowStatus		RowStatus
     }
@@ -3641,7 +4497,7 @@ sccpGtConversionRuleId OBJECT-TYPE
 	"ITU-T Q.751.2 gtConversionRuleId."
     ::= { sccpGtConversionRuleEntry 1 }
 
-sccpGtNewEncodingScheme OBJECT-TYPE
+sccpGtConversionRuleNewEncodingScheme OBJECT-TYPE
     SYNTAX GtEncodingScheme
     MAX-ACCESS read-create
     STATUS current
@@ -3654,7 +4510,7 @@ sccpGtNewEncodingScheme OBJECT-TYPE
     DEFVAL { 256 } -- notUsedOrNoOverwite
     ::= { sccpGtConversionRuleEntry 2 }
 
-sccpGtNewNatureOfAddress OBJECT-TYPE
+sccpGtConversionRuleNewNatureOfAddress OBJECT-TYPE
     SYNTAX GtNatureOfAddress
     MAX-ACCESS read-create
     STATUS current
@@ -3667,7 +4523,7 @@ sccpGtNewNatureOfAddress OBJECT-TYPE
     DEFVAL { 256 } -- notUsedOrNoOverwite
     ::= { sccpGtConversionRuleEntry 3 }
 
-sccpGtNewNumberingPlan OBJECT-TYPE
+sccpGtConversionRuleNewNumberingPlan OBJECT-TYPE
     SYNTAX GtNumberingPlan
     MAX-ACCESS read-create
     STATUS current
@@ -3680,7 +4536,7 @@ sccpGtNewNumberingPlan OBJECT-TYPE
     DEFVAL { 256 } -- notUsedOrNoOverwite
     ::= { sccpGtConversionRuleEntry 4 }
 
-sccpGtNewTranslationType OBJECT-TYPE
+sccpGtConversionRuleNewTranslationType OBJECT-TYPE
     SYNTAX GtTranslationType
     MAX-ACCESS read-create
     STATUS current
@@ -3738,7 +4594,7 @@ sccpAddressInfoTable OBJECT-TYPE
 	 are subject to the corresponding conversion rule."
     REFERENCE
 	"ITU-T Rec. Q.751.2 addressInfoConversionRules."
-    ::= { sccpAddressInfo 1 }
+    ::= { sccpGtConversionRule 2 }
 
 sccpAddressInfoEntry OBJECT-TYPE
     SYNTAX SccpAddressInfoEntry
@@ -3756,8 +4612,9 @@ sccpAddressInfoEntry OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.2 addressInfoConversionRules."
     INDEX   {
-	    sccpNetworkEntityId,    -- shared index
-	    sccpGtConversionRuleId, -- shared index
+	    mtpMsId,			-- shared index
+	    sccpNetworkEntityId,	-- shared index
+	    sccpGtConversionRuleId,	-- shared index
 	    sccpAddressInfoOperationId  -- index
 	}
     ::= { sccpAddressInfoTable 1 }
@@ -3799,30 +4656,30 @@ sccpAddressInfoOperation OBJECT-TYPE
     DESCRIPTION
 	"Specifies the operation to be performed by this entry in the Gt 
 	 conversion rule.
-
+	 
 	 - insert(0) specifies that an address element is to be inserted 
 	   into Global Titles to which this rule applies at this point 
 	   in the operations;
-
+	 
 	 - replace(1) specifies that an address element is to be replace 
 	   in Global Titles to which this rule applies at this point in 
 	   the operations;
-
+	 
 	 - passTransparently(2) specifies that a number of address 
 	   elements are to be passed transparently from Global Titles to 
 	   which this rule applies at this point in the operations;
-
+	 
 	 - delete(3) specifies that an address eleemnt is to be deleted 
 	   from Global Titles to which this rule applies at this point 
 	   in the operations;
-
+	 
 	 - stop(4) specifies that Gt conversion is to stop at this point 
 	   in the operations;
-
+	 
 	 - copyRemain(5) specifies that the remaining Gt address 
 	   elements are to be copied from Global Titles to which this 
 	   rule applies at this point in the operations.
-
+	 
 	 See ITU-T Rec. Q.715 for more information."
     REFERENCE
 	"ITU-T Q.751.2 ASN.1 Operation."
@@ -3903,25 +4760,26 @@ sccpGtTranslatorEntry OBJECT-TYPE
 	 for address of this nature' is emitted by the SCRC.  The 
 	 administrativeState attribute can have the following states: 
 	 locked and unlocked.
-
+	 
 	 The sccpNetworkEntityId identifies the SCCP network entity and 
 	 the contained SCRC (SCCP routing control) protocol module to 
 	 which the GT translator belongs."
     REFERENCE
 	"ITU-T Rec. Q.751.2 gtTranslator MO."
     INDEX   {
+	    mtpMsId,		 -- shared index
 	    sccpNetworkEntityId, -- shared index
-	    sccpGtTranslatorId
+	    sccpGtTranslatorId   -- index
 	}
     ::= { sccpGtTranslatorTable 1 }
 
 SccpGtTranslatorEntry ::=
     SEQUENCE {
 	sccpGtTranslatorId			SimpleNameType, -- index
-	sccpGtIndicator				GtIndicator,
-	sccpGtNatureOfAddress			GtNatureOfAddress,
-	sccpGtNumberingPlan			GtNumberingPlan,
-	sccpGtTranslationType			GtTranslationType,
+	sccpGtTranslatorGtIndicator		GtIndicator,
+	sccpGtTranslatorNatureOfAddress		GtNatureOfAddress,
+	sccpGtTranslatorNumberingPlan		GtNumberingPlan,
+	sccpGtTranslatorTranslationType		GtTranslationType,
 	sccpGtTranslatorAdministrativeState	AdministrativeState,
 	sccpGtTranslatorName			CommonLanguageName,
 	sccpGtTranslatorRowStatus		RowStatus
@@ -3937,7 +4795,7 @@ sccpGtTranslatorId OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 gtTranslatorId."
     ::= { sccpGtTranslatorEntry 1 }
 
-sccpGtIndicator OBJECT-TYPE
+sccpGtTranslatorGtIndicator OBJECT-TYPE
     SYNTAX GtIndicator
     MAX-ACCESS read-create
     STATUS current
@@ -3947,7 +4805,7 @@ sccpGtIndicator OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 gtIndicator."
     ::= { sccpGtTranslatorEntry 2 }
 
-sccpGtNatureOfAddress OBJECT-TYPE
+sccpGtTranslatorNatureOfAddress OBJECT-TYPE
     SYNTAX GtNatureOfAddress
     MAX-ACCESS read-create
     STATUS current
@@ -3957,7 +4815,7 @@ sccpGtNatureOfAddress OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 gtNatureOfAddress."
     ::= { sccpGtTranslatorEntry 3 }
 
-sccpGtNumberingPlan OBJECT-TYPE
+sccpGtTranslatorNumberingPlan OBJECT-TYPE
     SYNTAX GtNumberingPlan
     MAX-ACCESS read-create
     STATUS current
@@ -3967,7 +4825,7 @@ sccpGtNumberingPlan OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 gtNumberingPlan."
     ::= { sccpGtTranslatorEntry 4 }
 
-sccpGtTranslationType OBJECT-TYPE
+sccpGtTranslatorTranslationType OBJECT-TYPE
     SYNTAX GtTranslationType
     MAX-ACCESS read-create
     STATUS current
@@ -3984,7 +4842,9 @@ sccpGtTranslatorAdministrativeState OBJECT-TYPE
     DESCRIPTION
 	""
     REFERENCE
-	"ITU-T Rec. X.721 administrativeState."
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     administrativeState attribute."
+    DEFVAL { locked }
     ::= { sccpGtTranslatorEntry 6 }
 
 sccpGtTranslatorName OBJECT-TYPE
@@ -4041,9 +4901,10 @@ sccpGtRuleEntry OBJECT-TYPE
     REFERENCE
 	"ITU-T Q.751.2 gtRule MO."
     INDEX   {
-	    sccpNetworkEntityId,    -- shared index
-	    sccpGtTranslatorId, -- shared index
-	    sccpGtRuleId        -- index
+	    mtpMsId,		 -- shared index
+	    sccpNetworkEntityId, -- shared index
+	    sccpGtTranslatorId,	 -- shared index
+	    sccpGtRuleId	 -- index
 	}
     ::= { sccpGtRuleTable 1 }
 
@@ -4051,10 +4912,10 @@ SccpGtRuleEntry ::=
     SEQUENCE {
 	sccpGtRuleId				SimpleNameType,
 	sccpGtRuleAdministrativeState		AdminstrativeState,
-	sccpGtAddressInformation		GtAddressInformation,
-	sccpGtConvRulePointer			SimpleNameType,
-	sccpGtEncodingScheme			GtEncodingScheme,
-	sccpEntitySetPointer			SimpleNameType,
+	sccpGtRuleAddressInformation		GtAddressInformation,
+	sccpGtRuleGtConversionRulePointer	SimpleNameType,
+	sccpGtRuleEncodingScheme		GtEncodingScheme,
+	sccpGtRuleEntitySetPointer		SimpleNameType,
 	sccpGtRuleName				CommonLanguageName,
 	sccpGtRuleRowStatus			RowStatus
     }
@@ -4073,23 +4934,29 @@ sccpGtRuleAdministrativeState OBJECT-TYPE
     SYNTAX AdministrativeState
     MAX-ACCESS read-create
     STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     administrativeState attribute."
+    DEFVAL { locked }
     ::=  { sccpGtRuleEntry 2 }
 
-sccpGtAddressInformation OBJECT-TYPE
+sccpGtRuleAddressInformation OBJECT-TYPE
     SYNTAX GtAddressInformation
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
 	"Provides the address information against which to match the 
 	 Global Title for this GT Rule to be applicable.
-
+	 
 	 The gtAddressInformation attribute contains the value of the 
 	 Global Title address information, as indicated in 3.4.2/Q.713."
     REFERENCE
 	"ITU-T Rec. Q.751.2 gtAddressInformation."
     ::=  { sccpGtRuleEntry 3 }
 
-sccpGtConvRulePointer OBJECT-TYPE
+sccpGtRuleGtConversionRulePointer OBJECT-TYPE
     --
     -- Because this pointer only points to entries in one table, the 
     -- sccpGtConversionRuleTable, this pointer is formatted the same 
@@ -4110,7 +4977,7 @@ sccpGtConvRulePointer OBJECT-TYPE
 	 must be the same or an error will result."
     ::=  { sccpGtRuleEntry 4 }
 
-sccpGtEncodingScheme OBJECT-TYPE
+sccpGtRuleEncodingScheme OBJECT-TYPE
     SYNTAX GtEncodingScheme
     MAX-ACCESS read-create
     STATUS current
@@ -4121,7 +4988,7 @@ sccpGtEncodingScheme OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 gtEncodingScheme."
     ::=  { sccpGtRuleEntry 5 }
 
-sccpEntitySetPointer OBJECT-TYPE
+sccpGtRuleEntitySetPointer OBJECT-TYPE
     --
     -- Beacuse this pointer only points to entries in one table, the 
     -- sccpEntitySetTable, this pointer is formatted the same as the 
@@ -4190,30 +5057,31 @@ sccpSrvtEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX   {
+	    mtpMsId,		 -- shared index
 	    sccpNetworkEntityId, -- shared index
-	    sccpRouteTestId -- index
+	    sccpSrvtId		 -- index
 	}
     ::= { sccpSrvtTable 1 }
 
 SccpSrvtEntry ::=
     SEQUENCE {
-	sccpRouteTestId				SimpleNameType,
-	sccpDSRVT				TimeInterval,
-	sccpNSRVT				INTEGER,
+	sccpSrvtId				SimpleNameType,
+	sccpSrvtDSRVT				TimeInterval,
+	sccpSrvtNSRVT				INTEGER,
 	sccpSrvtName				CommonLanguageName,
-	sccpAdministrativeState			AdministrativeState,
-	sccpOperationalState			OperationalState,
-	sccpProceduralStatus			ProceduralStatus,
-	sccpTraceRequested			TruthValue,
-	sccpThreshold				INTEGER,
-	sccpMtpBackwardRoutingRequested		TruthValue,
-	sccpOriginalGT				GlobalTitle,
-	sccpInfoRequest				BITS,
-	sccpReturnUnknownParams			BITS,
-	sccpRouteTestRowStatus			RowStatus
+	sccpSrvtAdministrativeState		AdministrativeState,
+	sccpSrvtOperationalState		OperationalState,
+	sccpSrvtProceduralStatus		ProceduralStatus,
+	sccpSrvtTraceRequested			TruthValue,
+	sccpSrvtThreshold			INTEGER,
+	sccpSrvtMtpBackwardRoutingRequested	TruthValue,
+	sccpSrvtOriginalGT			GlobalTitle,
+	sccpSrvtInfoRequest			BITS,
+	sccpSrvtReturnUnknownParams		BITS,
+	sccpSrvtRowStatus			RowStatus
     }
 
-sccpRouteTestId OBJECT-TYPE
+sccpSrvtId OBJECT-TYPE
     SYNTAX SimpleNameType
     MAX-ACCESS not-accessible
     STATUS current
@@ -4224,7 +5092,7 @@ sccpRouteTestId OBJECT-TYPE
 	"ITU-T Rec. Q.751.2 routeTestId."
     ::= { sccpSrvtEntry 1 }
 
-sccpDSRVT OBJECT-TYPE
+sccpSrvtDSRVT OBJECT-TYPE
     SYNTAX TimeInterval
     UNITS       "seconds"
     MAX-ACCESS read-create
@@ -4237,7 +5105,7 @@ sccpDSRVT OBJECT-TYPE
 	"ITU-T Rec. Q.752.1 dSRVT ATTRIBUTE, ITU-T Rec. Q.753 3.2.2.5."
     ::= { sccpSrvtEntry 2 }
 
-sccpNSRVT OBJECT-TYPE
+sccpSrvtNSRVT OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-create
     STATUS current
@@ -4262,7 +5130,7 @@ sccpSrvtName OBJECT-TYPE
     DEFVAL { }
     ::= { sccpSrvtEntry 4 }
 
-sccpAdministrativeState OBJECT-TYPE
+sccpSrvtAdministrativeState OBJECT-TYPE
     SYNTAX AdministrativeState
     MAX-ACCESS read-create
     STATUS current
@@ -4274,18 +5142,18 @@ sccpAdministrativeState OBJECT-TYPE
 	 the startSVRT action.  The sccpRouteTestResult notification and 
 	 the operationalStatus and proceduralStatus columns model the 
 	 result of the action.
-
+	 
 	 Rows in this table are created by default in the locked(0) 
 	 administrativeState unless the adminstrativeState is explicity 
 	 set by management action when a row is created.  Setting the 
 	 administrativeState to unlocked(1) results in the initiation of 
 	 the startSRVT action with the parameters indicated in 
 	 subsequent columns.  After being launched, the 
-	 sccpOperationalState and sccpProceduralStatus columsn reflect 
-	 the operational and procedural state of the SRVT test.  A 
-	 sccpRouteTestResult notification will be issued when SRVT test 
-	 either fails or succeeds (but not if it is cancelled).
-
+	 sccpSrvtOperationalState and sccpSrvtProceduralStatus columsn 
+	 reflect the operational and procedural state of the SRVT test.  
+	 A sccpRouteTestResult notification will be issued when SRVT 
+	 test either fails or succeeds (but not if it is cancelled).
+	 
 	 Setting the administrative state to locked(1) when the 
 	 operational state is enabled(1) will result in the cancellation 
 	 of the test.  The results will not be reported.  Setting the 
@@ -4293,11 +5161,13 @@ sccpAdministrativeState OBJECT-TYPE
 	 will completed and the results reported."
     REFERENCE
 	"ITU-T Rec. Q.753 startSRVT ConfirmedAction,
-	 ITU-T Rec. Q.751.2 startSccpRouteTest ACTION."
-    DEFVAL { 0 } -- locked
+	 ITU-T Rec. Q.751.2 startSccpRouteTest ACTION.
+	 ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     administrativeState attribute."
+    DEFVAL { locked }
     ::= { sccpSrvtEntry 5 }
 
-sccpOperationalState OBJECT-TYPE
+sccpSrvtOperationalState OBJECT-TYPE
     SYNTAX OperationalState
     MAX-ACCESS read-only
     STATUS current
@@ -4307,7 +5177,7 @@ sccpOperationalState OBJECT-TYPE
 	 the test is not running, or when it has concluded.  The 
 	 operational state is enabled(1) when the test is running and 
 	 has not yet concluded.
-
+	 
 	 This object uses the OperationalState textual convention from 
 	 the OPENSS7-SMI-MIB module."
     REFERENCE
@@ -4315,55 +5185,56 @@ sccpOperationalState OBJECT-TYPE
 	 ITU-T Rec. Q.751.2 (1992) startSccpRouteTest ACTION,
 	 ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 
 	 operationalState."
+    DEFVAL { disabled }
     ::= { sccpSrvtEntry 6 }
 
-sccpProceduralStatus OBJECT-TYPE
+sccpSrvtProceduralStatus OBJECT-TYPE
     SYNTAX ProceduralStatus
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	"Provides the procedural statu of the SCCP Route Verification 
 	 test in progress.
-
+	 
 	 - initializationRequired(0): The procedural status contains 
 	   initialization required when the test requires initialization 
 	   to be invoked by the manager before it will run, and such 
 	   initialization has not yet been invoked.  The manager may 
-	   invoke intialization by setting the sccpAdministrativeState 
-	   to unlocked(1).
-
+	   invoke intialization by setting the 
+	   sccpSrvtAdministrativeState to unlocked(1).
+	 
 	 - notInitialized(1): The procedural status contains not 
 	   initialized when the test requires intialization before it 
 	   can run and the test has not been initialized.  The test 
 	   initializes itself autononomously, and the operational state 
 	   is disabled.
-
+	 
 	 - intializing(2): The procedural status contains initializing 
 	   when the test required initialization before it can run, and 
 	   this initialization has been initiated but is not yet 
 	   complete.  When this condition is present, the initialization 
 	   required condition is absent, since initialization has 
 	   already begun.  The operational state is enabled.
-
+	 
 	 - reporting(3): The procedural status contains reporting when 
 	   the test has terminated succesfully or unsuccessfully, and 
 	   the result is being reported.
-
+	 
 	 - teminating(4): The procedural status contains terminating 
 	   when the test is in a termination phase.  The 
 	   initializationRequired condition is not present and the 
 	   operational state is disabled.
-
+	 
 	 This object uses the ProceduralStatus textual convention from 
 	 the OPENSS7-SMI-MIB module."
     REFERENCE
 	"ITU-T Rec. Q.753 (1997) startSRVT ConfirmedAction,
 	 ITU-T Rec. Q.751.2 (1992) startSccpRouteTest ACTION,
 	 ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 
-	 proceduralStatus."
+	     proceduralStatus attribute."
     ::= { sccpSrvtEntry 7 }
 
-sccpTraceRequested OBJECT-TYPE
+sccpSrvtTraceRequested OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-create
     STATUS current
@@ -4377,7 +5248,7 @@ sccpTraceRequested OBJECT-TYPE
 	 traceRequested."
     ::= { sccpSrvtEntry 8 }
 
-sccpThreshold OBJECT-TYPE
+sccpSrvtThreshold OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-create
     STATUS current
@@ -4390,7 +5261,7 @@ sccpThreshold OBJECT-TYPE
 	"ITU-T Recommendation Q.753 (1997) ASN.1 startSVRT threshold."
     ::= { sccpSrvtEntry 9 }
 
-sccpMtpBackwardRoutingRequested OBJECT-TYPE
+sccpSrvtMtpBackwardRoutingRequested OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-create
     STATUS current
@@ -4405,7 +5276,7 @@ sccpMtpBackwardRoutingRequested OBJECT-TYPE
     DEFVAL { 2 } -- false
     ::= { sccpSrvtEntry 10 }
 
-sccpOriginalGT OBJECT-TYPE
+sccpSrvtOriginalGT OBJECT-TYPE
     SYNTAX GlobalTitle
     MAX-ACCESS read-create
     STATUS current
@@ -4421,7 +5292,7 @@ sccpOriginalGT OBJECT-TYPE
     DEFVAL { }
     ::= { sccpSrvtEntry 11 }
 
-sccpInfoRequest OBJECT-TYPE
+sccpSrvtInfoRequest OBJECT-TYPE
     SYNTAX BITS {
 	    pointCode(0),
 	    pointCodeList(1),
@@ -4434,17 +5305,18 @@ sccpInfoRequest OBJECT-TYPE
 	 for actions: this column appears in this table to model an 
 	 action parameter.  This column models an optional parameter of 
 	 the startSRVT action.  When not present, the value is set to 
-	 all zeros, '000'B.  sccpInfoRequest is used to inidicate that 
-	 the test initiator node can accept a routeTraceNew RVR message, 
-	 and also asks for particular parameters to be returned in it, 
-	 if it is sent.  This parameter can only be inserted at the 
-	 initiator node, but it can be copied into regenerated MRVTs."
+	 all zeros, '000'B.  sccpSrvtInfoRequest is used to inidicate 
+	 that the test initiator node can accept a routeTraceNew RVR 
+	 message, and also asks for particular parameters to be returned 
+	 in it, if it is sent.  This parameter can only be inserted at 
+	 the initiator node, but it can be copied into regenerated 
+	 MRVTs."
     REFERENCE
 	"ITU-T Recommendation Q.753 (1997) ASN.1 startSVRT infoRequest."
     DEFVAL { } -- '000'B
     ::= { sccpSrvtEntry 12 }
 
-sccpReturnUnknownParams OBJECT-TYPE
+sccpSrvtReturnUnknownParams OBJECT-TYPE
     SYNTAX BITS {
 	    tag15(0),
 	    tag16(1)
@@ -4456,20 +5328,20 @@ sccpReturnUnknownParams OBJECT-TYPE
 	 for actions: this column appears in this table to model an 
 	 action parameter.  This column models an optional parameter of 
 	 the startSRVT action.  When not present, the value is set to 
-	 all zeros, '00'B.  The sccpReturnUnknownParams is used to 
+	 all zeros, '00'B.  The sccpSrvtReturnUnknownParams is used to 
 	 indicate which parameters that a node does not understand 
 	 should be returned in an RVR if one is sent (or in an RVA 
 	 message in the copyData field if the test initiator is 
 	 unknown).  Bit 0 represents an RVT parameter with tag value 15, 
 	 bit 1 an RVT parameter with tage value 16, etc.  This parameter 
-	 can only be present if sccpInfoRequest is present."
+	 can only be present if sccpSrvtInfoRequest is present."
     REFERENCE
 	"ITU-T Recommendation Q.753 (1997) ASN.1 startSVRT 
 	 returnUnknownParams."
     DEFVAL { } -- '00'B
     ::= { sccpSrvtEntry 13 }
 
-sccpRouteTestRowStatus OBJECT-TYPE
+sccpSrvtRowStatus OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS current
@@ -4483,59 +5355,63 @@ sccpNetworkEntityGroup OBJECT-GROUP
     OBJECTS	{
 	sccpNetworkEntityId, 
 	sccpNetworkEntityAlarmStatus, 
-	sccpCommunicationsEntityId, 
-	sccpLocalSapNames, 
+	sccpNetworkEntityLocalSapNames, 
+	sccpNetworkEntityOperationalState, 
 	sccpNetworkEntityTitles, 
-	sccpSystemTypes, 
-	sccpVersion, 
-	sccpLUDTandLUDTSSupported, 
-	sccpCoordChangeTimer, 
-	sccpIgnoreSSTTimer, 
-	sccpMaxStatInfoTimer, 
-	sccpRowStatus
+	sccpNetworkEntitySystemTypes, 
+	sccpNetworkEntityVersion, 
+	sccpNetworkEntityLUDTandLUDTSSupported, 
+	sccpNetworkEntityCoordChangeTimer, 
+	sccpNetworkEntityIgnoreSSTTimer, 
+	sccpNetworkEntityMaxStatInfoTimer, 
+	sccpNetworkEntityRowStatus
     }
     STATUS current
     DESCRIPTION
 	""
     ::= { sccpGroups 1 }
 
-sccpSapNameGroup OBJECT-GROUP
+sccpAccessPointGroup OBJECT-GROUP
     OBJECTS	{
-	sccpSapNameRowStatus
+	sccpAccessPointSapId, 
+	sccpAccessPointAlarmStatus, 
+	sccpAccessPointSap2Address, 
+	sccpAccessPointUserEntityNames, 
+	sccpAccessPointProviderEntityNames, 
+	sccpAccessPointAvailabilityStatus, 
+	sccpAccessPointConcernedAreaPointer, 
+	sccpAccessPointRowStatus
     }
     STATUS current
     DESCRIPTION
 	""
     ::= { sccpGroups 2 }
 
-sccpAccessPointGroup OBJECT-GROUP
+sccpRemoteSAPGroup OBJECT-GROUP
     OBJECTS	{
-	sccpSapId, 
-	sccpAccessPointAlarmStatus, 
-	sccpSap2Address, 
-	sccpUserEntityNames, 
-	sccpProviderEntityNames, 
-	sccpAvailabilityStatus, 
-	sccpConcernedAreaPointer, 
-	sccpAccessPointRowStatus
+	sccpAccessPointLinkagePointer
     }
     STATUS current
     DESCRIPTION
 	""
     ::= { sccpGroups 3 }
 
-sccpRemoteSAPGroup OBJECT-GROUP
+sccpAlarmSeverityAssignmentPointerPackage OBJECT-GROUP
     OBJECTS	{
-	sccpLinkagePointer
+	sccpNetworkEntityAsaProfilePointer,
+	sccpAccessPointAsaProfilePointer,
+	sccpSclcAsaProfilePointer,
+	sccpScrcAsaProfilePointer
     }
-    STATUS current
+    STATUS	current
     DESCRIPTION
-	""
+	"A collcation of objects that impelement the 
+	 alarmSeverityAssignmentPointerPackage."
     ::= { sccpGroups 4 }
 
 sccpAvailableAfterSpRestartPackage OBJECT-GROUP
     OBJECTS	{
-	sccpSsAvailableAfterSpRestart
+	sccpAccessPointSsAvailableAfterSpRestart
     }
     STATUS	current
     DESCRIPTION
@@ -4546,8 +5422,8 @@ sccpAvailableAfterSpRestartPackage OBJECT-GROUP
 sccpLinkageGroup OBJECT-GROUP
     OBJECTS	{
 	sccpLinkageId, 
-	sccpOperationalProtocols, 
-	sccpSnSAP, 
+	sccpLinkageOperationalProtocols, 
+	sccpLinkageSnSAP, 
 	sccpLinkageRowStatus
     }
     STATUS current
@@ -4558,13 +5434,13 @@ sccpLinkageGroup OBJECT-GROUP
 sccpSclcGroup OBJECT-GROUP
     OBJECTS	{
 	sccpSclcAlarmStatus, 
-	sccpClProtocolMachineId, 
+	sccpSclcClProtocolMachineId, 
 	sccpSclcOperationalState, 
-	sccpTotalRemoteSAPs, 
+	sccpSclcTotalRemoteSAPs, 
 	sccpSclcAdministrativeState, 
 	sccpSclcSupportedProtocols, 
 	sccpSclcOperationalSystemType, 
-	sccpInitialValueReassTimer, 
+	sccpSclcInitialValueReassTimer, 
 	sccpSclcRowStatus -- really should not be here at all
     }
     STATUS current
@@ -4574,7 +5450,7 @@ sccpSclcGroup OBJECT-GROUP
 
 sccpScocGroup OBJECT-GROUP
     OBJECTS	{
-	sccpCoProtocolMachineId, 
+	sccpScocCoProtocolMachineId, 
 	sccpScocOperationalState, 
 	sccpScocAdministrativeState, 
 	sccpScocOperationalSystemType, 
@@ -4600,8 +5476,8 @@ sccpScrcGroup OBJECT-GROUP
 sccpEntitySetGroup OBJECT-GROUP
     OBJECTS	{
 	sccpEntitySetId, 
-	sccpSharingMode, 
-	sccpLoadSharingAlgPointer, 
+	sccpEntitySetSharingMode, 
+	sccpEntitySetLoadSharingAlgPointer, 
 	sccpEntitySetType, 
 	sccpEntitySetSsn, 
 	sccpEntitySetRowStatus,
@@ -4639,18 +5515,18 @@ sccpRemoteSCCPGroup OBJECT-GROUP
 sccpGtTranslatorGroup OBJECT-GROUP
     OBJECTS	{
 	sccpGtTranslatorId,
-	sccpGtIndicator,
-	sccpGtNatureOfAddress,
-	sccpGtNumberingPlan,
-	sccpGtTranslationType,
+	sccpGtTranslatorGtIndicator,
+	sccpGtTranslatorNatureOfAddress,
+	sccpGtTranslatorNumberingPlan,
+	sccpGtTranslatorTranslationType,
 	sccpGtTranslatorAdministrativeState,
 	sccpGtTranslatorRowStatus,
 	sccpGtRuleId,
 	sccpGtRuleAdministrativeState,
-	sccpGtAddressInformation,
-	sccpGtConvRulePointer,
-	sccpGtEncodingScheme,
-	sccpEntitySetPointer,
+	sccpGtRuleAddressInformation,
+	sccpGtRuleGtConversionRulePointer,
+	sccpGtRuleEncodingScheme,
+	sccpGtRuleEntitySetPointer,
 	sccpGtRuleRowStatus
     }
     STATUS current
@@ -4660,19 +5536,19 @@ sccpGtTranslatorGroup OBJECT-GROUP
 
 sccpSrvtGroup OBJECT-GROUP
     OBJECTS	{
-	sccpRouteTestId,
-	sccpDSRVT,
-	sccpNSRVT,
-	sccpAdministrativeState,
-	sccpOperationalState,
-	sccpProceduralStatus,
-	sccpTraceRequested,
-	sccpThreshold,
-	sccpMtpBackwardRoutingRequested,
-	sccpOriginalGT,
-	sccpInfoRequest,
-	sccpReturnUnknownParams,
-	sccpRouteTestRowStatus
+	sccpSrvtId,
+	sccpSrvtDSRVT,
+	sccpSrvtNSRVT,
+	sccpSrvtAdministrativeState,
+	sccpSrvtOperationalState,
+	sccpSrvtProceduralStatus,
+	sccpSrvtTraceRequested,
+	sccpSrvtThreshold,
+	sccpSrvtMtpBackwardRoutingRequested,
+	sccpSrvtOriginalGT,
+	sccpSrvtInfoRequest,
+	sccpSrvtReturnUnknownParams,
+	sccpSrvtRowStatus
     }
     STATUS current
     DESCRIPTION
@@ -4683,8 +5559,8 @@ sccpSrvtGroup OBJECT-GROUP
 sccpLocalSccpLinkagePackage OBJECT-GROUP
     OBJECTS	{
 	sccpLinkageConcernedAreaPointer, 
-	sccpLowerLimitForSegmentation, 
-	sccpUpperLimitForSegmentation
+	sccpLinkageLowerLimitForSegmentation, 
+	sccpLinkageUpperLimitForSegmentation
     }
     STATUS	current
     DESCRIPTION
@@ -4697,49 +5573,49 @@ sccpLocalSccpLinkagePackage OBJECT-GROUP
 	 - sccpLinkageConcernedAreaPointer, is a reference to a 
 	   concerned area that describes for which remote subsystems the 
 	   local user will be informed of status changes.
-	   
-	 - sccpLowerLimitForSegmentation, is the size (in octets) of 
-	   unit data supplied by the user in the N-UNITDATA-Request 
+	 
+	 - sccpLinkageLowerLimitForSegmentation, is the size (in octets) 
+	   of unit data supplied by the user in the N-UNITDATA-Request 
 	   primitive above which the data may be segmented depending on 
 	   network conditions.
-
-	 - sccpUpperLimitForSegmentation, is the size (in octets) of 
-	   unit data supplied by the user in the N-UNITDATA-Request 
+	 
+	 - sccpLinkageUpperLimitForSegmentation, is the size (in octets) 
+	   of unit data supplied by the user in the N-UNITDATA-Request 
 	   primitive above which the data will always be segmented.
 	"
     ::= { sccpGroups 15 }
 
 sccpCongestionPackage OBJECT-GROUP
     OBJECTS	{
-	sccpAttackTimerValue, 
-	sccpDecayTimerValue, 
-	sccpNrOfRestrictionLevels, 
-	sccpNrOfSubLevels, 
-	sccpCLS, 
-	sccpCongestionTimerValue, 
-	sccpp, 
-	sccpImportanceLevelCR, 
-	sccpImportanceLevelCC, 
-	sccpImportanceLevelCREF, 
-	sccpImportanceLevelDT1, 
-	sccpImportanceLevelDT2, 
-	sccpImportanceLevelAK, 
-	sccpImportanceLevelIT, 
-	sccpImportanceLevelED, 
-	sccpImportanceLevelEA, 
-	sccpImportanceLevelRSR, 
-	sccpImportanceLevelRSC, 
-	sccpImportanceLevelERR, 
-	sccpImportanceLevelRLC, 
-	sccpImportanceLevelRLSD, 
-	sccpImportanceLevelUDT, 
-	sccpImportanceLevelUDTS, 
-	sccpImportanceLevelXUDT, 
-	sccpImportanceLevelXUDTS, 
-	sccpImportanceLevelLUDT, 
-	sccpImportanceLevelLUDTS, 
-	sccpRLM, 
-	sccpRSLM
+	sccpLinkageAttackTimerValue, 
+	sccpLinkageDecayTimerValue, 
+	sccpLinkageNrOfRestrictionLevels, 
+	sccpLinkageNrOfSubLevels, 
+	sccpLinkageCLS, 
+	sccpLinkageCongestionTimerValue, 
+	sccpLinkageP, 
+	sccpLinkageImportanceLevelCR, 
+	sccpLinkageImportanceLevelCC, 
+	sccpLinkageImportanceLevelCREF, 
+	sccpLinkageImportanceLevelDT1, 
+	sccpLinkageImportanceLevelDT2, 
+	sccpLinkageImportanceLevelAK, 
+	sccpLinkageImportanceLevelIT, 
+	sccpLinkageImportanceLevelED, 
+	sccpLinkageImportanceLevelEA, 
+	sccpLinkageImportanceLevelRSR, 
+	sccpLinkageImportanceLevelRSC, 
+	sccpLinkageImportanceLevelERR, 
+	sccpLinkageImportanceLevelRLC, 
+	sccpLinkageImportanceLevelRLSD, 
+	sccpLinkageImportanceLevelUDT, 
+	sccpLinkageImportanceLevelUDTS, 
+	sccpLinkageImportanceLevelXUDT, 
+	sccpLinkageImportanceLevelXUDTS, 
+	sccpLinkageImportanceLevelLUDT, 
+	sccpLinkageImportanceLevelLUDTS, 
+	sccpLinkageRLM, 
+	sccpLinkageRSLM
     }
     STATUS current
     DESCRIPTION
@@ -4749,10 +5625,10 @@ sccpCongestionPackage OBJECT-GROUP
 sccpAddressInfoConversionRulePackage OBJECT-GROUP
     OBJECTS	{
 	sccpGtConversionRuleId, 
-	sccpGtNewEncodingScheme, 
-	sccpGtNewNatureOfAddress, 
-	sccpGtNewNumberingPlan, 
-	sccpGtNewTranslationType, 
+	sccpGtConversionRuleNewEncodingScheme, 
+	sccpGtConversionRuleNewNatureOfAddress, 
+	sccpGtConversionRuleNewNumberingPlan, 
+	sccpGtConversionRuleNewTranslationType, 
 	sccpGtConversionRuleRowStatus,
 	sccpAddressInfoOperationId, 
 	sccpAddressInfoOperation, 
@@ -4817,10 +5693,6 @@ sccpMIBCompliance MODULE-COMPLIANCE
 	GROUP sccpAvailableAfterSpRestartPackage
 	DESCRIPTION
 	    ""
-
-	GROUP sccpSapNameGroup
-	DESCRIPTION
-	    "Optional"
 
 	GROUP sccpRemoteSAPGroup
 	DESCRIPTION

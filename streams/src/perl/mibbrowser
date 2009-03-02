@@ -564,16 +564,12 @@ use Tk::Xrm;
 require Tk::Adjuster;
 require Tk::Dialog;
 require Tk::HList;
-require Tk::LabFrame;
 require Tk::ROText;
-require Tk::FBox;
 require Tk::NoteBook;
 require Tk::Pane;
 require Tk::Balloon;
-require Tk::NumEntry;
 require Tk::DragDrop;
 require Tk::DropSite;
-require Tk::Table;
 require Tk::TableMatrix;
 require Tk::TableMatrix::Spreadsheet;
 require Tk::Frame;
@@ -3251,13 +3247,16 @@ when this dialog was opened.  Do not exit.",
 	    -balloonmsg=>$spec->{'lmsg'},
 	) if defined $spec->{'lmsg'};
 	if ($spec->{'type'} eq 'Number') {
-	    $b = $pane->NumEntry(
+	    $b = $pane->Spinbox(
 		-exportselection=>1,
-		-buttons=>1,
+		#-buttons=>1,
+		#-orient=>'horizontal',
 		-justify=>'left',
-		-maxvalue=>$spec->{'max'},
-		-minvalue=>$spec->{'min'},
-		-orient=>'horizontal',
+		-from=>$spec->{'min'},
+		-to=>$spec->{'max'},
+		-increment=>1,
+		#-maxvalue=>$spec->{'max'},
+		#-minvalue=>$spec->{'min'},
 		-readonly=>$spec->{'readonly'},
 		-textvariable=>\$self->{'edit'}->{$spec->{'numvalue'}},
 		-state=>$spec->{'readonly'} ?  'disabled' : 'normal',
@@ -4863,8 +4862,9 @@ sub creatematrix {
     $self->{'balloonmsg'} = 'a default message';
     $self->attachballoon($matrix,
 	-balloonmsg=>\$self->{'balloonmsg'},
-	-balloonposition=>'mouse',
+	#-balloonposition=>'mouse',
 	-postcommand=>[\&MyGroup::postcommand,$self],
+	#-motioncommand=>[\&MyGroup::motioncommand,$self],
     );
     $self->createtags;
     $self->tagcells;
@@ -5690,29 +5690,74 @@ sub entryforcell {
 }
 
 #package MyGroup;
+sub motioncommand {
+    my ($self,$matrix,@args) = @_;
+    my $e = $matrix->XEvent || return 1;
+    my ($X,$Y) = ($e->x,$e->y);
+    my $index = $matrix->index("\@$X,$Y");
+    my ($row,$col) = split(/,/,$index);
+    my ($x,$y,$w,$h,$pos) = $matrix->bbox($index);
+    return 1 if $y > $Y || $Y > $y + $h;
+    return 1 if $x > $X || $X > $x + $w;
+    if (defined $self->{'wasrow'} && $row != $self->{'wasrow'}) {
+	return 1;
+    }
+    delete $self->{'wasrow'};
+    return 0;
+}
+
+#package MyGroup;
 sub postcommand {
     my ($self,$matrix,@args) = @_;
     my $e = $matrix->XEvent || return 0;
-    my $index = $matrix->index('@'.$e->x.','.$e->y);
+    my ($X,$Y) = ($e->x,$e->y);
+    my $index = $matrix->index("\@$X,$Y");
     my ($row,$col) = split(/,/,$index);
-    my ($x,$y,$w,$h) = $matrix->bbox($index);
+    my ($x,$y,$w,$h,$pos) = $matrix->bbox($index);
     if ($col == 0) { # labels
-	if ($row == 0) {
-	    if ($self->{'table'}) {
-		$self->{'balloonmsg'} = $self->{'table'}->fmsg;
-	    } else {
-		$self->{'balloonmsg'} = $self->{'ancestor'}->fmsg;
-	    }
-	} elsif ($row == 1) {
-	    $self->{'balloonmsg'} = <<EOF;
+	return 0 if $y > $Y || $Y > $y + $h;
+	return 0 if $x > $X || $X > $x + $w;
+	if ($X < $x + int($w/2)) {
+	    $pos = ($matrix->rootx+$x-10).','.($matrix->rooty+$y+$h-10);
+	    if ($row == 0) {
+		if ($self->{'table'}) {
+		    $self->{'balloonmsg'} = $self->{'table'}->fmsg;
+		} else {
+		    $self->{'balloonmsg'} = $self->{'ancestor'}->fmsg;
+		}
+	    } elsif ($row == 1) {
+		$self->{'balloonmsg'} = <<EOF;
 This column contains the labels of the various fields in
 the group.
 EOF
-	} elsif ($row > 1 && $row < 2 + $self->childnum) {
-	    my $mib = $self->mibforrow($row,$col);
-	    $self->{'balloonmsg'} = $mib->fmsg;
+	    } elsif ($row > 1 && $row < 2 + $self->childnum) {
+		my $mib = $self->mibforrow($row,$col);
+		$self->{'balloonmsg'} = $mib->fmsg;
+	    }
+	} elsif ($X > $x + int($w/2)) {
+	    $pos = ($matrix->rootx+$x+$w-10).','.($matrix->rooty+$y+$h-10);
+	    if ($row == 0) {
+		if ($self->{'entry'}) {
+		    $self->{'balloonmsg'} = $self->{'entry'}->fmsg;
+		} else {
+		    return 0;
+		}
+	    } elsif ($row == 1) {
+		$self->{'balloonmsg'} = <<EOF;
+The fields in this row represent the host name for the
+corresponding SNMP session.
+EOF
+	    } elsif ($row > 1 && $row < 2 + $self->childnum) {
+		my $mib = $self->mibforrow($row);
+		$self->{'balloonmsg'} = $mib->hmsg;
+	    }
+	} else {
+	    return 0;
 	}
     } elsif ($col == 1 + $self->entrynum) { # units
+	return 0 if $y > $Y || $Y > $y + $h;
+	return 0 if $x > $X || $X > $x + $w;
+	$pos = ($matrix->rootx+$x+int($w/2)-10).','.($matrix->rooty+$y+$h-10);
 	if ($row == 0) {
 	    if ($self->{'entry'}) {
 		$self->{'balloonmsg'} = $self->{'entry'}->fmsg;
@@ -5726,19 +5771,7 @@ EOF
 	    my $mib = $self->mibforrow($row,$col);
 	    $self->{'balloonmsg'} = $mib->tmsg;
 	}
-    } elsif ($col > 0 && $col < 1 + $self->entrynum) { # value
-	if ($row == 0) {
-	    return 0;
-	} elsif ($row == 1) {
-	    my $text = $self->hostforcol($col)->hostname;
-	    $self->{'balloonmsg'} = <<EOF;
-The fields in this column represent the host name.  The current
-column has hostname '$text'.
-EOF
-	} elsif ($row > 1 && $row < 2 + $self->childnum) {
-	    my $mib = $self->mibforrow($row,$col);
-	    $self->{'balloonmsg'} = $mib->hmsg;
-	}
+	#} elsif ($col > 0 && $col < 1 + $self->entrynum) { # value
     } else {
 	return 0;
     }
@@ -5748,7 +5781,9 @@ EOF
     if ($self->{'balloonmsg'} =~ /^(\s|\n)*$/) {
 	return 0;
     }
-    return (($matrix->rootx+$x+$w/2-10).','.($matrix->rooty+$y+$h-10));
+    $self->{'wasrow'} = $row;
+    return $pos;
+    #return (($matrix->rootx+$x+$w/2-10).','.($matrix->rooty+$y+$h-10));
 }
 
 #package MyGroup;
@@ -7207,7 +7242,9 @@ sub strip {
 #package MyObject;
 sub reflow {
     my ($self,$msg,$width,@args) = @_;
-    $width = 80 unless defined $width;
+    $width = 400 unless defined $width;
+    my $w = $::balloonwidget;
+    my $font = $w->cget('-font');
     my @lines;
     my @result = ();
     $msg =~ s/\n[ ]+\n/\n\n/sg;
@@ -7227,16 +7264,24 @@ sub reflow {
 	@lines = split(/\n/,$msg);
     }
     foreach my $line (@lines) {
-	$line =~ s/^( *)//;
-	my $indent = $1;
-	$line =~ s/^(([0-9]+\.|-|·)[ ]+)//;
-	my $lead = $1;
-	my $rest = $width - length($indent) - length($lead);
-	while (length($line) > $rest) {
-	    my $break = rindex($line,' ',$rest);
-	    $break = ($break == -1) ? $rest : $break + 1;
-	    push(@result,$indent.$lead.substr($line,0,$break,''));
+	my ($indent,$lead,$measure) = ('','');
+	$indent = $1 if $line =~ s/^( *)//;
+	$lead = $1 if $line =~ s/^(([0-9]+\.|-|·)[ ]+)//;
+	my $rest = $width - $w->fontMeasure($font, $indent) - $w->fontMeasure($font, $lead);
+	while (($measure = $w->fontMeasure($font, $line)) > $rest) {
+	    my ($pos,$where,$break) = (-1,-1,-1);
+	    while (($break = index($line,' ',$pos + 1)) >= 0) {
+		my $portion = $w->fontMeasure($font,substr($line,0,$break));
+		last if $portion >= $rest;
+		$where = $break unless $break == $pos + 1;
+		$pos = $break;
+	    }
+	    $where = $break if $where == 0;
+	    $where = length($line) if $where <= 0;
+	    push(@result,$indent.$lead.substr($line,0,$where,''));
+	    $line =~ s/^[ ]*//;
 	    $lead =~ s/./ /g;
+	    $rest = $width - $w->fontMeasure($font, $indent) - $w->fontMeasure($font, $lead);
 	}
 	push(@result,$indent.$lead.$line);
     }
@@ -7249,23 +7294,32 @@ sub reflow {
 #package MyObject;
 sub rehang {
     my ($self,$msg,$width,$hang,@args) = @_;
-    $width = 80 unless defined $width;
+    $width = 400 unless defined $width;
+    my $w = $::balloonwidget;
+    my $font = $w->cget('-font');
     $hang = '        ' unless defined $hang;
     $msg =~ s/\n[ ]+\n/\n\n/sg;
     $msg =~ s/[ ]\n[ ]*/ /sg;
     my @result = ();
     my @lines = split(/\n/,$msg);
     foreach my $line (@lines) {
-	$line =~ s/^( *)//;
-	my $indent = $1;
-	my $lead = '';
-	my $rest = $width - length($indent) - length($lead);
-	while (length($line) > $rest) {
-	    my $break = rindex($line,' ',$rest);
-	    $break = ($break == -1) ? $rest : $break + 1;
-	    push(@result,$indent.$lead.substr($line,0,$break,''));
+	my ($indent,$lead) = ('','');
+	$indent = $1 if $line =~ s/^( *)//;
+	my $rest = $width - $w->fontMeasure($font,$indent) - $w->fontMeasure($font,$lead);
+	while ((my $measure = $w->fontMeasure($font,$line)) > $rest) {
+	    my ($pos,$where,$break) = (-1,-1,-1);
+	    while (($break = index($line,' ',$pos + 1)) >= 0) {
+		my $portion = $w->fontMeasure($font,substr($line,0,$break));
+		last if $portion >= $rest;
+		$where = $break unless $break == $pos + 1;
+		$pos = $break;
+	    }
+	    $where = $break if $where == 0;
+	    $where = length($line) if $where <= 0;
+	    push(@result,$indent.$lead.substr($line,0,$where,''));
+	    $line =~ s/^[ ]*//;
 	    $lead = $hang;
-	    $rest = $width - length($indent) - length($lead);
+	    $rest = $width - $w->fontMeasure($font,$indent) - $w->fontMeasure($font,$lead);
 	}
 	push(@result,$indent.$lead.$line);
     }
@@ -7385,7 +7439,7 @@ sub fmsg {
     my $self = shift;
     my $msg = $self->{'fmsg'};
     return $msg if $msg;
-    my $width = 100;
+    my $width = 450;
     $msg = $self->{'moduleID'}."::".$self->{'label'}.":\n(".$self->{'objectID'}.")\n";
     $msg .= $self->syntaxtype."\n\n" if $self->syntaxtype;
     $msg .= $self->description($width)."\n\n" if $self->description($width);
@@ -7399,8 +7453,10 @@ sub fmsg {
 sub hmsg {
     my $self = shift;
     my $msg = $self->{'hmsg'};
+    my $w = $::balloonwidget;
+    my $font = $w->cget('-font');
     return $msg if $msg;
-    my $width = 100;
+    my $width = 450;
     my $factor;
     my $power;
     if ($self->{'hint'} && $self->{'hint'} =~ /^d(-([0-9]*))?$/) {
@@ -7413,9 +7469,28 @@ sub hmsg {
     if (($defval = $self->{'defaultValue'}) && defined $factor) {
 	$defval = sprintf('%.'.$power.'f',$defval/$factor);
     }
+    my $values;
+    my $x = $w->fontMeasure($font, "Values: ");
+    if (keys %{$self->{'enums'}}) {
+	foreach (map {"$_($self->{'enums'}{$_})"} sort {$self->{'enums'}{$a} <=> $self->{'enums'}{$b}} keys %{$self->{enums}}) {
+	    if (defined $values) {
+		if ($x + $w->fontMeasure($font,"$_, ") > $width) {
+		    $values .= ",\n        ";
+		    $x = $w->fontMeasure($font,'        ');
+		} else {
+		    $values .= ", ";
+		    $x += $w->fontMeasure($font,', ');
+		}
+	    }
+	    $values .= $_;
+	    $x += $w->fontMeasure($font,$_);
+	}
+    }
     $msg = "Syntax: ".$self->syntaxunits."\n";
+    $msg .= "Access: $self->{'access'}\n" if $self->{'access'};
     $msg .= "Format: $self->{'hint'}\n" if $self->{'hint'};
     $msg .= "Default value: $defval\n" if $defval;
+    $msg .= "Values: $values\n" if $values;
     $msg .= "\n";
     $msg .= $self->description($width)."\n\n" if $self->description($width);
     $msg =~ s/\n*$//sg;
@@ -7428,7 +7503,7 @@ sub tmsg {
     my $self = shift;
     my $msg = $self->{'tmsg'};
     return $msg if $msg;
-    my $width = 100;
+    my $width = 450;
     $msg = "$self->{'textualConvention'}\n\n" if $self->{'textualConvention'};
     $msg .= $self->TCDescription($width);
     $msg = $self->{'units'} unless $msg;
@@ -13942,9 +14017,10 @@ sub createstatusbar {
 sub createballoon {
     my $self = shift;
     $_ = $self->{'Balloon'} = $self->toplevel->Balloon(
-	-initwait=>1000,
+	#-initwait=>1000,
 	-statusbar=>$self->{'Message'},
     );
+    $::balloonwidget = $_;
     return $_;
 }
 

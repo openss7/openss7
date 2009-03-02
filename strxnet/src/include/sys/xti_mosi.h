@@ -97,6 +97,9 @@ struct t_mosiaddr {
 	unsigned char osi_addr[T_AP_MAX_ADDR];
 };
 
+#define T_OSI_AP_IID_BIT    (1<<0)  /**< The osi_ap_inv_id field is valid. */
+#define T_OSI_AE_IID_BIT    (1<<1)  /**< The osi_ae_inv_id field is valid. */
+
 #define T_ISO_APCO	0x0200
 #define T_ISO_APCL	0x0300
 #define T_AP_CNTX_NAME	0x1

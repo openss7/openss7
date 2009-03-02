@@ -107,51 +107,62 @@ struct sccpMIB_data {
 struct sccpNetworkEntityTable_data {
 	uint sccpNetworkEntityTable_request;
 	uint sccpNetworkEntityTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpNetworkEntityAlarmStatus;	/* Create */
 	size_t sccpNetworkEntityAlarmStatusLen;
-	ulong sccpCommunicationsEntityId;	/* NoAccess */
-	uint8_t *sccpLocalSapNames;	/* NoAccess */
-	size_t sccpLocalSapNamesLen;
+	uint8_t *sccpNetworkEntityLocalSapNames;	/* NoAccess */
+	size_t sccpNetworkEntityLocalSapNamesLen;
+	long sccpNetworkEntityOperationalState;	/* ReadOnly */
 	uint8_t *sccpNetworkEntityTitles;	/* NoAccess */
 	size_t sccpNetworkEntityTitlesLen;
-	uint8_t *sccpSystemTypes;	/* ReadOnly */
-	size_t sccpSystemTypesLen;
-	oid *sccpVersion;		/* Create */
-	size_t sccpVersionLen;
-	long sccpLUDTandLUDTSSupported;	/* Create */
-	long sccpCoordChangeTimer;	/* Create */
-	long sccpIgnoreSSTTimer;	/* Create */
-	long sccpMaxStatInfoTimer;	/* Create */
+	uint8_t *sccpNetworkEntitySystemTypes;	/* ReadOnly */
+	size_t sccpNetworkEntitySystemTypesLen;
+	oid *sccpNetworkEntityVersion;	/* Create */
+	size_t sccpNetworkEntityVersionLen;
+	long sccpNetworkEntityLUDTandLUDTSSupported;	/* Create */
+	long sccpNetworkEntityCoordChangeTimer;	/* Create */
+	long sccpNetworkEntityIgnoreSSTTimer;	/* Create */
+	long sccpNetworkEntityMaxStatInfoTimer;	/* Create */
+	oid *sccpNetworkEntityAsaProfilePointer;	/* Create */
+	size_t sccpNetworkEntityAsaProfilePointerLen;
 	uint8_t *sccpNetworkEntityName;	/* Create */
 	size_t sccpNetworkEntityNameLen;
-	long sccpRowStatus;		/* Create */
+	long sccpNetworkEntityRowStatus;	/* Create */
 };
-struct sccpSapNameTable_data {
-	uint sccpSapNameTable_request;
-	uint sccpSapNameTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	ulong sccpSapId;		/* NoAccess */
-	long sccpSapNameRowStatus;	/* Create */
+struct sccpLocalSapNamesTable_data {
+	uint sccpLocalSapNamesTable_request;
+	uint sccpLocalSapNamesTable_refs;
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	ulong sccpLocalSapNamesId;	/* NoAccess */
+	ulong sccpLocalSapNamesPointer;	/* Create */
+	long sccpLocalSapNamesRowStatus;	/* Create */
 };
 struct sccpAccessPointTable_data {
 	uint sccpAccessPointTable_request;
 	uint sccpAccessPointTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	ulong sccpSapId;		/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	ulong sccpAccessPointSapId;	/* NoAccess */
 	uint8_t *sccpAccessPointAlarmStatus;	/* Create */
 	size_t sccpAccessPointAlarmStatusLen;
-	uint8_t *sccpSap2Address;	/* Create */
-	size_t sccpSap2AddressLen;
-	uint8_t *sccpUserEntityNames;	/* Create */
-	size_t sccpUserEntityNamesLen;
-	uint8_t *sccpProviderEntityNames;	/* Create */
-	size_t sccpProviderEntityNamesLen;
-	uint8_t *sccpAvailabilityStatus;	/* ReadOnly */
-	size_t sccpAvailabilityStatusLen;
-	ulong sccpConcernedAreaPointer;	/* Create */
-	ulong sccpLinkagePointer;	/* Create */
-	long sccpSsAvailableAfterSpRestart;	/* Create */
+	uint8_t *sccpAccessPointSap2Address;	/* Create */
+	size_t sccpAccessPointSap2AddressLen;
+	uint8_t *sccpAccessPointUserEntityNames;	/* Create */
+	size_t sccpAccessPointUserEntityNamesLen;
+	uint8_t *sccpAccessPointProviderEntityNames;	/* Create */
+	size_t sccpAccessPointProviderEntityNamesLen;
+	uint8_t *sccpAccessPointAvailabilityStatus;	/* ReadOnly */
+	size_t sccpAccessPointAvailabilityStatusLen;
+	ulong sccpAccessPointConcernedAreaPointer;	/* Create */
+	ulong sccpAccessPointLinkagePointer;	/* Create */
+	long sccpAccessPointSsAvailableAfterSpRestart;	/* Create */
+	oid *sccpAccessPointAsaProfilePointer;	/* Create */
+	size_t sccpAccessPointAsaProfilePointerLen;
 	uint8_t *sccpAccessPointName;	/* Create */
 	size_t sccpAccessPointNameLen;
 	long sccpAccessPointRowStatus;	/* Create */
@@ -159,84 +170,115 @@ struct sccpAccessPointTable_data {
 struct sccpLinkageTable_data {
 	uint sccpLinkageTable_request;
 	uint sccpLinkageTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	ulong sccpLinkageId;		/* NoAccess */
-	uint8_t *sccpOperationalProtocols;	/* ReadOnly */
-	size_t sccpOperationalProtocolsLen;
-	oid *sccpSnSAP;			/* ReadOnly */
-	size_t sccpSnSAPLen;
-	long sccpAttackTimerValue;	/* Create */
-	long sccpDecayTimerValue;	/* Create */
-	long sccpNrOfRestrictionLevels;	/* Create */
-	long sccpNrOfSubLevels;		/* Create */
-	long sccpCLS;			/* Create */
-	long sccpCongestionTimerValue;	/* Create */
-	long sccpp;			/* Create */
-	uint8_t *sccpImportanceLevelCR;	/* Create */
-	size_t sccpImportanceLevelCRLen;
-	uint8_t *sccpImportanceLevelCC;	/* Create */
-	size_t sccpImportanceLevelCCLen;
-	uint8_t *sccpImportanceLevelCREF;	/* Create */
-	size_t sccpImportanceLevelCREFLen;
-	uint8_t *sccpImportanceLevelDT1;	/* Create */
-	size_t sccpImportanceLevelDT1Len;
-	uint8_t *sccpImportanceLevelDT2;	/* Create */
-	size_t sccpImportanceLevelDT2Len;
-	uint8_t *sccpImportanceLevelAK;	/* Create */
-	size_t sccpImportanceLevelAKLen;
-	uint8_t *sccpImportanceLevelIT;	/* Create */
-	size_t sccpImportanceLevelITLen;
-	uint8_t *sccpImportanceLevelED;	/* Create */
-	size_t sccpImportanceLevelEDLen;
-	uint8_t *sccpImportanceLevelEA;	/* Create */
-	size_t sccpImportanceLevelEALen;
-	uint8_t *sccpImportanceLevelRSR;	/* Create */
-	size_t sccpImportanceLevelRSRLen;
-	uint8_t *sccpImportanceLevelRSC;	/* Create */
-	size_t sccpImportanceLevelRSCLen;
-	uint8_t *sccpImportanceLevelERR;	/* Create */
-	size_t sccpImportanceLevelERRLen;
-	uint8_t *sccpImportanceLevelRLC;	/* Create */
-	size_t sccpImportanceLevelRLCLen;
-	uint8_t *sccpImportanceLevelRLSD;	/* Create */
-	size_t sccpImportanceLevelRLSDLen;
-	uint8_t *sccpImportanceLevelUDT;	/* Create */
-	size_t sccpImportanceLevelUDTLen;
-	uint8_t *sccpImportanceLevelUDTS;	/* Create */
-	size_t sccpImportanceLevelUDTSLen;
-	uint8_t *sccpImportanceLevelXUDT;	/* Create */
-	size_t sccpImportanceLevelXUDTLen;
-	uint8_t *sccpImportanceLevelXUDTS;	/* Create */
-	size_t sccpImportanceLevelXUDTSLen;
-	uint8_t *sccpImportanceLevelLUDT;	/* Create */
-	size_t sccpImportanceLevelLUDTLen;
-	uint8_t *sccpImportanceLevelLUDTS;	/* Create */
-	size_t sccpImportanceLevelLUDTSLen;
-	long sccpRLM;			/* Create */
-	long sccpRSLM;			/* Create */
-	uint8_t *sccpLinkageConcernedAreaPointer;	/* Create */
-	size_t sccpLinkageConcernedAreaPointerLen;
-	long sccpLowerLimitForSegmentation;	/* Create */
-	long sccpUpperLimitForSegmentation;	/* Create */
+	uint8_t *sccpLinkageOperationalProtocols;	/* Create */
+	size_t sccpLinkageOperationalProtocolsLen;
+	oid *sccpLinkageSnSAP;		/* Create */
+	size_t sccpLinkageSnSAPLen;
+	long sccpLinkageAttackTimerValue;	/* Create */
+	long sccpLinkageDecayTimerValue;	/* Create */
+	long sccpLinkageNrOfRestrictionLevels;	/* Create */
+	long sccpLinkageNrOfSubLevels;	/* Create */
+	long sccpLinkageCLS;		/* Create */
+	long sccpLinkageCongestionTimerValue;	/* Create */
+	long sccpLinkageP;		/* Create */
+	uint8_t *sccpLinkageImportanceLevelCR;	/* Create */
+	size_t sccpLinkageImportanceLevelCRLen;
+	uint8_t *sccpLinkageImportanceLevelCC;	/* Create */
+	size_t sccpLinkageImportanceLevelCCLen;
+	uint8_t *sccpLinkageImportanceLevelCREF;	/* Create */
+	size_t sccpLinkageImportanceLevelCREFLen;
+	uint8_t *sccpLinkageImportanceLevelDT1;	/* Create */
+	size_t sccpLinkageImportanceLevelDT1Len;
+	uint8_t *sccpLinkageImportanceLevelDT2;	/* Create */
+	size_t sccpLinkageImportanceLevelDT2Len;
+	uint8_t *sccpLinkageImportanceLevelAK;	/* Create */
+	size_t sccpLinkageImportanceLevelAKLen;
+	uint8_t *sccpLinkageImportanceLevelIT;	/* Create */
+	size_t sccpLinkageImportanceLevelITLen;
+	uint8_t *sccpLinkageImportanceLevelED;	/* Create */
+	size_t sccpLinkageImportanceLevelEDLen;
+	uint8_t *sccpLinkageImportanceLevelEA;	/* Create */
+	size_t sccpLinkageImportanceLevelEALen;
+	uint8_t *sccpLinkageImportanceLevelRSR;	/* Create */
+	size_t sccpLinkageImportanceLevelRSRLen;
+	uint8_t *sccpLinkageImportanceLevelRSC;	/* Create */
+	size_t sccpLinkageImportanceLevelRSCLen;
+	uint8_t *sccpLinkageImportanceLevelERR;	/* Create */
+	size_t sccpLinkageImportanceLevelERRLen;
+	uint8_t *sccpLinkageImportanceLevelRLC;	/* Create */
+	size_t sccpLinkageImportanceLevelRLCLen;
+	uint8_t *sccpLinkageImportanceLevelRLSD;	/* Create */
+	size_t sccpLinkageImportanceLevelRLSDLen;
+	uint8_t *sccpLinkageImportanceLevelUDT;	/* Create */
+	size_t sccpLinkageImportanceLevelUDTLen;
+	uint8_t *sccpLinkageImportanceLevelUDTS;	/* Create */
+	size_t sccpLinkageImportanceLevelUDTSLen;
+	uint8_t *sccpLinkageImportanceLevelXUDT;	/* Create */
+	size_t sccpLinkageImportanceLevelXUDTLen;
+	uint8_t *sccpLinkageImportanceLevelXUDTS;	/* Create */
+	size_t sccpLinkageImportanceLevelXUDTSLen;
+	uint8_t *sccpLinkageImportanceLevelLUDT;	/* Create */
+	size_t sccpLinkageImportanceLevelLUDTLen;
+	uint8_t *sccpLinkageImportanceLevelLUDTS;	/* Create */
+	size_t sccpLinkageImportanceLevelLUDTSLen;
+	long sccpLinkageRLM;		/* ReadOnly */
+	long sccpLinkageRSLM;		/* ReadOnly */
+	ulong sccpLinkageConcernedAreaPointer;	/* Create */
+	long sccpLinkageLowerLimitForSegmentation;	/* Create */
+	long sccpLinkageUpperLimitForSegmentation;	/* Create */
 	uint8_t *sccpLinkageName;	/* Create */
 	size_t sccpLinkageNameLen;
 	long sccpLinkageRowStatus;	/* Create */
 };
+struct sccpMtpTable_data {
+	uint sccpMtpTable_request;
+	uint sccpMtpTable_refs;
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	ulong sccpMtpSapId;		/* NoAccess */
+	uint8_t *sccpMtpSap2Address;	/* Create */
+	size_t sccpMtpSap2AddressLen;
+	long sccpMtpUserPart;		/* Create */
+	long sccpMtpUserPartStatus;	/* ReadOnly */
+	oid *sccpMtpUserEntityNames;	/* Create */
+	size_t sccpMtpUserEntityNamesLen;
+	oid *sccpMtpProviderEntityNames;	/* Create */
+	size_t sccpMtpProviderEntityNamesLen;
+	long sccpMtpUsageState;		/* ReadOnly */
+	long sccpMtpAdministrativeState;	/* Create */
+	long sccpMtpOperationalState;	/* ReadOnly */
+	long sccpMtpCongestedState;	/* ReadOnly */
+	long sccpMtpCongestionLevel;	/* ReadOnly */
+	uint8_t *sccpMtpRemoteExchangeLabel;	/* Create */
+	size_t sccpMtpRemoteExchangeLabelLen;
+	uint8_t *sccpMtpName;		/* Create */
+	size_t sccpMtpNameLen;
+	long sccpMtpRowStatus;		/* Create */
+};
 struct sccpSclcTable_data {
 	uint sccpSclcTable_request;
 	uint sccpSclcTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpSclcAlarmStatus;	/* Create */
 	size_t sccpSclcAlarmStatusLen;
-	uint8_t *sccpClProtocolMachineId;	/* NoAccess */
-	size_t sccpClProtocolMachineIdLen;
+	uint8_t *sccpSclcClProtocolMachineId;	/* Create */
+	size_t sccpSclcClProtocolMachineIdLen;
 	long sccpSclcOperationalState;	/* ReadOnly */
-	long sccpTotalRemoteSAPs;	/* ReadOnly */
+	long sccpSclcTotalRemoteSAPs;	/* ReadOnly */
 	long sccpSclcAdministrativeState;	/* Create */
 	uint8_t *sccpSclcSupportedProtocols;	/* ReadOnly */
 	size_t sccpSclcSupportedProtocolsLen;
 	long sccpSclcOperationalSystemType;	/* Create */
-	long sccpInitialValueReassTimer;	/* Create */
+	long sccpSclcInitialValueReassTimer;	/* Create */
+	oid *sccpSclcAsaProfilePointer;	/* Create */
+	size_t sccpSclcAsaProfilePointerLen;
 	uint8_t *sccpSclcName;		/* Create */
 	size_t sccpSclcNameLen;
 	long sccpSclcRowStatus;		/* Create */
@@ -244,9 +286,11 @@ struct sccpSclcTable_data {
 struct sccpScocTable_data {
 	uint sccpScocTable_request;
 	uint sccpScocTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	uint8_t *sccpCoProtocolMachineId;	/* Create */
-	size_t sccpCoProtocolMachineIdLen;
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	uint8_t *sccpScocCoProtocolMachineId;	/* Create */
+	size_t sccpScocCoProtocolMachineIdLen;
 	long sccpScocOperationalState;	/* ReadOnly */
 	long sccpScocAdministrativeState;	/* Create */
 	long sccpScocOperationalSystemType;	/* Create */
@@ -259,11 +303,15 @@ struct sccpScocTable_data {
 struct sccpScrcTable_data {
 	uint sccpScrcTable_request;
 	uint sccpScrcTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpScrcId;		/* Create */
 	size_t sccpScrcIdLen;
 	uint8_t *sccpScrcAlarmStatus;	/* Create */
 	size_t sccpScrcAlarmStatusLen;
+	oid *sccpScrcAsaProfilePointer;	/* Create */
+	size_t sccpScrcAsaProfilePointerLen;
 	uint8_t *sccpScrcName;		/* Create */
 	size_t sccpScrcNameLen;
 	long sccpScrcRowStatus;		/* Create */
@@ -271,12 +319,14 @@ struct sccpScrcTable_data {
 struct sccpEntitySetTable_data {
 	uint sccpEntitySetTable_request;
 	uint sccpEntitySetTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpEntitySetId;	/* NoAccess */
 	size_t sccpEntitySetIdLen;
-	long sccpSharingMode;		/* Create */
-	oid *sccpLoadSharingAlgPointer;	/* Create */
-	size_t sccpLoadSharingAlgPointerLen;
+	long sccpEntitySetSharingMode;	/* Create */
+	oid *sccpEntitySetLoadSharingAlgPointer;	/* Create */
+	size_t sccpEntitySetLoadSharingAlgPointerLen;
 	uint8_t *sccpEntitySetName;	/* Create */
 	size_t sccpEntitySetNameLen;
 	long sccpEntitySetType;		/* Create */
@@ -287,7 +337,9 @@ struct sccpEntitySetTable_data {
 struct sccpEntitySetSapTable_data {
 	uint sccpEntitySetSapTable_request;
 	uint sccpEntitySetSapTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpEntitySetId;	/* NoAccess */
 	size_t sccpEntitySetIdLen;
 	uint8_t *sccpEntitySetSapId;	/* NoAccess */
@@ -300,15 +352,20 @@ struct sccpEntitySetSapTable_data {
 struct sccpConcernedAreaTable_data {
 	uint sccpConcernedAreaTable_request;
 	uint sccpConcernedAreaTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpConcernedAreaId;	/* NoAccess */
 	size_t sccpConcernedAreaIdLen;
-	long sccpConcernedAreaRowStatus;	/* NoAccess */
+	ulong sccpConcernedAreaRemoteSCCPList;	/* ReadOnly */
+	long sccpConcernedAreaRowStatus;	/* Create */
 };
 struct sccpRemoteSCCPTable_data {
 	uint sccpRemoteSCCPTable_request;
 	uint sccpRemoteSCCPTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpConcernedAreaId;	/* NoAccess */
 	size_t sccpConcernedAreaIdLen;
 	uint8_t *sccpRemoteSCCPId;	/* NoAccess */
@@ -322,13 +379,15 @@ struct sccpRemoteSCCPTable_data {
 struct sccpGtConversionRuleTable_data {
 	uint sccpGtConversionRuleTable_request;
 	uint sccpGtConversionRuleTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpGtConversionRuleId;	/* NoAccess */
 	size_t sccpGtConversionRuleIdLen;
-	long sccpGtNewEncodingScheme;	/* Create */
-	long sccpGtNewNatureOfAddress;	/* Create */
-	long sccpGtNewNumberingPlan;	/* Create */
-	long sccpGtNewTranslationType;	/* Create */
+	long sccpGtConversionRuleNewEncodingScheme;	/* Create */
+	long sccpGtConversionRuleNewNatureOfAddress;	/* Create */
+	long sccpGtConversionRuleNewNumberingPlan;	/* Create */
+	long sccpGtConversionRuleNewTranslationType;	/* Create */
 	uint8_t *sccpGtConversionRuleName;	/* Create */
 	size_t sccpGtConversionRuleNameLen;
 	long sccpGtConversionRuleRowStatus;	/* Create */
@@ -336,7 +395,9 @@ struct sccpGtConversionRuleTable_data {
 struct sccpAddressInfoTable_data {
 	uint sccpAddressInfoTable_request;
 	uint sccpAddressInfoTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpGtConversionRuleId;	/* NoAccess */
 	size_t sccpGtConversionRuleIdLen;
 	uint8_t *sccpAddressInfoOperationId;	/* NoAccess */
@@ -349,13 +410,15 @@ struct sccpAddressInfoTable_data {
 struct sccpGtTranslatorTable_data {
 	uint sccpGtTranslatorTable_request;
 	uint sccpGtTranslatorTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpGtTranslatorId;	/* NoAccess */
 	size_t sccpGtTranslatorIdLen;
-	long sccpGtIndicator;		/* Create */
-	long sccpGtNatureOfAddress;	/* Create */
-	long sccpGtNumberingPlan;	/* Create */
-	long sccpGtTranslationType;	/* Create */
+	long sccpGtTranslatorGtIndicator;	/* Create */
+	long sccpGtTranslatorNatureOfAddress;	/* Create */
+	long sccpGtTranslatorNumberingPlan;	/* Create */
+	long sccpGtTranslatorTranslationType;	/* Create */
 	long sccpGtTranslatorAdministrativeState;	/* Create */
 	uint8_t *sccpGtTranslatorName;	/* Create */
 	size_t sccpGtTranslatorNameLen;
@@ -364,19 +427,21 @@ struct sccpGtTranslatorTable_data {
 struct sccpGtRuleTable_data {
 	uint sccpGtRuleTable_request;
 	uint sccpGtRuleTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	uint8_t *sccpGtTranslatorId;	/* NoAccess */
 	size_t sccpGtTranslatorIdLen;
 	uint8_t *sccpGtRuleId;		/* NoAccess */
 	size_t sccpGtRuleIdLen;
 	long sccpGtRuleAdministrativeState;	/* Create */
-	uint8_t *sccpGtAddressInformation;	/* Create */
-	size_t sccpGtAddressInformationLen;
-	uint8_t *sccpGtConvRulePointer;	/* Create */
-	size_t sccpGtConvRulePointerLen;
-	long sccpGtEncodingScheme;	/* Create */
-	uint8_t *sccpEntitySetPointer;	/* Create */
-	size_t sccpEntitySetPointerLen;
+	uint8_t *sccpGtRuleAddressInformation;	/* Create */
+	size_t sccpGtRuleAddressInformationLen;
+	uint8_t *sccpGtRuleGtConversionRulePointer;	/* Create */
+	size_t sccpGtRuleGtConversionRulePointerLen;
+	long sccpGtRuleEncodingScheme;	/* Create */
+	uint8_t *sccpGtRuleEntitySetPointer;	/* Create */
+	size_t sccpGtRuleEntitySetPointerLen;
 	uint8_t *sccpGtRuleName;	/* Create */
 	size_t sccpGtRuleNameLen;
 	long sccpGtRuleRowStatus;	/* Create */
@@ -384,35 +449,38 @@ struct sccpGtRuleTable_data {
 struct sccpSrvtTable_data {
 	uint sccpSrvtTable_request;
 	uint sccpSrvtTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	uint8_t *sccpRouteTestId;	/* NoAccess */
-	size_t sccpRouteTestIdLen;
-	long sccpDSRVT;			/* Create */
-	long sccpNSRVT;			/* Create */
+	ulong mtpMsId;			/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	uint8_t *sccpSrvtId;		/* NoAccess */
+	size_t sccpSrvtIdLen;
+	long sccpSrvtDSRVT;		/* Create */
+	long sccpSrvtNSRVT;		/* Create */
 	uint8_t *sccpSrvtName;		/* Create */
 	size_t sccpSrvtNameLen;
-	long sccpAdministrativeState;	/* Create */
-	long sccpOperationalState;	/* ReadOnly */
-	uint8_t *sccpProceduralStatus;	/* ReadOnly */
-	size_t sccpProceduralStatusLen;
-	long sccpTraceRequested;	/* Create */
-	long sccpThreshold;		/* Create */
-	long sccpMtpBackwardRoutingRequested;	/* Create */
-	uint8_t *sccpOriginalGT;	/* Create */
-	size_t sccpOriginalGTLen;
-	uint8_t *sccpInfoRequest;	/* Create */
-	size_t sccpInfoRequestLen;
-	uint8_t *sccpReturnUnknownParams;	/* Create */
-	size_t sccpReturnUnknownParamsLen;
-	long sccpRouteTestRowStatus;	/* Create */
+	long sccpSrvtAdministrativeState;	/* Create */
+	long sccpSrvtOperationalState;	/* ReadOnly */
+	uint8_t *sccpSrvtProceduralStatus;	/* ReadOnly */
+	size_t sccpSrvtProceduralStatusLen;
+	long sccpSrvtTraceRequested;	/* Create */
+	long sccpSrvtThreshold;		/* Create */
+	long sccpSrvtMtpBackwardRoutingRequested;	/* Create */
+	uint8_t *sccpSrvtOriginalGT;	/* Create */
+	size_t sccpSrvtOriginalGTLen;
+	uint8_t *sccpSrvtInfoRequest;	/* Create */
+	size_t sccpSrvtInfoRequestLen;
+	uint8_t *sccpSrvtReturnUnknownParams;	/* Create */
+	size_t sccpSrvtReturnUnknownParamsLen;
+	long sccpSrvtRowStatus;		/* Create */
 };
 
 /* storage declarations */
 extern struct sccpMIB_data *sccpMIBStorage;
 extern struct header_complex_index *sccpNetworkEntityTableStorage;
-extern struct header_complex_index *sccpSapNameTableStorage;
+extern struct header_complex_index *sccpLocalSapNamesTableStorage;
 extern struct header_complex_index *sccpAccessPointTableStorage;
 extern struct header_complex_index *sccpLinkageTableStorage;
+extern struct header_complex_index *sccpMtpTableStorage;
 extern struct header_complex_index *sccpSclcTableStorage;
 extern struct header_complex_index *sccpScocTableStorage;
 extern struct header_complex_index *sccpScrcTableStorage;
@@ -434,11 +502,14 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define SCCPNETWORKENTITYALARMSTATUS_MINOR       3
 #define SCCPNETWORKENTITYALARMSTATUS_ALARMOUTSTANDING 4
 
-#define SCCPSYSTEMTYPES_ES                       0
-#define SCCPSYSTEMTYPES_IS                       1
+#define SCCPNETWORKENTITYOPERATIONALSTATE_DISABLED 0
+#define SCCPNETWORKENTITYOPERATIONALSTATE_ENABLED 1
 
-#define SCCPLUDTANDLUDTSSUPPORTED_TRUE           1
-#define SCCPLUDTANDLUDTSSUPPORTED_FALSE          2
+#define SCCPNETWORKENTITYSYSTEMTYPES_ES          0
+#define SCCPNETWORKENTITYSYSTEMTYPES_IS          1
+
+#define SCCPNETWORKENTITYLUDTANDLUDTSSUPPORTED_TRUE 1
+#define SCCPNETWORKENTITYLUDTANDLUDTSSUPPORTED_FALSE 2
 
 #define SCCPACCESSPOINTALARMSTATUS_UNDERREPAIR   0
 #define SCCPACCESSPOINTALARMSTATUS_CRITICAL      1
@@ -446,23 +517,63 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define SCCPACCESSPOINTALARMSTATUS_MINOR         3
 #define SCCPACCESSPOINTALARMSTATUS_ALARMOUTSTANDING 4
 
-#define SCCPAVAILABILITYSTATUS_INTEST            0
-#define SCCPAVAILABILITYSTATUS_FAILED            1
-#define SCCPAVAILABILITYSTATUS_POWEROFF          2
-#define SCCPAVAILABILITYSTATUS_OFFLINE           3
-#define SCCPAVAILABILITYSTATUS_OFFDUTY           4
-#define SCCPAVAILABILITYSTATUS_DEPENDENCY        5
-#define SCCPAVAILABILITYSTATUS_DEGRADED          6
-#define SCCPAVAILABILITYSTATUS_NOTINSTALLED      7
-#define SCCPAVAILABILITYSTATUS_LOGFULL           8
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_INTEST 0
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_FAILED 1
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_POWEROFF 2
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_OFFLINE 3
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_OFFDUTY 4
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_DEPENDENCY 5
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_DEGRADED 6
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_NOTINSTALLED 7
+#define SCCPACCESSPOINTAVAILABILITYSTATUS_LOGFULL 8
 
-#define SCCPSSAVAILABLEAFTERSPRESTART_TRUE       1
-#define SCCPSSAVAILABLEAFTERSPRESTART_FALSE      2
+#define SCCPACCESSPOINTSSAVAILABLEAFTERSPRESTART_TRUE 1
+#define SCCPACCESSPOINTSSAVAILABLEAFTERSPRESTART_FALSE 2
 
-#define SCCPOPERATIONALPROTOCOLS_CLASS0          0
-#define SCCPOPERATIONALPROTOCOLS_CLASS1          1
-#define SCCPOPERATIONALPROTOCOLS_CLASS2          2
-#define SCCPOPERATIONALPROTOCOLS_CLASS3          3
+#define SCCPLINKAGEOPERATIONALPROTOCOLS_CLASS0   0
+#define SCCPLINKAGEOPERATIONALPROTOCOLS_CLASS1   1
+#define SCCPLINKAGEOPERATIONALPROTOCOLS_CLASS2   2
+#define SCCPLINKAGEOPERATIONALPROTOCOLS_CLASS3   3
+
+#define SCCPMTPUSERPART_SNMM                     0
+#define SCCPMTPUSERPART_SNTM                     1
+#define SCCPMTPUSERPART_SNSM                     2
+#define SCCPMTPUSERPART_SCCP                     3
+#define SCCPMTPUSERPART_TUP                      4
+#define SCCPMTPUSERPART_ISUP                     5
+#define SCCPMTPUSERPART_DUP1                     6
+#define SCCPMTPUSERPART_DUP2                     7
+#define SCCPMTPUSERPART_MTUP                     8
+#define SCCPMTPUSERPART_BISUP                    9
+#define SCCPMTPUSERPART_SIUP                     10
+#define SCCPMTPUSERPART_SPNEUP                   11
+#define SCCPMTPUSERPART_STC                      12
+#define SCCPMTPUSERPART_USER13                   13
+#define SCCPMTPUSERPART_USER14                   14
+#define SCCPMTPUSERPART_USER15                   15
+
+#define SCCPMTPUSERPARTSTATUS_UNKNOWN            0
+#define SCCPMTPUSERPARTSTATUS_INACCESSIBLE       1
+#define SCCPMTPUSERPARTSTATUS_UNEQUIPPED         2
+
+#define SCCPMTPUSAGESTATE_IDLE                   0
+#define SCCPMTPUSAGESTATE_ACTIVE                 1
+#define SCCPMTPUSAGESTATE_BUSY                   2
+
+#define SCCPMTPADMINISTRATIVESTATE_LOCKED        0
+#define SCCPMTPADMINISTRATIVESTATE_UNLOCKED      1
+#define SCCPMTPADMINISTRATIVESTATE_SHUTTINGDOWN  2
+
+#define SCCPMTPOPERATIONALSTATE_DISABLED         0
+#define SCCPMTPOPERATIONALSTATE_ENABLED          1
+
+#define SCCPMTPCONGESTEDSTATE_NOTCONGESTED       0
+#define SCCPMTPCONGESTEDSTATE_CONGESTED          1
+
+#define SCCPMTPCONGESTIONLEVEL_NONE              0
+#define SCCPMTPCONGESTIONLEVEL_CONGESTIONLEVEL1  1
+#define SCCPMTPCONGESTIONLEVEL_CONGESTIONLEVEL2  2
+#define SCCPMTPCONGESTIONLEVEL_CONGESTIONLEVEL3  3
 
 #define SCCPSCLCALARMSTATUS_UNDERREPAIR          0
 #define SCCPSCLCALARMSTATUS_CRITICAL             1
@@ -506,10 +617,10 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define SCCPSCRCALARMSTATUS_MINOR                3
 #define SCCPSCRCALARMSTATUS_ALARMOUTSTANDING     4
 
-#define SCCPSHARINGMODE_SOLITARY                 0
-#define SCCPSHARINGMODE_DUPLIDOMINANT            1
-#define SCCPSHARINGMODE_DUPLIREPLACEMENT         2
-#define SCCPSHARINGMODE_DUPLILOADSHARED          3
+#define SCCPENTITYSETSHARINGMODE_SOLITARY        0
+#define SCCPENTITYSETSHARINGMODE_DUPLIDOMINANT   1
+#define SCCPENTITYSETSHARINGMODE_DUPLIREPLACEMENT 2
+#define SCCPENTITYSETSHARINGMODE_DUPLILOADSHARED 3
 
 #define SCCPENTITYSETTYPE_ENDNODEENTITYSETWITHOUTSSN 2
 #define SCCPENTITYSETTYPE_ENDNODEENTITYSETWITHSSN 3
@@ -519,34 +630,34 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define SCCPENTITYSETSAPTYPE_PRIMARY             1
 #define SCCPENTITYSETSAPTYPE_BACKUP              2
 
-#define SCCPGTNEWENCODINGSCHEME_UNKNOWN          0
-#define SCCPGTNEWENCODINGSCHEME_BCDODD           1
-#define SCCPGTNEWENCODINGSCHEME_BCDEVEN          2
-#define SCCPGTNEWENCODINGSCHEME_NATIONALSPECIFIC 3
-#define SCCPGTNEWENCODINGSCHEME_NOTUSEDORNOOVERWITE 256
+#define SCCPGTCONVERSIONRULENEWENCODINGSCHEME_UNKNOWN 0
+#define SCCPGTCONVERSIONRULENEWENCODINGSCHEME_BCDODD 1
+#define SCCPGTCONVERSIONRULENEWENCODINGSCHEME_BCDEVEN 2
+#define SCCPGTCONVERSIONRULENEWENCODINGSCHEME_NATIONALSPECIFIC 3
+#define SCCPGTCONVERSIONRULENEWENCODINGSCHEME_NOTUSEDORNOOVERWITE 256
 
-#define SCCPGTNEWNATUREOFADDRESS_UNKNOWN         0
-#define SCCPGTNEWNATUREOFADDRESS_ISDNTNP         1
-#define SCCPGTNEWNATUREOFADDRESS_GENERICNUMBERINGPLAN 2
-#define SCCPGTNEWNATUREOFADDRESS_DNP             3
-#define SCCPGTNEWNATUREOFADDRESS_TNP             4
-#define SCCPGTNEWNATUREOFADDRESS_MMNP            5
-#define SCCPGTNEWNATUREOFADDRESS_LMNP            6
-#define SCCPGTNEWNATUREOFADDRESS_ISDNMNP         7
-#define SCCPGTNEWNATUREOFADDRESS_PRIVATENUMBERINGPLAN 14
-#define SCCPGTNEWNATUREOFADDRESS_NOTUSEDORNOOVERWITE 256
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_UNKNOWN 0
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_ISDNTNP 1
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_GENERICNUMBERINGPLAN 2
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_DNP 3
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_TNP 4
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_MMNP 5
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_LMNP 6
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_ISDNMNP 7
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_PRIVATENUMBERINGPLAN 14
+#define SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_NOTUSEDORNOOVERWITE 256
 
-#define SCCPGTNEWNUMBERINGPLAN_UNKNOWN           0
-#define SCCPGTNEWNUMBERINGPLAN_SUBSCRIBER        1
-#define SCCPGTNEWNUMBERINGPLAN_NATIONAL          3
-#define SCCPGTNEWNUMBERINGPLAN_INTERNATIONAL     4
-#define SCCPGTNEWNUMBERINGPLAN_NOTUSEDORNOOVERWRITE 256
+#define SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_UNKNOWN 0
+#define SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_SUBSCRIBER 1
+#define SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_NATIONAL 3
+#define SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_INTERNATIONAL 4
+#define SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_NOTUSEDORNOOVERWRITE 256
 
-#define SCCPGTNEWTRANSLATIONTYPE_UNKNOWN         0
-#define SCCPGTNEWTRANSLATIONTYPE_ITCC            1
-#define SCCPGTNEWTRANSLATIONTYPE_GENERICNUMBERINGPLAN 14
-#define SCCPGTNEWTRANSLATIONTYPE_IEESS           17
-#define SCCPGTNEWTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE 256
+#define SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_UNKNOWN 0
+#define SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_ITCC 1
+#define SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_GENERICNUMBERINGPLAN 14
+#define SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_IEESS 17
+#define SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE 256
 
 #define SCCPADDRESSINFOOPERATION_INSERT          0
 #define SCCPADDRESSINFOOPERATION_REPLACE         1
@@ -555,34 +666,34 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define SCCPADDRESSINFOOPERATION_STOP            4
 #define SCCPADDRESSINFOOPERATION_COPYREMAIN      5
 
-#define SCCPGTINDICATOR_NOGLOBALTITLE            0
-#define SCCPGTINDICATOR_NOAONLY                  1
-#define SCCPGTINDICATOR_TTONLY                   2
-#define SCCPGTINDICATOR_TT_NP_ES                 3
-#define SCCPGTINDICATOR_TT_NP_ES_NOA             4
+#define SCCPGTTRANSLATORGTINDICATOR_NOGLOBALTITLE 0
+#define SCCPGTTRANSLATORGTINDICATOR_NOAONLY      1
+#define SCCPGTTRANSLATORGTINDICATOR_TTONLY       2
+#define SCCPGTTRANSLATORGTINDICATOR_TT_NP_ES     3
+#define SCCPGTTRANSLATORGTINDICATOR_TT_NP_ES_NOA 4
 
-#define SCCPGTNATUREOFADDRESS_UNKNOWN            0
-#define SCCPGTNATUREOFADDRESS_ISDNTNP            1
-#define SCCPGTNATUREOFADDRESS_GENERICNUMBERINGPLAN 2
-#define SCCPGTNATUREOFADDRESS_DNP                3
-#define SCCPGTNATUREOFADDRESS_TNP                4
-#define SCCPGTNATUREOFADDRESS_MMNP               5
-#define SCCPGTNATUREOFADDRESS_LMNP               6
-#define SCCPGTNATUREOFADDRESS_ISDNMNP            7
-#define SCCPGTNATUREOFADDRESS_PRIVATENUMBERINGPLAN 14
-#define SCCPGTNATUREOFADDRESS_NOTUSEDORNOOVERWITE 256
+#define SCCPGTTRANSLATORNATUREOFADDRESS_UNKNOWN  0
+#define SCCPGTTRANSLATORNATUREOFADDRESS_ISDNTNP  1
+#define SCCPGTTRANSLATORNATUREOFADDRESS_GENERICNUMBERINGPLAN 2
+#define SCCPGTTRANSLATORNATUREOFADDRESS_DNP      3
+#define SCCPGTTRANSLATORNATUREOFADDRESS_TNP      4
+#define SCCPGTTRANSLATORNATUREOFADDRESS_MMNP     5
+#define SCCPGTTRANSLATORNATUREOFADDRESS_LMNP     6
+#define SCCPGTTRANSLATORNATUREOFADDRESS_ISDNMNP  7
+#define SCCPGTTRANSLATORNATUREOFADDRESS_PRIVATENUMBERINGPLAN 14
+#define SCCPGTTRANSLATORNATUREOFADDRESS_NOTUSEDORNOOVERWITE 256
 
-#define SCCPGTNUMBERINGPLAN_UNKNOWN              0
-#define SCCPGTNUMBERINGPLAN_SUBSCRIBER           1
-#define SCCPGTNUMBERINGPLAN_NATIONAL             3
-#define SCCPGTNUMBERINGPLAN_INTERNATIONAL        4
-#define SCCPGTNUMBERINGPLAN_NOTUSEDORNOOVERWRITE 256
+#define SCCPGTTRANSLATORNUMBERINGPLAN_UNKNOWN    0
+#define SCCPGTTRANSLATORNUMBERINGPLAN_SUBSCRIBER 1
+#define SCCPGTTRANSLATORNUMBERINGPLAN_NATIONAL   3
+#define SCCPGTTRANSLATORNUMBERINGPLAN_INTERNATIONAL 4
+#define SCCPGTTRANSLATORNUMBERINGPLAN_NOTUSEDORNOOVERWRITE 256
 
-#define SCCPGTTRANSLATIONTYPE_UNKNOWN            0
-#define SCCPGTTRANSLATIONTYPE_ITCC               1
-#define SCCPGTTRANSLATIONTYPE_GENERICNUMBERINGPLAN 14
-#define SCCPGTTRANSLATIONTYPE_IEESS              17
-#define SCCPGTTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE 256
+#define SCCPGTTRANSLATORTRANSLATIONTYPE_UNKNOWN  0
+#define SCCPGTTRANSLATORTRANSLATIONTYPE_ITCC     1
+#define SCCPGTTRANSLATORTRANSLATIONTYPE_GENERICNUMBERINGPLAN 14
+#define SCCPGTTRANSLATORTRANSLATIONTYPE_IEESS    17
+#define SCCPGTTRANSLATORTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE 256
 
 #define SCCPGTTRANSLATORADMINISTRATIVESTATE_LOCKED 0
 #define SCCPGTTRANSLATORADMINISTRATIVESTATE_UNLOCKED 1
@@ -592,37 +703,37 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define SCCPGTRULEADMINISTRATIVESTATE_UNLOCKED   1
 #define SCCPGTRULEADMINISTRATIVESTATE_SHUTTINGDOWN 2
 
-#define SCCPGTENCODINGSCHEME_UNKNOWN             0
-#define SCCPGTENCODINGSCHEME_BCDODD              1
-#define SCCPGTENCODINGSCHEME_BCDEVEN             2
-#define SCCPGTENCODINGSCHEME_NATIONALSPECIFIC    3
-#define SCCPGTENCODINGSCHEME_NOTUSEDORNOOVERWITE 256
+#define SCCPGTRULEENCODINGSCHEME_UNKNOWN         0
+#define SCCPGTRULEENCODINGSCHEME_BCDODD          1
+#define SCCPGTRULEENCODINGSCHEME_BCDEVEN         2
+#define SCCPGTRULEENCODINGSCHEME_NATIONALSPECIFIC 3
+#define SCCPGTRULEENCODINGSCHEME_NOTUSEDORNOOVERWITE 256
 
-#define SCCPADMINISTRATIVESTATE_LOCKED           0
-#define SCCPADMINISTRATIVESTATE_UNLOCKED         1
-#define SCCPADMINISTRATIVESTATE_SHUTTINGDOWN     2
+#define SCCPSRVTADMINISTRATIVESTATE_LOCKED       0
+#define SCCPSRVTADMINISTRATIVESTATE_UNLOCKED     1
+#define SCCPSRVTADMINISTRATIVESTATE_SHUTTINGDOWN 2
 
-#define SCCPOPERATIONALSTATE_DISABLED            0
-#define SCCPOPERATIONALSTATE_ENABLED             1
+#define SCCPSRVTOPERATIONALSTATE_DISABLED        0
+#define SCCPSRVTOPERATIONALSTATE_ENABLED         1
 
-#define SCCPPROCEDURALSTATUS_INITIALIZATIONREQUIRED 0
-#define SCCPPROCEDURALSTATUS_NOTINITIALIZED      1
-#define SCCPPROCEDURALSTATUS_INITIALIZING        2
-#define SCCPPROCEDURALSTATUS_REPORTING           3
-#define SCCPPROCEDURALSTATUS_TERMINATING         4
+#define SCCPSRVTPROCEDURALSTATUS_INITIALIZATIONREQUIRED 0
+#define SCCPSRVTPROCEDURALSTATUS_NOTINITIALIZED  1
+#define SCCPSRVTPROCEDURALSTATUS_INITIALIZING    2
+#define SCCPSRVTPROCEDURALSTATUS_REPORTING       3
+#define SCCPSRVTPROCEDURALSTATUS_TERMINATING     4
 
-#define SCCPTRACEREQUESTED_TRUE                  1
-#define SCCPTRACEREQUESTED_FALSE                 2
+#define SCCPSRVTTRACEREQUESTED_TRUE              1
+#define SCCPSRVTTRACEREQUESTED_FALSE             2
 
-#define SCCPMTPBACKWARDROUTINGREQUESTED_TRUE     1
-#define SCCPMTPBACKWARDROUTINGREQUESTED_FALSE    2
+#define SCCPSRVTMTPBACKWARDROUTINGREQUESTED_TRUE 1
+#define SCCPSRVTMTPBACKWARDROUTINGREQUESTED_FALSE 2
 
-#define SCCPINFOREQUEST_POINTCODE                0
-#define SCCPINFOREQUEST_POINTCODELIST            1
-#define SCCPINFOREQUEST_ROUTEPRIORITYLIST        2
+#define SCCPSRVTINFOREQUEST_POINTCODE            0
+#define SCCPSRVTINFOREQUEST_POINTCODELIST        1
+#define SCCPSRVTINFOREQUEST_ROUTEPRIORITYLIST    2
 
-#define SCCPRETURNUNKNOWNPARAMS_TAG15            0
-#define SCCPRETURNUNKNOWNPARAMS_TAG16            1
+#define SCCPSRVTRETURNUNKNOWNPARAMS_TAG15        0
+#define SCCPSRVTRETURNUNKNOWNPARAMS_TAG16        1
 
 #define FAILURETYPE_DETECTEDLOOP                 0
 #define FAILURETYPE_EXCESSIVELENGTHROUTE         1
@@ -656,13 +767,36 @@ extern oid congestionLevel_oid[13];
 extern oid globalTitle_oid[13];
 
 /* object id definitions */
-extern oid sccpLoadSharingRoundRobin_oid[13];
-extern oid sccpLoadSharingSlsSplitting_oid[13];
+extern oid hopCounterViolation_oid[14];
+extern oid localSubsystemProhibited_oid[14];
+extern oid localSccpUnavailable_oid[14];
+extern oid noReassemblySpace_oid[14];
+extern oid noRuleForAddress_oid[14];
+extern oid noSegmentationSupport_oid[14];
+extern oid noTranslatorForAddress_oid[14];
+extern oid pointCodeCongested_oid[14];
+extern oid pointCodeNotAvailable_oid[14];
+extern oid reassemblyFailure_oid[14];
+extern oid reassemblyTimeOut_oid[14];
+extern oid routingFailureNoReasonOrUnqualified_oid[14];
+extern oid sccpCongested_oid[14];
+extern oid segmentationFailure_oid[14];
+extern oid segmentOutOfOrder_oid[14];
+extern oid subsystemCongested_oid[14];
+extern oid subsystemOoSdenied_oid[14];
+extern oid subsystemOoSgranted_oid[14];
+extern oid subsystemProhibited_oid[14];
+extern oid subsystemUnavailable_oid[14];
+extern oid syntaxErrorDetected_oid[14];
+extern oid tooLargeForSegmentation_oid[14];
+extern oid unequippedSubsystem_oid[14];
+extern oid sccpLoadSharingRoundRobin_oid[14];
+extern oid sccpLoadSharingSlsSplitting_oid[14];
 extern oid sccpMIBCompliance_oid[13];
 extern oid sccpNetworkEntityGroup_oid[13];
-extern oid sccpSapNameGroup_oid[13];
 extern oid sccpAccessPointGroup_oid[13];
 extern oid sccpRemoteSAPGroup_oid[13];
+extern oid sccpAlarmSeverityAssignmentPointerPackage_oid[13];
 extern oid sccpAvailableAfterSpRestartPackage_oid[13];
 extern oid sccpLinkageGroup_oid[13];
 extern oid sccpSclcGroup_oid[13];
@@ -699,15 +833,15 @@ int sccpNetworkEntityTable_del(struct sccpNetworkEntityTable_data *);
 void parse_sccpNetworkEntityTable(const char *, char *);
 SNMPCallback store_sccpNetworkEntityTable;
 void refresh_sccpNetworkEntityTable(int);
-FindVarMethod var_sccpSapNameTable;
-struct sccpSapNameTable_data *sccpSapNameTable_create(void);
-struct sccpSapNameTable_data *sccpSapNameTable_duplicate(struct sccpSapNameTable_data *);
-int sccpSapNameTable_destroy(struct sccpSapNameTable_data **);
-int sccpSapNameTable_add(struct sccpSapNameTable_data *);
-int sccpSapNameTable_del(struct sccpSapNameTable_data *);
-void parse_sccpSapNameTable(const char *, char *);
-SNMPCallback store_sccpSapNameTable;
-void refresh_sccpSapNameTable(int);
+FindVarMethod var_sccpLocalSapNamesTable;
+struct sccpLocalSapNamesTable_data *sccpLocalSapNamesTable_create(void);
+struct sccpLocalSapNamesTable_data *sccpLocalSapNamesTable_duplicate(struct sccpLocalSapNamesTable_data *);
+int sccpLocalSapNamesTable_destroy(struct sccpLocalSapNamesTable_data **);
+int sccpLocalSapNamesTable_add(struct sccpLocalSapNamesTable_data *);
+int sccpLocalSapNamesTable_del(struct sccpLocalSapNamesTable_data *);
+void parse_sccpLocalSapNamesTable(const char *, char *);
+SNMPCallback store_sccpLocalSapNamesTable;
+void refresh_sccpLocalSapNamesTable(int);
 FindVarMethod var_sccpAccessPointTable;
 struct sccpAccessPointTable_data *sccpAccessPointTable_create(void);
 struct sccpAccessPointTable_data *sccpAccessPointTable_duplicate(struct sccpAccessPointTable_data *);
@@ -726,6 +860,15 @@ int sccpLinkageTable_del(struct sccpLinkageTable_data *);
 void parse_sccpLinkageTable(const char *, char *);
 SNMPCallback store_sccpLinkageTable;
 void refresh_sccpLinkageTable(int);
+FindVarMethod var_sccpMtpTable;
+struct sccpMtpTable_data *sccpMtpTable_create(void);
+struct sccpMtpTable_data *sccpMtpTable_duplicate(struct sccpMtpTable_data *);
+int sccpMtpTable_destroy(struct sccpMtpTable_data **);
+int sccpMtpTable_add(struct sccpMtpTable_data *);
+int sccpMtpTable_del(struct sccpMtpTable_data *);
+void parse_sccpMtpTable(const char *, char *);
+SNMPCallback store_sccpMtpTable;
+void refresh_sccpMtpTable(int);
 FindVarMethod var_sccpSclcTable;
 struct sccpSclcTable_data *sccpSclcTable_create(void);
 struct sccpSclcTable_data *sccpSclcTable_duplicate(struct sccpSclcTable_data *);
@@ -836,74 +979,88 @@ SNMPCallback store_sccpSrvtTable;
 void refresh_sccpSrvtTable(int);
 
 WriteMethod write_sccpNetworkEntityAlarmStatus;
-WriteMethod write_sccpVersion;
-WriteMethod write_sccpLUDTandLUDTSSupported;
-WriteMethod write_sccpCoordChangeTimer;
-WriteMethod write_sccpIgnoreSSTTimer;
-WriteMethod write_sccpMaxStatInfoTimer;
+WriteMethod write_sccpNetworkEntityVersion;
+WriteMethod write_sccpNetworkEntityLUDTandLUDTSSupported;
+WriteMethod write_sccpNetworkEntityCoordChangeTimer;
+WriteMethod write_sccpNetworkEntityIgnoreSSTTimer;
+WriteMethod write_sccpNetworkEntityMaxStatInfoTimer;
+WriteMethod write_sccpNetworkEntityAsaProfilePointer;
 WriteMethod write_sccpNetworkEntityName;
-WriteMethod write_sccpRowStatus;
-WriteMethod write_sccpSapNameRowStatus;
+WriteMethod write_sccpNetworkEntityRowStatus;
+WriteMethod write_sccpLocalSapNamesPointer;
+WriteMethod write_sccpLocalSapNamesRowStatus;
 WriteMethod write_sccpAccessPointAlarmStatus;
-WriteMethod write_sccpSap2Address;
-WriteMethod write_sccpUserEntityNames;
-WriteMethod write_sccpProviderEntityNames;
-WriteMethod write_sccpConcernedAreaPointer;
-WriteMethod write_sccpLinkagePointer;
-WriteMethod write_sccpSsAvailableAfterSpRestart;
+WriteMethod write_sccpAccessPointSap2Address;
+WriteMethod write_sccpAccessPointUserEntityNames;
+WriteMethod write_sccpAccessPointProviderEntityNames;
+WriteMethod write_sccpAccessPointConcernedAreaPointer;
+WriteMethod write_sccpAccessPointLinkagePointer;
+WriteMethod write_sccpAccessPointSsAvailableAfterSpRestart;
+WriteMethod write_sccpAccessPointAsaProfilePointer;
 WriteMethod write_sccpAccessPointName;
 WriteMethod write_sccpAccessPointRowStatus;
-WriteMethod write_sccpAttackTimerValue;
-WriteMethod write_sccpDecayTimerValue;
-WriteMethod write_sccpNrOfRestrictionLevels;
-WriteMethod write_sccpNrOfSubLevels;
-WriteMethod write_sccpCLS;
-WriteMethod write_sccpCongestionTimerValue;
-WriteMethod write_sccpp;
-WriteMethod write_sccpImportanceLevelCR;
-WriteMethod write_sccpImportanceLevelCC;
-WriteMethod write_sccpImportanceLevelCREF;
-WriteMethod write_sccpImportanceLevelDT1;
-WriteMethod write_sccpImportanceLevelDT2;
-WriteMethod write_sccpImportanceLevelAK;
-WriteMethod write_sccpImportanceLevelIT;
-WriteMethod write_sccpImportanceLevelED;
-WriteMethod write_sccpImportanceLevelEA;
-WriteMethod write_sccpImportanceLevelRSR;
-WriteMethod write_sccpImportanceLevelRSC;
-WriteMethod write_sccpImportanceLevelERR;
-WriteMethod write_sccpImportanceLevelRLC;
-WriteMethod write_sccpImportanceLevelRLSD;
-WriteMethod write_sccpImportanceLevelUDT;
-WriteMethod write_sccpImportanceLevelUDTS;
-WriteMethod write_sccpImportanceLevelXUDT;
-WriteMethod write_sccpImportanceLevelXUDTS;
-WriteMethod write_sccpImportanceLevelLUDT;
-WriteMethod write_sccpImportanceLevelLUDTS;
-WriteMethod write_sccpRLM;
-WriteMethod write_sccpRSLM;
+WriteMethod write_sccpLinkageOperationalProtocols;
+WriteMethod write_sccpLinkageSnSAP;
+WriteMethod write_sccpLinkageAttackTimerValue;
+WriteMethod write_sccpLinkageDecayTimerValue;
+WriteMethod write_sccpLinkageNrOfRestrictionLevels;
+WriteMethod write_sccpLinkageNrOfSubLevels;
+WriteMethod write_sccpLinkageCLS;
+WriteMethod write_sccpLinkageCongestionTimerValue;
+WriteMethod write_sccpLinkageP;
+WriteMethod write_sccpLinkageImportanceLevelCR;
+WriteMethod write_sccpLinkageImportanceLevelCC;
+WriteMethod write_sccpLinkageImportanceLevelCREF;
+WriteMethod write_sccpLinkageImportanceLevelDT1;
+WriteMethod write_sccpLinkageImportanceLevelDT2;
+WriteMethod write_sccpLinkageImportanceLevelAK;
+WriteMethod write_sccpLinkageImportanceLevelIT;
+WriteMethod write_sccpLinkageImportanceLevelED;
+WriteMethod write_sccpLinkageImportanceLevelEA;
+WriteMethod write_sccpLinkageImportanceLevelRSR;
+WriteMethod write_sccpLinkageImportanceLevelRSC;
+WriteMethod write_sccpLinkageImportanceLevelERR;
+WriteMethod write_sccpLinkageImportanceLevelRLC;
+WriteMethod write_sccpLinkageImportanceLevelRLSD;
+WriteMethod write_sccpLinkageImportanceLevelUDT;
+WriteMethod write_sccpLinkageImportanceLevelUDTS;
+WriteMethod write_sccpLinkageImportanceLevelXUDT;
+WriteMethod write_sccpLinkageImportanceLevelXUDTS;
+WriteMethod write_sccpLinkageImportanceLevelLUDT;
+WriteMethod write_sccpLinkageImportanceLevelLUDTS;
 WriteMethod write_sccpLinkageConcernedAreaPointer;
-WriteMethod write_sccpLowerLimitForSegmentation;
-WriteMethod write_sccpUpperLimitForSegmentation;
+WriteMethod write_sccpLinkageLowerLimitForSegmentation;
+WriteMethod write_sccpLinkageUpperLimitForSegmentation;
 WriteMethod write_sccpLinkageName;
 WriteMethod write_sccpLinkageRowStatus;
+WriteMethod write_sccpMtpSap2Address;
+WriteMethod write_sccpMtpUserPart;
+WriteMethod write_sccpMtpUserEntityNames;
+WriteMethod write_sccpMtpProviderEntityNames;
+WriteMethod write_sccpMtpAdministrativeState;
+WriteMethod write_sccpMtpRemoteExchangeLabel;
+WriteMethod write_sccpMtpName;
+WriteMethod write_sccpMtpRowStatus;
 WriteMethod write_sccpSclcAlarmStatus;
+WriteMethod write_sccpSclcClProtocolMachineId;
 WriteMethod write_sccpSclcAdministrativeState;
 WriteMethod write_sccpSclcOperationalSystemType;
-WriteMethod write_sccpInitialValueReassTimer;
+WriteMethod write_sccpSclcInitialValueReassTimer;
+WriteMethod write_sccpSclcAsaProfilePointer;
 WriteMethod write_sccpSclcName;
 WriteMethod write_sccpSclcRowStatus;
-WriteMethod write_sccpCoProtocolMachineId;
+WriteMethod write_sccpScocCoProtocolMachineId;
 WriteMethod write_sccpScocAdministrativeState;
 WriteMethod write_sccpScocOperationalSystemType;
 WriteMethod write_sccpScocName;
 WriteMethod write_sccpScocRowStatus;
 WriteMethod write_sccpScrcId;
 WriteMethod write_sccpScrcAlarmStatus;
+WriteMethod write_sccpScrcAsaProfilePointer;
 WriteMethod write_sccpScrcName;
 WriteMethod write_sccpScrcRowStatus;
-WriteMethod write_sccpSharingMode;
-WriteMethod write_sccpLoadSharingAlgPointer;
+WriteMethod write_sccpEntitySetSharingMode;
+WriteMethod write_sccpEntitySetLoadSharingAlgPointer;
 WriteMethod write_sccpEntitySetName;
 WriteMethod write_sccpEntitySetType;
 WriteMethod write_sccpEntitySetSsn;
@@ -911,42 +1068,43 @@ WriteMethod write_sccpEntitySetRowStatus;
 WriteMethod write_sccpEntitySetSapType;
 WriteMethod write_sccpEntitySetSapPointer;
 WriteMethod write_sccpEntitySetSapRowStatus;
+WriteMethod write_sccpConcernedAreaRowStatus;
 WriteMethod write_sccpRemoteSCCPMTPAccessPoint;
 WriteMethod write_sccpRemoteSCCPName;
 WriteMethod write_sccpRemoteSCCPRowStatus;
-WriteMethod write_sccpGtNewEncodingScheme;
-WriteMethod write_sccpGtNewNatureOfAddress;
-WriteMethod write_sccpGtNewNumberingPlan;
-WriteMethod write_sccpGtNewTranslationType;
+WriteMethod write_sccpGtConversionRuleNewEncodingScheme;
+WriteMethod write_sccpGtConversionRuleNewNatureOfAddress;
+WriteMethod write_sccpGtConversionRuleNewNumberingPlan;
+WriteMethod write_sccpGtConversionRuleNewTranslationType;
 WriteMethod write_sccpGtConversionRuleName;
 WriteMethod write_sccpGtConversionRuleRowStatus;
 WriteMethod write_sccpAddressInfoOperation;
 WriteMethod write_sccpAddressInfoAddressElement;
 WriteMethod write_sccpAddressInfoNrOfAddressElements;
 WriteMethod write_sccpAddressInfoRowStatus;
-WriteMethod write_sccpGtIndicator;
-WriteMethod write_sccpGtNatureOfAddress;
-WriteMethod write_sccpGtNumberingPlan;
-WriteMethod write_sccpGtTranslationType;
+WriteMethod write_sccpGtTranslatorGtIndicator;
+WriteMethod write_sccpGtTranslatorNatureOfAddress;
+WriteMethod write_sccpGtTranslatorNumberingPlan;
+WriteMethod write_sccpGtTranslatorTranslationType;
 WriteMethod write_sccpGtTranslatorAdministrativeState;
 WriteMethod write_sccpGtTranslatorName;
 WriteMethod write_sccpGtTranslatorRowStatus;
 WriteMethod write_sccpGtRuleAdministrativeState;
-WriteMethod write_sccpGtAddressInformation;
-WriteMethod write_sccpGtConvRulePointer;
-WriteMethod write_sccpGtEncodingScheme;
-WriteMethod write_sccpEntitySetPointer;
+WriteMethod write_sccpGtRuleAddressInformation;
+WriteMethod write_sccpGtRuleGtConversionRulePointer;
+WriteMethod write_sccpGtRuleEncodingScheme;
+WriteMethod write_sccpGtRuleEntitySetPointer;
 WriteMethod write_sccpGtRuleName;
 WriteMethod write_sccpGtRuleRowStatus;
-WriteMethod write_sccpDSRVT;
-WriteMethod write_sccpNSRVT;
+WriteMethod write_sccpSrvtDSRVT;
+WriteMethod write_sccpSrvtNSRVT;
 WriteMethod write_sccpSrvtName;
-WriteMethod write_sccpAdministrativeState;
-WriteMethod write_sccpTraceRequested;
-WriteMethod write_sccpThreshold;
-WriteMethod write_sccpMtpBackwardRoutingRequested;
-WriteMethod write_sccpOriginalGT;
-WriteMethod write_sccpInfoRequest;
-WriteMethod write_sccpReturnUnknownParams;
-WriteMethod write_sccpRouteTestRowStatus;
+WriteMethod write_sccpSrvtAdministrativeState;
+WriteMethod write_sccpSrvtTraceRequested;
+WriteMethod write_sccpSrvtThreshold;
+WriteMethod write_sccpSrvtMtpBackwardRoutingRequested;
+WriteMethod write_sccpSrvtOriginalGT;
+WriteMethod write_sccpSrvtInfoRequest;
+WriteMethod write_sccpSrvtReturnUnknownParams;
+WriteMethod write_sccpSrvtRowStatus;
 #endif				/* __LOCAL_SCCPMIB_H__ */

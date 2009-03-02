@@ -109,7 +109,7 @@ sort-adjacent-labels
 .\"
 .\"
 .HP
-.BI "int " tcap_xistr " = t_open(" device ", " flags );
+.BI "int " tcap_xtistr " = t_open(" device ", " flags );
 .\"
 .\"
 .SH OVERVIEW
@@ -124,7 +124,7 @@ tcapv2
 .[
 t1.114
 .]
-transport providers; it describes the protoocl-specific information that is relevant when TCAP
+transport providers; it describes the protocol-specific information that is relevant when TCAP
 services
 .[
 q771

@@ -496,4 +496,52 @@ typedef union {
 #define SCCP_REFC_NO_ADDRESS_TYPE_TRANSLATION			0x5012
 #define SCCP_REFC_UNEQUIPPED_USER				0x5013
 
+union __N_primitives {
+	np_ulong type;
+	N_info_req_t info_req;
+	N_info_ack_t info_ack;
+	N_bind_req_t bind_req;
+	N_bind_ack_t bind_ack;
+	N_unbind_req_t unbind_req;
+	N_optmgmt_req_t optmgmt_req;
+	N_error_ack_t error_ack;
+	N_uderror_ind_t uderror_ind;
+	N_ok_ack_t ok_ack;
+	N_conn_req_t conn_req;
+	N_conn_ind_t conn_ind;
+	N_conn_res_t conn_res;
+	N_conn_con_t conn_con;
+	N_data_req_t data_req;
+	N_data_ind_t data_ind;
+	N_datack_req_t datack_req;
+	N_datack_ind_t datack_ind;
+	N_exdata_req_t exdata_req;
+	N_exdata_ind_t exdata_ind;
+	N_reset_req_t reset_req;
+	N_reset_ind_t reset_ind;
+	N_reset_res_t reset_res;
+	N_reset_con_t reset_con;
+	N_discon_req_t discon_req;
+	N_discon_ind_t discon_ind;
+	N_unitdata_req_t unitdata_req;
+	N_unitdata_ind_t unitdata_ind;
+	/* additional SCCP primitives */
+	N_notice_ind_t notice_ind;
+	N_inform_req_t inform_req;
+	N_inform_ind_t inform_ind;
+	N_coord_req_t coord_req;
+	N_coord_res_t coord_res;
+	N_coord_ind_t coord_ind;
+	N_coord_con_t coord_con;
+	N_state_req_t state_req;
+	N_state_ind_t state_ind;
+	N_pcstate_ind_t pcstate_ind;
+	N_traffic_ind_t traffic_ind;
+	N_request_req_t request_req;
+	N_reply_ack_t reply_ack;
+};
+
+#define N_primitives __N_primitives
+
+
 #endif				/* _SYS_NPI_SCCP_H */

@@ -106,17 +106,29 @@
 /*
  *  Additional primitives for component handling.
  */
-#define TC_INVOKE_REQ		26	/* Invocation of an operation */
-#define TC_RESULT_REQ		27	/* Result of a successful operation */
-#define TC_ERROR_REQ		28	/* Error reply to an invoked operation */
-#define TC_CANCEL_REQ		29	/* Termination of an operation invocation */
-#define TC_REJECT_REQ		30	/* Rejection of a component */
+#define TC_INVOKE_REQ		48	/* Invocation of an operation */
+#define TC_RESULT_REQ		49	/* Result of a successful operation */
+#define TC_ERROR_REQ		50	/* Error reply to an invoked operation */
+#define TC_CANCEL_REQ		51	/* Termination of an operation invocation */
+#define TC_REJECT_REQ		52	/* Rejection of a component */
 
-#define TC_INVOKE_IND		32	/* Invocation of an operation */
-#define TC_RESULT_IND		33	/* Result of a successful operation */
-#define TC_ERROR_IND		34	/* Error reply to an invoked operation */
-#define TC_CANCEL_IND		35	/* Termination of an operation invocation */
-#define TC_REJECT_IND		36	/* Rejection of a component */
+#define TC_INVOKE_IND		53	/* Invocation of an operation */
+#define TC_RESULT_IND		54	/* Result of a successful operation */
+#define TC_ERROR_IND		55	/* Error reply to an invoked operation */
+#define TC_CANCEL_IND		56	/* Termination of an operation invocation */
+#define TC_REJECT_IND		57	/* Rejection of a component */
+
+/*
+ *  TCAP managment primitives.
+ */
+#define TC_COORD_REQ		35	/* coordinated withdrawal request */
+#define TC_COORD_RES		36	/* coordinated withdrawal response */
+#define TC_COORD_IND		37	/* coordinated withdrawal indication */
+#define TC_COORD_CON		38	/* coordinated withdrawal confirmation */
+#define TC_STATE_REQ		39	/* subsystem state request */
+#define TC_STATE_IND		40	/* subsystem state indication */
+#define TC_PCSTATE_IND		41	/* pointcode state indication */
+#define TC_TRAFFIC_IND		42	/* traffic mix indication */
 
 #define TC_QOS_SEL1		0x0701
 
@@ -693,5 +705,88 @@ typedef struct TC_cancel_ind {
 	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
 	t_uscalar_t INVOKE_id;		/* Invoke identifier */
 } TC_cancel_ind_t;
+
+/*
+ *  Management primitives.
+ */
+
+/*
+ * TC_COORD_REQ.
+ */
+typedef struct TC_coord_req {
+	np_ulong PRIM_type;		/* alwyas TC_COORD_REQ */
+	np_ulong ADDR_length;		/* affected subsystem */
+	np_ulong ADDR_offset;
+} TC_coord_req_t;
+
+/*
+ * TC_COORD_RES.
+ */
+typedef struct TC_coord_res {
+	np_ulong PRIM_type;		/* always TC_COORD_RES */
+	np_ulong ADDR_length;		/* affected subsystem */
+	np_ulong ADDR_offset;
+} TC_coord_res_t;
+
+/*
+ * TC_COORD_IND.
+ */
+typedef struct TC_coord_ind {
+	np_ulong PRIM_type;		/* alwyas TC_COORD_IND */
+	np_ulong ADDR_length;		/* affected subsystem */
+	np_ulong ADDR_offset;
+	np_ulong SMI;			/* subsystem multiplicity indicator */
+} TC_coord_ind_t;
+
+/*
+ * TC_COORD_CON.
+ */
+typedef struct TC_coord_con {
+	np_ulong PRIM_type;		/* always TC_COORD_CON */
+	np_ulong ADDR_length;		/* affected subsystem */
+	np_ulong ADDR_offset;
+	np_ulong SMI;			/* subsystem multiplicity indicator */
+} TC_coord_con_t;
+
+/*
+ * TC_STATE_REQ.
+ */
+typedef struct TC_state_req {
+	np_ulong PRIM_type;		/* always TC_STATE_REQ */
+	np_ulong ADDR_length;		/* affected subsystem */
+	np_ulong ADDR_offset;
+	np_ulong STATUS;		/* user status */
+} TC_state_req_t;
+
+/*
+ * TC_STATE_IND.
+ */
+typedef struct TC_state_ind {
+	np_ulong PRIM_type;		/* always TC_STATE_IND */
+	np_ulong ADDR_length;		/* affected subsystem */
+	np_ulong ADDR_offset;
+	np_ulong STATUS;		/* user status */
+	np_ulong SMI;			/* subsystem multiplicity indicator */
+} TC_state_ind_t;
+
+/*
+ * TC_PCSTATE_IND.
+ */
+typedef struct TC_pcstate_ind {
+	np_ulong PRIM_type;		/* always TC_PCSTATE_IND */
+	np_ulong ADDR_length;		/* affected point code */
+	np_ulong ADDR_offset;
+	np_ulong STATUS;		/* status */
+} TC_pcstate_ind_t;
+
+/*
+ * TC_TRAFFIC_IND
+ */
+typedef struct TC_traffic_ind {
+	np_ulong PRIM_type;		/* always TC_TRAFFIC_IND */
+	np_ulong ADDR_length;		/* affected user */
+	np_ulong ADDR_offset;
+	np_ulong TRAFFIC_mix;		/* traffic mix */
+} TC_traffic_ind_t;
 
 #endif				/* __SS7_TC_H__ */
