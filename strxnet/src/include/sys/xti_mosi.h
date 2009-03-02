@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mosi.h,v 0.9.2.10 2008-10-30 13:37:48 brian Exp $
+ @(#) $Id: xti_mosi.h,v 0.9.2.11 2009-03-02 05:15:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 13:37:48 $ by $Author: brian $
+ Last Modified $Date: 2009-03-02 05:15:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_mosi.h,v $
+ Revision 0.9.2.11  2009-03-02 05:15:02  brian
+ - updates
+
  Revision 0.9.2.10  2008-10-30 13:37:48  brian
  - updated headers for release
 
@@ -68,7 +71,7 @@
 #ifndef _SYS_XTI_MOSI_H
 #define _SYS_XTI_MOSI_H
 
-#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

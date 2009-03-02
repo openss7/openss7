@@ -64,7 +64,6 @@
  * for the ucd-snmp snmpd agent.
  */
 
-#define MASTER 1
 extern const char sa_program[];
 extern int sa_fclose;			/* default close files between requests */
 extern int sa_changed;			/* indication to reread MIB configuration */

@@ -25,8 +25,6 @@ config_require(util_funcs)
 	FindVarMethod var_m3uaAspAfTable;
 
 	WriteMethod write_m3uaAspName;
-	WriteMethod write_m3uaAspName;
-	WriteMethod write_m3uaAspAdministrativeState;
 	WriteMethod write_m3uaAspAdministrativeState;
 	WriteMethod write_m3uaAspCapabilities;
 	WriteMethod write_m3uaAspIdPolicy;
@@ -59,7 +57,7 @@ config_require(util_funcs)
 	WriteMethod write_m3uaAspSgTimerT3;
 	WriteMethod write_m3uaAspSgTimerT4;
 	WriteMethod write_m3uaAspSgTimerT5;
-	WriteMethod write_m3uaAspSgTimerT5;
+	WriteMethod write_m3uaAspSgTimerT17;
 	WriteMethod write_m3uaAspSgTimerT19A;
 	WriteMethod write_m3uaAspSgTimerT24;
 	WriteMethod write_m3uaAspSgTimerT31A;
@@ -94,12 +92,7 @@ config_require(util_funcs)
 	WriteMethod write_m3uaAspRsAdministrativeState;
 	WriteMethod write_m3uaAspRsAlarmStatus;
 	WriteMethod write_m3uaAspRlCost;
-	WriteMethod write_m3uaAspRlCost;
-	WriteMethod write_m3uaAspRlCost;
-	WriteMethod write_m3uaAspRlCost;
-	WriteMethod write_m3uaAspRlCost;
-	WriteMethod write_m3uaAspRlCost;
-	WriteMethod write_m3uaAspRlCost;
+	WriteMethod write_m3uaAspRlAdministrativeState;
 	WriteMethod write_m3uaAspRcValue;
 	WriteMethod write_m3uaAspRcRegstrationPolicy;
 	WriteMethod write_m3uaAspRcTrafficMode;

@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\- fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SL-MUX-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.11 $) $Date: 2009-01-10 17:09:26 $
+-- @(#) $RCSfile: OPENSS7-SL-MUX-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.13 $) $Date: 2009-01-21 07:41:43 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,17 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 17:09:26 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-21 07:41:43 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SL-MUX-MIB.mib,v $
+-- Revision 0.9.2.13  2009-01-21 07:41:43  brian
+-- - restructure
+--
+-- Revision 0.9.2.12  2009-01-21 07:02:39  brian
+-- - fill out mib
+--
 -- Revision 0.9.2.11  2009-01-10 17:09:26  brian
 -- - updated agents
 --
@@ -93,115 +99,365 @@ OPENSS7-SL-MUX-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE
-	FROM SNMPv2-SMI
+        FROM SNMPv2-SMI
     RowStatus
-	FROM SNMPv2-TC
+        FROM SNMPv2-TC
     openss7, openss7Modules
-	FROM OPENSS7-SMI;
+        FROM OPENSS7-SMI;
 
 slMuxMIB MODULE-IDENTITY
-    LAST-UPDATED "200812201153Z"
+    LAST-UPDATED "200901210702Z"
     ORGANIZATION "The OpenSS7 Project"
     CONTACT-INFO
-	"Brian Bidulock
-	 OpenSS7 Corporation
-	 1469 Jefferys Crescent
-	 Emonton, Alberta T6L 6T1
-	 CANADA
-	 Tel: +1 780 490 1141
-	 Fax: +1 780 490 1241
-	 Mob: +1 780 953 0557
-	 mailto:bidulock@openss7.org"
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Emonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
     DESCRIPTION
-	"MIB module for the Signalling Link Multiplexer.
+        "MIB module for the Signalling Link Multiplexer.
 
-	 The SL-MUX is a signalling link multiplexer implemented as a 
-	 STREAMS multiplexing driver that is used to organize and manage 
-	 signalling links on the OpenSS7 platform.  Streams are opened 
-	 on device drivers to obtain signalling link Streams which are 
-	 then linked under the multiplexing driver and assigned a global 
-	 PPA (Physical Point of Attachement) and a CLEI (Common Language 
-	 Equipment Identifier) or other administrative string.  
-	 Signalling links so established can be accessed by opening a 
-	 Stream on the SL multiplexer.  The multiplexer hides device 
-	 specifics from the user of the SL multiplexer.  This MIB 
-	 provides the ability to establish these Streams and reference 
-	 them from other MIBs."
-    REVISION "200812201153Z"
+         The SL-MUX is a signalling link multiplexer implemented 
+         as a STREAMS multiplexing driver that is used to 
+         organize and manage signalling links on the OpenSS7 
+         platform.  Streams are opened on device drivers to 
+         obtain signalling link Streams which are then linked 
+         under the multiplexing driver and assigned a global PPA 
+         (Physical Point of Attachement) and a CLEI (Common 
+         Language Equipment Identifier) or other administrative 
+         string.  Signalling links so established can be 
+         accessed by opening a Stream on the SL multiplexer.  
+         The multiplexer hides device specifics from the user of 
+         the SL multiplexer.  This MIB provides the ability to 
+         establish these Streams and reference them from other 
+         MIBs."
+    REVISION    "200901210702Z"
     DESCRIPTION
-	"Additional workup."
+        "Flattened mib."
+    REVISION    "200812201153Z"
+    DESCRIPTION
+        "Additional workup."
     ::= { openss7Modules 40 }
-
--- top level organization of the MIB
-
-slMuxNotifications	OBJECT IDENTIFIER ::= { slMuxMIB	 0 }
-slMuxObjects		OBJECT IDENTIFIER ::= { slMuxMIB	 1 }
-slMuxConformance	OBJECT IDENTIFIER ::= { slMuxMIB	 2 }
-
-slMuxTables		OBJECT IDENTIFIER ::= { slMuxObjects	 1 }
-slMuxScalars		OBJECT IDENTIFIER ::= { slMuxScalars	 2 }
-slMuxNotifs		OBJECT IDENTIFIER ::= { slMuxObjects	 3 }
-slMuxOids		OBJECT IDENTIFIER ::= { slMuxObjects	 4 }
-slMuxStats		OBJECT IDENTIFIER ::= { slMuxObjects	 5 }
-
-slMuxLinks		OBJECT IDENTIFIER ::= { slMuxTables	 1 }
-
-slMuxCompliances	OBJECT IDENTIFIER ::= { slMuxConformance 1 }
-slMuxObjects		OBJECT IDENTIFIER ::= { slMuxConformance 2 }
-
--- ====================================================================
 
 GlobalPPA ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1x:"
     STATUS current
     DESCRIPTION
-	"The GlobalPPA textual convention defines a Global PPA (Physical 
-	 Point of Attachement).  The syntax is a 4 octet string.  
-	 Embedded in the octet string is the encoding of a reference to 
-	 a specific TDM channel on the managed element."
+        "The GlobalPPA textual convention defines a Global PPA 
+         (Physical Point of Attachement).  The syntax is 
+         a 4 octet string.  Embedded in the octet string is the 
+         encoding of a reference to a specific TDM channel on 
+         the managed element."
     SYNTAX OCTET STRING (SIZE(4))
 
 LocalPPA ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1x:"
     STATUS current
     DESCRIPTION
-	"The LocalPPA textual convention defines a Local PPA (Physical 
-	 Point of Attachment).  The syntax is a 2 octet string.  The 
-	 interpretation of the bits within the octets is device 
-	 specific."
+        "The LocalPPA textual convention defines a Local PPA 
+         (Physical Point of Attachment).  The syntax is 
+         a 2 octet string.  The interpretation of the bits 
+         within the octets is device specific."
     SYNTAX OCTET STRING (SIZE(2))
 
 LinkDriver ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION
-	"The LinkDriver textual convention defines a STREAMS driver that 
-	 will be used to provide the signalling link."
+        "The LinkDriver textual convention defines a STREAMS 
+         driver that will be used to provide the signalling 
+         link."
     SYNTAX OCTET STRING
 
 
 -- ====================================================================
 
-SlMuxNameEntry ::= SEQUENCE {
-    slMuxNameName				SnmpAdminString,
-    slMuxNamePPA				GlobalPPA
-}
+slMuxNotifications OBJECT IDENTIFIER
+    ::= { slMuxMIB 0 }
 
-SlMuxLinkEntry ::= SEQUENCE {
-    slMuxLinkPPA				GlobalPPA,
-    slMuxLinkName				SnmpAdminString,
-    slMuxLinkOperationalState			OperationalState,
-    slMuxLinkUsageState				UsageState,
-    slMuxLinkAdministrativeState		AdministrativeState,
-    slMuxLinkAlarmStatus			AlarmStatus,
-    slMuxLinkProceduralStatus			ProceduralStatus,
-    slMuxLinkAvailabilityStatus			AvailabilityStatus,
-    slMuxLinkControlStatus			ControlStatus,
-    slMuxLinkUnknownStatus			UnknownStatus,
-    slMuxLinkDriver				OBJECT IDENTIFIER,
-    slMuxLinkLocalPPA				LocalPPA,
-    slMuxLinkStatus				RowStatus
-}
+slMuxObjects OBJECT IDENTIFIER
+    ::= { slMuxMIB 1 }
+
+slMuxScalars OBJECT IDENTIFIER
+    ::= { slMuxObjects 1 }
+
+slMuxTables OBJECT IDENTIFIER
+    ::= { slMuxObjects 2 }
+
+slMuxName OBJECT IDENTIFIER
+    ::= { slMuxTables 1 }
+
+slMuxNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SlMuxNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxName 1 }
+
+slMuxNameEntry OBJECT-TYPE
+    SYNTAX      SlMuxNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    INDEX {
+        slMuxNameName
+    }
+    ::= { slMuxNameTable 1 }
+
+SlMuxNameEntry ::=
+    SEQUENCE {
+        slMuxNameName
+            SnmpAdminString,
+        slMuxNamePPA
+            GlobalPPA,
+        slMuxNameRowStatus
+            RowStatus
+    }
+
+slMuxNameName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxNameEntry 1 }
+
+slMuxNamePPA OBJECT-TYPE
+    SYNTAX      GlobalPPA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxNameEntry 2 }
+
+slMuxNameRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxNameEntry 3 }
+
+
+slMuxLink OBJECT IDENTIFIER
+    ::= { slMuxTables 2 }
+
+slMuxLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SlMuxLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLink 1 }
+
+slMuxLinkEntry OBJECT-TYPE
+    SYNTAX      SlMuxLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    INDEX   {
+        slMuxLinkPPA
+    }
+    ::= { slMuxLinkTable 1 }
+
+SlMuxLinkEntry ::=
+    SEQUENCE {
+        slMuxLinkPPA
+            GlobalPPA,
+        slMuxLinkName
+            SnmpAdminString,
+        slMuxLinkOperationalState
+            OperationalState,
+        slMuxLinkUsageState
+            UsageState,
+        slMuxLinkAdministrativeState
+            AdministrativeState,
+        slMuxLinkAlarmStatus
+            AlarmStatus,
+        slMuxLinkProceduralStatus
+            ProceduralStatus,
+        slMuxLinkAvailabilityStatus
+            AvailabilityStatus,
+        slMuxLinkControlStatus
+            ControlStatus,
+        slMuxLinkUnknownStatus
+            UnknownStatus,
+        slMuxLinkDriver
+            RowPointer,
+        slMuxLinkLocalPPA
+            LocalPPA,
+        slMuxLinkStatus
+            RowStatus
+    }
+
+slMuxLinkPPA OBJECT-TYPE
+    SYNTAX      GlobalPPA
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 1 }
+
+slMuxLinkName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 2 }
+
+slMuxLinkOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 3 }
+
+slMuxLinkUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 4 }
+
+slMuxLinkAdministrativeState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 5 }
+
+slMuxLinkAlarmStatus OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 6 }
+
+slMuxLinkProceduralStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 7 }
+
+slMuxLinkAvailabilityStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 8 }
+
+slMuxLinkControlStatus OBJECT-TYPE
+    SYNTAX      ControlStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 9 }
+
+slMuxLinkUnknownStatus OBJECT-TYPE
+    SYNTAX      UnknownStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 10 }
+
+slMuxLinkDriver OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 11 }
+
+slMuxLinkLocalPPA OBJECT-TYPE
+    SYNTAX      LocalPPA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 12 }
+
+slMuxLinkStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        ""
+    ::= { slMuxLinkEntry 13 }
+
+slMuxStats OBJECT IDENTIFIER
+    ::= { slMuxObjects 3 }
+
+slMuxNotifs OBJECT IDENTIFIER
+    ::= { slMuxObjects 4 }
+
+slMuxOids OBJECT IDENTIFIER
+    ::= { slMuxObjects 5 }
+
+slMuxConformance OBJECT IDENTIFIER
+    ::= { slMuxMIB 2 }
+
+slMuxGroups OBJECT IDENTIFIER
+    ::= { slMuxConformance 1 }
+
+slMuxCompliances OBJECT IDENTIFIER
+    ::= { slMuxConformance 2 }
 
 END
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\- fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
