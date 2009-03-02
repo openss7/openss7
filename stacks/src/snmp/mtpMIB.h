@@ -131,7 +131,8 @@ struct mtpSapTable_data {
 	ulong mtpMsId;			/* NoAccess */
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpSapId;			/* NoAccess */
-	ulong mtpSap2Address;		/* ReadOnly */
+	uint8_t *mtpSap2Address;	/* ReadOnly */
+	size_t mtpSap2AddressLen;
 	long mtpSapUserPart;		/* Create */
 	long mtpSapUserPartStatus;	/* Create */
 	oid *mtpSapUserEntityNames;	/* ReadOnly */

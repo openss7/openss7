@@ -93,15 +93,15 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #cindlue <sys/tpi.h>
+.B #include <sys/tpi.h>
 .br
-.B #cindlue <sys/tpi_ss7.h>
+.B #include <sys/tpi_ss7.h>
 .br
-.B #cindlue <sys/tpi_mtp.h>
+.B #include <sys/tpi_mtp.h>
 .br
-.B #cindlue <sys/tpi_sccp.h>
+.B #include <sys/tpi_sccp.h>
 .br
-.B #cindlue <sys/tpi_tcap.h>
+.B #include <sys/tpi_tcap.h>
 .HP
 .BI "int " fd " = open(" device ", " flags );
 .\"

@@ -447,7 +447,7 @@ static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 struct variable7 mtpMIB_variables[] = {
 	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
 #define   MTPSAP2ADDRESS        1
-	{(u_char) MTPSAP2ADDRESS, ASN_UNSIGNED, RONLY, var_mtpSapTable, 6, {1, 1, 1, 1, 1, 2}},
+	{(u_char) MTPSAP2ADDRESS, ASN_OCTET_STR, RONLY, var_mtpSapTable, 6, {1, 1, 1, 1, 1, 2}},
 #define   MTPSAPUSERPART        2
 	{(u_char) MTPSAPUSERPART, ASN_INTEGER, RWRITE, var_mtpSapTable, 6, {1, 1, 1, 1, 1, 3}},
 #define   MTPSAPUSERPARTSTATUS  3
@@ -1912,7 +1912,8 @@ mtpSapTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mtpMsId = 0;
 		StorageNew->mtpSpId = 0;
-		StorageNew->mtpSap2Address = 0;
+		if ((StorageNew->mtpSap2Address = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpSap2AddressLen = strlen("");
 		StorageNew->mtpSapUserPart = 0;
 		StorageNew->mtpSapUserPartStatus = 0;
 		if ((StorageNew->mtpSapUserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
@@ -1974,6 +1975,8 @@ mtpSapTable_destroy(struct mtpSapTable_data **thedata)
 
 	DEBUGMSGTL(("mtpMIB", "mtpSapTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->mtpSap2Address);
+		StorageDel->mtpSap2AddressLen = 0;
 		SNMP_FREE(StorageDel->mtpSapUserEntityNames);
 		StorageDel->mtpSapUserEntityNamesLen = 0;
 		SNMP_FREE(StorageDel->mtpSapProviderEntityNames);
@@ -2073,7 +2076,12 @@ parse_mtpSapTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpMsId, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpSpId, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpSapId, &tmpsize);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpSap2Address, &tmpsize);
+	SNMP_FREE(StorageTmp->mtpSap2Address);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mtpSap2Address, &StorageTmp->mtpSap2AddressLen);
+	if (StorageTmp->mtpSap2Address == NULL) {
+		config_perror("invalid specification for mtpSap2Address");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mtpSapUserPart, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mtpSapUserPartStatus, &tmpsize);
 	SNMP_FREE(StorageTmp->mtpSapUserEntityNames);
@@ -2135,7 +2143,7 @@ store_mtpSapTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSapId, &tmpsize);
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSap2Address, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpSap2Address, &StorageTmp->mtpSap2AddressLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpSapUserPart, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpSapUserPartStatus, &tmpsize);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpSapUserEntityNames, &StorageTmp->mtpSapUserEntityNamesLen);
@@ -10748,8 +10756,8 @@ var_mtpSapTable(struct variable *vp, oid * name, size_t *length, int exact, size
 	case (u_char) MTPSAP2ADDRESS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->mtpSap2Address);
-		rval = (u_char *) &StorageTmp->mtpSap2Address;
+		*var_len = StorageTmp->mtpSap2AddressLen;
+		rval = (u_char *) StorageTmp->mtpSap2Address;
 		break;
 	case (u_char) MTPSAPUSERPART:	/* Create */
 		*write_method = write_mtpSapUserPart;
