@@ -115,6 +115,7 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "ds0Bundle.h"
+#undef MASTER
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #if defined MODULE
 #if defined MASTER
@@ -1096,9 +1097,7 @@ write_dsx0BondMode(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BondMode entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dsx0BondingTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(dsx0BondingTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1136,11 +1135,11 @@ write_dsx0BondMode(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx0BondMode for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->dsx0BondMode;
 		StorageTmp->dsx0BondMode = set_value;
 		break;
@@ -1176,9 +1175,7 @@ write_dsx0BundleCircuitIdentifier(int action, u_char *var_val, u_char var_val_ty
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BundleCircuitIdentifier entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dsx0BundleTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(dsx0BundleTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -1210,11 +1207,11 @@ write_dsx0BundleCircuitIdentifier(int action, u_char *var_val, u_char var_val_ty
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx0BundleCircuitIdentifier for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->dsx0BundleCircuitIdentifier;
 		old_length = StorageTmp->dsx0BundleCircuitIdentifierLen;
 		StorageTmp->dsx0BundleCircuitIdentifier = string;
@@ -1297,15 +1294,16 @@ write_dsx0BundleNextIndex(int action, u_char *var_val, u_char var_val_type, size
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the dsx0BondingTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 dsx0BondingTable_consistent(struct dsx0BondingTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -1314,15 +1312,16 @@ dsx0BondingTable_consistent(struct dsx0BondingTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the dsx0BundleTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 dsx0BundleTable_consistent(struct dsx0BundleTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -1343,7 +1342,7 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	static struct dsx0BondingTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 11;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BondRowStatus entering action=%d...  \n", action));
@@ -1452,14 +1451,22 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = dsx0BondingTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->dsx0BondRowStatus;
 			StorageTmp->dsx0BondRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!dsx0BondingTable_consistent(StorageTmp)) {
+				if ((ret = dsx0BondingTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->dsx0BondRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -1475,20 +1482,13 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (dsx0BondingTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device */
-				/* XXX: activate with underlying device */
-				StorageNew->dsx0BondRowStatus = RS_ACTIVE;
-			}
+			/* XXX: commit creation to underlying device */
+			/* XXX: activate with underlying device */
+			StorageNew->dsx0BondRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (dsx0BondingTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
-				StorageNew->dsx0BondRowStatus = RS_NOTINSERVICE;
-			}
+			StorageNew->dsx0BondRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -1561,7 +1561,7 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 	static struct dsx0BundleTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 11;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BundleRowStatus entering action=%d...  \n", action));
@@ -1670,14 +1670,22 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = dsx0BundleTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->dsx0BundleRowStatus;
 			StorageTmp->dsx0BundleRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!dsx0BundleTable_consistent(StorageTmp)) {
+				if ((ret = dsx0BundleTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->dsx0BundleRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -1693,20 +1701,13 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (dsx0BundleTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device */
-				/* XXX: activate with underlying device */
-				StorageNew->dsx0BundleRowStatus = RS_ACTIVE;
-			}
+			/* XXX: commit creation to underlying device */
+			/* XXX: activate with underlying device */
+			StorageNew->dsx0BundleRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (dsx0BundleTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
-				StorageNew->dsx0BundleRowStatus = RS_NOTINSERVICE;
-			}
+			StorageNew->dsx0BundleRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:

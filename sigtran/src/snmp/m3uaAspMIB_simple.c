@@ -42,261 +42,263 @@ struct variable7 m3uaAspMIB_simple_variables[] = {
 	{M3UAASPNEXTINDEX, ASN_UNSIGNED, RONLY, var_m3uaAspMIB, 4, {1, 2, 1, 1}},
 #define   M3UAASPNAME           2
 	{M3UAASPNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 2}},
-#define   M3UAASPNAME           3
-	{M3UAASPNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 2}},
-#define   M3UAASPADMINISTRATIVESTATE  4
+#define   M3UAASPADMINISTRATIVESTATE  3
 	{M3UAASPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 3}},
-#define   M3UAASPADMINISTRATIVESTATE  5
-	{M3UAASPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 3}},
-#define   M3UAASPCAPABILITIES   6
-	{M3UAASPCAPABILITIES, ASN_BIT_STR, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 4}},
-#define   M3UAASPIDPOLICY       7
-	{M3UAASPIDPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 5}},
-#define   M3UAASPREGISTRATIONPOLICY  8
-	{M3UAASPREGISTRATIONPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 6}},
-#define   M3UAASPASSOCIATIONPOLICY  9
-	{M3UAASPASSOCIATIONPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 7}},
-#define   M3UAASPSTATUS         10
-	{M3UAASPSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 8}},
-#define   M3UAASPAGNEXTINDEX    11
+#define   M3UAASPPROCEDURALSTATUS  4
+	{M3UAASPPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 4}},
+#define   M3UAASPUSAGESTATE     5
+	{M3UAASPUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 5}},
+#define   M3UAASPSTATE          6
+	{M3UAASPSTATE, ASN_INTEGER, RONLY, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 6}},
+#define   M3UAASPCAPABILITIES   7
+	{M3UAASPCAPABILITIES, ASN_BIT_STR, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 7}},
+#define   M3UAASPIDPOLICY       8
+	{M3UAASPIDPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 8}},
+#define   M3UAASPREGISTRATIONPOLICY  9
+	{M3UAASPREGISTRATIONPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 9}},
+#define   M3UAASPASSOCIATIONPOLICY  10
+	{M3UAASPASSOCIATIONPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 10}},
+#define   M3UAASPSTATUS         11
+	{M3UAASPSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspTable, 6, {1, 2, 1, 2, 1, 11}},
+#define   M3UAASPAGNEXTINDEX    12
 	{M3UAASPAGNEXTINDEX, ASN_UNSIGNED, RONLY, var_m3uaAspMIB, 4, {1, 2, 2, 1}},
-#define   M3UAASPAGPROTOCOLVERSION  12
+#define   M3UAASPAGPROTOCOLVERSION  13
 	{M3UAASPAGPROTOCOLVERSION, ASN_OBJECT_ID, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 2}},
-#define   M3UAASPAGOPTIONS      13
+#define   M3UAASPAGOPTIONS      14
 	{M3UAASPAGOPTIONS, ASN_BIT_STR, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 3}},
-#define   M3UAASPAGREGISTRATIONPOLICY  14
+#define   M3UAASPAGREGISTRATIONPOLICY  15
 	{M3UAASPAGREGISTRATIONPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 4}},
-#define   M3UAASPAGASPIDPOLICY  15
+#define   M3UAASPAGASPIDPOLICY  16
 	{M3UAASPAGASPIDPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 5}},
-#define   M3UAASPAGASPPROTOCOLPAYLOADID  16
+#define   M3UAASPAGASPPROTOCOLPAYLOADID  17
 	{M3UAASPAGASPPROTOCOLPAYLOADID, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 6}},
-#define   M3UAASPAGIPPORT       17
+#define   M3UAASPAGIPPORT       18
 	{M3UAASPAGIPPORT,, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 7}},
-#define   M3UAASPAGMINOSTREAMS  18
+#define   M3UAASPAGMINOSTREAMS  19
 	{M3UAASPAGMINOSTREAMS, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 8}},
-#define   M3UAASPAGMAXISTREAMS  19
+#define   M3UAASPAGMAXISTREAMS  20
 	{M3UAASPAGMAXISTREAMS, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 9}},
-#define   M3UAASPAGTIMERT7      20
+#define   M3UAASPAGTIMERT7      21
 	{M3UAASPAGTIMERT7, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 10}},
-#define   M3UAASPAGTIMERT19     21
+#define   M3UAASPAGTIMERT19     22
 	{M3UAASPAGTIMERT19, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 11}},
-#define   M3UAASPAGTIMERT21     22
+#define   M3UAASPAGTIMERT21     23
 	{M3UAASPAGTIMERT21, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 12}},
-#define   M3UAASPAGTIMERT25A    23
+#define   M3UAASPAGTIMERT25A    24
 	{M3UAASPAGTIMERT25A, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 13}},
-#define   M3UAASPAGTIMERT28A    24
+#define   M3UAASPAGTIMERT28A    25
 	{M3UAASPAGTIMERT28A, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 14}},
-#define   M3UAASPAGTIMERT29A    25
+#define   M3UAASPAGTIMERT29A    26
 	{M3UAASPAGTIMERT29A, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 15}},
-#define   M3UAASPAGTIMERT30A    26
+#define   M3UAASPAGTIMERT30A    27
 	{M3UAASPAGTIMERT30A, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 16}},
-#define   M3UAASPAGSTATUS       27
+#define   M3UAASPAGSTATUS       28
 	{M3UAASPAGSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 17}},
-#define   M3UAASPSGNAME         28
+#define   M3UAASPSGNAME         29
 	{M3UAASPSGNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 2}},
-#define   M3UAASPSGADMINISTRATIVESTATE  29
+#define   M3UAASPSGADMINISTRATIVESTATE  30
 	{M3UAASPSGADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 3}},
-#define   M3UAASPSGOPERATIONALSTATE  30
+#define   M3UAASPSGOPERATIONALSTATE  31
 	{M3UAASPSGOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 4}},
-#define   M3UAASPSGPROCEDUREALSTATUS  31
+#define   M3UAASPSGPROCEDUREALSTATUS  32
 	{M3UAASPSGPROCEDUREALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 5}},
-#define   M3UAASPSGUSGAGESTATE  32
+#define   M3UAASPSGUSGAGESTATE  33
 	{M3UAASPSGUSGAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 6}},
-#define   M3UAASPSGASPSTATE     33
+#define   M3UAASPSGASPSTATE     34
 	{M3UAASPSGASPSTATE, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 7}},
-#define   M3UAASPSGMAXINITRETRANS  34
+#define   M3UAASPSGMAXINITRETRANS  35
 	{M3UAASPSGMAXINITRETRANS, ASN_UNSIGNED, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 8}},
-#define   M3UAASPSGMAXPATHRETRANS  35
+#define   M3UAASPSGMAXPATHRETRANS  36
 	{M3UAASPSGMAXPATHRETRANS, ASN_UNSIGNED, RONLY, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 9}},
-#define   M3UAASPSGMAXLIFETIME  36
+#define   M3UAASPSGMAXLIFETIME  37
 	{M3UAASPSGMAXLIFETIME, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 10}},
-#define   M3UAASPSGTIMERT1      37
+#define   M3UAASPSGTIMERT1      38
 	{M3UAASPSGTIMERT1, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 11}},
-#define   M3UAASPSGTIMERT2      38
+#define   M3UAASPSGTIMERT2      39
 	{M3UAASPSGTIMERT2, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 12}},
-#define   M3UAASPSGTIMERT3      39
+#define   M3UAASPSGTIMERT3      40
 	{M3UAASPSGTIMERT3, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 13}},
-#define   M3UAASPSGTIMERT4      40
+#define   M3UAASPSGTIMERT4      41
 	{M3UAASPSGTIMERT4, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 14}},
-#define   M3UAASPSGTIMERT5      41
-	{M3UAASPSGTIMERT5, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 15}},
 #define   M3UAASPSGTIMERT5      42
 	{M3UAASPSGTIMERT5, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 15}},
-#define   M3UAASPSGTIMERT19A    43
-	{M3UAASPSGTIMERT19A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 16}},
-#define   M3UAASPSGTIMERT24     44
-	{M3UAASPSGTIMERT24, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 17}},
-#define   M3UAASPSGTIMERT31A    45
-	{M3UAASPSGTIMERT31A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 18}},
-#define   M3UAASPSGTIMERT32A    46
-	{M3UAASPSGTIMERT32A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 19}},
-#define   M3UAASPSGTIMERT33A    47
-	{M3UAASPSGTIMERT33A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 20}},
-#define   M3UAASPSGTIMERT34A    48
-	{M3UAASPSGTIMERT34A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 21}},
-#define   M3UAASPSGTIMERT1T     49
-	{M3UAASPSGTIMERT1T, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 22}},
-#define   M3UAASPSGTIMERT2T     50
-	{M3UAASPSGTIMERT2T, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 23}},
-#define   M3UAASPSGSTATUS       51
-	{M3UAASPSGSTATUS, ASN_INTEGER, RONLY, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 24}},
-#define   M3UAASPSGPNAME        52
+#define   M3UAASPSGTIMERT17     43
+	{M3UAASPSGTIMERT17, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 16}},
+#define   M3UAASPSGTIMERT19A    44
+	{M3UAASPSGTIMERT19A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 17}},
+#define   M3UAASPSGTIMERT24     45
+	{M3UAASPSGTIMERT24, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 18}},
+#define   M3UAASPSGTIMERT31A    46
+	{M3UAASPSGTIMERT31A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 19}},
+#define   M3UAASPSGTIMERT32A    47
+	{M3UAASPSGTIMERT32A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 20}},
+#define   M3UAASPSGTIMERT33A    48
+	{M3UAASPSGTIMERT33A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 21}},
+#define   M3UAASPSGTIMERT34A    49
+	{M3UAASPSGTIMERT34A, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 22}},
+#define   M3UAASPSGTIMERT1T     50
+	{M3UAASPSGTIMERT1T, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 23}},
+#define   M3UAASPSGTIMERT2T     51
+	{M3UAASPSGTIMERT2T, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 24}},
+#define   M3UAASPSGSTATUS       52
+	{M3UAASPSGSTATUS, ASN_INTEGER, RONLY, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 25}},
+#define   M3UAASPSGPNAME        53
 	{M3UAASPSGPNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 2}},
-#define   M3UAASPSGPADMINISTRATIVESTATE  53
+#define   M3UAASPSGPADMINISTRATIVESTATE  54
 	{M3UAASPSGPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 3}},
-#define   M3UAASPSGPPROCEDURALSTATUS  54
+#define   M3UAASPSGPPROCEDURALSTATUS  55
 	{M3UAASPSGPPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 4}},
-#define   M3UAASPSGPOPERATIONALSTATE  55
+#define   M3UAASPSGPOPERATIONALSTATE  56
 	{M3UAASPSGPOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 5}},
-#define   M3UAASPSGPUSAGESTATE  56
+#define   M3UAASPSGPUSAGESTATE  57
 	{M3UAASPSGPUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 6}},
-#define   M3UAASPSGPASPSTATE    57
+#define   M3UAASPSGPASPSTATE    58
 	{M3UAASPSGPASPSTATE, ASN_INTEGER, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 7}},
-#define   M3UAASPSGPPRIMARYADDRESS  58
+#define   M3UAASPSGPPRIMARYADDRESS  59
 	{M3UAASPSGPPRIMARYADDRESS, ASN_OCTET_STR, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 8}},
-#define   M3UAASPSGPHOSTNAME    59
+#define   M3UAASPSGPHOSTNAME    60
 	{M3UAASPSGPHOSTNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 9}},
-#define   M3UAASPSGPSTATUS      60
+#define   M3UAASPSGPSTATUS      61
 	{M3UAASPSGPSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 10}},
-#define   M3UAASPSPNEXTINDEX    61
+#define   M3UAASPSPNEXTINDEX    62
 	{M3UAASPSPNEXTINDEX, ASN_UNSIGNED, RONLY, var_m3uaAspMIB, 4, {1, 2, 5, 1}},
-#define   M3UAASPSPNAME         62
+#define   M3UAASPSPNAME         63
 	{M3UAASPSPNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 2}},
-#define   M3UAASPSPOPERATIONALSTATE  63
+#define   M3UAASPSPOPERATIONALSTATE  64
 	{M3UAASPSPOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 3}},
-#define   M3UAASPSPUSAGESTATE   64
+#define   M3UAASPSPUSAGESTATE   65
 	{M3UAASPSPUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 4}},
-#define   M3UAASPSPADMINISTRATIVESTATE  65
+#define   M3UAASPSPADMINISTRATIVESTATE  66
 	{M3UAASPSPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 5}},
-#define   M3UAASPSPALARMSTATUS  66
+#define   M3UAASPSPALARMSTATUS  67
 	{M3UAASPSPALARMSTATUS, ASN_BIT_STR, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 6}},
-#define   M3UAASPSPPROCEDURALSTATUS  67
+#define   M3UAASPSPPROCEDURALSTATUS  68
 	{M3UAASPSPPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 7}},
-#define   M3UAASPSPAVAILABILTYSTATUS  68
+#define   M3UAASPSPAVAILABILTYSTATUS  69
 	{M3UAASPSPAVAILABILTYSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 8}},
-#define   M3UAASPSPPOINTCODE    69
+#define   M3UAASPSPPOINTCODE    70
 	{M3UAASPSPPOINTCODE, ASN_OCTET_STR, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 9}},
-#define   M3UAASPSPTIMERT1R     70
+#define   M3UAASPSPTIMERT1R     71
 	{M3UAASPSPTIMERT1R, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 10}},
-#define   M3UAASPSPTIMERT18     71
+#define   M3UAASPSPTIMERT18     72
 	{M3UAASPSPTIMERT18, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 11}},
-#define   M3UAASPSPTIMERT20     72
+#define   M3UAASPSPTIMERT20     73
 	{M3UAASPSPTIMERT20, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 12}},
-#define   M3UAASPSPTIMERT22A    73
+#define   M3UAASPSPTIMERT22A    74
 	{M3UAASPSPTIMERT22A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 13}},
-#define   M3UAASPSPTIMERT23A    74
+#define   M3UAASPSPTIMERT23A    75
 	{M3UAASPSPTIMERT23A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 14}},
-#define   M3UAASPSPTIMERT24A    75
+#define   M3UAASPSPTIMERT24A    76
 	{M3UAASPSPTIMERT24A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 15}},
-#define   M3UAASPSPTIMERT26A    76
+#define   M3UAASPSPTIMERT26A    77
 	{M3UAASPSPTIMERT26A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 16}},
-#define   M3UAASPSPTIMERT27A    77
+#define   M3UAASPSPTIMERT27A    78
 	{M3UAASPSPTIMERT27A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 17}},
-#define   M3UAASPSPSTATUS       78
+#define   M3UAASPSPSTATUS       79
 	{M3UAASPSPSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 18}},
-#define   M3UAASPMTNAME         79
+#define   M3UAASPMTNAME         80
 	{M3UAASPMTNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 2}},
-#define   M3UAASPMTADMINISTRATIVESTATE  80
+#define   M3UAASPMTADMINISTRATIVESTATE  81
 	{M3UAASPMTADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 3}},
-#define   M3UAASPMTOPERATIONALSTATE  81
+#define   M3UAASPMTOPERATIONALSTATE  82
 	{M3UAASPMTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 4}},
-#define   M3UAASPMTPROCEDURALSTATUS  82
+#define   M3UAASPMTPROCEDURALSTATUS  83
 	{M3UAASPMTPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 5}},
-#define   M3UAASPMTUSAGESTATE   83
+#define   M3UAASPMTUSAGESTATE   84
 	{M3UAASPMTUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 6}},
-#define   M3UAASPMTASSTATE      84
+#define   M3UAASPMTASSTATE      85
 	{M3UAASPMTASSTATE, ASN_INTEGER, RWRITE, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 7}},
-#define   M3UAASPMTSTATUS       85
+#define   M3UAASPMTSTATUS       86
 	{M3UAASPMTSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 8}},
-#define   M3UAASPRSNAME         86
+#define   M3UAASPRSNAME         87
 	{M3UAASPRSNAME, ASN_OCTET_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 2}},
-#define   M3UAASPRSREMOTEPOINTCODE  87
+#define   M3UAASPRSREMOTEPOINTCODE  88
 	{M3UAASPRSREMOTEPOINTCODE, ASN_OCTET_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 3}},
-#define   M3UAASPRSOPERATIONALSTATE  88
+#define   M3UAASPRSOPERATIONALSTATE  89
 	{M3UAASPRSOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 4}},
-#define   M3UAASPRSADMINISTRATIVESTATE  89
+#define   M3UAASPRSADMINISTRATIVESTATE  90
 	{M3UAASPRSADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 5}},
-#define   M3UAASPRSUSAGESTATE   90
+#define   M3UAASPRSUSAGESTATE   91
 	{M3UAASPRSUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 6}},
-#define   M3UAASPRSALARMSTATUS  91
+#define   M3UAASPRSALARMSTATUS  92
 	{M3UAASPRSALARMSTATUS, ASN_BIT_STR, RWRITE, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 7}},
-#define   M3UAASPRSPROCEDURALSTATUS  92
+#define   M3UAASPRSPROCEDURALSTATUS  93
 	{M3UAASPRSPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 8}},
-#define   M3UAASPRSTIMERT8      93
+#define   M3UAASPRSTIMERT8      94
 	{M3UAASPRSTIMERT8, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 9}},
-#define   M3UAASPRSTIMERT11     94
+#define   M3UAASPRSTIMERT11     95
 	{M3UAASPRSTIMERT11, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 10}},
-#define   M3UAASPRSTIMERT15     95
+#define   M3UAASPRSTIMERT15     96
 	{M3UAASPRSTIMERT15, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 11}},
-#define   M3UAASPRSTIMERT16     96
+#define   M3UAASPRSTIMERT16     97
 	{M3UAASPRSTIMERT16, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 12}},
-#define   M3UAASPRSTIMERT18A    97
+#define   M3UAASPRSTIMERT18A    98
 	{M3UAASPRSTIMERT18A, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 13}},
-#define   M3UAASPRSOPTIONS      98
+#define   M3UAASPRSOPTIONS      99
 	{M3UAASPRSOPTIONS, ASN_BIT_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 14}},
-#define   M3UAASPRSAVAILABILITYSTATUS  99
+#define   M3UAASPRSAVAILABILITYSTATUS  100
 	{M3UAASPRSAVAILABILITYSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 15}},
-#define   M3UAASPRSCONGESTIONLEVEL  100
+#define   M3UAASPRSCONGESTIONLEVEL  101
 	{M3UAASPRSCONGESTIONLEVEL, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 16}},
-#define   M3UAASPRSSTATUS       101
+#define   M3UAASPRSSTATUS       102
 	{M3UAASPRSSTATUS, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 17}},
-#define   M3UAASPRLCOST         102
-	{M3UAASPRLCOST, ASN_UNSIGNED, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 1}},
 #define   M3UAASPRLCOST         103
 	{M3UAASPRLCOST, ASN_UNSIGNED, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 1}},
-#define   M3UAASPRLCOST         104
-	{M3UAASPRLCOST, ASN_UNSIGNED, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 1}},
-#define   M3UAASPRLCOST         105
-	{M3UAASPRLCOST, ASN_UNSIGNED, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 1}},
-#define   M3UAASPRLCOST         106
-	{M3UAASPRLCOST, ASN_UNSIGNED, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 1}},
-#define   M3UAASPRLCOST         107
-	{M3UAASPRLCOST, ASN_UNSIGNED, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 1}},
-#define   M3UAASPRLCOST         108
-	{M3UAASPRLCOST, ASN_UNSIGNED, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 1}},
-#define   M3UAASPRTCOST         109
+#define   M3UAASPRLADMINISTRATIVESTATE  104
+	{M3UAASPRLADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 2}},
+#define   M3UAASPRLOPERATIONALSTATE  105
+	{M3UAASPRLOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 3}},
+#define   M3UAASPRLPROCEDURALSTATUS  106
+	{M3UAASPRLPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 4}},
+#define   M3UAASPRLUSAGESTATE   107
+	{M3UAASPRLUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 5}},
+#define   M3UAASPRLAVAILABILITYSTATUS  108
+	{M3UAASPRLAVAILABILITYSTATUS,, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 6}},
+#define   M3UAASPRLSTATUS       109
+	{M3UAASPRLSTATUS, ASN_INTEGER, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 7}},
+#define   M3UAASPRTCOST         110
 	{M3UAASPRTCOST, ASN_UNSIGNED, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 1}},
-#define   M3UAASPRTTIMERT6      110
+#define   M3UAASPRTTIMERT6      111
 	{M3UAASPRTTIMERT6, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 2}},
-#define   M3UAASPRTTIMERT10     111
+#define   M3UAASPRTTIMERT10     112
 	{M3UAASPRTTIMERT10, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 3}},
-#define   M3UAASPRTAVAILABILITYSTATUS  112
+#define   M3UAASPRTAVAILABILITYSTATUS  113
 	{M3UAASPRTAVAILABILITYSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 4}},
-#define   M3UAASPRTADMINSTRATIVESTATE  113
+#define   M3UAASPRTADMINSTRATIVESTATE  114
 	{M3UAASPRTADMINSTRATIVESTATE, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 5}},
-#define   M3UAASPRTOPERATIONALSTATE  114
+#define   M3UAASPRTOPERATIONALSTATE  115
 	{M3UAASPRTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 6}},
-#define   M3UAASPRTPROCEDURALSTATUS  115
+#define   M3UAASPRTPROCEDURALSTATUS  116
 	{M3UAASPRTPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 7}},
-#define   M3UAASPRTUSAGESTATE   116
+#define   M3UAASPRTUSAGESTATE   117
 	{M3UAASPRTUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 8}},
-#define   M3UAASPRTSTATUS       117
+#define   M3UAASPRTSTATUS       118
 	{M3UAASPRTSTATUS, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 9}},
-#define   M3UAASPRCVALUE        118
+#define   M3UAASPRCVALUE        119
 	{M3UAASPRCVALUE, ASN_UNSIGNED, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 1}},
-#define   M3UAASPRCREGSTRATIONPOLICY  119
+#define   M3UAASPRCREGSTRATIONPOLICY  120
 	{M3UAASPRCREGSTRATIONPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 3}},
-#define   M3UAASPRCTRAFFICMODE  120
+#define   M3UAASPRCTRAFFICMODE  121
 	{M3UAASPRCTRAFFICMODE, ASN_OBJECT_ID, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 4}},
-#define   M3UAASPRCSTATUS       121
+#define   M3UAASPRCSTATUS       122
 	{M3UAASPRCSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 5}},
-#define   M3UAASPASASSTATE      122
+#define   M3UAASPASASSTATE      123
 	{M3UAASPASASSTATE, ASN_INTEGER, RONLY, var_m3uaAspAsTable, 6, {1, 2, 11, 1, 1, 1}},
-#define   M3UAASPASOPERATIONALSTATE  123
+#define   M3UAASPASOPERATIONALSTATE  124
 	{M3UAASPASOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspAsTable, 6, {1, 2, 11, 1, 1, 2}},
-#define   M3UAASPASPROCEDURALSTATUS  124
+#define   M3UAASPASPROCEDURALSTATUS  125
 	{M3UAASPASPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspAsTable, 6, {1, 2, 11, 1, 1, 3}},
-#define   M3UAASPASUSAGESTATE   125
+#define   M3UAASPASUSAGESTATE   126
 	{M3UAASPASUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspAsTable, 6, {1, 2, 11, 1, 1, 4}},
-#define   M3UAASPAFASSTATE      126
+#define   M3UAASPAFASSTATE      127
 	{M3UAASPAFASSTATE, ASN_INTEGER, RWRITE, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 1}},
-#define   M3UAASPAFADMINISTRATIVESTATE  127
+#define   M3UAASPAFADMINISTRATIVESTATE  128
 	{M3UAASPAFADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 2}},
-#define   M3UAASPAFOPERATIONALSTATE  128
+#define   M3UAASPAFOPERATIONALSTATE  129
 	{M3UAASPAFOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 3}},
-#define   M3UAASPAFPROCEDURALSTATUS  129
+#define   M3UAASPAFPROCEDURALSTATUS  130
 	{M3UAASPAFPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 4}},
-#define   M3UAASPAFUSAGESTATE   130
+#define   M3UAASPAFUSAGESTATE   131
 	{M3UAASPAFUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 5}},
 };
 
@@ -395,17 +397,21 @@ var_m3uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 		*string = 0;
 		*var_len = strlen(string);
 		return (u_char *) string;
-	case M3UAASPNAME:
-		*write_method = write_m3uaAspName;
-		*string = 0;
-		*var_len = strlen(string);
-		return (u_char *) string;
 	case M3UAASPADMINISTRATIVESTATE:
 		*write_method = write_m3uaAspAdministrativeState;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-	case M3UAASPADMINISTRATIVESTATE:
-		*write_method = write_m3uaAspAdministrativeState;
+	case M3UAASPPROCEDURALSTATUS:
+
+		*string = 0;
+		*var_len = strlen(string);
+		return (u_char *) string;
+	case M3UAASPUSAGESTATE:
+
+		long_ret = 0;
+		return (u_char *) &long_ret;
+	case M3UAASPSTATE:
+
 		long_ret = 0;
 		return (u_char *) &long_ret;
 	case M3UAASPCAPABILITIES:
@@ -637,8 +643,8 @@ var_m3uaAspSgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_m3uaAspSgTimerT5;
 		long_ret = 0;
 		return (u_char *) &long_ret;
-	case M3UAASPSGTIMERT5:
-		*write_method = write_m3uaAspSgTimerT5;
+	case M3UAASPSGTIMERT17:
+		*write_method = write_m3uaAspSgTimerT17;
 		long_ret = 0;
 		return (u_char *) &long_ret;
 	case M3UAASPSGTIMERT19A:
@@ -1104,30 +1110,29 @@ var_m3uaAspRlTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_m3uaAspRlCost;
 		ulong_ret = 0;
 		return (u_char *) &ulong_ret;
-	case M3UAASPRLCOST:
-		*write_method = write_m3uaAspRlCost;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case M3UAASPRLCOST:
-		*write_method = write_m3uaAspRlCost;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case M3UAASPRLCOST:
-		*write_method = write_m3uaAspRlCost;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case M3UAASPRLCOST:
-		*write_method = write_m3uaAspRlCost;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case M3UAASPRLCOST:
-		*write_method = write_m3uaAspRlCost;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
-	case M3UAASPRLCOST:
-		*write_method = write_m3uaAspRlCost;
-		ulong_ret = 0;
-		return (u_char *) &ulong_ret;
+	case M3UAASPRLADMINISTRATIVESTATE:
+		*write_method = write_m3uaAspRlAdministrativeState;
+		long_ret = 0;
+		return (u_char *) &long_ret;
+	case M3UAASPRLOPERATIONALSTATE:
+
+		long_ret = 0;
+		return (u_char *) &long_ret;
+	case M3UAASPRLPROCEDURALSTATUS:
+
+		*string = 0;
+		*var_len = strlen(string);
+		return (u_char *) string;
+	case M3UAASPRLUSAGESTATE:
+
+		long_ret = 0;
+		return (u_char *) &long_ret;
+	case M3UAASPRLAVAILABILITYSTATUS:
+
+	case M3UAASPRLSTATUS:
+
+		long_ret = 0;
+		return (u_char *) &long_ret;
 
 	default:
 		ERROR_MSG("");
@@ -1427,92 +1432,6 @@ write_m3uaAspName(int action, unsigned char *var_val, unsigned char var_val_type
 
 	case ACTION:
 		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_m3uaAspName(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
-{
-	static uint8_t string[SPRINT_MAX_LEN];
-	int size;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_OCTET_STR) {
-			fprintf(stderr, "write to m3uaAspName not ASN_OCTET_STR\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(string)) {
-			fprintf(stderr, "write to m3uaAspName: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		size = var_val_len;
-		string = (uint8_t *) var_val;
-
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_m3uaAspAdministrativeState(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
-{
-	static long *long_ret;
-	int size;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr, "write to m3uaAspAdministrativeState not ASN_INTEGER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(long_ret)) {
-			fprintf(stderr, "write to m3uaAspAdministrativeState: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		size = var_val_len;
-		long_ret = (long *) var_val;
-
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:
@@ -2903,7 +2822,7 @@ write_m3uaAspSgTimerT5(int action, unsigned char *var_val, unsigned char var_val
 }
 
 int
-write_m3uaAspSgTimerT5(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_m3uaAspSgTimerT17(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
 	static long *long_ret;
 	int size;
@@ -2911,11 +2830,11 @@ write_m3uaAspSgTimerT5(int action, unsigned char *var_val, unsigned char var_val
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
-			fprintf(stderr, "write to m3uaAspSgTimerT5 not ASN_INTEGER\n");
+			fprintf(stderr, "write to m3uaAspSgTimerT17 not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(long_ret)) {
-			fprintf(stderr, "write to m3uaAspSgTimerT5: bad length\n");
+			fprintf(stderr, "write to m3uaAspSgTimerT17: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
@@ -4408,26 +4327,26 @@ write_m3uaAspRlCost(int action, unsigned char *var_val, unsigned char var_val_ty
 }
 
 int
-write_m3uaAspRlCost(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
+write_m3uaAspRlAdministrativeState(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
 {
-	static unsigned long *ulong_ret;
+	static long *long_ret;
 	int size;
 
 	switch (action) {
 	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			fprintf(stderr, "write to m3uaAspRlCost not ASN_UNSIGNED\n");
+		if (var_val_type != ASN_INTEGER) {
+			fprintf(stderr, "write to m3uaAspRlAdministrativeState not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > sizeof(ulong_ret)) {
-			fprintf(stderr, "write to m3uaAspRlCost: bad length\n");
+		if (var_val_len > sizeof(long_ret)) {
+			fprintf(stderr, "write to m3uaAspRlAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 
 	case RESERVE2:
 		size = var_val_len;
-		ulong_ret = (unsigned long *) var_val;
+		long_ret = (long *) var_val;
 
 		break;
 
@@ -4436,222 +4355,7 @@ write_m3uaAspRlCost(int action, unsigned char *var_val, unsigned char var_val_ty
 		break;
 
 	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_m3uaAspRlCost(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
-{
-	static unsigned long *ulong_ret;
-	int size;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			fprintf(stderr, "write to m3uaAspRlCost not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(ulong_ret)) {
-			fprintf(stderr, "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		size = var_val_len;
-		ulong_ret = (unsigned long *) var_val;
-
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_m3uaAspRlCost(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
-{
-	static unsigned long *ulong_ret;
-	int size;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			fprintf(stderr, "write to m3uaAspRlCost not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(ulong_ret)) {
-			fprintf(stderr, "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		size = var_val_len;
-		ulong_ret = (unsigned long *) var_val;
-
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_m3uaAspRlCost(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
-{
-	static unsigned long *ulong_ret;
-	int size;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			fprintf(stderr, "write to m3uaAspRlCost not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(ulong_ret)) {
-			fprintf(stderr, "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		size = var_val_len;
-		ulong_ret = (unsigned long *) var_val;
-
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_m3uaAspRlCost(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
-{
-	static unsigned long *ulong_ret;
-	int size;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			fprintf(stderr, "write to m3uaAspRlCost not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(ulong_ret)) {
-			fprintf(stderr, "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		size = var_val_len;
-		ulong_ret = (unsigned long *) var_val;
-
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_m3uaAspRlCost(int action, unsigned char *var_val, unsigned char var_val_type, size_t var_val_len, unsigned char *statP, oid * name, size_t name_len)
-{
-	static unsigned long *ulong_ret;
-	int size;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			fprintf(stderr, "write to m3uaAspRlCost not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(ulong_ret)) {
-			fprintf(stderr, "write to m3uaAspRlCost: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		size = var_val_len;
-		ulong_ret = (unsigned long *) var_val;
-
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+		/* The variable has been stored in long_ret for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		break;
 
 	case UNDO:

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mapmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:02 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-03-02 05:15:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: mapmod.c,v $
+ Revision 0.9.2.1  2009-03-02 05:15:02  brian
+ - updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mapmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:02 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: mapmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:02 $";
 
 /*
  * This is MAPMOD, a GSM Mobile Application Part module implementing the MAPI
@@ -90,7 +93,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define MAPMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MAPMOD_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MAPMOD_COPYRIGHT	"Copyright (c) 2008-2009 Monavacon Limited.  All Rights Reserved."
-#define MAPMOD_REVISION		"Monavacon $RCSfile$ $Name$($Revision$) $Date$"
+#define MAPMOD_REVISION		"Monavacon $RCSfile: mapmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:02 $"
 #define MAPMOD_DEVICE		"GSM 29.002 MAP module for ITU-T Q.771 TC"
 #define MAPMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MAPMOD_LICENSE		"GPL"

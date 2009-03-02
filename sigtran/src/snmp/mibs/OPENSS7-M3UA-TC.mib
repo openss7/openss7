@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M3UA-TC.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-01-10 17:22:26 $
+-- @(#) $RCSfile: OPENSS7-M3UA-TC.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2009-01-21 07:17:42 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 17:22:26 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-21 07:17:42 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M3UA-TC.mib,v $
+-- Revision 0.9.2.5  2009-01-21 07:17:42  brian
+-- - corrections
+--
 -- Revision 0.9.2.4  2009-01-10 17:22:26  brian
 -- - updated mibs
 --
@@ -120,8 +123,8 @@ m3uaVersionInteroperable OBJECT-IDENTITY
 m3uaVersionRFC3332 OBJECT-IDENTITY
 	STATUS		current
 	DESCRIPTION
-
-
+		""
+	::= { m3uaObjectIds 2 }
 
 END
 

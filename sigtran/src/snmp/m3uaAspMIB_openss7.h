@@ -64,7 +64,6 @@
  * for the ucd-snmp snmpd agent.
  */
 
-#define MASTER 1
 extern const char sa_program[];
 extern int sa_fclose;			/* default close files between requests */
 extern int sa_changed;			/* indication to reread MIB configuration */
@@ -82,13 +81,13 @@ struct m3uaAspTable_data {
 	uint m3uaAspTable_request;
 	uint m3uaAspTable_refs;
 	ulong m3uaAspIndex;		/* NoAccess */
-	ulong m3uaAspIndex;		/* NoAccess */
-	uint8_t *m3uaAspName;		/* Create */
-	size_t m3uaAspNameLen;
 	uint8_t *m3uaAspName;		/* Create */
 	size_t m3uaAspNameLen;
 	long m3uaAspAdministrativeState;	/* Create */
-	long m3uaAspAdministrativeState;	/* Create */
+	uint8_t *m3uaAspProceduralStatus;	/* ReadOnly */
+	size_t m3uaAspProceduralStatusLen;
+	long m3uaAspUsageState;		/* ReadOnly */
+	long m3uaAspState;		/* ReadOnly */
 	uint8_t *m3uaAspCapabilities;	/* Create */
 	size_t m3uaAspCapabilitiesLen;
 	long m3uaAspIdPolicy;		/* Create */
@@ -139,7 +138,7 @@ struct m3uaAspSgTable_data {
 	long m3uaAspSgTimerT3;		/* Create */
 	long m3uaAspSgTimerT4;		/* Create */
 	long m3uaAspSgTimerT5;		/* Create */
-	long m3uaAspSgTimerT5;		/* Create */
+	long m3uaAspSgTimerT17;		/* Create */
 	long m3uaAspSgTimerT19A;	/* Create */
 	long m3uaAspSgTimerT24;		/* Create */
 	long m3uaAspSgTimerT31A;	/* Create */
@@ -246,12 +245,12 @@ struct m3uaAspRlTable_data {
 	ulong m3uaAspRsIndex;		/* NoAccess */
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	ulong m3uaAspRlCost;		/* Create */
-	ulong m3uaAspRlCost;		/* Create */
-	ulong m3uaAspRlCost;		/* Create */
-	ulong m3uaAspRlCost;		/* Create */
-	ulong m3uaAspRlCost;		/* Create */
-	ulong m3uaAspRlCost;		/* Create */
-	ulong m3uaAspRlCost;		/* Create */
+	long m3uaAspRlAdministrativeState;	/* Create */
+	long m3uaAspRlOperationalState;	/* ReadOnly */
+	uint8_t *m3uaAspRlProceduralStatus;	/* ReadOnly */
+	size_t m3uaAspRlProceduralStatusLen;
+	long m3uaAspRlUsageState;	/* ReadOnly */
+	long m3uaAspRlStatus;		/* ReadOnly */
 };
 struct m3uaAspRtTable_data {
 	uint m3uaAspRtTable_request;
@@ -334,9 +333,20 @@ extern struct header_complex_index *m3uaAspAfTableStorage;
 #define M3UAASPADMINISTRATIVESTATE_UNLOCKED      1
 #define M3UAASPADMINISTRATIVESTATE_SHUTTINGDOWN  2
 
-#define M3UAASPADMINISTRATIVESTATE_LOCKED        0
-#define M3UAASPADMINISTRATIVESTATE_UNLOCKED      1
-#define M3UAASPADMINISTRATIVESTATE_SHUTTINGDOWN  2
+#define M3UAASPPROCEDURALSTATUS_INITIALIZATIONREQUIRED 0
+#define M3UAASPPROCEDURALSTATUS_NOTINITIALIZED   1
+#define M3UAASPPROCEDURALSTATUS_INITIALIZING     2
+#define M3UAASPPROCEDURALSTATUS_REPORTING        3
+#define M3UAASPPROCEDURALSTATUS_TERMINATING      4
+
+#define M3UAASPUSAGESTATE_IDLE                   0
+#define M3UAASPUSAGESTATE_ACTIVE                 1
+#define M3UAASPUSAGESTATE_BUSY                   2
+
+#define M3UAASPSTATE_DOWN                        1
+#define M3UAASPSTATE_INITIALIZING                2
+#define M3UAASPSTATE_TERMINATING                 3
+#define M3UAASPSTATE_UP                          4
 
 #define M3UAASPCAPABILITIES_ASPEXT               0
 #define M3UAASPCAPABILITIES_SGINFO               1
@@ -531,6 +541,23 @@ extern struct header_complex_index *m3uaAspAfTableStorage;
 #define M3UAASPRSCONGESTIONLEVEL_CONGESTIONLEVEL1 1
 #define M3UAASPRSCONGESTIONLEVEL_CONGESTIONLEVEL2 2
 #define M3UAASPRSCONGESTIONLEVEL_CONGESTIONLEVEL3 3
+
+#define M3UAASPRLADMINISTRATIVESTATE_LOCKED      0
+#define M3UAASPRLADMINISTRATIVESTATE_UNLOCKED    1
+#define M3UAASPRLADMINISTRATIVESTATE_SHUTTINGDOWN 2
+
+#define M3UAASPRLOPERATIONALSTATE_DISABLED       0
+#define M3UAASPRLOPERATIONALSTATE_ENABLED        1
+
+#define M3UAASPRLPROCEDURALSTATUS_INITIALIZATIONREQUIRED 0
+#define M3UAASPRLPROCEDURALSTATUS_NOTINITIALIZED 1
+#define M3UAASPRLPROCEDURALSTATUS_INITIALIZING   2
+#define M3UAASPRLPROCEDURALSTATUS_REPORTING      3
+#define M3UAASPRLPROCEDURALSTATUS_TERMINATING    4
+
+#define M3UAASPRLUSAGESTATE_IDLE                 0
+#define M3UAASPRLUSAGESTATE_ACTIVE               1
+#define M3UAASPRLUSAGESTATE_BUSY                 2
 
 #define M3UAASPRTAVAILABILITYSTATUS_INACTIVE     0
 #define M3UAASPRTAVAILABILITYSTATUS_BLOCKED      1
@@ -740,8 +767,6 @@ SNMPCallback store_m3uaAspAfTable;
 void refresh_m3uaAspAfTable(int);
 
 WriteMethod write_m3uaAspName;
-WriteMethod write_m3uaAspName;
-WriteMethod write_m3uaAspAdministrativeState;
 WriteMethod write_m3uaAspAdministrativeState;
 WriteMethod write_m3uaAspCapabilities;
 WriteMethod write_m3uaAspIdPolicy;
@@ -774,7 +799,7 @@ WriteMethod write_m3uaAspSgTimerT2;
 WriteMethod write_m3uaAspSgTimerT3;
 WriteMethod write_m3uaAspSgTimerT4;
 WriteMethod write_m3uaAspSgTimerT5;
-WriteMethod write_m3uaAspSgTimerT5;
+WriteMethod write_m3uaAspSgTimerT17;
 WriteMethod write_m3uaAspSgTimerT19A;
 WriteMethod write_m3uaAspSgTimerT24;
 WriteMethod write_m3uaAspSgTimerT31A;
@@ -809,12 +834,7 @@ WriteMethod write_m3uaAspMtStatus;
 WriteMethod write_m3uaAspRsAdministrativeState;
 WriteMethod write_m3uaAspRsAlarmStatus;
 WriteMethod write_m3uaAspRlCost;
-WriteMethod write_m3uaAspRlCost;
-WriteMethod write_m3uaAspRlCost;
-WriteMethod write_m3uaAspRlCost;
-WriteMethod write_m3uaAspRlCost;
-WriteMethod write_m3uaAspRlCost;
-WriteMethod write_m3uaAspRlCost;
+WriteMethod write_m3uaAspRlAdministrativeState;
 WriteMethod write_m3uaAspRcValue;
 WriteMethod write_m3uaAspRcRegstrationPolicy;
 WriteMethod write_m3uaAspRcTrafficMode;

@@ -115,6 +115,7 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "m2paMIB.h"
+#define MASTER 1
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #if defined MODULE
 #if defined MASTER
@@ -1696,9 +1697,7 @@ write_m2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paN1 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1725,11 +1724,11 @@ write_m2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 		/* Note: default value 1000 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paN1 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paN1;
 		StorageTmp->m2paN1 = set_value;
 		break;
@@ -1764,9 +1763,7 @@ write_m2paProving(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProving entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1801,11 +1798,11 @@ write_m2paProving(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paProving for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paProving;
 		StorageTmp->m2paProving = set_value;
 		break;
@@ -1840,9 +1837,7 @@ write_m2paManagementProvingState(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paManagementProvingState entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1877,11 +1872,11 @@ write_m2paManagementProvingState(int action, u_char *var_val, u_char var_val_typ
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paManagementProvingState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paManagementProvingState;
 		StorageTmp->m2paManagementProvingState = set_value;
 		break;
@@ -1916,9 +1911,7 @@ write_m2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paLoopDelayLower entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1949,11 +1942,11 @@ write_m2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paLoopDelayLower for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paLoopDelayLower;
 		StorageTmp->m2paLoopDelayLower = set_value;
 		break;
@@ -1988,9 +1981,7 @@ write_m2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paLoopDelayUpper entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2021,11 +2012,11 @@ write_m2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paLoopDelayUpper for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paLoopDelayUpper;
 		StorageTmp->m2paLoopDelayUpper = set_value;
 		break;
@@ -2060,9 +2051,7 @@ write_m2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char var_
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransmissionRateIntervalLower entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2088,11 +2077,11 @@ write_m2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransmissionRateIntervalLower for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransmissionRateIntervalLower;
 		StorageTmp->m2paTransmissionRateIntervalLower = set_value;
 		break;
@@ -2127,9 +2116,7 @@ write_m2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char var_
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransmissionRateIntervalUpper entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2155,11 +2142,11 @@ write_m2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransmissionRateIntervalUpper for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransmissionRateIntervalUpper;
 		StorageTmp->m2paTransmissionRateIntervalUpper = set_value;
 		break;
@@ -2194,9 +2181,7 @@ write_m2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpNoDelay entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2230,11 +2215,11 @@ write_m2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpNoDelay for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpNoDelay;
 		StorageTmp->m2paSctpNoDelay = set_value;
 		break;
@@ -2269,9 +2254,7 @@ write_m2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxseg entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2302,11 +2285,11 @@ write_m2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxseg for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpMaxseg;
 		StorageTmp->m2paSctpMaxseg = set_value;
 		break;
@@ -2341,9 +2324,7 @@ write_m2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpHeartbeatItvl entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2374,11 +2355,11 @@ write_m2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, si
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpHeartbeatItvl for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpHeartbeatItvl;
 		StorageTmp->m2paSctpHeartbeatItvl = set_value;
 		break;
@@ -2413,9 +2394,7 @@ write_m2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpHeartbeat entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2449,11 +2428,11 @@ write_m2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpHeartbeat for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpHeartbeat;
 		StorageTmp->m2paSctpHeartbeat = set_value;
 		break;
@@ -2488,9 +2467,7 @@ write_m2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoInitial entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2521,11 +2498,11 @@ write_m2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoInitial for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpRtoInitial;
 		StorageTmp->m2paSctpRtoInitial = set_value;
 		break;
@@ -2560,9 +2537,7 @@ write_m2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoMin entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2593,11 +2568,11 @@ write_m2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoMin for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpRtoMin;
 		StorageTmp->m2paSctpRtoMin = set_value;
 		break;
@@ -2632,9 +2607,7 @@ write_m2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoMax entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2665,11 +2638,11 @@ write_m2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoMax for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpRtoMax;
 		StorageTmp->m2paSctpRtoMax = set_value;
 		break;
@@ -2704,9 +2677,7 @@ write_m2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpPathMaxRetrans entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2732,11 +2703,11 @@ write_m2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpPathMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpPathMaxRetrans;
 		StorageTmp->m2paSctpPathMaxRetrans = set_value;
 		break;
@@ -2771,9 +2742,7 @@ write_m2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpCookieLife entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2804,11 +2773,11 @@ write_m2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpCookieLife for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpCookieLife;
 		StorageTmp->m2paSctpCookieLife = set_value;
 		break;
@@ -2843,9 +2812,7 @@ write_m2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpCookieInc entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2876,11 +2843,11 @@ write_m2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpCookieInc for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpCookieInc;
 		StorageTmp->m2paSctpCookieInc = set_value;
 		break;
@@ -2915,9 +2882,7 @@ write_m2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxInitRetries entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2943,11 +2908,11 @@ write_m2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxInitRetries for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpMaxInitRetries;
 		StorageTmp->m2paSctpMaxInitRetries = set_value;
 		break;
@@ -2982,9 +2947,7 @@ write_m2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxBurst entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3010,11 +2973,11 @@ write_m2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxBurst for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpMaxBurst;
 		StorageTmp->m2paSctpMaxBurst = set_value;
 		break;
@@ -3049,9 +3012,7 @@ write_m2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpAssocMaxRetrans entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3077,11 +3038,11 @@ write_m2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpAssocMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpAssocMaxRetrans;
 		StorageTmp->m2paSctpAssocMaxRetrans = set_value;
 		break;
@@ -3116,9 +3077,7 @@ write_m2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpSackDelay entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3150,11 +3109,11 @@ write_m2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpSackDelay for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpSackDelay;
 		StorageTmp->m2paSctpSackDelay = set_value;
 		break;
@@ -3189,9 +3148,7 @@ write_m2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpLifetime entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3222,11 +3179,11 @@ write_m2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpLifetime for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paSctpLifetime;
 		StorageTmp->m2paSctpLifetime = set_value;
 		break;
@@ -3261,9 +3218,7 @@ write_m2paTimerT1(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT1 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3294,11 +3249,11 @@ write_m2paTimerT1(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT1 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT1;
 		StorageTmp->m2paTimerT1 = set_value;
 		break;
@@ -3333,9 +3288,7 @@ write_m2paTimerT2(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3366,11 +3319,11 @@ write_m2paTimerT2(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT2;
 		StorageTmp->m2paTimerT2 = set_value;
 		break;
@@ -3405,9 +3358,7 @@ write_m2paTimerT2L(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2L entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3438,11 +3389,11 @@ write_m2paTimerT2L(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2L for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT2L;
 		StorageTmp->m2paTimerT2L = set_value;
 		break;
@@ -3477,9 +3428,7 @@ write_m2paTimerT2H(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2H entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3510,11 +3459,11 @@ write_m2paTimerT2H(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2H for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT2H;
 		StorageTmp->m2paTimerT2H = set_value;
 		break;
@@ -3549,9 +3498,7 @@ write_m2paTimerT3(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT3 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3582,11 +3529,11 @@ write_m2paTimerT3(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT3 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT3;
 		StorageTmp->m2paTimerT3 = set_value;
 		break;
@@ -3621,9 +3568,7 @@ write_m2paTimerT4N(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT4N entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3654,11 +3599,11 @@ write_m2paTimerT4N(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT4N for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT4N;
 		StorageTmp->m2paTimerT4N = set_value;
 		break;
@@ -3693,9 +3638,7 @@ write_m2paTimerT4E(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT4E entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3726,11 +3669,11 @@ write_m2paTimerT4E(int action, u_char *var_val, u_char var_val_type, size_t var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT4E for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT4E;
 		StorageTmp->m2paTimerT4E = set_value;
 		break;
@@ -3765,9 +3708,7 @@ write_m2paTimerT6(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT6 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3798,11 +3739,11 @@ write_m2paTimerT6(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT6 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT6;
 		StorageTmp->m2paTimerT6 = set_value;
 		break;
@@ -3837,9 +3778,7 @@ write_m2paTimerT7(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT7 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3870,11 +3809,11 @@ write_m2paTimerT7(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT7 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerT7;
 		StorageTmp->m2paTimerT7 = set_value;
 		break;
@@ -3909,9 +3848,7 @@ write_m2paTransCongThresholdAbatementL1Messages(int action, u_char *var_val, u_c
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL1Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -3937,11 +3874,11 @@ write_m2paTransCongThresholdAbatementL1Messages(int action, u_char *var_val, u_c
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL1Messages for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL1Messages;
 		StorageTmp->m2paTransCongThresholdAbatementL1Messages = set_value;
 		break;
@@ -3976,9 +3913,7 @@ write_m2paTransCongThresholdAbatementL1Octets(int action, u_char *var_val, u_cha
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL1Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4004,11 +3939,11 @@ write_m2paTransCongThresholdAbatementL1Octets(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL1Octets for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL1Octets;
 		StorageTmp->m2paTransCongThresholdAbatementL1Octets = set_value;
 		break;
@@ -4043,9 +3978,7 @@ write_m2paTransCongThresholdOnsetL1Messages(int action, u_char *var_val, u_char 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL1Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4071,11 +4004,11 @@ write_m2paTransCongThresholdOnsetL1Messages(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL1Messages for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL1Messages;
 		StorageTmp->m2paTransCongThresholdOnsetL1Messages = set_value;
 		break;
@@ -4110,9 +4043,7 @@ write_m2paTransCongThresholdOnsetL1Octets(int action, u_char *var_val, u_char va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL1Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4138,11 +4069,11 @@ write_m2paTransCongThresholdOnsetL1Octets(int action, u_char *var_val, u_char va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL1Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL1Octets;
 		StorageTmp->m2paTransCongThresholdOnsetL1Octets = set_value;
 		break;
@@ -4177,9 +4108,7 @@ write_m2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, size
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProvingAttempts entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4205,11 +4134,11 @@ write_m2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, size
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paProvingAttempts for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paProvingAttempts;
 		StorageTmp->m2paProvingAttempts = set_value;
 		break;
@@ -4244,9 +4173,7 @@ write_m2paNumberOfThresholdLevels(int action, u_char *var_val, u_char var_val_ty
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paNumberOfThresholdLevels entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4277,11 +4204,11 @@ write_m2paNumberOfThresholdLevels(int action, u_char *var_val, u_char var_val_ty
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paNumberOfThresholdLevels for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paNumberOfThresholdLevels;
 		StorageTmp->m2paNumberOfThresholdLevels = set_value;
 		break;
@@ -4316,9 +4243,7 @@ write_m2paCongestionCounting(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paCongestionCounting entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4353,11 +4278,11 @@ write_m2paCongestionCounting(int action, u_char *var_val, u_char var_val_type, s
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paCongestionCounting for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paCongestionCounting;
 		StorageTmp->m2paCongestionCounting = set_value;
 		break;
@@ -4392,9 +4317,7 @@ write_m2paCongestionReportingBaseObject(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paCongestionReportingBaseObject entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4430,11 +4353,11 @@ write_m2paCongestionReportingBaseObject(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paCongestionReportingBaseObject for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paCongestionReportingBaseObject;
 		StorageTmp->m2paCongestionReportingBaseObject = set_value;
 		break;
@@ -4469,9 +4392,7 @@ write_m2paTimerTx(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerTx entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4502,11 +4423,11 @@ write_m2paTimerTx(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerTx for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerTx;
 		StorageTmp->m2paTimerTx = set_value;
 		break;
@@ -4541,9 +4462,7 @@ write_m2paTimerTy(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerTy entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4574,11 +4493,11 @@ write_m2paTimerTy(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerTy for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTimerTy;
 		StorageTmp->m2paTimerTy = set_value;
 		break;
@@ -4613,9 +4532,7 @@ write_m2paNumberOfCongestionStates(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paNumberOfCongestionStates entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4641,11 +4558,11 @@ write_m2paNumberOfCongestionStates(int action, u_char *var_val, u_char var_val_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paNumberOfCongestionStates for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paNumberOfCongestionStates;
 		StorageTmp->m2paNumberOfCongestionStates = set_value;
 		break;
@@ -4680,9 +4597,7 @@ write_m2paInitialLevelOfCongestion(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paInitialLevelOfCongestion entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4708,11 +4623,11 @@ write_m2paInitialLevelOfCongestion(int action, u_char *var_val, u_char var_val_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paInitialLevelOfCongestion for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paInitialLevelOfCongestion;
 		StorageTmp->m2paInitialLevelOfCongestion = set_value;
 		break;
@@ -4747,9 +4662,7 @@ write_m2paReceiveCongestionThresholdAbatement(int action, u_char *var_val, u_cha
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdAbatement entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4776,11 +4689,11 @@ write_m2paReceiveCongestionThresholdAbatement(int action, u_char *var_val, u_cha
 		/* Note: default value 3 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdAbatement for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paReceiveCongestionThresholdAbatement;
 		StorageTmp->m2paReceiveCongestionThresholdAbatement = set_value;
 		break;
@@ -4815,9 +4728,7 @@ write_m2paReceiveCongestionThresholdOnset(int action, u_char *var_val, u_char va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdOnset entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4844,11 +4755,11 @@ write_m2paReceiveCongestionThresholdOnset(int action, u_char *var_val, u_char va
 		/* Note: default value 6 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdOnset for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paReceiveCongestionThresholdOnset;
 		StorageTmp->m2paReceiveCongestionThresholdOnset = set_value;
 		break;
@@ -4883,9 +4794,7 @@ write_m2paReceiveCongestionThresholdDiscard(int action, u_char *var_val, u_char 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdDiscard entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4912,11 +4821,11 @@ write_m2paReceiveCongestionThresholdDiscard(int action, u_char *var_val, u_char 
 		/* Note: default value 9 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdDiscard for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paReceiveCongestionThresholdDiscard;
 		StorageTmp->m2paReceiveCongestionThresholdDiscard = set_value;
 		break;
@@ -4952,9 +4861,7 @@ write_m2paProtocolProfileName(int action, u_char *var_val, u_char var_val_type, 
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProtocolProfileName entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -4986,11 +4893,11 @@ write_m2paProtocolProfileName(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paProtocolProfileName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paProtocolProfileName;
 		old_length = StorageTmp->m2paProtocolProfileNameLen;
 		StorageTmp->m2paProtocolProfileName = string;
@@ -5032,9 +4939,7 @@ write_m2paTransCongThresholdAbatementL2Messages(int action, u_char *var_val, u_c
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL2Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5060,11 +4965,11 @@ write_m2paTransCongThresholdAbatementL2Messages(int action, u_char *var_val, u_c
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL2Messages for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL2Messages;
 		StorageTmp->m2paTransCongThresholdAbatementL2Messages = set_value;
 		break;
@@ -5099,9 +5004,7 @@ write_m2paTransCongThresholdAbatementL2Octets(int action, u_char *var_val, u_cha
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL2Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5127,11 +5030,11 @@ write_m2paTransCongThresholdAbatementL2Octets(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL2Octets for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL2Octets;
 		StorageTmp->m2paTransCongThresholdAbatementL2Octets = set_value;
 		break;
@@ -5166,9 +5069,7 @@ write_m2paTransCongThresholdOnsetL2Messages(int action, u_char *var_val, u_char 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL2Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5194,11 +5095,11 @@ write_m2paTransCongThresholdOnsetL2Messages(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL2Messages for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL2Messages;
 		StorageTmp->m2paTransCongThresholdOnsetL2Messages = set_value;
 		break;
@@ -5233,9 +5134,7 @@ write_m2paTransCongThresholdOnsetL2Octets(int action, u_char *var_val, u_char va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL2Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5261,11 +5160,11 @@ write_m2paTransCongThresholdOnsetL2Octets(int action, u_char *var_val, u_char va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL2Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL2Octets;
 		StorageTmp->m2paTransCongThresholdOnsetL2Octets = set_value;
 		break;
@@ -5300,9 +5199,7 @@ write_m2paTransCongThresholdAbatementL3Messages(int action, u_char *var_val, u_c
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL3Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5328,11 +5225,11 @@ write_m2paTransCongThresholdAbatementL3Messages(int action, u_char *var_val, u_c
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL3Messages for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL3Messages;
 		StorageTmp->m2paTransCongThresholdAbatementL3Messages = set_value;
 		break;
@@ -5367,9 +5264,7 @@ write_m2paTransCongThresholdAbatementL3Octets(int action, u_char *var_val, u_cha
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL3Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5395,11 +5290,11 @@ write_m2paTransCongThresholdAbatementL3Octets(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL3Octets for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdAbatementL3Octets;
 		StorageTmp->m2paTransCongThresholdAbatementL3Octets = set_value;
 		break;
@@ -5434,9 +5329,7 @@ write_m2paTransCongThresholdOnsetL3Messages(int action, u_char *var_val, u_char 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL3Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5462,11 +5355,11 @@ write_m2paTransCongThresholdOnsetL3Messages(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL3Messages for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL3Messages;
 		StorageTmp->m2paTransCongThresholdOnsetL3Messages = set_value;
 		break;
@@ -5501,9 +5394,7 @@ write_m2paTransCongThresholdOnsetL3Octets(int action, u_char *var_val, u_char va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL3Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5529,11 +5420,11 @@ write_m2paTransCongThresholdOnsetL3Octets(int action, u_char *var_val, u_char va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL3Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdOnsetL3Octets;
 		StorageTmp->m2paTransCongThresholdOnsetL3Octets = set_value;
 		break;
@@ -5568,9 +5459,7 @@ write_m2paTransCongThresholdDiscardL1Messages(int action, u_char *var_val, u_cha
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL1Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5596,11 +5485,11 @@ write_m2paTransCongThresholdDiscardL1Messages(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL1Messages for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL1Messages;
 		StorageTmp->m2paTransCongThresholdDiscardL1Messages = set_value;
 		break;
@@ -5635,9 +5524,7 @@ write_m2paTransCongThresholdDiscardL1Octets(int action, u_char *var_val, u_char 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL1Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5663,11 +5550,11 @@ write_m2paTransCongThresholdDiscardL1Octets(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL1Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL1Octets;
 		StorageTmp->m2paTransCongThresholdDiscardL1Octets = set_value;
 		break;
@@ -5702,9 +5589,7 @@ write_m2paTransCongThresholdDiscardL2Messages(int action, u_char *var_val, u_cha
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL2Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5730,11 +5615,11 @@ write_m2paTransCongThresholdDiscardL2Messages(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL2Messages for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL2Messages;
 		StorageTmp->m2paTransCongThresholdDiscardL2Messages = set_value;
 		break;
@@ -5769,9 +5654,7 @@ write_m2paTransCongThresholdDiscardL2Octets(int action, u_char *var_val, u_char 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL2Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5797,11 +5680,11 @@ write_m2paTransCongThresholdDiscardL2Octets(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL2Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL2Octets;
 		StorageTmp->m2paTransCongThresholdDiscardL2Octets = set_value;
 		break;
@@ -5836,9 +5719,7 @@ write_m2paTransCongThresholdDiscardL3Messages(int action, u_char *var_val, u_cha
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL3Messages entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5864,11 +5745,11 @@ write_m2paTransCongThresholdDiscardL3Messages(int action, u_char *var_val, u_cha
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL3Messages for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL3Messages;
 		StorageTmp->m2paTransCongThresholdDiscardL3Messages = set_value;
 		break;
@@ -5903,9 +5784,7 @@ write_m2paTransCongThresholdDiscardL3Octets(int action, u_char *var_val, u_char 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL3Octets entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5931,11 +5810,11 @@ write_m2paTransCongThresholdDiscardL3Octets(int action, u_char *var_val, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL3Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->m2paTransCongThresholdDiscardL3Octets;
 		StorageTmp->m2paTransCongThresholdDiscardL3Octets = set_value;
 		break;
@@ -6781,15 +6660,16 @@ write_m2paDefaultSctpLifetime(int action, u_char *var_val, u_char var_val_type, 
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the m2paProtocolProfileTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 m2paProtocolProfileTable_consistent(struct m2paProtocolProfileTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -6810,7 +6690,7 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 	static struct m2paProtocolProfileTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProtocolProfileRowStatus entering action=%d...  \n", action));
@@ -6915,14 +6795,22 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = m2paProtocolProfileTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->m2paProtocolProfileRowStatus;
 			StorageTmp->m2paProtocolProfileRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!m2paProtocolProfileTable_consistent(StorageTmp)) {
+				if ((ret = m2paProtocolProfileTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->m2paProtocolProfileRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -6938,20 +6826,13 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (m2paProtocolProfileTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device */
-				/* XXX: activate with underlying device */
-				StorageNew->m2paProtocolProfileRowStatus = RS_ACTIVE;
-			}
+			/* XXX: commit creation to underlying device */
+			/* XXX: activate with underlying device */
+			StorageNew->m2paProtocolProfileRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (m2paProtocolProfileTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
-				StorageNew->m2paProtocolProfileRowStatus = RS_NOTINSERVICE;
-			}
+			StorageNew->m2paProtocolProfileRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:

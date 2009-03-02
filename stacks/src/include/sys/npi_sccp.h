@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sccp.h,v 0.9.2.8 2008-11-17 14:13:06 brian Exp $
+ @(#) $Id: npi_sccp.h,v 0.9.2.9 2009-03-02 05:14:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-17 14:13:06 $ by $Author: brian $
+ Last Modified $Date: 2009-03-02 05:14:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_sccp.h,v $
+ Revision 0.9.2.9  2009-03-02 05:14:54  brian
+ - updates
+
  Revision 0.9.2.8  2008-11-17 14:13:06  brian
  - documentation additions
 
@@ -71,7 +74,7 @@
 #ifndef _SYS_NPI_SCCP_H
 #define _SYS_NPI_SCCP_H
 
-#ident "@(#) $RCSfile: npi_sccp.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_sccp.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

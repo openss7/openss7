@@ -115,6 +115,7 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "strExtMIB.h"
+#undef MASTER
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #if defined MODULE
 #if defined MASTER
@@ -195,7 +196,7 @@ struct variable7 strExtMIB_variables[] = {
 #define   STREXTSTRLOGRECORDLEVEL  7
 	{(u_char) STREXTSTRLOGRECORDLEVEL, ASN_UNSIGNED, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 7}},
 #define   STREXTSTRLOGRECORDFLAGS  8
-	{(u_char) STREXTSTRLOGRECORDFLAGS, ASN_BIT_STR, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 8}},
+	{(u_char) STREXTSTRLOGRECORDFLAGS, ASN_OCTET_STR, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 8}},
 #define   STREXTSTRLOGRECORDMSGSTRING  9
 	{(u_char) STREXTSTRLOGRECORDMSGSTRING, ASN_OCTET_STR, RWRITE, var_strExtStrlogRecordTable, 6, {1, 1, 1, 2, 1, 9}},
 #define   STREXTSTRLOGRECORDROWSTATUS  10
@@ -762,7 +763,7 @@ parse_strExtStrlogRecordTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strExtStrlogRecordSid, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strExtStrlogRecordLevel, &tmpsize);
 	SNMP_FREE(StorageTmp->strExtStrlogRecordFlags);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->strExtStrlogRecordFlags, &StorageTmp->strExtStrlogRecordFlagsLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strExtStrlogRecordFlags, &StorageTmp->strExtStrlogRecordFlagsLen);
 	if (StorageTmp->strExtStrlogRecordFlags == NULL) {
 		config_perror("invalid specification for strExtStrlogRecordFlags");
 		return;
@@ -810,7 +811,7 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordMid, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordSid, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordLevel, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->strExtStrlogRecordFlags, &StorageTmp->strExtStrlogRecordFlagsLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strExtStrlogRecordFlags, &StorageTmp->strExtStrlogRecordFlagsLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strExtStrlogRecordMsgString, &StorageTmp->strExtStrlogRecordMsgStringLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtStrlogRecordRowStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -1268,9 +1269,7 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordMid entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1301,11 +1300,11 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordMid for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->strExtStrlogRecordMid;
 		StorageTmp->strExtStrlogRecordMid = set_value;
 		break;
@@ -1340,9 +1339,7 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordSid entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1373,11 +1370,11 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordSid for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->strExtStrlogRecordSid;
 		StorageTmp->strExtStrlogRecordSid = set_value;
 		break;
@@ -1412,9 +1409,7 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordLevel entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1445,11 +1440,11 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordLevel for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->strExtStrlogRecordLevel;
 		StorageTmp->strExtStrlogRecordLevel = set_value;
 		break;
@@ -1485,9 +1480,7 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordFlags entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -1504,13 +1497,21 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 				break;
 			}
 		}
-		if (var_val_type != ASN_BIT_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordFlags not ASN_BIT_STR\n");
+		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordFlags not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordFlags: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordFlags: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordFlags: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -1518,11 +1519,11 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordFlags for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->strExtStrlogRecordFlags;
 		old_length = StorageTmp->strExtStrlogRecordFlagsLen;
 		StorageTmp->strExtStrlogRecordFlags = string;
@@ -1565,9 +1566,7 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordMsgString entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -1599,11 +1598,11 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordMsgString for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->strExtStrlogRecordMsgString;
 		old_length = StorageTmp->strExtStrlogRecordMsgStringLen;
 		StorageTmp->strExtStrlogRecordMsgString = string;
@@ -1645,9 +1644,7 @@ write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceMid entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1678,11 +1675,11 @@ write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceMid for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->strExtTraceMid;
 		StorageTmp->strExtTraceMid = set_value;
 		break;
@@ -1717,9 +1714,7 @@ write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceSid entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1750,11 +1745,11 @@ write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceSid for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->strExtTraceSid;
 		StorageTmp->strExtTraceSid = set_value;
 		break;
@@ -1789,9 +1784,7 @@ write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceLevel entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1822,11 +1815,11 @@ write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceLevel for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->strExtTraceLevel;
 		StorageTmp->strExtTraceLevel = set_value;
 		break;
@@ -2136,15 +2129,16 @@ write_strExtTraceLog(int action, u_char *var_val, u_char var_val_type, size_t va
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the strExtStrlogRecordTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 strExtStrlogRecordTable_consistent(struct strExtStrlogRecordTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -2153,15 +2147,16 @@ strExtStrlogRecordTable_consistent(struct strExtStrlogRecordTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the strExtTraceTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 strExtTraceTable_consistent(struct strExtTraceTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -2182,7 +2177,7 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 	static struct strExtStrlogRecordTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordRowStatus entering action=%d...  \n", action));
@@ -2285,14 +2280,22 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = strExtStrlogRecordTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->strExtStrlogRecordRowStatus;
 			StorageTmp->strExtStrlogRecordRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!strExtStrlogRecordTable_consistent(StorageTmp)) {
+				if ((ret = strExtStrlogRecordTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->strExtStrlogRecordRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -2308,20 +2311,13 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (strExtStrlogRecordTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device */
-				/* XXX: activate with underlying device */
-				StorageNew->strExtStrlogRecordRowStatus = RS_ACTIVE;
-			}
+			/* XXX: commit creation to underlying device */
+			/* XXX: activate with underlying device */
+			StorageNew->strExtStrlogRecordRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (strExtStrlogRecordTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
-				StorageNew->strExtStrlogRecordRowStatus = RS_NOTINSERVICE;
-			}
+			StorageNew->strExtStrlogRecordRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -2394,7 +2390,7 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 	static struct strExtTraceTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceRowStatus entering action=%d...  \n", action));
@@ -2497,14 +2493,22 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = strExtTraceTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->strExtTraceRowStatus;
 			StorageTmp->strExtTraceRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!strExtTraceTable_consistent(StorageTmp)) {
+				if ((ret = strExtTraceTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->strExtTraceRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -2520,20 +2524,13 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (strExtTraceTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device */
-				/* XXX: activate with underlying device */
-				StorageNew->strExtTraceRowStatus = RS_ACTIVE;
-			}
+			/* XXX: commit creation to underlying device */
+			/* XXX: activate with underlying device */
+			StorageNew->strExtTraceRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (strExtTraceTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
-				StorageNew->strExtTraceRowStatus = RS_NOTINSERVICE;
-			}
+			StorageNew->strExtTraceRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:

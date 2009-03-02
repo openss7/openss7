@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TCAP-OM-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2009-01-10 17:09:27 $
+-- @(#) $RCSfile: OPENSS7-TCAP-OM-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2009-03-02 05:14:55 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 17:09:27 $ by $Author: brian $
+-- Last Modified $Date: 2009-03-02 05:14:55 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TCAP-OM-MIB.mib,v $
+-- Revision 0.9.2.5  2009-03-02 05:14:55  brian
+-- - updates
+--
 -- Revision 0.9.2.4  2009-01-10 17:09:27  brian
 -- - updated agents
 --
@@ -90,7 +93,7 @@ IMPORTS
 	FROM HC-PerfHist-TC-MIB
     sccpNetworkEntityId
 	FROM OPENSS7-SCCP-MIB
-    tcapTcUserId, tcapApplicationEntityId
+    tcapTcUserId, tcapApplicationEntityId, tcapApplicationSubsystemId
 	FROM OPENSS7-TCAP-MIB
     openss7, openss7Q, openss7Q752
 	FROM OPENSS7-SMI;
@@ -1548,7 +1551,8 @@ tcapOmAEEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId	-- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId	    -- shared index
     }
     ::= { tcapOmAETable 1 }
 
@@ -1746,7 +1750,8 @@ tcapOmAECurrentEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId	-- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId	    -- shared index
     }
     ::= { tcapOmAECurrentTable 1 }
 
@@ -1923,6 +1928,7 @@ tcapOmAE5minIntEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
+	tcapApplicationSubsystemId,	-- shared index
 	tcapApplicationEntityId,	-- shared index
 	tcapOmInterval			-- shared index
     }
@@ -2097,6 +2103,7 @@ tcapOmAE15minIntEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
+	tcapApplicationSubsystemId,	-- shared index
 	tcapApplicationEntityId,	-- shared index
 	tcapOmInterval			-- shared index
     }
@@ -2273,7 +2280,8 @@ tcapOmTcEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId -- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId	    -- shared index
     }
     ::= { tcapOmTcTable 1 }
 
@@ -2606,7 +2614,8 @@ tcapOmTcCurrentEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId -- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId	    -- shared index
     }
     ::= { tcapOmTcCurrentTable 1 }
 
@@ -2918,8 +2927,9 @@ tcapOmTc5minIntEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId,	-- shared index
-	tcapOmInterval			-- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId,    -- shared index
+	tcapOmInterval		    -- shared index
     }
     ::= { tcapOmTc5minIntTable 1 }
 
@@ -3231,8 +3241,9 @@ tcapOmTc15minIntEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId,	-- shared index
-	tcapOmInterval			-- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId,    -- shared index
+	tcapOmInterval		    -- shared index
     }
     ::= { tcapOmTc15minIntTable 1 }
 
@@ -3545,7 +3556,8 @@ tcapOmDevelRecvEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId	-- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId	    -- shared index
     }
     ::= { tcapOmDevelRecvTable 1 }
 
@@ -4097,7 +4109,8 @@ tcapOmDevelRecvCurrentEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId	-- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId	    -- shared index
     }
     ::= { tcapOmDevelRecvCurrentTable 1 }
 
@@ -4628,8 +4641,9 @@ tcapOmDevelRecv5minIntEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId,	-- shared index
-	tcapOmInterval			-- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId,    -- shared index
+	tcapOmInterval		    -- shared index
     }
     ::= { tcapOmDevelRecv5minIntTable 1 }
 
@@ -5160,8 +5174,9 @@ tcapOmDevelRecv15minIntEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
-	tcapApplicationEntityId,	-- shared index
-	tcapOmInterval			-- shared index
+	tcapApplicationSubsystemId, -- shared index
+	tcapApplicationEntityId,    -- shared index
+	tcapOmInterval		    -- shared index
     }
     ::= { tcapOmDevelRecv15minIntTable 1 }
 
@@ -5692,6 +5707,7 @@ tcapOmDevelSentEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
+	tcapApplicationSubsystemId,	-- shared index
 	tcapTcUserId			-- shared index
     }
     ::= { tcapOmDevelSentTable 1 }
@@ -6239,6 +6255,7 @@ tcapOmDevelSentCurrentEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
+	tcapApplicationSubsystemId,	-- shared index
 	tcapTcUserId			-- shared index
     }
     ::= { tcapOmDevelSentCurrentTable 1 }
@@ -6765,6 +6782,7 @@ tcapOmDevelSent5minIntEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
+	tcapApplicationSubsystemId,	-- shared index
 	tcapTcUserId,			-- shared index
 	tcapOmInterval			-- shared index
     }
@@ -7292,6 +7310,7 @@ tcapOmDevelSent15minIntEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX	{
+	tcapApplicationSubsystemId,	-- shared index
 	tcapTcUserId,			-- shared index
 	tcapOmInterval			-- shared index
     }

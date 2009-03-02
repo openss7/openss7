@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-manager,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-11 04:31:32 $
+# @(#) $RCSfile: streams-manager,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009/01/22 09:02:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-11 04:31:32 $ by $Author: brian $
+# Last Modified $Date: 2009/01/22 09:02:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,9 +69,9 @@ use SNMP;
 $\ = "\n";
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: streams-manager,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-11 04:31:32 $';
-my $version = '$Revision: 0.9.2.2 $';
-my $date = '$Date: 2008-10-11 04:31:32 $';
+my $ident = '$RCSfile: streams-manager,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009/01/22 09:02:31 $';
+my $version = '$Revision: 0.9.2.3 $';
+my $date = '$Date: 2009/01/22 09:02:31 $';
 my $title = 'STREAMS SNMP Manager';
 
 my $Title = <<EOF;
@@ -887,6 +887,21 @@ sub EditHost {
 	$self->{data}->{Session} = {};
     }
     return $answer;
+}
+
+sub ConnectHost {
+    my $self = shift;
+    my $mapp = shift;
+    if (!defined($self->{data}->{sess})) {
+	$self->{data}->{sess} = new SNMP::Session(
+	    DestHost => 'porky',
+	    Community => 'openss7'
+	);
+	if (!defined($self->{data}->{sess})) {
+	    printf("Could not open session\n");
+	}
+    }
+    return $self->{data}->{sess};
 }
 
 package myapp;
@@ -2832,6 +2847,27 @@ sub HlistDelHost {
     $hl->delete('entry', $item);
 }
 
+sub HlistConnect {
+    my $self = shift;
+    my $item = shift;
+    my $hl = $self->{HList};
+    my $host = $hl->entrycget($item, '-data');
+    my $answer = $host->ConnectHost($self);
+    if (defined($answer)) {
+	$hl->indicator('configure', $item,
+	    -image=>'cbook-grn',
+	    -itemtype=>'image',
+	);
+	$host->{indicator} = 'cbook-grn';
+    } else {
+	$hl->indicator('configure', $item,
+	    -image=>'cbook-red',
+	    -itemtype=>'image',
+	);
+	$host->{indicator} = 'cbook-red';
+    }
+}
+
 sub HlistAddModule {
     my $self = shift;
     my $item = shift;
@@ -3520,6 +3556,9 @@ Tk::MainLoop;
 # =============================================================================
 #
 # $Log: streams-manager,v $
+# Revision 0.9.2.3  2009/01/22 09:02:31  brian
+# - add connect
+#
 # Revision 0.9.2.2  2008-10-11 04:31:32  brian
 # - handle -Wpointer-sign
 #

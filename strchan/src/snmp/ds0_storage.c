@@ -115,6 +115,7 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "ds0.h"
+#undef MASTER
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #if defined MODULE
 #if defined MASTER
@@ -1121,8 +1122,7 @@ write_dsx0RobbedBitSignalling(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("ds0", "write_dsx0RobbedBitSignalling entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -1183,8 +1183,7 @@ write_dsx0CircuitIdentifier(int action, u_char *var_val, u_char var_val_type, si
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("ds0", "write_dsx0CircuitIdentifier entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -1249,8 +1248,7 @@ write_dsx0IdleCode(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("ds0", "write_dsx0IdleCode entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -1307,8 +1305,7 @@ write_dsx0SeizedCode(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("ds0", "write_dsx0SeizedCode entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -1365,8 +1362,7 @@ write_dsx0TransmitCodesEnable(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("ds0", "write_dsx0TransmitCodesEnable entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(dsx0ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -1412,15 +1408,16 @@ write_dsx0TransmitCodesEnable(int action, u_char *var_val, u_char var_val_type, 
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the dsx0ConfigTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 dsx0ConfigTable_consistent(struct dsx0ConfigTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -1429,15 +1426,16 @@ dsx0ConfigTable_consistent(struct dsx0ConfigTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the dsx0ChanMappingTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 dsx0ChanMappingTable_consistent(struct dsx0ChanMappingTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**

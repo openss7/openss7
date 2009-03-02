@@ -1,7 +1,7 @@
 #!/usr/bin/perl -W
 # =============================================================================
 # 
-# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-02-18 20:19:01 $
+# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-03-02 05:15:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-02-18 20:19:01 $ by $Author: brian $
+# Last Modified $Date: 2009-03-02 05:15:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,9 +98,9 @@ $\ = "\n";
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-02-18 20:19:01 $';
-my $version = '$Revision: 0.9.2.12 $';
-my $date = '$Date: 2009-02-18 20:19:01 $';
+my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-03-02 05:15:01 $';
+my $version = '$Revision: 0.9.2.13 $';
+my $date = '$Date: 2009-03-02 05:15:01 $';
 my $title = 'OpenSS7 Network Manager';
 
 use SNMP;
@@ -14804,6 +14804,9 @@ exit;
 # =============================================================================
 #
 # $Log: mibbrowser,v $
+# Revision 0.9.2.13  2009-03-02 05:15:01  brian
+# - updates
+#
 # Revision 0.9.2.12  2009-02-18 20:19:01  brian
 # - updated agents
 #

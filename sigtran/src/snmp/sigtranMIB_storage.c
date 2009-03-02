@@ -115,6 +115,7 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "sigtranMIB.h"
+#undef MASTER
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #if defined MODULE
 #if defined MASTER
@@ -1024,9 +1025,7 @@ write_sigtranSctpProfileName(int action, u_char *var_val, u_char var_val_type, s
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileName entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -1058,11 +1057,11 @@ write_sigtranSctpProfileName(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileName;
 		old_length = StorageTmp->sigtranSctpProfileNameLen;
 		StorageTmp->sigtranSctpProfileName = string;
@@ -1104,9 +1103,7 @@ write_sigtranSctpProfileNodelay(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileNodelay entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1141,11 +1138,11 @@ write_sigtranSctpProfileNodelay(int action, u_char *var_val, u_char var_val_type
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileNodelay for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileNodelay;
 		StorageTmp->sigtranSctpProfileNodelay = set_value;
 		break;
@@ -1180,9 +1177,7 @@ write_sigtranSctpPayloadProtocolId(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpPayloadProtocolId entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1209,11 +1204,11 @@ write_sigtranSctpPayloadProtocolId(int action, u_char *var_val, u_char var_val_t
 		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpPayloadProtocolId for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpPayloadProtocolId;
 		StorageTmp->sigtranSctpPayloadProtocolId = set_value;
 		break;
@@ -1248,9 +1243,7 @@ write_sigtranSctpLifetime(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpLifetime entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1281,11 +1274,11 @@ write_sigtranSctpLifetime(int action, u_char *var_val, u_char var_val_type, size
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpLifetime for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpLifetime;
 		StorageTmp->sigtranSctpLifetime = set_value;
 		break;
@@ -1320,9 +1313,7 @@ write_sigtranSctpProfileCsumType(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileCsumType entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1360,11 +1351,11 @@ write_sigtranSctpProfileCsumType(int action, u_char *var_val, u_char var_val_typ
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileCsumType for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileCsumType;
 		StorageTmp->sigtranSctpProfileCsumType = set_value;
 		break;
@@ -1399,9 +1390,7 @@ write_sigtranSctpProfileMacType(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileMacType entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1438,11 +1427,11 @@ write_sigtranSctpProfileMacType(int action, u_char *var_val, u_char var_val_type
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileMacType for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileMacType;
 		StorageTmp->sigtranSctpProfileMacType = set_value;
 		break;
@@ -1477,9 +1466,7 @@ write_sigtranSctpProfileValidCookieLife(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileValidCookieLife entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1511,11 +1498,11 @@ write_sigtranSctpProfileValidCookieLife(int action, u_char *var_val, u_char var_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileValidCookieLife for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileValidCookieLife;
 		StorageTmp->sigtranSctpProfileValidCookieLife = set_value;
 		break;
@@ -1550,9 +1537,7 @@ write_sigtranSctpProfileCookieInc(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileCookieInc entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1584,11 +1569,11 @@ write_sigtranSctpProfileCookieInc(int action, u_char *var_val, u_char var_val_ty
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileCookieInc for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileCookieInc;
 		StorageTmp->sigtranSctpProfileCookieInc = set_value;
 		break;
@@ -1623,9 +1608,7 @@ write_sigtranSctpProfileMaxIstreams(int action, u_char *var_val, u_char var_val_
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileMaxIstreams entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1657,11 +1640,11 @@ write_sigtranSctpProfileMaxIstreams(int action, u_char *var_val, u_char var_val_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileMaxIstreams for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileMaxIstreams;
 		StorageTmp->sigtranSctpProfileMaxIstreams = set_value;
 		break;
@@ -1696,9 +1679,7 @@ write_sigtranSctpProfileReqOstreams(int action, u_char *var_val, u_char var_val_
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileReqOstreams entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1730,11 +1711,11 @@ write_sigtranSctpProfileReqOstreams(int action, u_char *var_val, u_char var_val_
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileReqOstreams for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileReqOstreams;
 		StorageTmp->sigtranSctpProfileReqOstreams = set_value;
 		break;
@@ -1769,9 +1750,7 @@ write_sigtranSctpEcn(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpEcn entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1806,11 +1785,11 @@ write_sigtranSctpEcn(int action, u_char *var_val, u_char var_val_type, size_t va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpEcn for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpEcn;
 		StorageTmp->sigtranSctpEcn = set_value;
 		break;
@@ -1845,9 +1824,7 @@ write_sigtranSctpAdaptationLayerInfo(int action, u_char *var_val, u_char var_val
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpAdaptationLayerInfo entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1874,11 +1851,11 @@ write_sigtranSctpAdaptationLayerInfo(int action, u_char *var_val, u_char var_val
 		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpAdaptationLayerInfo for you to use, and you have just been asked to do something with it.  Note that anything 
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpAdaptationLayerInfo;
 		StorageTmp->sigtranSctpAdaptationLayerInfo = set_value;
 		break;
@@ -1913,9 +1890,7 @@ write_sigtranSctpProfileMaxInitRetries(int action, u_char *var_val, u_char var_v
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileMaxInitRetries entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -1942,11 +1917,11 @@ write_sigtranSctpProfileMaxInitRetries(int action, u_char *var_val, u_char var_v
 		/* Note: default value 8 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileMaxInitRetries for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileMaxInitRetries;
 		StorageTmp->sigtranSctpProfileMaxInitRetries = set_value;
 		break;
@@ -1981,9 +1956,7 @@ write_sigtranSctpProfileMaxBurst(int action, u_char *var_val, u_char var_val_typ
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileMaxBurst entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2015,11 +1988,11 @@ write_sigtranSctpProfileMaxBurst(int action, u_char *var_val, u_char var_val_typ
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileMaxBurst for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileMaxBurst;
 		StorageTmp->sigtranSctpProfileMaxBurst = set_value;
 		break;
@@ -2054,9 +2027,7 @@ write_sigtranSctpProfileAssocMaxRetrans(int action, u_char *var_val, u_char var_
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileAssocMaxRetrans entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2083,11 +2054,11 @@ write_sigtranSctpProfileAssocMaxRetrans(int action, u_char *var_val, u_char var_
 		/* Note: default value 10 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileAssocMaxRetrans for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileAssocMaxRetrans;
 		StorageTmp->sigtranSctpProfileAssocMaxRetrans = set_value;
 		break;
@@ -2122,9 +2093,7 @@ write_sigtranSctpProfileMaxSackDelay(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileMaxSackDelay entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2156,11 +2125,11 @@ write_sigtranSctpProfileMaxSackDelay(int action, u_char *var_val, u_char var_val
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileMaxSackDelay for you to use, and you have just been asked to do something with it.  Note that anything 
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileMaxSackDelay;
 		StorageTmp->sigtranSctpProfileMaxSackDelay = set_value;
 		break;
@@ -2195,9 +2164,7 @@ write_sigtranSctpProfileRtoMin(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileRtoMin entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2229,11 +2196,11 @@ write_sigtranSctpProfileRtoMin(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileRtoMin for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileRtoMin;
 		StorageTmp->sigtranSctpProfileRtoMin = set_value;
 		break;
@@ -2268,9 +2235,7 @@ write_sigtranSctpProfileRtoInitial(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileRtoInitial entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2302,11 +2267,11 @@ write_sigtranSctpProfileRtoInitial(int action, u_char *var_val, u_char var_val_t
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileRtoInitial for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileRtoInitial;
 		StorageTmp->sigtranSctpProfileRtoInitial = set_value;
 		break;
@@ -2341,9 +2306,7 @@ write_sigtranSctpProfileRtoMax(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileRtoMax entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2375,11 +2338,11 @@ write_sigtranSctpProfileRtoMax(int action, u_char *var_val, u_char var_val_type,
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileRtoMax for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileRtoMax;
 		StorageTmp->sigtranSctpProfileRtoMax = set_value;
 		break;
@@ -2414,9 +2377,7 @@ write_sigtranSctpProfilePathMaxRetrans(int action, u_char *var_val, u_char var_v
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfilePathMaxRetrans entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2443,11 +2404,11 @@ write_sigtranSctpProfilePathMaxRetrans(int action, u_char *var_val, u_char var_v
 		/* Note: default value 5 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfilePathMaxRetrans for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfilePathMaxRetrans;
 		StorageTmp->sigtranSctpProfilePathMaxRetrans = set_value;
 		break;
@@ -2482,9 +2443,7 @@ write_sigtranSctpProfileHeartbeatItvl(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileHeartbeatItvl entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(sigtranSctpProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -2516,11 +2475,11 @@ write_sigtranSctpProfileHeartbeatItvl(int action, u_char *var_val, u_char var_va
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->sigtranSctpProfileHeartbeatItvl for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->sigtranSctpProfileHeartbeatItvl;
 		StorageTmp->sigtranSctpProfileHeartbeatItvl = set_value;
 		break;
@@ -2541,15 +2500,16 @@ write_sigtranSctpProfileHeartbeatItvl(int action, u_char *var_val, u_char var_va
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the sigtranSctpProfileTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 sigtranSctpProfileTable_consistent(struct sigtranSctpProfileTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -2570,7 +2530,7 @@ write_sigtranSctpProfileStatus(int action, u_char *var_val, u_char var_val_type,
 	static struct sigtranSctpProfileTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("sigtranMIB", "write_sigtranSctpProfileStatus entering action=%d...  \n", action));
@@ -2673,14 +2633,22 @@ write_sigtranSctpProfileStatus(int action, u_char *var_val, u_char var_val_type,
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = sigtranSctpProfileTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->sigtranSctpProfileStatus;
 			StorageTmp->sigtranSctpProfileStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!sigtranSctpProfileTable_consistent(StorageTmp)) {
+				if ((ret = sigtranSctpProfileTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->sigtranSctpProfileStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -2696,20 +2664,13 @@ write_sigtranSctpProfileStatus(int action, u_char *var_val, u_char var_val_type,
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (sigtranSctpProfileTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device */
-				/* XXX: activate with underlying device */
-				StorageNew->sigtranSctpProfileStatus = RS_ACTIVE;
-			}
+			/* XXX: commit creation to underlying device */
+			/* XXX: activate with underlying device */
+			StorageNew->sigtranSctpProfileStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (sigtranSctpProfileTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
-				StorageNew->sigtranSctpProfileStatus = RS_NOTINSERVICE;
-			}
+			StorageNew->sigtranSctpProfileStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:

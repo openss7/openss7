@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.17 $) $Date: 2009-01-10 18:18:40 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.22 $) $Date: 2009-03-02 05:14:54 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,26 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 18:18:40 $ by $Author: brian $
+-- Last Modified $Date: 2009-03-02 05:14:54 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB.mib,v $
+-- Revision 0.9.2.22  2009-03-02 05:14:54  brian
+-- - updates
+--
+-- Revision 0.9.2.21  2009-02-21 08:16:37  brian
+-- - updates
+--
+-- Revision 0.9.2.20  2009-02-18 02:11:48  brian
+-- - minor corrections
+--
+-- Revision 0.9.2.19  2009-01-25 07:58:09  brian
+-- - more numbering corrections
+--
+-- Revision 0.9.2.18  2009/01/25 07:48:24  brian
+-- - correct numbering
+--
 -- Revision 0.9.2.17  2009-01-10 18:18:40  brian
 -- - corrections
 --
@@ -360,6 +375,7 @@ mtpProtocols		OBJECT IDENTIFIER ::= { mtpOids		 1 }
 mtpProbableCauses	OBJECT IDENTIFIER ::= { mtpOids		 2 }
 mtpSpecificProblems	OBJECT IDENTIFIER ::= { mtpOids		 3 }
 mtpExtensions		OBJECT IDENTIFIER ::= { mtpOids		 4 }
+mtpProbableCauses2	OBJECT IDENTIFIER ::= { mtpOids		 5 }
 
 mtpSap			OBJECT IDENTIFIER ::= { mtpTables	 1 }
 mtpNa			OBJECT IDENTIFIER ::= { mtpTables	 2 }
@@ -1450,6 +1466,36 @@ MtpCongestionLevel ::= TEXTUAL-CONVENTION
 	none(0), congestionLevel1(1), congestionLevel2(2), 
 	congestionLevel3(3) }
 
+MtpSapAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d:1d-1d-1d:1d"
+    STATUS	current
+    DESCRIPTION
+	"This is a network referenced MTP signalling point code and MTP 
+	 user part that uniquely identifies an MTP-SAP within both the 
+	 national or international SS7 network (point code numbering 
+	 space) to which the MTP-SAP belongs as well as the point code 
+	 within the network and the MTP user part at the signalling 
+	 point.
+
+	 The MTP-SAP address is modelled as an octet string.  The first 
+	 octet in the string is a network identifier that identifies the 
+	 larger national or international SS7 signalling network; the 
+	 second octet is the 'network' portion of the signalling point 
+	 code as defined in Q.704; the third, the 'cluster', the fourth, 
+	 the 'member'; and the fifth and last octet is the MTP user part 
+	 (SI value) as defined in Q.704.
+
+	 The octet string is displayed with a colon separating the 
+	 network number and the normal numbers and dashes notation for 
+	 the sginalling point code, and a colon separating the network 
+	 point code from the MTP user part: e.g. 1:5-1-1:5.  Note that 
+	 the ITU-T signalling point code is unpacked by network, cluster 
+	 and member into separate octets.  Also note that when the first 
+	 octet is zero (0) it does not specify a global larger network 
+	 and thus the network point code applies only to a locally 
+	 defined network."
+    SYNTAX	OCTET STRING (SIZE(5))
+
 NetworkPointCode ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1d:1d-"
     STATUS	current
@@ -2135,7 +2181,7 @@ remoteUserPartUnavailable OBJECT-IDENTITY
 -- q752Item5p08 OBJECT IDENTIFIER
 --     ::= { mtpProbableCauses 508 }
 
-q752Item1p02 OBJECT IDENTIFIER ::= { mtpProbableCauses 102 }
+q752Item1p02 OBJECT IDENTIFIER ::= { mtpProbableCauses2 102 }
 
 slFailure OBJECT-IDENTITY
     STATUS	current
@@ -2211,7 +2257,7 @@ slFailure OBJECT-IDENTITY
 	     1.5, 1.6, 1.12"
     ::= { mtpProbableCauses 102 }
 
-q752Item1p10 OBJECT IDENTIFIER ::= { mtpProbableCauses 110 }
+q752Item1p10 OBJECT IDENTIFIER ::= { mtpProbableCauses2 110 }
 
 localAutomaticChange OBJECT-IDENTITY
     STATUS	current
@@ -2248,7 +2294,7 @@ localAutomaticChange OBJECT-IDENTITY
 	 ANSI T1.116.1 (2000D) : Table 1, 1.10 and 1.11"
     ::= { mtpProbableCauses 110 }
 
-q752Item2p10 OBJECT IDENTIFIER ::= { mtpProbableCauses 210 }
+q752Item2p10 OBJECT IDENTIFIER ::= { mtpProbableCauses2 210 }
 
 remoteProcOutage OBJECT-IDENTITY
     STATUS	current
@@ -2292,7 +2338,7 @@ remoteProcOutage OBJECT-IDENTITY
 	 ANSI T1.116.1 Table 1/T1.116.1 2.10, 2.11"
     ::= { mtpProbableCauses 210 }
 
-q752Item2p16 OBJECT IDENTIFIER ::= { mtpProbableCauses 216 }
+q752Item2p16 OBJECT IDENTIFIER ::= { mtpProbableCauses2 216 }
 
 localInhibition OBJECT-IDENTITY
     STATUS	current
@@ -2335,7 +2381,7 @@ localInhibition OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item2p16"
     ::= { mtpProbableCauses 216 }
 
-q752Item2p18 OBJECT IDENTIFIER ::= { mtpProbableCauses 218 }
+q752Item2p18 OBJECT IDENTIFIER ::= { mtpProbableCauses2 218 }
 
 remoteInhibition OBJECT-IDENTITY
     STATUS	current
@@ -2377,7 +2423,7 @@ remoteInhibition OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item2p18"
     ::= { mtpProbableCauses 218 }
 
-q752Item3p06 OBJECT IDENTIFIER ::= { mtpProbableCauses 306 }
+q752Item3p06 OBJECT IDENTIFIER ::= { mtpProbableCauses2 306 }
 
 linkCongestionIndications OBJECT-IDENTITY
     STATUS	current
@@ -2420,7 +2466,7 @@ linkCongestionIndications OBJECT-IDENTITY
 	 ANSI T1.116.2/2000 : q752Item3p06"
     ::= { mtpProbableCauses 306 }
 
-q752Item3p11 OBJECT IDENTIFIER ::= { mtpProbableCauses 311 }
+q752Item3p11 OBJECT IDENTIFIER ::= { mtpProbableCauses2 311 }
 
 linkCongestionDiscard OBJECT-IDENTITY
     STATUS	current
@@ -2462,7 +2508,7 @@ linkCongestionDiscard OBJECT-IDENTITY
 	 ANSI T1.116.2/2000 : q752Item3p11"
     ::= { mtpProbableCauses 311 }
 
-q752Item4p03 OBJECT IDENTIFIER ::= { mtpProbableCauses 403 }
+q752Item4p03 OBJECT IDENTIFIER ::= { mtpProbableCauses2 403 }
 
 linkSetFailure OBJECT-IDENTITY
     STATUS	current
@@ -2510,7 +2556,7 @@ linkSetFailure OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item4p03"
     ::= { mtpProbableCauses 403 }
 
-q752Item4p05 OBJECT IDENTIFIER ::= { mtpProbableCauses 405 }
+q752Item4p05 OBJECT IDENTIFIER ::= { mtpProbableCauses2 405 }
 
 linkSetFailureTFPBroadcast OBJECT-IDENTITY
     STATUS	current
@@ -2560,7 +2606,7 @@ linkSetFailureTFPBroadcast OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item4p05"
     ::= { mtpProbableCauses 405 }
 
-q752Item4p11 OBJECT IDENTIFIER ::= { mtpProbableCauses 411 }
+q752Item4p11 OBJECT IDENTIFIER ::= { mtpProbableCauses2 411 }
 
 routesetUnavailability OBJECT-IDENTITY
     STATUS	current
@@ -2610,7 +2656,7 @@ routesetUnavailability OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item4p11"
     ::= { mtpProbableCauses 411 }
 
-q752Item4p13 OBJECT IDENTIFIER ::= { mtpProbableCauses 413 }
+q752Item4p13 OBJECT IDENTIFIER ::= { mtpProbableCauses2 413 }
 
 linksetAdjSpChange OBJECT-IDENTITY
     STATUS	current
@@ -2657,7 +2703,7 @@ linksetAdjSpChange OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item4p13"
     ::= { mtpProbableCauses 413 }
 
-q752Item5p01 OBJECT IDENTIFIER ::= { mtpProbableCauses 501 }
+q752Item5p01 OBJECT IDENTIFIER ::= { mtpProbableCauses2 501 }
 
 adjSpInaccessibility OBJECT-IDENTITY
     STATUS	current
@@ -2697,7 +2743,7 @@ adjSpInaccessibility OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item5p01"
     ::= { mtpProbableCauses 501 }
 
-q752Item5p05 OBJECT IDENTIFIER ::= { mtpProbableCauses 505 }
+q752Item5p05 OBJECT IDENTIFIER ::= { mtpProbableCauses2 505 }
 
 routingDataError OBJECT-IDENTITY
     STATUS	current
@@ -2739,7 +2785,7 @@ routingDataError OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item5p05"
     ::= { mtpProbableCauses 505 }
 
-q752Item5p06 OBJECT IDENTIFIER ::= { mtpProbableCauses 506 }
+q752Item5p06 OBJECT IDENTIFIER ::= { mtpProbableCauses2 506 }
 
 userPartUnavailableSent OBJECT-IDENTITY
     STATUS	current
@@ -2786,7 +2832,7 @@ userPartUnavailableSent OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item5p06"
     ::= { mtpProbableCauses 506 }
 
-q752Item5p07 OBJECT IDENTIFIER ::= { mtpProbableCauses 507 }
+q752Item5p07 OBJECT IDENTIFIER ::= { mtpProbableCauses2 507 }
 
 userPartUnavailableReceived OBJECT-IDENTITY
     STATUS	current
@@ -2825,7 +2871,7 @@ userPartUnavailableReceived OBJECT-IDENTITY
 	"ITU-T Rec. Q.751.1 (1996) : q752Item5p07"
     ::= { mtpProbableCauses 507 }
 
-q752Item5p08 OBJECT IDENTIFIER ::= { mtpProbableCauses 508 }
+q752Item5p08 OBJECT IDENTIFIER ::= { mtpProbableCauses2 508 }
 
 transferControlledReceived OBJECT-IDENTITY
     STATUS	current
@@ -3389,7 +3435,7 @@ mtpSapEntry OBJECT-TYPE
     INDEX	{
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
-	mtpSapId
+	mtpSapId	-- index
     }
     ::= { mtpSapTable 1 }
 
@@ -3420,7 +3466,7 @@ mtpSapId OBJECT-TYPE
     ::= { mtpSapEntry 1 }
 
 mtpSap2Address OBJECT-TYPE
-    SYNTAX	Unsigned32
+    SYNTAX	MtpSapAddress
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -3507,7 +3553,7 @@ mtpSapProviderEntityNames OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000),
 	 ITU-T Rec. X.723 | ISO/IEC 10165-5, providerEntityNames 
-	 attibute."
+	     attibute."
     ::= { mtpSapEntry 6 }
 
 mtpSapUsageState OBJECT-TYPE
@@ -3544,7 +3590,7 @@ mtpSapAsaProfilePointer OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000),
 	 ITU-T Rec. M.3100, alarmSeverityAssignmentProfilePointer 
-	 attibute."
+	     attibute."
     DEFVAL { { zeroDotZero } }
     ::= { mtpSapEntry 8 }
 
@@ -3563,7 +3609,7 @@ mtpSapName OBJECT-TYPE
 	 (e.g. EDTAB01DS1 ISUP)."
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000),
-	 mtpAccessPointName attibute."
+	     mtpAccessPointName attibute."
     ::= { mtpSapEntry 9 }
 
 mtpSapLongMessageSupported OBJECT-TYPE
@@ -4064,7 +4110,7 @@ mtpMsEntry OBJECT-TYPE
 	 ANSI T1.116.1/2000 managedSwitchingElement MO.
 	 ITU-T Rec. M.3100 (1995) managedElementR2 MO."
     INDEX	{
-	mtpMsId
+	mtpMsId -- index
     }
     ::= { mtpMsTable 1 }
 
@@ -5247,7 +5293,7 @@ mtpSpProfileCircularRteDetect OBJECT-TYPE
 
 mtpSpRsDefault OBJECT-TYPE
     SYNTAX	SimpleNameType
-    MAX-ACCESS	not-accessible
+    MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
 	"Provides a reference to an MTP Level 3 signalling route set 
@@ -5260,7 +5306,7 @@ mtpSpRsDefault OBJECT-TYPE
 
 mtpSpLsDefault OBJECT-TYPE
     SYNTAX	SimpleNameType
-    MAX-ACCESS	not-accessible
+    MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
 	"Provides a reference to an MTP Level 3 signalling link set 
@@ -5377,7 +5423,7 @@ mtpSpEntry OBJECT-TYPE
 	 MO."
     INDEX	{
 	mtpMsId,	-- shared index
-	mtpSpId
+	mtpSpId		-- index
     }
     ::= { mtpSpTable 1 }
 
@@ -5690,7 +5736,7 @@ mtpSpOptions OBJECT-TYPE
 	    use link oscillation procedure B by default.
 	 
 	 Not all combinations of flag values are valid.  Not all valid 
-	 combinaation of flags are applicable to all protocol variants.
+	 combination of flags are applicable to all protocol variants.
 
 	 Notes on SP security:  When the spfSecurity(2) flag is set, the 
 	 following policies are enforced:
@@ -5905,7 +5951,7 @@ mtpL3Entry OBJECT-TYPE
     INDEX	{
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
-	mtpL3Id
+	mtpL3Id		-- index
     }
     ::= { mtpL3Table 1 }
 
@@ -5937,7 +5983,7 @@ mtpL3AdministrativeState OBJECT-TYPE
     STATUS	current
     DESCRIPTION
 	"Provides the administrative state of the MTP level 3 entity 
-	 followin the AdministrativeState textual convention of the 
+	 following the AdministrativeState textual convention of the 
 	 OPENSS7-SMI-MIB module and according to ITU-T Rec. X.721 | 
 	 ISO/IEC 10165-2.
 
@@ -5957,7 +6003,7 @@ mtpL3OperationalState OBJECT-TYPE
     STATUS	current
     DESCRIPTION
 	"Provides the operational state of the MTP level 3 entity 
-	 followin the OperationalState textual convention of the 
+	 following the OperationalState textual convention of the 
 	 OPENSS7-SMI-MIB module and according to ITU-T Rec. X.721 | 
 	 ISO/IEC 10165-2.
 
@@ -5975,7 +6021,7 @@ mtpL3UsageState OBJECT-TYPE
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
-	"Provides the usage state of the MTP level 3 entity followin the 
+	"Provides the usage state of the MTP level 3 entity following the 
 	 UsageState textual convention of the OPENSS7-SMI-MIB module and 
 	 according to ITU-T Rec. X.721 | ISO/IEC 10165-2.
 
@@ -5995,7 +6041,7 @@ mtpL3ProceduralStatus OBJECT-TYPE
     STATUS	current
     DESCRIPTION
 	"Provides the procedural status of the MTP level 3 entity 
-	 followin the ProceduralStatus textual convention of the 
+	 following the ProceduralStatus textual convention of the 
 	 OPENSS7-SMI-MIB module and according to ITU-T Rec. X.721 | 
 	 ISO/IEC 10165-2.
 	 
@@ -6081,7 +6127,7 @@ mtpGsEntry OBJECT-TYPE
     INDEX	{
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
-	mtpGsId
+	mtpGsId		-- index
     }
     ::= { mtpGsTable 1 }
 
@@ -6300,8 +6346,8 @@ mtpGsLineEntry OBJECT-TYPE
     INDEX	{
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
-	mtpGsId,
-	mtpGsLineId
+	mtpGsId,	-- shared index
+	mtpGsLineId	-- index
     }
     ::= { mtpGsLineTable 1 }
 
@@ -6439,11 +6485,11 @@ mtpGsLineContentEntry OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), ASN.1 
 	 StpScreeningTableLineContent."
     INDEX	{
-	mtpMsId,	-- shared index
-	mtpSpId,	-- shared index
-	mtpGsId,
-	mtpGsLineId,
-	mtpGsLineContentId
+	mtpMsId,	     -- shared index
+	mtpSpId,	     -- shared index
+	mtpGsId,	     -- shared index
+	mtpGsLineId,	     -- shared index
+	mtpGsLineContentId   -- index
     }
     ::= { mtpGsLineContentTable 1 }
 
@@ -6930,7 +6976,7 @@ mtpRsEntry OBJECT-TYPE
     INDEX	{
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
-	mtpRsId
+	mtpRsId		-- index
     }
     ::= { mtpRsTable 1 }
 
@@ -7173,7 +7219,7 @@ mtpRsName OBJECT-TYPE
 	 rejected and not carried out."
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
-	 signRouteSetNePartName attribute."
+	     signRouteSetNePartName attribute."
     ::= { mtpRsEntry 12 }
 
 mtpRsProfile OBJECT-TYPE
@@ -7443,7 +7489,7 @@ mtpRtEntry OBJECT-TYPE
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
 	mtpRsId,	-- shared index
-	mtpRtId
+	mtpRtId		-- index
     }
     ::= { mtpRtTable 1 }
 
@@ -7988,7 +8034,7 @@ mtpRtLsaEntry OBJECT-TYPE
 	mtpSpId,	-- shared index
 	mtpRsId,	-- shared index
 	mtpRtId,	-- shared index
-	mtpRtLsaSlsCode
+	mtpRtLsaSlsCode	-- index
     }
     ::= { mtpRtLsaTable 1 }
 
@@ -8251,7 +8297,7 @@ mtpLsProfileTimerT19I OBJECT-TYPE
     ::= { mtpLsProfileEntry 6 }
 
 mtpLsProfileTimerT21I OBJECT-TYPE
-    SYNTAX	TimeInterval
+    SYNTAX	TimeInterval (6300..6500)
     UNITS	"centiseconds"
     MAX-ACCESS	read-create
     STATUS	current
@@ -8315,6 +8361,7 @@ mtpLsProfileTimerT21I OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), q704-t21 attribute.
 	 ITU-T Rec. Q.704 (1996)"
+    DEFVAL { 6400 } -- 64 seconds (provisional)
     ::= { mtpLsProfileEntry 7 }
 
 mtpLsProfileTimerT25A OBJECT-TYPE
@@ -8833,7 +8880,7 @@ mtpLsEntry OBJECT-TYPE
     INDEX	{
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
-	mtpLsId
+	mtpLsId		-- index
     }
     ::= { mtpLsTable 1 }
 
@@ -11535,7 +11582,7 @@ mtpSlEntry OBJECT-TYPE
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
 	mtpLsId,	-- shared index
-	mtpSlId
+	mtpSlId		-- index
     }
     ::= { mtpSlTable 1 }
 
@@ -12254,7 +12301,7 @@ mtpSlSdlListEntry OBJECT-TYPE
 	mtpSpId,	-- shared index
 	mtpLsId,	-- shared index
 	mtpSlId,	-- shared index
-	mtpSlSdlListId
+	mtpSlSdlListId	-- index
     }
     ::= { mtpSlSdlListTable 1 }
 
@@ -12340,7 +12387,7 @@ mtpSlSdtListEntry OBJECT-TYPE
 	mtpSpId,	-- shared index
 	mtpLsId,	-- shared index
 	mtpSlId,	-- shared index
-	mtpSlSdtListId
+	mtpSlSdtListId	-- index
     }
     ::= { mtpSlSdtListTable 1 }
 
@@ -13632,7 +13679,7 @@ mtpM2paSctpSackDelay OBJECT-TYPE
 	"This column defines the interval of time (in milliseconds) that 
 	 will be used as an RTO (retransmission timeout) value when 
 	 sending packets to a destination transport address.  Valid 
-	 values are zero or to 500 milliseconds (RFC 4960 forbits 
+	 values are zero or to 500 milliseconds (RFC 4960 forbids 
 	 setting this value larger than 500 milliseconds).
 	 
 	 The default value is the value recommended in RFC 4960 (200 
@@ -13776,7 +13823,7 @@ mtpSdtEntry OBJECT-TYPE
 	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), signTerm MO."
     INDEX	{
 	mtpMsId,	-- shared index
-	mtpSdtId
+	mtpSdtId	-- index
     }
     ::= { mtpSdtTable 1 }
 
@@ -14119,7 +14166,7 @@ mtpSdlEntry OBJECT-TYPE
     INDEX	{
 	mtpMsId,	-- shared index
 	mtpSpId,	-- shared index
-	mtpSdlId
+	mtpSdlId	-- index
     }
     ::= { mtpSdlTable 1 }
 
@@ -14796,7 +14843,7 @@ mtpSctpProfileSackDelay OBJECT-TYPE
 	"This column defines the interval of time (in milliseconds) that 
 	 will be used as an RTO (retransmission timeout) value when 
 	 sending packets to a destination transport address.  Valid 
-	 values are zero or to 500 milliseconds (RFC 2960 forbits 
+	 values are zero or to 500 milliseconds (RFC 2960 forbids 
 	 setting this value larger than 500 milliseconds).  The default 
 	 value is the value recommended in RFC 2960 (200 milliseconds).
 	 
@@ -15970,7 +16017,7 @@ mtpDefaultSctpNoDelay OBJECT-TYPE
 	 Nagle algorithm is in effect.
 	 
 	 The default default is true(1): send packets without delay.  
-	 The default default value is only application when never set by 
+	 The default default value is only applicable when never set by 
 	 any management station.  When set, the scalar value must 
 	 persist across system reboots."
     REFERENCE
@@ -15996,7 +16043,7 @@ mtpDefaultSctpMaxseg OBJECT-TYPE
 	 When set to a lower value, the lower value will be used.
 	 
 	 The default default allows the prevailing MTU to be controlling 
-	 (65536 octets).  The default default value is only application 
+	 (65536 octets).  The default default value is only applicable 
 	 when never set by any management station.  When set, the scalar 
 	 value must persist across system reboots."
     REFERENCE
@@ -16034,7 +16081,7 @@ mtpDefaultSctpHeartbeatItvl OBJECT-TYPE
 	 
 	 The default default value is that recommended by RFC 4960 
 	 (60,000 milliseconds, or 60 seconds).  The default default 
-	 value is only application when never set by any management 
+	 value is only applicable when never set by any management 
 	 station.  When set, the scalar value must persist across system 
 	 reboots."
     REFERENCE
@@ -16060,7 +16107,7 @@ mtpDefaultSctpHeartbeat OBJECT-TYPE
 	 at its default value.
 	 
 	 The default default value from RFC 4960 is true(1).  The 
-	 default default value is only application when never set by any 
+	 default default value is only applicable when never set by any 
 	 management station.  When set, the scalar value must persist 
 	 across system reboots."
     REFERENCE
@@ -16089,7 +16136,7 @@ mtpDefaultSctpRtoInitial OBJECT-TYPE
 	 
 	 The default default value is that value recommended by RFC 4960 
 	 (3,000 milliseconds, or 3 seconds).  The default default value 
-	 is only application when never set by any management station.  
+	 is only applicable when never set by any management station.  
 	 When set, the scalar value must persist across system reboots."
     REFERENCE
 	"RFC 4960 15. RTO.Initial"
@@ -16118,7 +16165,7 @@ mtpDefaultSctpRtoMin OBJECT-TYPE
 	 
 	 The default default value is the value recommended by RFC 4960 
 	 (1000 milliseconds, or 1 second).  The default default value is 
-	 only application when never set by any management station.  
+	 only applicable when never set by any management station.  
 	 When set, the scalar value must persist across system reboots."
     REFERENCE
 	"RFC 4960 15. RTO.Min"
@@ -16141,7 +16188,7 @@ mtpDefaultSctpRtoMax OBJECT-TYPE
 	 
 	 The default default value is the value recommended by RFC 4960 
 	 (60000 milliseconds, or 60 seconds).  The default default value 
-	 is only application when never set by any management station.  
+	 is only applicable when never set by any management station.  
 	 When set, the scalar value must persist across system reboots."
     REFERENCE
 	"RFC 4960 15. RTO.Max"
@@ -16168,7 +16215,7 @@ mtpDefaultSctpPathMaxRetrans OBJECT-TYPE
 	 
 	 The default default value is the value recommended in RFC 4960 
 	 (5 retransmissions).  The default default value is only 
-	 application when never set by any management station.  When 
+	 applicable when never set by any management station.  When 
 	 set, the scalar value must persist across system reboots."
     REFERENCE
 	"RFC 4960 15. Path.Max.Retrans"
@@ -16206,7 +16253,7 @@ mtpDefaultSctpCookieLife OBJECT-TYPE
 	 
 	 The default default value is the value recommended by RFC 4960 
 	 (60,000 milliseconds, or 60 seconds).  The default default value 
-	 is only application when never set by any management station.  
+	 is only applicable when never set by any management station.  
 	 When set, the scalar value must persist across system reboots."
     REFERENCE
 	"RFC 4960 15. Valid.Cookie.Life"
@@ -16232,7 +16279,7 @@ mtpDefaultSctpCookieInc OBJECT-TYPE
 	 The default default value is the value recommended in RFC 4960 
 	 5.2.6 (1000 milliseconds, or 1 second).  The default default 
 	 setting is adequate for Internet applications.  The default 
-	 default value is only application when never set by any 
+	 default value is only applicable when never set by any 
 	 management station.  When set, the scalar value must persist 
 	 across system reboots."
     REFERENCE
@@ -16252,7 +16299,7 @@ mtpDefaultSctpMaxInitRetries OBJECT-TYPE
 	 zero or greater.
 	 
 	 The default default value is the value recommended by RFC 4960 
-	 (8 retries).  The default default value is only application 
+	 (8 retries).  The default default value is only applicable 
 	 when never set by any management station.  When set, the scalar 
 	 value must persist across system reboots."
     REFERENCE
@@ -16272,7 +16319,7 @@ mtpDefaultSctpMaxBurst OBJECT-TYPE
 	 and RFC 4960.
 	 
 	 The default default value is the value recommended in RFC 4960 
-	 (4 MTUs).  The default default value is only application when 
+	 (4 MTUs).  The default default value is only applicable when 
 	 never set by any management station.  When set, the scalar 
 	 value must persist across system reboots."
     REFERENCE
@@ -16302,7 +16349,7 @@ mtpDefaultSctpAssocMaxRetrans OBJECT-TYPE
 	 
 	 The default default value is the value recommended in RFC 4960 
 	 (10 retransmissions).  The default default value is only 
-	 application when never set by any management station.  When 
+	 applicable when never set by any management station.  When 
 	 set, the scalar value must persist across system reboots."
     REFERENCE
 	"RFC 4960 15. Association.Max.Retrans"
@@ -16323,7 +16370,7 @@ mtpDefaultSctpSackDelay OBJECT-TYPE
 	 
 	 The default default value is the value recommended in RFC 4960 
 	 (200 milliseconds).  The default default value is only 
-	 application when never set by any management station.  When 
+	 applicable when never set by any management station.  When 
 	 set, the scalar value must persist across system reboots."
     REFERENCE
 	"RFC 4960 15. 6.2"
@@ -16339,7 +16386,7 @@ mtpDefaultSctpLifetime OBJECT-TYPE
 	"This scalar defines, for M2PA, the default life time assigned 
 	 to user data to be sent on the association.
 	 
-	 The default default value is only application when never set by 
+	 The default default value is only applicable when never set by 
 	 any management station.  When set, the scalar value must 
 	 persist across system reboots."
     REFERENCE

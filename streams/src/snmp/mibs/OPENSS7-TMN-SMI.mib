@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TMN-SMI.mib,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-01-10 17:18:43 $
+-- @(#) $RCSfile: OPENSS7-TMN-SMI.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.17 $) $Date: 2009-01-25 07:49:37 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 17:18:43 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-25 07:49:37 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TMN-SMI.mib,v $
+-- Revision 0.9.2.17  2009-01-25 07:49:37  brian
+-- - corrections
+--
 -- Revision 0.9.2.16  2009-01-10 17:18:43  brian
 -- - updated headers
 --
@@ -110,14 +113,38 @@
 OPENSS7-TMN-SMI DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
-		FROM SNMPv2-SMI
-	RowPointer, RowStatus, TimeStamp
-		FROM SNMPv2-TC
-	openss7, openss7Ms, openss7MsSmi
-		FROM OPENSS7-SMI
-	ProbableCause, SimpleNameType
-		FROM OPENSS7-TMN-TC;
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+	FROM SNMPv2-SMI
+
+    DateAndTime, RowPointer, RowStatus, TimeStamp
+	FROM SNMPv2-TC
+
+    AdditionalInformation, AdditionalText, AdministrativeState, 
+    AdministrativeState, AlarmStatus, AlarmType, 
+    AttributeIdentifierList, AttributeList, 
+    AttributeValueChangeDefiniiton, AvailabilityStatus, 
+    AvailabilityStatus, BackedUpStatus, BackUpObject, 
+    ControlStatus, CorrelatedNotifications, 
+    EventDiscriminatorConstruct, EventForwardingDestination, 
+    EventForwardingDestinationList, EventTimeStamp, EventTypeId, 
+    FullAction, GnmAlarmStatus, InformationData, 
+    InformationType, IntervalsOfDay, LogCapacityAlarmThreshold, 
+    LogCapacityAlarmThreshold, MonitoredAttributes, 
+    NotificationIdentifier, ObjectClass, ObjectInstance, 
+    OperationalState, OperationalState, PerceivedSeverity, 
+    ProbableCause, ProceduralStatus, ProposedRepairActions, 
+    SecurityAlarmCause, SecurityAlarmDetector, 
+    SecurityAlarmSeverity, ServiceProvider, ServiceUser, 
+    SimpleNameType, SourceIndicator, SpecificProblems, 
+    StandbyStatus, ThresholdInfo, Time24, Time24, 
+    TrendIndication, UnknownStatus, UsageState, WeekMask
+	FROM OPENSS7-SMI-MIB
+
+    openss7, openss7Ms, openss7MsSmi
+	FROM OPENSS7-SMI
+
+    SimpleNameType
+	FROM OPENSS7-TMN-TC;
 
 tmnMIB MODULE-IDENTITY
     LAST-UPDATED
@@ -143,46 +170,6 @@ tmnMIB MODULE-IDENTITY
 -- Top level organization of the MIB
 --
 
-tmnNotifications	OBJECT IDENTIFIER ::= { tmnMIB       0 }
-tmnObjects		OBJECT IDENTIFIER ::= { tmnMIB       1 }
-tmnConformance		OBJECT IDENTIFIER ::= { tmnMIB       2 }
-
-tmnScalars		OBJECT IDENTIFIER ::= { tmnObjects   1 }
-tmnTables		OBJECT IDENTIFIER ::= { tmnObjects   2 }
-tmnNotifObjects		OBJECT IDENTIFIER ::= { tmnObjects   3 }
-
-tmnCompliances		OBJECT IDENTIFIER ::= { tmnConformance   1 }
-tmnGroups		OBJECT IDENTIFIER ::= { tmnConformance   2 }
-
-tmnSeverityMapping	OBJECT IDENTIFIER ::= { tmnTables    1 }
-tmnAlarmSummary		OBJECT IDENTIFIER ::= { tmnTables    2 }
-tmnAlarmSummaryControl	OBJECT IDENTIFIER ::= { tmnTables    3 }
-
-managementOperationsSchedule		OBJECT IDENTIFIER ::= { tmnTables    4 }
-enhancedCurrentAlarmSummaryControl	OBJECT IDENTIFIER ::= { tmnTables    5 }
-discriminator				OBJECT IDENTIFIER ::= { tmnTables    6 }
-discriminatorDuration			OBJECT IDENTIFIER ::= { tmnTables    7 }
-discriminatorDailySchedule		OBJECT IDENTIFIER ::= { tmnTables    8 }
-discriminatorWeeklyScheduling		OBJECT IDENTIFIER ::= { tmnTables    9 }
-discriminatorExternalScheduler		OBJECT IDENTIFIER ::= { tmnTables   10 }
-eventForwardingDiscriminator		OBJECT IDENTIFIER ::= { tmnTables   11 }
-efdDestination				OBJECT IDENTIFIER ::= { tmnTables   12 }
-log					OBJECT IDENTIFIER ::= { tmnTables   13 }
-logDuration				OBJECT IDENTIFIER ::= { tmnTables   14 }
-logDailyScheduling			OBJECT IDENTIFIER ::= { tmnTables   15 }
-logWeeklyScheduling			OBJECT IDENTIFIER ::= { tmnTables   16 }
-logExternalScheduler			OBJECT IDENTIFIER ::= { tmnTables   17 }
-logRecord				OBJECT IDENTIFIER ::= { tmnTables   18 }
-eventLogRecord				OBJECT IDENTIFIER ::= { tmnTables   19 }
-alarmRecord				OBJECT IDENTIFIER ::= { tmnTables   20 }
-attributeValueChangeRecord		OBJECT IDENTIFIER ::= { tmnTables   21 }
-objectCreationRecord			OBJECT IDENTIFIER ::= { tmnTables   22 }
-objectDeletionRecord			OBJECT IDENTIFIER ::= { tmnTables   23 }
-relationshipChangeRecord		OBJECT IDENTIFIER ::= { tmnTables   24 }
-securityAlarmReportRecord		OBJECT IDENTIFIER ::= { tmnTables   25 }
-stateChangeRecord			OBJECT IDENTIFIER ::= { tmnTables   26 }
-system					OBJECT IDENTIFIER ::= { tmnTables   27 }
-
 -- =====================================================================
 --
 -- NOTIFICATION OBJECTS
@@ -192,6 +179,12 @@ system					OBJECT IDENTIFIER ::= { tmnTables   27 }
 -- use these types in notifications.  Basically we need a notification 
 -- object for each textual convention that we want to use in the 
 -- notification.
+
+tmnObjects OBJECT IDENTIFIER
+    ::= { tmnMIB 1 }
+
+tnmNotifs OBJECT IDENTIFIER
+    ::= { tmnObjects 1 }
 
 objectInstance OBJECT-TYPE
     SYNTAX ObjectInstance
@@ -204,7 +197,7 @@ objectInstance OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    objectInstance."
-    ::= { tmnNotifObjects 1 }
+    ::= { tnmNotifs 1 }
 
 notificationIdentifier OBJECT-TYPE
     SYNTAX NotificationIdentifier
@@ -215,7 +208,7 @@ notificationIdentifier OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	 notificationIdentifier."
-    ::= { tmnNotifObjects 2 }
+    ::= { tnmNotifs 2 }
 
 correlatedNotifications OBJECT-TYPE
     SYNTAX CorrelatedNotifications
@@ -226,7 +219,7 @@ correlatedNotifications OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    correlatedNotifications."
-    ::= { tmnNotifObjects 3 }
+    ::= { tnmNotifs 3 }
 
 probableCause OBJECT-TYPE
     SYNTAX ProbableCause
@@ -264,7 +257,7 @@ probableCause OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    probableCause."
-    ::= { tmnNotifObjects 4 }
+    ::= { tnmNotifs 4 }
 
 specificProblems OBJECT-TYPE
     SYNTAX SpecificProblems
@@ -304,7 +297,7 @@ specificProblems OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    specificProblems."
-    ::= { tmnNotifObjects 5 }
+    ::= { tnmNotifs 5 }
 
 perceivedSeverity OBJECT-TYPE
     SYNTAX PerceivedSeverity
@@ -328,7 +321,7 @@ perceivedSeverity OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    perceivedSeverity."
-    ::= { tmnNotifObjects 6 }
+    ::= { tnmNotifs 6 }
 
 backedUpStatus OBJECT-TYPE
     SYNTAX BackedUpStatus
@@ -339,10 +332,10 @@ backedUpStatus OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    backedUpStatus."
-    ::= { tmnNotifObjects 7 }
+    ::= { tnmNotifs 7 }
 
 backUpObject OBJECT-TYPE
-    SYNTAX ObjectInstance
+    SYNTAX BackUpObject
     MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
@@ -350,7 +343,7 @@ backUpObject OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    backUpObject."
-    ::= { tmnNotifObjects 8 }
+    ::= { tnmNotifs 8 }
 
 trendIndication OBJECT-TYPE
     SYNTAX TrendIndication
@@ -361,7 +354,7 @@ trendIndication OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    trendIndication."
-    ::= { tmnNotifObjects 9 }
+    ::= { tnmNotifs 9 }
 
 thresholdInfo OBJECT-TYPE
     SYNTAX ThresholdInfo
@@ -372,7 +365,7 @@ thresholdInfo OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    thresholdInfo."
-    ::= { tmnNotifObjects 10 }
+    ::= { tnmNotifs 10 }
 
 stateChangeDefinition OBJECT-TYPE
     SYNTAX AttributeValueChangeDefinition
@@ -383,7 +376,7 @@ stateChangeDefinition OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    stateChangeDefinition."
-    ::= { tmnNotifObjects 11 }
+    ::= { tnmNotifs 11 }
 
 monitoredAttributes OBJECT-TYPE
     SYNTAX MonitoredAttributes
@@ -394,7 +387,7 @@ monitoredAttributes OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    monitoredAttributes."
-    ::= { tmnNotifObjects 12 }
+    ::= { tnmNotifs 12 }
 
 proposedRepairActions OBJECT-TYPE
     SYNTAX ProposedRepairActions
@@ -405,7 +398,7 @@ proposedRepairActions OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    proposedRepairActions."
-    ::= { tmnNotifObjects 13 }
+    ::= { tnmNotifs 13 }
 
 sourceIndicator OBJECT-TYPE
     SYNTAX SourceIndicator
@@ -424,7 +417,7 @@ sourceIndicator OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    sourceIndicator."
-    ::= { tmnNotifObjects 14 }
+    ::= { tnmNotifs 14 }
 
 attributeIdentifierList OBJECT-TYPE
     SYNTAX AttributeIdentifierList
@@ -435,7 +428,7 @@ attributeIdentifierList OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    attributeIdentifierList."
-    ::= { tmnNotifObjects 15 }
+    ::= { tnmNotifs 15 }
 
 attributeValueChangeDefinition OBJECT-TYPE
     SYNTAX AttributeValueChangeDefinition
@@ -446,7 +439,7 @@ attributeValueChangeDefinition OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    attributeValueChangeDefinition."
-    ::= { tmnNotifObjects 16 }
+    ::= { tnmNotifs 16 }
 
 additionalText OBJECT-TYPE
     SYNTAX AdditionalText
@@ -459,7 +452,7 @@ additionalText OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    additionalText."
-    ::= { tmnNotifObjects 17 }
+    ::= { tnmNotifs 17 }
 
 additionalInformation OBJECT-TYPE
     SYNTAX AdditionalInformation
@@ -472,7 +465,7 @@ additionalInformation OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    additionalInformation."
-    ::= { tmnNotifObjects 18 }
+    ::= { tnmNotifs 18 }
 
 securityAlarmCause OBJECT-TYPE
     SYNTAX SecurityAlarmCause
@@ -509,7 +502,7 @@ securityAlarmCause OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    securityAlarmCause."
-    ::= { tmnNotifObjects 19 }
+    ::= { tnmNotifs 19 }
 
 securityAlarmSeverity OBJECT-TYPE
     SYNTAX SecurityAlarmSeverity
@@ -521,7 +514,7 @@ securityAlarmSeverity OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    securityAlarmSeverity."
-    ::= { tmnNotifObjects 20 }
+    ::= { tnmNotifs 20 }
 
 securityAlarmDetector OBJECT-TYPE
     SYNTAX SecurityAlarmDetector
@@ -534,7 +527,7 @@ securityAlarmDetector OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    securityAlarmDetector."
-    ::= { tmnNotifObjects 21 }
+    ::= { tnmNotifs 21 }
 
 serviceUser OBJECT-TYPE
     SYNTAX ServiceUser
@@ -546,7 +539,7 @@ serviceUser OBJECT-TYPE
 	 textual convention."
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, serviceUser."
-    ::= { tmnNotifObjects 22 }
+    ::= { tnmNotifs 22 }
 
 serviceProvider OBJECT-TYPE
     SYNTAX ServiceProvider
@@ -559,7 +552,7 @@ serviceProvider OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    serviceProvider."
-    ::= { tmnNotifObjects 23 }
+    ::= { tnmNotifs 23 }
 
 attributeList OBJECT-TYPE
     SYNTAX AttributeList
@@ -570,7 +563,7 @@ attributeList OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    attributeList."
-    ::= { tmnNotifObjects 24 }
+    ::= { tnmNotifs 24 }
 
 relationshipChangeDefinition OBJECT-TYPE
     SYNTAX AttributeValueChangeDefinition
@@ -581,7 +574,7 @@ relationshipChangeDefinition OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
 	    relationshipChangeDefinition."
-    ::= { tmnNotifObjects 25 }
+    ::= { tnmNotifs 25 }
 
 informationType OBJECT-TYPE
     SYNTAX InformationType
@@ -616,7 +609,7 @@ informationType OBJECT-TYPE
     REFERENCE
 	"ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
 	 informationType."
-    ::= { tmnNotifObjects 26 }
+    ::= { tnmNotifs 26 }
 
 informationData OBJECT-TYPE
     SYNTAX InformationData
@@ -628,7 +621,7 @@ informationData OBJECT-TYPE
     REFERENCE
 	"ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
 	 informationData."
-    ::= { tmnNotifObjects 27 }
+    ::= { tnmNotifs 27 }
 
 -- =====================================================================
 --
@@ -638,6 +631,9 @@ informationData OBJECT-TYPE
 -- These are general purpose notifications taken from X.721.  They rely 
 -- on the definition of some Scalars from this module and some textual 
 -- conventions from the OPENSS7-TMN-TC module.
+
+tmnNotifications OBJECT IDENTIFIER
+    ::= { tmnMIB 0 }
 
 attributeValueChange NOTIFICATION-TYPE
     OBJECTS {
@@ -3217,6 +3213,12 @@ unspecifiedReason OBJECT-IDENTITY
 -- manager to create a table of mappings and that is presented here.
 --
 
+tmnTables OBJECT IDENTIFIER
+    ::= { tmnObjects 2 }
+
+tmnSeverityMapping OBJECT IDENTIFIER
+    ::= { tmnTables 1 }
+
 tmnSeverityMappingTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TmnSeverityMappingEntry
     MAX-ACCESS not-accessible
@@ -3312,6 +3314,9 @@ tmnSeverityMappingStatus OBJECT-TYPE
 
 
 -- =====================================================================
+
+tmnAlarmSummary OBJECT IDENTIFIER
+    ::= { tmnTables 2 }
 
 tmnAlarmSummaryTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TmnAlarmSummaryEntry
@@ -3445,6 +3450,9 @@ tmnAlarmSummaryObjectInstance OBJECT-TYPE
 --  Scalars for alarm summary.
 --
 
+tmnScalars OBJECT IDENTIFIER
+    ::= { tmnObjects 3 }
+
 tmnAlarmOutstanding OBJECT-TYPE
     SYNTAX RowPointer
     MAX-ACCESS read-only
@@ -3523,241 +3531,14 @@ tmpAlarmOutstandingMinor OBJECT-TYPE
 --    notifications.
 --
 
-
--- =====================================================================
--- 
--- Managed objects from ITU-T Rec. Q.821
--- 
--- =====================================================================
-
-AlarmStatusList ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
-	"Specifies an alarm status list.  This is a set-valued 
-	 attribute."
-    REFERENCE
-	"ITU-T Recommendation M.3100 ASN.1 AlarmStatus."
-    SYNTAX BITS {
-	    cleared(0),
-	    activeReportable-Indeterminate(1),
-	    activeReportable-Warning(2),
-	    activeReportable-Minor(3),
-	    activeReportable-Major(4),
-	    activeReportable-Critical(5),
-	    activePending(6)
-	}
-
-
-currentAlarmSummaryControlTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF CurrentAlarmSummaryControlEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	"ITU-T Rec. Q.821 (2000) currentAlarmSummaryControl."
-    ::= { tmnAlarmSummaryControl 1 }
-
-
-currentAlarmSummaryControlEntry OBJECT-TYPE
-    SYNTAX CurrentAlarmSummaryControlEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	"ITU-T Rec. Q.821 (2000) currentAlarmSummaryControl."
-    INDEX {
-	    currentAlarmSummaryControlId -- index
-	}
-    ::= { currentAlarmSummaryControlTable 1 }
-
-CurrentAlarmSummaryControlEntry ::=
-    SEQUENCE {
-	currentAlarmSummaryControlId
-	    SimpleNameType,
-	alarmStatusList
-	    AlarmStatusList,
-	objectList
-	    ObjectList,
-	perceivedSeverityList
-	    PerceivedSeverityList,
-	probableCauseList
-	    OCTET STRING,
-	currentAlarmSummaryStorageType
-	    StorageType,
-	currentAlarmSummaryRowStatus
-	    RowStatus
-    }
-
-currentAlarmSummaryControlId OBJECT-TYPE
-    SYNTAX SimpleNameType
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
-    ::= { currentAlarmSummaryControlEntry 1 }
-
-alarmStatusList OBJECT-TYPE
-    SYNTAX AlarmStatusList
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
-    ::= { currentAlarmSummaryControlEntry 2 }
-
-objectList OBJECT-TYPE
-    SYNTAX ObjectList
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
-    ::= { currentAlarmSummaryControlEntry 3 }
-
-perceivedSeverityList OBJECT-TYPE
-    SYNTAX PerceivedSeverityList
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
-    ::= { currentAlarmSummaryControlEntry 4 }
-
-probableCauseList OBJECT-TYPE
-    SYNTAX OCTET STRING
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
-    ::= { currentAlarmSummaryControlEntry 5 }
-
-currentAlarmSummaryStorageType OBJECT-TYPE
-    SYNTAX StorageType
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
-    ::= { currentAlarmSummaryControlEntry 6 }
-
-currentAlarmSummaryRowStatus OBJECT-TYPE
-    SYNTAX RowStatus
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
-    ::= { currentAlarmSummaryControlEntry 7 }
-
--- =====================================================================
-
-managementOperationsScheduleTable OBJECT-TYPE
-    SYNTAX		SEQUENCE OF ManagementOperationsScheduleEntry
-    MAX-ACCESS	not-accessible
-    STATUS		current
-    DESCRIPTION
-	""
-    REFERENCE
-	"ITU-T Rec. Q.821 (2000) managementOperationsSchedule."
-    ::= { managementOperationsSchedule 1 }
-
-managementOperationsScheduleEntry OBJECT-TYPE
-    SYNTAX		ManagementOperationsScheduleEntry
-    MAX-ACCESS	not-accessible
-    STATUS		current
-    DESCRIPTION
-	""
-    REFERENCE
-	"ITU-T Rec. Q.821 (2000) managementOperationsSchedule."
-    INDEX	{
-		mosScheduleId -- index
-	}
-    ::= { managementOperationsScheduleTable 1 }
-
-ManagementOperationsScheduleEntry ::=
-    SEQUENCE {
-	mosAdministrativeState
-	    AdministrativeState,
-	-- mosAffectedObjectClass
-	mosAffectedObjectInstance
-	    RowPointer,
-	mosBeginTime
-	    TimeStamp,
-	mosDestinationAddress
-	    ,
-	mosEndTime
-	    TimeStamp,
-	mosInterval
-	    TimeInterval,
-	mosScheduleId
-	    SimpleNameType,
-	mosStorageType
-	    StorageType,
-	mosRowStatus
-	    RowStatus
-    }
-
--- =====================================================================
-
-enhancedCurrentAlarmSummaryControlTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF EnhancedCurrentAlarmSummaryControlEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	"ITU-T Rec. Q.821 (2000) 
-	 enhancedCurrentAlarmSummaryControl."
-    ::= { enhancedCurrentAlarmSummaryControl 1 }
-
-enhancedCurrentAlarmSummaryControlEntry OBJECT-TYPE
-    SYNTAX EnhancedCurrentAlarmSummaryControlEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	"ITU-T Rec. Q.821 (2000) 
-	 enhancedCurrentAlarmSummaryControl."
-    INDEX	{
-	    enhancedCurrentAlarmSummaryControlId
-	}
-    ::= { enhancedCurrentAlarmSummaryControlTable 1 }
-
-EnhancedCurrentAlarmSummaryControlEntry ::=
-    SEQUENCE {
-	enhancedCurrentAlarmSummaryControlId
-	    SimpleNameType,
-	-- action alarmSynchronization
-	-- logRecordIdActionParameter
-	-- correlatedRecordNameActionParameter
-	-- invalidBaseManagedObjectErrorParameter
-	-- invalidObjectInstanceErrorParameter
-	-- suspectObjectListActionParameter
-	-- cancelledAlarmSynchronizationParameter
-	ecasStorageType
-	    StorageType,
-	ecasRowStatus
-	    RowStatus
-    }
-
--- =====================================================================
 -- =====================================================================
 --
 -- Managed objects from ITU-T Rec. X.721
 --
 -- =====================================================================
+
+discriminator OBJECT IDENTIFIER
+    ::= { tmnTables 3 }
 
 discriminatorTable OBJECT-TYPE
     SYNTAX SEQUENCE OF Discriminator
@@ -3822,7 +3603,7 @@ discriminatorDurationTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { discriminatorDuration 1 }
+    ::= { discriminator 2 }
 
 discriminatorDurationEntry OBJECT-TYPE
     SYNTAX DiscriminatorDurationEntry
@@ -3840,14 +3621,55 @@ discriminatorDurationEntry OBJECT-TYPE
 DiscriminatorDurationEntry ::=
     SEQUENCE {
 	discriminatorDurationStartTime
-	    ExtUTCTime,
+	    DateAndTime,
 	discriminatorDurationStopTime
-	    ExtUTCTime,
+	    DateAndTime,
 	discriminatorDurationStorageType
 	    StorageType,
 	discriminatorDurationRowStatus
 	    RowStatus
     }
+
+discriminatorDurationStartTime OBJECT-TYPE
+    SYNTAX	DateAndTime
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2, discriminator MOC."
+    ::= { descriminatorDurationEntry 1 }
+
+discriminatorDurationStopTime OBJECT-TYPE
+    SYNTAX	DateAndTime
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2, discriminator MOC."
+    ::= { descriminatorDurationEntry 2 }
+
+discriminatorDurationStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2, discriminator MOC."
+    ::= { descriminatorDurationEntry 3 }
+
+discriminatorDurationRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2, discriminator MOC."
+    ::= { descriminatorDurationEntry 4 }
+
 
 -- discriminatorTable side-table
 -- dailyScheduling PRESENT IF "both the weekly scheduling package and 
@@ -3862,7 +3684,7 @@ discriminatorDailySchedulingTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { discriminatorDailySchedule 1 }
+    ::= { discriminator 3 }
 
 discriminatorDailySchedulingEntry OBJECT-TYPE
     SYNTAX DiscriminatorDailySchedulingEntry
@@ -3891,6 +3713,49 @@ DiscriminatorDailySchedulingEntry ::=
 	    RowStatus
     }
 
+discriminatorIntervalStart OBJECT-TYPE
+    SYNTAX	Time24
+    MAX-ACCESS	not-accessible -- index
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     intervalStart ATTRIBUTE."
+    ::= { discriminatorDailySchedulingEntry 1 }
+
+discriminatorIntervalEnd OBJECT-TYPE
+    SYNTAX	Time24
+    MAX-ACCESS	not-accessible -- index
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     intervalEnd ATTRIBUTE."
+    ::= { discriminatorDailySchedulingEntry 2 }
+
+discriminatorDailySchedulingStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { discriminatorDailySchedulingEntry 3 }
+
+discriminatorDailySchedulingRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { discriminatorDailySchedulingEntry 4 }
+
+
 -- discriminatorTable side-table
 -- weeklyScheduling PRESENT IF "both the daily scheduling package and 
 -- external scheduler packages are not present in an instance and weekly 
@@ -3904,7 +3769,7 @@ discriminatorWeeklySchedulingTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { discriminatorWeeklyScheduling 1 }
+    ::= { discriminator 4 }
 
 discriminatorWeeklySchedulingEntry OBJECT-TYPE
     SYNTAX DiscriminatorWeeklySchedulingEntry
@@ -3924,12 +3789,42 @@ discriminatorWeeklySchedulingEntry OBJECT-TYPE
 DiscriminatorWeeklySchedulingEntry ::=
     SEQUENCE {
 	discriminatorWeekMask
-	    BITS,
+	    WeekMask,
 	discriminatorWeeklySchedulingStorageType
 	    StorageType,
 	discriminatorWeeklySchedulingRowStatus
 	    RowStatus
     }
+
+discriminatorWeekMask OBJECT-TYPE
+    SYNTAX	WeekMask
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2, weekMask ATTRIBUTE."
+    ::= { discriminatorWeeklySchedulingEntry 1 }
+
+discriminatorWeeklySchedulingStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { discriminatorWeeklySchedulingEntry 2 }
+
+discriminatorWeeklySchedulingRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { discriminatorWeeklySchedulingEntry 3 }
 
 -- discriminatorTable side-table
 -- externalScheduler PRESENT IF "both the daily scheduling package and 
@@ -3944,7 +3839,7 @@ discriminatorExternalSchedulerTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { discriminatorExternalScheduler 1 }
+    ::= { discriminator 5 }
 
 discriminatorExternalSchedulerEntry OBJECT-TYPE
     SYNTAX DiscriminatorExternalSchedulerEntry
@@ -3969,12 +3864,47 @@ DiscriminatorExternalSchedulerEntry ::=
 	    RowStatus
     }
 
+discriminatorExternalSchedulerName OBJECT-TYPE
+    SYNTAX	RowPointer
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     schedulerName ATTRIBUTE."
+    ::= { discriminatorExternalSchedulerEntry 1 }
+
+discriminatorExternalSchedulerStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { discriminatorExternalSchedulerEntry 2 }
+
+discriminatorExternalSchedulerRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { discriminatorExternalSchedulerEntry 3 }
+
+
 -- =====================================================================
 
+eventForwardingDiscriminator OBJECT IDENTIFIER
+    ::= { tmnTables 4 }
+
 eventForwardingDiscriminatorTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF EventForwardingDiscriminator
-    MAX-ACCESS not-accessible
-    STATUS current
+    SYNTAX	SEQUENCE OF EventForwardingDiscriminatorEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
     DESCRIPTION
 	""
     REFERENCE
@@ -3982,9 +3912,9 @@ eventForwardingDiscriminatorTable OBJECT-TYPE
     ::= { eventForwardingDiscriminator 1 }
 
 eventForwardingDiscriminatorEntry OBJECT-TYPE
-    SYNTAX EventForwardingDiscriminator
-    MAX-ACCESS not-accessible
-    STATUS current
+    SYNTAX	EventForwardingDiscriminatorEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
     DESCRIPTION
 	""
     REFERENCE
@@ -3994,10 +3924,10 @@ eventForwardingDiscriminatorEntry OBJECT-TYPE
 	}
     ::= { eventForwardingDiscriminatorTable 1 }
 
-EventForwardingDiscriminator ::=
+EventForwardingDiscriminatorEntry ::=
     SEQUENCE {
-	-- eventForwardingDiscriminatorDestination
-	--  ,
+	eventForwardingDiscriminatorDestination
+	    OCTET STRING,
 	-- backUpDestinationListPackage PACKAGE
 	eventForwardingDiscriminatorActiveDestination
 	    OCTET STRING,
@@ -4011,41 +3941,130 @@ EventForwardingDiscriminator ::=
 	    RowStatus
     }
 
--- side-table to expand destination lists
+eventForwardingDiscriminatorDestination OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, destination 
+	     ATTRIBUTE."
+    ::= { eventForwardingDiscriminatorEntry 1 }
 
-efdDestinationTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF EfdDestinationEntry
+eventForwardingDiscriminatorActiveDestination OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     activeDestination ATTRIBUTE."
+    ::= { eventForwardingDiscriminatorEntry 2 }
+
+eventForwardingDiscriminatorConfirmedMode OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     confirmedMode ATTRIBUTE."
+    ::= { eventForwardingDiscriminatorEntry 3 }
+
+eventForwardingDiscriminatorStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { eventForwardingDiscriminatorEntry 4 }
+
+eventForwardingDiscriminatorRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { eventForwardingDiscriminatorEntry 5 }
+
+
+-- side-table to expand backup destination lists
+
+efdBackupDestinationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EfdBackupDestinationEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
-	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { efdDestination 1 }
+	"ITU-T Ref. X.721 (1997) | ISO/IEC 10165-2, 
+	     Attribute-ASN1Module.BackUpDestinationList."
+    ::= { eventForwardingDiscriminator 2 }
 
-efdDestinationEntry OBJECT-TYPE
-    SYNTAX EfdDestinationEntry
+efdBackupDestinationEntry OBJECT-TYPE
+    SYNTAX EfdBackupDestinationEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
-	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { efdDestinationTable 1 }
+	"ITU-T Ref. X.721 (1997) | ISO/IEC 10165-2, 
+	     Attribute-ASN1Module.BackUpDestinationList."
+    ::= { efdBackupDestinationTable 1 }
 
-EfdDestinationEntry ::=
+EfdBackupDestinationEntry ::=
     SEQUENCE {
-	efdDestination
+	efdBackupDestination
 	    OCTET STRING,
-	efdDestinationType
-	    INTEGER,
 	efdDestinationStorageType
 	    StorageType,
 	efdDestinationRowStatus
 	    RowStatus
     }
 
+efdBackupDestination OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Ref. X.721 (1997) | ISO/IEC 10165-2, 
+	     Attribute-ASN1Module.BackUpDestinationList."
+    ::= { efdBackupDestinationEntry 1 }
+
+efdDestinationStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { efdBackupDestinationEntry 2 }
+
+efdDestinationRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { efdBackupDestinationEntry 3 }
+
+
 -- =====================================================================
+
+log OBJECT IDENTIFIER
+    ::= { tmnTables 5 }
 
 logTable OBJECT-TYPE
     SYNTAX SEQUENCE OF Log
@@ -4086,17 +4105,17 @@ Log ::=
 	logAvailabilityStatus
 	    AvailabilityStatus,
 	logFullAction
-	    INTEGER, -- { wrap(0), halt(1) }
+	    FullAction,
 	-- finiteLogSizePackage PACKAGE
-	maxLogSize
-	    INTEGER, -- size in octets or unlimited(0)
-	currentLogSize
-	    INTEGER,
-	numberOfRecords
-	    INTEGER,
+	logMaxLogSize
+	    Unsigned32, -- size in octets or unlimited(0)
+	logCurrentLogSize
+	    Gauge32,
+	logNumberOfRecords
+	    Gauge32,
 	-- logAlarmPackage PACKAGE
-	capacityAlarmThreshold
-	    OCTET STRING, -- SET OF INTEGER(0..100)
+	logCapacityAlarmThreshold
+	    LogCapacityAlarmThreshold,
 	logAvailabilityStatus
 	    AvailabilityStatus,
 	logStorageType
@@ -4104,6 +4123,155 @@ Log ::=
 	logRowStatus
 	    RowStatus
     }
+
+logId OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     logId ATTRIBUTE."
+    ::= { logEntry 1 }
+
+logDiscriminatorConstruct OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"This is the description of a CMIS filter."
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     discriminatorConstruct ATTRIBUTE."
+    ::= { logEntry 2 }
+
+logAdministrativeState OBJECT-TYPE
+    SYNTAX	AdministrativeState
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     administrativeState ATTRIBUTE."
+    ::= { logEntry 3 }
+
+logOperationalState OBJECT-TYPE
+    SYNTAX	OperationalState
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     operationalState ATTRIBUTE."
+    ::= { logEntry 4 }
+
+logAvailabilityStatus OBJECT-TYPE
+    SYNTAX	AvailabilityStatus
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     availabilityStatus ATTRIBUTE."
+    ::= { logEntry 5 }
+
+logFullAction OBJECT-TYPE
+    SYNTAX	FullAction
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     logFullAction ATTRIBUTE."
+    ::= { logEntry 6 }
+
+-- finiteLogSizePackage PACKAGE
+logMaxLogSize OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"octets"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     maxLogSize ATTRIBUTE."
+    ::= { logEntry 7 }
+
+logCurrentLogSize OBJECT-TYPE
+    SYNTAX	Gauge32
+    UNITS	"octets"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     currentLogSize ATTRIBUTE."
+    ::= { logEntry 8 }
+
+logNumberOfRecords OBJECT-TYPE
+    SYNTAX	Gauge32
+    UNITS	"records"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     numberOfRecords ATTRIBUTE."
+    ::= { logEntry 9 }
+
+-- logAlarmPackage PACKAGE
+logCapacityAlarmThreshold OBJECT-TYPE
+    SYNTAX	OCTET STRING, -- SET OF INTEGER(0..100)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"This object is a set of integers with a value from zero 
+	 to 100 (percent) where each octet represents one alarm 
+	 threshold."
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     capacityAlarmThreshold ATTRIBUTE."
+    ::= { logEntry 10 }
+
+logAvailabilityStatus OBJECT-TYPE
+    SYNTAX	AvailabilityStatus
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     availabilityStatus ATTRIBUTE."
+    ::= { logEntry 11 }
+
+logStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { logEntry 12 }
+
+logRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { logEntry 13 }
+
 
 -- NOTIFICATIONS
 -- objectCreation,
@@ -4122,7 +4290,7 @@ logDurationTable OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { logDuration 1 }
+    ::= { log 2 }
 
 logDurationEntry OBJECT-TYPE
     SYNTAX LogDurationEntry
@@ -4140,14 +4308,57 @@ logDurationEntry OBJECT-TYPE
 LogDurationEntry ::=
     SEQUENCE {
 	logDurationStartTime
-	    ExtUTCTime,
+	    DateAndTime,
 	logDurationStopTime
-	    ExtUTCTime,
+	    DateAndTime,
 	logDurationStorageType
 	    StorageType,
 	logDurationRowStatus
 	    RowStatus
     }
+
+logDurationStartTime OBJECT-TYPE
+    SYNTAX	DateAndTime
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, startTime 
+	 ATTRIBUTE."
+    ::= { logDurationEntry 1 }
+
+logDurationStopTime OBJECT-TYPE
+    SYNTAX	DateAndTime
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, stopTime 
+	 ATTRIBUTE."
+    ::= { logDurationEntry 2 }
+
+logDurationStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { logDurationEntry 3 }
+
+logDurationRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { logDurationEntry 4 }
+
 
 -- dailySchedulingPackage
 
@@ -4159,7 +4370,7 @@ logDailySchedulingTable OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { logDailyScheduling 1 }
+    ::= { log 3 }
 
 logDailySchedulingEntry OBJECT-TYPE
     SYNTAX LogDailySchedulingEntry
@@ -4188,6 +4399,48 @@ LogDailySchedulingEntry ::=
 	    RowStatus
     }
 
+logIntervalStart OBJECT-TYPE
+    SYNTAX	Time24
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     intervalStart ATTRIBUTE."
+    ::= { logDailySchedulingEntry 1 }
+
+logIntervalEnd OBJECT-TYPE
+    SYNTAX	Time24
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, 
+	     intervalEnd ATTRIBUTE."
+    ::= { logDailySchedulingEntry 2 }
+
+logDailySchedulingStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { logDailySchedulingEntry 3 }
+
+logDailySchedulingRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { logDailySchedulingEntry 4 }
+
 -- weeklySchedulingPackage
 
 logWeeklySchedulingTable OBJECT-TYPE
@@ -4198,7 +4451,7 @@ logWeeklySchedulingTable OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { logWeeklyScheduling 1 }
+    ::= { log 4 }
 
 logWeeklySchedulingEntry OBJECT-TYPE
     SYNTAX LogWeeklySchedulingEntry
@@ -4218,12 +4471,43 @@ logWeeklySchedulingEntry OBJECT-TYPE
 LogWeeklySchedulingEntry ::=
     SEQUENCE {
 	logWeekMask
-	    BITS,
+	    WeekMask,
 	logWeeklySchedulingStorageType
 	    StorageType,
 	logWeeklySchedulingRowStatus
 	    RowStatus
     }
+
+logWeekMask OBJECT-TYPE
+    SYNTAX	WeekMask
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 (1997) | ISO/IEC 10165-2, weekMask 
+	     ATTRIBUTE."
+    ::= { logWeeklySchedulingEntry 1 }
+
+logWeeklySchedulingStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { logWeeklySchedulingEntry 2 }
+
+logWeeklySchedulingRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { logWeeklySchedulingEntry 3 }
 
 -- externalSchedulerPackage
 
@@ -4235,7 +4519,7 @@ logExternalSchedulerTable OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { logExternalScheduler 1 }
+    ::= { log 5 }
 
 logExternalSchedulerEntry OBJECT-TYPE
     SYNTAX LogExternalSchedulerEntry
@@ -4260,7 +4544,42 @@ LogExternalSchedulerEntry ::=
 	    RowStatus
     }
 
+logExternalSchedulerName OBJECT-TYPE
+    SYNTAX	RowPointer
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2, schedulerName 
+	     ATTRIBUTE."
+    ::= { logExternalSchedulerEntry 1 }
+
+logExternalSchedulerStorageType OBJECT-TYPE
+    SYNTAX	StorageType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { logExternalSchedulerEntry 2 }
+
+logExternalSchedulerRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { logExternalSchedulerEntry 3 }
+
+
 -- =====================================================================
+
+logRecord OBJECT IDENTIFIER
+    ::= { tmnTables 6 }
 
 logRecordTable OBJECT-TYPE
     SYNTAX SEQUENCE OF LogRecord
@@ -4288,6 +4607,10 @@ logRecordEntry OBJECT-TYPE
 
 LogRecord ::=
     SEQUENCE {
+	logRecordId
+	    SimpleNameType,
+	logRecordLoggingTime
+	    DateAndTime
     }
 
 -- =====================================================================
@@ -4300,7 +4623,7 @@ eventLogRecordTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { eventLogRecord 1 }
+    ::= { logRecord 2 }
 
 eventLogRecordEntry OBJECT-TYPE
     SYNTAX EventLogRecord
@@ -4318,6 +4641,12 @@ eventLogRecordEntry OBJECT-TYPE
 
 EventLogRecord ::=
     SEQUENCE {
+	eventLogRecordManagedObjectClass
+	    ObjectClass,
+	eventLogRecordManagedObjectInstance
+	    ObjectInstance,
+	eventLogRecordEventType
+	    OBJECT IDENTIFIER
     }
 
 -- =====================================================================
@@ -4330,7 +4659,7 @@ alarmRecordTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { alarmRecord 1 }
+    ::= { logRecord 3 }
 
 alarmRecordEntry OBJECT-TYPE
     SYNTAX AlarmRecord
@@ -4348,6 +4677,20 @@ alarmRecordEntry OBJECT-TYPE
 
 AlarmRecord ::=
     SEQUENCE {
+	alarmRecordProbableCause
+	    ProbableCause,
+	alarmRecordPerceivedSeverity
+	    PerceivedSeverity,
+	-- specificProblemsPackage CONDITIONAL PACKAGE
+	alarmRecordSpecificProblems
+	    SpecificProblems,
+	alarmRecordBackedUpStatus,
+	    BackedUpStatus,
+	alarmRecordBackUpObject
+	    RowPointer,
+	alarmRecordTrendIndication
+	    TrendIndication,
+
     }
 
 -- =====================================================================
@@ -4360,7 +4703,7 @@ attributeValueChangeRecordTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { attributeValueChangeRecord 1 }
+    ::= { logRecord 4 }
 
 attributeValueChangeRecordEntry OBJECT-TYPE
     SYNTAX AttributeValueChangeRecord
@@ -4390,7 +4733,7 @@ objectCreationRecordTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { objectCreationRecord 1 }
+    ::= { logRecord 5 }
 
 objectCreationRecordEntry OBJECT-TYPE
     SYNTAX ObjectCreationRecord
@@ -4420,7 +4763,7 @@ objectDeletionRecordTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { objectDeletionRecord 1 }
+    ::= { logRecord 6 }
 
 objectDeletionRecordEntry OBJECT-TYPE
     SYNTAX ObjectDeletionRecord
@@ -4450,7 +4793,7 @@ relationshipChangeRecordTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { relationshipChangeRecord 1 }
+    ::= { logRecord 7 }
 
 relationshipChangeRecordEntry OBJECT-TYPE
     SYNTAX RelationshipChangeRecord
@@ -4480,7 +4823,7 @@ securityAlarmReportRecordTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { securityAlarmReportRecord 1 }
+    ::= { logRecord 8 }
 
 securityAlarmReportRecordEntry OBJECT-TYPE
     SYNTAX SecurityAlarmReportRecord
@@ -4510,7 +4853,7 @@ stateChangeRecordTable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2"
-    ::= { stateChangeRecord 1 }
+    ::= { logRecord 9 }
 
 stateChangeRecordEntry OBJECT-TYPE
     SYNTAX StateChangeRecord
@@ -4531,6 +4874,9 @@ StateChangeRecord ::=
     }
 
 -- =====================================================================
+
+system OBJECT IDENTIFIER
+    ::= { tmnTables 7 }
 
 systemTable OBJECT-TYPE
     SYNTAX SEQUENCE OF System
@@ -4558,13 +4904,14 @@ System ::=
 
 -- =====================================================================
 
--- =====================================================================
+tmnConformance OBJECT IDENTIFIER
+    ::= { tmnMIB 2 }
 
--- =====================================================================
+tmnCompliances OBJECT IDENTIFIER
+    ::= { tmnConformance 1 }
 
--- =====================================================================
-
--- =====================================================================
+tmnGroups OBJECT IDENTIFIER
+    ::= { tmnConformance 2 }
 
 -- =====================================================================
 

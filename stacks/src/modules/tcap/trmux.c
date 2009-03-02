@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: trmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:03 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-03-02 05:15:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: trmux.c,v $
+ Revision 0.9.2.1  2009-03-02 05:15:03  brian
+ - updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: trmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:03 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: trmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:03 $";
 
 /*
  * This is TRMUX, a TCAP Translaction Sublayer (TR) driver implementing the TRI
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TRMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TRMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TRMUX_COPYRIGHT	"Copyright (c) 2008-2009 Monavacon Limited.  All Rights Reserved."
-#define TRMUX_REVISION	"Monavacon $RCSfile$ $Name$($Revision$) $Date$"
+#define TRMUX_REVISION	"Monavacon $RCSfile: trmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:03 $"
 #define TRMUX_DEVICE	"SVR 4.2 STREAMS Q.771 Transaction Sublayer (TR) Driver"
 #define TRMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TRMUX_LICENSE	"GPL"

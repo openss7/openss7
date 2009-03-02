@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M3UA-ASP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.7 $) $Date: 2009-01-10 17:22:26 $
+-- @(#) $RCSfile: OPENSS7-M3UA-ASP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2009-01-25 07:06:21 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,20 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-01-10 17:22:26 $ by $Author: brian $
+-- Last Modified $Date: 2009-01-25 07:06:21 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M3UA-ASP-MIB.mib,v $
+-- Revision 0.9.2.10  2009-01-25 07:06:21  brian
+-- - correct numbering again
+--
+-- Revision 0.9.2.9  2009-01-25 07:01:13  brian
+-- - correct numbering again
+--
+-- Revision 0.9.2.8  2009-01-25 06:56:48  brian
+-- - correct numbering
+--
 -- Revision 0.9.2.7  2009-01-10 17:22:26  brian
 -- - updated mibs
 --
@@ -306,7 +315,7 @@ m3uaAspProceduralStatus OBJECT-TYPE
          overall procedural status is the set-union (logical OR) 
          of the procedural statuses of all of the ASP-SGP 
          associations defined for this ASP."
-    ::= { m3uaAspEntry 1 }
+    ::= { m3uaAspEntry 4 }
 
 m3uaAspUsageState OBJECT-TYPE
     SYNTAX      UsageState
@@ -317,7 +326,7 @@ m3uaAspUsageState OBJECT-TYPE
          the UsageState textual convention.  The overall usage 
          state is the greatest value of the state of the 
          individual usage states of the ASP-SGP associations."
-    ::= { m3uaAspEntry 2 }
+    ::= { m3uaAspEntry 5 }
 
 m3uaAspState OBJECT-TYPE
     SYNTAX      AspState -- OPENSS7-SIGTRAN-TC
@@ -328,7 +337,7 @@ m3uaAspState OBJECT-TYPE
          AspState textual convention.  The overall state is the 
          largest state number of the individual ASP-SGP 
          associations."
-    ::= { m3uaAspEntry 3 }
+    ::= { m3uaAspEntry 6 }
 
 m3uaAspCapabilities OBJECT-TYPE
     SYNTAX      SigtranOptions -- OPENSS7-SIGTRAN-TC
@@ -337,7 +346,7 @@ m3uaAspCapabilities OBJECT-TYPE
     DESCRIPTION
         "Provides the capabilities of the AS using the 
          SigtranOptions textual convention."
-    ::= { m3uaAspEntry 4 }
+    ::= { m3uaAspEntry 7 }
 
 m3uaAspIdPolicy OBJECT-TYPE
     SYNTAX      AspIdPolicy -- OPENSS7-SIGTRAN-TC
@@ -346,7 +355,7 @@ m3uaAspIdPolicy OBJECT-TYPE
     DESCRIPTION
         "Provides the default ASP Id policy for the ASP 
          following the AspIdPolicy textual convention."
-    ::= { m3uaAspEntry 5 }
+    ::= { m3uaAspEntry 8 }
 
 m3uaAspRegistrationPolicy OBJECT-TYPE
     SYNTAX      RegistrationPolicy -- OPENSS7-SIGTRAN-TC
@@ -358,7 +367,7 @@ m3uaAspRegistrationPolicy OBJECT-TYPE
          ASP toward the local AS that it serves.  It is tempered 
          by the registration policy of the particular SG that 
          serves an ASP."
-    ::= { m3uaAspEntry 6 }
+    ::= { m3uaAspEntry 9 }
 
 m3uaAspAssociationPolicy OBJECT-TYPE
     SYNTAX      AssociationPolicy -- OPENSS7-SIGTRAN-TC
@@ -367,7 +376,7 @@ m3uaAspAssociationPolicy OBJECT-TYPE
     DESCRIPTION
         "Provides the association formation policy for the ASP 
          following the AssociationPolicy textual convention."
-    ::= { m3uaAspEntry 7 }
+    ::= { m3uaAspEntry 10 }
 
 m3uaAspStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -377,7 +386,7 @@ m3uaAspStatus OBJECT-TYPE
         "Provides the ability for management stations to add an 
          delete entries from this table according to the 
          RowStatus textual convention."
-    ::= { m3uaAspEntry 8 }
+    ::= { m3uaAspEntry 11 }
 
 
 -- ====================================================================
@@ -1281,7 +1290,7 @@ m3uaAspSgTimerT17 OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. Q.704 (1996) : Clause 12."
     DEFVAL  { 100 }
-    ::= { m3uaAspSgEntry 15 }
+    ::= { m3uaAspSgEntry 16 }
 
 m3uaAspSgTimerT19A OBJECT-TYPE
     SYNTAX      TimeInterval -- (48000..60000)
@@ -1318,7 +1327,7 @@ m3uaAspSgTimerT19A OBJECT-TYPE
     REFERENCE
         "ANSI T1.111.4 (1996 and 2000) 12.2.2"
     DEFVAL  { 0 }
-    ::= { m3uaAspSgEntry 16 }
+    ::= { m3uaAspSgEntry 17 }
 
 m3uaAspSgTimerT24 OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -1342,7 +1351,7 @@ m3uaAspSgTimerT24 OBJECT-TYPE
          from the remote end to stabilize as it carries out any 
          siganalling traffic management of its own."
     DEFVAL  { 0 }
-    ::= { m3uaAspSgEntry 17 }
+    ::= { m3uaAspSgEntry 18 }
 
 m3uaAspSgTimerT31A OBJECT-TYPE
     SYNTAX      TimeInterval -- (1000..12000)
@@ -1376,7 +1385,7 @@ m3uaAspSgTimerT31A OBJECT-TYPE
         "ANSI T1.111.5 (2000) 3.8.2.2, 
              draft-bidulock-sigtran-aspcong"
     DEFVAL  { 1000 }
-    ::= { m3uaAspSgEntry 18 }
+    ::= { m3uaAspSgEntry 19 }
 
 m3uaAspSgTimerT32A OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -1411,7 +1420,7 @@ m3uaAspSgTimerT32A OBJECT-TYPE
     REFERENCE
         "ANSI T1.111.4 (1996 and 2000) 12.2.2"
     DEFVAL  { 6000 }
-    ::= { m3uaAspSgEntry 19 }
+    ::= { m3uaAspSgEntry 20 }
 
 m3uaAspSgTimerT33A OBJECT-TYPE
     SYNTAX      TimeInterval -- (6000..60000)
@@ -1441,7 +1450,7 @@ m3uaAspSgTimerT33A OBJECT-TYPE
     REFERENCE
         "ANSI T1.111.4 (1996 and 2000) 12.2.2 (B)"
     DEFVAL  { 6000 }
-    ::= { m3uaAspSgEntry 20 }
+    ::= { m3uaAspSgEntry 21 }
 
 m3uaAspSgTimerT34A OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -1476,7 +1485,7 @@ m3uaAspSgTimerT34A OBJECT-TYPE
     REFERENCE
         "ANSI T1.111.4 (1996 and 2000) 12.2.2"
     DEFVAL  { 500 }
-    ::= { m3uaAspSgEntry 21 }
+    ::= { m3uaAspSgEntry 22 }
 
 m3uaAspSgTimerT1T OBJECT-TYPE
     SYNTAX      TimeInterval -- (400..1200)
@@ -1526,7 +1535,7 @@ m3uaAspSgTimerT1T OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. Q.707 (1988) 2.2"
     DEFVAL  { 800 }
-    ::= { m3uaAspSgEntry 22 }
+    ::= { m3uaAspSgEntry 23 }
 
 m3uaAspSgTimerT2T OBJECT-TYPE
     SYNTAX      TimeInterval -- (3000..9000)
@@ -1556,7 +1565,7 @@ m3uaAspSgTimerT2T OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. Q.707 (1988) 2.2"
     DEFVAL  { 6000 }
-    ::= { m3uaAspSgEntry 23 }
+    ::= { m3uaAspSgEntry 24 }
 
 m3uaAspSgStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -1567,7 +1576,7 @@ m3uaAspSgStatus OBJECT-TYPE
          add or delete rows from the SG table.  Adding a row to 
          the SG table adds an SG to an SG group.  Removing a row 
          from the table removes an SG from an SG group."
-    ::= { m3uaAspSgEntry 24 }
+    ::= { m3uaAspSgEntry 25 }
 
 
 -- ====================================================================
@@ -2777,7 +2786,7 @@ m3uaAspRlAdministrativeState OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. X.721 (1992) : administrativeState"
     DEFVAL  { 0 } -- locked(0)
-    ::= { m3uaAspRlEntry 1 }
+    ::= { m3uaAspRlEntry 2 }
 
 m3uaAspRlOperationalState OBJECT-TYPE
     SYNTAX      OperationalState
@@ -2793,7 +2802,7 @@ m3uaAspRlOperationalState OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. X.721 (1992) : operationalState"
     DEFVAL  { 1 } -- enabled(1)
-    ::= { m3uaAspRlEntry 1 }
+    ::= { m3uaAspRlEntry 3 }
 
 m3uaAspRlProceduralStatus OBJECT-TYPE
     SYNTAX      ProceduralStatus
@@ -2808,7 +2817,7 @@ m3uaAspRlProceduralStatus OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. X.721 (1992) : proceduralStatus"
     DEFVAL  { } -- '000000'B
-    ::= { m3uaAspRlEntry 1 }
+    ::= { m3uaAspRlEntry 4 }
 
 m3uaAspRlUsageState OBJECT-TYPE
     SYNTAX      UsageState
@@ -2834,7 +2843,7 @@ m3uaAspRlUsageState OBJECT-TYPE
          than the idle(0) state at any given instant in time."
     REFERENCE
         "ITU-T Rec. X.721 (1992) : usageState"
-    ::= { m3uaAspRlEntry 1 }
+    ::= { m3uaAspRlEntry 5 }
 
 m3uaAspRlAvailabilityStatus OBJECT-TYPE
     SYNTAX      MtpAvaliabiltiyStatus
@@ -2848,7 +2857,7 @@ m3uaAspRlAvailabilityStatus OBJECT-TYPE
          of the availability status of the contained routes."
     REFERENCE
         "ITU-T Rec. Q.704 (1996)"
-    ::= { m3uaAspRlEntry 1 }
+    ::= { m3uaAspRlEntry 6 }
 
 m3uaAspRlStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -2860,7 +2869,7 @@ m3uaAspRlStatus OBJECT-TYPE
          following the RowStatus textual convention."
     REFERENCE
         "STD 58"
-    ::= { m3uaAspRlEntry 1 }
+    ::= { m3uaAspRlEntry 7 }
 
 
 
