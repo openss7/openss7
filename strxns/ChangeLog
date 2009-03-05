@@ -1,3 +1,12 @@
+2009-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/dl.c: fixes
+	* src/drivers/ip_to_dlpi.c: fixes
+	* src/drivers/np.c: fixes
+	* src/lib/dlpiapi.c: fixes
+	* src/lib/libdlpi/dlpi.c: fixes
+	- fixes thanks to Larry Cipriani's syntax checker
+
 2009-01-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/dlMIB.c: agent updates

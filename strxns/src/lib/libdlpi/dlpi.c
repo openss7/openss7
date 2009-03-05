@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:50:08 $
+ @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-03-05 13:07:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:08 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 13:07:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.c,v $
+ Revision 0.9.2.7  2009-03-05 13:07:17  brian
+ - fixes thanks to Larry Capriani's syntax checker
+
  Revision 0.9.2.6  2008-09-10 03:50:08  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:50:08 $"
+#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-03-05 13:07:17 $"
 
 static char const ident[] =
-    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:50:08 $";
+    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-03-05 13:07:17 $";
 
 /* This file can be processed by doxygen(1). */
 
@@ -1310,7 +1313,7 @@ _dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
 	if (unlikely(aptr == NULL))
 		return (DLPI_EINVAL);
 
-	if (unlikely(alen == 0) | unlikely(alen > DLPI_PHYSADDR_MAX))
+	if (unlikely(alen == 0) || unlikely(alen > DLPI_PHYSADDR_MAX))
 		return (DLPI_EINVAL);
 
 	buf.prim.enabmulti_req.dl_primitive = DL_ENABMULTI_REQ;

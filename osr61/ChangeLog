@@ -1,3 +1,8 @@
+2009-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/mercd/source/msdrcv.c: fixes
+	- fixes thanks to Larry Cipriani's syntax checker
+
 2008-12-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* osr61.spec.in: new stratm package

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:51 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-03-05 13:07:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:51 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 13:07:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.19  2009-03-05 13:07:17  brian
+ - fixes thanks to Larry Capriani's syntax checker
+
  Revision 0.9.2.18  2008-09-22 20:31:51  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:51 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-03-05 13:07:17 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:51 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-03-05 13:07:17 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -104,7 +107,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:51 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2009-03-05 13:07:17 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -3108,7 +3111,7 @@ ne_ip_bind_req(struct np *np, struct ne_bind_req *ep)
 		np->ADDR_length = ep->ADDR_length;
 	}
 	NPI_error = NBADADDR;
-	if (sin->sin_port == 0 & ~(np->BIND_flags & (DEFAULT_LISTENER | TOKEN_REQUEST)))
+	if (sin->sin_port == 0 && (np->BIND_flags & ~(DEFAULT_LISTENER | TOKEN_REQUEST)))
 		goto error;
 	if (ep->PROTOID_length == 0) {
 		uchar *proto = (uchar *) np->PROTOID_buffer;
@@ -3615,7 +3618,7 @@ n_data_req(queue_t *q, mblk_t *mp)
 	if ((ne.DATA_xfer_flags = p->DATA_xfer_flags) & ~(N_MORE_DATA_FLAG | N_RC_FLAG))
 		goto error;
 	err = NBADFLAG;
-	if ((ne.DATA_xfer_flags & (N_MORE_DATA_FLAG | N_RC_FLAG)) = (N_MORE_DATA_FLAG | N_RC_FLAG))
+	if ((ne.DATA_xfer_flags & (N_MORE_DATA_FLAG | N_RC_FLAG)) != (N_MORE_DATA_FLAG | N_RC_FLAG))
 		goto error;
 	if (err = np->np_event(q, np, &ne))
 		goto error;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-30 18:31:58 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2009-03-05 13:07:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:31:58 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 13:07:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_to_dlpi.c,v $
+ Revision 0.9.2.36  2009-03-05 13:07:17  brian
+ - fixes thanks to Larry Capriani's syntax checker
+
  Revision 0.9.2.35  2008-10-30 18:31:58  brian
  - rationalized drivers, modules and test programs
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-30 18:31:58 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2009-03-05 13:07:17 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-30 18:31:58 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2009-03-05 13:07:17 $";
 
 #include <sys/os7/compat.h>
 
@@ -89,7 +92,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.35 $) $Date: 2008-10-30 18:31:58 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.36 $) $Date: 2009-03-05 13:07:17 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -794,7 +797,7 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 			   could remain DL_IDLE if we couldn't allocate mblk for UNBIND_REQ. There
 			   are many ways in which the dev->start could be 1 but dlpi state - not
 			   DL_IDLE. */
-			if (ip2xinet_status.ip2x_dlstate == DL_IDLE && privptr->state == 1) ;
+			if (ip2xinet_status.ip2x_dlstate == DL_IDLE && privptr->state == 1)
 			{
 				mblk_t *newmp;
 				unsigned char *buf;

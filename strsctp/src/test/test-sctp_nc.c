@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 23:13:29 $
+ @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-03-05 13:07:16 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:29 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 13:07:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_nc.c,v $
+ Revision 0.9.2.12  2009-03-05 13:07:16  brian
+ - fixes thanks to Larry Capriani's syntax checker
+
  Revision 0.9.2.11  2008-04-28 23:13:29  brian
  - updated headers for release
 
@@ -87,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 23:13:29 $"
+#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-03-05 13:07:16 $"
 
-static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 23:13:29 $";
+static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-03-05 13:07:16 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -253,7 +256,7 @@ sctp_get(int fd, int wait)
 			perror("sctp_get: poll");
 			return -1;
 		}
-		if ((ret == 1) | (ret == 2)) {
+		if ((ret == 1) || (ret == 2)) {
 			if (pfd[0].revents & (POLLIN | POLLPRI)) {
 				flags = 0;
 				while ((ret = getmsg(fd, &ctrl, &data, &flags)) < 0) {

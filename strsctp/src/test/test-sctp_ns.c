@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-30 18:31:44 $
+ @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2009-03-05 13:07:16 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:31:44 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 13:07:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_ns.c,v $
+ Revision 0.9.2.14  2009-03-05 13:07:16  brian
+ - fixes thanks to Larry Capriani's syntax checker
+
  Revision 0.9.2.13  2008-10-30 18:31:44  brian
  - rationalized drivers, modules and test programs
 
@@ -93,9 +96,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-30 18:31:44 $"
+#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2009-03-05 13:07:16 $"
 
-static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-30 18:31:44 $";
+static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2009-03-05 13:07:16 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -257,7 +260,7 @@ sctp_get(int fd, int wait)
 			perror("sctp_get: poll");
 			return -1;
 		}
-		if ((ret == 1) | (ret == 2)) {
+		if ((ret == 1) || (ret == 2)) {
 			if (pfd[0].revents & (POLLIN | POLLPRI)) {
 				flags = 0;
 				if (getmsg(fd, &ctrl, &data, &flags) < 0) {
@@ -628,7 +631,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sctp_ns", PACKAGE, VERSION, "$Revision: 0.9.2.13 $ $Date: 2008-10-30 18:31:44 $");
+", "test-sctp_ns", PACKAGE, VERSION, "$Revision: 0.9.2.14 $ $Date: 2009-03-05 13:07:16 $");
 }
 
 void

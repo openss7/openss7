@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:49 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-03-05 13:07:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:49 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 13:07:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.16  2009-03-05 13:07:17  brian
+ - fixes thanks to Larry Capriani's syntax checker
+
  Revision 0.9.2.15  2008-09-22 20:31:49  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:49 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-03-05 13:07:17 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:49 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-03-05 13:07:17 $";
 
 /*
  *  This multiplexing driver is a master device driver for Data Link Provider streams prsenting a
@@ -99,7 +102,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:49 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2009-03-05 13:07:17 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -2309,7 +2312,7 @@ dl_subs_bind_req(queue_t *q, mblk_t *mp)
 		goto error;
 	dl_errno = -ENOBUFS;
 	if (unlikely(mp->b_datap->db_lim < mp->b_datap->db_base + size))
-		if (unlikely((mp = ss7_allocb(q, size, BPR_MED) == NULL)))
+		if (unlikely((mp = ss7_allocb(q, size, BPR_MED)) == NULL))
 			goto error;
 	dl_set_state(dl, DL_SUBS_BIND_PND);
 	/* provider specific subsequent bind */
@@ -4041,7 +4044,7 @@ dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		return (ENXIO);
 	}
 #ifdef LIS
-	if (cmajor != CMAJOR_0 || (cminor & 0x1f >= DL_MINOR_FREE)) {
+	if (cmajor != CMAJOR_0 || (cminor & 0x1f) >= DL_MINOR_FREE) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
 		       "attempt to open device %d:%d directly", cmajor, cminor);
 		return (ENXIO);
@@ -4049,7 +4052,7 @@ dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 #endif				/* LIS */
 #ifdef LFS
 	/* Linux Fast-STREAMS always passes internal major dvice numbers (module ids) */
-	if (cmajor != DRV_ID || (cminor & 0x1f >= DL_MINOR_FREE)) {
+	if (cmajor != DRV_ID || (cminor & 0x1f) >= DL_MINOR_FREE) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
 		       "attempt to open device %d:%d directly", cmajor, cminor);
 		return (ENXIO);
