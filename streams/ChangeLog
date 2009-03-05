@@ -1,3 +1,10 @@
+2009-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/strspecfs.cA: fixes
+	* src/snmp/mib2c.main.confA: fixes
+	* src/snmp/mib2c.master.confA: fixes
+	- fixes thanks to Larry Cipriani's syntax checker
+
 2009-02-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: updated agents

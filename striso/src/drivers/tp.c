@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:37 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2009-03-05 13:07:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:37 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 13:07:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.21  2009-03-05 13:07:15  brian
+ - fixes thanks to Larry Capriani's syntax checker
+
  Revision 0.9.2.20  2008-09-22 20:31:37  brian
  - added module version and truncated logs
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:37 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2009-03-05 13:07:15 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:37 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2009-03-05 13:07:15 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -120,7 +123,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:37 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2009-03-05 13:07:15 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"
@@ -2194,7 +2197,7 @@ tp_pack_cr(struct tp *tp)
 		*p++ = _TP_PT_VERSION;	/* version number */
 		*p++ = 1;
 		*p++ = 1;
-		if (tp->opts.flags & _T_BIT_TCO_PROTECTION & tp->opts.tco.tco_protection !=
+		if ((tp->opts.flags & _T_BIT_TCO_PROTECTION) && tp->opts.tco.tco_protection !=
 		    T_UNSPEC) {
 			*p++ = _TP_PT_PROTECTION;	/* protection */
 			*p++ = 1;

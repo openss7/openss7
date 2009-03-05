@@ -272,7 +272,7 @@ merc_int_t rcv_data_from_adapter(pmercd_adapter_block_sT padapter,  int doDMA)
 	// If we hit block that we can not DMA follow through ... 
         if (cannotDMA) {
 	    // Please notice changes in rcv_receive_data
-            if ((ReturnCode = (rcv_receive_data(padapter, NextMessageAddress)) != MD_SUCCESS)) {
+            if ((ReturnCode = (rcv_receive_data(padapter, NextMessageAddress))) != MD_SUCCESS) {
 	        // If this falls here, it is a serious error.
                 CirBuffer->Read = NextRead;
                 goto out;

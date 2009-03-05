@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $
+ @(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2009-03-05 13:07:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 13:07:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpiapi.c,v $
+ Revision 0.9.2.9  2009-03-05 13:07:17  brian
+ - fixes thanks to Larry Capriani's syntax checker
+
  Revision 0.9.2.8  2008-09-10 03:50:07  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $"
+#ident "@(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2009-03-05 13:07:17 $"
 
 static char const ident[] =
-    "$RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $";
+    "$RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2009-03-05 13:07:17 $";
 
 /*
  * This is an OpenSS7 implemetnation of the GCOM dlpiapi library.  It builds
@@ -1813,7 +1816,7 @@ __dlpi_attach_ppa_r(int fd, unsigned long ppa)
 	int ret;
 
 	pthread_cleanup_push_defer_np(__dlpi_putuser, &fd);
-	if (likely((ret = __dlpi_getuser(fd) >= 0))) {
+	if (likely((ret = __dlpi_getuser(fd)) >= 0)) {
 		ret = _dlpi_attach_ppa(fd, ppa);
 		__dlpi_putuser(&fd);
 	}
