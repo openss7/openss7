@@ -6186,7 +6186,6 @@ tr_copy_done(struct tr *tr, queue_t *q, mblk_t *mp, int err)
 	} else {
 		LOGIO(tr, "<- M_IOCNAK(%s)", tr_iocname(((struct iocblk *)mp->b_rptr)->ioc_cmd));
 	}
-
 	mi_copy_done(q, mp, err);
 }
 static void
@@ -6360,50 +6359,28 @@ tr_tcap_ioctl(struct tr *tr, queue_t *q, mblk_t *mp)
 
 	switch (_IOC_NR(ioc->ioc_cmd)) {
 	case _IOC_NR(TCAP_IOCGOPTION):
-		size = sizeof(struct tcap_option);
-		break;
 	case _IOC_NR(TCAP_IOCSOPTION):
 		size = sizeof(struct tcap_option);
 		break;
 	case _IOC_NR(TCAP_IOCSCONFIG):
-		size = sizeof(struct tcap_config);
-		break;
 	case _IOC_NR(TCAP_IOCGCONFIG):
-		size = sizeof(struct tcap_config);
-		break;
 	case _IOC_NR(TCAP_IOCTCONFIG):
-		size = sizeof(struct tcap_config);
-		break;
 	case _IOC_NR(TCAP_IOCCCONFIG):
-		size = sizeof(struct tcap_config);
-		break;
 	case _IOC_NR(TCAP_IOCLCONFIG):
 		size = sizeof(struct tcap_config);
 		break;
 	case _IOC_NR(TCAP_IOCGSTATEM):
-		size = sizeof(struct tcap_statem);
-		break;
 	case _IOC_NR(TCAP_IOCCMRESET):
 		size = sizeof(struct tcap_statem);
 		break;
 	case _IOC_NR(TCAP_IOCGSTATSP):
-		size = sizeof(struct tcap_stats);
-		break;
 	case _IOC_NR(TCAP_IOCSSTATSP):
-		size = sizeof(struct tcap_stats);
-		break;
 	case _IOC_NR(TCAP_IOCGSTATS):
-		size = sizeof(struct tcap_stats);
-		break;
 	case _IOC_NR(TCAP_IOCCSTATS):
 		size = sizeof(struct tcap_stats);
 		break;
 	case _IOC_NR(TCAP_IOCGNOTIFY):
-		size = sizeof(struct tcap_notify);
-		break;
 	case _IOC_NR(TCAP_IOCSNOTIFY):
-		size = sizeof(struct tcap_notify);
-		break;
 	case _IOC_NR(TCAP_IOCCNOTIFY):
 		size = sizeof(struct tcap_notify);
 		break;
@@ -7202,6 +7179,55 @@ sc_r_data(queue_t *q, mblk_t *mp)
 }
 
 /*
+ * M_FLUSH HANDLING
+ * --------------------------------------------------------------------------
+ */
+noinline fastcall __unlikely int
+tr_w_flush(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
+		mp->b_rptr[0] &= ~FLUSHW;
+	}
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(RD(q), FLUSHDATA);
+		qreply(q, mp);
+	} else
+		freemsg(mp);
+	return (0);
+}
+noinline fastcall __unlikely int
+sc_r_flush(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
+		mp->b_rptr[0] &= ~FLUSHR;
+	}
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(WR(q), FLUSHDATA);
+		if (!(mp->b_flag & MSGNOLOOP)) {
+			mp->b_flag |= MSGNOLOOP;
+			qreply(q, mp);
+		} else
+			freemsg(mp);
+	} else
+		freemsg(mp);
+	return (0);
+}
+
+/*
  * UNKNOWN STREAMS MESSAGE HANDLING
  * --------------------------------------------------------------------------
  */
@@ -7224,6 +7250,10 @@ sc_r_other(queue_t *q, mblk_t *mp)
 	return (-EBUSY);
 }
 
+/*
+ * STREAMS MESSAGE DISCRIMINATION
+ * --------------------------------------------------------------------------
+ */
 static fastcall int
 tr_wsrv_msg(struct tr *tr, queue_t *q, mblk_t *mp)
 {
@@ -7259,6 +7289,8 @@ tr_wput_msg(queue_t *q, mblk_t *mp)
 		return tr_w_proto(q, mp);
 	case M_DATA:
 		return tr_w_data(q, mp);
+	case M_FLUSH:
+		return tr_w_flush(q, mp);
 	default:
 		return tr_w_other(q, mp);
 	}
@@ -7272,6 +7304,12 @@ sc_rput_msg(queue_t *q, mblk_t *mp)
 		return sc_r_proto(q, mp);
 	case M_DATA:
 		return sc_r_data(q, mp);
+	case M_FLUSH:
+		return sc_r_flush(q, mp);
+	case M_ERROR:
+		return sc_r_error(q, mp);
+	case M_HANGUP:
+		return sc_r_hangup(q, mp);
 	default:
 		return sc_r_other(q, mp);
 	}
@@ -7632,7 +7670,7 @@ trmuxinit(void)
 		goto no_map_cminor;
 	}
 	if ((err = autopush_add(&tr_push_tp)) < 0) {
-		cmn_err(CE_WARN, "%s: could not add autopush for TC_CMINOR, err = %d",
+		cmn_err(CE_WARN, "%s: could not add autopush for TP_CMINOR, err = %d",
 			__FUNCTION__, err);
 		goto no_apush_tp;
 	}

@@ -136,10 +136,10 @@
 #define TC_QOS_SEL1		0x0701
 
 typedef struct {
-	t_uscalar_t type;		/* Always TC_QOS_SEL1 */
-	t_uscalar_t flags;		/* Return option */
-	t_uscalar_t seq_ctrl;		/* Sequence Control */
-	t_uscalar_t priority;		/* Message priority */
+	t_scalar_t type;		/* Always TC_QOS_SEL1 */
+	t_scalar_t flags;		/* Return option */
+	t_scalar_t seq_ctrl;		/* Sequence Control */
+	t_scalar_t priority;		/* Message priority */
 } TC_qos_sel1_t;
 
 /*
@@ -169,8 +169,7 @@ typedef struct {
  * TC_ERROR_ACK error return code values
  */
 #define TCBADADDR		 1	/* Incorrect address format/illegal address information */
-#define TCBADOPT		 2	/* Options in incorrect format or contain illegal
-					   information */
+#define TCBADOPT		 2	/* Options in incorrect format or contain illegal information */
 #define TCACCESS		 3	/* User did not have proper permissions */
 #define TCNOADDR		 5	/* TC Provider could not allocate address */
 #define TCOUTSTATE		 6	/* Primitive was issues in wrong sequence */
@@ -179,12 +178,9 @@ typedef struct {
 #define TCBADDATA		10	/* User data spec. outside range supported by TC provider */
 #define TCBADFLAG		16	/* Flags specified in primitive were illegal/incorrect */
 #define TCNOTSUPPORT		18	/* Primitive type not supported by the TC provider */
-#define TCBOUND			19	/* Illegal second attempt to bind listener or default
-					   listener */
-#define TCBADQOSPARAM		20	/* QOS values specified are outside the range supported by
-					   the TC provider */
-#define TCBADQOSTYPE		21	/* QOS structure type specified is not supported by the TC
-					   provider */
+#define TCBOUND			19	/* Illegal second attempt to bind listener or default listener */
+#define TCBADQOSPARAM		20	/* QOS values specified are outside the range supported by the TC provider */
+#define TCBADQOSTYPE		21	/* QOS structure type specified is not supported by the TC provider */
 #define TCBADTOKEN		22	/* Token used is not associated with an open stream */
 #define TCNOPROTOID		23	/* Protocol id could not be allocated */
 
@@ -260,7 +256,7 @@ typedef struct {
  *  TC_INFO_REQ
  */
 typedef struct TC_info_req {
-	t_uscalar_t PRIM_type;		/* Always TC_INFO_REQ */
+	t_scalar_t PRIM_type;		/* Always TC_INFO_REQ */
 } TC_info_req_t;
 
 /*
@@ -285,90 +281,90 @@ typedef struct TC_info_ack {
  *  TC_BIND_REQ
  */
 typedef struct TC_bind_req {
-	t_uscalar_t PRIM_type;
-	t_uscalar_t ADDR_length;	/* address length */
-	t_uscalar_t ADDR_offset;	/* address offset */
-	t_uscalar_t XACT_number;	/* maximum outstanding transaction reqs. */
-	t_uscalar_t BIND_flags;		/* bind flags */
+	t_scalar_t PRIM_type;		/* always TC_BIND_REQ */
+	t_scalar_t ADDR_length;		/* address length */
+	t_scalar_t ADDR_offset;		/* address offset */
+	t_scalar_t XACT_number;		/* maximum outstanding transaction reqs. */
+	t_scalar_t BIND_flags;		/* bind flags */
 } TC_bind_req_t;
 
 /*
- *  TC_BIND_ACK
+ *  TC_BIND_ACK:- one M_PCPROTO message block.
  */
 typedef struct TC_bind_ack {
-	t_uscalar_t PRIM_type;
-	t_uscalar_t ADDR_length;
-	t_uscalar_t ADDR_offset;
-	t_uscalar_t XACT_number;
-	t_uscalar_t TOKEN_value;
+	t_scalar_t PRIM_type;		/* always TC_BIND_ACK */
+	t_scalar_t ADDR_length;
+	t_scalar_t ADDR_offset;
+	t_scalar_t XACT_number;
+	t_scalar_t TOKEN_value;
 } TC_bind_ack_t;
 
 /*
  *  TC_SUBS_BIND_REQ
  */
 typedef struct TC_subs_bind_req {
-	t_uscalar_t PRIM_type;
+	t_scalar_t PRIM_type;		/* always TC_SUBS_BIND_REQ */
 } TC_subs_bind_req_t;
 
 /*
- *  TC_SUBS_BIND_ACK
+ *  TC_SUBS_BIND_ACK:- one M_PCPROTO message block.
  */
 typedef struct TC_subs_bind_ack {
-	t_uscalar_t PRIM_type;
+	t_scalar_t PRIM_type;		/* always TC_SUBS_BIND_ACK */
 } TC_subs_bind_ack_t;
 
 /*
  *  TC_SUBS_UNBIND_REQ
  */
 typedef struct TC_subs_unbind_req {
-	t_uscalar_t PRIM_type;
+	t_scalar_t PRIM_type;		/* always TC_SUBS_UNBIND_REQ */
 } TC_subs_unbind_req_t;
 
 /*
  *  TC_UNBIND_REQ
  */
 typedef struct TC_unbind_req {
-	t_uscalar_t PRIM_type;		/* Always TC_UNBIND_REQ */
+	t_scalar_t PRIM_type;		/* Always TC_UNBIND_REQ */
 } TC_unbind_req_t;
 
 /*
- *  TC_OK_ACK
+ *  TC_OK_ACK:- one M_PCPROTO message block.
  */
 typedef struct TC_ok_ack {
-	t_uscalar_t PRIM_type;		/* Always TC_OK_ACK */
-	t_uscalar_t CORRECT_prim;	/* correct primitive */
+	t_scalar_t PRIM_type;		/* Always TC_OK_ACK */
+	t_scalar_t CORRECT_prim;	/* correct primitive */
 } TC_ok_ack_t;
 
 /*
- *  TC_ERROR_ACK
+ *  TC_ERROR_ACK:- one M_PCPROTO message block.
  */
 typedef struct TC_error_ack {
-	t_uscalar_t PRIM_type;
-	t_uscalar_t ERROR_prim;
-	t_uscalar_t TRPI_error;
-	t_uscalar_t UNIX_error;
-	t_uscalar_t DIALOG_id;
-	t_uscalar_t INVOKE_id;
+	t_scalar_t PRIM_type;		/* always TC_ERROR_ACK */
+	t_scalar_t ERROR_prim;
+	t_scalar_t TRPI_error;
+	t_scalar_t UNIX_error;
+	t_scalar_t DIALOG_id;
+	t_scalar_t INVOKE_id;
 } TC_error_ack_t;
 
 /*
  *  TC_OPTMGMT_REQ
  */
 typedef struct TC_optmgmt_req {
-	t_uscalar_t PRIM_type;
-	t_uscalar_t OPT_length;
-	t_uscalar_t OPT_offset;
-	t_uscalar_t MGMT_flags;
+	t_scalar_t PRIM_type;		/* always TC_OPTMGMT_REQ */
+	t_scalar_t OPT_length;		/* Options length */
+	t_scalar_t OPT_offset;		/* Options offset */
+	t_scalar_t MGMT_flags;
 } TC_optmgmt_req_t;
 
 /*
- *  TC_OPTMGMT_ACK
+ *  TC_OPTMGMT_ACK:- one M_PCPROTO message block.
  */
 typedef struct TC_optmgmt_ack {
-	t_uscalar_t PRIM_type;
-	t_uscalar_t OPT_length;
-	t_uscalar_t OPT_offset;
-	t_uscalar_t MGMT_flags;
+	t_scalar_t PRIM_type;		/* always TC_OPTMGMT_ACK */
+	t_scalar_t OPT_length;		/* Options length */
+	t_scalar_t OPT_offset;		/* Options offset */
+	t_scalar_t MGMT_flags;
 } TC_optmgmt_ack_t;
 
 /*
@@ -385,14 +381,14 @@ typedef struct TC_optmgmt_ack {
  *	    TC-Provider to refer to a dialog.
  */
 typedef struct TC_uni_req {
-	t_uscalar_t PRIM_type;		/* Always TC_UNI_REQ */
-	t_uscalar_t SRC_length;		/* Source address length */
-	t_uscalar_t SRC_offset;		/* Source address offset */
-	t_uscalar_t DEST_length;	/* Destination address length */
-	t_uscalar_t DEST_offset;	/* Destination address offset */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t PRIM_type;		/* Always TC_UNI_REQ */
+	t_scalar_t SRC_length;		/* Source address length */
+	t_scalar_t SRC_offset;		/* Source address offset */
+	t_scalar_t DEST_length;		/* Destination address length */
+	t_scalar_t DEST_offset;		/* Destination address offset */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
 } TC_uni_req_t;
 
 /*
@@ -407,15 +403,15 @@ typedef struct TC_uni_req {
  *	    in the indication.
  */
 typedef struct TC_uni_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_UNI_IND */
-	t_uscalar_t SRC_length;		/* Source address length */
-	t_uscalar_t SRC_offset;		/* Source address offset */
-	t_uscalar_t DEST_length;	/* Destination address length */
-	t_uscalar_t DEST_offset;	/* Destination address offset */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t COMP_flags;		/* Components preset flag */
+	t_scalar_t PRIM_type;		/* Always TC_UNI_IND */
+	t_scalar_t SRC_length;		/* Source address length */
+	t_scalar_t SRC_offset;		/* Source address offset */
+	t_scalar_t DEST_length;		/* Destination address length */
+	t_scalar_t DEST_offset;		/* Destination address offset */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t COMP_flags;		/* Components preset flag */
 } TC_uni_ind_t;
 
 /*
@@ -428,15 +424,15 @@ typedef struct TC_uni_ind {
  *  Also T_QUERY_REQ for ANSI.
  */
 typedef struct TC_begin_req {
-	t_uscalar_t PRIM_type;		/* Always TC_BEGIN_REQ */
-	t_uscalar_t SRC_length;		/* Source address length */
-	t_uscalar_t SRC_offset;		/* Source address offset */
-	t_uscalar_t DEST_length;	/* Destination address length */
-	t_uscalar_t DEST_offset;	/* Destination address offset */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t COMP_flags;		/* For use with ANSI QWP/QWOP */
+	t_scalar_t PRIM_type;		/* Always TC_BEGIN_REQ */
+	t_scalar_t SRC_length;		/* Source address length */
+	t_scalar_t SRC_offset;		/* Source address offset */
+	t_scalar_t DEST_length;		/* Destination address length */
+	t_scalar_t DEST_offset;		/* Destination address offset */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t COMP_flags;		/* For use with ANSI QWP/QWOP */
 } TC_begin_req_t;
 
 typedef struct TC_begin_req TC_query_req;
@@ -451,15 +447,15 @@ typedef struct TC_begin_req TC_query_req;
  *  Also T_QUERY_IND for ANSI.
  */
 typedef struct TC_begin_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_BEGIN_IND */
-	t_uscalar_t SRC_length;		/* Source address length */
-	t_uscalar_t SRC_offset;		/* Source address offset */
-	t_uscalar_t DEST_length;	/* Destination address length */
-	t_uscalar_t DEST_offset;	/* Destination address offset */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t COMP_flags;		/* For use with ANSI QWP/QWOP */
+	t_scalar_t PRIM_type;		/* Always TC_BEGIN_IND */
+	t_scalar_t SRC_length;		/* Source address length */
+	t_scalar_t SRC_offset;		/* Source address offset */
+	t_scalar_t DEST_length;		/* Destination address length */
+	t_scalar_t DEST_offset;		/* Destination address offset */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t COMP_flags;		/* For use with ANSI QWP/QWOP */
 } TC_begin_ind_t;
 
 typedef struct TC_begin_ind TC_query_ind;
@@ -470,11 +466,11 @@ typedef struct TC_begin_ind TC_query_ind;
  *  Also TC_RESP_REQ for ANSI.
  */
 typedef struct TC_end_req {
-	t_uscalar_t PRIM_type;		/* Always TC_END_REQ */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t TERM_scenario;	/* Reason for termination */
+	t_scalar_t PRIM_type;		/* Always TC_END_REQ */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t TERM_scenario;	/* Reason for termination */
 } TC_end_req_t;
 
 typedef struct TC_end_req TC_resp_req_t;
@@ -485,11 +481,11 @@ typedef struct TC_end_req TC_resp_req_t;
  *  Also TC_RESP_IND for ANSI.
  */
 typedef struct TC_end_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_END_IND */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t COMP_flags;		/* Components present flag */
+	t_scalar_t PRIM_type;		/* Always TC_END_IND */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t COMP_flags;		/* Components present flag */
 } TC_end_ind_t;
 
 typedef struct TC_end_ind TC_resp_ind_t;
@@ -503,21 +499,22 @@ typedef struct TC_end_ind TC_resp_ind_t;
  *  Also TC_CONV_REQ for ANSI.
  */
 typedef struct TC_begin_res {
-	t_uscalar_t PRIM_type;		/* Always TC_CONT_REQ */
-	t_uscalar_t SRC_length;		/* Source address length */
-	t_uscalar_t SRC_offset;		/* Source address offset */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_scalar_t PRIM_type;		/* Always TC_CONT_REQ */
+	t_scalar_t SRC_length;		/* Source address length */
+	t_scalar_t SRC_offset;		/* Source address offset */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_scalar_t ACCEPTOR_id;		/* Token of accepting stream */
 } TC_begin_res_t;
 
 typedef struct TC_cont_req {
-	t_uscalar_t PRIM_type;		/* Always TC_CONT_REQ */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_scalar_t PRIM_type;		/* Always TC_CONT_REQ */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
 } TC_cont_req_t;
 
 typedef struct TC_cont_req TC_conv_req_t;
@@ -531,19 +528,19 @@ typedef struct TC_cont_req TC_conv_req_t;
  *  Also TC_CONV_IND for ASNI.
  */
 typedef struct TC_begin_con {
-	t_uscalar_t PRIM_type;		/* Always TC_BEGIN_CON */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_scalar_t PRIM_type;		/* Always TC_BEGIN_CON */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
 } TC_begin_con_t;
 
 typedef struct TC_cont_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_CONT_IND */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_scalar_t PRIM_type;		/* Always TC_CONT_IND */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
 } TC_cont_ind_t;
 
 typedef struct TC_cont_ind TC_conv_ind_t;
@@ -555,11 +552,11 @@ typedef struct TC_cont_ind TC_conv_ind_t;
  *	    not supported".
  */
 typedef struct TC_abort_req {
-	t_uscalar_t PRIM_type;		/* Always TC_ABORT_REQ */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t ABORT_reason;	/* Abort reason */
+	t_scalar_t PRIM_type;		/* Always TC_ABORT_REQ */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t ABORT_reason;	/* Abort reason */
 } TC_abort_req_t;
 
 /*
@@ -569,21 +566,21 @@ typedef struct TC_abort_req {
  *	    not supported".
  */
 typedef struct TC_abort_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_ABORT_IND */
-	t_uscalar_t OPT_length;		/* Options associated with the primitive */
-	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t ABORT_reason;	/* Abort reason */
-	t_uscalar_t ORIGINATOR;		/* Either User or Provider originated */
+	t_scalar_t PRIM_type;		/* Always TC_ABORT_IND */
+	t_scalar_t OPT_length;		/* Options associated with the primitive */
+	t_scalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t ABORT_reason;	/* Abort reason */
+	t_scalar_t ORIGINATOR;		/* Either User or Provider originated */
 } TC_abort_ind_t;
 
 /*
  *  TC_NOTICE_IND.
  */
 typedef struct TC_notice_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_NOTICE_IND */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t REPORT_cause;	/* Report cause */
+	t_scalar_t PRIM_type;		/* Always TC_NOTICE_IND */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t REPORT_cause;	/* Report cause */
 } TC_notice_ind_t;
 
 /*
@@ -595,14 +592,14 @@ typedef struct TC_notice_ind {
  *  blocks containing the parameters of the operation.
  */
 typedef struct TC_invoke_req {
-	t_uscalar_t PRIM_type;		/* Always TC_INVOKE_REQ */
-	t_uscalar_t DIALOG_id;		/* Dialog identifier */
-	t_uscalar_t PROTOCOL_class;	/* Application protocol class */
-	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
-	t_uscalar_t LINKED_id;		/* Linked Invoke Identifier */
-	t_uscalar_t OPERATION;		/* Requested operation to invoke */
-	t_uscalar_t MORE_flag;		/* Not last */
-	t_uscalar_t TIMEOUT;		/* Timeout */
+	t_scalar_t PRIM_type;		/* Always TC_INVOKE_REQ */
+	t_scalar_t DIALOG_id;		/* Dialog identifier */
+	t_scalar_t PROTOCOL_class;	/* Application protocol class */
+	t_scalar_t INVOKE_id;		/* Invoke Identifier */
+	t_scalar_t LINKED_id;		/* Linked Invoke Identifier */
+	t_scalar_t OPERATION;		/* Requested operation to invoke */
+	t_scalar_t MORE_flag;		/* Not last */
+	t_scalar_t TIMEOUT;		/* Timeout */
 } TC_invoke_req_t;
 
 /*
@@ -612,13 +609,13 @@ typedef struct TC_invoke_req {
  *  Note:   Dialog Id is ignored for Class 4 (TC_UNI_IND) operations.
  */
 typedef struct TC_invoke_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_INVOKE_IND */
-	t_uscalar_t DIALOG_id;		/* Dialog identifier */
-	t_uscalar_t OP_class;		/* Application operation class */
-	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
-	t_uscalar_t LINKED_id;		/* Linked Invoke Identifier */
-	t_uscalar_t OPERATION;		/* Requested operation to invoke */
-	t_uscalar_t MORE_flag;		/* Not last */
+	t_scalar_t PRIM_type;		/* Always TC_INVOKE_IND */
+	t_scalar_t DIALOG_id;		/* Dialog identifier */
+	t_scalar_t OP_class;		/* Application operation class */
+	t_scalar_t INVOKE_id;		/* Invoke Identifier */
+	t_scalar_t LINKED_id;		/* Linked Invoke Identifier */
+	t_scalar_t OPERATION;		/* Requested operation to invoke */
+	t_scalar_t MORE_flag;		/* Not last */
 } TC_invoke_ind_t;
 
 /*
@@ -626,11 +623,11 @@ typedef struct TC_invoke_ind {
  *  M_DATA blocks containing the parameters of the operation.
  */
 typedef struct TC_result_req {
-	t_uscalar_t PRIM_type;		/* Always TC_RESULT_REQ */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
-	t_uscalar_t OPERATION;		/* Requested operation result */
-	t_uscalar_t MORE_flag;		/* Not last */
+	t_scalar_t PRIM_type;		/* Always TC_RESULT_REQ */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t INVOKE_id;		/* Invoke Identifier */
+	t_scalar_t OPERATION;		/* Requested operation result */
+	t_scalar_t MORE_flag;		/* Not last */
 } TC_result_req_t;
 
 /*
@@ -640,11 +637,11 @@ typedef struct TC_result_req {
  *  This primitive is only valid (expected) for operation class 1 and 3.
  */
 typedef struct TC_result_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_RESULT_IND */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
-	t_uscalar_t OPERATION;		/* Requested operation result */
-	t_uscalar_t MORE_flag;		/* Not last */
+	t_scalar_t PRIM_type;		/* Always TC_RESULT_IND */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t INVOKE_id;		/* Invoke Identifier */
+	t_scalar_t OPERATION;		/* Requested operation result */
+	t_scalar_t MORE_flag;		/* Not last */
 } TC_result_ind_t;
 
 /*
@@ -652,11 +649,11 @@ typedef struct TC_result_ind {
  *  M_DATA blocks containing the parameters of the error.
  */
 typedef struct TC_error_req {
-	t_uscalar_t PRIM_type;		/* Always TC_ERROR_REQ */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
-	t_uscalar_t ERROR_code;		/* Error code */
-	t_uscalar_t MORE_flag;		/* Not last */
+	t_scalar_t PRIM_type;		/* Always TC_ERROR_REQ */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t INVOKE_id;		/* Invoke Identifier */
+	t_scalar_t ERROR_code;		/* Error code */
+	t_scalar_t MORE_flag;		/* Not last */
 } TC_error_req_t;
 
 /*
@@ -664,49 +661,49 @@ typedef struct TC_error_req {
  *  M_DATA blocks containing the parameters of the error.
  */
 typedef struct TC_error_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_ERROR_IND */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
-	t_uscalar_t ERROR_code;		/* Error code */
+	t_scalar_t PRIM_type;		/* Always TC_ERROR_IND */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t INVOKE_id;		/* Invoke Identifier */
+	t_scalar_t ERROR_code;		/* Error code */
 } TC_error_ind_t;
 
 /*
  *  TC_REJECT_REQ.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TC_reject_req {
-	t_uscalar_t PRIM_type;		/* Always TC_REJECT_REQ */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t INVOKE_id;		/* Invoke identifier */
-	t_uscalar_t PROBLEM_code;	/* Problem code */
+	t_scalar_t PRIM_type;		/* Always TC_REJECT_REQ */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t INVOKE_id;		/* Invoke identifier */
+	t_scalar_t PROBLEM_code;	/* Problem code */
 } TC_reject_req_t;
 
 /*
  *  TC_REJECT_IND.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TC_reject_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_REJECT_IND */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t INVOKE_id;		/* Invoke identifier */
-	t_uscalar_t ORIGINATOR;		/* Either User, Local or Remote */
-	t_uscalar_t PROBLEM_code;	/* Problem code */
+	t_scalar_t PRIM_type;		/* Always TC_REJECT_IND */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t INVOKE_id;		/* Invoke identifier */
+	t_scalar_t ORIGINATOR;		/* Either User, Local or Remote */
+	t_scalar_t PROBLEM_code;	/* Problem code */
 } TC_reject_ind_t;
 
 /*
  *  TC_CANCEL_REQ.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TC_cancel_req {
-	t_uscalar_t PRIM_type;		/* Always TC_CANCEL_REQ */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t INVOKE_id;		/* Invoke identifier */
+	t_scalar_t PRIM_type;		/* Always TC_CANCEL_REQ */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t INVOKE_id;		/* Invoke identifier */
 } TC_cancel_req_t;
 
 /*
  *  TC_CANCEL_IND.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TC_cancel_ind {
-	t_uscalar_t PRIM_type;		/* Always TC_CANCEL_REQ */
-	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
-	t_uscalar_t INVOKE_id;		/* Invoke identifier */
+	t_scalar_t PRIM_type;		/* Always TC_CANCEL_REQ */
+	t_scalar_t DIALOG_id;		/* Dialog Identifier */
+	t_scalar_t INVOKE_id;		/* Invoke identifier */
 } TC_cancel_ind_t;
 
 /*
@@ -717,79 +714,79 @@ typedef struct TC_cancel_ind {
  * TC_COORD_REQ.
  */
 typedef struct TC_coord_req {
-	np_ulong PRIM_type;		/* alwyas TC_COORD_REQ */
-	np_ulong ADDR_length;		/* affected subsystem */
-	np_ulong ADDR_offset;
+	t_scalar_t PRIM_type;		/* alwyas TC_COORD_REQ */
+	t_scalar_t ADDR_length;		/* affected subsystem */
+	t_scalar_t ADDR_offset;
 } TC_coord_req_t;
 
 /*
  * TC_COORD_RES.
  */
 typedef struct TC_coord_res {
-	np_ulong PRIM_type;		/* always TC_COORD_RES */
-	np_ulong ADDR_length;		/* affected subsystem */
-	np_ulong ADDR_offset;
+	t_scalar_t PRIM_type;		/* always TC_COORD_RES */
+	t_scalar_t ADDR_length;		/* affected subsystem */
+	t_scalar_t ADDR_offset;
 } TC_coord_res_t;
 
 /*
  * TC_COORD_IND.
  */
 typedef struct TC_coord_ind {
-	np_ulong PRIM_type;		/* alwyas TC_COORD_IND */
-	np_ulong ADDR_length;		/* affected subsystem */
-	np_ulong ADDR_offset;
-	np_ulong SMI;			/* subsystem multiplicity indicator */
+	t_scalar_t PRIM_type;		/* alwyas TC_COORD_IND */
+	t_scalar_t ADDR_length;		/* affected subsystem */
+	t_scalar_t ADDR_offset;
+	t_scalar_t SMI;			/* subsystem multiplicity indicator */
 } TC_coord_ind_t;
 
 /*
  * TC_COORD_CON.
  */
 typedef struct TC_coord_con {
-	np_ulong PRIM_type;		/* always TC_COORD_CON */
-	np_ulong ADDR_length;		/* affected subsystem */
-	np_ulong ADDR_offset;
-	np_ulong SMI;			/* subsystem multiplicity indicator */
+	t_scalar_t PRIM_type;		/* always TC_COORD_CON */
+	t_scalar_t ADDR_length;		/* affected subsystem */
+	t_scalar_t ADDR_offset;
+	t_scalar_t SMI;			/* subsystem multiplicity indicator */
 } TC_coord_con_t;
 
 /*
  * TC_STATE_REQ.
  */
 typedef struct TC_state_req {
-	np_ulong PRIM_type;		/* always TC_STATE_REQ */
-	np_ulong ADDR_length;		/* affected subsystem */
-	np_ulong ADDR_offset;
-	np_ulong STATUS;		/* user status */
+	t_scalar_t PRIM_type;		/* always TC_STATE_REQ */
+	t_scalar_t ADDR_length;		/* affected subsystem */
+	t_scalar_t ADDR_offset;
+	t_scalar_t STATUS;		/* user status */
 } TC_state_req_t;
 
 /*
  * TC_STATE_IND.
  */
 typedef struct TC_state_ind {
-	np_ulong PRIM_type;		/* always TC_STATE_IND */
-	np_ulong ADDR_length;		/* affected subsystem */
-	np_ulong ADDR_offset;
-	np_ulong STATUS;		/* user status */
-	np_ulong SMI;			/* subsystem multiplicity indicator */
+	t_scalar_t PRIM_type;		/* always TC_STATE_IND */
+	t_scalar_t ADDR_length;		/* affected subsystem */
+	t_scalar_t ADDR_offset;
+	t_scalar_t STATUS;		/* user status */
+	t_scalar_t SMI;			/* subsystem multiplicity indicator */
 } TC_state_ind_t;
 
 /*
  * TC_PCSTATE_IND.
  */
 typedef struct TC_pcstate_ind {
-	np_ulong PRIM_type;		/* always TC_PCSTATE_IND */
-	np_ulong ADDR_length;		/* affected point code */
-	np_ulong ADDR_offset;
-	np_ulong STATUS;		/* status */
+	t_scalar_t PRIM_type;		/* always TC_PCSTATE_IND */
+	t_scalar_t ADDR_length;		/* affected point code */
+	t_scalar_t ADDR_offset;
+	t_scalar_t STATUS;		/* status */
 } TC_pcstate_ind_t;
 
 /*
  * TC_TRAFFIC_IND
  */
 typedef struct TC_traffic_ind {
-	np_ulong PRIM_type;		/* always TC_TRAFFIC_IND */
-	np_ulong ADDR_length;		/* affected user */
-	np_ulong ADDR_offset;
-	np_ulong TRAFFIC_mix;		/* traffic mix */
+	t_scalar_t PRIM_type;		/* always TC_TRAFFIC_IND */
+	t_scalar_t ADDR_length;		/* affected user */
+	t_scalar_t ADDR_offset;
+	t_scalar_t TRAFFIC_mix;		/* traffic mix */
 } TC_traffic_ind_t;
 
 #endif				/* __SS7_TC_H__ */

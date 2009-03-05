@@ -138,8 +138,8 @@ Invoke ::= SEQUENCE {
 ReturnResult ::= SEQUENCE {
 	invokeID InvokeIdType,
 	result SEQUENCE {
-		CEoperationCode	OPERATION,
-		CEparameter	ANY DEFINED BY operationCode } OPTIONAL }
+		operationCode	OPERATION,
+		parameter	ANY DEFINED BY operationCode } OPTIONAL }
 
 -- ANY is filled by the single ASN.1 datatype following the keyword RESULT in the type definition
 -- of a particular operation.

@@ -217,7 +217,10 @@ TransferSyntax ::= TEXTUAL-CONVENTION
 	     Tranfer-syntax."
     SYNTAX OBJECT IDENTIFIER
     
-TransferSyntax ::= TEXTUAL-CONVENTION
+ApplicationContextName ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides a specification of an application context name with 
+	 the syntax of an OBJECT IDENTIFIER.   Fields using this
 
 tcapNotifications OBJECT IDENTIFIER
     ::= { tcapMIB 0 }

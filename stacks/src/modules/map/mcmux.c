@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mcmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:02 $
+ @(#) $RCSfile: mcmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $
 
  -----------------------------------------------------------------------------
 
@@ -47,33 +47,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-02 05:15:02 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 15:51:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: mcmod.c,v $
- Revision 0.9.2.1  2009-03-02 05:15:02  brian
- - updates
+ $Log: mcmux.c,v $
+ Revision 0.9.2.1  2009-03-05 15:51:27  brian
+ - new files for map library
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mcmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:02 $"
+#ident "@(#) $RCSfile: mcmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $"
 
-static char const ident[] =
-    "$RCSfile: mcmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:02 $";
+static char const ident[] = "$RCSfile: mcmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $";
 
 /*
- * This is MCMOD, a GSM Mobile Application Part module implementing the MAPI
- * interface as described in GSM 29.002 as a module pushed over a TCI stream.
- * This module does not implement all of the service invocations of MAPI as
- * described in GSM 29.002, but implements the basic MAP open, continue, close,
- * delimit and other basic commands.
- *
- * MAPI in GSM 29.002 is described for using the TCI as described in ITU-T Rec.
- * Q.771 which is implemented by the OpenSS7 projects as the TCI interface.  TCI
- * itself can be implementd as a pushable module over the TRI interface, also
- * described in Q.771 and implemented by the OpenSS7 project as the TRI
- * interace.
+ * This is MCMUX, a GSM MAP Common Services (MC) driver implementing the MAPI
+ * interfaces as described in 3GPP TS 29.002 as a driver linked over TC
+ * streams implementing the TCI interface.  This driver implemeents all of the
+ * MAP Common Services interface described in 3GPP TS 29.002.
  */
 
 #define _DEBUG 1
@@ -82,70 +74,65 @@ static char const ident[] =
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
-#include <sys/os8/compat.h>
+#include <sys/os7/compat.h>
 #include <sys/strsun.h>
 
-#include <ss7/ss7.h>
-#include <ss7/mtp.h>
-#include <ss7/sccp.h>
-#include <ss7/tr.h>
-#include <ss7/tc.h>
-#include <ss7/mc.h>
+#include <sys/sad.h>
 
-#define MCMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MCMOD_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MCMOD_COPYRIGHT	"Copyright (c) 2008-2009 Monavacon Limited.  All Rights Reserved."
-#define MCMOD_REVISION		"Monavacon $RCSfile: mcmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:02 $"
-#define MCMOD_DEVICE		"GSM 29.002 MAP Common Services module for ITU-T Q.771 TC"
-#define MCMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MCMOD_LICENSE		"GPL"
-#define MCMOD_BANNER		MCMOD_DESCRIP		"\n" \
-				MCMOD_EXTRA		"\n" \
-				MCMOD_REVISION		"\n" \
-				MCMOD_COPYRIGHT	"\n" \
-				MCMOD_DEVICE		"\n" \
-				MCMOD_CONTACT
-#define MCMOD_SPLASH		MCMOD_DESCRIP		" - " \
-				MCMOD_REVISION
+#define MCMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MCMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define MCMUX_COPYRIGHT	"Copyright (c) 2008-2009 Monavacon Limited.  All Rights Reserved."
+#define MCMUX_REVISION	"Monavacon $RCSfile: mcmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $"
+#define MCMUX_DEVICE	"SVR 4.2 STREAMS 3GPP TS 29.002 MAP Common Services (MC) Driver"
+#define MCMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define MCMUX_LICENSE	"GPL"
+#define MCMUX_BANNER	MCMUX_DESCRIP	"\n" \
+			MCMUX_EXTRA	"\n" \
+			MCMUX_REVISION	"\n" \
+			MCMUX_COPYRIGHT	"\n" \
+			MCMUX_DEVICE	"\n" \
+			MCMUX_CONTACT
+#define MCMUX_SPLASH	MCMUX_DESCRIPT	"\n" \
+			MCMUX_REVISION
 
 #ifdef LINUX
-MODULE_AUTHOR(MCMOD_CONTACT);
-MODULE_DESCRIPTION(MCMOD_DESCRIP);
-MODULE_SUPPORTED_DEVICE(MCMOD_DEVICE);
+MODULE_AUTHOR(MCMUX_CONTACT);
+MODULE_DESCRIPTION(MCMUX_DESCRIP);
+MODULE_SUPPORTED_DEVICE(MCMUX_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(MCMOD_LICENSE);
+MODULE_LICENSE(MCMUX_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("streams-mcmod");
+MODULE_ALIAS("streams-mcmux");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRLEASE PACKAGE_RPMEXTRA2);
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
 #ifdef LFS
-#define MCMOD_MOD_ID	CONFIG_STREAMS_MCMOD_MODID
-#define MCMOD_MOD_NAME	CONFIG_STREAMS_MCMOD_NAME
-#define MCMOD_CMAJORS	CONFIG_STREMSS_MCMOD_NMAJORS
-#define MCMOD_CMAJOR_0	CONFIG_STREAMS_MCMOD_MAJOR
-#define MCMOD_UNITS	CONFIG_STREAMS_MCMOD_NMINORS
+#define MCMUX_DRV_ID	CONFIG_STREAMS_MCMUX_MODID
+#define MCMUX_DRV_NAME	CONFIG_STREAMS_MCMUX_NAME
+#define MCMUX_CMAJORS	CONFIG_STREAMS_MCMUX_NMAJORS
+#define MCMUX_CMAJOR_0	CONFIG_STREAMS_MCMUX_MAJOR
+#define MCMUX_UNITS	CONFIG_STREAMS_MCMUX_NMINORS
 #endif				/* LFS */
 
-#ifndef MCMOD_MOD_ID
-#error "MCMOD_MOD_ID must be defined."
+#ifndef MCMUX_DRV_ID
+#error "MCMUX_DRV_ID must be defined."
 #endif
-#ifndef MCMOD_MOD_NAME
-#error "MCMOD_MOD_NAME must be defined."
+#ifndef MCMUX_DRV_NAME
+#error "MCMUX_DRV_NAME must be defined."
 #endif
 
-#define MOD_ID		MCMOD_MOD_ID
-#define MOD_NAME	MCMOD_MOD_NAME
+#define DRV_ID		MCMUX_DRV_ID
+#define DRV_NAME	MCMUX_DRV_NAME
 #ifdef MODULE
-#define MOD_BANNER	MCMOD_BANNER
-#else				/* MODULE */
-#define MOD_BANNER	MCMOD_SPLASH
-#endif				/* MODULE */
+#define DRV_BANNER	MCMUX_BANNER
+#else MODULE
+#define DRV_BANNER	MCMUX_SPLASH
+#endif MODULE
 
 #define FIRST_CMINOR	0
 #define MC_CMINOR	0
@@ -157,31 +144,34 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 #ifndef module_param
 MODULE_PARM(modid, "h");
+MODULE_PARM(major, "h");
 #else
 module_param(modid, ushort, 0444);
+module_param(major, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for MCMOD.  (0 for allocation.)");
+MODULE_PARM_DESC(major, "Device ID for MCMOD.  (0 for allocation.)");
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MCMOD_MODID));
-#if 0
-MODULE_ALIAS("streams-driver-mcmod");
-MODULE_ALIAS("/dev/streams/mcmod");
-MODULE_ALIAS("/dev/streams/mcmod/*");
-MODULE_ALIAS("/dev/streams/clone/mcmod");
-MODULE_ALIAS("/dev/streams/mcmod/mc");
-MODULE_ALIAS("/dev/streams/mcmod/mgr");
-MODULE_ALIAS("/dev/streams/mcmod/tp");
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MCMUX_MODID));
+if 1
+MODULE_ALIAS("streams-driver-mcmux");
+MODULE_ALIAS("/dev/streams/mcmux");
+MODULE_ALIAS("/dev/streams/mcmux/*");
+MODULE_ALIAS("/dev/streams/clone/mcmux");
+MODULE_ALIAS("/dev/streams/mcmux/mc");
+MODULE_ALIAS("/dev/streams/mcmux/mgr");
+MODULE_ALIAS("/dev/streams/mcmux/tp");
 #endif
 #endif				/* LFS */
-#if 0
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-" __stringify(MGR_CMINOR));
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-" __stringify(TP_CMINOR));
+#if 1
+MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-" __stringify(MGR_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-" __stringify(TP_CMINOR));
 #endif
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
@@ -5306,11 +5296,14 @@ mc_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	struct mc *mc;
 	caddr_t ptr;
 	int err;
+	minor_t cminor = getminor(*devp);
 
-	if (q->q_ptr != NULL)
+	if (q->q_ptr)
 		return (0);	/* already open */
-	if (sflag != MODOPEN || WR(q)->q_next == NULL)
-		goto enxio;	/* can't be opened as driver */
+	if (sflag == MODOPEN || WR(q)->q_next != NULL)
+		goto enxio;	/* can't be pushed as module */
+	if (cminor < FIRST_CMINOR || cminor > LAST_CMINOR)
+		goto enxio;
 	if (!mi_set_sth_lowat(q, 0))
 		goto enobufs;
 	if (!mi_set_sth_hiwat(q, SHEADHIWAT >> 1))
@@ -5322,6 +5315,9 @@ mc_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	mc->wq = WR(q);
 	mc->cred = *crp;
 	mc->dev = *devp;
+	sflag = CLONEOPEN;
+	cminor = FREE_CMINOR;
+	*devp = makedevice(getmajor(*devp), cminor);
 	write_lock_irqsave(&mc_lock, flags);
 	if (mi_acquire_sleep(ptr, &ptr, &mc_lock, &flags) == NULL) {
 		err = EINTR;
@@ -5380,13 +5376,13 @@ mc_qclose(queue_t *q, int oflags, cred_t *crp)
  * --------------------------------------------------------------------------
  */
 
-static struct qinit tc_rinit = {
-	.qi_putp = tc_rput,
-	.qi_srvp = tc_rsrv,
+static struct qinit mc_rinit = {
+	/* never put to upper read queue */
+	.qi_srvp = mc_rsrv,	/* for back-enable */
 	.qi_qopen = mc_qopen,
 	.qi_qclose = mc_qclose,
 	.qi_minfo = &mc_minfo,
-	.qi_mstat = &tc_mstat,
+	.qi_mstat = &mc_mstat,
 };
 static struct qinit mc_winit = {
 	.qi_putp = mc_wput,
@@ -5394,21 +5390,70 @@ static struct qinit mc_winit = {
 	.qi_minfo = &mc_minfo,
 	.qi_mstat = &mc_mstat,
 };
+static struct qinit tc_rinit = {
+	.qi_putp = tc_rput,
+	.qi_srvp = tc_rsrv,
+	.qi_qopen = tc_link,
+	.qi_qclose = tc_unlink,
+	.qi_minfo = &tc_minfo,
+	.qi_mstat = &tc_mstat,
+};
+static struct qinit tc_winit = {
+	/* never put to lower write queue */
+	.qi_srvp = tc_wsrv,	/* for back-enable */
+	.qi_minfo = &tc_minfo,
+	.qi_mstat = &tc_mstat,
+};
 
-MODULE_STATIC struct streamtab mcmodinfo = {
-	.st_rdinit = &tc_rinit,
+MODULE_STATIC struct streamtab mcmuxinfo = {
+	.st_rdinit = &mc_rinit,
 	.st_wrinit = &mc_winit,
+	.st_muxrinit = &tc_rinit,
+	.st_muxwinit = &tc_winit,
 };
 
-STATIC struct fmodsw mc_fmod = {
-	.f_name = MOD_NAME,
-	.f_str = &mcmodinfo,
-	.f_flag = D_MP,
-	.f_kmod = THIS_MODULE,
+STATIC struct cdevsw mc_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &mcmuxinfo,
+	.d_flag = D_MP | D_CLONE,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
+/* mgr minor for management access */
+static struct devnode mc_node_mgr = {
+	.n_name = "mgr",
+	.n_flag = D_CLONE,
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
 
-modID_t modid = MOD_ID;
+/* mc minor for basic MAPI access */
+static struct devnode mc_node_mc = {
+	.n_name = "mc",
+	.n_flag = D_CLONE,
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+/* tp minor for basic TPI access */
+static struct devnode mc_node_tp = {
+	.n_name = "tp",
+	.n_flag = D_CLONE,
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+static struct strapush mc_push_tp = {
+	.ap_cmd = SAD_ONE,
+	.sap_major = major,
+	.sap_minor = TC_CMINOR,
+	.sap_lastminor = TC_CMINOR,
+	.sap_npush = 1,
+	.sap_list = {
+		     [0] = "tptr",
+		     };
+};
+
+modID_t modid = DRV_ID;
+major_t major = CMAJOR_0;
 
 /*
  * Kernel module initialization
@@ -5416,43 +5461,81 @@ modID_t modid = MOD_ID;
  */
 
 MODULE_STATIC int __init
-mcmodinit(void)
+mcmuxinit(void)
 {
 	int err;
 
-	cmn_err(CE_NOTE, MOD_BANNER);
+	cmn_err(CE_NOTE, DRV_BANNER);
 	if ((err = mc_init_caches()) < 0) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", __FUNCTION__, err);
 		return (err);
 	}
-	if ((err = register_strmod(&mc_fmod)) < 0) {
-		cmn_err(CE_WARN, "%s: could not register module, err = %d", __FUNCTION__, err);
-		goto no_module;
+	if ((err = register_strdev(&mc_cdev, major)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register driver, err = %d", __FUNCTION__, err);
+		goto no_major;
 	}
-	if (modid == 0)
-		modid = err;
-	if (modid == 0)
-		goto lost_module;
+	if ((err = register_strnod(&mc_cdev, &mc_node_mgr, MGR_CMINOR)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register MGR_CMINOR, err = %d", __FUNCTION__, err);
+		goto no_mgr_cminor;
+	}
+	if ((err = register_strnod(&mc_cdev, &mc_node_mc, MC_CMINOR)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register MC_CMINOR, err = %d", __FUNCTION__, err);
+		goto no_mc_cminor;
+	}
+	if ((err = register_strnod(&mc_cdev, &mc_node_tp, TP_CMINOR)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register TP_CMINOR, err = %d", __FUNCTION__, err);
+		goto no_tp_cminor;
+	}
+	if ((err = autopush_add(&mc_push_tp)) < 0) {
+		cmn_err(CE_WARN, "%s: could not add autopush for TP_CMINOR, err = %d", __FUNCTION__,
+			err);
+		goto no_apush_tp;
+	}
+	if (major == 0)
+		major = err;
+	if (major == 0)
+		goto lost_major;
 	return (0);
 	/* error paths */
-      lost_module:
-	unregister_strmod(&mc_fmod);
-      no_module:
+      lost_major:
+	autopush_del(&mc_push_map);
+      no_apush_map:
+	autopush_del(&mc_push_tc);
+      no_apush_tc:
+	autopush_del(&mc_push_tp);
+      no_apush_tp:
+	unregister_strnod(&mc_cdev, TP_CMINOR);
+      no_tp_cminor:
+	unregister_strnod(&mc_cdev, MC_CMINOR);
+      no_mc_cminor:
+	unregister_strnod(&mc_cdev, MGR_CMINOR);
+      no_mgr_cminor:
+	unregister_strdev(&mc_cdev, major);
+      no_major:
 	mc_term_caches();
 	return (err);
 }
 
 MODULE_STATIC void __exit
-mcmodexit(void)
+mcmuxexit(void)
 {
 	int err;
 
-	if ((err = unregister_strmod(&mc_fmod)) < 0)
-		cmn_err(CE_WARN, "%s: could not unregister module, err = %d", __FUNCTION__, err);
+	if ((err = autopush_del(&mc_push_tp)) < 0)
+		cmn_err(CE_WARN, "%s: could not delete autopush for TP_CMINOR, err = %d", __FUNCTION__, err);
+	if ((err = unregister_strmod(&mc_cdev, TP_CMINOR)) < 0)
+		cmn_err(CE_WARN, "%s: could not unregister TP_CMINOR, err = %d", __FUNCTION__, err);
+	if ((err = unregister_strmod(&mc_cdev, MC_CMINOR)) < 0)
+		cmn_err(CE_WARN, "%s: could not unregister MC_CMINOR, err = %d", __FUNCTION__, err);
+	if ((err = unregister_strmod(&mc_cdev, MGR_CMINOR)) < 0)
+		cmn_err(CE_WARN, "%s: could not unregister MGR_CMINOR, err = %d", __FUNCTION__,
+			err);
+	if ((err = unregister_strdev(&mc_cdev, major)) < 0)
+		cmn_err(CE_WARN, "%s: could not unregister driver, err = %d", __FUNCTION__, err);
 	if ((err = mc_term_caches()) < 0)
 		cmn_err(CE_WARN, "%s: could not terminate caches, err = %d", __FUNCTION__, err);
 	return;
 }
 
-module_init(mcmodinit);
-module_exit(mcmodexit);
+module_init(mcmuxinit);
+module_exit(mcmuxexit);
