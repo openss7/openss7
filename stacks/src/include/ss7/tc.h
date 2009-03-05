@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tc.h,v 0.9.2.12 2009-03-02 05:14:54 brian Exp $
+ @(#) $Id: tc.h,v 0.9.2.13 2009-03-05 15:59:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-02 05:14:54 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 15:59:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc.h,v $
+ Revision 0.9.2.13  2009-03-05 15:59:40  brian
+ - tcap and map driver and library updates
+
  Revision 0.9.2.12  2009-03-02 05:14:54  brian
  - updates
 
@@ -71,7 +74,7 @@
 #ifndef __SS7_TC_H__
 #define __SS7_TC_H__
 
-#ident "@(#) $RCSfile: tc.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tc.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

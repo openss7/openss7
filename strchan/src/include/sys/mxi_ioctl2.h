@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi_ioctl2.h,v 1.1.2.1 2009-01-16 20:41:38 brian Exp $
+ @(#) $Id: mxi_ioctl2.h,v 1.1.2.2 2009-03-05 15:59:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-16 20:41:38 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 15:59:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi_ioctl2.h,v $
+ Revision 1.1.2.2  2009-03-05 15:59:43  brian
+ - tcap and map driver and library updates
+
  Revision 1.1.2.1  2009-01-16 20:41:38  brian
  - added new headers for mibs
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_MXI_IOCTL2_H__
 #define __SYS_MXI_IOCTL2_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl2.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: mxi_ioctl2.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <linux/ioctl.h>
 #include <sys/smi_ioctl.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: map.h,v 0.9.2.1 2009-03-02 05:14:54 brian Exp $
+ @(#) $Id: map.h,v 0.9.2.2 2009-03-05 15:59:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-02 05:14:54 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 15:59:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: map.h,v $
+ Revision 0.9.2.2  2009-03-05 15:59:40  brian
+ - tcap and map driver and library updates
+
  Revision 0.9.2.1  2009-03-02 05:14:54  brian
  - updates
 
@@ -60,7 +63,7 @@
 #ifndef __SS7_MAP_H__
 #define __SS7_MAP_H__
 
-#ident "@(#) $RCSfile: map.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: map.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define MAP_INFO_REQ		 0	/* Information request */
 #define MAP_BIND_REQ		 1	/* Bind to network address */

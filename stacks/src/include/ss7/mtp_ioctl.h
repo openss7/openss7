@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtp_ioctl.h,v 0.9.2.6 2008-04-29 07:10:44 brian Exp $
+ @(#) $Id: mtp_ioctl.h,v 0.9.2.7 2009-03-05 15:59:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:44 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 15:59:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_ioctl.h,v $
+ Revision 0.9.2.7  2009-03-05 15:59:40  brian
+ - tcap and map driver and library updates
+
  Revision 0.9.2.6  2008-04-29 07:10:44  brian
  - updating headers for release
 
@@ -66,7 +69,7 @@
 #ifndef __MTP_IOCTL_H__
 #define __MTP_IOCTL_H__
 
-#ident "@(#) $RCSfile: mtpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mtp_ioctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

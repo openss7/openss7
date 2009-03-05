@@ -1,5 +1,19 @@
 2009-03-05  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/ss7/map.h: tcap and map updates
+	* src/include/ss7/mtp_ioctl.h: tcap and map updates
+	* src/include/ss7/sccp_ioctl.h: tcap and map updates
+	* src/include/ss7/tc.h: tcap and map updates
+	* src/include/ss7/tcap_ioctl.h: tcap and map updates
+	* src/include/ss7/tr.h: tcap and map updates
+	* src/modules/map/mapmod.c: tcap and map updates
+	* src/modules/tcap/ITUT_TCAP.asn: tcap and map updates
+	* src/modules/tcap/trmod.c: tcap and map updates
+	* src/modules/tcap/trmux.c: tcap and map updates
+	* src/snmp/mibs/OPENSS7-TCAP-MIB.mib: tcap and map updates
+
+2009-03-05  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/include/xmap.h: new file for map library
 	* src/include/xmap_sms.h: new file for map library
 	* src/include/ss7/map_ioctl.h: new file for map library
