@@ -4,6 +4,7 @@
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -65,10 +66,10 @@
 
  *****************************************************************************/
 
-#ifndef __SSCP_IOCTL_H__
-#define __SSCP_IOCTL_H__
+#ifndef __TCAP_IOCTL_H__
+#define __TCAP_IOCTL_H__
 
-#ident "@(#) $RCSfile: tcap_ioctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed by doxygen(1). */
 
@@ -87,73 +88,91 @@
 #define TCAP_OBJ_TYPE_SP	8	/* SCCP SAP */
 #define TCAP_OBJ_TYPE_SC	9	/* SCCP */
 
-#ifdef __KERNEL__
-typedef mblk_t *tcap_timer_t;
-#else				/* __KERNEL__ */
-typedef unsigned long mtp_timer_t;
-#endif				/* __KERNEL__ */
-
 /*
- *  SCCP options
+ * INFORMATION
+ *
+ * Provides read-only information that is not available for the manager to
+ * configure.  Also, this information does not change while the object exists:
+ * it is purely static for the lifetime of the object.
  */
-typedef struct tcap_opt_conf_sc {
-} tcap_opt_conf_sc_t;
+typedef struct tcap_info_df {
+} tcap_info_df_t;
+typedef struct tcap_info_tc {
+} tcap_info_tc_t;
+typedef struct tcap_info_iv {
+} tcap_info_iv_t;
+typedef struct tcap_info_op {
+} tcap_info_op_t;
+typedef struct tcap_info_dg {
+} tcap_info_dg_t;
+typedef struct tcap_info_ac {
+} tcap_info_ac_t;
+typedef struct tcap_info_tr {
+} tcap_info_tr_t;
+typedef struct tcap_info_te {
+} tcap_info_te_t;
+typedef struct tcap_info_sp {
+} tcap_info_sp_t;
+typedef struct tcap_info_sc {
+} tcap_info_sc_t;
+
+typedef union tcap_info_obj {
+	struct tcap_info_df df;
+	struct tcap_info_tc tc;
+	struct tcap_info_iv iv;
+	struct tcap_info_op op;
+	struct tcap_info_dg dg;
+	struct tcap_info_ac ac;
+	struct tcap_info_tr tr;
+	struct tcap_info_te te;
+	struct tcap_info_sp sp;
+	struct tcap_info_sc sc;
+} tcap_info_obj_t;
+
+typedef struct tcap_info {
+	uint type;			/* object type */
+	uint id;			/* object identifier */
+	uint cmd;			/* command */
+	/* followed by object-specific structure */
+	union tcap_info_obj info[0];
+} tcap_info_t;
+
+#define TCAP_IOCGINFO	_IOWR(TCAP_IOC_MAGIC,	 0, tcap_info_t)	/* get */
 
 /*
- *  SCCP SAP options
- */
-typedef struct tcap_opt_conf_sp {
-} tcap_opt_conf_sp_t;
-
-/*
- *  TCAP Entity options
- */
-typedef struct tcap_opt_conf_te {
-} tcap_opt_conf_te_t;
-
-/*
- *  Transaction options
- */
-typedef struct tcap_opt_conf_tr {
-} tcap_opt_conf_tr_t;
-
-/*
- *  Application Context options
- */
-typedef struct tcap_opt_conf_ac {
-} tcap_opt_conf_ac_t;
-
-/*
- *  Dialogue options
- */
-typedef struct tcap_opt_conf_dg {
-} tcap_opt_conf_dg_t;
-
-/*
- *  Operation options
- */
-typedef struct tcap_opt_conf_op {
-} tcap_opt_conf_op_t;
-
-/*
- *  Invoke options
- */
-typedef struct tcap_opt_conf_iv {
-} tcap_opt_conf_iv_t;
-
-/*
- *  TCAP options
- */
-typedef struct tcap_opt_conf_tc {
-} tcap_opt_conf_tc_t;
-
-/*
- *  Default options
+ * OPTIONS
+ *
+ * Provides options not necessary for configuration but that can be changed
+ * while the object exists without reconfiguration of the object (that is, a
+ * change to these items does not change the relationship between the object
+ * changed and other objects).
+ *
+ * Note that one of these option structures can optionally be appended to a
+ * configuration structure when an object is created or moved.
  */
 typedef struct tcap_opt_conf_df {
 } tcap_opt_conf_df_t;
+typedef struct tcap_opt_conf_tc {
+} tcap_opt_conf_tc_t;
+typedef struct tcap_opt_conf_iv {
+} tcap_opt_conf_iv_t;
+typedef struct tcap_opt_conf_op {
+} tcap_opt_conf_op_t;
+typedef struct tcap_opt_conf_dg {
+} tcap_opt_conf_dg_t;
+typedef struct tcap_opt_conf_ac {
+} tcap_opt_conf_ac_t;
+typedef struct tcap_opt_conf_tr {
+} tcap_opt_conf_tr_t;
+typedef struct tcap_opt_conf_te {
+} tcap_opt_conf_te_t;
+typedef struct tcap_opt_conf_sp {
+} tcap_opt_conf_sp_t;
+typedef struct tcap_opt_conf_sc {
+} tcap_opt_conf_sc_t;
 
 typedef union tcap_option_obj {
+	struct tcap_opt_conf_df df;
 	struct tcap_opt_conf_tc tc;
 	struct tcap_opt_conf_iv iv;
 	struct tcap_opt_conf_op op;
@@ -163,90 +182,57 @@ typedef union tcap_option_obj {
 	struct tcap_opt_conf_te te;
 	struct tcap_opt_conf_sp sp;
 	struct tcap_opt_conf_sc sc;
-	struct tcap_opt_conf_df df;
 } tcap_option_obj_t;
 
-/*
- *  OPTIONS
- */
 typedef struct tcap_option {
-	t_uscalar_t type;		/* object type */
-	t_uscalar_t id;			/* object id */
+	uint type;			/* object type */
+	uint id;			/* object id */
 	/* followed by specific proto structure */
-	tcap_option_obj_t options[0];
+	union tcap_option_obj options[0];
 } tcap_option_t;
 
-#define TCAP_IOCGOPTION		_IOR(	TCAP_IOC_MAGIC,	 0, tcap_option_t   )
-#define TCAP_IOCSOPTION		_IOR(	TCAP_IOC_MAGIC,	 1, tcap_option_t   )
+#define TCAP_IOCGOPTION	_IOWR(TCAP_IOC_MAGIC,	 1, tcap_option_t)	/* get */
+#define TCAP_IOCSOPTION	_IOWR(TCAP_IOC_MAGIC,	 2, tcap_option_t)	/* set */
 
 /*
- *  SCCP configuration
+ * CONFIGURATION
+ *
+ * Configures the object (creates, destroys, moves).  These actions require
+ * reconfiguration of the object and a change in its relationship to other
+ * objects.  Also, this structure contains information that must be specified
+ * during creation of the object.  Each structure can optionally be followed by
+ * an options structure to specify the options during creation.
  */
-typedef struct tcap_conf_sc {
-	int muxid;
-	t_uscalar_t spid;
+typedef struct tcap_conf_df {
 	lmi_option_t proto;
-} tcap_conf_sc_t;
-
-/*
- *  SCCP SAP configuration
- */
+} tcap_conf_df_t;
+typedef struct tcap_conf_tc {
+} tcap_conf_tc_t;
+typedef struct tcap_conf_iv {
+} tcap_conf_iv_t;
+typedef struct tcap_conf_op {
+} tcap_conf_op_t;
+typedef struct tcap_conf_dg {
+} tcap_conf_dg_t;
+typedef struct tcap_conf_ac {
+} tcap_conf_ac_t;
+typedef struct tcap_conf_tr {
+} tcap_conf_tr_t;
+typedef struct tcap_conf_te {
+} tcap_conf_te_t;
 typedef struct tcap_conf_sp {
 	struct sccp_addr add;
 	uchar addr[SCCP_MAX_ADDR_LENGTH];
 	lmi_option_t proto;
 } tcap_conf_sp_t;
-
-/*
- *  TCAP Entity configuratoin
- */
-typedef struct tcap_conf_te {
-} tcap_conf_te_t;
-
-/*
- *  Transaction configuration
- */
-typedef struct tcap_conf_tr {
-} tcap_conf_tr_t;
-
-/*
- *  Application Context configuration
- */
-typedef struct tcap_conf_ac {
-} tcap_conf_ac_t;
-
-/*
- *  Dialogue configuration
- */
-typedef struct tcap_conf_dg {
-} tcap_conf_dg_t;
-
-/*
- *  Operation configuration
- */
-typedef struct tcap_conf_op {
-} tcap_conf_op_t;
-
-/*
- *  Invoke configuration
- */
-typedef struct tcap_conf_iv {
-} tcap_conf_iv_t;
-
-/*
- *  TCAP configuration
- */
-typedef struct tcap_conf_tc {
-} tcap_conf_tc_t;
-
-/*
- *  Default configuration
- */
-typedef struct tcap_conf_df {
+typedef struct tcap_conf_sc {
+	int muxid;
+	uint spid;
 	lmi_option_t proto;
-} tcap_conf_df_t;
+} tcap_conf_sc_t;
 
 typedef union tcap_conf_obj {
+	struct tcap_conf_df df;
 	struct tcap_conf_tc tc;
 	struct tcap_conf_iv iv;
 	struct tcap_conf_op op;
@@ -256,93 +242,90 @@ typedef union tcap_conf_obj {
 	struct tcap_conf_te te;
 	struct tcap_conf_sp sp;
 	struct tcap_conf_sc sc;
-	struct tcap_conf_df df;
 } tcap_conf_obj_t;
 
-/*
- *  CONFIGURATION
- */
+#define TCAP_GET	0	/* get options or configuration */
+#define TCAP_ADD	1	/* add configuration */
+#define TCAP_CHA	2	/* set options or change configuration */
+#define TCAP_DEL	3	/* delete configuraiton */
+#define TCAP_TST	4	/* test options or configuration */
+#define TCAP_COM	5	/* commit options or configuration */
+
 typedef struct tcap_config {
-	t_uscalar_t type;		/* object type */
-	t_uscalar_t id;			/* object id */
-	t_uscalar_t cmd;		/* object command */
+	uint type;			/* object type */
+	uint id;			/* object id */
+	uint cmd;			/* object command */
 	/* followed by specific configuration structure */
-	tcap_conf_obj_t config[0];
+	union tcap_conf_obj config[0];
 } tcap_config_t;
 
-#define TCAP_GET	0
-#define TCAP_ADD	1
-#define TCAP_CHA	2
-#define TCAP_DEL	3
+#define TCAP_IOCLCONFIG	_IOWR(TCAP_IOC_MAGIC,	 3, tcap_config_t)	/* list */
+#define TCAP_IOCGCONFIG	_IOWR(TCAP_IOC_MAGIC,	 4, tcap_config_t)	/* get */
+#define TCAP_IOCSCONFIG	_IOWR(TCAP_IOC_MAGIC,	 5, tcap_config_t)	/* set */
+#define TCAP_IOCTCONFIG	_IOWR(TCAP_IOC_MAGIC,	 6, tcap_config_t)	/* test */
+#define TCAP_IOCCCONFIG	_IOWR(TCAP_IOC_MAGIC,	 7, tcap_config_t)	/* commit */
 
-#define TCAP_IOCGCONFIG		_IOWR(	TCAP_IOC_MAGIC,	 2, tcap_config_t   )
-#define TCAP_IOCSCONFIG		_IOWR(	TCAP_IOC_MAGIC,	 3, tcap_config_t   )
-#define TCAP_IOCTCONFIG		_IOWR(	TCAP_IOC_MAGIC,	 4, tcap_config_t   )
-#define TCAP_IOCCCONFIG		_IOWR(	TCAP_IOC_MAGIC,	 5, tcap_config_t   )
-
-typedef struct tcap_timers_tc {
-} tcap_timers_tc_t;
-typedef struct tcap_statem_tc {
-	tcap_timers_tc_t timers;
-} tcap_statem_tc_t;
-
-typedef struct tcap_timers_iv {
-	tcap_timer_t t1;
-} tcap_timers_iv_t;
-typedef struct tcap_statem_iv {
-	tcap_timers_iv_t timers;
-} tcap_statem_iv_t;
-
-typedef struct tcap_timers_op {
-	tcap_timer_t t1;
-} tcap_timers_op_t;
-typedef struct tcap_statem_op {
-	tcap_timers_op_t timers;
-} tcap_statem_op_t;
-
-typedef struct tcap_timers_dg {
-} tcap_timers_dg_t;
-typedef struct tcap_statem_dg {
-	tcap_timers_dg_t timers;
-} tcap_statem_dg_t;
-
-typedef struct tcap_timers_ac {
-} tcap_timers_ac_t;
-typedef struct tcap_statem_ac {
-	tcap_timers_ac_t timers;
-} tcap_statem_ac_t;
-
-typedef struct tcap_timers_tr {
-} tcap_timers_tr_t;
-typedef struct tcap_statem_tr {
-	tcap_timers_tr_t timers;
-} tcap_statem_tr_t;
-
-typedef struct tcap_timers_te {
-} tcap_timers_te_t;
-typedef struct tcap_statem_te {
-	tcap_timers_te_t timers;
-} tcap_statem_te_t;
-
-typedef struct tcap_timers_sp {
-} tcap_timers_sp_t;
-typedef struct tcap_statem_sp {
-	tcap_timers_sp_t timers;
-} tcap_statem_sp_t;
-
-typedef struct tcap_timers_sc {
-} tcap_timers_sc_t;
-typedef struct tcap_statem_sc {
-	tcap_timers_sc_t timers;
-} tcap_statem_sc_t;
-
+/*
+ * STATE
+ *
+ * Provides state machine state information.  The purpose of these items is
+ * primarily for debugging: to view the internal state of the state machine.
+ * Some of these state variables might also be reflected in status fields.
+ */
 typedef struct tcap_timers_df {
 } tcap_timers_df_t;
+typedef struct tcap_timers_tc {
+} tcap_timers_tc_t;
+typedef struct tcap_timers_iv {
+} tcap_timers_iv_t;
+typedef struct tcap_timers_op {
+} tcap_timers_op_t;
+typedef struct tcap_timers_dg {
+} tcap_timers_dg_t;
+typedef struct tcap_timers_ac {
+} tcap_timers_ac_t;
+typedef struct tcap_timers_tr {
+} tcap_timers_tr_t;
+typedef struct tcap_timers_te {
+} tcap_timers_te_t;
+typedef struct tcap_timers_sp {
+} tcap_timers_sp_t;
+typedef struct tcap_timers_sc {
+} tcap_timers_sc_t;
+
 typedef struct tcap_statem_df {
-	tcap_timers_df_t timers;
+	struct tcap_timers_df timers;
 } tcap_statem_df_t;
+typedef struct tcap_statem_tc {
+	struct tcap_timers_tc timers;
+} tcap_statem_tc_t;
+typedef struct tcap_statem_iv {
+	struct tcap_timers_iv timers;
+} tcap_statem_iv_t;
+typedef struct tcap_statem_op {
+	struct tcap_timers_op timers;
+} tcap_statem_op_t;
+typedef struct tcap_statem_dg {
+	struct tcap_timers_dg timers;
+} tcap_statem_dg_t;
+typedef struct tcap_statem_ac {
+	struct tcap_timers_ac timers;
+} tcap_statem_ac_t;
+typedef struct tcap_statem_tr {
+	struct tcap_timers_tr timers;
+} tcap_statem_tr_t;
+typedef struct tcap_statem_te {
+	struct tcap_timers_te timers;
+} tcap_statem_te_t;
+typedef struct tcap_statem_sp {
+	struct tcap_timers_sp timers;
+} tcap_statem_sp_t;
+typedef struct tcap_statem_sc {
+	struct tcap_timers_sc timers;
+} tcap_statem_sc_t;
 
 typedef union tcap_statem_obj {
+	struct tcap_statem_df df;
 	struct tcap_statem_tc tc;
 	struct tcap_statem_iv iv;
 	struct tcap_statem_op op;
@@ -352,83 +335,131 @@ typedef union tcap_statem_obj {
 	struct tcap_statem_te te;
 	struct tcap_statem_sp sp;
 	struct tcap_statem_sc sc;
-	struct tcap_statem_df df;
 } tcap_statem_obj_t;
 
-/*
- *  STATE
- */
 typedef struct tcap_statem {
-	t_uscalar_t type;		/* object type */
-	t_uscalar_t id;			/* object id */
-	t_uscalar_t header;		/* object stats header */
-	/* followed by object specific state structure */
-	tcap_statem_obj_t statem[0];
+	uint type;			/* object type */
+	uint id;			/* object id */
+	uint flags;			/* object flags */
+	uint state;			/* object state */
+	/* followed by object-specific state structure */
+	union tcap_statem_obj statem[0];
 } tcap_statem_t;
 
-#define TCAP_IOCGSTATEM		_IOWR(	TCAP_IOC_MAGIC,	 6, tcap_statem_t   )
-#define TCAP_IOCCMRESET		_IOWR(	TCAP_IOC_MAGIC,	 7, tcap_statem_t   )
+#define TCAP_IOCGSTATEM	_IOWR(TCAP_IOC_MAGIC,	 8, tcap_statem_t)	/* get */
+#define TCAP_IOCCMRESET	_IOWR(TCAP_IOC_MAGIC,	 9, tcap_statem_t)	/* master reset */
 
+/*
+ * STATUS
+ *
+ * Provides status on the object.  Many of these are X.721 status fields or
+ * object-specific status information.  Only read-write status fields may be
+ * altered with a set or clear command.
+ */
+typedef struct tcap_status_df {
+} tcap_status_df_t;
+typedef struct tcap_status_tc {
+} tcap_status_tc_t;
+typedef struct tcap_status_iv {
+} tcap_status_iv_t;
+typedef struct tcap_status_op {
+} tcap_status_op_t;
+typedef struct tcap_status_dg {
+} tcap_status_dg_t;
+typedef struct tcap_status_ac {
+} tcap_status_ac_t;
+typedef struct tcap_status_tr {
+} tcap_status_tr_t;
+typedef struct tcap_status_te {
+} tcap_status_te_t;
+typedef struct tcap_status_sp {
+} tcap_status_sp_t;
+typedef struct tcap_status_sc {
+} tcap_status_sc_t;
+
+typedef union tcap_status_obj {
+	struct tcap_status_df df;
+	struct tcap_status_tc tc;
+	struct tcap_status_iv iv;
+	struct tcap_status_op op;
+	struct tcap_status_dg dg;
+	struct tcap_status_ac ac;
+	struct tcap_status_tr tr;
+	struct tcap_status_te te;
+	struct tcap_status_sp sp;
+	struct tcap_status_sc sc;
+} tcap_status_obj_t;
+
+typedef struct tcap_status {
+	uint type;			/* object type */
+	uint id;			/* object identifier */
+	/* followed by object-specific structure */
+	union tcap_status_obj status[0];
+} tcap_status_t;
+
+#define TCAP_IOCGSTATUS	_IOWR(TCAP_IOC_MAGIC,	10, tcap_status_t)	/* get */
+#define TCAP_IOCSSTATUS	_IOWR(TCAP_IOC_MAGIC,	11, tcap_status_t)	/* set */
+#define TCAP_IOCCSTATUS	_IOWR(TCAP_IOC_MAGIC,	12, tcap_status_t)	/* clear */
+
+/*
+ * STATISTICS
+ */
+typedef struct tcap_stats_df {
+} tcap_stats_df_t;
 typedef struct tcap_stats_tc {
 } tcap_stats_tc_t;
-
 typedef struct tcap_stats_iv {
 } tcap_stats_iv_t;
-
 typedef struct tcap_stats_op {
 } tcap_stats_op_t;
-
 typedef struct tcap_stats_dg {
-	t_uscalar_t dg_13_3;		/* Q.752/13.3 Total comps tx by the node (5,30) */
-	t_uscalar_t dg_13_4;		/* Q.752/13.4 Total comps rx by the node (5,30) */
-	t_uscalar_t dg_14_3_d;		/* Q.752/14.3 d) TC-u rej rx: iv resource limitation (1+D) */
-	t_uscalar_t dg_14_6_d;		/* Q.752/14.6 d) TC-u rej tx: iv resource limitation (1+D) */
-	t_uscalar_t dg_14_7;		/* Q.752/14.7 TC_L_CANCEL indications for Op Class 1 (5) */
-	t_uscalar_t dg_14_11;		/* Q.752/14.11 Rejects rx (5) */
-	t_uscalar_t dg_A_2_a;		/* Q.752/A.2 a) CP PE (rej rx): gp unrec comp */
-	t_uscalar_t dg_A_2_b;		/* Q.752/A.2 b) CP PE (rej rx): gp mistyped comp */
-	t_uscalar_t dg_A_2_c;		/* Q.752/A.2 c) CP PE (rej rx): gp badly structured comp */
-	t_uscalar_t dg_A_2_d;		/* Q.752/A.2 d) CP PE (rej rx): iv unrec invoke id */
-	t_uscalar_t dg_A_2_e;		/* Q.752/A.2 e) CP PE (rej rx): rr unrec comp */
-	t_uscalar_t dg_A_2_f;		/* Q.752/A.2 f) CP PE (rej rx): rr RR unexp */
-	t_uscalar_t dg_A_2_g;		/* Q.752/A.2 g) CP PE (rej rx): re unrec invoke id */
-	t_uscalar_t dg_A_2_h;		/* Q.752/A.2 h) CP PE (rej rx): re RE unexp */
-	t_uscalar_t dg_A_3_a;		/* Q.752/A.3 a) TC-u rej rx: iv duplicate invoke id */
-	t_uscalar_t dg_A_3_b;		/* Q.752/A.3 b) TC-u rej rx: iv unrec op */
-	t_uscalar_t dg_A_3_c;		/* Q.752/A.3 c) TC-u rej rx: iv mistyped parm */
-	t_uscalar_t dg_A_3_d;		/* Q.752/A.3 d) TC-u rej rx: iv initiating release */
-	t_uscalar_t dg_A_3_e;		/* Q.752/A.3 e) TC-u rej rx: iv linked response unexp */
-	t_uscalar_t dg_A_3_f;		/* Q.752/A.3 f) TC-u rej rx: iv unexp linked op */
-	t_uscalar_t dg_A_3_g;		/* Q.752/A.3 g) TC-u rej rx: re unrec error */
-	t_uscalar_t dg_A_3_h;		/* Q.752/A.3 h) TC-u rej rx: re unexp error */
-	t_uscalar_t dg_A_3_i;		/* Q.752/A.3 i) TC-u rej rx: rr mistyped parm */
-	t_uscalar_t dg_A_3_j;		/* Q.752/A.3 j) TC-u rej rx: re mistyped parm */
-	t_uscalar_t dg_A_5_a;		/* Q.752/A.5 a) CP PE (rej tx): gp unrec comp */
-	t_uscalar_t dg_A_5_b;		/* Q.752/A.5 b) CP PE (rej tx): gp mistyped comp */
-	t_uscalar_t dg_A_5_c;		/* Q.752/A.5 c) CP PE (rej tx): gp badly structured comp */
-	t_uscalar_t dg_A_5_d;		/* Q.752/A.5 d) CP PE (rej tx): iv unrec invoke id */
-	t_uscalar_t dg_A_5_e;		/* Q.752/A.5 e) CP PE (rej tx): rr unrec comp */
-	t_uscalar_t dg_A_5_f;		/* Q.752/A.5 f) CP PE (rej tx): rr RR unexp */
-	t_uscalar_t dg_A_5_g;		/* Q.752/A.5 g) CP PE (rej tx): re unrec invoke id */
-	t_uscalar_t dg_A_5_h;		/* Q.752/A.5 h) CP PE (rej tx): re RE unexp */
-	t_uscalar_t dg_A_6_a;		/* Q.752/A.6 a) TC-u rej tx: iv duplicate invoke id */
-	t_uscalar_t dg_A_6_b;		/* Q.752/A.6 b) TC-u rej tx: iv unrec op */
-	t_uscalar_t dg_A_6_c;		/* Q.752/A.6 c) TC-u rej tx: iv mistyped parm */
-	t_uscalar_t dg_A_6_d;		/* Q.752/A.6 d) TC-u rej tx: iv initiating release */
-	t_uscalar_t dg_A_6_e;		/* Q.752/A.6 e) TC-u rej tx: iv linked response unexp */
-	t_uscalar_t dg_A_6_f;		/* Q.752/A.6 f) TC-u rej tx: iv unexp linked op */
-	t_uscalar_t dg_A_6_g;		/* Q.752/A.6 g) TC-u rej tx: re unrec error */
-	t_uscalar_t dg_A_6_h;		/* Q.752/A.6 h) TC-u rej tx: re unexp error */
-	t_uscalar_t dg_A_6_i;		/* Q.752/A.6 i) TC-u rej tx: rr mistyped parm */
-	t_uscalar_t dg_A_6_j;		/* Q.752/A.6 j) TC-u rej tx: re mistyped parm */
+	uint dg_13_3;			/* Q.752/13.3 Total comps tx by the node (5,30) */
+	uint dg_13_4;			/* Q.752/13.4 Total comps rx by the node (5,30) */
+	uint dg_14_3_d;			/* Q.752/14.3 d) TC-u rej rx: iv resource limitation (1+D) */
+	uint dg_14_6_d;			/* Q.752/14.6 d) TC-u rej tx: iv resource limitation (1+D) */
+	uint dg_14_7;			/* Q.752/14.7 TC_L_CANCEL indications for Op Class 1 (5) */
+	uint dg_14_11;			/* Q.752/14.11 Rejects rx (5) */
+	uint dg_A_2_a;			/* Q.752/A.2 a) CP PE (rej rx): gp unrec comp */
+	uint dg_A_2_b;			/* Q.752/A.2 b) CP PE (rej rx): gp mistyped comp */
+	uint dg_A_2_c;			/* Q.752/A.2 c) CP PE (rej rx): gp badly structured comp */
+	uint dg_A_2_d;			/* Q.752/A.2 d) CP PE (rej rx): iv unrec invoke id */
+	uint dg_A_2_e;			/* Q.752/A.2 e) CP PE (rej rx): rr unrec comp */
+	uint dg_A_2_f;			/* Q.752/A.2 f) CP PE (rej rx): rr RR unexp */
+	uint dg_A_2_g;			/* Q.752/A.2 g) CP PE (rej rx): re unrec invoke id */
+	uint dg_A_2_h;			/* Q.752/A.2 h) CP PE (rej rx): re RE unexp */
+	uint dg_A_3_a;			/* Q.752/A.3 a) TC-u rej rx: iv duplicate invoke id */
+	uint dg_A_3_b;			/* Q.752/A.3 b) TC-u rej rx: iv unrec op */
+	uint dg_A_3_c;			/* Q.752/A.3 c) TC-u rej rx: iv mistyped parm */
+	uint dg_A_3_d;			/* Q.752/A.3 d) TC-u rej rx: iv initiating release */
+	uint dg_A_3_e;			/* Q.752/A.3 e) TC-u rej rx: iv linked response unexp */
+	uint dg_A_3_f;			/* Q.752/A.3 f) TC-u rej rx: iv unexp linked op */
+	uint dg_A_3_g;			/* Q.752/A.3 g) TC-u rej rx: re unrec error */
+	uint dg_A_3_h;			/* Q.752/A.3 h) TC-u rej rx: re unexp error */
+	uint dg_A_3_i;			/* Q.752/A.3 i) TC-u rej rx: rr mistyped parm */
+	uint dg_A_3_j;			/* Q.752/A.3 j) TC-u rej rx: re mistyped parm */
+	uint dg_A_5_a;			/* Q.752/A.5 a) CP PE (rej tx): gp unrec comp */
+	uint dg_A_5_b;			/* Q.752/A.5 b) CP PE (rej tx): gp mistyped comp */
+	uint dg_A_5_c;			/* Q.752/A.5 c) CP PE (rej tx): gp badly structured comp */
+	uint dg_A_5_d;			/* Q.752/A.5 d) CP PE (rej tx): iv unrec invoke id */
+	uint dg_A_5_e;			/* Q.752/A.5 e) CP PE (rej tx): rr unrec comp */
+	uint dg_A_5_f;			/* Q.752/A.5 f) CP PE (rej tx): rr RR unexp */
+	uint dg_A_5_g;			/* Q.752/A.5 g) CP PE (rej tx): re unrec invoke id */
+	uint dg_A_5_h;			/* Q.752/A.5 h) CP PE (rej tx): re RE unexp */
+	uint dg_A_6_a;			/* Q.752/A.6 a) TC-u rej tx: iv duplicate invoke id */
+	uint dg_A_6_b;			/* Q.752/A.6 b) TC-u rej tx: iv unrec op */
+	uint dg_A_6_c;			/* Q.752/A.6 c) TC-u rej tx: iv mistyped parm */
+	uint dg_A_6_d;			/* Q.752/A.6 d) TC-u rej tx: iv initiating release */
+	uint dg_A_6_e;			/* Q.752/A.6 e) TC-u rej tx: iv linked response unexp */
+	uint dg_A_6_f;			/* Q.752/A.6 f) TC-u rej tx: iv unexp linked op */
+	uint dg_A_6_g;			/* Q.752/A.6 g) TC-u rej tx: re unrec error */
+	uint dg_A_6_h;			/* Q.752/A.6 h) TC-u rej tx: re unexp error */
+	uint dg_A_6_i;			/* Q.752/A.6 i) TC-u rej tx: rr mistyped parm */
+	uint dg_A_6_j;			/* Q.752/A.6 j) TC-u rej tx: re mistyped parm */
 } tcap_stats_dg_t;
-
 typedef struct tcap_stats_ac {
 } tcap_stats_ac_t;
-
 typedef struct tcap_stats_tr {
 } tcap_stats_tr_t;
-
 typedef struct tcap_stats_te {
 	uint s_msgs_uni;		/* Q.752/13.1 Total TC msgs tx by the node (by MT) (5,30) */
 	uint s_msgs_begin;		/* Q.752/13.1 Total TC msgs tx by the node (by MT) (5,30) */
@@ -509,17 +540,13 @@ typedef struct tcap_stats_te {
 	uint s_rr_mistyped_parm;	/* Q.752/A.6 i) TC-U rej tx: rr mistyped parm */
 	uint s_re_mistyped_parm;	/* Q.752/A.6 j) TC-U rej tx: re mistyped parm */
 } tcap_stats_te_t;
-
 typedef struct tcap_stats_sp {
 } tcap_stats_sp_t;
-
 typedef struct tcap_stats_sc {
 } tcap_stats_sc_t;
 
-typedef struct tcap_stats_df {
-} tcap_stats_df_t;
-
 typedef union tcap_stats_obj {
+	struct tcap_stats_df df;
 	struct tcap_stats_tc tc;
 	struct tcap_stats_iv iv;
 	struct tcap_stats_op op;
@@ -529,55 +556,69 @@ typedef union tcap_stats_obj {
 	struct tcap_stats_te te;
 	struct tcap_stats_sp sp;
 	struct tcap_stats_sc sc;
-	struct tcap_stats_df df;
 } tcap_stats_obj_t;
 
-/*
- *  STATISTICS
- */
 typedef struct tcap_stats {
-	t_uscalar_t type;		/* object type */
-	t_uscalar_t id;			/* object id */
-	t_uscalar_t header;		/* object stats header */
-	/* followed by object specific stats structure */
-	tcap_stats_obj_t stats[0];
+	uint type;			/* object type */
+	uint id;			/* object id */
+	uint header;			/* object stats header */
+	/* followed by object-specific statistics structure */
+	union tcap_stats_obj stats[0];
 } tcap_stats_t;
 
-#define TCAP_IOCGSTATSP		_IOWR(	TCAP_IOC_MAGIC,  8,  tcap_stats_t )
-#define TCAP_IOCSSTATSP		_IOWR(	TCAP_IOC_MAGIC,  9,  tcap_stats_t )
-#define TCAP_IOCGSTATS		_IOWR(	TCAP_IOC_MAGIC, 10,  tcap_stats_t )
-#define TCAP_IOCCSTATS		_IOWR(	TCAP_IOC_MAGIC, 11,  tcap_stats_t )
+#define TCAP_IOCGSTATSP	_IOWR(TCAP_IOC_MAGIC,	 8,  tcap_stats_t) /* get period */
+#define TCAP_IOCSSTATSP	_IOWR(TCAP_IOC_MAGIC,	 9,  tcap_stats_t) /* set period */
+#define TCAP_IOCGSTATS	_IOWR(TCAP_IOC_MAGIC,	10,  tcap_stats_t) /* get stats */
+#define TCAP_IOCCSTATS	_IOWR(TCAP_IOC_MAGIC,	11,  tcap_stats_t) /* get and clear stats */
 
+/*
+ * EVENTS
+ *
+ * Provides a mechanism for requesting event notifications.  The flags field in
+ * the header is used to requesting X.721 events (e.g. object creation
+ * notification).  Events can be requested by object class, and a mechanism
+ * exists for requesting events by specific object; however, the driver is not
+ * required to support per-object notification and will return EOPNOTSUPP.  To
+ * request notification for an object class, specify zero (0) for the
+ * object identifier.
+ *
+ * Event requests are per requesting Stream.  Non-management streams should only
+ * be notified of events for objects associated with the Stream and not X.721
+ * events unless also specified as a specific event (e.g. communications alarm
+ * events).  Management Streams can be notified of any object.  Notifications
+ * are provided using the LMI_EVENT_IND (event indication) for X.721 events, and
+ * the LMI_EVENT_IND (for other events).
+ */
+typedef struct tcap_notify_df {
+	uint events;
+} tcap_notify_df_t;
 typedef struct tcap_notify_tc {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_tc_t;
 typedef struct tcap_notify_iv {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_iv_t;
 typedef struct tcap_notify_op {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_op_t;
 typedef struct tcap_notify_dg {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_dg_t;
 typedef struct tcap_notify_ac {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_ac_t;
 typedef struct tcap_notify_tr {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_tr_t;
 typedef struct tcap_notify_te {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_te_t;
 typedef struct tcap_notify_sp {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_sp_t;
 typedef struct tcap_notify_sc {
-	t_uscalar_t events;
+	uint events;
 } tcap_notify_sc_t;
-typedef struct tcap_notify_df {
-	t_uscalar_t events;
-} tcap_notify_df_t;
 
 /*
    The following are the Q.752 "occurence" or "first & interval" events associated with TC
@@ -645,7 +686,9 @@ typedef struct tcap_notify_df {
 #define TC_EVT_RECV_RE_MISTYPED_PARM	(1<<24)	/* Q.752/A.3 j) TC-U rej rx: re mistyped parm */
 #define TC_EVT_SEND_RE_MISTYPED_PARM	(1<<24)	/* Q.752/A.6 j) TC-U rej tx: re mistyped parm */
 
+
 typedef union tcap_notify_obj {
+	struct tcap_notify_df df;
 	struct tcap_notify_tc tc;
 	struct tcap_notify_iv iv;
 	struct tcap_notify_op op;
@@ -655,30 +698,186 @@ typedef union tcap_notify_obj {
 	struct tcap_notify_te te;
 	struct tcap_notify_sp sp;
 	struct tcap_notify_sc sc;
-	struct tcap_notify_df df;
 } tcap_notify_obj_t;
 
-/*
- *  EVENTS
- */
 typedef struct tcap_notify {
-	t_uscalar_t type;		/* object type */
-	t_uscalar_t id;			/* object id */
+	uint type;			/* object type */
+	uint id;			/* object id */
 	/* followed by object-specific notification structure */
-	tcap_notify_obj_t notify[0];
+	union tcap_notify_obj notify[0];
 } tcap_notify_t;
 
-#define TCAP_IOCGNOTIFY		_IOR(	TCAP_IOC_MAGIC, 12,  tcap_notify_t )
-#define TCAP_IOCSNOTIFY		_IOW(	TCAP_IOC_MAGIC, 13,  tcap_notify_t )
-#define TCAP_IOCCNOTIFY		_IOW(	TCAP_IOC_MAGIC, 14,  tcap_notify_t )
+#define TCAP_IOCGNOTIFY	_IOWR(TCAP_IOC_MAGIC, 17,  tcap_notify_t)	/* get */
+#define TCAP_IOCSNOTIFY	_IOWR(TCAP_IOC_MAGIC, 18,  tcap_notify_t)	/* set */
+#define TCAP_IOCCNOTIFY	_IOWR(TCAP_IOC_MAGIC, 19,  tcap_notify_t)	/* clear */
+
+/*
+ * ATTRIBUTES
+ *
+ * Provides a structure that contains all of the other information structures
+ * pertaining to an object.  This is the total view of the object.  This 
+ * structure can only be read and cannot be used to reconfigure or change
+ * options associated with an object.  This structure is primarily for the
+ * convenience of management agents so that it is possible to atomically read
+ * all of the attributes associated with an object.
+ */
+typedef struct tcap_attr_df {
+	struct tcap_conf_df config;
+	struct tcap_opt_conf_df option;
+	struct tcap_info_df inform;
+	struct tcap_statem_df statem;
+	struct tcap_status_df status;
+	struct tcap_stats_df stats;
+	struct tcap_notify_df events;
+} tcap_attr_df_t;
+typedef struct tcap_attr_tc {
+	struct tcap_conf_tc config;
+	struct tcap_opt_conf_tc option;
+	struct tcap_info_tc inform;
+	struct tcap_statem_tc statem;
+	struct tcap_status_tc status;
+	struct tcap_stats_tc stats;
+	struct tcap_notify_tc events;
+} tcap_attr_tc_t;
+typedef struct tcap_attr_iv {
+	struct tcap_conf_iv config;
+	struct tcap_opt_conf_iv option;
+	struct tcap_info_iv inform;
+	struct tcap_statem_iv statem;
+	struct tcap_status_iv status;
+	struct tcap_stats_iv stats;
+	struct tcap_notify_iv events;
+} tcap_attr_iv_t;
+typedef struct tcap_attr_op {
+	struct tcap_conf_op config;
+	struct tcap_opt_conf_op option;
+	struct tcap_info_op inform;
+	struct tcap_statem_op statem;
+	struct tcap_status_op status;
+	struct tcap_stats_op stats;
+	struct tcap_notify_op events;
+} tcap_attr_op_t;
+typedef struct tcap_attr_dg {
+	struct tcap_conf_dg config;
+	struct tcap_opt_conf_dg option;
+	struct tcap_info_dg inform;
+	struct tcap_statem_dg statem;
+	struct tcap_status_dg status;
+	struct tcap_stats_dg stats;
+	struct tcap_notify_dg events;
+} tcap_attr_dg_t;
+typedef struct tcap_attr_ac {
+	struct tcap_conf_ac config;
+	struct tcap_opt_conf_ac option;
+	struct tcap_info_ac inform;
+	struct tcap_statem_ac statem;
+	struct tcap_status_ac status;
+	struct tcap_stats_ac stats;
+	struct tcap_notify_ac events;
+} tcap_attr_ac_t;
+typedef struct tcap_attr_tr {
+	struct tcap_conf_tr config;
+	struct tcap_opt_conf_tr option;
+	struct tcap_info_tr inform;
+	struct tcap_statem_tr statem;
+	struct tcap_status_tr status;
+	struct tcap_stats_tr stats;
+	struct tcap_notify_tr events;
+} tcap_attr_tr_t;
+typedef struct tcap_attr_te {
+	struct tcap_conf_te config;
+	struct tcap_opt_conf_te option;
+	struct tcap_info_te inform;
+	struct tcap_statem_te statem;
+	struct tcap_status_te status;
+	struct tcap_stats_te stats;
+	struct tcap_notify_te events;
+} tcap_attr_te_t;
+typedef struct tcap_attr_sp {
+	struct tcap_conf_sp config;
+	struct tcap_opt_conf_sp option;
+	struct tcap_info_sp inform;
+	struct tcap_statem_sp statem;
+	struct tcap_status_sp status;
+	struct tcap_stats_sp stats;
+	struct tcap_notify_sp events;
+} tcap_attr_sp_t;
+typedef struct tcap_attr_sc {
+} tcap_attr_sc_t;
+	struct tcap_conf_sc config;
+	struct tcap_opt_conf_sc option;
+	struct tcap_info_sc inform;
+	struct tcap_statem_sc statem;
+	struct tcap_status_sc status;
+	struct tcap_stats_sc stats;
+	struct tcap_notify_sc events;
+
+typedef union tcap_attr_obj {
+	struct tcap_attr_df df;
+	struct tcap_attr_tc tc;
+	struct tcap_attr_iv iv;
+	struct tcap_attr_op op;
+	struct tcap_attr_dg dg;
+	struct tcap_attr_ac ac;
+	struct tcap_attr_tr tr;
+	struct tcap_attr_te te;
+	struct tcap_attr_sp sp;
+	struct tcap_attr_sc sc;
+} tcap_attr_obj_t;
+
+typedef struct tcap_attr {
+	uint type;			/* object type */
+	uint id;			/* object identifier */
+	uint cmd;			/* command */
+	/* followed by object-specific structure */
+	union tcap_attr_obj attrs[0];
+} tcap_attr_t;
+
+#define	TCAP_IOCGATTR	_IOWR(TCAP_IOC_MAGIC,	20, tcap_attr_t)	/* get attributes */
 
 /*
  *  MANAGEMENT
  */
+typedef struct tcap_action_df {
+} tcap_action_df_t;
+typedef struct tcap_action_tc {
+} tcap_action_tc_t;
+typedef struct tcap_action_iv {
+} tcap_action_iv_t;
+typedef struct tcap_action_op {
+} tcap_action_op_t;
+typedef struct tcap_action_dg {
+} tcap_action_dg_t;
+typedef struct tcap_action_ac {
+} tcap_action_ac_t;
+typedef struct tcap_action_tr {
+} tcap_action_tr_t;
+typedef struct tcap_action_te {
+} tcap_action_te_t;
+typedef struct tcap_action_sp {
+} tcap_action_sp_t;
+typedef struct tcap_action_sc {
+} tcap_action_sc_t;
+
+typedef union tcap_action_obj {
+	struct tcap_action_df df;
+	struct tcap_action_tc tc;
+	struct tcap_action_iv iv;
+	struct tcap_action_op op;
+	struct tcap_action_dg dg;
+	struct tcap_action_ac ac;
+	struct tcap_action_tr tr;
+	struct tcap_action_te te;
+	struct tcap_action_sp sp;
+	struct tcap_action_sc sc;
+} tcap_action_obj_t;
+
 typedef struct tcap_mgmt {
-	t_uscalar_t type;		/* object type */
-	t_uscalar_t id;			/* object id */
-	t_uscalar_t cmd;		/* command */
+	uint type;			/* object type */
+	uint id;			/* object id */
+	uint cmd;			/* command */
+	/* followed by object-specific structure */
+	union tcap_action_obj action[0];
 } tcap_mgmt_t;
 
 #define TCAP_MGMT_BLOCK			1
@@ -689,21 +888,65 @@ typedef struct tcap_mgmt {
 #define TCAP_IOCCMGMT		_IOWR(	TCAP_IOC_MAGIC, 15,  tcap_mgmt_t )
 
 /*
- *  CONTROL LOWER
+ * PASS LOWER
+ *
+ * This structure is deprecated and as largely used for testing as a mechanism
+ * to bypass an input-output control to a stream linked under a multiplexing
+ * driver supporting this interface.
  */
 typedef struct tcap_pass {
-	t_uscalar_t muxid;		/* mux index of lower SCCP to pass message to */
-	t_uscalar_t type;		/* type of message block */
-	t_uscalar_t band;		/* band of message block */
-	t_uscalar_t ctl_length;		/* length of cntl part */
-	t_uscalar_t dat_length;		/* length of data part */
-	/* followed by cntl and data part of message to pass to SCCP */
+	uint muxid;			/* mux index of lower stream to pass message to */
+	uint8_t type;			/* type of message block */
+	uint8_t band;			/* band of message block */
+	uint ctl_length;		/* length of cntl part */
+	uint dat_length;		/* length of data part */
+	/* followed by cntl and data part of message to pass */
 } tcap_pass_t;
 
-#define TCAP_IOCCPASS		_IOWR(	TCAP_IOC_MAGIC, 16,  tcap_pass_t )
+#define TCAP_IOCCPASS	_IOWR(TCAP_IOC_MAGIC,	22, tcap_pass_t)	/* pass */
+
+union tcap_ioctls {
+	struct {
+		struct tcap_info info;
+		union tcap_info_obj obj;
+	};
+	struct {
+		struct tcap_option option;
+		union tcap_option_obj obj;
+	} opt_conf;
+	struct {
+		struct tcap_config config;
+		union tcap_conf_obj obj;
+	} conf;
+	struct {
+		struct tcap_statem statem;
+		union tcap_statem_obj obj;
+	} statem;
+	struct {
+		struct tcap_status status;
+		union tcap_status_obj obj;
+	} status;
+	struct {
+		struct tcap_stats stats;
+		union tcap_stats_obj obj;
+	} stats;
+	struct {
+		struct tcap_notify notify;
+		union tcap_notify_obj obj;
+	} notify;
+	struct {
+		struct tcap_attr attr;
+		union tcap_attr_obj obj;
+	} attr;
+	struct {
+		struct tcap_mgmt mgmt;
+		union tcap_action_obj obj;
+	} mgmt;
+	struct tcap_pass pass;
+};
 
 #define TCAP_IOC_FIRST		 0
-#define TCAP_IOC_LAST		16
+#define TCAP_IOC_LAST		22
 #define TCAP_IOC_PRIVATE	32
 
-#endif				/* __SSCP_IOCTL_H__ */
+#endif				/* __TCAP_IOCTL_H__ */

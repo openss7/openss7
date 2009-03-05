@@ -142,44 +142,36 @@ typedef struct {
 /*
  * TR_ERROR_ACK error return code values
  */
-#define TRBADADDR	1	/* Incorrect address format/illegal address
-				   information */
-#define TRBADOPT	2	/* Options in incorrect format or contain illegal
-				   information */
+#define TRBADADDR	1	/* Incorrect address format/illegal address information */
+#define TRBADOPT	2	/* Options in incorrect format or contain illegal information */
 #define TRACCESS	3	/* User did not have proper permissions */
 #define TRNOADDR	5	/* TR Provider could not allocate address */
 #define TROUTSTATE	6	/* Primitive was issues in wrong sequence */
-#define TRBADSEQ	7	/* Sequence number in primitive was
-				   incorrect/illegal */
+#define TRBADSEQ	7	/* Sequence number in primitive was incorrect/illegal */
 #define TRSYSERR	8	/* UNIX system error occurred */
-#define TRBADDATA	10	/* User data spec. outside range supported by TR
-				   provider */
-#define TRBADFLAG	16	/* Flags specified in primitive were
-				   illegal/incorrect */
+#define TRBADDATA	10	/* User data spec. outside range supported by TR provider */
+#define TRBADFLAG	16	/* Flags specified in primitive were illegal/incorrect */
 #define TRNOTSUPPORT	18	/* Primitive type not supported by the TR provider */
-#define TRBOUND		19	/* Illegal second attempt to bind listener or
-				   default listener */
-#define TRBADQOSPARAM	20	/* QOS values specified are outside the range
-				   supported by the TR provider */
-#define TRBADQOSTYPE	21	/* QOS structure type specified is not supported by
-				   the TR provider */
+#define TRBOUND		19	/* Illegal second attempt to bind listener or default listener */
+#define TRBADQOSPARAM	20	/* QOS values specified are outside the range supported by the TR provider */
+#define TRBADQOSTYPE	21	/* QOS structure type specified is not supported by the TR provider */
 #define TRBADTOKEN	22	/* Token used is not associated with an open stream */
 #define TRNOPROTOID	23	/* Protocol id could not be allocated */
 
 /*
  *  ASSOC_flags - association flags
  */
-#define TR_PERMISSION	(1<<0)		/* permission to respond */
+#define TR_PERMISSION	(1<<0)	/* permission to respond */
 
 /*
- *  TR_INFO_REQ.  This primitive consists of one M_PCPROTO message block.
+ *  TR_INFO_REQ:- one M_PROTO or M_PCPROTO message block.
  */
 typedef struct TR_info_req {
 	t_scalar_t PRIM_type;		/* Always TR_INFO_REQ */
 } TR_info_req_t;
 
 /*
- *  TR_INFO_ACK.  This primitive consists of one M_PCPROTO message block.
+ *  TR_INFO_ACK:- one M_PCPROTO message block.
  */
 typedef struct TR_info_ack {
 	t_scalar_t PRIM_type;		/* Always TR_INFO_ACK */
@@ -210,7 +202,7 @@ typedef struct TR_info_ack {
 #define TR_ANSI		(1<<10)	/* ANSI based PRIVATE TCAP */
 
 /*
- *  TR_BIND_REQ.  This primitive consists of one M_PROTO message block.
+ *  TR_BIND_REQ:- one M_PROTO message block.
  */
 typedef struct TR_bind_req {
 	t_scalar_t PRIM_type;		/* Always TR_BIND_REQ */
@@ -221,7 +213,7 @@ typedef struct TR_bind_req {
 } TR_bind_req_t;
 
 /*
- *  TR_BIND_ACK.  This primitive consists of one M_PROTO message block.
+ *  TR_BIND_ACK:- one M_PCPROTO message block.
  */
 typedef struct TR_bind_ack {
 	t_scalar_t PRIM_type;		/* Always TR_BIND_ACK */
@@ -232,7 +224,7 @@ typedef struct TR_bind_ack {
 } TR_bind_ack_t;
 
 /*
- *  TR_ADDR_REQ.  This primitive consists of one M_PROTO message block.
+ *  TR_ADDR_REQ:- one M_PROTO or M_PCPROTO message block.
  */
 typedef struct TR_addr_req {
 	t_scalar_t PRIM_type;		/* Always TR_ADDR_REQ */
@@ -240,7 +232,7 @@ typedef struct TR_addr_req {
 } TR_addr_req_t;
 
 /*
- *  TR_ADDR_ACK.  This primitive consists of one M_PCPROTO message block.
+ *  TR_ADDR_ACK:- one M_PCPROTO or M_PCPROTO message block.
  */
 typedef struct TR_addr_ack {
 	t_scalar_t PRIM_type;		/* Always TR_ADDR_ACK */
@@ -248,10 +240,11 @@ typedef struct TR_addr_ack {
 	t_scalar_t LOCADDR_offset;	/* local address offset */
 	t_scalar_t REMADDR_length;	/* remote address length */
 	t_scalar_t REMADDR_offset;	/* remote address offset */
+	t_scalar_t TRANS_id;		/* Transaction id */
 } TR_addr_ack_t;
 
 /*
- * TR_CAPABILITY_REQ.  This primitive consists of one M_PROTO or M_PCPROTO message block.
+ * TR_CAPABILITY_REQ:- one M_PROTO or M_PCPROTO message block.
  */
 typedef struct TR_capability_req {
 	t_scalar_t PRIM_type;		/* Always TR_CAPABILITY_REQ */
@@ -259,28 +252,34 @@ typedef struct TR_capability_req {
 } TR_capability_req_t;
 
 /*
- * TR_CAPABILITY_REQ.  This primitive consists of one M_PCPROTO message block.
+ * TR_CAPABILITY_ACK:- of one M_PROTO or M_PCPROTO message block.
+ *
+ * Note that TRANS_id returns a spare transaction id that will not be allocated for
+ * some period of time in the future and can be used within a reasonable period by
+ * the caller.
  */
 typedef struct TR_capability_ack {
 	t_scalar_t PRIM_type;		/* Always TR_CAPABILITY_ACK */
 	t_uscalar_t CAP_bits1;		/* Capability bits #1 */
 	struct TR_info_ack INFO_ack;	/* Info acknowledgement. */
+	t_uscalar_t TOKEN_value;	/* Accept token value. */
 	t_uscalar_t TRANS_id;		/* Transaction id. */
 } TR_capability_ack_t;
 
 #define TRC1_INFO	(1<<0)	/* Request/contains TR_info_ack. */
+#define TRC1_TOKEN	(1<<1)	/* Request/contains acceptor token. */
 #define TRC1_TRANS_ID	(1<<1)	/* Request/contains TRANS_id. */
 #define TRC1_CAP_BITS2	(1<<31)	/* Contains extensions (unused). */
 
 /*
- *  TR_UNBIND_REQ.  This primtive consists of one M_PROTO message block.
+ *  TR_UNBIND_REQ:- one M_PROTO message block.
  */
 typedef struct TR_unbind_req {
 	t_scalar_t PRIM_type;		/* Always TR_UNBIND_REQ */
 } TR_unbind_req_t;
 
 /*
- *  TR_OPTMGMT_REQ.  This primtive consists of one M_PROTO message block.
+ *  TR_OPTMGMT_REQ:- one M_PROTO or M_PCPROTO message block.
  */
 typedef struct TR_optmgmt_req {
 	t_scalar_t PRIM_type;		/* Always T_OPTMGMT_REQ */
@@ -290,7 +289,7 @@ typedef struct TR_optmgmt_req {
 } TR_optmgmt_req_t;
 
 /*
- *  TR_OPTMGMT_ACK.  This primitive consists of one M_PCPROTO message block.
+ *  TR_OPTMGMT_ACK:- one M_PCPROTO message block.
  */
 typedef struct TR_optmgmt_ack {
 	t_scalar_t PRIM_type;		/* Always T_OPTMGMT_ACK */
@@ -300,16 +299,15 @@ typedef struct TR_optmgmt_ack {
 } TR_optmgmt_ack_t;
 
 /*
- *  TR_OK_ACK.  This primitive consists of one M_PCPROTO message block.
+ *  TR_OK_ACK:- one M_PCPROTO message block.
  */
 typedef struct TR_ok_ack {
 	t_scalar_t PRIM_type;		/* Always T_OK_ACK */
 	t_scalar_t CORRECT_prim;	/* correct primitive */
-	t_scalar_t TRANS_id;		/* Transaction id */
 } TR_ok_ack_t;
 
 /*
- *  TR_ERROR_ACK.  This primitive consists of one M_PCPROTO message block.
+ *  TR_ERROR_ACK:- one M_PCPROTO message block.
  */
 typedef struct TR_error_ack {
 	t_scalar_t PRIM_type;		/* Always T_ERROR_ACK */
@@ -320,7 +318,8 @@ typedef struct TR_error_ack {
 
 /*
  *  TR_UNI_REQ.  This primitive consists of one M_PROTO message block followed
- *  by one or more M_DATA blocks.
+ *  by one or more M_DATA blocks containing the dialogue portion and component
+ *  sequence for the message.
  */
 typedef struct TR_uni_req {
 	t_scalar_t PRIM_type;		/* Always TR_UNI_REQ */
@@ -334,7 +333,9 @@ typedef struct TR_uni_req {
 
 /*
  *  TR_UNI_IND.  This primitive consists of one M_PROTO message block followed
- *  by one or more M_DATA blocks.
+ *  by one or more M_DATA blocks containing the dialogue portion and component
+ *  sequence for the message.  Options may contain SCCP quality of service options
+ *  and TCAP protocol variant.
  */
 typedef struct TR_uni_ind {
 	t_scalar_t PRIM_type;		/* Always TR_UNI_REQ */
@@ -348,9 +349,10 @@ typedef struct TR_uni_ind {
 } TR_uni_ind_t;
 
 /*
- *  TR_BEGIN_REQ.  This primitive consists of one M_PROTO message block followed by zero or more
- *  M_DATA blocks containing the components of the transaction.  The associated options structures
- *  contain the protocol version, application-context-name and user-information, when provided.
+ *  TR_BEGIN_REQ.  This primitive consists of one M_PROTO message block followed by
+ *  zero or more M_DATA blocks containing the dialogue portion and component sequence
+ *  of the transaction.  Options may contain SCCP quality of service parameters and
+ *  TCAP protocol variant.
  */
 typedef struct TR_begin_req {
 	t_scalar_t PRIM_type;		/* Always TR_BEGIN_REQ */
@@ -365,7 +367,10 @@ typedef struct TR_begin_req {
 } TR_begin_req_t;
 
 /*
- *  TR_BEGIN_IND.
+ *  TR_BEGIN_IND:- one M_PROTO message block followed by one or more M_DATA message
+ *  blocks containing the dialogue portion and component sequence for the
+ *  transaction.  Options may contain SCCP quality of service parameters and TCAP
+ *  protocol variant.
  */
 typedef struct TR_begin_ind {
 	t_scalar_t PRIM_type;		/* Always TR_BEGIN_IND */
@@ -380,7 +385,9 @@ typedef struct TR_begin_ind {
 } TR_begin_ind_t;
 
 /*
- *  TR_BEGIN_RES.
+ *  TR_BEGIN_RES:- one M_PROTO message block followed by one or more M_DATA message
+ *  blocks containing the dialogue portion and component sequence for the
+ *  transaction.  Options may contain SCCP quality of service parameters.
  *
  *  This primitive represents the first TR-CONTINUE response to a TR-BEGIN
  *  indication.
@@ -393,10 +400,13 @@ typedef struct TR_begin_res {
 	t_scalar_t OPT_length;		/* Options structure length */
 	t_scalar_t OPT_offset;		/* Options structure offset */
 	t_scalar_t ASSOC_flags;		/* Association flags */
+	t_scalar_t ACCEPTOR_id;		/* Token of accepting stream */
 } TR_begin_res_t;
 
 /*
- *  TR_BEGIN_CON.
+ *  TR_BEGIN_CON: - one M_PROTO message block followed by one or more M_DATA message
+ *  blocks containing the dialogue portion and component sequence for the
+ *  transaction.  Options may contain SCCP quality of service parameters.
  *
  *  This primitive represents the first TR-CONTINUE configuration of a
  *  TR-BEGIN request.
@@ -412,7 +422,9 @@ typedef struct TR_begin_con {
 } TR_begin_con_t;
 
 /*
- *  TR_CONT_REQ.
+ *  TR_CONT_REQ: - one M_PROTO message block followed by one or more M_DATA message
+ *  blocks containing the dialogue portion and component sequence for the
+ *  transaction.  Options may contain SCCP quality of service parameters.
  */
 typedef struct TR_cont_req {
 	t_scalar_t PRIM_type;		/* Always TR_CONT_REQ */
@@ -423,7 +435,9 @@ typedef struct TR_cont_req {
 } TR_cont_req_t;
 
 /*
- *  TR_CONT_IND.
+ *  TR_CONT_IND:- one M_PROTO message block followed by one or more M_DATA message
+ *  blocks contianing the dialogue oprtion and component sequence for the
+ *  transaction.  Options may contain SCCP quality of service parameters.
  */
 typedef struct TR_cont_ind {
 	t_scalar_t PRIM_type;		/* Always TR_CONT_IND */
@@ -434,7 +448,11 @@ typedef struct TR_cont_ind {
 } TR_cont_ind_t;
 
 /*
- *  TR_END_REQ.
+ *  TR_END_REQ:- one M_PROTO message block followed by zero or more M_DATA message
+ *  blocks containing the dialogue portion and component sequence for the
+ *  transaction.  Options may contain SCCP quality of service parameters.  Attached
+ *  M_DATA message blocks and SCCP QoS parameters are ignored for prearranged
+ *  termination scenarios.
  */
 typedef struct TR_end_req {
 	t_scalar_t PRIM_type;		/* Always TR_END_REQ */
@@ -452,7 +470,9 @@ typedef struct TR_end_req {
 #define TR_TERM_PREARRANGED	2	/* termination prearranged */
 
 /*
- *  TR_END_IND.
+ *  TR_END_IND:- one M_PROTO message block followed by zero or more M_DATA message
+ *  blocks containing the dialogue portion and component sequence for the
+ *  transaction.  Options may contain SCCP quality of service parameters.
  */
 typedef struct TR_end_ind {
 	t_scalar_t PRIM_type;		/* Always TR_END_IND */
@@ -464,7 +484,7 @@ typedef struct TR_end_ind {
 } TR_end_ind_t;
 
 /*
- *  TR_ABORT_REQ.
+ *  TR_ABORT_REQ
  */
 typedef struct TR_abort_req {
 	t_scalar_t PRIM_type;		/* Always TR_ABORT_REQ */

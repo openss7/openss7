@@ -99,6 +99,10 @@ IMPORTS
     MtpCongestionLevel, MtpLinkFailureReason, mtpMsId, 
     MtpUserPartStatus, NetworkPointCode
 	FROM OPENSS7-MTP-MIB
+    AbstractSyntax, ApplicationContextName, PresentationRequirements,  
+    PresentationSelectorValue, SessFUs, SessionProtVer, 
+    SessionSelectorValue, SessOptSupport,  TransferSyntax
+	FROM OPENSS7-ASCE-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
     Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
@@ -130,6 +134,8 @@ tcapMIB MODULE-IDENTITY
     DESCRIPTION
 	"First release of this module."
     ::= { openss7Q751 4 }
+
+-- ====================================================================
 
 tcapNotifications OBJECT IDENTIFIER
     ::= { tcapMIB 0 }
@@ -218,6 +224,30 @@ tcapTransactionCopm OBJECT IDENTIFIER
 	-- operationalState
 	-- coProtocolMachine-entity NAME BINDING
 
+tcapTransactionCopmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapTransactionCopmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapTransactionCopm 1 }
+
+tcapTransactionCopmEntry OBJECT-TYPE
+    SYNTAX TcapTransactionCopmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapTransactionCopmTable 1 }
+
+TcapTransactionCopmEntry ::=
+    SEQUENCE {
+    }
+
 -- ====================================================================
 
 tcapTransaction OBJECT IDENTIFIER
@@ -262,7 +292,7 @@ tcapTransactionTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Provides a table of TCAP transactions."
     REFERENCE
 	""
     ::= { tcapTransaction 1 }
@@ -272,7 +302,9 @@ tcapTransactionEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Each entry in the table consists of a single instance of a TCAP 
+	 transaction.  Entries are added to the table by the agent from 
+	 within the managed system."
     REFERENCE
 	""
     INDEX {
@@ -286,11 +318,11 @@ TcapTransactionEntry ::=
 	tcapTransactionId			INTEGER,
 	tcapTransactionUnderlyingConnectionNames RowPointer,
 	tcapTransactionInvocationOfPointer	RowPointer,
-	tcapTransactionPresFUinUse		PresentationRequirements,
-	tcapTransactionPresContextInUse		PresentationContext,
-	tcapTransactionSessProtInUse		SessProtVer,
-	tcapTransactionSessFUInUse		SessFUs,
-	tcapTransactionMaxTSUDsize		Unsigned32
+	-- tcapTransactionPresFUinUse		PresentationRequirements,
+	-- tcapTransactionPresContextInUse	PresentationContext,
+	-- tcapTransactionSessProtInUse		SessProtVer,
+	-- tcapTransactionSessFUInUse		SessFUs,
+	tcapTransactionMaxTSDUsize		Unsigned32
     }
 
 tcapTransactionId OBJECT-TYPE
@@ -357,7 +389,7 @@ tcapTransactionSessFUInUse OBJECT-TYPE
 	""
     ::= { tcapTransactionEntry xx }
 
-tcapTransactionMaxTSUDsize OBJECT-TYPE
+tcapTransactionMaxTSDUsize OBJECT-TYPE
     SYNTAX Unsigned32
     STATUS current
     DESCRIPTION
@@ -414,11 +446,70 @@ TcapDialogueEntry ::=
 	tcapDialogueId				Unsigned32,
 	tcapDialogueInvocationOfPointer		RowPointer,
 	tcapDialogueCallingAEtitle		SubSystemNumber,
-	tcapDialogueAcseFUinUse			AcseFUs,
-	tcapDialogueApplContextInUse		ApplicationContext,
+	-- tcapDialogueAcseFUinUse			AcseFUs,
+	tcapDialogueApplContextInUse		OBJECT IDENTIFIER,
 	tcapDialogueParentASOinvoc		RowPointer,
 	tcapDialogueCalledAEtitle		SubSystemNumber
     }
+
+tcapDialogueId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Provides a non-zero index into the TCAP dialogue table for each 
+	 TCAP application process invocation id and TCAP transaction id.  
+	 The value of this index is not significant."
+    REFERENCE
+	""
+    ::= { tcapDialogEntry 1 }
+
+tcapDialogueInvocationOfPointer OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    ::= { tcapDialogEntry 2 }
+
+tcapDialogueCallingAEtitle OBJECT-TYPE
+    SYNTAX SubSystemNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the calling TCAP application entity title.  The 
+	 calling TCAP application entity title corresponds to the SCCP 
+	 calling party address."
+    ::= { tcapDialogEntry 3 }
+
+tcapDialogueApplContextInUse OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Indicates the application context that is in use by the 
+	 dialogue."
+    ::= { tcapDialogEntry 4 }
+
+tcapDialogueParentASOinvoc OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    ::= { tcapDialogEntry 5 }
+
+tcapDialogueCalledAEtitle OBJECT-TYPE
+    SYNTAX SubSystemNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the called TCAP application entity title.  The 
+	 called TCAP application entity title corresponds to the SCCP 
+	 called part address."
+    ::= { tcapDialogEntry 6 }
+
+-- ====================================================================
 
 tcapOperation OBJECT IDENTIFIER
     ::= { tcapObjectClass xx }
@@ -443,7 +534,8 @@ tcapTcUserTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"This table contains all instances of TC Users in the TCAP 
+	 system."
     REFERENCE
 	""
     ::= { tcapTcUser 1 }
@@ -453,7 +545,9 @@ tcapTcUserEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Each entry represents an invocation of an application process.   
+	 For TCAP, an application process corresponds to an instance of 
+	 a TC User."
     REFERENCE
 	""
     INDEX {
@@ -467,7 +561,6 @@ TcapTcUserEntry ::=
     SEQUENCE {
 	tcapTcUserId				Unsigned32,
 	tcapTcUserInvocationOfPointer		RowPointer,
-	tcapTcUserRowStatus			RowStatus
     }
 
 tcapTcUserId OBJECT-TYPE
@@ -475,7 +568,9 @@ tcapTcUserId OBJECT-TYPE
     MAX-ACCESS not-accessible -- index
     STATUS current
     DESCRIPTION
-	""
+	"Provides a non-zero ordinal index into the TC User table by 
+	 system id, application subsystem id and TC User id.  The value 
+	 of the index is not significant and is chosen by the agent."
     REFERENCE
 	""
     ::= { tcapTcUserEntry 1 }
@@ -486,20 +581,14 @@ tcapTcUserInvocationOfPointer OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"Specifies the TCAP application process of which this TC User 
-	 is an instantiation."
+	 is an instantiation.  The value of this field may be 
+	 zeroDotZero whe the TC User has not yet bound itself to a TCAP 
+	 application process.  When bound to a TCAP application process, 
+	 the value is a pointer to the TCAP application process to which 
+	 the TC User is bound."
     REFERENCE
 	""
     ::= { tcapTcUserEntry 2 }
-
-tcapTcUserRowStatus OBJECT-TYPE
-    SYNTAX RowStatus
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
-    ::= { tcapTcUserEntry 3 }
 
 -- ====================================================================
 
@@ -553,8 +642,9 @@ tcapApplicationProcessId OBJECT-TYPE
     MAX-ACCESS not-accessible -- index
     STATUS current
     DESCRIPTION
-	"Provides an index into the TCAP application process table using 
-	 the SimpleNameType textual convention of the OPENSS7-SMI-MIB."
+	"Provides a non-zero index into the TCAP application process 
+	 table using the SimpleNameType textual convention of the 
+	 OPENSS7-SMI-MIB."
     REFERENCE
 	""
     ::= { tcapApplicationProcessEntry 1 }
@@ -564,7 +654,13 @@ tcapApplicationProcessTitle OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	""
+	"Provides a specfication of an TCAP application process title.  
+	 A TCAP application process title is an SCCP address that 
+	 corresponds to the TCAP application process.  This represents 
+	 the SCCP address of a local SCCP against which the TCAP 
+	 application process is associated.  Application process titles 
+	 in OSI applications are object identifiers.  In the case of 
+	 TCAP, they are an SCCP called party address."
     REFERENCE
 	""
     ::= { tcapApplicationProcessEntry 2 }
@@ -574,7 +670,9 @@ tcapApplicationProcessSupportEntityNames OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"This field provides the number of associated support entity 
+	 names at that appear in the tcapSupportEntityNameTable 
+	 side-table that correspond to this application process."
     REFERENCE
 	""
     ::= { tcapApplicationProcessEntry 3 }
@@ -584,7 +682,24 @@ tcapApplicationProcessOperationalState OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+	"Provides the operational state of the TCAP application process 
+	 following the OperationalState textual convention and ITU-T 
+	 Rec. X.721 | ISO/IEC 10165-2.  This state is single-valued and 
+	 may contain one of the following values:
+
+	 - disabled(0): the TCAP application process is inoperable and 
+	   unable to provide service to its users(s);
+
+	 - enabled(1): the TCAP application entity is partially or fully 
+	   operable and available for use.
+
+	 When the TCAP application process does not have defined any 
+	 support entities, the TCAP AP has an operational state of 
+	 disabled(0).
+
+	 When the TCAP AP contains support entities, but no support 
+	 entity is operable, the TCAP AP has an operational state of 
+	 disabled(0)."
     REFERENCE
 	""
     ::= { tcapApplicationProcessEntry 4 }
@@ -606,7 +721,10 @@ tcapSupportEntityNameTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Provides a set of support entity names for a given application 
+	 process.  Because this table represents a set, a given value of 
+	 the non-index fields of an entry can only occur once for a 
+	 given TCAP application process."
     REFERENCE
 	""
     ::= { tcapApplicationProcess 2 }
@@ -951,12 +1069,12 @@ tcapLocalSapNameId OBJECT-TYPE
     MAX-ACCESS not-accessible -- index
     STATUS current
     DESCRIPTION
-	"Provides a non-zero ordinal index into the local SAP name 
-	 table.  This index is used with the TCAP application entity 
-	 identifier index value to specify one of a number of local SAP 
-	 names that correspond to the TCAP application entity.  Ordinal 
-	 values should be chosen as monotonically increasing numbers 
-	 beginning at 1."
+	"Provides a non-zero index into the local SAP name table.  This 
+	 index is used with the TCAP application entity identifier index 
+	 value to specify one of a set of local SAP names that 
+	 correspond to the TCAP application entity.  Ordinal values 
+	 should be chosen as monotonically increasing numbers beginning 
+	 at 1."
     REFERENCE
 	"ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, localSapNames 
 	     ATTRIBUTE."
@@ -1081,7 +1199,7 @@ tcapApplicationContextNameEntry OBJECT-TYPE
 TcapApplicationContextNameEntry ::=
     SEQUENCE {
 	tcapApplicationContextId		Unsigned32,
-	tcapApplicationContextName		OBJECT IDENTIFIER,
+	tcapApplicationContextName		ApplicationContextName,
 	tcapApplicationContextNumber		INTEGER,
 	tcapApplicationContextRowStatus		RowStatus
     }
@@ -1091,17 +1209,18 @@ tcapApplicationContextId OBJECT-TYPE
     MAX-ACCESS not-accessible -- index
     STATUS current
     DESCRIPTION
-	"Provides a non-zero ordinal index into the TCAP application 
-	 context name table for each TCAP application entity.  The value 
-	 of this index is not significant and simply identifies one of a 
-	 list of application context names for a TCAP application 
-	 entity."
+	"Provides a non-zero index into the TCAP application context 
+	 name table for each TCAP application entity.  The value of this 
+	 index is not significant and simply identifies one of a set of 
+	 application context names for a TCAP application entity.  
+	 Ordinal values should be chosen as monotonically increasing 
+	 numbers beginning at 1."
     REFERENCE
 	""
     ::= { tcapApplicationContextEntry 1 }
 
 tcapApplicationContextName OBJECT-TYPE
-    SYNTAX OBJECT IDENTIFIER
+    SYNTAX ApplicationContextName
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -1169,7 +1288,11 @@ tcapAbtractSyntaxTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Provides a list of abstract syntaxes that correspond to a TCAP 
+	 application entity.  The list represents a set and the same 
+	 abstract syntax value cannot exist more than once in the table 
+	 for a given TCAP application entity.  Ordinal values should be 
+	 chosen as monotonically increasing numbers beginning at 1."
     REFERENCE
 	""
     ::= { tcapApplicationEntity 4 }
@@ -1179,7 +1302,8 @@ tcapAbtractSyntaxEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Each entry in this table corresponds to an abstract syntax that 
+	 belongs to a TCAP application entity."
     REFERENCE
 	""
     INDEX {
@@ -1200,7 +1324,9 @@ tcapAbstractSyntaxId OBJECT-TYPE
     MAX-ACCESS not-accessible -- index
     STATUS current
     DESCRIPTION
-	""
+	"Provides a non-zero index for the tcapAbstractSyntaxTable 
+	 table.  As this table represents as set, the specific value of 
+	 the index is not significant."
     REFERENCE
 	""
     ::= { tcapAbstractSyntaxEntry 1 }
@@ -1210,11 +1336,20 @@ tcapAbstractSyntaxName OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	""
+	"Provides the abstract syntax name as an object identifier.  
+	 When specified, the value must be unique from other values 
+	 specified for the same TCAP application entity.  This value may 
+	 be unspecified or specified as zeroDotZero when the 
+	 tcapAbstractSyntaxNumber is specified.  A value for this field 
+	 must be specified when the corresponding TCAP application 
+	 entity is an ITU-based entity.  A value for this field is 
+	 optional when the corresponding TCAP application entity is an 
+	 ANSI-based entity."
     REFERENCE
 	""
-    DEFVAL { { itu-t(0) recommendation(0) q(17) 773 as(1) dialogue-as(1) version(1) } }
-    DEFVAL { { itu-t(0) recommendation(0) q(17) 773 as(1) unidialogue-as(2) version(1) } }
+    DEFVAL { tcapQ773DialogueAsId }
+    -- DEFVAL { { itu-t(0) recommendation(0) q(17) 773 as(1) dialogue-as(1) version(1) } }
+    -- DEFVAL { { itu-t(0) recommendation(0) q(17) 773 as(1) unidialogue-as(2) version(1) } }
     ::= { tcapAbstractSyntaxEntry 2 }
 
 tcapAbstractSyntaxRowStatus OBJECT-TYPE
@@ -1222,7 +1357,9 @@ tcapAbstractSyntaxRowStatus OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	""
+	"Provides a mechanism whereby management stations may add or 
+	 remove abstract syntaxes from the transfer syntax list 
+	 associated with a TCAP Application Entity."
     REFERENCE
 	""
     ::= { tcapAbstractSyntaxEntry 3 }
@@ -1234,7 +1371,10 @@ tcapTransferSyntaxTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Provides a list of transfer syntaxes that correspond to a TCAP 
+	 application entity.  The list represents a set and the same 
+	 transfer syntax value cannot exist more than once in the table 
+	 for a given TCAP application entity."
     REFERENCE
 	""
     ::= { tcapApplicationEntity 5 }
@@ -1244,7 +1384,8 @@ tcapTransferSyntaxEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+	"Each entry in this table corresponds to a transfer syntax that 
+	 belongs to a TCAP application entity."
     REFERENCE
 	""
     INDEX {
@@ -1265,7 +1406,10 @@ tcapTransferSyntaxId OBJECT-TYPE
     MAX-ACCESS not-accessible -- index
     STATUS current
     DESCRIPTION
-	""
+	"Provides a non-zero index for the tcapTransferSyntaxTable 
+	 table.  As this table represents as set, the specific value of 
+	 the index is not significant.  Ordinal values should be chosen 
+	 as monotonically increasing numbers beginning at 1."
     REFERENCE
 	""
     DEFVAL { { joint-iso-itu-t(2) asn1(1) basic-encoding(1) } }
@@ -1276,9 +1420,18 @@ tcapTransferSyntaxName OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	""
+	"Provides the transfer syntax name as an object identfier.  When 
+	 specified, the value must be unique from other values specified 
+	 for the same TCAP application entity.  This value may be 
+	 unspecified or specified as zeroDotZero when the 
+	 tcapTransferSyntaxNumber is specified.  A value for this field 
+	 must be specified when the corresponding TCAP application 
+	 entity is an ITU-based entity.  A value for this field is 
+	 optional when the corresponding TCAP application entity is an 
+	 ANSI-based entity."
     REFERENCE
 	""
+    DEFVAL { tcapAsn1BerTsId }
     ::= { tcapTransferSyntaxEntry 2 }
 
 tcapTransferSyntaxRowStatus OBJECT-TYPE
@@ -1286,7 +1439,9 @@ tcapTransferSyntaxRowStatus OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-	""
+	"Provides a mechanism whereby management stations may add or 
+	 remove transfer syntaxes from the transfer syntax list 
+	 associated with a TCAP Application Entity."
     REFERENCE
 	""
     ::= { tcapTransferSyntaxEntry 3 }

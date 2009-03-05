@@ -1,0 +1,537 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-TCAP2-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2009-03-05 15:51:27 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-TCAP2-MIB.mib,v $
+-- Revision 0.9.2.1  2009-03-05 15:51:27  brian
+-- - new files for map library
+--
+-- =============================================================================
+
+OPENSS7-TCAP-MIB DEFINITIONS ::= BEGIN
+
+tcapMIB MODULE-IDENTITY
+    LAST-UPDATED "200903032246Z"
+    ORGANIZATION
+	"The OpenSS7 Project"
+    CONTACT-INFO
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "This is a MIB providing management information is 
+         accordance with ITU-T Rec. Q.751.1, ITU-T Rec. 
+         Q.2751.1, ANSI T1.116.1."
+    REVISION "200903032246Z"
+    DESCRIPTION
+	"First release of this module."
+    ::= { openss7Q751 4 }
+
+tcapNotifications OBJECT IDENTIFIER
+    ::= { tcapMIB 0 }
+
+tcapDefaults OBJECT IDENTIFIER
+    ::= { tcapMIB 1 }
+
+tcapTables OBJECT IDENTIFIER
+    ::= { tcapMIB 2 }
+
+-- =============================================================================
+
+
+tcapApplicationSubsystem OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+tcapApplicationSubsystemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapApplicationSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapApplicationSubsystem 1 }
+
+tcapApplicationSubsystemEntry OBJECT-TYPE
+    SYNTAX TcapApplicationSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	tcapApplicationSubsystemId
+    }
+    ::= { tcapApplicationSubsystemTable 1 }
+
+TcapApplicationSubsystemEntry ::=
+    SEQUENCE {
+	tcapApplicationSubsystemId		SimpleNameType,
+	tcapApplicationSubsystemRowStatus	RowStatus
+    }
+
+tcapApplicationEntity OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+-- =============================================================================
+
+-- The TCAP entity structure (TE) is the primary structure that 
+-- identifies a TCAP system.  A TCAP system can contain a collection of 
+-- SCCP SAPs which represent the specific entry and exit points for SCCP 
+-- messages to an from the SS7 network.  Each TE structure can have 
+-- multiple SP structures representing SCCP SAPs beneath it providing 
+-- connectivity to the SS7 network via SC structures in turn (SC 
+-- structures representing linked lower SCCP Streams).  Each TE 
+-- structure can serve multiple AC structures representing one or more 
+-- Application Contexts, which in turn serve TC structures (TC 
+-- structures representing open upper TCAP Streams).
+--
+-- The TCAP Entity contains the primary lock for each TCAP Entity 
+-- system.  The primary lock is used to protect the total state of the 
+-- TCAP Entity and all its subtending components.  The structure of the 
+-- TCAP Entity (linkage between structures within the TCAP Entity 
+-- system) is protected by the master read-write TCAP multiplexing 
+-- driver lock.
+
+tcapApplicationEntityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapApplicationEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapEntity 1 }
+
+tcapApplicationEntityEntry OBJECT-TYPE
+    SYNTAX TcapApplicationEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	tcapApplicationSubsystemId,
+	tcapApplicationEntityId
+    }
+    ::= { tcapEntityTable 1 }
+
+TcapApplicationEntityEntry ::=
+    SEQUENCE {
+	tcapApplicationEntityId			Unsigned32,
+	tcapApplicationEntityName		SnmpAdminString,
+	tcapApplicationEntityAdministativeState	AdministrativeState,
+	tcapApplicationEntityOperationalState	OperationalState,
+	tcapApplicationEntityUsageState		UsageState,
+	tcapApplicationEntityRowStatus		RowStatus
+    }
+
+-- =============================================================================
+
+-- The Application Context (AC) structure has the primary purpose of 
+-- providing a location where AC information can be maintained separate 
+-- from a structure that is associated with an open TC User Stream.  
+-- This is for information that should persist beyond the unbinding and 
+-- rebinding of TC User Streams.  When the TC User Stream is bound, it 
+-- is associated one-to-one with an AC structure.  AC structures can be 
+-- created on demand with default information when a TC User stream is 
+-- bound to a not yet existing AC.
+--
+-- An application context has an Application Context OID or Universal 
+-- Integer associated with it that identifies the Application Context to 
+-- which it corresponds.  It could also represent a wildcard Application 
+-- Context.  The Application Context defines the range of dialogues that 
+-- are serviced by the associated TC User for the TCAP Entity with which 
+-- the AC is associated.  Each Application Context can have a defined 
+-- set of valid Operations, or can have a null list of operations 
+-- permitting any operation within the Application Context.
+
+tcapApplicationContextTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapApplicationContextEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapApplicationEntity 2 }
+
+tcapApplicationContextEntry OBJECT-TYPE
+    SYNTAX TcapApplicationContextEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	tcapApplicationSubsystemId,
+	tcapApplicationEntityId,
+	tcapApplicationContextIndex
+    }
+    ::= { tcapApplicationContextTable 1 }
+
+TcapApplicationContextEntry ::=
+    SEQUENCE {
+	tcapApplicationContextIndex		Unsigned32,
+	tcapApplicationContextName		OBJECT IDENTIFIER,
+	tcapApplicationContextRowStatus		RowStatus
+    }
+
+-- =============================================================================
+
+-- The TCAP structure (TC) represents an open TC User, TR User, or TP 
+-- User Stream.  Which interface style is applied to the Stream depends 
+-- upon the major and minor device number opened.  TCAP User Streams can 
+-- be associated with a TCAP Entity, either by the major and minor 
+-- device number opened, or by temporarily linking SCCP provider Streams 
+-- under the open Stream as a control Stream, or by binding the Stream.
+
+tcapTcUser OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+tcapTcUserTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapTcUserEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapTcUser 1 }
+
+tcapTcUserEntry OBJECT-TYPE
+    SYNTAX TcapTcUserEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	tcapApplicationSubsystemId,
+	tcapTcUserId
+    }
+    ::= { tcapTcUserTable 1 }
+
+TcapTcUserEntry ::=
+    SEQUENCE {
+	tcapTcUserId				Unsigned32
+    }
+
+
+-- =============================================================================
+
+-- The primary purpose the SCCP SAP structure is to provide a location 
+-- where SCCP SAP information can be maintained separate from a 
+-- structure that is associated with a linked SCCP Stream.  This is for 
+-- information that should persist beyond the unlinking and relinking of 
+-- SCCP Streams beneath the multiplexing driver.  When an SCCP Stream is 
+-- linked under the multiplexing driver, it awaits configuration.  When 
+-- the SCCP Stream is configured, it is associated one-to-one with an 
+-- SCCP SAP structure.  SCCP SAP structures can be created on demand 
+-- with default information when an SCCP Stream is associated with a not 
+-- yet existing SCCP SAP.
+
+tcapSccpSap OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+tcapSccpSapTable OBJECT-IDENTITY
+    SYNTAX SEQUENCE OF TcapSccpSapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This is a table of SCCP-SAPs.  It should not be necessary, the 
+	 sccpAccessPointTable should be referenced instead."
+    REFERENCE
+	""
+    ::= { tcapSccpSap 1 }
+
+tcapSccpSapEntry OBJECT-IDENTITY
+    SYNTAX TcapSccpSapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	tcapSccpSapAddress
+    }
+    ::= { tcapSccpSapTable 1 }
+
+TcapSccpSapEntry ::=
+    SEQUENCE {
+	tcapSccpSapAddress			SccpSapAddress,
+	tcapSccpSapApplicationEntity		RowPointer,
+	tcapSccpSapSupportingEntity		RowPointer,
+	tcapSccpSapAdministrativeState		AdministrativeState,
+	tcapSccpSapOperationalState		OperationalState,
+	tcapSccpSapUsageState			UsageState,
+	tcapSccpSapName				CommonLanguageName,
+	tcapSccpSapRowStatus			RowStatus
+    }
+
+-- =============================================================================
+
+
+tcapRemoteEntity OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+tcapRemoteEntityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapRemoteEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Each entry in this table defines a signalling relation between 
+	 a local TCAP entity and a remote TCAP entity.  The table serves 
+	 two purposes:
+	 
+	 1. To provide an object whereby the status of the signalling 
+	    relation between local and remote TCAP Entities can be 
+	    tracked.  The local TCAP Entity will track the status of 
+	    remote TCAP Entities (remote SCCP subsystems) in this list.  
+	    This is performed on the receipt of N-STATE indication 
+	    primitives from the SCCP provider over the SCCP-SAP.
+	    
+	 2. To provide an access control list for the local TCAP Entity.  
+	    Local TCAP Entities will accept signalling messages from 
+	    remote TCAP Entities that have an entry in this table and 
+	    refuse signalling messages from other TCAP Entities.
+
+	 Remote TCAP entities can be added and removed from this list by 
+	 management stations.
+	 "
+    REFERENCE
+	""
+    ::= { tcapRemoteEntity 1 }
+
+tcapRemoteEntityEntry OBJECT-TYPE
+    SYNTAX TcapRemoteEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	tcapSccpSapAddress,
+	tcapRemoteSccpSapAddress
+    }
+    ::= { tcapRemoteEntityTable 1 }
+
+TcapRemoteEntityEntry ::=
+    SEQUENCE {
+    }
+
+-- =============================================================================
+
+
+tcapRemoteSccp OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+tcapRemoteSccpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapRemoteSccpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Each entry in this table defines a signaling relation between a 
+	 local SCCP and a remote SCCP.  The table serves two purposes:
+	 
+	 1. To provide an object whereby the status of the signalling 
+	    relation between local and remote SCCP Entities can be 
+	    tracked.  The local SCCP Entity will track the status of 
+	    remote SCCP Entities (remote MTP SCCP User parts) in this 
+	    list.  This is performed on the receipt of N-PCSTATE 
+	    indication primitives from the SCCP provider over the 
+	    SCCP-SAP.
+	    
+	 2. To provide an access control list for the local SCCP Entity.  
+	    Local SCCP Entities will accept signalling messages from 
+	    remote SCCP Entities that have an entry in this table and 
+	    refuse signalling messages from other remote SCCP Entities.
+	    
+	 Remote SCCP entities can be added and removed from this list by 
+	 management stations."
+    REFERENCE
+	""
+    ::= { tcapRemoteSccp 1 }
+
+tcapRemoteSccpEntry OBJECT-TYPE
+    SYNTAX TcapRemoteSccpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	tcapSccpSapAddress,
+	tcapRemoteSccpSapAddress
+    }
+    ::= { tcapRemoteSccpTable 1 }
+
+TcapRemoteSccpEntry ::=
+    SEQUENCE {
+	tcapRemoteSccpSapAddress		SccpSapAddress,
+	tcapRemoteSccpAvailabilityStatus	MtpUserStatus,
+	tcapRemoteSccpRowStatus			RowStatus
+    }
+
+-- =============================================================================
+
+
+tcapSccp OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+tcapSccpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapSccpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapSccp 1 }
+
+tcapSccpEntry OBJECT-TYPE
+    SYNTAX TcapSccpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	tcapSccpId
+    }
+    ::= { tcapSccpTable 1 }
+
+TcapSccpEntry ::=
+    SEQUENCE {
+	tcapSccpId				Unsigned32,
+	tcapSccpNsduSize			Unsigned32,
+	tcapSccpNiduSize			Unsigned32,
+	tcapSccpNoduSize			Unsigned32,
+	tcapSccpProtocolVariant			Ss7ProtocolVariant,
+	tcapSccpRowStatus			RowStatus
+    }
+
+tcapTransaction OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+-- =============================================================================
+
+-- The Dialog (DG) structure is a dynamic structure that represents a 
+-- dialog and maintains the dialog state.  Dialogs are created when 
+-- transactions are created for the TCI interface style and TPI 
+-- interface style, but not for the TRI interface.  For the TPI 
+-- interface style, each dialog is associated with a TP User Stream.  
+-- For the TCI interface style, dialogs are hashed against the TC User 
+-- Stream by dialog id.
+
+tcapDialogue OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+
+-- =============================================================================
+
+-- The Operation (OP) structure is an optional static configuration 
+-- structure that describes a valid operation within an Application 
+-- Context and provides additional information pertinent to that 
+-- operation (such as response timeout value).
+
+tcapOperation OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+
+-- =============================================================================
+
+-- The Invoke (IV) structure is a dynamic structure that represents an 
+-- instance of an operation within a dialog.  Invokes are created when 
+-- invoke components are encountered within the dialog and are destroyed 
+-- when a response arrives or the invocation is otherwise aborted.  
+-- Invokes are hashed against dialogs by their invoke id.  Each invoke 
+-- can be associated with an operation structure by its operation code.
+
+tcapInvocation OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+
+-- =============================================================================
+
+
+tcapComponent OBJECT IDENTIFIER
+    ::= { tcapTables yy }
+
+
+
+END -- OPENSS7-TCAP-MIB
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+

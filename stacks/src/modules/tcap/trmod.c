@@ -652,7 +652,7 @@ tr_init_caches(void)
 		cmn_err(CE_DEBUG, "%s: initialized driver private structure cache", MOD_NAME);
 	if (!tn_cachep
 	    && !(tn_cachep =
-		 kmem_create_cache("tn_cachep", mi_open_size(sizeof(struct tn)), 0,
+		 kmem_create_cache("tn_cachep", sizeof(struct tn), 0,
 				   SLAB_HWCACHE_ALIGN, NULL, NULL)
 	    )) {
 		cmn_err(CE_PANIC, "%s: could not allocate tn_cachep", __FUNCTION__);
@@ -1344,8 +1344,8 @@ struct t_tr_options {
 	struct {
 		t_uscalar_t pvar;
 		t_uscalar_t mplev;
-		t_uscalar_t cluster;
-		t_uscalar_t prio;
+		t_uscalar_t sls;
+		t_uscalar_t mp;
 	} mtp;
 	struct {
 		t_uscalar_t pvar;

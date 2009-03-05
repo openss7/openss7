@@ -1,3 +1,17 @@
+2009-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/xmap.h: new file for map library
+	* src/include/xmap_sms.h: new file for map library
+	* src/include/ss7/map_ioctl.h: new file for map library
+	* src/include/ss7/sl_ioctl.h: new file for map library
+	* src/lib/libxtcap: new file for map library
+	* src/lib/libxmap/xmap.VERSION: new file for map library
+	* src/lib/libxmap/xmap.c: new file for map library
+	* src/lib/libxmap/xmap_sms.c: new file for map library
+	* src/modules/map/mcmux.c: new file for map library
+	* src/snmp/mibs/OPENSS7-SCCP2-MIB.mib: new file for map library
+	* src/snmp/mibs/OPENSS7-TCAP2-MIB.mib: new file for map library
+
 2009-02-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: update agents
