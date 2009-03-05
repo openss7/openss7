@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmp.h,v 0.9.2.2 2007/11/10 19:40:52 brian Exp $
+ @(#) $Id: xmp.h,v 0.9.2.3 2009-03-05 15:59:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/11/10 19:40:52 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 15:59:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmp.h,v $
+ Revision 0.9.2.3  2009-03-05 15:59:43  brian
+ - tcap and map driver and library updates
+
  Revision 0.9.2.2  2007/11/10 19:40:52  brian
  - documentation updates
 
@@ -61,7 +64,7 @@
 #ifndef __XMP_H__
 #define __XMP_H__
 
-#ident "@(#) $RCSfile: xmp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xmp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  * The <xmp.h> header declares the interface functions, the structures passed

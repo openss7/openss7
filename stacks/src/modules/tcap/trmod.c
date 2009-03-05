@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: trmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:03 $
+ @(#) $RCSfile: trmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-05 15:59:41 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-02 05:15:03 $ by $Author: brian $
+ Last Modified $Date: 2009-03-05 15:59:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: trmod.c,v $
+ Revision 0.9.2.2  2009-03-05 15:59:41  brian
+ - tcap and map driver and library updates
+
  Revision 0.9.2.1  2009-03-02 05:15:03  brian
  - updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: trmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:03 $"
+#ident "@(#) $RCSfile: trmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-05 15:59:41 $"
 
-static char const ident[] = "$RCSfile: trmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:03 $";
+static char const ident[] = "$RCSfile: trmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-05 15:59:41 $";
 
 /*
  * This is TRMOD, a TCAP Transaction Sublayer (TR) module implementing the TRI
@@ -82,7 +85,7 @@ static char const ident[] = "$RCSfile: trmod.c,v $ $Name: OpenSS7-0_9_2 $($Revis
 #define TRMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TRMOD_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TRMOD_COPYRIGHT	"Copyright (c) 2008-2009 Monavacon Limited.  All Rights Reserved."
-#define TRMOD_REVISION	"$RCSfile: trmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:03 $"
+#define TRMOD_REVISION	"$RCSfile: trmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-05 15:59:41 $"
 #define TRMOD_DEVICE	"SVR 4.2 STREAMS Q.771 Transaction Sublayer (TR) Module"
 #define TRMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TRMOD_LICENSE	"GPL"

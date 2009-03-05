@@ -1,6 +1,6 @@
 -- ===========================================================================
 --
--- @(#) $Id: ITUT_TCAP.asn,v 0.9.2.1 2004/08/21 10:15:01 brian Exp $
+-- @(#) $Id: ITUT_TCAP.asn,v 0.9.2.2 2009-03-05 15:59:41 brian Exp $
 --
 -- ===========================================================================
 --
@@ -28,11 +28,14 @@
 -- techniques, or procedures embodied, described, or referred to herein.
 -- The author is under no obligation to provide any feature listed herein.
 --
--- Modified $Date: 2004/08/21 10:15:01 $ by <bidulock@openss7.org>
+-- Modified $Date: 2009-03-05 15:59:41 $ by <bidulock@openss7.org>
 --
 -- ===========================================================================
 --
 -- $Log: ITUT_TCAP.asn,v $
+-- Revision 0.9.2.2  2009-03-05 15:59:41  brian
+-- - tcap and map driver and library updates
+--
 -- Revision 0.9.2.1  2004/08/21 10:15:01  brian
 -- - Force checkin on branch.
 --
