@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-11-17 14:13:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2009-03-12 15:08:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,17 +46,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-17 14:13:05 $ by $Author: brian $
+# Last Modified $Date: 2009-03-12 15:08:33 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
-SUBDIRS = cci tri tci mapi sccpi mtpi sli sdli sdti
+SUBDIRS = cci tri tci mapi sccpi mtpi sli sdli sdti xmap
 
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.12  2009-03-12 15:08:33  brian
+## - map library doc and impl
+##
 ## Revision 0.9.2.11  2008-11-17 14:13:05  brian
 ## - documentation additions
 ##

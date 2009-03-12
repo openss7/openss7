@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmap_sms.h,v 0.9.2.1 2009-03-05 15:51:26 brian Exp $
+ @(#) $Id: xmap_sms.h,v 0.9.2.2 2009-03-12 15:08:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-05 15:51:26 $ by $Author: brian $
+ Last Modified $Date: 2009-03-12 15:08:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap_sms.h,v $
+ Revision 0.9.2.2  2009-03-12 15:08:34  brian
+ - map library doc and impl
+
  Revision 0.9.2.1  2009-03-05 15:51:26  brian
  - new files for map library
 
@@ -60,7 +63,7 @@
 #ifndef __XMAP_SMS_H__
 #define __XMAP_SMS_H__
 
-#ident "@(#) $RCSfile: xmap_sms.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_sms.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* SMS parameters */
 
@@ -209,6 +212,25 @@
  * (C )(C=) MAP_SERVICE_USER_ERROR
  * (- )(O) MAP_SERVICE_PROVIDER_ERROR
  */
+
+/* primitive types */
+#define MAP_P_SEND_ROUTING_INFO_FOR_SM_IND	((OM_sint) 1)
+#define MAP_P_SEND_ROUTING_INFO_FOR_SM_CNF	((OM_sint) 2)
+#define MAP_P_MO_FORWARD_SHORT_MESSAGE_IND	((OM_sint) 3)
+#define MAP_P_MO_FORWARD_SHORT_MESSAGE_CNF	((OM_sint) 4)
+#define MAP_P_REPORT_SM_DELIVERY_STATUS_IND	((OM_sint) 5)
+#define MAP_P_REPORT_SM_DELIVERY_STATUS_CNF	((OM_sint) 6)
+#define MAP_P_READY_FOR_SM_IND			((OM_sint) 7)
+#define MAP_P_READY_FOR_SM_CNF			((OM_sint) 8)
+#define MAP_P_ALERT_SERVICE_CENTER_IND		((OM_sint) 9)
+#define MAP_P_ALERT_SERVICE_CENTER_CNF		((OM_sint)10)
+#define MAP_P_INFORM_SERVICE_CENTER_IND		((OM_sint)11)
+#define MAP_P_SEND_INFO_FOR_MT_SMS_IND		((OM_sint)12)
+#define MAP_P_SEND_INFO_FOR_MT_SMS_CNF		((OM_sint)13)
+#define MAP_P_SEND_INFO_FOR_MO_SMS_IND		((OM_sint)14)
+#define MAP_P_SEND_INFO_FOR_MO_SMS_CNF		((OM_sint)15)
+#define MAP_P_MT_FORWARD_SHORT_MESSAGE_IND	((OM_sint)16)
+#define MAP_P_MT_FORWARD_SHORT_MESSAGE_CNF	((OM_sint)17)
 
 /* mwdMngtPackage */
 #define OMP_O_MAP_MWD_MNGT_CONTEXT_V3		mapP_acId(\x18\x03)

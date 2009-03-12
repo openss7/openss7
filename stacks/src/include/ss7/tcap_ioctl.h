@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tcap_ioctl.h,v 0.9.2.9 2009-03-05 15:59:40 brian Exp $
+ @(#) $Id: tcap_ioctl.h,v 0.9.2.10 2009-03-12 15:08:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-05 15:59:40 $ by $Author: brian $
+ Last Modified $Date: 2009-03-12 15:08:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap_ioctl.h,v $
+ Revision 0.9.2.10  2009-03-12 15:08:34  brian
+ - map library doc and impl
+
  Revision 0.9.2.9  2009-03-05 15:59:40  brian
  - tcap and map driver and library updates
 
@@ -72,7 +75,7 @@
 #ifndef __TCAP_IOCTL_H__
 #define __TCAP_IOCTL_H__
 
-#ident "@(#) $RCSfile: tcap_ioctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: tcap_ioctl.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed by doxygen(1). */
 
@@ -569,10 +572,10 @@ typedef struct tcap_stats {
 	union tcap_stats_obj stats[0];
 } tcap_stats_t;
 
-#define TCAP_IOCGSTATSP	_IOWR(TCAP_IOC_MAGIC,	 8,  tcap_stats_t) /* get period */
-#define TCAP_IOCSSTATSP	_IOWR(TCAP_IOC_MAGIC,	 9,  tcap_stats_t) /* set period */
-#define TCAP_IOCGSTATS	_IOWR(TCAP_IOC_MAGIC,	10,  tcap_stats_t) /* get stats */
-#define TCAP_IOCCSTATS	_IOWR(TCAP_IOC_MAGIC,	11,  tcap_stats_t) /* get and clear stats */
+#define TCAP_IOCGSTATSP	_IOWR(TCAP_IOC_MAGIC,	13,  tcap_stats_t) /* get period */
+#define TCAP_IOCSSTATSP	_IOWR(TCAP_IOC_MAGIC,	14,  tcap_stats_t) /* set period */
+#define TCAP_IOCGSTATS	_IOWR(TCAP_IOC_MAGIC,	15,  tcap_stats_t) /* get stats */
+#define TCAP_IOCCSTATS	_IOWR(TCAP_IOC_MAGIC,	16,  tcap_stats_t) /* get and clear stats */
 
 /*
  * EVENTS
@@ -710,9 +713,9 @@ typedef struct tcap_notify {
 	union tcap_notify_obj notify[0];
 } tcap_notify_t;
 
-#define TCAP_IOCGNOTIFY	_IOWR(TCAP_IOC_MAGIC, 17,  tcap_notify_t)	/* get */
-#define TCAP_IOCSNOTIFY	_IOWR(TCAP_IOC_MAGIC, 18,  tcap_notify_t)	/* set */
-#define TCAP_IOCCNOTIFY	_IOWR(TCAP_IOC_MAGIC, 19,  tcap_notify_t)	/* clear */
+#define TCAP_IOCGNOTIFY	_IOWR(TCAP_IOC_MAGIC,	17,  tcap_notify_t)	/* get */
+#define TCAP_IOCSNOTIFY	_IOWR(TCAP_IOC_MAGIC,	18,  tcap_notify_t)	/* set */
+#define TCAP_IOCCNOTIFY	_IOWR(TCAP_IOC_MAGIC,	19,  tcap_notify_t)	/* clear */
 
 /*
  * ATTRIBUTES
@@ -888,7 +891,7 @@ typedef struct tcap_mgmt {
 #define TCAP_MGMT_RESET			3
 #define TCAP_MGMT_QUERY			4
 
-#define TCAP_IOCCMGMT		_IOWR(	TCAP_IOC_MAGIC, 15,  tcap_mgmt_t )
+#define TCAP_IOCCMGMT	_IOWR(TCAP_IOC_MAGIC,	21,  tcap_mgmt_t )
 
 /*
  * PASS LOWER
