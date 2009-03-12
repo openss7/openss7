@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xmap_sms.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $
+ @(#) $RCSfile: xmap_sms.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-12 15:08:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,30 +47,41 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-05 15:51:27 $ by $Author: brian $
+ Last Modified $Date: 2009-03-12 15:08:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap_sms.c,v $
+ Revision 0.9.2.2  2009-03-12 15:08:34  brian
+ - map library doc and impl
+
  Revision 0.9.2.1  2009-03-05 15:51:27  brian
  - new files for map library
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xmap_sms.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $"
+#ident "@(#) $RCSfile: xmap_sms.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-12 15:08:34 $"
 
-static char const ident[] = "$RCSfile: xmap_sms.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $";
+static char const ident[] = "$RCSfile: xmap_sms.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-12 15:08:34 $";
 
 #include <xom.h>
 #include <xomi.h>
 #include <xmap.h>
 #include <xmap_sms.h>
 
+/** @brief receive an SMS service indication or confirmation
+  * @param assoc open MAP association
+  * @param primitive_return return primitive value
+  * @param arguments_or_result_return returned primitive argument or result
+  * @param invoke_id_return returned invoke identifier for primitive
+  *
+  * This function may be used to receive an SMS service indication or
+  * confirmation primitive from an association.
+  */
 MAP_status
 map_sms_service_rcv(OM_private_object assoc,
 		    OM_sint * primitive_return,
-		    OM_private_object * arguments_return,
-		    OM_private_object * component_return,
+		    OM_private_object * arguments_or_result_return,
 		    OM_sint * invoke_id_return)
 {
 }

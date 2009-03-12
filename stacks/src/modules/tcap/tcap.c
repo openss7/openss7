@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-12-07 10:40:22 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2009-03-12 15:08:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-07 10:40:22 $ by $Author: brian $
+ Last Modified $Date: 2009-03-12 15:08:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.28  2009-03-12 15:08:35  brian
+ - map library doc and impl
+
  Revision 0.9.2.27  2008-12-07 10:40:22  brian
  - new stratm package
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-12-07 10:40:22 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2009-03-12 15:08:35 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-12-07 10:40:22 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2009-03-12 15:08:35 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -121,7 +124,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.27 $) $Date: 2008-12-07 10:40:22 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.28 $) $Date: 2009-03-12 15:08:35 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3970,8 +3973,8 @@ tcap_r_state(uint state)
 		return ("TRS_IDLE");
 	case TRS_WACK_OPTREQ:
 		return ("TRS_WACK_OPTREQ");
-	case TRS_WACK_RRES:
-		return ("TRS_WACK_RRES");
+	case TRS_WACK_CREQ:
+		return ("TRS_WACK_CREQ");
 	case TRS_WCON_CREQ:
 		return ("TRS_WCON_CREQ");
 	case TRS_WRES_CIND:
@@ -3980,20 +3983,14 @@ tcap_r_state(uint state)
 		return ("TRS_WACK_CRES");
 	case TRS_DATA_XFER:
 		return ("TRS_DATA_XFER");
-	case TRS_WCON_RREQ:
-		return ("TRS_WCON_RREQ");
-	case TRS_WRES_RIND:
-		return ("TRS_WRES_RIND");
 	case TRS_WACK_DREQ6:
 		return ("TRS_WACK_DREQ6");
 	case TRS_WACK_DREQ7:
 		return ("TRS_WACK_DREQ7");
 	case TRS_WACK_DREQ9:
 		return ("TRS_WACK_DREQ9");
-	case TRS_WACK_DREQ10:
-		return ("TRS_WACK_DREQ10");
-	case TRS_WACK_DREQ11:
-		return ("TRS_WACK_DREQ11");
+	case TRS_NOSTATES:
+		return ("TRS_NOSTATES");
 	default:
 		return ("(unknown)");
 	}
@@ -5277,7 +5274,7 @@ tr_error_ack(struct tc *tc, queue_t *q, t_uscalar_t prim, t_uscalar_t etype, t_u
 	p->ERROR_prim = prim;
 	p->TRPI_error = etype < 0 ? TRSYSERR : etype;
 	p->UNIX_error = etype < 0 ? -etype : 0;
-	p->TRANS_id = tid;
+	//p->TRANS_id = tid;
 	printd(("%s: %p: <- TR_ERROR_ACK\n", DRV_NAME, tc));
 	put(tc->oq, mp);
 	return (QR_DONE);
@@ -5466,7 +5463,7 @@ tr_begin_con(struct tc *tc, queue_t *q, struct sccp_addr *org,
 	p = (typeof(p)) mp->b_wptr;
 	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_BEGIN_CON;
-	p->CORR_id = cid;
+	//p->CORR_id = cid;
 	p->TRANS_id = tid;
 	p->ORIG_length = org_len;
 	p->ORIG_offset = org_len ? sizeof(*p) : 0;
@@ -5562,7 +5559,7 @@ tr_end_ind(struct tc *tc, queue_t *q, struct tcap_opts *opt, t_uscalar_t tid, t_
 	p = (typeof(p)) mp->b_wptr;
 	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_END_IND;
-	p->CORR_id = cid;
+	//p->CORR_id = cid;
 	p->TRANS_id = tid;
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -5610,7 +5607,7 @@ tr_abort_ind(struct tc *tc, queue_t *q, t_uscalar_t cause, t_uscalar_t orig,
 	p->PRIM_type = TR_ABORT_IND;
 	p->ABORT_cause = cause;
 	p->ORIGINATOR = orig;
-	p->CORR_id = cid;
+	//p->CORR_id = cid;
 	p->TRANS_id = tid;
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -5654,7 +5651,7 @@ tr_notice_ind(struct tc *tc, queue_t *q, t_uscalar_t cause, t_uscalar_t tid, t_u
 	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_NOTICE_IND;
 	p->REPORT_cause = cause;
-	p->CORR_id = cid;
+	//p->CORR_id = cid;
 	p->TRANS_id = tid;
 	printd(("%s: %p: <- TR_NOTICE_IND\n", DRV_NAME, tc));
 	put(tc->oq, mp);
@@ -8669,9 +8666,9 @@ tr_begin_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		if (tcap_parse_opts(tc, &opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 			goto badopt;
 	}
-	if (!p->CORR_id || tr_lookup_cid(tc, p->CORR_id))
+	if (!p->TRANS_id || tr_lookup_cid(tc, p->TRANS_id))
 		goto badaddr;
-	if (!(tr = tcap_alloc_tr(tc, p->CORR_id, 0)))
+	if (!(tr = tcap_alloc_tr(tc, p->TRANS_id, 0)))
 		goto enomem;
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
@@ -8691,7 +8688,7 @@ tr_begin_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	err = -ENOMEM;
 	goto error;
       error:
-	return tr_error_ack(tc, q, p->PRIM_type, err, p->CORR_id);
+	return tr_error_ack(tc, q, p->PRIM_type, err, p->TRANS_id);
 }
 
 /*

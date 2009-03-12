@@ -1,5 +1,16 @@
 2009-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.ac: map library documentation and impl
+	* doc/specs/Makefile.am: map library documentation and impl
+	* src/include/xmap.h: map library documentation and impl
+	* src/include/xmap_sms.h: map library documentation and impl
+	* src/include/ss7/tcap_ioctl.h: map library documentation and impl
+	* src/lib/libxmap/xmap.c: map library documentation and impl
+	* src/lib/libxmap/xmap_sms.c: map library documentation and impl
+	* src/modules/tcap/tc_mod.c: map library documentation and impl
+	* src/modules/tcap/tcap.c: map library documentation and impl
+	* src/modules/tcap/tr_mod.c: map library documentation and impl
+
 	* src/include/xmap_gsm.h: added GSM header
 	* doc/specs/xmap/Makefile.am: added xmap documentation
 	* doc/specs/xmap/xmap.texi: added xmap documentation

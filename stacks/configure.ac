@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-11-17 14:13:04 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2009-03-12 15:08:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-11-17 14:13:04 $ by $Author: brian $
+# Last Modified $Date: 2009-03-12 15:08:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.56 $) $Date: 2008-11-17 14:13:04 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.57 $) $Date: 2009-03-12 15:08:33 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -202,6 +202,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/sdli/Makefile
 		 doc/specs/sdti/Makefile
 		 doc/specs/sccpi/Makefile
+		 doc/specs/xmap/Makefile
 		 src/modules/ti/streams.conf
 		 src/modules/inet/streams.conf
 		 src/modules/sctp/streams.conf
@@ -227,6 +228,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.57  2009-03-12 15:08:33  brian
+# - map library doc and impl
+#
 # Revision 0.9.2.56  2008-11-17 14:13:04  brian
 # - documentation additions
 #

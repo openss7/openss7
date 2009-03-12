@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-07 10:40:22 $
+ @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2009-03-12 15:08:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-07 10:40:22 $ by $Author: brian $
+ Last Modified $Date: 2009-03-12 15:08:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc_mod.c,v $
+ Revision 0.9.2.8  2009-03-12 15:08:34  brian
+ - map library doc and impl
+
  Revision 0.9.2.7  2008-12-07 10:40:22  brian
  - new stratm package
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-07 10:40:22 $"
+#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2009-03-12 15:08:34 $"
 
 static char const ident[] =
-    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-07 10:40:22 $";
+    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2009-03-12 15:08:34 $";
 
 /*
  * This is TC-MOD.  It is a simplified Transaction Component Interface (TCI) module for TCAP that
@@ -130,7 +133,7 @@ static char const ident[] =
 #include <sys/xti_tcap.h>
 
 #define TC_DESCRIP	"SS7/TCAP-TC (TCAP Component Handling) STREAMS MODULE."
-#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-12-07 10:40:22 $"
+#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2009-03-12 15:08:34 $"
 #define TC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TC_DEVICE	"Provides OpenSS7 TCAP-TC module."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -618,8 +621,8 @@ tr_statename(uint state)
 		return ("TRS_IDLE");
 	case TRS_WACK_OPTREQ:
 		return ("TRS_WACK_OPTREQ");
-	case TRS_WACK_RRES:
-		return ("TRS_WACK_RRES");
+	case TRS_WACK_CREQ:
+		return ("TRS_WACK_CREQ");
 	case TRS_WCON_CREQ:
 		return ("TRS_WCON_CREQ");
 	case TRS_WRES_CIND:
@@ -628,20 +631,12 @@ tr_statename(uint state)
 		return ("TRS_WACK_CRES");
 	case TRS_DATA_XFER:
 		return ("TRS_DATA_XFER");
-	case TRS_WCON_RREQ:
-		return ("TRS_WCON_RREQ");
-	case TRS_WRES_RIND:
-		return ("TRS_WRES_RIND");
 	case TRS_WACK_DREQ6:
 		return ("TRS_WACK_DREQ6");
 	case TRS_WACK_DREQ7:
 		return ("TRS_WACK_DREQ7");
 	case TRS_WACK_DREQ9:
 		return ("TRS_WACK_DREQ9");
-	case TRS_WACK_DREQ10:
-		return ("TRS_WACK_DREQ10");
-	case TRS_WACK_DREQ11:
-		return ("TRS_WACK_DREQ11");
 	case TRS_NOSTATES:
 		return ("TRS_NOSTATES");
 	default:
@@ -2184,7 +2179,7 @@ tr_begin_req(struct tr *tr, queue_t *q, mblk_t *msg, t_uscalar_t cid, t_uscalar_
 	DB_TYPE(mp) = M_PROTO;
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = TR_BEGIN_REQ;
-	p->CORR_id = cid;
+	//p->CORR_id = cid;
 	p->ASSOC_flags = flags;
 	p->DEST_length = dst_len;
 	p->DEST_offset = sizeof(*p);

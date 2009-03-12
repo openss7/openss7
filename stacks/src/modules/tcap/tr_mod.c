@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:23 $
+ @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2009-03-12 15:08:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-07 10:40:23 $ by $Author: brian $
+ Last Modified $Date: 2009-03-12 15:08:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr_mod.c,v $
+ Revision 0.9.2.11  2009-03-12 15:08:35  brian
+ - map library doc and impl
+
  Revision 0.9.2.10  2008-12-07 10:40:23  brian
  - new stratm package
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:23 $"
+#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2009-03-12 15:08:35 $"
 
 static char const ident[] =
-    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:23 $";
+    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2009-03-12 15:08:35 $";
 
 /*
  * This is TR-MOD.  It is a simplified Transaction Interface (TRI) module for TCAP that can be
@@ -116,7 +119,7 @@ static char const ident[] =
 #include <ss7/tcap_ioctl.h>
 
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS MODULE."
-#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:23 $"
+#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2009-03-12 15:08:35 $"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -367,8 +370,8 @@ tr_statename(uint state)
 		return ("TRS_IDLE");
 	case TRS_WACK_OPTREQ:
 		return ("TRS_WACK_OPTREQ");
-	case TRS_WACK_RRES:
-		return ("TRS_WACK_RRES");
+	case TRS_WACK_CREQ:
+		return ("TRS_WACK_CREQ");
 	case TRS_WCON_CREQ:
 		return ("TRS_WCON_CREQ");
 	case TRS_WRES_CIND:
@@ -377,20 +380,12 @@ tr_statename(uint state)
 		return ("TRS_WACK_CRES");
 	case TRS_DATA_XFER:
 		return ("TRS_DATA_XFER");
-	case TRS_WCON_RREQ:
-		return ("TRS_WCON_RREQ");
-	case TRS_WRES_RIND:
-		return ("TRS_WRES_RIND");
 	case TRS_WACK_DREQ6:
 		return ("TRS_WACK_DREQ6");
 	case TRS_WACK_DREQ7:
 		return ("TRS_WACK_DREQ7");
 	case TRS_WACK_DREQ9:
 		return ("TRS_WACK_DREQ9");
-	case TRS_WACK_DREQ10:
-		return ("TRS_WACK_DREQ10");
-	case TRS_WACK_DREQ11:
-		return ("TRS_WACK_DREQ11");
 	case TRS_NOSTATES:
 		return ("TRS_NOSTATES");
 	default:
@@ -737,7 +732,7 @@ tr_error_ack(struct tr *tr, queue_t *q, mblk_t *msg, t_uscalar_t prim, t_scalar_
 		p->ERROR_prim = prim;
 		p->TRPI_error = error < 0 ? TRSYSERR : error;
 		p->UNIX_error = error < 0 ? -error : 0;
-		p->TRANS_id = tid;
+		//p->TRANS_id = tid;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- TR_ERROR_ACK");
@@ -920,7 +915,7 @@ tr_begin_con(struct tr *tr, queue_t *q, mblk_t *msg,
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = TR_BEGIN_CON;
-			p->CORR_id = cid;
+			//p->CORR_id = cid;
 			p->ASSOC_flags = flags;
 			p->TRANS_id = tid;
 			p->ORIG_length = orig_len;
@@ -1013,7 +1008,7 @@ tr_end_ind(struct tr *tr, queue_t *q, mblk_t *msg,
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = TR_END_IND;
-			p->CORR_id = cid;
+			//p->CORR_id = cid;
 			p->TRANS_id = tid;
 			p->OPT_length = opts_len;
 			p->OPT_offset = opts_len ? sizeof(*p) : 0;
@@ -1060,7 +1055,7 @@ tr_abort_ind(struct tr *tr, queue_t *q, mblk_t *msg,
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = TR_ABORT_IND;
-			p->CORR_id = cid;
+			//p->CORR_id = cid;
 			p->TRANS_id = tid;
 			p->OPT_length = opts_len;
 			p->OPT_offset = opts_len ? sizeof(*p) : 0;
@@ -1105,7 +1100,7 @@ tr_notice_ind(struct tr *tr, queue_t *q, mblk_t *msg,
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = TR_NOTICE_IND;
-			p->CORR_id = cid;
+			//p->CORR_id = cid;
 			p->TRANS_id = tid;
 			p->REPORT_cause = cause;
 			mp->b_wptr += sizeof(*p);

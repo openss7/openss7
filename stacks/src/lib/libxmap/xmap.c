@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xmap.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $
+ @(#) $RCSfile: xmap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-12 15:08:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-05 15:51:27 $ by $Author: brian $
+ Last Modified $Date: 2009-03-12 15:08:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap.c,v $
+ Revision 0.9.2.2  2009-03-12 15:08:34  brian
+ - map library doc and impl
+
  Revision 0.9.2.1  2009-03-05 15:51:27  brian
  - new files for map library
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xmap.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $"
+#ident "@(#) $RCSfile: xmap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-12 15:08:34 $"
 
-static char const ident[] = "$RCSfile: xmap.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $";
+static char const ident[] = "$RCSfile: xmap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-12 15:08:34 $";
 
 #include <xom.h>
 #include <xomi.h>
@@ -67,7 +70,7 @@ static char const ident[] = "$RCSfile: xmap.c,v $ $Name: OpenSS7-0_9_2 $($Revisi
 
 #define OMP_O_MAP_DIALOGUE_AS \
 	mapP_asId(\x01\x01) /* 0.4.0.0.1.1.1.1 */
-	/* { itu-t(0) identified-organization(4) etsi(0) mobile-domain(0) * gsm-Network(1) as-Id(1) map-DialoguePDU(1) version1(1) }
+	/* { itu-t(0) identified-organization(4) etsi(0) mobile-domain(0) * gsm-Network(1) as-Id(1) map-DialoguePDU(1) version1(1) } */
 
 static OM_return_code
 __xmap_om_copy(OM_private_object original, OM_workspace workspace,
@@ -1082,9 +1085,23 @@ __xmap_map_service_rsp(OM_private_object assoc, OM_object arguments,
 __asm__(".symver __xmap_map_service_rsp,map_service_rsp@@XMAP_1.0");
 
 /** @brief add parameter(s) to a pending service request or response
-  * @param assoc association
-  * @param paramter parameters to add
+  * @param assoc open MAP association
+  * @param parameter parameters to add
   * @param invoke_id invoke identifier of pending service request or response
+  *
+  * @assoc is an open MAP association.
+  *
+  * @parameter is an OM object containing parameters.  This object is either of
+  * type MAP_C_PARAMETER or MAP_C_PARAMETER_LIST.  Parameters must be of the
+  * correct type and in the correct order for the component to which they are
+  * being appended.
+  *
+  * @invoke_id is the invoke identifier of the component onto which to append
+  * parameters.  The component must be a pending component.
+  *
+  * This function is not really necessary.  OM functions or direct operations
+  * can be used to append OM objects or attributes to the service arguments or
+  * result list.
   */
 MAP_status
 __xmap_map_service_parameter(OM_private_object assoc, OM_object parameter,
