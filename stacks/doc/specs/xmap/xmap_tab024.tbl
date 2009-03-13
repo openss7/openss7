@@ -36,7 +36,7 @@ OM Attribute:Syntax:Length:Number:Initially
 =
 requestor-Address:Object(Address):\(em:0-1:\(em
 requestor-Title:Object(Title):\(em:0-1:\(em
-.\"role:Integer:\(em:0-1:see below
+role:Integer:\(em:0-1:see below
 file-Descriptor:Integer:\(em:1:see below
 presentation-Layer-Args:Object(Presentation-Layer-Args):\(em:0-1:\(em
 acse-Args:Object(Acse-Args):\(em:0-1:\(em

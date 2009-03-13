@@ -37,6 +37,7 @@ OM Attribute:Syntax:Length:Number:Initially
 msisdn:String(Address):1-9:0-1:\(em
 mw-Status:String(Bit):6-16:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 absent-Subscriber-Diagnostic-SM:Integer:\(em:0-1:\(em
 additional-Absent-Subscriber-Diagnostic-SM:Integer:\(em:0-1:\(em
 _

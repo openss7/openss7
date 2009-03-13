@@ -34,8 +34,7 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-.\"extension-Container:Object(Extension-Container):\(em:0-1:\(em
-.\"extension:Object(Extension):\(em:0-1:\(em
-call-Barring-Cause:Enum(Call-Barring-Cause):\(em:1:\(em
+call-Barring-Cause:Enum(Call-Barring-Cause):\(em:0-1:\(em
+extensible-Call-Barred-Param:Object(Extensible-Call-Barred-Param):\(em:0-1:\(em
 _
 .TE

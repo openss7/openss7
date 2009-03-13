@@ -35,5 +35,6 @@ _
 OM Attribute:Syntax:Length:Number:Initially
 =
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 _
 .TE

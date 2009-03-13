@@ -37,7 +37,8 @@ OM Attribute:Syntax:Length:Number:Initially
 sm-RP-DA:Object(SM-RP-DA):\(em:1:\(em
 sm-RP-OA:Object(SM-RP-OA):\(em:1:\(em
 sm-RP-UI:String(Octet):1-200:1:\(em
-extenstion-Container:Object(Extension-Container):\(em:0-1:\(em
+extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 imsi:String(TBCD):3-8:0-1:\(em
 _
 .TE

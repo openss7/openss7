@@ -37,6 +37,7 @@ OM Attribute:Syntax:Length:Number:Initially
 network-Node-Number:String(TBCD):1-8:1:\(em
 lmsi:String(Octet):4:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 gprs-Node-Indicator:Null:\(em:0-1:\(em
 additional-Number:Object(Additional-Number):\(em:0-1:\(em
 _

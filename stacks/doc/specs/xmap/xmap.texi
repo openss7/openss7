@@ -1,7 +1,7 @@
-% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi et
 % =========================================================================
 %
-% @(#) $Id: xmap.texi,v 0.9.2.1 2009-03-12 14:52:32 brian Exp $
+% @(#) $Id: xmap.texi,v 0.9.2.3 2009-03-13 11:20:24 brian Exp $
 %
 % =========================================================================
 %
@@ -55,11 +55,17 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-03-12 14:52:32 $ by $Author: brian $
+% Last Modified $Date: 2009-03-13 11:20:24 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: xmap.texi,v $
+% Revision 0.9.2.3  2009-03-13 11:20:24  brian
+% - doc and header updates
+%
+% Revision 0.9.2.2  2009-03-12 15:29:57  brian
+% - syntax corrections
+%
 % Revision 0.9.2.1  2009-03-12 14:52:32  brian
 % - added XMAP documentation
 %
@@ -432,6 +438,12 @@ is an @strong{UNCONTROLLED VERSION}.
 @smallexample
 @verbatim
 $Log: xmap.texi,v $
+Revision 0.9.2.3  2009-03-13 11:20:24  brian
+- doc and header updates
+
+Revision 0.9.2.2  2009-03-12 15:29:57  brian
+- syntax corrections
+
 Revision 0.9.2.1  2009-03-12 14:52:32  brian
 - added XMAP documentation
 
@@ -1683,6 +1695,7 @@ Operation indication received in a mobile application service interaction.
 @item NAME
 @b{Abandon} -- abandon locally the result of a pending asynchronous operation.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -1692,6 +1705,7 @@ MAP_status map_abandon(
         OM_sint32          invoke_id
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function abandons the result of an outstanding asynchronous function call.  The function is no
 longer outstnading after this function returns, and the result (or the remaining results in case of
@@ -1740,6 +1754,7 @@ The function can also return the error constants @perr{[MAP_NO_WORKSPACE]},
 @item NAME
 @b{Abort} -- Abort Association.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -1750,6 +1765,7 @@ MAP_status map_abort(
         OM_object          argument
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is one of a group of dialogue handling functions: @i{Open()}, @i{Accept()},
 @i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the MAP dialogue
@@ -1797,6 +1813,7 @@ This function corresponds to the @var{MAP-U-ABORT} request primitive of 3GPP TS 
 @item NAME
 @b{Abort-req} --- abort a mobile application association.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -1807,6 +1824,7 @@ MAP_status map_abort_req(
         OM_object           response
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to abort a mobile application session that is either associated or partially
 associated.  The service is defined as an unconfirmed service.  A reply is not expected.
@@ -1854,6 +1872,7 @@ This function can also return the error constants
 @item NAME
 @b{Accept} --- accept an indicated mobile application open operation.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -1866,6 +1885,7 @@ MAP_status map_accept(
         OM_private_object      *connected_session_return
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is one of a group of dialogue handling functions: @i{Open()}, @i{Accept()},
 @i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the MAP dialogue
@@ -1930,6 +1950,7 @@ acceptance) of 3GPP TS 29.002 Section 7.
 @item NAME
 @b{Assoc-req} --- establish mobile application association.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -1941,6 +1962,7 @@ MAP_status map_assoc_req(
         OM_private_object  *result_return
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to request the establishment of a mobile application association.  The service
 is defined as a non-confirmed service.  No reply is expected.
@@ -1993,6 +2015,7 @@ This function can also return the error constants
 @item NAME
 @b{Assoc-rsp} --- reply to a requested association operation.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2004,6 +2027,7 @@ MAP_status map_assoc_rsp(
         OM_sint32           assoc_id
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to reply to a previously invoked @var{Assoc} operation.
 
@@ -2054,6 +2078,7 @@ session-terminated.
 @item NAME
 @b{Bind} --- open a mobile application session.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2064,6 +2089,7 @@ MAP_status map_bind(
         OM_private_object  *bound_session_return
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function opens a mobile application session.  It creates a @b{Session} OM object describing the
 session suitable for supplying to other XMAP functions.  A session must be opened before any
@@ -2128,6 +2154,7 @@ This function can also return the error constants
 @item NAME
 @b{Close} --- terminate a mobile application association.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2138,6 +2165,7 @@ MAP_status map_close(
         OM_object               argument
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to request the termination of a mobile application association.  The service
 is defined as an unconfirmed service.  No reply is expected.
@@ -2186,6 +2214,7 @@ This function corresponds to the @var{MAP-CLOSE} request primitive of 3GPP TS 29
 @item NAME
 @b{Error-Message} --- return an error message describing a particular error.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2196,6 +2225,7 @@ OM_sint map_error_message(
         unsigned char      *error_text_return
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function returns an error message string that describes the error.  The caller provides a
 buffer-address and buffer-length argument.  The error message is stored in the client's buffer.
@@ -2230,6 +2260,7 @@ problems).
 @item NAME
 @b{Get-Assoc-Info} --- retrieve negotiated association values.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2243,6 +2274,7 @@ MAP_status map_get_assoc_info(
         OM_public_object        *map_assoc_args
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function returns the negotiated association values corresponding to an incoming
 @i{Receive-Result-Or-Argument} object previously supplied by @i{Receive()}.  The caller provides a
@@ -2346,6 +2378,7 @@ This function can return error constants
 @b{Get-last-error} --- retrieve secondary return code of the most recent function call
 Communications or System error.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2355,6 +2388,7 @@ MAP_status map_get_last_error(
         OM_uint32          *additional_return_error
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to return additional error information related to the last function call that
 returned a status of:
@@ -2400,6 +2434,7 @@ This function can return error constants
 @item NAME
 @b{Initialize} --- initialize the interface.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2408,6 +2443,7 @@ OM_workspace map_initialize(
         void
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function performs any necessary initialization of the interface and allocates a workspace.  It
 must be called before any other mobile application interface functions are called.  It may be called
@@ -2426,6 +2462,17 @@ the other management interface functions.  This function returns NULL if it fail
 None.
 @item SEE ALSO
 @i{Shutdown()}.@footnote{@xref{Shutdown}.}
+@item EXAMPLE
+@sp
+@smallformat
+@verbatim
+OM_workspace workspace;
+
+if ((workspace = map_initialize()) == NULL) {
+	exit(1);
+}
+@end verbatim
+@end smallformat
 @end table
 
 @page
@@ -2435,6 +2482,7 @@ None.
 @item NAME
 @b{Issue} --- issue pending service requests and responses.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2445,6 +2493,7 @@ MAP_status map_issue(
         OM_sint32               dialog_id
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is one of a group of dialogue handling functions: @i{Open()}, @i{Accept()},
 @i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage MAP dialogues
@@ -2511,6 +2560,7 @@ This function corresponds to the @var{MAP-DELIM} request primitive of 3GPP TS 29
 @item NAME
 @b{Negotiate} --- negotiate features of the interface and service.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2520,6 +2570,7 @@ MAP_status map_negotiate(
         OM_workspace        workspace
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function negotiates features of the interface; each feature is represented as an Object
 Identifier.  Several features are defined and registered within this specification.  Features may
@@ -2562,33 +2613,33 @@ The following Features are defined and registered by this specification:
 The GSM Mobile Application package and the ANSI Mobile Application package are specified in
 @ref{Interface Class Definitions}.  Additional Mobile Application packages may be sepcified in the
 future.
+Note that multiple Mobile Application Packages can be activated within the same workspace.
+
 @item @b{Automatic Association Management} @*
 This feature provides for automatic establishment and release of the underlying protocol
 associations(s) (if any); refer to @ref{Automatic Association Management}.
 The Object-Identifier associated with this feature is @samp{@{ iso(1) org(3) dod(6) internet(1)
 private(4) enterprises(1) openss7(29591) xom-packages(1) xmap(1) common(1)
 automatic-association-management(1) @}}.
-
 This Object-Identifier is represented by the constant @samp{MAP_AUTOMATIC_ASSOCIATION_MANAGEMENT}.
-
 Automatic Association Management is enabled by default.
+
 @item @b{Automatic Dialog Handling}
 This feature provides for automatic establishment and release of the unerlying protocol dialog(s)
 (if any); refer to @ref{Automatic Dialog Handling}.
 The Object-Identifier associated with this feature is @samp{@{ iso(1) org(3) dod(6) internet(1)
 private(4) enterprises(1) openss7(29591) xom-packages(1) xmap(1) common(1)
 automatic-dialog-handling(2) @}}.
-
 This Object-Identifier is represented by the constant @samp{MAP_AUTOMATIC_DIALOG_HANDLING}.
+
 @item @b{Automatic ASN.1 BER Encoding and Decoding} @*
 This feature provides for automatic encoding and decoding of OM class and attribute types using
 ASN.1 BER;refer to @ref{Encoding and Decoding}.  The Object-Identifier associated with this feature
 is @samp{@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
 xom-packages(1) xmap(1) common(1) automatic-decoding(3) @}}.
-
 This Object-Identifier is reprsented by the constant @samp{MAP_AUTOMATIC_DECODING}.
-
 Automatic ASN.1 BER Encoding and Decoding is enabled by default.
+
 @end itemize
 
 Mobile Application Services packages are also negotiated as part of the Feature-List.  Mobile
@@ -2631,6 +2682,34 @@ This function does not return a @b{Communications-Error}, nor any mobile applica
 
 The function can also return the error constants @perr{[MAP_NO_WORKSPACE]},
 @perr{[MAP_INVALID_SESSION]} and @perr{[MAP_INSUFFICIENT_RESOURCE]}.
+@item EXAMPLE
+@sp
+@smallformat
+@verbatim
+MAP_status status;
+OM_workspace workspace;
+int i;
+
+workspace = map_initialize();
+
+MAP_feature feature_list[] = {
+	{MAP_COMMON_PKG, MAP_ACTIVATE, 0}
+	, {MAP_GSM_PKG, MAP_ACTIVATE, 0}
+	, {MAP_GSM_SM_PKG, MAP_ACTIVATE, 0}
+	, {MAP_GSM_LS_PKG, MAP_ACTIVATE, 0}
+	, {MAP_GSM_IN_PKG, MAP_ACTIVATE, 0}
+	, {MAP_GSM_CH_PKG, MAP_ACTIVATE, 0}
+	, {NULL, 0, 0}
+};
+
+if ((status = map_negotiate(feature_list, workspace)) != MAP_SUCCESS)
+	exit(1);
+
+for (i = 0; i < 6; i++)
+	if (!feature_list[i].response)
+		exit(1);
+@end verbatim
+@end smallformat
 @end table
 
 @page
@@ -2640,6 +2719,7 @@ The function can also return the error constants @perr{[MAP_NO_WORKSPACE]},
 @item NAME
 @b{Open} --  Resquest estblishment of a Mobile Application Services association (dialogue).
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2652,6 +2732,7 @@ MAP_status map_open(
         OM_sint32               *dialog_id_return
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to request the creation of a mobile application entity association (dialogue).
 The service is defined as a confirmed service: a reply is expected.
@@ -2735,6 +2816,7 @@ This function corresponds to the @var{MAP-OPEN} request primitive of 3GPP TS 29.
 @b{Receive} --- get the argument of an operation or retrieve the (partial) result of an
 asynchronously executed operation.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2749,6 +2831,7 @@ MAP_status map_receive(
         OM_sint32          *invoke_or_dialog_id_return
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to retrieve the argument of an invoked operation and to retrieve a partial
 result (linked reply) or the completed result of a previous asynchronous operation.
@@ -2886,6 +2969,7 @@ This function can also return the error constants
 @item NAME
 @b{Refuse} --  refuse an indicated association operation.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2897,6 +2981,7 @@ MAP_status map_refuse(
         OM_sint32               dialog_id
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is one of a group of dialogue handling functions: @i{Open()}, @i{Accept()},
 @i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the MAP dialogue
@@ -2951,6 +3036,7 @@ refusal) of 3GPP TS 29.002 Section 7.
 @item NAME
 @b{Release-req} ---
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2958,6 +3044,7 @@ refusal) of 3GPP TS 29.002 Section 7.
 MAP_status map_release_req(
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 @item ARGUMENTS
 @table @i
@@ -2975,6 +3062,7 @@ MAP_status map_release_req(
 @item NAME
 @b{Release-rsp} ---
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -2982,6 +3070,7 @@ MAP_status map_release_req(
 MAP_status map_release_rsp(
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 @item ARGUMENTS
 @table @i
@@ -2999,6 +3088,7 @@ MAP_status map_release_rsp(
 @item NAME
 @b{Service-req} --- request mobile appliction service.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -3011,6 +3101,7 @@ MAP_status map_service_req(
         OM_sint32          *invoke_id_return
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to request mobile application service.
 @item ARGUMENTS
@@ -3083,6 +3174,7 @@ This function corresponds to the @var{MAP-XXX} request primitive of 3GPP TS 29.0
 @item NAME
 @b{Service-rsp} --- reply to a requested mobile application service operation.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -3094,6 +3186,7 @@ MAP_status map_service_rsp(
         OM_sint32           invoke_id
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to reply to a previously invoked confirmed mobile application service
 operation.  This function can only be called in synchronous mode.
@@ -3136,7 +3229,7 @@ service response corresponds.
 @end table
 @item RESULTS
 @table @i
-@i Status (Status)
+@item Status (Status)
 Indicates whether or not the action response was completed.
 @end table
 @item ERRORS
@@ -3164,6 +3257,7 @@ This function corresponds to the @var{MAP-XXX} response primitive of 3GPP TS 29.
 @item NAME
 @b{Service-parameter} -- 
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -3171,6 +3265,7 @@ This function corresponds to the @var{MAP-XXX} response primitive of 3GPP TS 29.
 MAP_status map_xxx(
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 @item ARGUMENTS
 @item RESULTS
@@ -3186,6 +3281,7 @@ This function corresponds to the @var{MAP-PARAMETER} request primitive of 3GPP T
 @item NAME
 @b{Shutdown} --- delete a workspace and the associated resources.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -3194,6 +3290,7 @@ MAP_status map_shutdown(
         OM_workspace    workspace
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function deletes a workspace established by @i{Initialize()}@footnote{@xref{Initialize}.} and
 all the associated resources.  It may enable the service to release resources.
@@ -3218,6 +3315,23 @@ This function can return the error constants
 @perr{[MAP_INSUFFICIENT_RESOURCES]}.
 @item SEE ALSO
 @i{Initialize()}.@footnote{@xref{Initialize}.}
+@item EXAMPLE
+@sp
+@smallformat
+@verbatim
+OM_workspace workspace;
+MAP_status status;
+
+if ((workspace = map_initialize()) == NULL)
+	exit(1);
+
+/* perform functions within the workspace */
+
+if ((status = map_shutdown(workspace)) != MAP_SUCCESS)
+	exit(1);
+exit(0);
+@end verbatim
+@end smallformat
 @end table
 
 @page
@@ -3227,6 +3341,7 @@ This function can return the error constants
 @item NAME
 @b{Unbind} --- unbind from a mobile application session.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -3235,6 +3350,7 @@ MAP_status map_unbind(
         OM_private_object   session
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function terminates the given mobile application session, and makes the argument unavailable
 for use with other interface functions (except @i{Bind()}).
@@ -3284,6 +3400,7 @@ This function can return the error constants
 @item NAME
 @b{Validate-object} --- analyze OM-Object and return Bad-Argument details if necessary.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -3294,6 +3411,7 @@ MAP_status map_validate_obejct(
         OM_private_object  *bad_argument_return
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to analyze any OM-Object to validate its structure.  It may be used as a debug
 tool prior to issuing other XMAP function calls.  It may also be used after XMAP function calls that
@@ -3322,6 +3440,37 @@ This function can return the error constants
 @perr{[MAP_INSUFFICIENT_RESOURCES]},
 @perr{[MAP_E_SYSTEM]} or
 @perr{[MAP_E_BAD_ARGUMENT]}.
+@item EXAMPLE
+Following is a @samp{C} binding example of validating a user-generated public object from the GSM
+MAP Short Message services package:
+@sp
+@smallformat
+@verbatim
+OM_object argument = {
+    OM_OID_DESC(OM_CLASS, MAP_C_MO_FORWARD_SM_ARG)
+    , {MAP_SM_RP_DA, OM_S_OBJECT, {
+        OM_OID_DESC(OM_CLASS, MAP_C_SM_RP_DA)
+        , {MAP_IMSI, MAP_S_TBCD_STRING, OM_STRING("\x21\x43\x65\x87")}
+        , OM_NULL_DESCRIPTOR
+      } }
+    , {MAP_SM_RP_OA, OM_S_OBJECT, {
+        OM_OID_DESC(OM_CLASS, MAP_C_SM_RP_OA)
+        , {MAP_NO_SM_RP_OA, OM_S_NULL, NULL}
+        , OM_NULL_DESCRIPTOR
+      } }
+    , {MAP_SM_RP_UI, OM_S_OCTET_STRING, (OM_string) {data_length, data_pointer} }
+    , {MAP_IMSI, MAP_S_TBCD_STRING, OM_STRING("\x21\x43\x65\x87")}
+    , OM_NULL_DESCRIPTOR
+};
+MAP_status status;
+OM_private_object bad_argument;
+
+status = map_validate_object(workspace, argument, &bad_argument);
+
+if (status == MAP_E_BAD_ARGUMENT)
+    exit(1);
+@end verbatim
+@end smallformat
 @end table
 
 @page
@@ -3331,6 +3480,7 @@ This function can return the error constants
 @item NAME
 @b{Wait} --- wait for the availability of manaement message(s) from one or more bound Sessions.
 @item SYNOPSIS
+@format
 @verbatim
 #include <xom.h>
 #include <xmap.h>
@@ -3341,6 +3491,7 @@ MAP_status map_wait(
         OM_uint32               timeout
 );
 @end verbatim
+@end format
 @item DESCRIPTION
 This function is used to suspend the caller until a mobile application operation is available for a
 bound Session.  A timeout value specifies the maximum number of milliseconds to suspend before
@@ -3394,6 +3545,35 @@ The function can also return the error constants @perr{[MAP_NO_WORKSPACE]},
 @i{Initialize()},@footnote{@xref{Initialize}.}
 @i{Receive()},@footnote{@xref{Receive}.}
 @i{Bind()}.@footnote{@xref{Bind}.}
+@item EXAMPLE
+Following is a @samp{C} language binding example of using the @i{Wait()} function in conjunction
+with the @i{Receive()} function to process indications or confirmations:
+@sp
+@smallformat
+@verbatim
+MAP_waiting_sessions bound_session_list[] =
+    { {session, OM_FALSE} , {NULL,} };
+
+for (;;) {
+    if ((status = map_wait(bound_session_list, workspace, 0)) != MAP_SUCCESS)
+        exit(1);
+    if (bound_session_list[0].activated) {
+        OM_sint mode;
+        OM_sint primitive;
+        OM_sint completion_flag;
+        MAP_status operation_status;
+        OM_private_object result;
+        OM_sint32 received_invoke_id;
+
+        if ((status = map_receive(session, &mode, &primitive, &operation_status,
+                            &result, &received_invoke_id)) != MAP_SUCCESS)
+                exit(1);
+        /* process received result */
+        om_delete(result);
+    }
+}
+@end verbatim
+@end smallformat
 @end table
 
 @node Interface Class Definitions
@@ -3641,8 +3821,8 @@ In the C binding, the OM Syntax name for @i{String(TBCD)} is declared as @samp{M
 
 A TBCD string is a Telephony Binary Coded Decimal encoding where digits @samp{0} through @samp{9},
 @samp{*}, @samp{#}, @samp{a}, @samp{b} and @samp{c} keys are coded @samp{0000} through @samp{1001},
-@samp{1010}, @samp{1011}, @samp{1100}, @samp{1101} and @samp{1110}.  The @var{(2n)}'th digit is
-encoded in the @var{n}'th octet in bits @samp{4321} and the @var{(2(n-1)+1)}'th digit iin bits
+@samp{1010}, @samp{1011}, @samp{1100}, @samp{1101} and @samp{1110}.  The @dfn{(2n)}'th digit is
+encoded in the @dfn{n}'th octet in bits @samp{4321} and the @dfn{(2(n-1)+1)}'th digit iin bits
 @samp{8765}.  Code @samp{1111} is used as a filler when the number of digits is odd.
 
 A Telephony Binary Coded Decimal (TBCD) String is used to represent several digits from @samp{0}
@@ -3650,7 +3830,7 @@ through @samp{9}, @samp{*}, @samp{#}, @samp{a}, @samp{b}, @samp{c}, two digits p
 encoded @samp{0000} to @samp{1001} (@samp{0} to @samp{9}), @samp{1010} (@samp{*}),
 @samp{1011}(@samp{#}), @samp{1100} (@samp{a}), @samp{1101} (@samp{b}), @samp{1110} (@samp{c});
 @samp{1111} used as a filler when there is an odd number of digits.   Bits @samp{8765} of octet
-@var{n} encodes digit @var{2n}.  Bits @samp{4321} of octet @var{n} encoding digit @var{2(n-1)+1}.
+@dfn{n} encodes digit @dfn{2n}.  Bits @samp{4321} of octet @dfn{n} encoding digit @dfn{2(n-1)+1}.
 
 @node String(Sccp-Address)
 @subsection String(Sccp-Address)
@@ -4292,7 +4472,6 @@ does not define any OM attributes of its own.
 See also @ref{Service Error}.
 
 @c @tabfig{xmap_tab054,54,OM Attributes of OM class @var{P-Abort-Result}}
-@c @tabfig{xmap_tabxx,100,OM Attributes of OM class @b{Presentation-Address}}
 
 @node Presentation-Context
 @subsection Presentation-Context
@@ -4489,8 +4668,8 @@ Requester and Invoker of mobile application services operations.  If @b{performe
 @b{invoker-role} is clear, the Mobile Application Service provider does not need to honor operation
 or service requests from the bound session user.
 @end table
-When both role flags are clear, the Mobile Application Service provider may still honor operation
-and service requests.
+When both role flags are clear, or this attribute is not present in the session, the Mobile
+Application Service provider may still honor operation and service requests.
 @item file-Descriptor
 Indicates the file descriptor associated with the session.  The file descriptor may be used by
 implementors of the @i{Wait()} function.  The file descriptor may be used in subsequent calls to
@@ -4507,6 +4686,8 @@ supplied, the Mobile Application Service provider will supply defaults if requir
 Indicates the ACSE related arguments that will be used during association establishment.  If none
 are supplied, the Mobile Application Service Provider will supply defaults if required.
 @item map-Assoc-Args
+Indicates the MAP association related arguments that will be used during association establishment.
+If not are supplied, the Mobile Application Service Provider will supply defaults if required.
 @c @item specific-Information ????
 @end vtable
 
@@ -4755,7 +4936,7 @@ An instance of this OM class has the OM attributes of its superclass, @i{Object}
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item problem (Integer)
+@item problem
 @table @b
 @item user-specific-reason(0)@footnote{Note: this error corresponds to the @var{MAP-U-ABORT} @var{User reason} @b{procedure-error}.} (@samp{MAP_E_PROCEDURE_ERROR})
 Processing of the procedure is terminated due to procedural reasons.
@@ -4807,7 +4988,7 @@ futher qualified as to the source of the cancellation as follows:
 @end table
 This further qualification is contained in the error @var{parameter} as an Integer value.
 @end table
-@item parameter (any)
+@item parameter
 This attribute is an instance of OM class @b{Specific-Information}.
 @item specific-Information
 This attribute is zero or more instances of OM class @b{Specific-Information}.
@@ -5628,12 +5809,15 @@ not applicable to version 1 or 2 dialogues.
 * Additional-Number::
 * Alert-Service-Centre-Arg::
 * Alert-Service-Centre-Res::
+* Dispatcher-List::
 * Inform-Service-Center-Arg::
 * Location-Info-With-LMSI::
 * MO-Forward-SM-Arg::
 * MO-Forward-SM-Res::
 * MT-Forward-SM-Arg::
 * MT-Forward-SM-Res::
+* MT-Forward-SM-VGCS-Arg::
+* MT-Forward-SM-VGCS-Res::
 * Ready-For-SM-Arg::
 * Ready-For-SM-Res::
 * Report-SM-Delivery-Status-Arg::
@@ -5661,6 +5845,7 @@ not applicable to version 1 or 2 dialogues.
 @item @b{Inform-Service-Center-Arg}
 @item @b{MO-Forward-SM-Arg}
 @item @b{MT-Forward-SM-Arg}
+@item @b{MT-Forward-SM-VGCS-Arg}
 @item @b{Ready-For-SM-Arg}
 @item @b{Report-SM-Delivery-Status-Arg}
 @item @b{Send-Info-For-Mo-Sms-Argument}
@@ -5678,6 +5863,7 @@ not applicable to version 1 or 2 dialogues.
 @item @b{Alert-Service-Centre-Res}
 @item @b{MO-Forward-SM-Res}
 @item @b{MT-Forward-SM-Res}
+@item @b{MT-Forward-SM-VGCS-Res}
 @item @b{Ready-For-SM-Res}
 @item @b{Report-SM-Delivery-Status-Res}
 @item @b{Send-Info-For-Mo-Sms-Result}
@@ -5804,6 +5990,22 @@ Mobile Application Service response operation to be performed.  This object is p
 An instance of the OM class has the OM attributes of its superclasses, @i{GSM-Service-Result}; it
 does not provide any attributes of its own.
 
+@node Dispatcher-List
+@subsubsection Dispatcher-List
+
+An instance of OM class @b{Dispatcher-List} represents a list of one to five ISDN dispatch
+addresses.
+
+An instance of this OM class has the OM attributes of its superclasses, @i{Object}, and additionaly
+the OM attributes listed in @tabref{118}.
+
+@tabfig{xmap_tab118,118,OM Attributes of OM class @b{Dispatcher-List}}
+
+@vtable @var
+@item dispatcher
+One to five ISDN address strings.
+@end vtable
+
 @node Inform-Service-Center-Arg
 @subsubsection Inform-Service-Center-Arg
 
@@ -5840,6 +6042,9 @@ mw-Status is a bit string with 6 to 16 bits with the following bits defined:
 @item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @item absent-Subscriber-Diagnostic-SM
 This optional attribute is used to indicate the reason why the subscribe is absent.  For the values
 for this attribute, see 3GPP TS 23.040.
@@ -5907,6 +6112,9 @@ It is an octet string between one and two hundred octets in length.
 @item extension-Container
 This optional attribute  is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @item imsi
 This attribute represents the International Mobile Subscriber Identity defined in 3GPP TS 23.003.
 The syntax of this attribute is an octet string containing a TBCD string (@pxref{String(TBCD)})
@@ -5938,6 +6146,9 @@ It is an octet string between one and two hundred octets in length.
 @item extension-Container
 This optional attribute  is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @end vtable
 
 @node MT-Forward-SM-Arg
@@ -5971,6 +6182,9 @@ send.  Its presence indicates that there are more messages.
 @item extension-Container
 This optional attribute  is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @end vtable
 
 @node MT-Forward-SM-Res
@@ -5995,7 +6209,69 @@ It is an octet string between one and two hundred octets in length.
 @item extension-Container
 This optional attribute  is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @end vtable
+
+@node MT-Forward-SM-VGCS-Arg
+@subsubsection MT-Forward-SM-VGCS-Arg
+
+An instance of OM class @b{MT-Forward-SM-VGCS-Arg} is the information supplied as an argument of a
+Mobile Application Service request operation to be performed.  This object is passed to
+@i{Service-req()} or returned from @i{Receive()}.
+
+An instance of the OM class has the OM attributes of its superclasses, @i{GSM-Service-Argument}, and
+aditionallity the OM attributes listed in @tabref{116}.
+
+@tabfig{xmap_tab116,116,OM Attributes of OM class @b{MT-Forward-SM-VGCS-Arg}}
+
+@vtable @var
+@item asci-Call-Reference
+A TBCD string of 1 to 8 octets representing the destination of the Short Message.  Digits of
+VGCS/VBS-area and Group-ID are concatenated in this order if there is a VGCS/VBS-area.
+@item sm-RP-OA
+This attribute is a @b{SM-RP-OA} object that refers to the originating adress used by the short
+message service relay sub-layer protocol.  @xref{SM-RP-OA}.
+@item sm-RP-UI
+This attribute represents the user data field carried by the short message service relay sub-layer
+protocol.
+It is an octet string between one and two hundred octets in length.
+@item extension-Container
+This optional attribute  is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.  @xref{Extension}.
+@end vtable
+
+@node MT-Forward-SM-VGCS-Res
+@subsubsection MT-Forward-SM-VGCS-Res
+
+An instance of OM class @b{MT-Forward-SM-VGCS-Res} is the information supplied as an argument of a
+Mobile Application Service response operation to be performed.  This object is passed to
+@i{Service-rsp()} or returned from @i{Receive()}.
+
+An instance of the OM class has the OM attributes of its superclasses, @i{GSM-Service-Result}, and
+aditionallity the OM attributes listed in @tabref{117}.
+
+@tabfig{xmap_tab117,117,OM Attributes of OM class @b{MT-Forward-SM-VGCS-Res}}
+
+@vtable @var
+@item sm-RP-UI
+This attribute represents the user data field carried by the short message service relay sub-layer
+protocol.
+It is an octet string between one and two hundred octets in length.
+@item dispatcher-List
+This optional attribute  is an instance of OM class @b{Dispatcher-List}.
+@xref{Dispatcher-List}.
+@item ongoing-Call
+@item extension-Container
+This optional attribute  is an instance of OM class @b{Extension-Container}.
+@xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
+@end vtable
+
 
 @node Ready-For-SM-Arg
 @subsubsection Ready-For-SM-Arg
@@ -6030,6 +6306,9 @@ This attribute indicates that the alert reason is sent to the HLR due to GPRS ac
 @item extension-Container
 This optional attribute  is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @end vtable
 
 @node Ready-For-SM-Res
@@ -6050,6 +6329,9 @@ This OM class contains the following class-specific OM attributes:
 @item extension-Container
 This optional attribute  is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @end vtable
 
 @node Report-SM-Delivery-Status-Arg
@@ -6085,6 +6367,12 @@ It can take one of the following values:
 @item absent-Subscriber-Diagnostic-SM
 This attribute is used to indicate the reason why the subscribe is absent.
 For the values for this attribute, see 3GPP TS 23.040.
+@item extension-Container
+This optional attribute  is an instance of OM class @b{Extension-Container}.
+@xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @item gprs-Support-Indicator
 This attribute indicates that the SMS-GMSC supports GPRS specific procedure of combine delivery of
 Short Message via MSC and/or via the SGSN.
@@ -6102,6 +6390,20 @@ It can take one of the following values:
 @item additional-Absent-Subscriber-Diagnostic-SM
 This attribute indicates the reason of the additional SM Delivery Outcome.
 For the values for this attribute, see 3GPP TS 23.040.
+@item ip-sm-gw-Indicator
+The @b{ip-sm-gw-Indicator} indicates y its presence that sm-Delivery-Outcome is for delivery via
+IMS.  When present, delivery-Outcome-Indicator shall be absent.
+@item ip-sm-gw-sm-Delivery-Outcome
+@itemize
+@item @b{memory-capacity-exceeded} (@samp{MAP_T_MEMORY_CAPACITY_EXCEEDED} @samp{0})
+@item @b{absent-subscriber} (@samp{MAP_T_ABSENT_SUBSCRIBER} @samp{1})
+@item @b{successful-transfer} (@samp{MAP_T_SUCCESSUL_TRANSFER} @samp{2})
+@end itemize
+If present, ip-sm-gw-sm-Delivery-Outcome is for delivery via IMS.
+Only present when ip-sm-gw-Indicator is present.
+@item ip-sm-gw-Absent-Subscriber-Diagnostic-SM is for delivery via IMS.
+If present, ip-sm-gw-sm-Absent-Subscriber-Diagnostic
+Only present when ip-sm-gw-Indicator is present.
 @end vtable
 
 @node Report-SM-Delivery-Status-Res
@@ -6127,6 +6429,9 @@ This attribute has syntax @i{String(Address)}.  @xref{String(Address)}.
 @item extension-Container
 This optional attribute  is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @end vtable
 
 @node Routing-Info-For-SM-Arg
@@ -6148,18 +6453,21 @@ This OM class contains the following class-specific OM attributes:
 This attribute refers to one of the ISDN numbers assigned to a mobile subscriber in accordance with
 ITU-T Recommendation E.213.
 This attribute has syntax @i{String(Address)}.  @xref{String(Address)}.
-@item extension-Container
-This optional attribute  is an instance of OM class @b{Extension-Container}.
-@xref{Extension-Container}.
-@item gprs-Support-Indicator
-This attribute indicates that the SMS-GMSC supports GPRS specific procedure of combine delivery of
-Short Message via MSC and/or via the SGSN.
 @item sm-RP-PRI
 This attribute is used to indicate whether or not delivery of the short message shall be attempted
 when a service centre address is already contained in the Message Waiting Data file.
 @item service-Centre-Address
 This attribute represents the address of a Short Message Service Centre.
 This attribute has syntax @i{String(Address)}.  @xref{String(Address)}.
+@item extension-Container
+This optional attribute  is an instance of OM class @b{Extension-Container}.
+@xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
+@item gprs-Support-Indicator
+This attribute indicates that the SMS-GMSC supports GPRS specific procedure of combine delivery of
+Short Message via MSC and/or via the SGSN.
 @item sm-RP-MTI
 This parameter represents the RP-Message Type Indicator of the Short Message.  It is used to
 distinguish a SM sent to the moile station in order to acknowledge an MO-SM initiated by the mobile
@@ -6184,6 +6492,11 @@ field contains 3 elements:
 @item type-of-address
 @item address-value
 @end itemize
+@item sm-Delivery-Not-Intended
+@table @asis
+@item @b{only-imsi-requested} (@samp{MAP_T_ONLY_IMSI_REQUESTED} @samp{0})
+@item @b{only-mcc-mnc-requested} (@samp{MAP_T_ONLY_MCC_MNC_REQUESTED} @samp{1})
+@end table
 @end vtable
 
 @node Routing-Info-For-SM-Res
@@ -6212,6 +6525,9 @@ information for delivery of short messages.  @xref{Location-Info-With-LMSI}.
 @item extension-Container
 This optional attribute  is an instance of OM class @b{Extension-Container}.
 @xref{Extension-Container}.
+@item extension
+This optional attribute  is an instance of OM class @b{Extension}.
+@xref{Extension}.
 @end vtable
 
 @node Send-Info-For-Mo-Sms-Argument
@@ -6888,20 +7204,26 @@ An instance of the OM class @b{System-Failure-Param} provides an object for use 
 
 @tabfig{xmap_tab068,68,OM Attributes of OM class @b{System-Failure-Param}}
 
+This OM class represents a choice and exactly one attribute must appear in an instance.
+
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item network-Resource @c (Enum(Network-Resource))
+@item network-Resource
+An enumeration identifying the failed network resource.  The enumeration can assume the following
+values:
 @table @asis
 @item @b{plmn} (@samp{MAP_T_PLMN} @samp{0})
-@item @b{hlr} (@samp{MAP_T_PLMN} @samp{1})
-@item @b{vlr} (@samp{MAP_T_PLMN} @samp{2})
-@item @b{pvlr} (@samp{MAP_T_PLMN} @samp{3})
-@item @b{controlling-msc} (@samp{MAP_T_PLMN} @samp{4})
-@item @b{vmsc} (@samp{MAP_T_PLMN} @samp{5})
-@item @b{eir} (@samp{MAP_T_PLMN} @samp{6})
-@item @b{rss} (@samp{MAP_T_PLMN} @samp{7})
+@item @b{hlr} (@samp{MAP_T_HLR} @samp{1})
+@item @b{vlr} (@samp{MAP_T_VLR} @samp{2})
+@item @b{pvlr} (@samp{MAP_T_PVLR} @samp{3})
+@item @b{controlling-msc} (@samp{MAP_T_CONTROLLING_MSC} @samp{4})
+@item @b{vmsc} (@samp{MAP_T_VMSC} @samp{5})
+@item @b{eir} (@samp{MAP_T_EIR} @samp{6})
+@item @b{rss} (@samp{MAP_T_RSS} @samp{7})
 @end table
+@item extensible-System-Failure-Param
+An object of class @b{Extensible-System-Failure-Param}.
 @end vtable
 
 @node Extensible-System-Failure-Param
@@ -6917,7 +7239,9 @@ An instance of the OM class @b{Extensible-System-Failure-Param} provides an obje
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item network-Resource @c (Enum(Network-Resource))
+@item network-Resource
+An enumeration identifying the failed network resource.  The enumeration can assume the following
+values:
 @table @asis
 @item @b{plmn} (@samp{MAP_T_PLMN} @samp{0})
 @item @b{hlr} (@samp{MAP_T_HLR} @samp{1})
@@ -6928,11 +7252,13 @@ This OM class contains the following class-specific OM attributes:
 @item @b{eir} (@samp{MAP_T_EIR} @samp{6})
 @item @b{rss} (@samp{MAP_T_RSS} @samp{7})
 @end table
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
-@item additional-Network-Resource @c (Enum(Additional-Network-Resource))
+@item additional-Network-Resource
+An enumeration identifying the additional failed network resource.  The enumeration can assume the
+following values:
 @table @asis
 @item @b{sgsn} (@samp{MAP_T_SGSN} @samp{0})
 @item @b{ggsn} (@samp{MAP_T_GGSN} @samp{1})
@@ -6956,9 +7282,9 @@ attribute of an @i{GSM-Service-Error} object when the @var{problem} value is set
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -6979,9 +7305,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -7002,12 +7328,12 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
-@item shape-Of-Location-Estimated-Not-Supported @c (Null)
-@item needed-Lcs-Capability-Not-Supported-In-Serving-Node @c (Null)
+@item shape-Of-Location-Estimated-Not-Supported
+@item needed-Lcs-Capability-Not-Supported-In-Serving-Node
 @end vtable
 
 @node Incompatible-Terminal-Param
@@ -7027,9 +7353,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -7050,9 +7376,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -7094,11 +7420,11 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
-@item unknown-Subscriber-Diagnostic @c (Enum(Unknown-Subscriber-Diagnostic))
+@item unknown-Subscriber-Diagnostic
 @table @asis
 @item @b{imsi-unknown} (@samp{MAP_T_IMSI_UNKNOWN} @samp{0})
 @item @b{gprs-subscription-unknown} (@samp{MAP_T_GPRS_SUBSCRIPTION_UNKNOWN} @samp{1})
@@ -7123,9 +7449,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7146,9 +7472,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7193,14 +7519,14 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item roaming-Not-Allowed-Cause @c (Enum(Roaming-Not-Allowed-Cause))
+@item roaming-Not-Allowed-Cause
 @table @asis
 @item @b{plmn-roaming-not-allowed} (@samp{MAP_T_PLMN_ROAMING_NOT_ALLOWED} @samp{0})
 @item @b{operator-determined-barring} (@samp{MAP_T_OPERATOR_DETERMINED_BARRING} @samp{3})
 @end table
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7221,9 +7547,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7244,9 +7570,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7267,9 +7593,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7290,9 +7616,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7329,9 +7655,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -7364,9 +7690,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7423,9 +7749,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7446,11 +7772,11 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
-@item absent-Subscriber-Reason @c (Enum(Absent-Subscriber-Reason))
+@item absent-Subscriber-Reason
 @table @asis
 @item @b{imsi-detach} (@samp{MAP_T_IMSI_DETACH} @samp{0})
 @item @b{restricted-area} (@samp{MAP_T_RESTRICTED_AREA} @samp{1})
@@ -7476,12 +7802,12 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
-@item ccbs-Possible @c (Null)
-@item ccbs-Busy @c (Null)
+@item ccbs-Possible
+@item ccbs-Busy
 @end table
 
 @node No-Subscriber-Reply-Param
@@ -7501,9 +7827,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7521,14 +7847,18 @@ additionally the OM attributes listed in
 
 @tabfig{xmap_tab089,89,OM Attributes of OM class @b{Call-Barred-Param}}
 
+This OM class represents a choice and exactly one attribute must appear in an instance.
+
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item call-Barring-Cause @c (Enum(Call-Barring-Cause))
+@item call-Barring-Cause
 @table @asis
 @item @b{barring-service-active} (@samp{MAP_T_BARRING_SERVICE_ACTIVE} @samp{0})
 @item @b{operator-barring} (@samp{MAP_T_OPERATOR_BARRING} @samp{1})
 @end table
+@item extensible-Call-Barred-Param
+An object of class @b{Extensible-Call-Barred-Param}.
 @end vtable
 
 @node Extensible-Call-Barred-Param
@@ -7548,16 +7878,16 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item call-Barring-Cause @c (Enum(Call-Barring-Cause))
+@item call-Barring-Cause
 @table @asis
 @item @b{barring-service-active} (@samp{MAP_T_BARRING_SERVICE_ACTIVE} @samp{0})
 @item @b{operator-barring} (@samp{MAP_T_OPERATOR_BARRING} @samp{1})
 @end table
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
-@item unauthorized-Message-Originator @c (Null)
+@item unauthorized-Message-Originator
 @end vtable
 
 @node Forwarding-Violation-Param
@@ -7577,9 +7907,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7600,9 +7930,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7623,16 +7953,16 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item cug-Reject-Cause @c (Enum(CUG-Reject-Cause))
+@item cug-Reject-Cause
 @table @asis
 @item @b{incoming-calls-barred-withing-cug} (@samp{MAP_T_INCOMING_CALLS_BARRED_WITHING_CUG} @samp{0})
 @item @b{subscriber-not-member-of-cug} (@samp{MAP_T_SUBSCRIBER_NOT_MEMBER_OF_CUG} @samp{1})
 @item @b{requested-basic-service-violates-cug-constraints} (@samp{MAP_T_REQUESTED_BASIC_SERVICE_VIOLATES_CUG_CONSTRAINTS} @samp{5})
 @item @b{called-party-ss-interaction-violation} (@samp{MAP_T_CALLED_PARTY_SS_INTERACTION_VIOLATION} @samp{7})
 @end table
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7653,9 +7983,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7688,9 +8018,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7745,9 +8075,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7768,9 +8098,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7832,9 +8162,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7863,9 +8193,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7886,9 +8216,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end table
 
@@ -7931,7 +8261,7 @@ This OM class contains the following class-specific OM attributes:
 
 @table @dfn
 @item ss-Code (SS-Code = String(Octet) (SIZE(1)))
-@item basic-Service @c (Object(Basic-Service-Code))
+@item basic-Service
 @item ss-Status (SS-Status = String(Octet) (SIZE(1)))
 @end table
 
@@ -7964,7 +8294,7 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension @c (Object(Extension))
+@item extension
 @end table
 
 @node Long-Term-Denial-Param
@@ -7984,7 +8314,7 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @table @dfn
-@item extension @c (Object(Extension))
+@item extension
 @end table
 
 
@@ -7998,7 +8328,7 @@ The GSM MAP Short Message service package defines the following Short Message Se
 @item @b{subscriber-busy-for-mt-sms(31)} (@samp{MAP_E_SUBSCRIBER_BUSY_FOR_MT_SMS})
 The error @var{parameter} associated with this error is an instance of OM class
 @b{Sub-Busy-For-MT-SMS-Param}, defined below.
-@item @b{sm-delivery-failure(32)} (@samp{MAP_E_SMS_DELIVERY_FAILURE})
+@item @b{sm-delivery-failure(32)} (@samp{MAP_E_SM_DELIVERY_FAILURE})
 The error @var{parameter} associated with this error is an instance of OM class
 @b{SM-Delivery-Failure-Cause}, defined below.
 @item @b{message-waiting-list-full(33)} (@samp{MAP_E_MESSAGE_WAITING_LIST_FULL})
@@ -8049,11 +8379,11 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
-@item gprs-Connection-Suspended @c (Null)
+@item gprs-Connection-Suspended
 @end vtable
 
 @node SM-Delivery-Failure-Cause
@@ -8073,7 +8403,7 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item sm-Enumerated-Delivery-Failure-Cause @c (Enum(SM-Enumerated-Delivery-Failure-Cause))
+@item sm-Enumerated-Delivery-Failure-Cause
 @table @asis
 @item @b{memory-capacity-exceeded} (@samp{MAP_T_MEMORY_CAPACITY_EXCEEDED} @samp{0})
 @item @b{equipment-protocol-error} (@samp{MAP_T_EQUIPMENT_PROTOCOL_ERROR} @samp{1})
@@ -8083,10 +8413,10 @@ This OM class contains the following class-specific OM attributes:
 @item @b{invalid-sme-address} (@samp{MAP_T_INVALID_SME_ADDRESS} @samp{5})
 @item @b{subscriber-not-sc-subscriber} (@samp{MAP_T_SUBSCRIBER_NOT_SC_SUBSCRIBER} @samp{6})
 @end table
-@item diagnostic-Info (SignalInfo = String(Octet) (SIZE(1..200)))
-@item extension-Container @c (Object(Extension-Container))
+@item diagnostic-Info
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -8107,9 +8437,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -8130,14 +8460,14 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item absent-Subscriber-Diagnostic-SM (Integer (0..255))
+@item absent-Subscriber-Diagnostic-SM
 Values are defined in 3GPP TS 23.040.
 Can be either for non-GPRS or non-GRPS.
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
-@item additional-Subscriber-Diagnostic-SM (Integer (0..255))
+@item additional-Subscriber-Diagnostic-SM
 Values are defined in 3GPP TS 23.040.
 When present, absent-Subscriber-Diagnostic-SM is for non-GRPS and this attribute is for GPRS.
 @end vtable
@@ -8171,9 +8501,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -8189,7 +8519,7 @@ The error @var{parameter} associated with this error is an instance of OM class
 @b{Unauthorized-Requesting-Network-Param}.
 @item @b{unauthorized-lcs-client(53)} (@samp{MAP_E_UNAUTHORIZED_LCS_CLIENT})
 The error @var{parameter} associated with this error is an instance of OM class
-@b{Unauthorized-CCS-Client-Param}.
+@b{Unauthorized-LCS-Client-Param}.
 @item @b{position-method-failure(54)} (@samp{MAP_E_POSITION_METHOD_FAILURE})
 The error @var{parameter} associated with this error is an instance of OM class
 @b{Position-Method-Failure-Param}.
@@ -8215,9 +8545,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -8238,7 +8568,7 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item unauthorized-LCS-Client-Diagnostic @c (Enum(Unauthorized-LCS-Client-Diagnostic))
+@item unauthorized-LCS-Client-Diagnostic
 @table @asis
 @item @b{no-additional-information} (@samp{MAP_T_NO_ADDITIONAL_INFORMATION} @samp{0})
 @item @b{client-not-in-ms-privacy-exception-list} (@samp{MAP_T_CLIENT_NOT_IN_MS_PRIVACY_EXCEPTION_LIST} @samp{1})
@@ -8249,9 +8579,9 @@ This OM class contains the following class-specific OM attributes:
 @item @b{unauthorized-call-session-unrelated-external-client} (@samp{MAP_T_UNAUTHORIZED_CALL_SESSION_UNRELATED_EXTERNAL_CLIENT} @samp{6})
 @item @b{unauthorized-call-session-related-external-client} (@samp{MAP_T_UNAUTHORIZED_CALL_SESSION_RELATED_EXTERNAL_CLIENT} @samp{7})
 @end table
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -8272,7 +8602,7 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item position-Method-Failure-Diagnostic @c (Enum(Position-Method-Failure-Diagnostic))
+@item position-Method-Failure-Diagnostic
 @table @asis
 @item @b{congestion} (@samp{MAP_T_CONGESTION} @samp{0})
 @item @b{insufficient-resources} (@samp{MAP_T_INSUFFICIENT_RESOURCES} @samp{1})
@@ -8284,9 +8614,9 @@ This OM class contains the following class-specific OM attributes:
 @item @b{position-method-not-available-in-network} (@samp{MAP_T_POSITION_METHOD_NOT_AVAILABLE_IN_NETWORK} @samp{7})
 @item @b{position-method-not-available-in-location-area} (@samp{MAP_T_POSITION_METHOD_NOT_AVAILABLE_IN_LOCATION_AREA} @samp{8})
 @end table
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -8307,9 +8637,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -8342,9 +8672,9 @@ additionally the OM attributes listed in
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item extension-Container @c (Object(Extension-Container))
+@item extension-Container
 This optional attribute is an instance of OM class @b{Extension-Container}.  @xref{Extension-Container}.
-@item extension @c (Object(Extension))
+@item extension
 This optional attribute is an instance of OM class @b{Extension}.  @xref{Extension}.
 @end vtable
 
@@ -8371,8 +8701,8 @@ the @var{problem} value is set to
 An instance of this class has all of the OM attributes of its superclasses, @i{Object}.
 
 @vtable @var
-@item security-header @c (Security-Header)
-@item protected-Payload @c (Protected-Payload)
+@item security-header
+@item protected-Payload
 @end vtable
 
 
@@ -8389,9 +8719,17 @@ An instance of this class has all of the OM attributes of its superclasses, @i{O
 @node xmap.h
 @section @file{xmap.h}
 
+@smallformat
+@verbatiminclude xmap.h
+@end smallformat
+
 @page
 @node xmap_gsm.h
 @section @file{xmap_gsm.h}
+
+@smallformat
+@verbatiminclude xmap_gsm.h
+@end smallformat
 
 @page
 @node xmap_ansi.h
@@ -8403,6 +8741,10 @@ An instance of this class has all of the OM attributes of its superclasses, @i{O
 
 @node Examples
 @appendix Examples
+
+@smallformat
+@verbatiminclude example.c
+@end smallformat
 
 @node License
 @unnumbered License

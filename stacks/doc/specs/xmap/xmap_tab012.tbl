@@ -39,5 +39,6 @@ sm-RP-OA:Object(SM-RP-OA):\(em:1:\(em
 sm-RP-UI:String(Octet):1-200:1:\(em
 more-Message-To-Send:Null:\(em:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 _
 .TE

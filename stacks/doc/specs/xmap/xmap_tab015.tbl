@@ -38,9 +38,14 @@ msisdn:String(Address):1-9:1:\(em
 service-Center-Address:String(Address):1-20:1:\(em
 sm-Delivery-Outcome:Enum(SM-Delivery-Outcome):\(em:1:\(em
 absent-Subscriber-Diagnostic-SM:Integer:\(em:0-1:\(em
+extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 gprs-Support-Indicator:Null:\(em:0-1:\(em
 delivery-Outcome-Indicator:Null:\(em:0-1:\(em
 additional-SM-Delivery-Outcome:Enum(SM-Delivery-Outcome):\(em:0-1:\(em
 additional-Absent-Subscriber-Diagnostic-SM:Integer:\(em:0-1:\(em
+ip-sm-gw-Indicator:Null:\(em:0-1:\(em
+ip-sm-gw-sm-Delivery-Outcome:Enum(SM-Delivery-Outcome):\(em:0-1:\(em
+ip-sm-gw-Absent-Subscriber-Diagnostic-SM:Integer:\(em:0-1:\(em
 _
 .TE

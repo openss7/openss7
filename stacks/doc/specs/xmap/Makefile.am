@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-12 14:52:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-03-13 11:20:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-03-12 14:52:32 $ by $Author: brian $
+# Last Modified $Date: 2009-03-13 11:20:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,6 @@ if PKG_BUILD_INDEP
 FIG_FIGS		= 
 
 TBL_TBLS		= \
-			  xmap_tabxx.tbl \
 			  xmap_tab001.tbl \
 			  xmap_tab002.tbl \
 			  xmap_tab003.tbl \
@@ -197,7 +196,10 @@ TBL_TBLS		= \
 			  xmap_tab112.tbl \
 			  xmap_tab113.tbl \
 			  xmap_tab114.tbl \
-			  xmap_tab115.tbl
+			  xmap_tab115.tbl \
+			  xmap_tab116.tbl \
+			  xmap_tab117.tbl \
+			  xmap_tab118.tbl
 
 ## PKG_BUILD_INDEP
 endif
@@ -210,6 +212,12 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.3  2009-03-13 11:20:24  brian
+## - doc and header updates
+##
+## Revision 0.9.2.2  2009-03-12 15:29:57  brian
+## - syntax corrections
+##
 ## Revision 0.9.2.1  2009-03-12 14:52:32  brian
 ## - added XMAP documentation
 ##
