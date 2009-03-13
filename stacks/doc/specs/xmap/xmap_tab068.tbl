@@ -34,6 +34,7 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-network-Resource:Enum(Network-Resource):\(em:1:\(em
+network-Resource:Enum(Network-Resource):\(em:0-1:\(em
+extensible-System-Failure-Param:Object(Extensible-System-Failure-Param):\(em:0-1:\(em
 _
 .TE

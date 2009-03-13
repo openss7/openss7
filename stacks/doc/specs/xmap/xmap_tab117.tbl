@@ -34,8 +34,10 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
+sm-RP-UI:String(Octet):1-200:0-1:\(em
+dispatcher-List:Object(Dispatcher-List):\(em:0-1:\(em
+ongoing-Call:Null:\(em:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
 extension:Object(Extension):\(em:0-1:\(em
-absent-Subscriber-Reason:Enum(Absent-Subscriber-Reason):\(em:0-1:\(em
 _
 .TE

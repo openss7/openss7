@@ -34,8 +34,10 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
+asci-Call-Reference:String(TBCD):1-8:1:\(em
+sm-RP-OA:Object(SM-RP-OA):\(em:1:\(em
+sm-RP-UI:String(Octet):1-200:1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
 extension:Object(Extension):\(em:0-1:\(em
-absent-Subscriber-Reason:Enum(Absent-Subscriber-Reason):\(em:0-1:\(em
 _
 .TE

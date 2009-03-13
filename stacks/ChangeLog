@@ -1,3 +1,54 @@
+2009-03-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/xmap/Makefile.am: doc updates
+	* doc/specs/xmap/xmap.h: doc updates
+	* doc/specs/xmap/xmap.texi: doc updates
+	* doc/specs/xmap/xmap_gsm.h: doc updates
+	* doc/specs/xmap/xmap_tab008.tbl: doc updates
+	* doc/specs/xmap/xmap_tab009.tbl: doc updates
+	* doc/specs/xmap/xmap_tab010.tbl: doc updates
+	* doc/specs/xmap/xmap_tab011.tbl: doc updates
+	* doc/specs/xmap/xmap_tab012.tbl: doc updates
+	* doc/specs/xmap/xmap_tab013.tbl: doc updates
+	* doc/specs/xmap/xmap_tab014.tbl: doc updates
+	* doc/specs/xmap/xmap_tab015.tbl: doc updates
+	* doc/specs/xmap/xmap_tab016.tbl: doc updates
+	* doc/specs/xmap/xmap_tab021.tbl: doc updates
+	* doc/specs/xmap/xmap_tab022.tbl: doc updates
+	* doc/specs/xmap/xmap_tab024.tbl: doc updates
+	* doc/specs/xmap/xmap_tab033.tbl: doc updates
+	* doc/specs/xmap/xmap_tab043.tbl: doc updates
+	* doc/specs/xmap/xmap_tab068.tbl: doc updates
+	* doc/specs/xmap/xmap_tab075.tbl: doc updates
+	* doc/specs/xmap/xmap_tab086.tbl: doc updates
+	* doc/specs/xmap/xmap_tab089.tbl: doc updates
+	* doc/specs/xmap/xmap_tab093.tbl: doc updates
+	* doc/specs/xmap/xmap_tab103.tbl: doc updates
+	* doc/specs/xmap/xmap_tab109.tbl: doc updates
+	* doc/specs/xmap/xmap_tab112.tbl: doc updates
+	* doc/specs/xmap/xmap_tab113.tbl: doc updates
+	* src/include/xmap.h: doc updates
+	* src/include/xmap_gsm.h: doc updates
+	* src/include/xmap_sms.h: doc updates
+
+	* doc/specs/xmap/example.c: added headers and tables
+	* doc/specs/xmap/xmap_tab116.tbl: added headers and tables
+	* doc/specs/xmap/xmap_tab117.tbl: added headers and tables
+	* doc/specs/xmap/xmap_tab118.tbl: added headers and tables
+	* src/include/xmap_gsm_at.h: added headers and tables
+	* src/include/xmap_gsm_ch.h: added headers and tables
+	* src/include/xmap_gsm_gc.h: added headers and tables
+	* src/include/xmap_gsm_ho.h: added headers and tables
+	* src/include/xmap_gsm_in.h: added headers and tables
+	* src/include/xmap_gsm_ls.h: added headers and tables
+	* src/include/xmap_gsm_mm.h: added headers and tables
+	* src/include/xmap_gsm_ms.h: added headers and tables
+	* src/include/xmap_gsm_om.h: added headers and tables
+	* src/include/xmap_gsm_sb.h: added headers and tables
+	* src/include/xmap_gsm_sm.h: added headers and tables
+	* src/include/xmap_gsm_ss.h: added headers and tables
+	* src/include/xmap_gsm_st.h: added headers and tables
+
 2009-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: map library documentation and impl

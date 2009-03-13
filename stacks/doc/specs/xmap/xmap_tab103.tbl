@@ -34,8 +34,8 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-ss-Code:String(Octet):1:1:\(em
-basic-Service:Object(Basic-Service-Code):\(em:1:\(em
-ss-Status:String(Octet):1:1:\(em
+ss-Code:String(Octet):1:0-1:\(em
+basic-Service:Object(Basic-Service-Code):\(em:0-1:\(em
+ss-Status:String(Octet):1:0-1:\(em
 _
 .TE

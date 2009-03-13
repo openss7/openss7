@@ -37,5 +37,6 @@ OM Attribute:Syntax:Length:Number:Initially
 imsi:String(TBCD):3-8:1:\(em
 location-Info-With-LMSI:Object(Location-Info-With-LMSI):\(em:1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 _
 .TE

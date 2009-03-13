@@ -36,5 +36,6 @@ OM Attribute:Syntax:Length:Number:Initially
 =
 msisdn:String(Address):1-9:1:\(em
 service-Center-Address:String(Address):1-20:\(em:1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 _
 .TE

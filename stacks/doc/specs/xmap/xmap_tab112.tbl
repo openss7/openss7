@@ -34,7 +34,7 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-unauthorized-LCS-Client-Diagnostic:Enum(Unauthorized-LCS-Client-Diagnostic):\(em:1:\(em
+unauthorized-LCS-Client-Diagnostic:Enum(Unauthorized-LCS-Client-Diagnostic):\(em:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
 extension:Object(Extension):\(em:0-1:\(em
 _

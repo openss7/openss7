@@ -34,7 +34,7 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-cug-Reject-Cause:Enum(CUG-Reject-Cause):\(em:1:\(em
+cug-Reject-Cause:Enum(CUG-Reject-Cause):\(em:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
 extension:Object(Extension):\(em:0-1:\(em
 _

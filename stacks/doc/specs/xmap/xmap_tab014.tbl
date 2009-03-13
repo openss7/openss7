@@ -38,5 +38,6 @@ imsi:String(TBCD):3-8:1:\(em
 alert-Reason:Enum(Alert-Reason):\(em:1:\(em
 alert-Reason-Indicator:Null:\(em:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
 _
 .TE

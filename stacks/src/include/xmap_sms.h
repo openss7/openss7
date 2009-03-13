@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmap_sms.h,v 0.9.2.2 2009-03-12 15:08:34 brian Exp $
+ @(#) $Id: xmap_sms.h,v 0.9.2.3 2009-03-13 11:20:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-12 15:08:34 $ by $Author: brian $
+ Last Modified $Date: 2009-03-13 11:20:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap_sms.h,v $
+ Revision 0.9.2.3  2009-03-13 11:20:25  brian
+ - doc and header updates
+
  Revision 0.9.2.2  2009-03-12 15:08:34  brian
  - map library doc and impl
 
@@ -63,155 +66,51 @@
 #ifndef __XMAP_SMS_H__
 #define __XMAP_SMS_H__
 
-#ident "@(#) $RCSfile: xmap_sms.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_sms.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* SMS parameters */
 
-#define MAP_SM_RP_DA				((OM_type)12001)
-#define MAP_SM_RP_OA				((OM_type)12002)
-#define MAP_MWD_STATUS				((OM_type)12003)
-#define MAP_SM_RP_UI				((OM_type)12004)
-#define MAP_SM_RP_PRI				((OM_type)12005)
-#define MAP_SM_DELIVERY_OUTCOME			((OM_type)12006)
-#define MAP_MORE_MESSAGES_TO_SEND		((OM_type)12007)
-#define MAP_ALERT_REASON			((OM_type)12008)
-#define MAP_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM	((OM_type)12009)
-#define MAP_ALERT_REASON_INDICATOR		((OM_type)12010)
-#define MAP_ADDITIONAL_SM_DELIVERY_OUTCOME	((OM_type)12011)
-#define MAP_ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM ((OM_type)12012)
-#define MAP_DELIVERY_OUTCOME_INDICATOR		((OM_type)12013)
-#define MAP_GPRS_NODE_INDICATOR			((OM_type)12014)
-#define MAP_GRPS_SUPPORT_INDICATOR		((OM_type)12015)
-#define MAP_SM_RP_MTI				((OM_type)12016)
-#define MAP_SM_RP_SMEA				((OM_type)12017)
+#define MAP_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM			((OM_type)12009)
+#define MAP_ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM		((OM_type)12012)
+#define MAP_ADDITIONAL_SM_DELIVERY_OUTCOME			((OM_type)12011)
+#define MAP_ALERT_REASON_INDICATOR				((OM_type)12010)
+#define MAP_ALERT_REASON					((OM_type)12008)
+#define MAP_DELIVERY_OUTCOME_INDICATOR				((OM_type)12013)
+#define MAP_GPRS_NODE_INDICATOR					((OM_type)12014)
+#define MAP_GPRS_SUPPORT_INDICATOR				((OM_type)12015)
+#define MAP_MORE_MESSAGES_TO_SEND				((OM_type)12007)
+#define MAP_MWD_STATUS						((OM_type)12003)
+#define MAP_SM_DELIVERY_OUTCOME					((OM_type)12006)
+#define MAP_SM_RP_DA						((OM_type)12001)
+#define MAP_SM_RP_MTI						((OM_type)12016)
+#define MAP_SM_RP_OA						((OM_type)12002)
+#define MAP_SM_RP_PRI						((OM_type)12005)
+#define MAP_SM_RP_SMEA						((OM_type)12017)
+#define MAP_SM_RP_UI						((OM_type)12004)
 
 /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
 #define MAP_C_SEND_ROUTING_INFO_FOR_SM_ARG
-/* (M) (M=) MAP_INVOKE_ID
- * (M) (M=) MAP_MS_ISDN
- * (M) (M=) MAP_SM_RP_PRI
- * (M) (M=) MAP_SERVICE_CENTRE_ADDRESS
- * (C) (C=) MAP_SM_RP_MTI
- * (C) (C=) MAP_SM_RP_SMEA
- * (C) (C=) MAP_GPRS_SUPPORT_INDICATOR
- */
-
 #define MAP_C_SEND_ROUTING_INFO_FOR_SM_RES
-/* (M=)(M=) MAP_INVOKE_ID
- * (C )(C=) MAP_IMSI
- * (C )(C=) MAP_NETWORK_NODE_NUMBER
- * (C )(C=) MAP_LMSI
- * (C )(C=) MAP_GPRS_NODE_INDICATOR
- * (C )(C=) MAP_ADDITIONAL_NUMBER
- * (C )(C=) MAP_SERVICE_USER_ERROR
- * (- )(O) MAP_SERVICE_PROVIDER_ERROR
- */
-
 /* MAP_SHORT_MSG_MO_RELAY_CONTEXT */
 #define MAP_C_MO_FORWARD_SHORT_MESSAGE_ARG
-/* (M)(M=) MAP_INVOKE_ID
- * (M)(M=) MAP_SM_RP_DA
- * (M)(M=) MAP_SM_RP_OA
- * (M)(M=) MAP_SM_RP_UI
- * (C)(C=) MAP_IMSI
- */
 #define MAP_C_MO_FORWARD_SHORT_MESSAGE_RES
-/* (M=)(M=) MAP_INVOKE_ID
- * (C )(C=) MAP_SM_RP_UI
- * (C )(C=) MAP_SERVICE_USER_ERROR
- * (- )(O) MAP_SERVICE_PROVIDER_ERROR
- */
-
 /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
 #define MAP_C_REPORT_SM_DELIVERY_STATUS_ARG
-/* (M)(M=) MAP_INVOKE_ID
- * (M)(M=) MAP_MS_ISDN
- * (M)(M=) MAP_SERVICE_CENTER_ADDRESS
- * (M)(M=) MAP_SM_DELIVERY_OUTCOME
- * (C)(C=) MAP_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM
- * (C)(C=) MAP_GPRS_SUPPORT_INDICATOR
- * (C)(C=) MAP_DELIVERY_OUTCOME_INDICATOR
- * (C)(C=) MAP_ADDITIONALSM_DELIVERY_OUTCOME
- * (C)(C=) MAP_ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM
- */
 #define MAP_C_REPORT_SM_DELIVERY_STATUS_RES
-/* (M=)(M=) MAP_INVOKE_ID
- * (C )(C=) MAP_MSISDN_ALERT
- * (C )(C=) MAP_SERVICE_USER_ERROR
- * (- )(O ) MAP_SERVICE_PROVIDER_ERROR
- */
-
 #define MAP_C_READY_FOR_SM_ARG
-/* (M)(M=) MAP_INVOKE_ID
- * (C)(C=) MAP_IMSI
- * (C)(C=) MAP_TMSI
- * (M)(M=) MAP_ALERT_REASON
- * (C)(C=) MAP_ALERT_REASON_INDICATOR
- */
 #define MAP_C_READY_FOR_SM_RES
-/* (M=)(M=) MAP_INVOKE_ID
- * (C )(C) MAP_SERVICE_USER_ERROR
- * (- )(O) MAP_SERVICE_PROVIDER_ERROR
- */
-
 /* MAP_SHORT_MSG_ALERT_CONTEXT */
 #define MAP_C_ALERT_SERVICE_CENTER_ARG
-/* (M)(M=) MAP_INVOKE_ID
- * (M)(M=) MAP_MSISDN_ALERT
- * (M)(M=) MAP_SERVICE_CENTER_ADDRESS
- */
 #define MAP_C_ALERT_SERVICE_CENTER_RES
-/* (M=)(M=) MAP_INVOKE_ID
- * (C )(C=) MAP_SERVICE_USER_ERROR
- * (- )(O) MAP_SERVICE_PROVIDER_ERROR
- */
-
 /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
 #define MAP_C_INFORM_SERVICE_CENTER_ARG
-/* (M)(M=) MAP_INVOKE_ID
- * (C)(C=) MAP_MSISDN_ALERT
- * (C)(C=) MAP_MWD_STATUS
- * (C)(C=) MAP_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM
- * (C)(C=) MAP_ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM
- */
-
 #define MAP_C_SEND_INFO_FOR_MT_SMS_ARG
-/* (M)(M=) MAP_INVOKE_ID
- * (M)(M=) MAP_SM_RP_DA
- * (C)(C ) MAP_IMSI
- */
 #define MAP_C_SEND_INFO_FOR_MT_SMS_RES
-/* (M=)(M=) MAP_INVOKE_ID
- * (C )(C=) MAP_MS_ISDN
- * (C )(C=) MAP_SERVICE_USER_ERROR
- * (- )(O) MAP_SERVICE_PROVIDER_ERROR
- */
-
 #define MAP_C_SEND_INFO_FOR_MO_SMS_ARG
-/* (M)(M=) MAP_INVOKE_ID
- * (M)(M=) MAP_SERVICE_CENTER_ADDRESS
- */
 #define MAP_C_SEND_INFO_FOR_MO_SMS_RES
-/* (M=)(M=) MAP_INVOKE_ID
- * (C )(C=) MAP_MS_ISDN
- * (C )(C=) MAP_SERVICE_USER_ERROR
- * (- )(O ) MAP_SERVICE_PROVIDER_ERROR
- */
-
 /* MAP_SHORT_MSG_MT_RELAY_CONTEXT */
 #define MAP_C_MT_FORWARD_SHORT_MESSAGE_ARG
-/* (M)(M=) MAP_INVOKE_ID
- * (M)(M=) MAP_SM_RP_DA
- * (M)(M=) MAP_SM_RP_OA
- * (M)(M=) MAP_SM_RP_UI
- * (C)(C=) MAP_MORE_MESSAGES_TO_SEND
- */
 #define MAP_C_MT_FORWARD_SHORT_MESSAGE_RES
-/* (M=)(M=) MAP_INVOKE_ID
- * (C )(C=) MAP_SM_RP_UI
- * (C )(C=) MAP_SERVICE_USER_ERROR
- * (- )(O) MAP_SERVICE_PROVIDER_ERROR
- */
 
 /* primitive types */
 #define MAP_P_SEND_ROUTING_INFO_FOR_SM_IND	((OM_sint) 1)

@@ -34,7 +34,7 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-position-Method-Failure-Diagnostic:Enum(Position-Method-Failure-Diagnostic):\(em:1:\(em
+position-Method-Failure-Diagnostic:Enum(Position-Method-Failure-Diagnostic):\(em:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
 extension:Object(Extension):\(em:0-1:\(em
 _
