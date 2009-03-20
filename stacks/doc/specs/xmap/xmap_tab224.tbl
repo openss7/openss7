@@ -1,0 +1,59 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+center expand tab(:);
+lblblblblb
+lblblblblb
+lllll.
+_
+:Value:Value:Value:Value
+OM Attribute:Syntax:Length:Number:Initially
+=
+imsi:String(TBCD):3-8:1:\(em
+basic-Service-List:Object(Basic-Serivce-List):\(em:0-1:\(em
+ss-List:Object(SS-List):\(em:0-1:\(em
+roaming-Restriction:Null:\(em:0-1:\(em
+regional-Subscription-Identifier:String(Octet):2:0-1:\(em
+vbs-Group-Indication:Null:\(em:0-1:\(em
+vgcs-Group-Indication:Null:\(em:0-1:\(em
+camel-Subscription-Info-Withdraw:Null:\(em:0-1:\(em
+extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
+gprs-Subscription-Data-Withdraw:Object(GPRS-Subscription-Data-Withdraw):\(em:0-1:\(em
+roaming-Restricted-In-Sgsn:Null:\(em:0-1:\(em
+lsa-Information-Withdraw:Object(LSA-Information-Withdraw):\(em:0-1:\(em
+gmlc-List-Withdraw:Null:\(em:0-1:\(em
+ist-Information-Withdraw:Null:\(em:0-1:\(em
+specific-CSI-Withdraw:String(Bit):14:0-1:\(em
+charging-Characteristics-Withdraw:Null:\(em:0-1:\(em
+stn-sr-Withdraw:Null:\(em:0-1:\(em
+eps-Subscription-Data-Withdraw:Object(EPS-Subscription-Data-Withdraw):\(em:0-1:\(em
+apn-oi-replacement-Withdraw:Null:\(em:0-1:\(em
+csg-Subscription-Deleted:Null:\(em:0-1:\(em
+_
+.TE

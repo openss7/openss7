@@ -1,0 +1,69 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+center expand tab(:);
+lblblblblb
+lblblblblb
+lllll.
+_
+:Value:Value:Value:Value
+OM Attribute:Syntax:Length:Number:Initially
+=
+msisdn:String(Address):1-9:1:\(em
+cug-Check-Info:Object(CUG-Check-Info):\(em:0-1:\(em
+number-Of-Forwarding:Integer:1-5:0-1:\(em
+interrogation-Type:Enum(Interrogation-Type):\(em:0-1:\(em
+or-Interrogation:Null:\(em:0-1:\(em
+or-Capability:Integer:1-127:0-1:\(em
+gmsc-Or-gsmSCF-Address:String(Address):1-9:0-1:\(em
+call-Reference-Number:String(Octet):1-8:0-1:\(em
+forwarding-Reason:Enum(Forwarding-Reason):\(em:0-1:\(em
+basic-Service-Group:Object(Ext-Basic-Service-Code):\(em:0-1:\(em
+network-Signal-Info:Object(External-Signal-Info):\(em:0-1:\(em
+camel-Info:Object(Camel-Info):\(em:0-1:\(em
+suppression-Of-Announcement:Null:\(em:0-1:\(em
+extension-Container:Object(Extension-Container):\(em:0-1:\(em
+extension:Object(Extension):\(em:0-1:\(em
+alerting-Pattern:String(Octet):1:0-1:\(em
+ccbs-Call:Null:\(em:0-1:\(em
+supported-CCBS-Phase:Integer:1-127:0-1:\(em
+additional-Signal-Info:Object(Ext-External-Signal-Info):\(em:0-1:\(em
+ist-Support-Indicator:Enum(IST-Support-Indicator):\(em:0-1:\(em
+pre-Paging-Supported:Null:\(em:0-1:\(em
+call-Diversion-Treatment-Indicator:String(Octet):1:0-1:\(em
+long-FTN-Supported:Null:\(em:0-1:\(em
+suppress-VT-CSI:Null:\(em:0-1:\(em
+suppress-Incoming-Call-Barring:Null:\(em:0-1:\(em
+gsmSCF-Initiated-Call:Null:\(em:0-1:\(em
+basic-Service-Group-2:Object(Ext-Basic-Service-Code):\(em:0-1:\(em
+network-Signal-Info-2:Object(External-Signal-Info):\(em:0-1:\(em
+suppress-MT-SS:Enum(Suppress-MT-SS):\(em:0-1:\(em
+mt-Roaming-Retry-Supported:Null:\(em:0-1:\(em
+call-Priority:Integer:0-15:0-1:\(em
+_
+.TE
