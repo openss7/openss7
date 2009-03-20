@@ -37,7 +37,7 @@ OM Attribute:Syntax:Length:Number:Initially
 sm-RP-DA:Object(SM-RP-DA):\(em:1:\(em
 sm-RP-OA:Object(SM-RP-OA):\(em:1:\(em
 sm-RP-UI:String(Octet):1-200:1:\(em
-more-Message-To-Send:Null:\(em:0-1:\(em
+more-Messages-To-Send:Null:\(em:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
 extension:Object(Extension):\(em:0-1:\(em
 _

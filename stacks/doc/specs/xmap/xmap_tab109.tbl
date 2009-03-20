@@ -37,6 +37,6 @@ OM Attribute:Syntax:Length:Number:Initially
 absent-Subscriber-Diagnostic-SM:Integer:0-255:0-1:\(em
 extension-Container:Object(Extension-Container):\(em:0-1:\(em
 extension:Object(Extension):\(em:0-1:\(em
-additional-Subscriber-Diagnostic-SM:Integer:0-255:0-1:\(em
+additional-Absent-Subscriber-Diagnostic-SM:Integer:0-255:0-1:\(em
 _
 .TE

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmap_gsm_in.h,v 0.9.2.1 2009-03-13 11:20:25 brian Exp $
+ @(#) $Id: xmap_gsm_in.h,v 0.9.2.2 2009-03-20 18:27:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-13 11:20:25 $ by $Author: brian $
+ Last Modified $Date: 2009-03-20 18:27:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap_gsm_in.h,v $
+ Revision 0.9.2.2  2009-03-20 18:27:40  brian
+ - documentation and headers
+
  Revision 0.9.2.1  2009-03-13 11:20:25  brian
  - doc and header updates
 
@@ -60,7 +63,7 @@
 #ifndef __XMAP_GSM_IN_H__
 #define __XMAP_GSM_IN_H__
 
-#ident "@(#) $RCSfile: xmap_gsm_in.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_gsm_in.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
@@ -87,12 +90,14 @@
 #define MAP_E_UNIDENTIFIED_SUBSCRIBER				mapP_problem( 5)
 #define MAP_E_UNKNOWN_EQUIPMENT					mapP_problem( 7)
 
+#if 0
 /* MAP_T_Unknown_Subscriber_Diagnostic: */
 typedef enum {
 	MAP_T_IMSI_UNKNOWN = 0,
 	MAP_T_GPRS_SUBSCRIPTION_UNKNOWN,
 	MAP_T_NPDB_MISMATCH,
 } MAP_T_Unknown_Subscriber_Diagnostic;
+#endif
 
 #endif				/* __XMAP_GSM_IN_H__ */
 

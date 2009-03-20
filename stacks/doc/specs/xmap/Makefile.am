@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-03-13 11:20:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-03-20 18:27:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-03-13 11:20:24 $ by $Author: brian $
+# Last Modified $Date: 2009-03-20 18:27:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,6 +82,7 @@ if PKG_BUILD_INDEP
 FIG_FIGS		= 
 
 TBL_TBLS		= \
+			  xmap_tabxxx.tbl \
 			  xmap_tab001.tbl \
 			  xmap_tab002.tbl \
 			  xmap_tab003.tbl \
@@ -199,7 +200,334 @@ TBL_TBLS		= \
 			  xmap_tab115.tbl \
 			  xmap_tab116.tbl \
 			  xmap_tab117.tbl \
-			  xmap_tab118.tbl
+			  xmap_tab118.tbl \
+			  xmap_tab119.tbl \
+			  xmap_tab120.tbl \
+			  xmap_tab121.tbl \
+			  xmap_tab122.tbl \
+			  xmap_tab123.tbl \
+			  xmap_tab124.tbl \
+			  xmap_tab125.tbl \
+			  xmap_tab126.tbl \
+			  xmap_tab127.tbl \
+			  xmap_tab128.tbl \
+			  xmap_tab129.tbl \
+			  xmap_tab130.tbl \
+			  xmap_tab131.tbl \
+			  xmap_tab132.tbl \
+			  xmap_tab133.tbl \
+			  xmap_tab134.tbl \
+			  xmap_tab135.tbl \
+			  xmap_tab136.tbl \
+			  xmap_tab137.tbl \
+			  xmap_tab138.tbl \
+			  xmap_tab139.tbl \
+			  xmap_tab140.tbl \
+			  xmap_tab141.tbl \
+			  xmap_tab142.tbl \
+			  xmap_tab143.tbl \
+			  xmap_tab144.tbl \
+			  xmap_tab145.tbl \
+			  xmap_tab146.tbl \
+			  xmap_tab147.tbl \
+			  xmap_tab148.tbl \
+			  xmap_tab149.tbl \
+			  xmap_tab150.tbl \
+			  xmap_tab151.tbl \
+			  xmap_tab152.tbl \
+			  xmap_tab153.tbl \
+			  xmap_tab154.tbl \
+			  xmap_tab155.tbl \
+			  xmap_tab156.tbl \
+			  xmap_tab157.tbl \
+			  xmap_tab158.tbl \
+			  xmap_tab159.tbl \
+			  xmap_tab160.tbl \
+			  xmap_tab161.tbl \
+			  xmap_tab162.tbl \
+			  xmap_tab163.tbl \
+			  xmap_tab164.tbl \
+			  xmap_tab165.tbl \
+			  xmap_tab166.tbl \
+			  xmap_tab167.tbl \
+			  xmap_tab168.tbl \
+			  xmap_tab169.tbl \
+			  xmap_tab170.tbl \
+			  xmap_tab171.tbl \
+			  xmap_tab172.tbl \
+			  xmap_tab173.tbl \
+			  xmap_tab174.tbl \
+			  xmap_tab175.tbl \
+			  xmap_tab176.tbl \
+			  xmap_tab177.tbl \
+			  xmap_tab178.tbl \
+			  xmap_tab179.tbl \
+			  xmap_tab180.tbl \
+			  xmap_tab181.tbl \
+			  xmap_tab182.tbl \
+			  xmap_tab183.tbl \
+			  xmap_tab184.tbl \
+			  xmap_tab185.tbl \
+			  xmap_tab186.tbl \
+			  xmap_tab187.tbl \
+			  xmap_tab188.tbl \
+			  xmap_tab189.tbl \
+			  xmap_tab190.tbl \
+			  xmap_tab191.tbl \
+			  xmap_tab192.tbl \
+			  xmap_tab193.tbl \
+			  xmap_tab194.tbl \
+			  xmap_tab195.tbl \
+			  xmap_tab196.tbl \
+			  xmap_tab197.tbl \
+			  xmap_tab198.tbl \
+			  xmap_tab199.tbl \
+			  xmap_tab200.tbl \
+			  xmap_tab201.tbl \
+			  xmap_tab202.tbl \
+			  xmap_tab203.tbl \
+			  xmap_tab204.tbl \
+			  xmap_tab205.tbl \
+			  xmap_tab206.tbl \
+			  xmap_tab207.tbl \
+			  xmap_tab208.tbl \
+			  xmap_tab209.tbl \
+			  xmap_tab210.tbl \
+			  xmap_tab211.tbl \
+			  xmap_tab212.tbl \
+			  xmap_tab213.tbl \
+			  xmap_tab214.tbl \
+			  xmap_tab215.tbl \
+			  xmap_tab216.tbl \
+			  xmap_tab217.tbl \
+			  xmap_tab218.tbl \
+			  xmap_tab219.tbl \
+			  xmap_tab220.tbl \
+			  xmap_tab221.tbl \
+			  xmap_tab222.tbl \
+			  xmap_tab223.tbl \
+			  xmap_tab224.tbl \
+			  xmap_tab225.tbl \
+			  xmap_tab226.tbl \
+			  xmap_tab227.tbl \
+			  xmap_tab228.tbl \
+			  xmap_tab229.tbl \
+			  xmap_tab230.tbl \
+			  xmap_tab231.tbl \
+			  xmap_tab232.tbl \
+			  xmap_tab233.tbl \
+			  xmap_tab234.tbl \
+			  xmap_tab235.tbl \
+			  xmap_tab236.tbl \
+			  xmap_tab237.tbl \
+			  xmap_tab238.tbl \
+			  xmap_tab239.tbl \
+			  xmap_tab240.tbl \
+			  xmap_tab241.tbl \
+			  xmap_tab242.tbl \
+			  xmap_tab243.tbl \
+			  xmap_tab244.tbl \
+			  xmap_tab245.tbl \
+			  xmap_tab246.tbl \
+			  xmap_tab247.tbl \
+			  xmap_tab248.tbl \
+			  xmap_tab249.tbl \
+			  xmap_tab250.tbl \
+			  xmap_tab251.tbl \
+			  xmap_tab252.tbl \
+			  xmap_tab253.tbl \
+			  xmap_tab254.tbl \
+			  xmap_tab255.tbl \
+			  xmap_tab256.tbl \
+			  xmap_tab257.tbl \
+			  xmap_tab258.tbl \
+			  xmap_tab259.tbl \
+			  xmap_tab260.tbl \
+			  xmap_tab261.tbl \
+			  xmap_tab262.tbl \
+			  xmap_tab263.tbl \
+			  xmap_tab264.tbl \
+			  xmap_tab265.tbl \
+			  xmap_tab266.tbl \
+			  xmap_tab267.tbl \
+			  xmap_tab268.tbl \
+			  xmap_tab269.tbl \
+			  xmap_tab270.tbl \
+			  xmap_tab271.tbl \
+			  xmap_tab272.tbl \
+			  xmap_tab273.tbl \
+			  xmap_tab274.tbl \
+			  xmap_tab275.tbl \
+			  xmap_tab276.tbl \
+			  xmap_tab277.tbl \
+			  xmap_tab278.tbl \
+			  xmap_tab279.tbl \
+			  xmap_tab280.tbl \
+			  xmap_tab281.tbl \
+			  xmap_tab282.tbl \
+			  xmap_tab283.tbl \
+			  xmap_tab284.tbl \
+			  xmap_tab285.tbl \
+			  xmap_tab286.tbl \
+			  xmap_tab287.tbl \
+			  xmap_tab288.tbl \
+			  xmap_tab289.tbl \
+			  xmap_tab290.tbl \
+			  xmap_tab291.tbl \
+			  xmap_tab292.tbl \
+			  xmap_tab293.tbl \
+			  xmap_tab294.tbl \
+			  xmap_tab295.tbl \
+			  xmap_tab296.tbl \
+			  xmap_tab297.tbl \
+			  xmap_tab298.tbl \
+			  xmap_tab299.tbl \
+			  xmap_tab300.tbl \
+			  xmap_tab301.tbl \
+			  xmap_tab302.tbl \
+			  xmap_tab303.tbl \
+			  xmap_tab304.tbl \
+			  xmap_tab305.tbl \
+			  xmap_tab306.tbl \
+			  xmap_tab307.tbl \
+			  xmap_tab308.tbl \
+			  xmap_tab309.tbl \
+			  xmap_tab310.tbl \
+			  xmap_tab311.tbl \
+			  xmap_tab312.tbl \
+			  xmap_tab313.tbl \
+			  xmap_tab314.tbl \
+			  xmap_tab315.tbl \
+			  xmap_tab316.tbl \
+			  xmap_tab317.tbl \
+			  xmap_tab318.tbl \
+			  xmap_tab319.tbl \
+			  xmap_tab320.tbl \
+			  xmap_tab321.tbl \
+			  xmap_tab322.tbl \
+			  xmap_tab323.tbl \
+			  xmap_tab324.tbl \
+			  xmap_tab325.tbl \
+			  xmap_tab326.tbl \
+			  xmap_tab327.tbl \
+			  xmap_tab328.tbl \
+			  xmap_tab329.tbl \
+			  xmap_tab330.tbl \
+			  xmap_tab331.tbl \
+			  xmap_tab332.tbl \
+			  xmap_tab333.tbl \
+			  xmap_tab334.tbl \
+			  xmap_tab335.tbl \
+			  xmap_tab336.tbl \
+			  xmap_tab337.tbl \
+			  xmap_tab338.tbl \
+			  xmap_tab339.tbl \
+			  xmap_tab340.tbl \
+			  xmap_tab341.tbl \
+			  xmap_tab342.tbl \
+			  xmap_tab343.tbl \
+			  xmap_tab344.tbl \
+			  xmap_tab345.tbl \
+			  xmap_tab346.tbl \
+			  xmap_tab347.tbl \
+			  xmap_tab348.tbl \
+			  xmap_tab349.tbl \
+			  xmap_tab350.tbl \
+			  xmap_tab351.tbl \
+			  xmap_tab352.tbl \
+			  xmap_tab353.tbl \
+			  xmap_tab354.tbl \
+			  xmap_tab355.tbl \
+			  xmap_tab356.tbl \
+			  xmap_tab357.tbl \
+			  xmap_tab358.tbl \
+			  xmap_tab359.tbl \
+			  xmap_tab360.tbl \
+			  xmap_tab361.tbl \
+			  xmap_tab362.tbl \
+			  xmap_tab363.tbl \
+			  xmap_tab364.tbl \
+			  xmap_tab365.tbl \
+			  xmap_tab366.tbl \
+			  xmap_tab367.tbl \
+			  xmap_tab368.tbl \
+			  xmap_tab369.tbl \
+			  xmap_tab370.tbl \
+			  xmap_tab371.tbl \
+			  xmap_tab372.tbl \
+			  xmap_tab373.tbl \
+			  xmap_tab374.tbl \
+			  xmap_tab375.tbl \
+			  xmap_tab376.tbl \
+			  xmap_tab377.tbl \
+			  xmap_tab378.tbl \
+			  xmap_tab379.tbl \
+			  xmap_tab380.tbl \
+			  xmap_tab381.tbl \
+			  xmap_tab382.tbl \
+			  xmap_tab383.tbl \
+			  xmap_tab384.tbl \
+			  xmap_tab385.tbl \
+			  xmap_tab386.tbl \
+			  xmap_tab387.tbl \
+			  xmap_tab388.tbl \
+			  xmap_tab389.tbl \
+			  xmap_tab390.tbl \
+			  xmap_tab391.tbl \
+			  xmap_tab392.tbl \
+			  xmap_tab393.tbl \
+			  xmap_tab394.tbl \
+			  xmap_tab395.tbl \
+			  xmap_tab396.tbl \
+			  xmap_tab397.tbl \
+			  xmap_tab398.tbl \
+			  xmap_tab399.tbl \
+			  xmap_tab400.tbl \
+			  xmap_tab401.tbl \
+			  xmap_tab402.tbl \
+			  xmap_tab403.tbl \
+			  xmap_tab404.tbl \
+			  xmap_tab405.tbl \
+			  xmap_tab406.tbl \
+			  xmap_tab407.tbl \
+			  xmap_tab408.tbl \
+			  xmap_tab409.tbl \
+			  xmap_tab410.tbl \
+			  xmap_tab411.tbl \
+			  xmap_tab412.tbl \
+			  xmap_tab413.tbl \
+			  xmap_tab414.tbl \
+			  xmap_tab415.tbl \
+			  xmap_tab416.tbl \
+			  xmap_tab417.tbl \
+			  xmap_tab418.tbl \
+			  xmap_tab419.tbl \
+			  xmap_tab420.tbl \
+			  xmap_tab421.tbl \
+			  xmap_tab422.tbl \
+			  xmap_tab423.tbl \
+			  xmap_tab424.tbl \
+			  xmap_tab425.tbl \
+			  xmap_tab426.tbl \
+			  xmap_tab427.tbl \
+			  xmap_tab428.tbl \
+			  xmap_tab429.tbl \
+			  xmap_tab430.tbl \
+			  xmap_tab431.tbl \
+			  xmap_tab432.tbl \
+			  xmap_tab433.tbl \
+			  xmap_tab434.tbl \
+			  xmap_tab435.tbl \
+			  xmap_tab436.tbl \
+			  xmap_tab437.tbl \
+			  xmap_tab438.tbl \
+			  xmap_tab439.tbl \
+			  xmap_tab440.tbl \
+			  xmap_tab441.tbl \
+			  xmap_tab442.tbl \
+			  xmap_tab443.tbl \
+			  xmap_tab444.tbl \
+			  xmap_tab445.tbl
 
 ## PKG_BUILD_INDEP
 endif
@@ -212,6 +540,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.4  2009-03-20 18:27:39  brian
+## - documentation and headers
+##
 ## Revision 0.9.2.3  2009-03-13 11:20:24  brian
 ## - doc and header updates
 ##

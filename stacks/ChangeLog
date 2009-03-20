@@ -1,3 +1,22 @@
+2009-03-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/xmap/.cvsignore: documentation and headers
+	* doc/specs/xmap/Makefile.am: documentation and headers
+	* doc/specs/xmap/xmap.texi: documentation and headers
+	* doc/specs/xmap/xmap_tab012.tbl: documentation and headers
+	* doc/specs/xmap/xmap_tab109.tbl: documentation and headers
+	* src/include/xmap.h: documentation and headers
+	* src/include/xmap_gsm.h: documentation and headers
+	* src/include/xmap_gsm_ch.h: documentation and headers
+	* src/include/xmap_gsm_gc.h: documentation and headers
+	* src/include/xmap_gsm_in.h: documentation and headers
+	* src/include/xmap_gsm_ls.h: documentation and headers
+	* src/include/xmap_gsm_ms.h: documentation and headers
+	* src/include/xmap_gsm_om.h: documentation and headers
+	* src/include/xmap_gsm_sb.h: documentation and headers
+	* src/include/xmap_gsm_sm.h: documentation and headers
+	* src/include/xmap_gsm_ss.h: documentation and headers
+
 2009-03-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/specs/xmap/Makefile.am: doc updates
