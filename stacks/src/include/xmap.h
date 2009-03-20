@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmap.h,v 0.9.2.4 2009-03-13 11:20:25 brian Exp $
+ @(#) $Id: xmap.h,v 0.9.2.5 2009-03-20 18:27:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-13 11:20:25 $ by $Author: brian $
+ Last Modified $Date: 2009-03-20 18:27:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap.h,v $
+ Revision 0.9.2.5  2009-03-20 18:27:40  brian
+ - documentation and headers
+
  Revision 0.9.2.4  2009-03-13 11:20:25  brian
  - doc and header updates
 
@@ -66,7 +69,7 @@
 #ifndef __XMAP_H__
 #define __XMAP_H__
 
-#ident "@(#) $RCSfile: xmap.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * The <xmap.h> header declares the inteface functions, the structures passed to
@@ -124,40 +127,53 @@
  *
  * OM_IMPORT(MAP_C_RESULT)
  */
-
 #define OMP_O_MAP_C_ABORT_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
-#define OMP_O_MAP_C_ABORT_RESULT		mapP_comn(\x87\x6A)	/* 1002 */
-#define OMP_O_MAP_C_ACCEPT_RESULT		mapP_comn(\x87\x6B)	/* 1003 */
-#define OMP_O_MAP_C_ACSE_ARGS			mapP_comn(\x87\x6C)	/* 1004 */
-#define OMP_O_MAP_C_ADDRESS			mapP_comn(\x87\x6D)	/* 1005 */
-#define OMP_O_MAP_C_APPLICATION_CONTEXT_LIST	mapP_comn(\x87\x6E)	/* 1006 */
-#define OMP_O_MAP_C_ASSOC_ARGUMENT		mapP_comn(\x87\x6F)	/* 1007 */
-#define OMP_O_MAP_C_ASSOC_RESULT		mapP_comn(\x87\x70)	/* 1008 */
-#define OMP_O_MAP_C_BAD_ARGUMENT		mapP_comn(\x87\x71)	/* 1009 */
-#define OMP_O_MAP_C_CLOSE_ARGUMENT		mapP_comn(\x87\x72)	/* 1010 */
-#define OMP_O_MAP_C_CONTEXT			mapP_comn(\x87\x73)	/* 1011 */
-#define OMP_O_MAP_C_ERROR			mapP_comn(\x87\x74)	/* 1012 */
-#define OMP_O_MAP_C_EXTENSION			mapP_comn(\x87\x75)	/* 1013 */
-#define OMP_O_MAP_C_MAP_ASSOC_ARGS		mapP_comn(\x87\x76)	/* 1014 */
-#define OMP_O_MAP_C_NOTICE_RESULT		mapP_comn(\x87\x77)	/* 1015 */
-#define OMP_O_MAP_C_OPEN_ARGUMENT		mapP_comn(\x87\x78)	/* 1016 */
-#define OMP_O_MAP_C_OPERATION_ARGUMENT		mapP_comn(\x87\x79)	/* 1017 */
-#define OMP_O_MAP_C_OPERATION_ERROR		mapP_comn(\x87\x7A)	/* 1018 */
-#define OMP_O_MAP_C_OPERATION_REJECT		mapP_comn(\x87\x7B)	/* 1019 */
-#define OMP_O_MAP_C_OPERATION_RESULT		mapP_comn(\x87\x7C)	/* 1020 */
-#define OMP_O_MAP_C_P_ABORT_RESULT		mapP_comn(\x87\x7D)	/* 1021 */
-#define OMP_O_MAP_C_PRESENTATION_CONTEXT	mapP_comn(\x87\x7E)	/* 1022 */
-#define OMP_O_MAP_C_PRESENTATION_LAYER_ARGS	mapP_comn(\x87\x7F)	/* 1023 */
-#define OMP_O_MAP_C_REFUSE_RESULT		mapP_comn(\x88\x00)	/* 1024 */
-#define OMP_O_MAP_C_RELEASE_ARGUMENT		mapP_comn(\x88\x01)	/* 1025 */
-#define OMP_O_MAP_C_RELEASE_RESULT		mapP_comn(\x88\x02)	/* 1026 */
-#define OMP_O_MAP_C_SERVICE_ARGUMENT		mapP_comn(\x88\x03)	/* 1027 */
-#define OMP_O_MAP_C_SERVICE_RESULT		mapP_comn(\x88\x04)	/* 1028 */
-#define OMP_O_MAP_C_SESSION			mapP_comn(\x88\x05)	/* 1029 */
-#define OMP_O_MAP_C_TITLE			mapP_comn(\x88\x06)	/* 1030 */
+#define OMP_O_MAP_C_ABORT_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ACCEPT_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ACSE_ARGS			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ADDRESS			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_APPLICATION_CONTEXT_LIST	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ASSOC_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ASSOC_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_CLOSE_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_CONTEXT			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_EXTENSION			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_GENERIC_SERVICE_ARGUMENT	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_GENERIC_SERVICE_RESULT	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_MAP_ASSOC_ARGS		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_NOTICE_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPEN_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPERATION_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPERATION_ERROR		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPERATION_REJECT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPERATION_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_P_ABORT_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_PRESENTATION_CONTEXT	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_PRESENTATION_LAYER_ARGS	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_REFUSE_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_RELEASE_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_RELEASE_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SERVICE_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SERVICE_ERROR		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SERVICE_REJECT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SERVICE_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SESSION			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_TITLE			mapP_comn(\x87\x69)	/* 1001 */
 
-#define OMP_O_MAP_C_PROPRIETARY_ARGS		mapP_comn(\x88\x10)	/* 1040 */
+#define OMP_O_MAP_C_PROPRIETARY_ARGS		mapP_comn(\x87\x69)	/* 1001 */
 
+/* Error classes: */
+#define OMP_O_MAP_C_BAD_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ERROR			mapP_comn(\x87\x69)	/* 1001 */
+
+/* Error attributes: */
+#define MAP_A_OM_ATTRIBUTE						((OM_type)10021)
+#define MAP_A_OM_BAD_ARGUMENT						((OM_type)10022)
+#define MAP_A_OM_CLASS							((OM_type)10023)
+#define MAP_A_OM_INDEX							((OM_type)10024)
+#define MAP_A_OM_SUBOBJECT						((OM_type)10025)
+#define MAP_A_PARAMETER							((OM_type)10026)
+#define MAP_A_PROBLEM							((OM_type)10028)
 
 /* The OM syntax names that are defined are listed below. */
 #define MAP_S_TBCD_STRING		((OM_syntax) 32)

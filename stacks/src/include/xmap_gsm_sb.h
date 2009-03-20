@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmap_gsm_sb.h,v 0.9.2.1 2009-03-13 11:20:25 brian Exp $
+ @(#) $Id: xmap_gsm_sb.h,v 0.9.2.2 2009-03-20 18:27:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-13 11:20:25 $ by $Author: brian $
+ Last Modified $Date: 2009-03-20 18:27:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap_gsm_sb.h,v $
+ Revision 0.9.2.2  2009-03-20 18:27:41  brian
+ - documentation and headers
+
  Revision 0.9.2.1  2009-03-13 11:20:25  brian
  - doc and header updates
 
@@ -60,7 +63,7 @@
 #ifndef __XMAP_GSM_SB_H__
 #define __XMAP_GSM_SB_H__
 
-#ident "@(#) $RCSfile: xmap_gsm_sb.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_gsm_sb.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
@@ -104,11 +107,13 @@
 #define MAP_E_BEARER_SERVICE_NOT_PROVISIONED			mapP_problem(10)
 #define MAP_E_TELESERVICE_NOT_PROVISIONED			mapP_problem(11)
 
-/* MAP_T_Roaming_Not_Allowed: */
+#if 0
+/* MAP_T_Roaming_Not_Allowed_Cause: */
 typedef enum {
 	MAP_T_PLMN_ROAMING_NOT_ALLOWED = 0,
 	MAP_T_OPERATOR_DETERMINED_BARRING = 3,
-} MAP_T_Roaming_Not_Allowed;
+} MAP_T_Roaming_Not_Allowed_Cause;
+#endif
 
 
 #endif				/* __XMAP_GSM_SB_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmap_gsm_sm.h,v 0.9.2.1 2009-03-13 11:20:25 brian Exp $
+ @(#) $Id: xmap_gsm_sm.h,v 0.9.2.2 2009-03-20 18:27:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-13 11:20:25 $ by $Author: brian $
+ Last Modified $Date: 2009-03-20 18:27:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap_gsm_sm.h,v $
+ Revision 0.9.2.2  2009-03-20 18:27:41  brian
+ - documentation and headers
+
  Revision 0.9.2.1  2009-03-13 11:20:25  brian
  - doc and header updates
 
@@ -60,45 +63,67 @@
 #ifndef __XMAP_GSM_SM_H__
 #define __XMAP_GSM_SM_H__
 
-#ident "@(#) $RCSfile: xmap_gsm_sm.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_gsm_sm.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
+
+#include <xom.h>
+#include <xmap.h>
+#include <xmap_gsm.h>
 
 /*
  * { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
- *   xom-packages(1) xmap(1) gsm(2) gsm-sm(9) }
+ *   xom-packages(1) xmap(1) gsm(2) gsm-sm(5) }
  */
 #define OMP_O_MAP_GSM_SM_PKG \
-    "\x2b\x06\x01\x04\x01\x81\xe7\x17\x01\x01\x02\x09"
+    "\x2b\x06\x01\x04\x01\x81\xe7\x17\x01\x01\x02\x05"
 
 /* Intermediate object identifier macro: */
 #define mapP_gsm_sm(X) (OMP_O_MAP_GSM_SM_PKG# #X)
 
-/* mwdMngtPackage */
-#define OMP_O_MAP_MWD_MNGT_CONTEXT_V3		mapP_acId(\x18\x03) /* { map-ac mwdMngt(24) version3(3) } */
-#define OMP_O_MAP_MWD_MNGT_CONTEXT_V2		mapP_acId(\x18\x02) /* { map-ac mwdMngt(24) version2(2) } */
-#define OMP_O_MAP_MWD_MNGT_CONTEXT_V1		mapP_acId(\x18\x01) /* { map-ac mwdMngt(24) version1(1) } */
+/* This application context is used for short message gateway procedures. */
+#define OMP_O_MAP_SHORT_MSG_GATEWAY_CONTEXT			mapP_acId(\x14)
+#define OMP_O_MAP_SHORT_MSG_GATEWAY_CONTEXT_V3			mapP_acId(\x14\x03)
+#define OMP_O_MAP_SHORT_MSG_GATEWAY_CONTEXT_V2			mapP_acId(\x14\x02)
+#define OMP_O_MAP_SHORT_MSG_GATEWAY_CONTEXT_V1			mapP_acId(\x14\x01)
 
-/* alertingPackage */
-#define OMP_O_MAP_SHORT_MSG_ALERT_CONTEXT_V2	mapP_acId(\x17\x02) /* { map-ac shortMsgAlert(23) version2(2) } */
-#define OMP_O_MAP_SHORT_MSG_ALERT_CONTEXT_V1	mapP_acId(\x17\x01) /* { map-ac shortMsgAlert(23) version1(1) } */
+/* This application context is used between MSC and IWMSC or between SGSN and
+   IWMSC for mobile originated short message relay procedures.  For the
+   SGSN-IWMSC interface version 1, version 2 and version 3 of this pplication
+   context are applicable. */
+#define OMP_O_MAP_SHORT_MSG_MO_RELAY_CONTEXT			mapP_acId(\x15)
+#define OMP_O_MAP_SHORT_MSG_MO_RELAY_CONTEXT_V3			mapP_acId(\x15\x03)
+#define OMP_O_MAP_SHORT_MSG_MO_RELAY_CONTEXT_V2			mapP_acId(\x15\x02)
+#define OMP_O_MAP_SHORT_MSG_MO_RELAY_CONTEXT_V1			mapP_acId(\x15\x01)
 
-/* mo-ShortMsgRelayPackage */
-#define OMP_O_MAP_SHORT_MSG_MO_RELAY_CONTEXT_V3	mapP_acId(\x15\x03) /* { map-ac shortMsgMO-Relay(21) version3(3) } */
-#define OMP_O_MAP_SHORT_MSG_MO_RELAY_CONTEXT_V2	mapP_acId(\x15\x02) /* { map-ac shortMsgMO-Relay(21) version2(2) } */
-#define OMP_O_MAP_SHORT_MSG_MO_RELAY_CONTEXT_V1	mapP_acId(\x15\x01) /* { map-ac shortMsgMO-Relay(21) version1(1) } */
+/* This application context is used for short message alerting procedures. */
+#define OMP_O_MAP_SHORT_MSG_ALERT_CONTEXT			mapP_acId(\x17)
+#define OMP_O_MAP_SHORT_MSG_ALERT_CONTEXT_V2			mapP_acId(\x17\x02)
+#define OMP_O_MAP_SHORT_MSG_ALERT_CONTEXT_V1			mapP_acId(\x17\x01)
 
-/* mt-ShortMsgRelayPackage */
-#define OMP_O_MAP_SHORT_MSG_MT_RELAY_CONTEXT_V3	mapP_acId(\x19\x03) /* { map-ac shortMstMT-Relay(25) version3(3) } */
-#define OMP_O_MAP_SHORT_MSG_MT_RELAY_CONTEXT_V2	mapP_acId(\x19\x02) /* { map-ac shortMstMT-Relay(25) version2(2) } */
-#define OMP_O_MAP_SHORT_MSG_MT_RELAY_CONTEXT_V1	mapP_acId(\x15\x01) /* { map-ac shortMstMO-Relay(21) version1(1) } */
+/* This application context is used between VLR and HLR or between SGSN and
+   HLR for short message wiating data management procedures.  For the SGSN-HLR 
+   interface only version 3 of this pplication context is applicable. */
+#define OMP_O_MAP_MWD_MNGT_CONTEXT				mapP_acId(\x18)
+#define OMP_O_MAP_MWD_MNGT_CONTEXT_V3				mapP_acId(\x18\x03)
+#define OMP_O_MAP_MWD_MNGT_CONTEXT_V2				mapP_acId(\x18\x02)
+#define OMP_O_MAP_MWD_MNGT_CONTEXT_V1				mapP_acId(\x18\x01)
 
-/* shortMsgGatewayPackage */
-#define OMP_O_MAP_SHORT_MSG_GATEWAY_CONTEXT_V3	mapP_acId(\x14\x03) /* { map-ac shortMsgGateway(20) version3(3) } */
-#define OMP_O_MAP_SHORT_MSG_GATEWAY_CONTEXT_V2	mapP_acId(\x14\x02) /* { map-ac shortMsgGateway(20) version2(2) } */
-#define OMP_O_MAP_SHORT_MSG_GATEWAY_CONTEXT_V1	mapP_acId(\x14\x01) /* { map-ac shortMsgGateway(20) version1(1) } */
+/* This application context is used between GMSC and MSC or between GMSC and
+   SGSN for mobile terminating short message relay procedures.  For the
+   GMSC-SGSN interface version 2 and version 3 of this application context and 
+   the equivalent version 1 application context are applicable. */
+#define OMP_O_MAP_SHORT_MSG_MT_RELAY_CONTEXT			mapP_acId(\x19)
+#define OMP_O_MAP_SHORT_MSG_MT_RELAY_CONTEXT_V3			mapP_acId(\x19\x03)
+#define OMP_O_MAP_SHORT_MSG_MT_RELAY_CONTEXT_V2			mapP_acId(\x19\x02)
+#define OMP_O_MAP_SHORT_MSG_MT_RELAY_CONTEXT_V1			mapP_acId(\x15\x01)
+
+/* This application context is used between SMS-GMSC and MSC for mobile
+   termination short message relay procedures for VGCS. */
+#define OMP_O_MAP_SHORT_MSG_MT_RELAY_VGCS_CONTEXT		mapP_acId(\x29)
+#define OMP_O_MAP_SHORT_MSG_MT_RELAY_VGCS_CONTEXT_V3		mapP_acId(\x29\x03)
 
 /* Application-Context-Name-List object to use in session with map_bind() to
- * restrict service responder indications to the listed application context
- * names. */
+   restrict service responder indications to the listed application context
+   names. */
 
 #define MAP_SM_ACNAME_LIST \
 	{ \
@@ -136,77 +161,85 @@
 	}
 
 /* OM class names (prefixed MAP_C_) */
+#define OMP_O_MAP_C_ABSENT_SUBSCRIBER_SM_PARAM		mapP_gsm_sm(\xC6\x29)	/* 9001 */
 
-#define OMP_O_MAP_C_ABSENT_SUBSCRIBER_SM_PARAM			mapP_gsm_sm(\xC6\x29) /* 9001 */
-#define OMP_O_MAP_C_ADDITIONAL_NUMBER				mapP_gsm_sm(\xC6\x2A) /* 9002 */
-#define OMP_O_MAP_C_ALERT_SERVICE_CENTRE_ARG			mapP_gsm_sm(\xC6\x2B) /* 9003 */ /* MAP_SHORT_MSG_ALERT_CONTEXT */
-#define OMP_O_MAP_C_ALERT_SERVICE_CENTRE_RES			mapP_gsm_sm(\xC6\x2C) /* 9004 */ /* MAP_SHORT_MSG_ALERT_CONTEXT */
-#define OMP_O_MAP_C_INFORM_SERVICE_CENTRE_ARG			mapP_gsm_sm(\xC6\x2D) /* 9005 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_LOCATION_INFO_WITH_LMSI			mapP_gsm_sm(\xC6\x2E) /* 9006 */
-#define OMP_O_MAP_C_MESSAGE_WAITING_LIST_FULL_PARAM		mapP_gsm_sm(\xC6\x2F) /* 9007 */
-#define OMP_O_MAP_C_MO_FORWARD_SM_ARG				mapP_gsm_sm(\xC6\x30) /* 9008 */ /* MAP_SHORT_MSG_MO_RELAY_CONTEXT */
-#define OMP_O_MAP_C_MO_FORWARD_SM_RES				mapP_gsm_sm(\xC6\x31) /* 9009 */ /* MAP_SHORT_MSG_MO_RELAY_CONTEXT */
-#define OMP_O_MAP_C_MT_FORWARD_SM_ARG				mapP_gsm_sm(\xC6\x32) /* 9010 */ /* MAP_SHORT_MSG_MT_RELAY_CONTEXT */
-#define OMP_O_MAP_C_MT_FORWARD_SM_RES				mapP_gsm_sm(\xC6\x33) /* 9011 */ /* MAP_SHORT_MSG_MT_RELAY_CONTEXT */
-#define OMP_O_MAP_C_READY_FOR_SM_ARG				mapP_gsm_sm(\xC6\x34) /* 9012 */
-#define OMP_O_MAP_C_READY_FOR_SM_RES				mapP_gsm_sm(\xC6\x35) /* 9013 */
-#define OMP_O_MAP_C_REPORT_SM_DELIVERY_STATUS_ARG		mapP_gsm_sm(\xC6\x36) /* 9014 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_REPORT_SM_DELIVERY_STATUS_RES		mapP_gsm_sm(\xC6\x37) /* 9015 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_ROUTING_INFO_FOR_SM_ARG			mapP_gsm_sm(\xC6\x38) /* 9016 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_ROUTING_INFO_FOR_SM_RES			mapP_gsm_sm(\xC6\x39) /* 9017 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_SEND_INFO_FOR_MO_SMS_ARG			mapP_gsm_sm(\xC6\x3A) /* 9018 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_SEND_INFO_FOR_MO_SMS_RES			mapP_gsm_sm(\xC6\x3B) /* 9019 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_SEND_INFO_FOR_MT_SMS_ARG			mapP_gsm_sm(\xC6\x3C) /* 9020 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_SEND_INFO_FOR_MT_SMS_RES			mapP_gsm_sm(\xC6\x3D) /* 9021 */ /* MAP_SHORT_MSG_GATEWAY_CONTEXT */
-#define OMP_O_MAP_C_SM_DELIVERY_FAILURE_CAUSE			mapP_gsm_sm(\xC6\x3E) /* 9022 */
-#define OMP_O_MAP_C_SM_RP_DA					mapP_gsm_sm(\xC6\x3F) /* 9023 */
-#define OMP_O_MAP_C_SM_RP_OA					mapP_gsm_sm(\xC6\x40) /* 9024 */
-#define OMP_O_MAP_C_SUB_BUSY_FOR_MT_SMS_PARAM			mapP_gsm_sm(\xC6\x41) /* 9025 */
-#define OMP_O_MAP_C_MT_FORWARD_SM_VGCS_ARG			mapP_gsm_sm(\xC6\x42) /* 9026 */
-#define OMP_O_MAP_C_MT_FORWARD_SM_VGCS_RES			mapP_gsm_sm(\xC6\x43) /* 9027 */
-#define OMP_O_MAP_C_DISPATCHER_LIST				mapP_gsm_sm(\xC6\x44) /* 9028 */
+#define OMP_O_MAP_C_ADDITIONAL_NUMBER			mapP_gsm_sm(\xC6\x2A)	/* 9002 */
+#define OMP_O_MAP_C_ALERT_SERVICE_CENTRE_ARG		mapP_gsm_sm(\xC6\x2B)	/* 9003 */	/* MAP_SHORT_MSG_ALERT_CONTEXT */
+#define OMP_O_MAP_C_ALERT_SERVICE_CENTRE_RES		mapP_gsm_sm(\xC6\x2C)	/* 9004 */	/* MAP_SHORT_MSG_ALERT_CONTEXT */
+#define OMP_O_MAP_C_DISPATCHER_LIST			mapP_gsm_sm(\xC6\x44)	/* 9028 */
+#define OMP_O_MAP_C_INFORM_SERVICE_CENTRE_ARG		mapP_gsm_sm(\xC6\x2D)	/* 9005 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_LOCATION_INFO_WITH_LMSI		mapP_gsm_sm(\xC6\x2E)	/* 9006 */
+#define OMP_O_MAP_C_MO_FORWARD_SM_ARG			mapP_gsm_sm(\xC6\x30)	/* 9008 */	/* MAP_SHORT_MSG_MO_RELAY_CONTEXT */
+#define OMP_O_MAP_C_MO_FORWARD_SM_RES			mapP_gsm_sm(\xC6\x31)	/* 9009 */	/* MAP_SHORT_MSG_MO_RELAY_CONTEXT */
+#define OMP_O_MAP_C_MT_FORWARD_SM_ARG			mapP_gsm_sm(\xC6\x32)	/* 9010 */	/* MAP_SHORT_MSG_MT_RELAY_CONTEXT */
+#define OMP_O_MAP_C_MT_FORWARD_SM_RES			mapP_gsm_sm(\xC6\x33)	/* 9011 */	/* MAP_SHORT_MSG_MT_RELAY_CONTEXT */
+#define OMP_O_MAP_C_MT_FORWARD_SM_VGCS_ARG		mapP_gsm_sm(\xC6\x42)	/* 9026 */
+#define OMP_O_MAP_C_MT_FORWARD_SM_VGCS_RES		mapP_gsm_sm(\xC6\x43)	/* 9027 */
+#define OMP_O_MAP_C_READY_FOR_SM_ARG			mapP_gsm_sm(\xC6\x34)	/* 9012 */
+#define OMP_O_MAP_C_READY_FOR_SM_RES			mapP_gsm_sm(\xC6\x35)	/* 9013 */
+#define OMP_O_MAP_C_REPORT_SM_DELIVERY_STATUS_ARG	mapP_gsm_sm(\xC6\x36)	/* 9014 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_REPORT_SM_DELIVERY_STATUS_RES	mapP_gsm_sm(\xC6\x37)	/* 9015 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_ROUTING_INFO_FOR_SM_ARG		mapP_gsm_sm(\xC6\x38)	/* 9016 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_ROUTING_INFO_FOR_SM_RES		mapP_gsm_sm(\xC6\x39)	/* 9017 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_SEND_INFO_FOR_MO_SMS_ARG		mapP_gsm_sm(\xC6\x3A)	/* 9018 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_SEND_INFO_FOR_MO_SMS_RES		mapP_gsm_sm(\xC6\x3B)	/* 9019 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_SEND_INFO_FOR_MT_SMS_ARG		mapP_gsm_sm(\xC6\x3C)	/* 9020 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_SEND_INFO_FOR_MT_SMS_RES		mapP_gsm_sm(\xC6\x3D)	/* 9021 */	/* MAP_SHORT_MSG_GATEWAY_CONTEXT */
+#define OMP_O_MAP_C_SM_RP_DA				mapP_gsm_sm(\xC6\x3F)	/* 9023 */
+#define OMP_O_MAP_C_SM_RP_OA				mapP_gsm_sm(\xC6\x40)	/* 9024 */
 
 /* OM attribute names (prefixed MAP_) */
-#define MAP_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM			((OM_type)9001)
-#define MAP_ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM		((OM_type)9002)
-#define MAP_ADDITIONAL_NUMBER					((OM_type)9003) /* XXX */
-#define MAP_ADDITIONAL_SM_DELIVERY_OUTCOME			((OM_type)9004)
-#define MAP_ALERT_REASON_INDICATOR				((OM_type)9005)
-#define MAP_ALERT_REASON					((OM_type)9006)
-#define MAP_DELIVERY_OUTCOME_INDICATOR				((OM_type)9007)
-#define MAP_GPRS_CONNECTION_SUSPENDED				((OM_type)9008)
-#define MAP_GPRS_NODE_INDICATOR					((OM_type)9009)
-#define MAP_GPRS_SUPPORT_INDICATOR				((OM_type)9010)
-#define MAP_IMSI						((OM_type)9011) /* XXX */ /* XXX */
-#define MAP_LMSI						((OM_type)9012) /* XXX */ /* XXX */
-#define MAP_LOCATION_INFO_WITH_LMSI				((OM_type)9013)
-#define MAP_MORE_MESSAGES_TO_SEND				((OM_type)9014)
-#define MAP_MSC_NUMBER						((OM_type)9015) /* XXX */
-#define MAP_MSISDN						((OM_type)9016)
-#define MAP_MW_STATUS						((OM_type)9017)
-#define MAP_NETWORK_NODE_NUMBER					((OM_type)9018) /* XXX */
-#define MAP_NO_SM_RP_DA						((OM_type)9019)
-#define MAP_NO_SM_RP_OA						((OM_type)9020)
-#define MAP_SERVICE_CENTRE_ADDRESS				((OM_type)9021) /* XXX */
-#define MAP_SGSN_NUMBER						((OM_type)9022) /* XXX */
-#define MAP_SM_DELIVERY_OUTCOME					((OM_type)9023)
-#define MAP_SM_ENUMERATED_DELIVERY_FAILURE_CAUSE		((OM_type)9024)
-#define MAP_SM_RP_DA						((OM_type)9025)
-#define MAP_SM_RP_MTI						((OM_type)9026)
-#define MAP_SM_RP_OA						((OM_type)9027)
-#define MAP_SM_RP_PRI						((OM_type)9028)
-#define MAP_SM_RP_SMEA						((OM_type)9029)
-#define MAP_SM_RP_UI						((OM_type)9030)
-#define MAP_SM_DELIVERY_NOT_INTENDED				((OM_type)9031)
-#define MAP_IP_SM_GW_INDICATOR					((OM_type)9032)
-#define MAP_IP_SM_GW_SM_DELIVERY_OUTCOME			((OM_type)9033)
-#define MAP_IP_GW_ABSENT_SUBSCRIBER_DIAGNOSTIC			((OM_type)9034)
+#define MAP_A_ADDITIONAL_SM_DELIVERY_OUTCOME		((OM_type)7004)
+#define MAP_A_ALERT_REASON_INDICATOR			((OM_type)7005)
+#define MAP_A_ALERT_REASON				((OM_type)7006)
+#define MAP_A_DELIVERY_OUTCOME_INDICATOR		((OM_type)7008)
+#define MAP_A_DISPATCHER				((OM_type)7009)
+#define MAP_A_DISPATCHER_LIST				((OM_type)7010)
+#define MAP_A_GPRS_SUPPORT_INDICATOR			((OM_type)7014)
+#define MAP_A_IP_GW_ABSENT_SUBSCRIBER_DIAGNOSTIC	((OM_type)7016)
+#define MAP_A_IP_SM_GW_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM	((OM_type)7017)
+#define MAP_A_IP_SM_GW_INDICATOR			((OM_type)7018)
+#define MAP_A_IP_SM_GW_SM_DELIVERY_OUTCOME		((OM_type)7019)
+#define MAP_A_LOCATION_INFO_WITH_LMSI			((OM_type)7021)
+#define MAP_A_MORE_MESSAGES_TO_SEND			((OM_type)7022)
+#define MAP_A_MW_STATUS					((OM_type)7025)
+#define MAP_A_NO_SM_RP_DA				((OM_type)7027)
+#define MAP_A_NO_SM_RP_OA				((OM_type)7028)
+#define MAP_A_ONGOING_CALL				((OM_type)7029)
+#define MAP_A_SERVICE_CENTRE_ADDRESS			((OM_type)7030)
+#define MAP_A_SM_DELIVERY_NOT_INTENDED			((OM_type)7032)
+#define MAP_A_SM_DELIVERY_OUTCOME			((OM_type)7033)
+#define MAP_A_SM_RP_DA					((OM_type)7034)
+#define MAP_A_SM_RP_MTI					((OM_type)7035)
+#define MAP_A_SM_RP_OA					((OM_type)7036)
+#define MAP_A_SM_RP_PRI					((OM_type)7037)
+#define MAP_A_SM_RP_SMEA				((OM_type)7038)
+#define MAP_A_SM_RP_UI					((OM_type)7039)
 
-/* Service-Error problem values */
-#define MAP_E_ABSENT_SUBSCRIBER_SM				mapP_problem( 6)
-#define MAP_E_MESSAGE_WAITING_LIST_FULL				mapP_problem(33)
-#define MAP_E_SM_DELIVERY_FAILURE				mapP_problem(32)
-#define MAP_E_SUBSCRIBER_BUSY_FOR_MT_SMS			mapP_problem(31)
+#if 0
+/* Attributes used defined in <xmap_gsm.h> */
+#define MAP_A_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM		((OM_type)7001)
+#define MAP_A_ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM ((OM_type)7002)
+#define MAP_A_ADDITIONAL_NUMBER				((OM_type)7003)
+#define MAP_A_ASCI_CALL_REFERENCE			((OM_type)7007)
+#define MAP_A_EXTENSION					((OM_type)7011)
+#define MAP_A_EXTENSION_CONTAINER			((OM_type)7012)
+#define MAP_A_GPRS_NODE_INDICATOR			((OM_type)7013)
+#define MAP_A_IMSI					((OM_type)7015)
+#define MAP_A_LMSI					((OM_type)7020)
+#define MAP_A_MSC_NUMBER				((OM_type)7023)
+#define MAP_A_MSISDN					((OM_type)7024)
+#define MAP_A_NETWORK_NODE_NUMBER			((OM_type)7026)
+#define MAP_A_SGSN_NUMBER				((OM_type)7031)
+#endif
+
+/* OM enumerations (prefixed MAP_T_) */
+
+/* MAP_T_Alert_Reason: */
+typedef enum {
+	MAP_T_MS_PRESENT = 0,
+	MAP_T_MEMORY_AVAILABLE,
+} MAP_T_Alert_Reason;
 
 /* MAP_T_Mw_Status bits: */
 typedef enum {
@@ -216,11 +249,11 @@ typedef enum {
 	MAP_T_MNRG_SET,
 } MAP_T_Mw_Status;
 
-/* MAP_T_Alert_Reason: */
+/* MAP_T_SM_Delivery_Not_Intended: */
 typedef enum {
-	MAP_T_MS_PRESENT = 0,
-	MAP_T_MEMORY_AVAILABLE,
-} MAP_T_Alert_Reason;
+	MAP_T_ONLY_IMSI_REQUSTED = 0,
+	MAP_T_ONLY_MCC_MNC_REQUESTED,
+} MAP_T_SM_Delivery_Not_Intended;
 
 /* MAP_T_SM_Delivery_Outcome: */
 typedef enum {
@@ -235,6 +268,40 @@ typedef enum {
 	MAP_T_STATUS_REPORT,
 } MAP_T_SM_RP_MTI;
 
+/* Operation codes (MAP_T_Operation_Code): */
+#define MAP_T_SEND_ROUTING_INFO_FOR_SM			45
+#define MAP_T_MO_FORWARD_SM				46
+#define MAP_T_MT_FORWARD_SM				44
+#define MAP_T_REPORT_SM_DELIVERY_STATUS			47
+#define MAP_T_ALERT_SERVICE_CENTRE			64
+#define MAP_T_INFORM_SERVICE_CENTRE			63
+#define MAP_T_READY_FOR_SM				66
+#define MAP_T_MT_FORWARD_SM_VGCS			21
+
+#if 0
+/*
+ * SERVICE ERRORS
+ */
+/* Service-Error problem values (MAP_T_User_Error): */
+#define MAP_E_ABSENT_SUBSCRIBER_SM			mapP_problem( 6)
+#define MAP_E_MESSAGE_WAITING_LIST_FULL			mapP_problem(33)
+#define MAP_E_SM_DELIVERY_FAILURE			mapP_problem(32)
+#define MAP_E_SUBSCRIBER_BUSY_FOR_MT_SMS		mapP_problem(31)
+
+/* Service-Error parameter classes: */
+#define OMP_O_MAP_C_SUB_BUSY_FOR_MT_SMS_PARAM		mapP_gsm_sm(\xC6\x41)	/* 9025 */
+#define OMP_O_MAP_C_SM_DELIVERY_FAILURE_CAUSE		mapP_gsm_sm(\xC6\x3E)	/* 9022 */
+#define OMP_O_MAP_C_MESSAGE_WAIT_LIST_FULL_PARAM	mapP_gsm_sm(\xC6\x2F)	/* 9007 */
+
+/* Service-Error attributes: */
+#define MAP_A_GPRS_CONNECTION_SUSPENDED				((OM_type)7101)
+#define MAP_A_SM_ENUMERATED_DELIVERY_FAILURE_CAUSE		((OM_type)7102)
+#define MAP_A_DIAGNOSTIC_INFO					((OM_type)7103)
+#define MAP_A_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM			((OM_type)9001)
+#define MAP_A_ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM	((OM_type)9002)
+
+/* Service-Error enumerations: */
+
 /* MAP_T_SM_Enumerated_Delivery_Failure_Cause: */
 typedef enum {
 	MAP_T_MEMORY_CAPACITY_EXCEEDED = 0,
@@ -245,12 +312,33 @@ typedef enum {
 	MAP_T_INVALID_SME_ADDRESS,
 	MAP_T_SUBSCRIBER_NOT_SC_SUBSCRIBER,
 } MAP_T_SM_Enumerated_Delivery_Failure_Cause;
+#endif
 
-/* MAP_T_SM_Delivery_Not_Intended: */
-typedef enum {
-	MAP_T_ONLY_IMSI_REQUSTED = 0,
-	MAP_T_ONLY_MCC_MNC_REQUESTED,
-} MAP_T_SM_Delivery_Not_Intended;
+
+/* Uses:
+ *
+ * OMP_O_MAP_C_EXTENSION <xmap.h>
+ *
+ * OMP_O_MAP_C_EXTENSION_CONTAINER <xmap_gsm.h>
+ *
+ * OMP_O_MAP_C_ADDITIONAL_NUMBER (this file)
+ * OMP_O_MAP_C_SM_RP_DA (this file)
+ * OMP_O_MAP_C_SM_RP_OA (this file)
+ * OMP_O_MAP_C_DISPATCHER_LIST (this file)
+ * OMP_O_MAP_C_LOCATION_INFO_WITH_LMSI (this file)
+ *
+ * MAP_T_Alert_Reason (this file)
+ * MAP_T_SM_Delivery_Not_Intended (this file)
+ * MAP_T_SM_Delivery_Outcome (this file)
+ */
+
+/* Errors:
+ *
+ * OMP_MAP_C_EXTENSION <xmap.h>
+ *
+ * OMP_MAP_C_EXTENSION_CONTAINER <xmap_gsm.h>
+ *
+ * MAP_T_SM_Enumerated_Delivery_Failure_Cause
+ */
 
 #endif				/* __XMAP_GSM_SM_H__ */
-
