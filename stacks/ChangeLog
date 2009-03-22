@@ -1,3 +1,8 @@
+2009-03-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/xmap/Makefile.am: added tables
+	* doc/specs/xmap/xmap.texi: added tables and MAP chapters
+
 2009-03-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/specs/xmap/.cvsignore: documentation and headers
