@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-03-20 18:27:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2009-03-22 09:37:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-03-20 18:27:39 $ by $Author: brian $
+# Last Modified $Date: 2009-03-22 09:37:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -527,7 +527,107 @@ TBL_TBLS		= \
 			  xmap_tab442.tbl \
 			  xmap_tab443.tbl \
 			  xmap_tab444.tbl \
-			  xmap_tab445.tbl
+			  xmap_tab445.tbl \
+			  xmap_tab446.tbl \
+			  xmap_tab447.tbl \
+			  xmap_tab448.tbl \
+			  xmap_tab449.tbl \
+			  xmap_tab450.tbl \
+			  xmap_tab451.tbl \
+			  xmap_tab452.tbl \
+			  xmap_tab453.tbl \
+			  xmap_tab454.tbl \
+			  xmap_tab455.tbl \
+			  xmap_tab456.tbl \
+			  xmap_tab457.tbl \
+			  xmap_tab458.tbl \
+			  xmap_tab459.tbl \
+			  xmap_tab460.tbl \
+			  xmap_tab461.tbl \
+			  xmap_tab462.tbl \
+			  xmap_tab463.tbl \
+			  xmap_tab464.tbl \
+			  xmap_tab465.tbl \
+			  xmap_tab466.tbl \
+			  xmap_tab467.tbl \
+			  xmap_tab468.tbl \
+			  xmap_tab469.tbl \
+			  xmap_tab470.tbl \
+			  xmap_tab471.tbl \
+			  xmap_tab472.tbl \
+			  xmap_tab473.tbl \
+			  xmap_tab474.tbl \
+			  xmap_tab475.tbl \
+			  xmap_tab476.tbl \
+			  xmap_tab477.tbl \
+			  xmap_tab478.tbl \
+			  xmap_tab479.tbl \
+			  xmap_tab480.tbl \
+			  xmap_tab481.tbl \
+			  xmap_tab482.tbl \
+			  xmap_tab483.tbl \
+			  xmap_tab484.tbl \
+			  xmap_tab485.tbl \
+			  xmap_tab486.tbl \
+			  xmap_tab487.tbl \
+			  xmap_tab488.tbl \
+			  xmap_tab489.tbl \
+			  xmap_tab490.tbl \
+			  xmap_tab491.tbl \
+			  xmap_tab492.tbl \
+			  xmap_tab493.tbl \
+			  xmap_tab494.tbl \
+			  xmap_tab495.tbl \
+			  xmap_tab496.tbl \
+			  xmap_tab497.tbl \
+			  xmap_tab498.tbl \
+			  xmap_tab499.tbl \
+			  xmap_tab500.tbl \
+			  xmap_tab501.tbl \
+			  xmap_tab502.tbl \
+			  xmap_tab503.tbl \
+			  xmap_tab504.tbl \
+			  xmap_tab505.tbl \
+			  xmap_tab506.tbl \
+			  xmap_tab507.tbl \
+			  xmap_tab508.tbl \
+			  xmap_tab509.tbl \
+			  xmap_tab510.tbl \
+			  xmap_tab511.tbl \
+			  xmap_tab512.tbl \
+			  xmap_tab513.tbl \
+			  xmap_tab514.tbl \
+			  xmap_tab515.tbl \
+			  xmap_tab516.tbl \
+			  xmap_tab517.tbl \
+			  xmap_tab518.tbl \
+			  xmap_tab519.tbl \
+			  xmap_tab520.tbl \
+			  xmap_tab521.tbl \
+			  xmap_tab522.tbl \
+			  xmap_tab523.tbl \
+			  xmap_tab524.tbl \
+			  xmap_tab525.tbl \
+			  xmap_tab526.tbl \
+			  xmap_tab527.tbl \
+			  xmap_tab528.tbl \
+			  xmap_tab529.tbl \
+			  xmap_tab530.tbl \
+			  xmap_tab531.tbl \
+			  xmap_tab532.tbl \
+			  xmap_tab533.tbl \
+			  xmap_tab534.tbl \
+			  xmap_tab535.tbl \
+			  xmap_tab536.tbl \
+			  xmap_tab537.tbl \
+			  xmap_tab538.tbl \
+			  xmap_tab539.tbl \
+			  xmap_tab540.tbl \
+			  xmap_tab541.tbl \
+			  xmap_tab542.tbl \
+			  xmap_tab543.tbl \
+			  xmap_tab544.tbl \
+			  xmap_tab545.tbl
 
 ## PKG_BUILD_INDEP
 endif
@@ -540,6 +640,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.5  2009-03-22 09:37:44  brian
+## - added MAP tables and chapters
+##
 ## Revision 0.9.2.4  2009-03-20 18:27:39  brian
 ## - documentation and headers
 ##
