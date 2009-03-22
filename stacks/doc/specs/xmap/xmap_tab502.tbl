@@ -1,0 +1,46 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+center expand tab(:);
+lblblblblb
+lblblblblb
+lllll.
+_
+:Value:Value:Value:Value
+OM Attribute:Syntax:Length:Number:Initially
+=
+access-Denied-Reason:Enum(Access-Denied-Reason):\(em:0-1:\(em
+billing-ID:String(Octet):7:0-1:\(em
+conditionally-Denied-Reason:Enum(Conditionally-Denied-Reason):\(em:0-1:\(em
+digits:String(Digits):4-12:0-1:\(em
+extended-MSC-ID:String(Octet):4:0-1:\(em
+extended-System-My-Type-Code:String(Octet):2:0-1:\(em
+msc-Identification-Number:String(Digits):4-23:0-1:\(em
+pc-SSN:String(Octets):5:0-1:\(em
+_
+.TE
