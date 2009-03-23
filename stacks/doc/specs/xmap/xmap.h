@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmap.h,v 0.9.2.3 2009-03-13 11:20:24 brian Exp $
+ @(#) $Id: xmap.h,v 0.9.2.5 2009-03-20 18:27:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,15 +47,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-13 11:20:24 $ by $Author: brian $
+ Last Modified $Date: 2009-03-20 18:27:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap.h,v $
- Revision 0.9.2.3  2009-03-13 11:20:24  brian
+ Revision 0.9.2.5  2009-03-20 18:27:40  brian
+ - documentation and headers
+
+ Revision 0.9.2.4  2009-03-13 11:20:25  brian
  - doc and header updates
 
- Revision 0.9.2.2  2009/03/12 15:08:34  brian
+ Revision 0.9.2.2  2009-03-12 15:08:34  brian
  - map library doc and impl
 
  Revision 0.9.2.1  2009-03-05 15:51:26  brian
@@ -66,7 +69,7 @@
 #ifndef __XMAP_H__
 #define __XMAP_H__
 
-#ident "@(#) $RCSfile: xmap.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * The <xmap.h> header declares the inteface functions, the structures passed to
@@ -109,11 +112,6 @@
 /* Intermediate object identifier macro */
 #define mapP_comn(X) (OMP_O_MAP_COMMON_PKG# #X)
 
-/* The OM syntax names that are defined are listed below. */
-
-#define MAP_S_TBCD_STRING		((OM_syntax) 32)
-#define MAP_S_SCCP_ADDRESS_STRING	((OM_syntax) 33)
-
 /* OM class names (prefixed MAP_C_) */
 
 /*
@@ -129,100 +127,59 @@
  *
  * OM_IMPORT(MAP_C_RESULT)
  */
-
 #define OMP_O_MAP_C_ABORT_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
-#define OMP_O_MAP_C_ABORT_RESULT		mapP_comn(\x87\x6A)	/* 1002 */
-#define OMP_O_MAP_C_ACCEPT_RESULT		mapP_comn(\x87\x6B)	/* 1003 */
-#define OMP_O_MAP_C_ACSE_ARGS			mapP_comn(\x87\x6C)	/* 1004 */
-#define OMP_O_MAP_C_ADDRESS			mapP_comn(\x87\x6D)	/* 1005 */
-#define OMP_O_MAP_C_APPLICATION_CONTEXT_LIST	mapP_comn(\x87\x6E)	/* 1006 */
-#define OMP_O_MAP_C_ASSOC_ARGUMENT		mapP_comn(\x87\x6F)	/* 1007 */
-#define OMP_O_MAP_C_ASSOC_RESULT		mapP_comn(\x87\x70)	/* 1008 */
-#define OMP_O_MAP_C_BAD_ARGUMENT		mapP_comn(\x87\x71)	/* 1009 */
-#define OMP_O_MAP_C_CLOSE_ARGUMENT		mapP_comn(\x87\x72)	/* 1010 */
-#define OMP_O_MAP_C_CONTEXT			mapP_comn(\x87\x73)	/* 1011 */
-#define OMP_O_MAP_C_ERROR			mapP_comn(\x87\x74)	/* 1012 */
-#define OMP_O_MAP_C_EXTENSION			mapP_comn(\x87\x75)	/* 1013 */
-#define OMP_O_MAP_C_GENERIC_SERVICE_ARGUMENT	mapP_comn(\x87\x76)	/* 1014 */
-#define OMP_O_MAP_C_GENERIC_SERVICE_RESULT	mapP_comn(\x87\x77)	/* 1015 */
-#define OMP_O_MAP_C_MAP_ASSOC_ARGS		mapP_comn(\x87\x78)	/* 1016 */
-#define OMP_O_MAP_C_NOTICE_RESULT		mapP_comn(\x87\x79)	/* 1017 */
-#define OMP_O_MAP_C_OPEN_ARGUMENT		mapP_comn(\x87\x7A)	/* 1018 */
-#define OMP_O_MAP_C_OPERATION_ARGUMENT		mapP_comn(\x87\x7B)	/* 1019 */
-#define OMP_O_MAP_C_OPERATION_ERROR		mapP_comn(\x87\x7C)	/* 1020 */
-#define OMP_O_MAP_C_OPERATION_REJECT		mapP_comn(\x87\x7D)	/* 1021 */
-#define OMP_O_MAP_C_OPERATION_RESULT		mapP_comn(\x87\x7E)	/* 1022 */
-#define OMP_O_MAP_C_P_ABORT_RESULT		mapP_comn(\x87\x7F)	/* 1023 */
-#define OMP_O_MAP_C_PRESENTATION_CONTEXT	mapP_comn(\x88\x00)	/* 1024 */
-#define OMP_O_MAP_C_PRESENTATION_LAYER_ARGS	mapP_comn(\x88\x01)	/* 1025 */
-#define OMP_O_MAP_C_REFUSE_RESULT		mapP_comn(\x88\x02)	/* 1026 */
-#define OMP_O_MAP_C_RELEASE_ARGUMENT		mapP_comn(\x88\x03)	/* 1027 */
-#define OMP_O_MAP_C_RELEASE_RESULT		mapP_comn(\x88\x04)	/* 1028 */
-#define OMP_O_MAP_C_SERVICE_ARGUMENT		mapP_comn(\x88\x05)	/* 1029 */
-#define OMP_O_MAP_C_SERVICE_ERROR		mapP_comn(\x88\x06)	/* 1030 */
-#define OMP_O_MAP_C_SERVICE_REJECT		mapP_comn(\x88\x07)	/* 1031 */
-#define OMP_O_MAP_C_SERVICE_RESULT		mapP_comn(\x88\x08)	/* 1032 */
-#define OMP_O_MAP_C_SESSION			mapP_comn(\x88\x09)	/* 1033 */
-#define OMP_O_MAP_C_TITLE			mapP_comn(\x88\x0A)	/* 1034 */
+#define OMP_O_MAP_C_ABORT_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ACCEPT_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ACSE_ARGS			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ADDRESS			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_APPLICATION_CONTEXT_LIST	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ASSOC_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ASSOC_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_CLOSE_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_CONTEXT			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_EXTENSION			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_GENERIC_SERVICE_ARGUMENT	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_GENERIC_SERVICE_RESULT	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_MAP_ASSOC_ARGS		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_NOTICE_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPEN_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPERATION_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPERATION_ERROR		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPERATION_REJECT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_OPERATION_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_P_ABORT_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_PRESENTATION_CONTEXT	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_PRESENTATION_LAYER_ARGS	mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_REFUSE_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_RELEASE_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_RELEASE_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SERVICE_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SERVICE_ERROR		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SERVICE_REJECT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SERVICE_RESULT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_SESSION			mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_TITLE			mapP_comn(\x87\x69)	/* 1001 */
 
-#define OMP_O_MAP_C_PROPRIETARY_ARGS		mapP_comn(\x88\x10)	/* 1040 */
+#define OMP_O_MAP_C_PROPRIETARY_ARGS		mapP_comn(\x87\x69)	/* 1001 */
 
+/* Error classes: */
+#define OMP_O_MAP_C_BAD_ARGUMENT		mapP_comn(\x87\x69)	/* 1001 */
+#define OMP_O_MAP_C_ERROR			mapP_comn(\x87\x69)	/* 1001 */
+
+/* Error attributes: */
+#define MAP_A_OM_ATTRIBUTE						((OM_type)10021)
+#define MAP_A_OM_BAD_ARGUMENT						((OM_type)10022)
+#define MAP_A_OM_CLASS							((OM_type)10023)
+#define MAP_A_OM_INDEX							((OM_type)10024)
+#define MAP_A_OM_SUBOBJECT						((OM_type)10025)
+#define MAP_A_PARAMETER							((OM_type)10026)
+#define MAP_A_PROBLEM							((OM_type)10028)
+
+/* The OM syntax names that are defined are listed below. */
+#define MAP_S_TBCD_STRING		((OM_syntax) 32)
+#define MAP_S_SCCP_ADDRESS_STRING	((OM_syntax) 33)
 
 /* The OM attribute names that are defined are listed below. */
-
-#define MAP_ACSE_ARGS				((OM_type)11001)
-#define MAP_APPLICATION_CONTEXT_LIST		((OM_type)11002)
-#define MAP_APPLICATION_CONTEXT			((OM_type)11003)
-#define MAP_ARGUMENTS				((OM_type)11004)
-#define MAP_ASYNCHRONOUS			((OM_type)11005)
-#define MAP_AUTHENTICATION_INFORMATION		((OM_type)11006)
-#define MAP_CONFIRMATION			((OM_type)11007)
-#define MAP_EXTENSION				((OM_type)11008)
-#define MAP_EXTENSIONS				((OM_type)11009)
-#define MAP_FILE_DESCRIPTOR			((OM_type)11010)
-#define MAP_MAP_ASSOC_ARGS			((OM_type)11011)
-#define MAP_MODE				((OM_type)11012)
-#define MAP_OM_ATTRIBUTE			((OM_type)11013)
-#define MAP_OM_BAD_ARGUMENT			((OM_type)11014)
-#define MAP_OM_CLASS				((OM_type)11015)
-#define MAP_OM_INDEX				((OM_type)11016)
-#define MAP_OM_SUBOBJECT			((OM_type)11017)
-#define MAP_OPERATION				((OM_type)11018)
-#define MAP_PARAMETER				((OM_type)11019)
-#define MAP_PRESENTATION_ABSTRACT		((OM_type)11020)
-#define MAP_PRESENTATION_CONTEXT_LIST		((OM_type)11021)
-#define MAP_PRESENTATION_ID			((OM_type)11022)
-#define MAP_PRESENTATION_LAYER_ARGS		((OM_type)11023)
-#define MAP_PROBLEM				((OM_type)11024)
-#define MAP_REPLY_LIMIT				((OM_type)11025)
-#define MAP_REQUESTING_ADDRESS			((OM_type)11026)
-#define MAP_REQUESTING_TITLE			((OM_type)11027)
-#define MAP_RESPONDER_ADDRESS			((OM_type)11028)
-#define MAP_RESPONDER_TITLE			((OM_type)11029)
-#define MAP_RESPONSE				((OM_type)11030)
-#define MAP_ROLE				((OM_type)11031)
-#define MAP_SCCP_ADDRESS			((OM_type)11032)
-#define MAP_SCCP_TITLE				((OM_type)11033)
-#define MAP_SECURITY_CONTEXT			((OM_type)11034)
-#define MAP_SESSION				((OM_type)11035)
-#define MAP_TIME_LIMIT				((OM_type)11036)
-#define MAP_VERSION_LIST			((OM_type)11037)
-
-/* MAP_mode: */
-#define MAP_T_UNCONFIRMED			((OM_enumeration) 0)
-#define MAP_T_CONFIRMED				((OM_enumeration) 1)
-
-/* MAP_role: */
-#define MAP_T_INVOKER_ROLE			((OM_uint) 0x01)
-#define MAP_T_PERFORMER_ROLE			((OM_uint) 0x02)
-
-/* MAP_OM_Bad_Argument: */
-#define MAP_T_MISSING_ATTRIBUTE			((OM_enumeration) 0)
-#define MAP_T_INVALID_ATTRIBUTE			((OM_enumeration) 1)
-#define MAP_T_EXCLUSIVE_ATTRIBUTE		((OM_enumeration) 2)
-#define MAP_T_NOT_MULTI_VALUED			((OM_enumeration) 3)
-#define MAP_T_BAD_SYNTAX			((OM_enumeration) 4)
-#define MAP_T_BAD_VALUE				((OM_enumeration) 5)
 
 #define MAP_APPLICATION_CONTEXT_NAME		((OM_type)11001)
 #define MAP_DESTINATION_ADDRESS			((OM_type)11002)
@@ -249,69 +206,69 @@
 #define MAP_ALL_INFORMATION_SENT		((OM_type)11021)
 
 /* numbering and identification parameters */
-#define MAP_IMSI				((OM_type)11022)
-#define MAP_TMSI				((OM_type)11023)
-#define MAP_IMEI				((OM_type)11024)
-#define MAP_IMEISV				((OM_type)11025)
-#define MAP_PREVIOUS_LOCATION_AREA_ID		((OM_type)11026)
-#define MAP_STORED_LOCATION_AREA_ID		((OM_type)11027)
-#define MAP_CURRENT_LOCATION_AREA_ID		((OM_type)11028)
-#define MAP_TARGET_LOCATION_AREA_ID		((OM_type)11029)
-#define MAP_TARGET_CELL_ID			((OM_type)11030)
-#define MAP_TARGET_RNC_ID			((OM_type)11031)
-#define MAP_ORIGINATING_ENTITY_NUMBER		((OM_type)11032)
-#define MAP_MSC_NUMBER				((OM_type)11033)
-#define MAP_TARGET_MSC_NUMBER			((OM_type)11034)
-#define MAP_HLR_NUMBER				((OM_type)11035)
-#define MAP_VLR_NUMBER				((OM_type)11036)
-#define MAP_HLR_ID				((OM_type)11037)
-#define MAP_LMSI				((OM_type)11038)
-#define MAP_MS_ISDN				((OM_type)11039)
-#define MAP_OMC_ID				((OM_type)11040)
-#define MAP_ROAMING_NUMBER			((OM_type)11041)
-#define MAP_RELOCATION_NUMBER_LIST		((OM_type)11042)
-#define MAP_HANDOVER_NUMBER			((OM_type)11043)
-#define MAP_FORWARDED_TO_NUMBER			((OM_type)11044)
-#define MAP_LONG_FORWARDED_TO_NUMBER		((OM_type)11045)
-#define MAP_LONG_FTN_SUPPORTED			((OM_type)11046)
-#define MAP_FORWARDED_TO_SUBADDRESS		((OM_type)11047)
-#define MAP_CALLED_NUMBER			((OM_type)11048)
-#define MAP_CALLING_NUMBER			((OM_type)11049)
-#define MAP_ORIGINAL_DIALED_NUMBER		((OM_type)11050)
-#define MAP_SERVICE_CENTRE_ADDRESS		((OM_type)11051)
-#define MAP_MSISDN_ALERT			((OM_type)11052)
-#define MAP_LOCATION_INFORMATION		((OM_type)11053)
-#define MAP_LOCATION_INFORMATION_FOR_GPRC	((OM_type)11054)
-#define MAP_GMSC_ADDRESS			((OM_type)11055)
-#define MAP_VMSC_ADDRESS			((OM_type)11056)
-#define MAP_GROUP_ID				((OM_type)11057)
-#define MAP_NORTH_AMERICAN_EQUAL_ACCESS_PIC	((OM_type)11058)
-#define MAP_SERVING_CELL_ID			((OM_type)11059)
-#define MAP_SGSN_NUMBER				((OM_type)11060)
-#define MAP_SGSN_ADDRESS			((OM_type)11061)
-#define MAP_GGSN_ADDRESS			((OM_type)11062)
+#define MAP_ADDITIONAL_NUMBER			((OM_type)11067) /* XXX */
+#define MAP_ADDITIONAL_V_GMLC_ADDRESS		((OM_type)11074)
 #define MAP_APN					((OM_type)11063)
-#define MAP_NETWORK_NODE_NUMBER			((OM_type)11064)
-#define MAP_PDP_TYPE				((OM_type)11065)
-#define MAP_PDP_ADDRESS				((OM_type)11066)
-#define MAP_ADDITIONAL_NUMBER			((OM_type)11067)
-#define MAP_P_TMSI				((OM_type)11068)
 #define MAP_B_SUBSCRIBER_NUMBER			((OM_type)11069)
 #define MAP_B_SUBSCRIBER_SUBADDRESS		((OM_type)11060)
-#define MAP_LMU_NUMBER				((OM_type)11061)
-#define MAP_MLC_NUMBER				((OM_type)11062)
-#define MAP_MULTICALL_BEARER_INFORMATION	((OM_type)11063)
-#define MAP_MULTIPLE_BEARER_REQUESTED		((OM_type)11064)
-#define MAP_MULTIPLE_BEARER_NOT_SUPPORTED	((OM_type)11065)
-#define MAP_PDP_CHARGING_CHARACTERISTICS	((OM_type)11066)
-#define MAP_SELECTED_RAB_ID			((OM_type)11067)
-#define MAP_RAB_ID				((OM_type)11068)
+#define MAP_CALLED_NUMBER			((OM_type)11048)
+#define MAP_CALLING_NUMBER			((OM_type)11049)
+#define MAP_CURRENT_LOCATION_AREA_ID		((OM_type)11028)
+#define MAP_FORWARDED_TO_NUMBER			((OM_type)11044)
+#define MAP_FORWARDED_TO_SUBADDRESS		((OM_type)11047)
+#define MAP_GGSN_ADDRESS			((OM_type)11062)
+#define MAP_GMSC_ADDRESS			((OM_type)11055)
+#define MAP_GROUP_ID				((OM_type)11057)
 #define MAP_GSMSCF_ADDRESS			((OM_type)11069)
-#define MAP_V_GMLC_ADDRESS			((OM_type)11070)
+#define MAP_HANDOVER_NUMBER			((OM_type)11043)
 #define MAP_H_GMLC_ADDRESS			((OM_type)11071)
+#define MAP_HLR_ID				((OM_type)11037)
+#define MAP_HLR_NUMBER				((OM_type)11035)
+#define MAP_IMEI				((OM_type)11024)
+#define MAP_IMEISV				((OM_type)11025)
+#define MAP_IMSI				((OM_type)11022) /* XXX */
+#define MAP_LMSI				((OM_type)11038) /* XXX */
+#define MAP_LMU_NUMBER				((OM_type)11061)
+#define MAP_LOCATION_INFORMATION_FOR_GPRC	((OM_type)11054)
+#define MAP_LOCATION_INFORMATION		((OM_type)11053)
+#define MAP_LONG_FORWARDED_TO_NUMBER		((OM_type)11045)
+#define MAP_LONG_FTN_SUPPORTED			((OM_type)11046)
+#define MAP_MLC_NUMBER				((OM_type)11062)
+#define MAP_MSC_NUMBER				((OM_type)11033) /* XXX */
+#define MAP_MSISDN_ALERT			((OM_type)11052)
+#define MAP_MS_ISDN				((OM_type)11039)
+#define MAP_MULTICALL_BEARER_INFORMATION	((OM_type)11063)
+#define MAP_MULTIPLE_BEARER_NOT_SUPPORTED	((OM_type)11065)
+#define MAP_MULTIPLE_BEARER_REQUESTED		((OM_type)11064)
+#define MAP_NETWORK_NODE_NUMBER			((OM_type)11064) /* XXX */
+#define MAP_NORTH_AMERICAN_EQUAL_ACCESS_PIC	((OM_type)11058)
+#define MAP_OMC_ID				((OM_type)11040)
+#define MAP_ORIGINAL_DIALED_NUMBER		((OM_type)11050)
+#define MAP_ORIGINATING_ENTITY_NUMBER		((OM_type)11032)
+#define MAP_PDP_ADDRESS				((OM_type)11066)
+#define MAP_PDP_CHARGING_CHARACTERISTICS	((OM_type)11066)
+#define MAP_PDP_TYPE				((OM_type)11065)
 #define MAP_PPR_ADDRESS				((OM_type)11072)
+#define MAP_PREVIOUS_LOCATION_AREA_ID		((OM_type)11026)
+#define MAP_P_TMSI				((OM_type)11068)
+#define MAP_RAB_ID				((OM_type)11068)
+#define MAP_RELOCATION_NUMBER_LIST		((OM_type)11042)
+#define MAP_ROAMING_NUMBER			((OM_type)11041)
 #define MAP_ROUTEING_NUMBER			((OM_type)11073)
-#define MAP_ADDITIONAL_V_GMLC_ADDRESS		((OM_type)11074)
+#define MAP_SELECTED_RAB_ID			((OM_type)11067)
+#define MAP_SERVICE_CENTRE_ADDRESS		((OM_type)11051) /* XXX */
+#define MAP_SERVING_CELL_ID			((OM_type)11059)
+#define MAP_SGSN_ADDRESS			((OM_type)11061)
+#define MAP_SGSN_NUMBER				((OM_type)11060) /* XXX */
+#define MAP_STORED_LOCATION_AREA_ID		((OM_type)11027)
+#define MAP_TARGET_CELL_ID			((OM_type)11030)
+#define MAP_TARGET_LOCATION_AREA_ID		((OM_type)11029)
+#define MAP_TARGET_MSC_NUMBER			((OM_type)11034)
+#define MAP_TARGET_RNC_ID			((OM_type)11031)
+#define MAP_TMSI				((OM_type)11023)
+#define MAP_V_GMLC_ADDRESS			((OM_type)11070)
+#define MAP_VLR_NUMBER				((OM_type)11036)
+#define MAP_VMSC_ADDRESS			((OM_type)11056)
 
 
 
@@ -513,7 +470,7 @@ typedef struct {
 #define MAP_STC3_IND			30
 #define MAP_STC4_IND			31
 
-#define MAP_COMPLETED			 1
+#define MAP_COMPLETETED			 1
 #define MAP_INCOMING			 2
 #define MAP_NOTHING			 3
 #define MAP_OUTSTANDING			 4
