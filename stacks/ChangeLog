@@ -1,3 +1,10 @@
+2009-03-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* stacks/src/include/xmap_ansi.h: added header file
+	* stacks/src/include/xmap_gsm_err.h: added header file
+	* stacks/src/include/xmap_gsm_xx.h: added header file
+	* stacks/src/lib/libxmap/xmap_gsmi.h: added header file
+
 2009-03-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/specs/xmap/Makefile.am: added tables
