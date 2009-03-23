@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:42 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:43:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:42 $ by $Author: brian $
+ Last Modified $Date: 2009-03-23 11:43:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.15  2009-03-23 11:43:59  brian
+ - put register_strdrv back the way it was before
+
  Revision 0.9.2.14  2008-09-22 20:31:42  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:42 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:43:59 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:42 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:43:59 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -90,7 +93,7 @@ static char const ident[] =
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:42 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:43:59 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
@@ -1176,7 +1179,7 @@ ptm_register_strdev(major_t major)
 	/* Because we are stealing Linux's device number for pseudo-terminals, we do not want to
 	   publish this device to the external file system nor create device nodes.  Leave it in
 	   the specfs(5) so that it can be accessed with /dev/streams/ptm/ptmx. */
-	if ((err = register_strdrv(&ptm_cdev, major)) < 0)
+	if ((err = register_strdrv(&ptm_cdev)) < 0)
 		return (err);
 #endif
 	if ((err = register_strnod(&ptm_cdev, &ptmx, 0)) < 0)
@@ -1222,7 +1225,7 @@ pts_register_strdev(major_t major)
 	/* Because we are stealing Linux's device number for pseudo-terminals, we do not want to
 	   publish this device to the external file system nor create device nodes.  Leave it in
 	   the specfs(5) so that it can be accessed with /dev/streams/pts/N. */
-	if ((err = register_strdrv(&pts_cdev, major)) < 0)
+	if ((err = register_strdrv(&pts_cdev)) < 0)
 		return (err);
 #endif
 	return (0);
