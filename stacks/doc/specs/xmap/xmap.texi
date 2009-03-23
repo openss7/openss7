@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi et
 % =========================================================================
 %
-% @(#) $Id: xmap.texi,v 0.9.2.5 2009-03-22 09:37:44 brian Exp $
+% @(#) $Id: xmap.texi,v 0.9.2.6 2009-03-23 11:52:05 brian Exp $
 %
 % =========================================================================
 %
@@ -55,11 +55,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-03-22 09:37:44 $ by $Author: brian $
+% Last Modified $Date: 2009-03-23 11:52:05 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: xmap.texi,v $
+% Revision 0.9.2.6  2009-03-23 11:52:05  brian
+% - correction
+%
 % Revision 0.9.2.5  2009-03-22 09:37:44  brian
 % - added MAP tables and chapters
 %
@@ -444,6 +447,9 @@ is an @strong{UNCONTROLLED VERSION}.
 @smallexample
 @verbatim
 $Log: xmap.texi,v $
+Revision 0.9.2.6  2009-03-23 11:52:05  brian
+- correction
+
 Revision 0.9.2.5  2009-03-22 09:37:44  brian
 - added MAP tables and chapters
 
@@ -15957,7 +15963,7 @@ This OM class encodes the same as @ref{USSD-Arg}.
 
 @node Deactivate-SS-Res
 @subsubsection Deactivate-SS-Res
-@node Deactivate-SS-Res
+@vindex Deactivate-SS-Res
 
 An instance of OM class @b{Deactivate-SS-Res} represents the information of a mobile application service
 operation response supplied as the @i{Response} argument to the @i{Service-rsp()} function

@@ -10,6 +10,8 @@
 	* src/include/ss7/mtpi.h: header file updates
 	* src/lib/libxmap/xmap.c: library updates
 
+	* doc/specs/xmap/xmap.texi: correction
+
 2009-03-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/specs/xmap/Makefile.am: added tables
