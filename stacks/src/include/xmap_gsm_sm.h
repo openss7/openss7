@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmap_gsm_sm.h,v 0.9.2.2 2009-03-20 18:27:41 brian Exp $
+ @(#) $Id: xmap_gsm_sm.h,v 0.9.2.3 2009-03-23 11:43:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-20 18:27:41 $ by $Author: brian $
+ Last Modified $Date: 2009-03-23 11:43:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmap_gsm_sm.h,v $
+ Revision 0.9.2.3  2009-03-23 11:43:24  brian
+ - header file updates
+
  Revision 0.9.2.2  2009-03-20 18:27:41  brian
  - documentation and headers
 
@@ -63,7 +66,7 @@
 #ifndef __XMAP_GSM_SM_H__
 #define __XMAP_GSM_SM_H__
 
-#ident "@(#) $RCSfile: xmap_gsm_sm.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_gsm_sm.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <xom.h>
 #include <xmap.h>
@@ -161,8 +164,6 @@
 	}
 
 /* OM class names (prefixed MAP_C_) */
-#define OMP_O_MAP_C_ABSENT_SUBSCRIBER_SM_PARAM		mapP_gsm_sm(\xC6\x29)	/* 9001 */
-
 #define OMP_O_MAP_C_ADDITIONAL_NUMBER			mapP_gsm_sm(\xC6\x2A)	/* 9002 */
 #define OMP_O_MAP_C_ALERT_SERVICE_CENTRE_ARG		mapP_gsm_sm(\xC6\x2B)	/* 9003 */	/* MAP_SHORT_MSG_ALERT_CONTEXT */
 #define OMP_O_MAP_C_ALERT_SERVICE_CENTRE_RES		mapP_gsm_sm(\xC6\x2C)	/* 9004 */	/* MAP_SHORT_MSG_ALERT_CONTEXT */

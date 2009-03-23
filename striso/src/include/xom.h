@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xom.h,v 0.9.2.3 2009-03-05 15:59:44 brian Exp $
+ @(#) $Id: xom.h,v 0.9.2.4 2009-03-23 11:43:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-05 15:59:44 $ by $Author: brian $
+ Last Modified $Date: 2009-03-23 11:43:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xom.h,v $
+ Revision 0.9.2.4  2009-03-23 11:43:26  brian
+ - header file updates
+
  Revision 0.9.2.3  2009-03-05 15:59:44  brian
  - tcap and map driver and library updates
 
@@ -64,7 +67,7 @@
 #ifndef __XOM_H__
 #define __XOM_H__
 
-#ident "@(#) $RCSfile: xom.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xom.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* BEGIN SERVICE INTERFACE */
 
@@ -221,7 +224,9 @@ typedef struct OM_descriptor_struct {
  */
 
 /* Private macro to calculate length of an object identifier. */
-#define OMP_LENGTH(oid_string) (sizeof(OMP_O_ ## oid_string)-1)
+#define OMP_OBJECT(oid_string) OMP_O_ ## oid_string
+#define OMP_STRING(oid_string) OMP_D_ ## oid_string
+#define OMP_LENGTH(oid_string) (sizeof(OMP_OBJECT(oid_string))-1)
 
 /* Macro to intialize the syntax and valud of an object identifier */
 #define OM_OID_DESC(type, oid_name) \
@@ -229,7 +234,7 @@ typedef struct OM_descriptor_struct {
 		(type), OM_S_OBJECT_IDENTIFIER_STRING, \
 		{ \
 			{ \
-				OMP_LENGTH(oid_name), OMP_D_ ## oid_name \
+				OMP_LENGTH(oid_name), OMP_STRING(oid_name) \
 			} \
 		} \
 	}
@@ -245,12 +250,12 @@ typedef struct OM_descriptor_struct {
 
 /* Macro to make class constants available within a compilation unit */
 #define OM_IMPORT(class_name) \
-	extern char OMP_D_ ## class_name []; \
+	extern char OMP_STRING(class_name)[]; \
 	extern OM_string class_name;
 
 /* Macro to allocate memory for class constants within a compilation unit */
 #define OM_EXPORT(class_name) \
-	char OMP_D_ ## class_name[] = OMP_O_ ## class_name; \
+	char OMP_STRING(class_name)[] = OMP_OBJECT(class_name); \
 	OM_string class_name = { OMP_LENGTH(class_name), OMD_D_ ## class_name };
 
 /* Constant for the OM package */
@@ -263,7 +268,7 @@ typedef struct OM_descriptor_struct {
 #define OMP_O_OM_C_EXTERNAL	"\x2A\x86\x48\xCE\x21\x00\x02"
 
 /* Constant for the Object class */
-#define OMP_O_OM_C_EXTERNAL	"\x2A\x86\x48\xCE\x21\x00\x03"
+#define OMP_O_OM_C_OBJECT	"\x2A\x86\x48\xCE\x21\x00\x03"
 
 /* Constant for the BER Object Identifier */
 #define OMP_O_OM_BER		"\x51\01"

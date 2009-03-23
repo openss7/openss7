@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lmi.h,v 0.9.2.10 2008-04-29 07:10:44 brian Exp $
+ @(#) $Id: lmi.h,v 0.9.2.11 2009-03-23 11:43:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:44 $ by $Author: brian $
+ Last Modified $Date: 2009-03-23 11:43:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lmi.h,v $
+ Revision 0.9.2.11  2009-03-23 11:43:25  brian
+ - header file updates
+
  Revision 0.9.2.10  2008-04-29 07:10:44  brian
  - updating headers for release
 
@@ -68,7 +71,7 @@
 #ifndef __LMI_H__
 #define __LMI_H__
 
-#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -364,6 +367,8 @@ union LMI_primitives {
 	lmi_error_ind_t error_ind;
 	lmi_stats_ind_t stats_ind;
 	lmi_event_ind_t event_ind;
+	lmi_optmgmt_req_t optmgmt_req;
+	lmi_optmgmt_ack_t optmgmt_ack;
 };
 
 #define LMI_INFO_REQ_SIZE	sizeof(lmi_info_req_t)

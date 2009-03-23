@@ -1,3 +1,7 @@
+2009-03-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/xom.h: header file correction
+
 2009-03-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/xmp.h: corrections
