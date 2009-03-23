@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-04-28 12:54:05 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2009-03-23 11:43:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
+ Last Modified $Date: 2009-03-23 11:43:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strreg.c,v $
+ Revision 0.9.2.79  2009-03-23 11:43:58  brian
+ - put register_strdrv back the way it was before
+
  Revision 0.9.2.78  2008-04-28 12:54:05  brian
  - update file headers for release
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-04-28 12:54:05 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2009-03-23 11:43:58 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-04-28 12:54:05 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2009-03-23 11:43:58 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -502,7 +505,6 @@ EXPORT_SYMBOL(unregister_strmod);
 /**
  *  register_strdrv:	- register STREAMS driver to specfs
  *  @cdev:	STREAMS device structure to register
- *  @major:	major device number
  *
  *  register_strdrv() registers the specified cdevsw(9) structure to the specfs(5).  This results in
  *  the allocation of a specfs(5) directory node for the driver.  This is probably not the function
@@ -511,7 +513,7 @@ EXPORT_SYMBOL(unregister_strmod);
  *  For full details, see register_strdrv(9).
  */
 streams_fastcall int
-register_strdrv(struct cdevsw *cdev, major_t major)
+register_strdrv(struct cdevsw *cdev)
 {
 	struct module_info *mi;
 	struct cdevsw *c;
@@ -546,7 +548,7 @@ register_strdrv(struct cdevsw *cdev, major_t major)
 			_ptrace(("Error path taken!\n"));
 			goto ebusy;
 		}
-		if (!(modid = major) && !(modid = mi->mi_idnum)) {
+		if (!(modid = mi->mi_idnum)) {
 			/* find a free module id */
 			_ptrace(("Finding a free module id\n"));
 			for (modid = (modID_t) (-1UL); modid && __cdrv_lookup(modid); modid--) ;
@@ -917,12 +919,9 @@ register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops
 	int err;
 	struct devnode *cmaj;
 
-	if ((err = register_strdrv(cdev, major)) < 0 && err != -EBUSY)
+	if ((err = register_strdrv(cdev)) < 0 && err != -EBUSY)
 		goto no_strdrv;
 	err = -ENOMEM;
-	/* If major is zero, use the module id as the major device number. */
-	if (major == 0)
-		major = cdev->d_modid;
 	if (!(cmaj = kmalloc(sizeof(*cmaj), GFP_ATOMIC)))
 		goto no_cmaj;
 	memset(cmaj, 0, sizeof(*cmaj));

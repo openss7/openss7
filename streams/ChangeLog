@@ -1,3 +1,8 @@
+2009-03-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/sys/streams/strconf.h: put register_strdrv back the way it was before
+	* src/kernel/strreg.c: put register_strdrv back the way it was before
+
 2009-03-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/strspecfs.cA: fixes

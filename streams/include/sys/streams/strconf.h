@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.31 2009-01-16 20:25:47 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.32 2009-03-23 11:43:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-16 20:25:47 $ by $Author: brian $
+ Last Modified $Date: 2009-03-23 11:43:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.32  2009-03-23 11:43:58  brian
+ - put register_strdrv back the way it was before
+
  Revision 0.9.2.31  2009-01-16 20:25:47  brian
  - working up streams mibs and agents
 
@@ -84,7 +87,7 @@
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.31 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.32 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/streams/strconf.h directly, include sys/strconf.h instead."
@@ -144,7 +147,7 @@ __STREAMS_EXTERN int streams_unregister_notifier(struct streams_notify *sn);
 
 __STREAMS_EXTERN int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
 __STREAMS_EXTERN int register_strdev(struct cdevsw *cdev, major_t major);
-__STREAMS_EXTERN int register_strdrv(struct cdevsw *cdev, major_t major);
+__STREAMS_EXTERN int register_strdrv(struct cdevsw *cdev);
 __STREAMS_EXTERN int register_strmod(struct fmodsw *fmod);
 __STREAMS_EXTERN int register_strsync(struct fmodsw *fmod);
 __STREAMS_EXTERN int unregister_strnod(struct cdevsw *cdev, minor_t minor);
