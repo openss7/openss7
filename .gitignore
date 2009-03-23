@@ -16,6 +16,7 @@ doc/projects/Makefile.in
 doc/projects/ss/ss.info
 .gitignore
 hold.tar.bz2
+*.info
 *.info-*
 INSTALL
 iperf/aclocal.m4
@@ -2473,6 +2474,7 @@ stacks/doc/specs/mapi/mapi.info
 stacks/doc/specs/mapi/mapi.info-1
 stacks/doc/specs/mapi/mapi.info-2
 stacks/doc/specs/mtpi/mtpi.info
+stacks/doc/specs/mtpi/npi_mtp.info
 stacks/doc/specs/npi/Makefile.in
 stacks/doc/specs/npi/npi.info
 stacks/doc/specs/npi/npi.info-1
@@ -2485,6 +2487,10 @@ stacks/doc/specs/npi/npi.info-7
 stacks/doc/specs/npi/npi.info-8
 stacks/doc/specs/sccpi/Makefile.in
 stacks/doc/specs/sccpi/Makefile.in
+stacks/doc/specs/sccpi/npi_sccp.info
+stacks/doc/specs/sccpi/sccpi.info
+stacks/doc/specs/sccpi/tpi_sccp.info
+stacks/doc/specs/sccpi/xti_sccp.info
 stacks/doc/specs/sdli/sdli.info
 stacks/doc/specs/sdti/sdti.info
 stacks/doc/specs/sli/sli.info
@@ -2498,6 +2504,7 @@ stacks/doc/specs/tpi/tpi.info-3
 stacks/doc/specs/tpi/tpi_tcap.info
 stacks/doc/specs/tri/Makefile.in
 stacks/doc/specs/tri/tri.info
+stacks/doc/specs/xmap/xmap.info
 stacks/doc/wiki/*
 stacks/INSTALL
 stacks/intl/*
