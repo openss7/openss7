@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi.h,v 0.9.2.9 2008-11-26 13:13:52 brian Exp $
+ @(#) $Id: mtpi.h,v 0.9.2.10 2009-03-23 11:43:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-26 13:13:52 $ by $Author: brian $
+ Last Modified $Date: 2009-03-23 11:43:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtpi.h,v $
+ Revision 0.9.2.10  2009-03-23 11:43:25  brian
+ - header file updates
+
  Revision 0.9.2.9  2008-11-26 13:13:52  brian
  - sync with working copy
 
@@ -71,7 +74,7 @@
 #ifndef __SS7_MTPI_H__
 #define __SS7_MTPI_H__
 
-#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -394,6 +397,7 @@ union MTP_primitives {
 	MTP_resume_ind_t resume_ind;
 	MTP_status_ind_t status_ind;
 	MTP_restart_complete_ind_t restart_complete_ind;
+	MTP_status_req_t status_req;
 };
 
 typedef struct {

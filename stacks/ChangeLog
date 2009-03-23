@@ -5,6 +5,11 @@
 	* stacks/src/include/xmap_gsm_xx.h: added header file
 	* stacks/src/lib/libxmap/xmap_gsmi.h: added header file
 
+	* src/include/xmap_gsm_sm.h: header file updates
+	* src/include/ss7/lmi.h: header file updates
+	* src/include/ss7/mtpi.h: header file updates
+	* src/lib/libxmap/xmap.c: library updates
+
 2009-03-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/specs/xmap/Makefile.am: added tables
