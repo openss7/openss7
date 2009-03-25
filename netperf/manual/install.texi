@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.28 2008-10-25 13:20:16 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.29 2009-03-25 04:37:19 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-10-25 13:20:16 $ by $Author: brian $
+@c Last Modified $Date: 2009-03-25 04:37:19 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -1040,7 +1040,7 @@ version from the archive:
 
 @cartouche
 @example
-% export CVSROOT='-d:pserver:@var{username}@@cvs.openss7.com:2401/var/cvs'
+% export CVSROOT=':pserver:@var{username}@@cvs.openss7.org:2401/var/cvs'
 % cvs login
 Password: *********
 % cvs co -r @value{PACKAGE}_@value{VERSION} @value{PACKAGE_CVSMODULE}

@@ -1,3 +1,13 @@
+2009-03-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS/manual/install.texi: correction to CVS instructions
+	* doc/manual/install.texi: correction to CVS instructions
+	* doc/manual/texi/install.texi: correction to CVS instructions
+	* iperf/doc/manual/install.texi: correction to CVS instructions
+	* netperf/manual/install.texi: correction to CVS instructions
+	* streams/doc/manual/install.texi: correction to CVS instructions
+	* texi/install.texi
+
 2009-01-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* mibs/RFC3877-MIB.txt: added standard MIBs
