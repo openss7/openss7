@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m3ua-raw.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-25 23:25:32 $
+ @(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-26 19:34:15 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-25 23:25:32 $ by $Author: brian $
+ Last Modified $Date: 2009-03-26 19:34:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m3ua-raw.c,v $
+ Revision 0.9.2.2  2009-03-26 19:34:15  brian
+ - updates
+
  Revision 0.9.2.1  2009-03-25 23:25:32  brian
  - start with interop test program as baseline
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m3ua-raw.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-25 23:25:32 $"
+#ident "@(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-26 19:34:15 $"
 
-static char const ident[] = "$RCSfile: test-m3ua-raw.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-25 23:25:32 $";
+static char const ident[] = "$RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-26 19:34:15 $";
 
 /*
  *  This file is for testing raw M3UA in conjunction with the sctp_t driver.  It provides test cases
@@ -328,6 +331,231 @@ typedef struct addr {
 struct timeval when;
 
 /*
+ *  M3UA Message Definitions
+ */
+
+#define M3UA_PPI    3
+
+#define UA_VERSION  1
+#define UA_PAD4(__len) (((__len)+3)&~0x3)
+#define UA_MHDR(__version, __spare, __class, __type) \
+	(__constant_htonl(((__version)<<24)|((__spare)<<16)|((__class)<<8)|(__type)))
+
+#define UA_MSG_VERS(__hdr) ((ntohl(__hdr)>>24)&0xff)
+#define UA_MSG_CLAS(__hdr) ((ntohl(__hdr)>> 8)&0xff)
+#define UA_MSG_TYPE(__hdr) ((ntohl(__hdr)>> 0)&0xff)
+
+/*
+ *  MESSAGE CLASSES:-
+ */
+#define UA_CLASS_MGMT	0x00	/* UA Management (MGMT) Message */
+#define UA_CLASS_XFER	0x01	/* M3UA Data transfer message */
+#define UA_CLASS_SNMM	0x02	/* Signalling Network Mgmt (SNM) Messages */
+#define UA_CLASS_ASPS	0x03	/* ASP State Maintenance (ASPSM) Messages */
+#define UA_CLASS_ASPT	0x04	/* ASP Traffic Maintenance (ASPTM) Messages */
+#define UA_CLASS_Q921	0x05	/* Q.931 User Part Messages */
+#define UA_CLASS_MAUP	0x06	/* M2UA Messages */
+#define UA_CLASS_CNLS	0x07	/* SUA Connectionless Messages */
+#define UA_CLASS_CONS	0x08	/* SUA Connection Oriented Messages */
+#define UA_CLASS_RKMM	0x09	/* Routing Key Management Messages */
+#define UA_CLASS_TDHM	0x0a	/* TUA Dialog Handling Mesages */
+#define UA_CLASS_TCHM	0x0b	/* TUA Component Handling Messages */
+
+/*
+ *  MESSAGES DEFINED IN EACH CLASS:-
+ */
+#define UA_MGMT_ERR		UA_MHDR(UA_VERSION, 0, UA_CLASS_MGMT, 0x00)
+#define UA_MGMT_NTFY		UA_MHDR(UA_VERSION, 0, UA_CLASS_MGMT, 0x01)
+#define UA_MGMT_LAST		0x01
+
+#define UA_XFER_DATA		UA_MHDR(UA_VERSION, 0, UA_CLASS_XFER, 0x01)
+
+#define UA_SNMM_DUNA		UA_MHDR(UA_VERSION, 0, UA_CLASS_SNMM, 0x01)
+#define UA_SNMM_DAVA		UA_MHDR(UA_VERSION, 0, UA_CLASS_SNMM, 0x02)
+#define UA_SNMM_DAUD		UA_MHDR(UA_VERSION, 0, UA_CLASS_SNMM, 0x03)
+#define UA_SNMM_SCON		UA_MHDR(UA_VERSION, 0, UA_CLASS_SNMM, 0x04)
+#define UA_SNMM_DUPU		UA_MHDR(UA_VERSION, 0, UA_CLASS_SNMM, 0x05)
+#define UA_SNMM_DRST		UA_MHDR(UA_VERSION, 0, UA_CLASS_SNMM, 0x06)
+#define UA_SNMM_LAST		0x06
+
+#define UA_ASPS_ASPUP_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPS, 0x01)
+#define UA_ASPS_ASPDN_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPS, 0x02)
+#define UA_ASPS_HBEAT_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPS, 0x03)
+#define UA_ASPS_ASPUP_ACK	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPS, 0x04)
+#define UA_ASPS_ASPDN_ACK	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPS, 0x05)
+#define UA_ASPS_HBEAT_ACK	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPS, 0x06)
+#define UA_ASPS_LAST		0x06
+
+#define UA_ASPT_ASPAC_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPT, 0x01)
+#define UA_ASPT_ASPIA_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPT, 0x02)
+#define UA_ASPT_ASPAC_ACK	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPT, 0x03)
+#define UA_ASPT_ASPIA_ACK	UA_MHDR(UA_VERSION, 0, UA_CLASS_ASPT, 0x04)
+#define UA_ASPT_LAST		0x04
+
+#define UA_RKMM_REG_REQ		UA_MHDR(UA_VERSION, 0, UA_CLASS_RKMM, 0x01)
+#define UA_RKMM_REG_RSP		UA_MHDR(UA_VERSION, 0, UA_CLASS_RKMM, 0x02)
+#define UA_RKMM_DEREG_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_RKMM, 0x03)
+#define UA_RKMM_DEREG_RSP	UA_MHDR(UA_VERSION, 0, UA_CLASS_RKMM, 0x04)
+#define UA_RKMM_LAST		0x04
+
+#define UA_MHDR_SIZE (sizeof(uint32_t)*2)
+#define UA_PHDR_SIZE (sizeof(uint32_t))
+#define UA_MAUP_SIZE (UA_MHDR_SIZE + UA_PHDR_SIZE + sizeof(uint32_t))
+
+#define UA_TAG_MASK		(__constant_htonl(0xffff0000))
+#define UA_PTAG(__phdr)		((htonl(__phdr)>>16)&0xffff)
+#define UA_PLEN(__phdr)		(htonl(__phdr)&0xffff)
+#define UA_SIZE(__phdr)		(__constant_htonl(__phdr)&0xffff)
+#define UA_TAG(__phdr)		((__constant_htonl(__phdr)>>16)&0xffff)
+#define UA_PHDR(__phdr, __length) \
+	(htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
+#define UA_CONST_PHDR(__phdr, __length) \
+	(__constant_htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
+
+/*
+ *  COMMON PARAMETERS:-
+ *
+ *  Common parameters per draft-ietf-sigtran-m2ua-10.txt
+ *  Common parameters per draft-ietf-sigtran-m3ua-08.txt
+ *  Common parameters per draft-ietf-sigtran-sua-07.txt
+ *  Common parameters per rfc3057.txt
+ *  -------------------------------------------------------------------
+ */
+#define UA_PARM_RESERVED	UA_CONST_PHDR(0x0000,0)
+#define UA_PARM_IID		UA_CONST_PHDR(0x0001,sizeof(uint32_t))
+#define UA_PARM_IID_RANGE	UA_CONST_PHDR(0x0002,0)	/* m2ua-10 */
+#define UA_PARM_DATA		UA_CONST_PHDR(0x0003,0)	/* sua-07 */
+#define UA_PARM_IID_TEXT	UA_CONST_PHDR(0x0003,0)
+#define UA_PARM_INFO		UA_CONST_PHDR(0x0004,0)
+#define UA_PARM_APC		UA_CONST_PHDR(0x0005,sizeof(uint32_t))	/* sua-07 */
+#define UA_PARM_DLCI		UA_CONST_PHDR(0x0005,sizeof(uint32_t))	/* rfc3057 */
+#define UA_PARM_RC		UA_CONST_PHDR(0x0006,sizeof(uint32_t))
+#define UA_PARM_DIAG		UA_CONST_PHDR(0x0007,0)
+#define UA_PARM_IID_RANGE1	UA_CONST_PHDR(0x0008,0)	/* rfc3057 */
+#define UA_PARM_HBDATA		UA_CONST_PHDR(0x0009,0)
+#define UA_PARM_REASON		UA_CONST_PHDR(0x000a,sizeof(uint32_t))
+#define UA_PARM_TMODE		UA_CONST_PHDR(0x000b,sizeof(uint32_t))
+#define UA_PARM_ECODE		UA_CONST_PHDR(0x000c,sizeof(uint32_t))
+#define UA_PARM_STATUS		UA_CONST_PHDR(0x000d,sizeof(uint32_t))
+#define UA_PARM_ASPID		UA_CONST_PHDR(0x000e,sizeof(uint32_t))
+#define UA_PARM_PROT_DATA	UA_CONST_PHDR(0x000e,sizeof(uint32_t))	/* rfc3057 */
+#define UA_PARM_CONG_LEVEL	UA_CONST_PHDR(0x000f,sizeof(uint32_t))	/* sua-07 */
+#define UA_PARM_REL_REASON	UA_CONST_PHDR(0x000f,sizeof(uint32_t))	/* rfc3057 */
+#define UA_PARM_TEI_STATUS	UA_CONST_PHDR(0x0010,sizeof(uint32_t))	/* rfc3057 */
+
+/*
+ *  Somewhat common field values:
+ */
+#define   UA_ECODE_INVALID_VERSION		(0x01)
+#define   UA_ECODE_INVALID_IID			(0x02)
+#define   UA_ECODE_UNSUPPORTED_MESSAGE_CLASS	(0x03)
+#define   UA_ECODE_UNSUPPORTED_MESSAGE_TYPE	(0x04)
+#define   UA_ECODE_UNSUPPORTED_TRAFFIC_MODE	(0x05)
+#define   UA_ECODE_UNEXPECTED_MESSAGE		(0x06)
+#define   UA_ECODE_PROTOCOL_ERROR		(0x07)
+#define   UA_ECODE_UNSUPPORTED_IID_TYPE		(0x08)
+#define   UA_ECODE_INVALID_STREAM_IDENTIFIER	(0x09)
+#define  IUA_ECODE_UNASSIGNED_TEI		(0x0a)
+#define  IUA_ECODE_UNRECOGNIZED_SAPI		(0x0b)
+#define  IUA_ECODE_INVALID_TEI_SAPI_COMBINATION	(0x0c)
+#define   UA_ECODE_REFUSED_MANAGEMENT_BLOCKING	(0x0d)
+#define   UA_ECODE_ASPID_REQUIRED		(0x0e)
+#define   UA_ECODE_INVALID_ASPID		(0x0f)
+#define M2UA_ECODE_ASP_ACTIVE_FOR_IIDS		(0x10)
+#define   UA_ECODE_INVALID_PARAMETER_VALUE	(0x11)
+#define   UA_ECODE_PARAMETER_FIELD_ERROR	(0x12)
+#define   UA_ECODE_UNEXPECTED_PARAMETER		(0x13)
+#define   UA_ECODE_DESTINATION_STATUS_UNKNOWN	(0x14)
+#define   UA_ECODE_INVALID_NETWORK_APPEARANCE	(0x15)
+#define   UA_ECODE_MISSING_PARAMETER		(0x16)
+#define   UA_ECODE_ROUTING_KEY_CHANGE_REFUSED	(0x17)
+#define   UA_ECODE_INVALID_ROUTING_CONTEXT	(0x19)
+#define   UA_ECODE_NO_CONFIGURED_AS_FOR_ASP	(0x1a)
+#define   UA_ECODE_SUBSYSTEM_STATUS_UNKNOWN	(0x1b)
+
+#define UA_STATUS_AS_DOWN			(0x00010001)
+#define UA_STATUS_AS_INACTIVE			(0x00010002)
+#define UA_STATUS_AS_ACTIVE			(0x00010003)
+#define UA_STATUS_AS_PENDING			(0x00010004)
+#define UA_STATUS_AS_INSUFFICIENT_ASPS		(0x00020001)
+#define UA_STATUS_ALTERNATE_ASP_ACTIVE		(0x00020002)
+#define UA_STATUS_ASP_FAILURE			(0x00020003)
+#define UA_STATUS_AS_MINIMUM_ASPS		(0x00020004)
+
+#define UA_TMODE_OVERRIDE			(0x1)
+#define UA_TMODE_LOADSHARE			(0x2)
+#define UA_TMODE_BROADCAST			(0x3)
+#define UA_TMODE_SB_OVERRIDE			(0x4)
+#define UA_TMODE_SB_LOADSHARE			(0x5)
+#define UA_TMODE_SB_BROADCAST			(0x6)
+
+#define UA_RESULT_SUCCESS			(0x00)
+#define UA_RESULT_FAILURE			(0x01)
+
+/* M3UA Specific parameters. */
+
+#define M3UA_PARM_NTWK_APP	UA_CONST_PHDR(0x0200,sizeof(uint32_t))
+#define M3UA_PARM_PROT_DATA1	UA_CONST_PHDR(0x0201,0)
+#define M3UA_PARM_PROT_DATA2	UA_CONST_PHDR(0x0202,0)
+#define M3UA_PARM_AFFECT_DEST	UA_CONST_PHDR(0x0203,sizeof(uint32_t))
+#define M3UA_PARM_USER_CAUSE	UA_CONST_PHDR(0x0204,sizeof(uint32_t))
+#define M3UA_PARM_CONG_IND	UA_CONST_PHDR(0x0205,sizeof(uint32_t))
+#define M3UA_PARM_CONCERN_DEST	UA_CONST_PHDR(0x0206,sizeof(uint32_t))
+#define M3UA_PARM_ROUTING_KEY	UA_CONST_PHDR(0x0207,0)
+#define M3UA_PARM_REG_RESULT	UA_CONST_PHDR(0x0208,sizeof(uint32_t))
+#define M3UA_PARM_DEREG_RESULT	UA_CONST_PHDR(0x0209,sizeof(uint32_t)*4)
+#define M3UA_PARM_LOC_KEY_ID	UA_CONST_PHDR(0x020a,sizeof(uint32_t))
+#define M3UA_PARM_DPC		UA_CONST_PHDR(0x020b,0)
+#define M3UA_PARM_SI		UA_CONST_PHDR(0x020c,0)
+#define M3UA_PARM_SSN		UA_CONST_PHDR(0x020d,0)
+#define M3UA_PARM_OPC		UA_CONST_PHDR(0x020e,0)
+#define M3UA_PARM_CIC		UA_CONST_PHDR(0x020f,0)
+#define M3UA_PARM_PROT_DATA3	UA_CONST_PHDR(0x0210,0)	/* proposed */
+#define M3UA_PARM_REG_STATUS	UA_CONST_PHDR(0x0212,sizeof(uint32_t))
+#define M3UA_PARM_DEREG_STATUS	UA_CONST_PHDR(0x0213,sizeof(uint32_t))
+
+struct ua_parm {
+	union {
+		uchar *cp;		/* pointer to parameter field */
+		uint32_t *wp;		/* pointer to parameter field */
+	};
+	size_t len;			/* length of parameter field */
+	uint32_t val;			/* value of first 4 bytes (host order) */
+};
+
+struct m3ua {
+	struct ua_parm data;
+	struct ua_parm info;
+	struct ua_parm rc;
+	struct ua_parm diag;
+	struct ua_parm hbdata;
+	struct ua_parm reason;
+	struct ua_parm tmode;
+	struct ua_parm ecode;
+	struct ua_parm status;
+	struct ua_parm aspid;
+	struct ua_parm ntwk_app;
+	struct ua_parm prot_data1;
+	struct ua_parm prot_data2;
+	struct ua_parm affect_dest;
+	struct ua_parm user_cause;
+	struct ua_parm cong_ind;
+	struct ua_parm concern_dest;
+	struct ua_parm routing_key;
+	struct ua_parm reg_result;
+	struct ua_parm dereg_result;
+	struct ua_parm loc_key_id;
+	struct ua_parm dpc;
+	struct ua_parm si;
+	struct ua_parm ssn;
+	struct ua_parm opc;
+	struct ua_parm cic;
+	struct ua_parm prot_data3;
+	struct ua_parm reg_status;
+	struct ua_parm dereg_status;
+} m3ua = {};
+
+/*
  *  -------------------------------------------------------------------------
  *
  *  Events and Actions
@@ -378,12 +606,12 @@ enum {
 	__TEST_TI_SETMYNAME_DISC, __TEST_TI_SETPEERNAME_DISC,
 	__TEST_TI_SETMYNAME_DISC_DATA, __TEST_TI_SETPEERNAME_DISC_DATA,
 	__TEST_PRIM_TOO_SHORT, __TEST_PRIM_WAY_TOO_SHORT,
-	__TEST_ASPUP_REQ, __TEST_ASPUP_ACK,
-	__TEST_ASPDN_REQ, __TEST_ASPDN_ACK,
-	__TEST_REG_REQ, __TEST_REG_RSP,
-	__TEST_DEREG_REQ, __TEST_DEREG_RSP,
-	__TEST_ASPAC_REQ, __TEST_ASPAC_ACK,
-	__TEST_ASPIA_REQ, __TEST_ASPIA_ACK
+	__TEST_ASPUP_REQ, __TEST_ASPUP_ACK, __TEST_ASPDN_REQ, __TEST_ASPDN_ACK,
+	__TEST_REG_REQ, __TEST_REG_RSP, __TEST_DEREG_REQ, __TEST_DEREG_RSP,
+	__TEST_ASPAC_REQ, __TEST_ASPAC_ACK, __TEST_ASPIA_REQ, __TEST_ASPIA_ACK,
+	__TEST_HBEAT_REQ, __TEST_HBEAT_ACK, __TEST_ERR_MSG, __TEST_NTFY_MSG,
+	__TEST_DUNA_MSG, __TEST_DAVA_MSG, __TEST_SCON_MSG, __TEST_DUPU_MSG, __TEST_DRST_MSG,
+	__TEST_XFER_DATA,
 };
 
 /*
@@ -4262,6 +4490,7 @@ do_signal(int child, int action)
 	char cbuf[BUFSIZE], dbuf[BUFSIZE];
 	union T_primitives *p = (typeof(p)) cbuf;
 	struct strioctl ic;
+	uint32_t *m;
 
 	ic.ic_cmd = 0;
 	ic.ic_timout = test_timout;
@@ -4677,6 +4906,7 @@ do_signal(int child, int action)
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTDATA_REQ:
+test_optdata_req:
 		ctrl->len = sizeof(p->optdata_req)
 		    + (test_opts ? test_olen : 0);
 		p->optdata_req.PRIM_type = T_OPTDATA_REQ;
@@ -5042,6 +5272,301 @@ do_signal(int child, int action)
 		p->capability_req.PRIM_type = T_CAPABILITY_REQ;
 		p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
 		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_ASPUP_REQ:
+		/* set up message in data buffer */
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ (m3ua.aspid.len ? UA_SIZE(UA_PARM_ASPID) : 0)
+			+ (m3ua.info.len ? UA_PHDR_SIZE + UA_PAD4(m3ua.info.len) : 0);
+		m[0] = UA_ASPS_ASPUP_REQ;
+		m[1] = htonl(test_dlen);
+		m += 2;
+		if (m3ua.aspid.len) {
+			m[0] = UA_PARM_ASPID;
+			m[1] = htonl(m3ua.aspid.val);
+			m += 2;
+		}
+		if (m3ua.info.len) {
+			m[0] = UA_PHDR(UA_PARM_INFO, m3ua.info.len);
+			m++;
+			bcopy(m3ua.info.cp, m, m3ua.info.len);
+			m += ((m3ua.info.len + 3) >> 2);
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "ASPUP REQ");
+		goto test_optdata_req;
+	case __TEST_ASPUP_ACK:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ (m3ua.aspid.len ? UA_SIZE(UA_PARM_ASPID) : 0)
+			+ (m3ua.info.len ? UA_PHDR_SIZE + UA_PAD4(m3ua.info.len) : 0);
+		m[0] = UA_ASPS_ASPUP_ACK;
+		m[1] = htonl(test_dlen);
+		m += 2;
+		if (m3ua.aspid.len) {
+			m[0] = UA_PARM_ASPID;
+			m[1] = htonl(m3ua.aspid.val);
+			m += 2;
+		}
+		if (m3ua.info.len) {
+			m[0] = UA_PHDR(UA_PARM_INFO, m3ua.info.len);
+			m++;
+			bcopy(m3ua.info.cp, m, m3ua.info.len);
+			m += ((m3ua.info.len + 3) >> 2);
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "ASPUP ACK");
+		goto test_optdata_req;
+	case __TEST_ASPDN_REQ:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ (m3ua.aspid.len ? UA_SIZE(UA_PARM_ASPID) : 0)
+			+ (m3ua.info.len ? UA_PHDR_SIZE + UA_PAD4(m3ua.info.len) : 0);
+		m[0] = UA_ASPS_ASPDN_REQ;
+		m[1] = htonl(test_dlen);
+		m += 2;
+		if (m3ua.aspid.len) {
+			m[0] = UA_PARM_ASPID;
+			m[1] = htonl(m3ua.aspid.val);
+			m += 2;
+		}
+		if (m3ua.info.len) {
+			m[0] = UA_PHDR(UA_PARM_INFO, m3ua.info.len);
+			m++;
+			bcopy(m3ua.info.cp, m, m3ua.info.len);
+			m += ((m3ua.info.len + 3) >> 2);
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "ASPDN REQ");
+		goto test_optdata_req;
+	case __TEST_ASPDN_ACK:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ (m3ua.aspid.len ? UA_SIZE(UA_PARM_ASPID) : 0)
+			+ (m3ua.info.len ? UA_PHDR_SIZE + UA_PAD4(m3ua.info.len) : 0);
+		m[0] = UA_ASPS_ASPDN_ACK;
+		m[1] = htonl(test_dlen);
+		m += 2;
+		if (m3ua.aspid.len) {
+			m[0] = UA_PARM_ASPID;
+			m[1] = htonl(m3ua.aspid.val);
+			m += 2;
+		}
+		if (m3ua.info.len) {
+			m[0] = UA_PHDR(UA_PARM_INFO, m3ua.info.len);
+			m++;
+			bcopy(m3ua.info.cp, m, m3ua.info.len);
+			m += ((m3ua.info.len + 3) >> 2);
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "ASPDN ACK");
+		goto test_optdata_req;
+	case __TEST_REG_REQ:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ UA_PHDR
+			+ UA_SIZE(M3UA_PARM_LOC_KEY_ID)
+			+ (m3ua.rc.len ? UA_SIZE(UA_PARM_RC) : 0)
+			+ (m3ua.tmode.len ? UA_SIZE(UA_PARM_TMODE) : 0)
+			+ UA_SIZE(M3UA_PARM_DPC)
+			+ (m3ua.ntwk_app.len ? UA_SIZE(M3UA_PARM_NTWK_APP) : 0)
+			+ (m3ua.si.len ? UA_PHDR_SIZE + UA_PAD4(1) : 0)
+			+ (m3ua.opc.len ? UA_PHDR_SIZE + UA_PAD4(4) : 0);
+		m[0] = UA_RKMM_REG_REQ;
+		m[1] = htonl(test_dlen);
+		m[2] = UA_PHDR(M3UA_PARM_ROUTING_KEY, test_dlen - UA_MHDR_SIZE - UA_PHDR);
+		m[3] = M3UA_PARM_LOC_KEY_ID;
+		m[4] = htonl(m3ua.loc_key_id.val);
+		m += 5;
+		if (m3ua.rc.len) {
+			m[0] = UA_PARM_RC;
+			m[1] = htonl(m3ua.rc.val);
+			m += 2;
+		}
+		if (m3ua.tmode.len) {
+			m[0] = UA_PARM_TMODE;
+			m[1] = htonl(m3ua.tmode.val);
+			m += 2;
+		}
+		m[0] = M3UA_PARM_DPC;
+		m[1] = htonl(m3ua.dpc.val);
+		m += 2;
+		if (m3ua.ntwk_app.len) {
+			m[0] = M3UA_PARM_NTWK_APP;
+			m[1] = htonl(m3ua.ntwk_app.val);
+			m += 2;
+		}
+		if (m3ua.si.len) {
+			m[0] = UA_PHDR(M3UA_PARM_SI,1);
+			m[1] = 0;
+			((char *)m)[0] = m3ua.si.val;
+			m += 2;
+		}
+		if (m3ua.opc.len) {
+			m[0] = UA_PHDR(M3UA_PARM_OPC,4);
+			m[1] = htonl(m3ua.opc.val);
+			m += 2;
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "REG REQ");
+		goto test_optdata_req;
+	case __TEST_REG_RSP:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ UA_PHDR_SIZE
+			+ UA_SIZE(M3UA_PARM_LOC_KEY_ID)
+			+ UA_SIZE(M3UA_PARM_REG_STATUS)
+			+ UA_SIZE(UA_PARM_RC);
+		m[0] = UA_RKMM_REG_RSP;
+		m[1] = htonl(test_dlen);
+		m[2] = UA_PHDR(M3UA_PARM_REG_RESULT,test_dlen - UA_MHDR_SIZE - UA_PHDR_SIZE);
+		m[3] = M3UA_PARM_LOC_KEY_ID;
+		m[4] = htonl(m3ua.loc_key_id.val);
+		m[5] = M3UA_PARM_REG_STATUS;
+		m[6] = htonl(m3ua.reg_status);
+		m += 7;
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "REG RSP");
+		goto test_optdata_req;
+	case __TEST_DEREG_REQ:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ UA_SIZE(UA_PARM_RC);
+		m[0] = UA_RKMM_DEREG_REQ;
+		m[1] = htonl(test_dlen);
+		m[2] = UA_PARM_RC;
+		m[3] = htonl(m3ua.rc.val);
+		m += 4;
+		DATA_flag = 0;
+		print_tx_prim(child, "DEREG REQ");
+		goto test_optdata_req;
+	case __TEST_DEREG_RSP:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ UA_PHDR_SIZE
+			+ UA_SIZE(UA_PARM_RC)
+			+ UA_SIZE(M3UA_PARM_DEREG_STATUS);
+		m[0] = UA_RKMM_DEREG_RSP;
+		m[1] = htonl(test_dlen);
+		m[2] = UA_PHDR(M3UA_PARM_REG_RESULT,test_dlen - UA_MHDR_SIZE - UA_PHDR_SIZE);
+		m[3] = UA_PARM_RC;
+		m[4] = htonl(m3ua.rc.val);
+		m[5] = M3UA_PARM_DEREG_STATUS;
+		m[6] = htonl(m3ua.dereg_status);
+		m += 7;
+		DATA_flag = 0;
+		print_tx_prim(child, "DEREG RSP");
+		goto test_optdata_req;
+	case __TEST_ASPAC_REQ:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ (m3ua.tmode.len ? UA_SIZE(UA_PARM_TMODE) : 0)
+			+ (m3ua.rc.len ? UA_SIZE(UA_PARM_RC) : 0)
+			+ (m3ua.info.len ? UA_PHDR_SIZE + UA_PAD4(m3ua.info.len) : 0);
+		m[0] = UA_ASPT_ASPAC_REQ;
+		m[1] = htonl(test_dlen);
+		m += 2;
+		if (m3ua.tmode.len) {
+			m[0] = UA_PARM_TMODE;
+			m[1] = htonl(m3ua.tmode.val);
+			m += 2;
+		}
+		if (m3ua.rc.len) {
+			m[0] = UA_PARM_RC;
+			m[1] = htonl(m3ua.rc.val);
+			m += 2;
+		}
+		if (m3ua.info.len) {
+			m[0] = UA_PHDR(UA_PARM_INFO, m3ua.info.len);
+			m++;
+			bcopy(m3ua.info.cp, m, m3ua.info.len);
+			m += ((m3ua.info.len + 3) >> 2);
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "ASPAC REQ");
+		goto test_optdata_req;
+	case __TEST_ASPAC_ACK:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ (m3ua.tmode.len ? UA_SIZE(UA_PARM_TMODE) : 0)
+			+ (m3ua.rc.len ? UA_SIZE(UA_PARM_RC) : 0)
+			+ (m3ua.info.len ? UA_PHDR_SIZE + UA_PAD4(m3ua.info.len) : 0);
+		m[0] = UA_ASPT_ASPAC_ACK;
+		m[1] = htonl(test_dlen);
+		m += 2;
+		if (m3ua.tmode.len) {
+			m[0] = UA_PARM_TMODE;
+			m[1] = htonl(m3ua.tmode.val);
+			m += 2;
+		}
+		if (m3ua.rc.len) {
+			m[0] = UA_PARM_RC;
+			m[1] = htonl(m3ua.rc.val);
+			m += 2;
+		}
+		if (m3ua.info.len) {
+			m[0] = UA_PHDR(UA_PARM_INFO, m3ua.info.len);
+			m++;
+			bcopy(m3ua.info.cp, m, m3ua.info.len);
+			m += ((m3ua.info.len + 3) >> 2);
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "ASPAC ACK");
+		goto test_optdata_req;
+	case __TEST_ASPIA_REQ:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ (m3ua.rc.len ? UA_SIZE(UA_PARM_RC) : 0)
+			+ (m3ua.info.len ? UA_PHDR_SIZE + UA_PAD4(m3ua.info.len) : 0);
+		m[0] = UA_ASPT_ASPAC_ACK;
+		m[1] = htonl(test_dlen);
+		m += 2;
+		if (m3ua.rc.len) {
+			m[0] = UA_PARM_RC;
+			m[1] = htonl(m3ua.rc.val);
+			m += 2;
+		}
+		if (m3ua.info.len) {
+			m[0] = UA_PHDR(UA_PARM_INFO, m3ua.info.len);
+			m++;
+			bcopy(m3ua.info.cp, m, m3ua.info.len);
+			m += ((m3ua.info.len + 3) >> 2);
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "ASPIA REQ");
+		goto test_optdata_req;
+	case __TEST_ASPIA_ACK:
+		m = (typeof(m)) data->buf;
+		test_dlen = UA_MHDR_SIZE
+			+ (m3ua.rc.len ? UA_SIZE(UA_PARM_RC) : 0)
+			+ (m3ua.info.len ? UA_PHDR_SIZE + UA_PAD4(m3ua.info.len) : 0);
+		m[0] = UA_ASPT_ASPAC_ACK;
+		m[1] = htonl(test_dlen);
+		m += 2;
+		if (m3ua.rc.len) {
+			m[0] = UA_PARM_RC;
+			m[1] = htonl(m3ua.rc.val);
+			m += 2;
+		}
+		if (m3ua.info.len) {
+			m[0] = UA_PHDR(UA_PARM_INFO, m3ua.info.len);
+			m++;
+			bcopy(m3ua.info.cp, m, m3ua.info.len);
+			m += ((m3ua.info.len + 3) >> 2);
+		}
+		test_dlen = (char *)m - data->buf;
+		DATA_flag = 0;
+		print_tx_prim(child, "ASPIA ACK");
+		goto test_optdata_req;
 	default:
 		return __RESULT_SCRIPT_ERROR;
 	}
@@ -5055,7 +5580,256 @@ do_signal(int child, int action)
  *
  *  -------------------------------------------------------------------------
  */
+void
+clear_parms(struct m3ua *m3ua)
+{
+	struct ua_parm *uap = (typeof(uap)) m3ua;
+	int i;
 
+	for (i = 0; i < sizeof(*m3ua) / sizeof(*uap); i++) {
+		uap->cp = NULL;
+		uap->len = 0;
+	}
+	return;
+}
+static int
+do_decode_parm(int child, uint32_t *wp, uint32_t *e)
+{
+	int len, plen;
+
+	for (wp += 2; wp < e; wp += plen) {
+		len = UA_PLEN(*wp);
+		if (len < 4)
+			return __RESULT_DECODE_ERROR;
+		plen = (len + 3) >> 2;
+		if (wp + plen > e)
+			return __RESULT_DECODE_ERROR;
+		switch (UA_TAG(*wp)) {
+		case UA_TAG(UA_PARM_DATA):
+			m3ua.data.wp = wp + 1;
+			m3ua.data.len = len - 4;
+			m3ua.data.val = ntohl(wp[1]);
+			print_opt_name(child, "DATA");
+			break;
+		case UA_TAG(UA_PARM_INFO):
+			m3ua.info.wp = wp + 1;
+			m3ua.info.len = len - 4;
+			m3ua.info.val = ntohl(wp[1]);
+			print_opt_name(child, "INFO");
+			break;
+		case UA_TAG(UA_PARM_RC):
+			if (len < UA_PLEN(UA_PARM_RC))
+				return __RESULT_DECODE_ERROR;
+			m3ua.rc.wp = wp + 1;
+			m3ua.rc.len = len - 4;
+			m3ua.rc.val = ntohl(wp[1]);
+			print_opt_name(child, "RC");
+			break;
+		case UA_TAG(UA_PARM_DIAG):
+			m3ua.diag.wp = wp + 1;
+			m3ua.diag.len = len - 4;
+			m3ua.diag.val = ntohl(wp[1]);
+			print_opt_name(child, "DIAG");
+			break;
+		case UA_TAG(UA_PARM_HBDATA):
+			m3ua.hbdata.wp = wp + 1;
+			m3ua.hbdata.len = len - 4;
+			m3ua.hbdata.val = ntohl(wp[1]);
+			print_opt_name(child, "HBDATA");
+			break;
+		case UA_TAG(UA_PARM_REASON):
+			if (len < UA_PLEN(UA_PARM_REASON))
+				return __RESULT_DECODE_ERROR;
+			m3ua.reason.wp = wp + 1;
+			m3ua.reason.len = len - 4;
+			m3ua.reason.val = ntohl(wp[1]);
+			print_opt_name(child, "REASON");
+			break;
+		case UA_TAG(UA_PARM_TMODE):
+			if (len < UA_PLEN(UA_PARM_TMODE))
+				return __RESULT_DECODE_ERROR;
+			m3ua.tmode.wp = wp + 1;
+			m3ua.tmode.len = len - 4;
+			m3ua.tmode.val = ntohl(wp[1]);
+			print_opt_name(child, "TMODE");
+			break;
+		case UA_TAG(UA_PARM_ECODE):
+			if (len < UA_PLEN(UA_PARM_ECODE))
+				return __RESULT_DECODE_ERROR;
+			m3ua.ecode.wp = wp + 1;
+			m3ua.ecode.len = len - 4;
+			m3ua.ecode.val = ntohl(wp[1]);
+			print_opt_name(child, "ECODE");
+			break;
+		case UA_TAG(UA_PARM_STATUS):
+			if (len < UA_PLEN(UA_PARM_STATUS))
+				return __RESULT_DECODE_ERROR;
+			m3ua.status.wp = wp + 1;
+			m3ua.status.len = len - 4;
+			m3ua.status.val = ntohl(wp[1]);
+			print_opt_name(child, "STATUS");
+			break;
+		case UA_TAG(UA_PARM_ASPID):
+			if (len < UA_PLEN(UA_PARM_ASPID))
+				return __RESULT_DECODE_ERROR;
+			m3ua.aspid.wp = wp + 1;
+			m3ua.aspid.len = len - 4;
+			m3ua.aspid.val = ntohl(wp[1]);
+			print_opt_name(child, "ASPID");
+			break;
+		case UA_TAG(M3UA_PARM_NTWK_APP):
+			if (len < UA_PLEN(M3UA_PARM_NTWK_APP))
+				return __RESULT_DECODE_ERROR;
+			m3ua.ntwk_app.wp = wp + 1;
+			m3ua.ntwk_app.len = len - 4;
+			m3ua.ntwk_app.val = ntohl(wp[1]);
+			print_opt_name(child, "NA");
+			break;
+		case UA_TAG(M3UA_PARM_PROT_DATA1):
+			m3ua.prot_data1.wp = wp + 1;
+			m3ua.prot_data1.len = len - 4;
+			m3ua.prot_data1.val = ntohl(wp[1]);
+			print_opt_name(child, "PROT_DATA1");
+			break;
+		case UA_TAG(M3UA_PARM_PROT_DATA2):
+			m3ua.prot_data2.wp = wp + 1;
+			m3ua.prot_data2.len = len - 4;
+			m3ua.prot_data2.val = ntohl(wp[1]);
+			print_opt_name(child, "PROT_DATA2");
+			break;
+		case UA_TAG(M3UA_PARM_AFFECT_DEST):
+			if (len < UA_PLEN(M3UA_PARM_AFFECT_DEST))
+				return __RESULT_DECODE_ERROR;
+			m3ua.affect_dest.wp = wp + 1;
+			m3ua.affect_dest.len = len - 4;
+			m3ua.affect_dest.val = ntohl(wp[1]);
+			print_opt_name(child, "APC");
+			break;
+		case UA_TAG(M3UA_PARM_USER_CAUSE):
+			if (len < UA_PLEN(M3UA_PARM_USER_CAUSE))
+				return __RESULT_DECODE_ERROR;
+			m3ua.user_cause.wp = wp + 1;
+			m3ua.user_cause.len = len - 4;
+			m3ua.user_cause.val = ntohl(wp[1]);
+			print_opt_name(child, "CAUSE");
+			break;
+		case UA_TAG(M3UA_PARM_CONG_IND):
+			if (len < UA_PLEN(M3UA_PARM_CONG_IND))
+				return __RESULT_DECODE_ERROR;
+			m3ua.cong_ind.wp = wp + 1;
+			m3ua.cong_ind.len = len - 4;
+			m3ua.cong_ind.val = ntohl(wp[1]);
+			print_opt_name(child, "CONG_STATUS");
+			break;
+		case UA_TAG(M3UA_PARM_CONCERN_DEST):
+			if (len < UA_PLEN(M3UA_PARM_CONCERN_DEST))
+				return __RESULT_DECODE_ERROR;
+			m3ua.concern_dest.wp = wp + 1;
+			m3ua.concern_dest.len = len - 4;
+			m3ua.concern_dest.val = ntohl(wp[1]);
+			print_opt_name(child, "CPC");
+			break;
+		case UA_TAG(M3UA_PARM_ROUTING_KEY):
+			m3ua.routing_key.wp = wp + 1;
+			m3ua.routing_key.len = len - 4;
+			m3ua.routing_key.val = ntohl(wp[1]);
+			/* meaningless nesting */
+			if (do_decode_parm(child, wp + 1, wp + plen) == __RESULT_DECODE_ERROR)
+				return __RESULT_DECODE_ERROR;
+			print_opt_name(child, "RK");
+			break;
+		case UA_TAG(M3UA_PARM_REG_RESULT):
+			if (len < UA_PLEN(M3UA_PARM_REG_RESULT))
+				return __RESULT_DECODE_ERROR;
+			m3ua.reg_result.wp = wp + 1;
+			m3ua.reg_result.len = len - 4;
+			m3ua.reg_result.val = ntohl(wp[1]);
+			/* meaningless nesting */
+			if (do_decode_parm(child, wp + 1, wp + plen) == __RESULT_DECODE_ERROR)
+				return __RESULT_DECODE_ERROR;
+			print_opt_name(child, "REG RESULT");
+			break;
+		case UA_TAG(M3UA_PARM_DEREG_RESULT):
+			if (len < UA_PLEN(M3UA_PARM_DEREG_RESULT))
+				return __RESULT_DECODE_ERROR;
+			m3ua.dereg_result.wp = wp + 1;
+			m3ua.dereg_result.len = len - 4;
+			m3ua.dereg_result.val = ntohl(wp[1]);
+			/* meaningless nesting */
+			if (do_decode_parm(child, wp + 1, wp + plen) == __RESULT_DECODE_ERROR)
+				return __RESULT_DECODE_ERROR;
+			print_opt_name(child, "DEREG RESULT");
+			break;
+		case UA_TAG(M3UA_PARM_LOC_KEY_ID):
+			if (len < UA_PLEN(M3UA_PARM_LOC_KEY_ID))
+				return __RESULT_DECODE_ERROR;
+			m3ua.loc_key_id.wp = wp + 1;
+			m3ua.loc_key_id.len = len - 4;
+			m3ua.loc_key_id.val = ntohl(wp[1]);
+			print_opt_name(child, "KEYID");
+			break;
+		case UA_TAG(M3UA_PARM_DPC):
+			m3ua.dpc.wp = wp + 1;
+			m3ua.dpc.len = len - 4;
+			m3ua.dpc.val = ntohl(wp[1]);
+			print_opt_name(child, "DPC");
+			break;
+		case UA_TAG(M3UA_PARM_SI):
+			m3ua.si.wp = wp + 1;
+			m3ua.si.len = len - 4;
+			m3ua.si.val = ntohl(wp[1]);
+			print_opt_name(child, "SI");
+			break;
+		case UA_TAG(M3UA_PARM_SSN):
+			m3ua.ssn.wp = wp + 1;
+			m3ua.ssn.len = len - 4;
+			m3ua.ssn.val = ntohl(wp[1]);
+			print_opt_name(child, "SSN");
+			break;
+		case UA_TAG(M3UA_PARM_OPC):
+			m3ua.opc.wp = wp + 1;
+			m3ua.opc.len = len - 4;
+			m3ua.opc.val = ntohl(wp[1]);
+			print_opt_name(child, "OPC");
+			break;
+		case UA_TAG(M3UA_PARM_CIC):
+			m3ua.cic.wp = wp + 1;
+			m3ua.cic.len = len - 4;
+			m3ua.cic.val = ntohl(wp[1]);
+			print_opt_name(child, "CIC");
+			break;
+		case UA_TAG(M3UA_PARM_PROT_DATA3):
+			m3ua.prot_data3.wp = wp + 1;
+			m3ua.prot_data3.len = len - 4;
+			m3ua.prot_data3.val = ntohl(wp[1]);
+			print_opt_name(child, "PROT_DATA3");
+			break;
+		case UA_TAG(M3UA_PARM_REG_STATUS):
+			if (len < UA_PLEN(M3UA_PARM_REG_STATUS))
+				return __RESULT_DECODE_ERROR;
+			m3ua.reg_status.wp = wp + 1;
+			m3ua.reg_status.len = len - 4;
+			m3ua.reg_status.val = ntohl(wp[1]);
+			print_opt_name(child, "REG_STATUS");
+			break;
+		case UA_TAG(M3UA_PARM_DEREG_STATUS):
+			if (len < UA_PLEN(M3UA_PARM_DEREG_STATUS))
+				return __RESULT_DECODE_ERROR;
+			m3ua.dereg_status.wp = wp + 1;
+			m3ua.dereg_status.len = len - 4;
+			m3ua.dereg_status.val = ntohl(wp[1]);
+			print_opt_name(child, "DEREG_STATUS");
+			break;
+		default:
+			/* ignore it */
+			print_opt_name(child, "(???)");
+			break;
+		}
+	}
+	if (wp > e)
+		return __RESULT_DECODE_ERROR;
+	return __RESULT_SUCCESS;
+}
 static int
 do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
@@ -5064,6 +5838,159 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 	if (data->len >= 0) {
 		event = __TEST_DATA;
 		print_rx_data(child, "M_DATA----------", data->len);
+
+		if (data->len >= UA_MHDR_SIZE) {
+			uint32_t *wp = (typeof(wp)) data->buf;
+			uint32_t *e = (typeof(e)) (data->buf + UA_PAD4(ntohl(wp[1])));
+
+			if ((char *) e > (char *) wp + test_dlen) {
+				print_rx_prim(child, "(BAD MSG)-------");
+				return __RESULT_DECODE_ERROR;
+			}
+			switch (UA_MSG_CLAS(wp[0])) {
+			case UA_CLASS_MGMT:
+				switch (UA_MSG_TYPE(wp[0])) {
+				case UA_MGMT_ERR:
+					print_rx_prim(child, "ERROR-----------");
+					event = __TEST_ERR_MSG;
+					break;
+				case UA_MGMT_NTFY:
+					print_rx_prim(child, "NOTIFY----------");
+					event = __TEST_NTFY_MSG;
+					break;
+				default:
+					print_rx_prim(child, "MGMT UKNOWN-----");
+					event = __RESULT_DECODE_ERROR;
+					break;
+				}
+				break;
+			case UA_CLASS_ASPS:
+				switch (UA_MSG_TYPE(wp[0])) {
+				case UA_ASPS_HBEAT_REQ:
+					print_rx_prim(child, "BEAT REQ--------");
+					event = __TEST_HBEAT_REQ;
+					break;
+				case UA_ASPS_HBEAT_ACK:
+					print_rx_prim(child, "BEAT ACK--------");
+					event = __TEST_HBEAT_ACK;
+					break;
+				case UA_ASPS_ASPUP_REQ:
+					print_rx_prim(child, "ASPUP REQ-------");
+					event = __TEST_ASPUP_REQ;
+					break;
+				case UA_ASPS_ASPUP_ACK:
+					print_rx_prim(child, "ASPUP ACK-------");
+					event = __TEST_ASPUP_ACK;
+					break;
+				case UA_ASPS_ASPDN_REQ:
+					print_rx_prim(child, "ASPDN REQ-------");
+					event = __TEST_ASPDN_REQ;
+					break;
+				case UA_ASPS_ASPDN_ACK:
+					print_rx_prim(child, "ASPDN ACK-------");
+					event = __TEST_ASPDN_ACK;
+					break;
+				default:
+					print_rx_prim(child, "ASPS UNKNOWN----");
+					event = __RESULT_DECODE_ERROR;
+					break;
+				}
+				break;
+			case UA_CLASS_ASPT:
+				switch (UA_MSG_TYPE(wp[0])) {
+				case UA_ASPT_ASPAC_REQ:
+					print_rx_prim(child, "ASPAC REQ-------");
+					event = __TEST_ASPAC_REQ;
+					break;
+				case UA_ASPT_ASPAC_ACK:
+					print_rx_prim(child, "ASPAC ACK-------");
+					event = __TEST_ASPAC_ACK;
+					break;
+				case UA_ASPT_ASPIA_REQ:
+					print_rx_prim(child, "ASPIA REQ-------");
+					event = __TEST_ASPIA_REQ;
+					break;
+				case UA_ASPT_ASPIA_ACK:
+					print_rx_prim(child, "ASPIA ACK-------");
+					event = __TEST_ASPIA_ACK;
+					event = __RESULT_DECODE_ERROR;
+					break;
+				default:
+					print_rx_prim(child, "ASPT UNKNOWN----");
+					break;
+				}
+				break;
+			case UA_CLASS_RKMM:
+				switch (UA_MSG_TYPE(wp[0])) {
+				case UA_RKMM_REG_REQ:
+					print_rx_prim(child, "REG REQ---------");
+					event = __TEST_REG_RSP;
+					break;
+				case UA_RKMM_REG_RSP:
+					print_rx_prim(child, "REG RSP---------");
+					event = __TEST_REG_RSP;
+					break;
+				case UA_RKMM_DEREG_REQ:
+					print_rx_prim(child, "DEREG REQ-------");
+					event = __TEST_DEREG_REQ;
+					break;
+				case UA_RKMM_DEREG_RSP:
+					print_rx_prim(child, "DEREG RSP-------");
+					event = __TEST_DEREG_RSP;
+					break;
+				default:
+					print_rx_prim(child, "RKMM UNKNOWN----");
+					event = __RESULT_DECODE_ERROR;
+					break;
+				}
+				break;
+			case UA_CLASS_XFER:
+				switch (UA_MSG_TYPE(wp[0])) {
+				case UA_XFER_DATA:
+					print_rx_prim(child, "XFER DATA-------");
+					event = __TEST_XFER_DATA;
+					break;
+				default:
+					print_rx_prim(child, "XFER UNKNOWN----");
+					event = __RESULT_DECODE_ERROR;
+					break;
+				}
+				break;
+			case UA_CLASS_SNMM:
+				switch (UA_MSG_TYPE(wp[0])) {
+				case UA_SNMM_DUNA:
+					print_rx_prim(child, "DUNA------------");
+					event = __TEST_DUNA_MSG;
+					break;
+				case UA_SNMM_DAVA:
+					print_rx_prim(child, "DAVA------------");
+					event = __TEST_DAVA_MSG;
+					break;
+				case UA_SNMM_SCON:
+					print_rx_prim(child, "SCON------------");
+					event = __TEST_SCON_MSG;
+					break;
+				case UA_SNMM_DUPU:
+					print_rx_prim(child, "DUPU------------");
+					event = __TEST_DUPU_MSG;
+					break;
+				case UA_SNMM_DRST:
+					print_rx_prim(child, "DRST------------");
+					event = __TEST_DRST_MSG;
+					break;
+				default:
+					print_rx_prim(child, "SNMM UNKNOWN----");
+					event = __RESULT_DECODE_ERROR;
+					break;
+				}
+				break;
+			default:
+				print_rx_prim(child, "M3UA UNKNOWN----");
+				break;
+			}
+			if (do_decode_parm(child, wp, e) == __RESULT_DECODE_ERROR)
+				event = __RESULT_DECODE_ERROR;
+		}
 	}
 	return ((last_event = event));
 }
@@ -5073,6 +6000,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 	union T_primitives *p = (union T_primitives *) ctrl->buf;
+	uint32_t *m, *e;
 
 	if (ctrl->len >= sizeof(p->type)) {
 		switch ((last_prim = p->type)) {
@@ -5310,8 +6238,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		}
 		if (data && data->len >= 0)
-			if (do_decode_data(child, ctrl, data) != __TEST_DATA)
-				event = __RESULT_FAILURE;
+			event = do_decode_data(child, ctrl, data);
 	}
 	return ((last_event = event));
 }

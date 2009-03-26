@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:42:54 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-03-26 19:34:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-23 11:42:54 $ by $Author: brian $
+ Last Modified $Date: 2009-03-26 19:34:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.16  2009-03-26 19:34:15  brian
+ - updates
+
  Revision 0.9.2.15  2009-03-23 11:42:54  brian
  - M3UA-AS module updates
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:42:54 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-03-26 19:34:15 $"
 
-static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:42:54 $";
+static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-03-26 19:34:15 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -141,7 +144,7 @@ static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:42:54 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-03-26 19:34:15 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2233,7 +2236,7 @@ mtp_send_asps_aspup_req(struct mtp *mtp, queue_t *q, mblk_t *msg, uint32_t *aspi
 	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		p[0] = UA_ASPS_ASPDN_REQ;
+		p[0] = UA_ASPS_ASPUP_REQ;
 		p[1] = htonl(mlen);
 		p += 2;
 		if (aspid) {
