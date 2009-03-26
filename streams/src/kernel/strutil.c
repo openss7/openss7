@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2008-09-10 03:49:45 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2009-03-26 19:32:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:45 $ by $Author: brian $
+ Last Modified $Date: 2009-03-26 19:32:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.158  2009-03-26 19:32:00  brian
+ - new timer implementation
+
  Revision 0.9.2.157  2008-09-10 03:49:45  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -159,10 +162,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2008-09-10 03:49:45 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2009-03-26 19:32:00 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2008-09-10 03:49:45 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2009-03-26 19:32:00 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -412,6 +415,7 @@ freeb_skb(caddr_t arg)
 }
 
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#undef module_text_address
 /* unfortunately, this function is not exported */
 struct module *module_text_address(ulong addr);
 

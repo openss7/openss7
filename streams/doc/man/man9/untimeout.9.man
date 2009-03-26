@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: untimeout.9.man,v 0.9.2.23 2008-12-16 08:34:18 brian Exp $
+.\" @(#) $Id: untimeout.9.man,v 0.9.2.24 2009-03-26 19:31:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-12-16 08:34:18 $ by $Author: brian $
+.\" Last Modified $Date: 2009-03-26 19:31:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: untimeout.9.man,v $
+.\" Revision 0.9.2.24  2009-03-26 19:31:59  brian
+.\" - new timer implementation
+.\"
 .\" Revision 0.9.2.23  2008-12-16 08:34:18  brian
 .\" - document and fix BUG #026
 .\"
@@ -217,7 +220,7 @@ or
 .BR qtimeout (9)
 it is more appropriate to use the
 .BR quntimeout (9)
-funciton.)
+function.)
 .PP
 .BR untimeout ()
 must be called for all outstanding timeout calls from the

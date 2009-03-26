@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2008-12-20 13:00:01 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2009-03-26 19:31:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-20 13:00:01 $ by $Author: brian $
+ Last Modified $Date: 2009-03-26 19:31:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.177  2009-03-26 19:31:59  brian
+ - new timer implementation
+
  Revision 0.9.2.176  2008-12-20 13:00:01  brian
  - working changes
 
@@ -213,10 +216,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2008-12-20 13:00:01 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2009-03-26 19:31:59 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2008-12-20 13:00:01 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2009-03-26 19:31:59 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -614,8 +617,8 @@ di_alloc(struct cdevsw *cdev)
 	struct devinfo *di;
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
 
-	/* Note: devinfo is only used by Solaris compatiblity modules that have been extracted from
-	   fast streams.  Chances are it will only be called at registration time, but I will leave
+	/* Note: devinfo is only used by Solaris compatiblity modules that have been extracted from 
+	   fast streams. Chances are it will only be called at registration time, but I will leave
 	   this at GFP_ATOMIC until the compatibility module can be checked. */
 	if (likely((di = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
@@ -721,8 +724,8 @@ modi_alloc(struct fmodsw *fmod)
 	struct mdlinfo *mi;
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
 
-	/* Note: mdlinfo is only used by Solaris compatiblity modules that have been extracted from
-	   fast streams.  Chances are it will only be called at registration time, but I will leave
+	/* Note: mdlinfo is only used by Solaris compatiblity modules that have been extracted from 
+	   fast streams. Chances are it will only be called at registration time, but I will leave
 	   this at GFP_ATOMIC until the compatibility module can be checked. */
 	if (likely((mi = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
@@ -934,8 +937,8 @@ qget(queue_t *q)
 
 		qu = (typeof(qu)) RD(q);
 		dassert(atomic_read(&qu->qu_refs) >= 1);
-		_printd(("%s: queue pair %p ref count is now %d\n",
-			 __FUNCTION__, qu, atomic_read(&qu->qu_refs) + 1));
+		_printd(("%s: queue pair %p ref count is now %d\n", __FUNCTION__, qu,
+			 atomic_read(&qu->qu_refs) + 1));
 		atomic_inc(&qu->qu_refs);
 		return (q);
 	}
@@ -960,8 +963,8 @@ qput(queue_t **qp)
 		qu = (typeof(qu)) rq;
 		*qp = NULL;
 		assert(atomic_read(&qu->qu_refs) >= 1);
-		_printd(("%s: queue pair %p ref count is now %d\n",
-			 __FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
+		_printd(("%s: queue pair %p ref count is now %d\n", __FUNCTION__, qu,
+			 atomic_read(&qu->qu_refs) - 1));
 		if (unlikely(atomic_dec_and_test(&qu->qu_refs) != 0))	/* PROFILED */
 			freeq(rq);
 		return;
@@ -1132,18 +1135,18 @@ mdbblock_alloc_slow(uint priority, void *func)
 #endif
 
 #ifdef DOUBLE_CHECK_MBLKS
-			__ensure(md->msgblk.m_mblock.b_next == NULL,
-				 md->msgblk.m_mblock.b_next = NULL);
-			__ensure(md->msgblk.m_mblock.b_prev == NULL,
-				 md->msgblk.m_mblock.b_prev = NULL);
-			__ensure(md->msgblk.m_mblock.b_cont == NULL,
-				 md->msgblk.m_mblock.b_cont = NULL);
+			__ensure(md->msgblk.m_mblock.b_next == NULL, md->msgblk.m_mblock.b_next =
+				 NULL);
+			__ensure(md->msgblk.m_mblock.b_prev == NULL, md->msgblk.m_mblock.b_prev =
+				 NULL);
+			__ensure(md->msgblk.m_mblock.b_cont == NULL, md->msgblk.m_mblock.b_cont =
+				 NULL);
 			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf,
 				md->msgblk.m_mblock.b_rptr = md->databuf);
 			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf,
 				md->msgblk.m_mblock.b_wptr = md->databuf);
-			__ensure(md->msgblk.m_mblock.b_datap == NULL,
-				 md->msgblk.m_mblock.b_datap = NULL);
+			__ensure(md->msgblk.m_mblock.b_datap == NULL, md->msgblk.m_mblock.b_datap =
+				 NULL);
 			md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
 			__ensure(md->msgblk.m_mblock.b_band == 0, md->msgblk.m_mblock.b_band = 0);
 			__ensure(md->msgblk.m_mblock.b_pad1 == 0, md->msgblk.m_mblock.b_pad1 = 0);
@@ -1160,8 +1163,8 @@ mdbblock_alloc_slow(uint priority, void *func)
 			md->datablk.d_dblock.db_ref = 1;
 			__ensure(md->datablk.d_dblock.db_type == M_DATA,
 				 md->datablk.d_dblock.db_type = M_DATA);
-			__ensure(md->datablk.d_dblock.db_flag == 0,
-				 md->datablk.d_dblock.db_flag = 0);
+			__ensure(md->datablk.d_dblock.db_flag == 0, md->datablk.d_dblock.db_flag =
+				 0);
 			_ensure(md->datablk.d_dblock.db_size == FASTBUF,
 				md->datablk.d_dblock.db_size = FASTBUF);
 #endif
@@ -1183,7 +1186,7 @@ mdbblock_alloc(uint priority, void *func)
 	mblk_t *mp;
 
 	_trace();
-	/* Very first order of business: check free list.  Every priority is allowed to get a block
+	/* Very first order of business: check free list.  Every priority is allowed to get a block 
 	   from the free list now.  It is just a matter of speed.  If blocks are cached on the
 	   per-cpu free list we want to use them, not free them later. */
 
@@ -1227,18 +1230,18 @@ mdbblock_alloc(uint priority, void *func)
 			}
 
 #ifdef DOUBLE_CHECK_MBLKS
-			__ensure(md->msgblk.m_mblock.b_next == NULL,
-				 md->msgblk.m_mblock.b_next = NULL);
-			__ensure(md->msgblk.m_mblock.b_prev == NULL,
-				 md->msgblk.m_mblock.b_prev = NULL);
-			__ensure(md->msgblk.m_mblock.b_cont == NULL,
-				 md->msgblk.m_mblock.b_cont = NULL);
+			__ensure(md->msgblk.m_mblock.b_next == NULL, md->msgblk.m_mblock.b_next =
+				 NULL);
+			__ensure(md->msgblk.m_mblock.b_prev == NULL, md->msgblk.m_mblock.b_prev =
+				 NULL);
+			__ensure(md->msgblk.m_mblock.b_cont == NULL, md->msgblk.m_mblock.b_cont =
+				 NULL);
 			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf,
 				md->msgblk.m_mblock.b_rptr = md->databuf);
 			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf,
 				md->msgblk.m_mblock.b_wptr = md->databuf);
-			__ensure(md->msgblk.m_mblock.b_datap == NULL,
-				 md->msgblk.m_mblock.b_datap = NULL);
+			__ensure(md->msgblk.m_mblock.b_datap == NULL, md->msgblk.m_mblock.b_datap =
+				 NULL);
 			md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
 			__ensure(md->msgblk.m_mblock.b_band == 0, md->msgblk.m_mblock.b_band = 0);
 			__ensure(md->msgblk.m_mblock.b_pad1 == 0, md->msgblk.m_mblock.b_pad1 = 0);
@@ -1255,8 +1258,8 @@ mdbblock_alloc(uint priority, void *func)
 			md->datablk.d_dblock.db_ref = 1;
 			__ensure(md->datablk.d_dblock.db_type == M_DATA,
 				 md->datablk.d_dblock.db_type = M_DATA);
-			__ensure(md->datablk.d_dblock.db_flag == 0,
-				 md->datablk.d_dblock.db_flag = 0);
+			__ensure(md->datablk.d_dblock.db_flag == 0, md->datablk.d_dblock.db_flag =
+				 0);
 			_ensure(md->datablk.d_dblock.db_size == FASTBUF,
 				md->datablk.d_dblock.db_size = FASTBUF);
 #endif
@@ -1817,9 +1820,13 @@ sq_release(struct syncq **sqp)
 #define EVENT_LIMIT (1<<EVENT_ID_BITS)
 #define EVENT_HASH_SIZE (1<<10)
 #define EVENT_HASH_MASK (EVENT_HASH_SIZE-1)
-STATIC rwlock_t event_hash_lock = RW_LOCK_UNLOCKED;
+STATIC spinlock_t event_hash_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct strevent *event_hash[EVENT_HASH_SIZE] __cacheline_aligned;
 STATIC int event_id = 1;		/* start odd */
+STATIC struct strevent *event_free_list = NULL;	/* free list */
+STATIC struct strevent *event_cancel_list = NULL;	/* cancel list */
+STATIC struct strevent *event_frozen_head = NULL;	/* frozen list */
+STATIC struct strevent **event_frozen_tail = &event_frozen_head;
 STATIC void
 #ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 seinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -1832,11 +1839,13 @@ seinfo_ctor(kmem_cachep_t cachep, void *obj)
 #endif
 	{
 		struct seinfo *s = obj;
+		struct strevent *se = obj;
 
 		bzero(s, sizeof(*s));
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&s->s_list);
 #endif
+		se->se_prev = &se->se_next;
 	}
 }
 STATIC struct strevent *
@@ -1850,33 +1859,22 @@ event_alloc(int type, queue_t *q)
 		   procedures and must be called with GFP_ATOMIC. */
 		if (likely((se = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 			struct seinfo *s = (struct seinfo *) se;
+
+#if defined CONFIG_STREAMS_DEBUG
 			unsigned long flags;
+#endif
 
 			s->s_type = type;
 #if defined CONFIG_STREAMS_DEBUG
 			s->s_queue = NULL;
-			write_lock(&si->si_rwlock);
+			/* take strict locks so timeouts and bufcalls can be called from ISRs */
+			streams_write_lock(&si->si_rwlock, flags);
 			list_add_tail(&s->s_list, &si->si_head);
-			write_unlock(&si->si_rwlock);
+			streams_write_unlock(&si->si_rwlock, flags);
 #endif
 			atomic_inc(&si->si_cnt);
 			if (atomic_read(&si->si_cnt) > si->si_hwl)
 				si->si_hwl = atomic_read(&si->si_cnt);
-			/* XXX: are these strict locks necessary? */
-			write_lock_irqsave(&event_hash_lock, flags);
-			do {
-				struct strevent *se2;
-
-				/* ensure that id is not reused */
-				for (se2 = event_hash[event_id & EVENT_HASH_MASK];
-				     se2 && se2->se_id != event_id; se2 = se2->se_prev) ;
-				if (se2 == NULL)
-					break;
-				event_id += 2;	/* stay odd so no zero check on wrap */
-			} while (1);	/* EVENT_LIMIT guarantees that this loop is not indefinite */
-			se->se_id = event_id;
-			event_id += 2;	/* stay odd so no zero check on wrap */
-			write_unlock_irqrestore(&event_hash_lock, flags);
 		}
 	}
 	return (se);
@@ -1885,36 +1883,213 @@ STATIC void
 event_free(struct strevent *se)
 {
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
-	unsigned long flags;
-	struct strevent **sep;
 
 #if defined CONFIG_STREAMS_DEBUG
 	struct seinfo *s = (struct seinfo *) se;
+	unsigned long flags;
 
 	if (s->s_queue)
 		qput(&s->s_queue);
-	write_lock(&si->si_rwlock);
+	/* take strict locks so timeouts and bufcalls can be called from ISRs */
+	streams_write_lock(&si->si_rwlock, flags);
 	list_del_init(&s->s_list);
-	write_unlock(&si->si_rwlock);
+	streams_write_unlock(&si->si_rwlock, flags);
 #endif
-	write_lock_irqsave(&event_hash_lock, flags);
-	for (sep = &event_hash[se->se_id & EVENT_HASH_MASK];
-	     *sep && *sep != se; sep = &(*sep)->se_prev) ;
-	if (*sep)
-		*sep = XCHG(&(*sep)->se_prev, NULL);
-	write_unlock_irqrestore(&event_hash_lock, flags);
 	atomic_dec(&si->si_cnt);
 	kmem_cache_free(si->si_cache, se);
 }
-STATIC struct strevent *
-find_event(int event_id)
-{
-	struct strevent **sep, *se;
 
-	for (sep = &event_hash[event_id & EVENT_HASH_MASK];
-	     *sep && (*sep)->se_id != event_id; sep = &(*sep)->se_prev) ;
-	if ((se = *sep))
-		*sep = XCHG(&se->se_prev, NULL);
+/*
+ *  event_acquire: - acquire an event structure for use (and place in hash)
+ *
+ *  This is the primary allocator for cancellable STREAMS events.  The logic is as follows: first
+ *  try the free list.  We use a free list now instead of relying on the SLAP_NOREAP flag.  If there
+ *  are no events on the free list, try to reuse one from the frozen list.  When an event on the
+ *  frozen list has been there for longer than some long amount of time (currently 10 ticks), they
+ *  can be reused rather than allocating a new one from the slab.  When one cannot be reused from
+ *  the frozen list attempt to allocate one from the SLAB.  If the allocation fails it is due to
+ *  event count limits or memory pressure.  In either case try to pull from the frozen list
+ *  regardless of duration of time on the list.  Otherwise fail.
+ */
+STATIC struct strevent *
+event_acquire(int type, queue_t *q)
+{
+	struct strinfo *si = &Strinfo[DYN_STREVENT];
+	struct strevent *se, **sep;
+	unsigned long flags;
+
+	streams_spin_lock(&event_hash_lock, flags);
+	if (likely(!!(se = event_free_list))) {
+		/* got event from free list */
+		if ((event_free_list = XCHG(&se->se_next, NULL)))
+			event_free_list->se_prev = &event_free_list;
+		se->se_prev = &se->se_next;
+		((struct seinfo *) se)->s_type = type;;
+		atomic_inc(&si->si_cnt);
+		if (atomic_read(&si->si_cnt) > si->si_hwl)
+			si->si_hwl = atomic_read(&si->si_cnt);
+	} else if (likely(!!(se = event_frozen_head) && (jiffies >= se->x.t.timer.expires))) {
+		/* got an aged event from frozen list */
+		if ((event_frozen_head = XCHG(&se->se_next, NULL)))
+			event_frozen_head->se_prev = &event_frozen_head;
+		else
+			event_frozen_tail = &event_frozen_head;	/* empty */
+		se->se_prev = &se->se_next;
+		((struct seinfo *) se)->s_type = type;;
+		atomic_inc(&si->si_cnt);
+		if (atomic_read(&si->si_cnt) > si->si_hwl)
+			si->si_hwl = atomic_read(&si->si_cnt);
+		goto nohash;	/* still in hash */
+	} else if (likely(!!(se = event_alloc(type, q)))) {
+		/* got a new event, allocate id for it */
+		se->se_id = event_id;
+		/* stay odd so no zero check on wrap, however, we never expect to wrap */
+		event_id += 2;
+		/* in all other cases the event id was assigned at allocation */
+	} else if (likely(!!(se = event_frozen_head))) {
+		/* got event from frozen list under pressure */
+		if ((event_frozen_head = XCHG(&se->se_next, NULL)))
+			event_frozen_head->se_prev = &event_frozen_head;
+		else
+			event_frozen_tail = &event_frozen_head;	/* empty */
+		se->se_prev = &se->se_next;
+		((struct seinfo *) se)->s_type = type;;
+		atomic_inc(&si->si_cnt);
+		if (atomic_read(&si->si_cnt) > si->si_hwl)
+			si->si_hwl = atomic_read(&si->si_cnt);
+		goto nohash;	/* still in hash */
+	} else
+		goto nohash;
+	/* place in hash */
+	sep = &event_hash[se->se_id & EVENT_HASH_MASK];
+	if ((se->se_next = XCHG(sep, se)))
+		se->se_next->se_prev = &se->se_next;
+	se->se_prev = sep;
+      nohash:
+	streams_spin_unlock(&event_hash_lock, flags);
+	return (se);
+}
+
+/*
+ *  event_kill: - place event on free list
+ *
+ *  Events are placed on the free list once cancelled an not pending on a STREAMS scheduler.  This
+ *  routine removes the event from the hash or cancel list and places the event on the free list.
+ *  Events on the free list can be reused immediately.  We did not consider these allocated under
+ *  SLAP_NOREAP and so do not now either.
+ */
+STATIC void
+event_kill(struct strevent *se)
+{
+	struct strinfo *si = &Strinfo[DYN_STREVENT];
+	unsigned long flags;
+
+	streams_spin_lock(&event_hash_lock, flags);
+	/* remove from cancel list (when called from STREAMS scheduler) */
+	if ((*(se->se_prev) = se->se_next))
+		se->se_next->se_prev = se->se_prev;
+	/* place on head of free list (keep hot) */
+	if ((se->se_next = XCHG(&event_free_list, se)))
+		se->se_next->se_prev = &se->se_next;
+	se->se_prev = &event_free_list;
+	atomic_dec(&si->si_cnt);	/* considered deallocated */
+	streams_spin_unlock(&event_hash_lock, flags);
+}
+
+/*
+ * event_thaw: - thaw a frozen event an place on free list
+ *
+ * Events are placed on the frozen list after the callback runs.  Events are removed from the hashes
+ * when cancelled.  This routine removes the event from the frozen list and places it on the free
+ * list.  It is not expected that events are cancelled late (it is bad STREAMS module design), but
+ * this may also occur if there is a cancel and callback collision and the cancel waited for the
+ * callback to complete.
+ */
+STATIC void
+event_thaw(struct strevent *se)
+{
+	unsigned long flags;
+
+	streams_spin_lock(&event_hash_lock, flags);
+	/* remove from frozen list */
+	if (event_frozen_tail == &se->se_next)
+		event_frozen_tail = se->se_prev;
+	if ((*(se->se_prev) = se->se_next))
+		se->se_next->se_prev = se->se_prev;
+	/* place on head of free list (keep hot) */
+	if ((se->se_next = XCHG(&event_free_list, se)))
+		se->se_next->se_prev = &se->se_next;
+	se->se_prev = &event_free_list;
+	streams_spin_unlock(&event_hash_lock, flags);
+}
+
+/*
+ * event_cancel: - place event on cancel list
+ *
+ * Events are placed on the cancel list when cancelled but still pending on a STREAMS scheduler.
+ * When cancelled but pending on the STREAMS scheduler, the event has already been removed from the
+ * event hashes and will now be placed on the cancel list.  When the scheduler runs on the event, it
+ * will remove it from the cancel list and place it on the free list.
+ */
+STATIC void
+event_cancel(struct strevent *se)
+{
+	unsigned long flags;
+
+	streams_spin_lock(&event_hash_lock, flags);
+	/* place on head of cancel list (keep hot) */
+	if ((se->se_next = XCHG(&event_cancel_list, se)))
+		se->se_next->se_prev = &se->se_next;
+	se->se_prev = &event_cancel_list;
+	streams_spin_unlock(&event_hash_lock, flags);
+}
+
+/*
+ *  event_freeze: - place event on frozen list
+ *
+ *  Events are placed on the frozen list after a callback has run on an uncancelled event.  They sit
+ *  here in case an event cancellation is pending.  Events are only taken from the frozen list and
+ *  reused when they are cancelled late, have been on the list for some time, or the allocator is
+ *  under pressure.  The purpose of this list is to permit cancellation events to collide with
+ *  callbacks.  The event is removed from the hashes so late cancellations will simply return.  We
+ *  did not consider these allocated under SLAP_NOREAP and so do not now either.
+ */
+STATIC void
+event_freeze(struct strevent *se)
+{
+	struct strinfo *si = &Strinfo[DYN_STREVENT];
+	unsigned long flags;
+
+	streams_spin_lock(&event_hash_lock, flags);
+	/* remove from hashes */
+	if ((*(se->se_prev) = se->se_next))
+		se->se_next->se_prev = se->se_prev;
+	/* place on tail of freeze list */
+	se->se_next = NULL;
+	se->x.t.timer.expires = jiffies + 10;
+	*(se->se_prev = XCHG(&event_frozen_tail, &se->se_next)) = se;
+	atomic_dec(&si->si_cnt);	/* considered deallocated */
+	streams_spin_unlock(&event_hash_lock, flags);
+}
+STATIC struct strevent *
+find_event(int id)
+{
+	struct strevent *se;
+	unsigned long flags;
+
+	se = event_hash[id & EVENT_HASH_MASK];
+	streams_spin_lock(&event_hash_lock, flags);
+	for (; se; se = se->se_next) {
+		if (se->se_id == id) {
+			/* remove from hash when found */
+			if ((*(se->se_prev) = se->se_next))
+				se->se_next->se_prev = se->se_prev;
+			se->se_next = NULL;
+			se->se_prev = &se->se_next;
+			break;
+		}
+	}
+	streams_spin_unlock(&event_hash_lock, flags);
 	return (se);
 }
 
@@ -2019,25 +2194,23 @@ strdefer_mfunc(void *func, queue_t *q, mblk_t *mp, void *arg)
 STATIC streams_fastcall long
 strsched_event(struct strevent *se)
 {
-	long id;
 	struct strthread *t;
 
 	prefetchw(se);
 	t = this_thread;
 	prefetchw(t);
-	id = se->se_id;
 
-	se->se_next = NULL;
+	se->se_link = NULL;
 	{
 		unsigned long flags;
 
 		streams_local_save(flags);
-		*XCHG(&t->strevents_tail, &se->se_next) = se;
+		*XCHG(&t->strevents_tail, &se->se_link) = se;
 		streams_local_restore(flags);
 	}
 	if (!test_and_set_bit(strevents, &t->flags))
 		__raise_streams();
-	return (id);
+	return (se->se_id);
 }
 
 /*
@@ -2052,24 +2225,22 @@ strsched_event(struct strevent *se)
 STATIC streams_fastcall long
 strsched_bufcall(struct strevent *se)
 {
-	long id;
 	struct strthread *t;
 
 	prefetchw(se);
 	t = this_thread;
 	prefetchw(t);
-	id = se->se_id;
 
-	se->se_next = NULL;
+	se->se_link = NULL;
 	{
 		unsigned long flags;
 
 		streams_local_save(flags);
-		*XCHG(&t->strbcalls_tail, &se->se_next) = se;
+		*XCHG(&t->strbcalls_tail, &se->se_link) = se;
 		streams_local_restore(flags);
 	}
 	set_bit(strbcwait, &t->flags);
-	return (id);
+	return (se->se_id);
 }
 
 static spinlock_t timeout_list_lock = SPIN_LOCK_UNLOCKED;
@@ -2100,14 +2271,14 @@ timeout_function(unsigned long arg)
 
 	prefetchw(t);
 
-	se->se_next = NULL;
+	se->se_link = NULL;
 	{
 		unsigned long flags;
 
 		/* Spin lock here to keep multiple processors from appending to the list at the
 		   same time.  Stealing the list for processing is MP safe. */
 		streams_spin_lock(&timeout_list_lock, flags);
-		*XCHG(&t->strtimout_tail, &se->se_next) = se;
+		*XCHG(&t->strtimout_tail, &se->se_link) = se;
 		streams_spin_unlock(&timeout_list_lock, flags);
 	}
 	if (!test_and_set_bit(strtimout, &t->flags))
@@ -2126,14 +2297,20 @@ timeout_function(unsigned long arg)
 STATIC streams_fastcall long
 strsched_timeout(struct strevent *se)
 {
-	long id;
-
-	id = se->se_id;
 	se->x.t.timer.data = (long) se;
 	se->x.t.timer.function = timeout_function;
 	add_timer(&se->x.t.timer);
-	return (id);
+	return (se->se_id);
 }
+
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#undef module_text_address
+/* unfortunately, this function is not exported */
+struct module *module_text_address(ulong addr);
+
+#define module_text_address(__arg) \
+	((typeof(&module_text_address)) HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 
 #if 0
 STATIC streams_fastcall long
@@ -2142,7 +2319,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_STREAM, q))) {
+	if ((se = event_acquire(SE_STREAM, q))) {
 		se->x.e.procp = procp;
 		se->x.e.events = events;
 		id = strsched_event(se);
@@ -2157,11 +2334,20 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_BUFCALL, q))) {
+	if ((se = event_acquire(SE_BUFCALL, q))) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		struct module *kmod;
+
+		if ((kmod = module_text_address((ulong) func))
+		    && kmod != THIS_MODULE && try_module_get(kmod))
+			se->x.b.kmod = kmod;
+		else
+			se->x.b.kmod = NULL;
+#endif
 		se->x.b.queue = q ? qget(q) : NULL;
-		se->x.b.func = func;
 		se->x.b.arg = arg;
 		se->x.b.size = size;
+		se->x.b.func = func;
 		id = strsched_bufcall(se);
 	}
 	return (id);
@@ -2173,14 +2359,23 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_TIMEOUT, q))) {
+	if ((se = event_acquire(SE_TIMEOUT, q))) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		struct module *kmod;
+
+		if ((kmod = module_text_address((ulong) func))
+		    && kmod != THIS_MODULE && try_module_get(kmod))
+			se->x.t.kmod = kmod;
+		else
+			se->x.t.kmod = NULL;
+#endif
 		se->x.t.queue = q ? qget(q) : NULL;
-		se->x.t.func = func;
 		se->x.t.arg = arg;
 		se->x.t.pl = pl;
 		se->x.t.cpu = cpu;
 		init_timer(&se->x.t.timer);
 		se->x.t.timer.expires = jiffies + ticks;
+		se->x.t.func = func;
 		id = strsched_timeout(se);
 	}
 	return (id);
@@ -2192,14 +2387,23 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_WELDQ, q))) {
+	if ((se = event_acquire(SE_WELDQ, q))) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		struct module *kmod;
+
+		if ((kmod = module_text_address((ulong) func))
+		    && kmod != THIS_MODULE && try_module_get(kmod))
+			se->x.w.kmod = kmod;
+		else
+			se->x.w.kmod = NULL;
+#endif
 		se->x.w.queue = q ? qget(q) : NULL;
-		se->x.w.func = func;
 		se->x.w.arg = arg;
 		se->x.w.q1 = qget(q1);
 		se->x.w.q2 = qget(q2);
 		se->x.w.q3 = qget(q3);
 		se->x.w.q4 = qget(q4);
+		se->x.w.func = func;
 		id = strsched_event(se);
 	}
 	return (id);
@@ -2211,14 +2415,23 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_UNWELDQ, q))) {
+	if ((se = event_acquire(SE_UNWELDQ, q))) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		struct module *kmod;
+
+		if ((kmod = module_text_address((ulong) func))
+		    && kmod != THIS_MODULE && try_module_get(kmod))
+			se->x.w.kmod = kmod;
+		else
+			se->x.w.kmod = NULL;
+#endif
 		se->x.w.queue = q ? qget(q) : NULL;
-		se->x.w.func = func;
 		se->x.w.arg = arg;
 		se->x.w.q1 = qget(q1);
 		se->x.w.q2 = qget(q2);
 		se->x.w.q3 = qget(q3);
 		se->x.w.q4 = qget(q4);
+		se->x.w.func = func;
 		id = strsched_event(se);
 	}
 	return (id);
@@ -2275,24 +2488,33 @@ EXPORT_SYMBOL(esbbcall);	/* include/sys/streams/stream.h */
  *  @bcid:	buffer call id returned by bufcall() or esbbcall()
  *  Notices:	Don't ever call this function with an expired bufcall id.
  *
- *  FIXME: This is not completely correct.  The SVR 4.2 MP assurance is that this function will not
- *  return until the callback is either cancelled or has completed running.  The way things stand,
- *  this function will return before a buffer callback on another processor completes, even when it
- *  has not been successfully cancelled.
- *
- *  Of course, there is also the problem that unbufcall() might be called at interrupt on the same
- *  processor as is executing the buffer callback.
+ *  This function may return before the callback completes when called from within an interrupt that
+ *  interrupted the callback function.  If this is not desired use the QSAFE flag and qbufcall to
+ *  suppress interrupts during callbacks.
  */
 streams_fastcall void
 unbufcall(register bcid_t bcid)
 {
 	struct strevent *se;
-	unsigned long flags;
 
-	write_lock_irqsave(&event_hash_lock, flags);
-	if ((se = find_event(bcid)))
-		se->x.b.func = NULL;
-	write_unlock_irqrestore(&event_hash_lock, flags);
+	if ((se = find_event(bcid))) {
+		if (likely(xchg(&se->x.b.func, NULL) != NULL)) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+			struct module *kmod;
+
+			if ((kmod = se->x.b.kmod) != NULL) {
+				module_put(kmod);
+				se->x.b.kmod = NULL;
+			}
+#endif
+			if (se->x.b.queue)
+				qput(&se->x.b.queue);
+			event_cancel(se);
+		} else if (likely(se->se_task != current)) {
+			while (se->se_task != NULL) ;
+			event_thaw(se);
+		}
+	}
 }
 
 EXPORT_SYMBOL(unbufcall);	/* include/sys/streams/stream.h */
@@ -2341,30 +2563,40 @@ EXPORT_SYMBOL(timeout);		/* include/sys/streams/stream.h */
  *  untimeout:	- cancel a timeout callback
  *  @toid:	timeout identifier
  *
- *  FIXME: This is not completely correct.  The SVR 4.2 MP assurance is that this function will not
- *  return until the callback is either cancelled or has completed running.  The way things stand,
- *  this function will return before a timer callback on another processor completes, even when it
- *  has not been successfully cancelled.
+ *  This function may return before the callback completes when called from within an interrupt that
+ *  interrupted the callback function.  If this is not appropriate use the QSAFE flag and qtimeout
+ *  to suppress interrupts during callbacks.
  */
 streams_fastcall clock_t
 untimeout(toid_t toid)
 {
 	struct strevent *se;
 	clock_t rem = 0;
-	unsigned long flags;
 
-	write_lock_irqsave(&event_hash_lock, flags);
 	if ((se = find_event(toid))) {
-		se->x.t.func = NULL;
-		if (se->x.t.queue)
-			qput(&se->x.t.queue);
-		rem = se->x.t.timer.expires - jiffies;
-		if (rem < 0)
-			rem = 0;
-		if (del_timer(&se->x.t.timer))
-			event_free(se);
+		if (likely(xchg(&se->x.t.func, NULL) != NULL)) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+			struct module *kmod;
+
+			if ((kmod = se->x.t.kmod) != NULL) {
+				module_put(kmod);
+				se->x.t.kmod = NULL;
+			}
+#endif
+			if (se->x.t.queue)
+				qput(&se->x.t.queue);
+			rem = se->x.t.timer.expires - jiffies;
+			if (rem < 0)
+				rem = 0;
+			if (del_timer(&se->x.t.timer))
+				event_kill(se);
+			else
+				event_cancel(se);
+		} else if (se->se_task != current) {
+			while (se->se_task != NULL) ;
+			event_thaw(se);
+		}
 	}
-	write_unlock_irqrestore(&event_hash_lock, flags);
 	return (rem);
 }
 
@@ -2383,8 +2615,8 @@ EXPORT_SYMBOL(untimeout);	/* include/sys/streams/stream.h */
  *  Issues the STREAMS event necessary to weld two queue pairs together with synchronization.
  */
 STATIC streams_fastcall int
-__weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
-	weld_arg_t arg, queue_t *protq)
+__weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
+	queue_t *protq)
 {
 	return ((defer_weldq_event(q1, q2, q3, q4, func, arg, protq) != 0) ? 0 : EAGAIN);
 }
@@ -2402,8 +2634,8 @@ __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
  *  Issues the STREAMS event necessary to unweld two queue pairs apart with synchronization.
  */
 STATIC streams_fastcall int
-__unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
-	  weld_arg_t arg, queue_t *protq)
+__unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
+	  queue_t *protq)
 {
 	return ((defer_unweldq_event(q1, q2, q3, q4, func, arg, protq) != 0) ? 0 : EAGAIN);
 }
@@ -2780,12 +3012,12 @@ defer_syncq(struct syncq_cookie *sc)
 	struct strevent *se;
 
 	if ((se = sc->sc_se)) {
-		se->se_next = NULL;
+		se->se_link = NULL;
 		{
 			unsigned long flags;
 
 			streams_local_save(flags);
-			*XCHG(&sc->sc_sq->sq_etail, &se->se_next) = se;
+			*XCHG(&sc->sc_sq->sq_etail, &se->se_link) = se;
 			streams_local_restore(flags);
 		}
 	} else {
@@ -2823,8 +3055,8 @@ find_syncq(struct syncq_cookie *sc)
 	if (global_inner_syncq != NULL) {
 		sc->sc_isq = global_inner_syncq;
 		sc->sc_osq = sc->sc_isq->sq_outer;
-	} else
-	    if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
+	} else if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq)
+		   && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
 		sc->sc_isq = sc->sc_osq;
 		sc->sc_osq = sc->sc_isq->sq_outer;
 	}
@@ -2836,8 +3068,8 @@ find_syncqs(struct syncq_cookie *sc)
 	if (global_inner_syncq != NULL) {
 		sc->sc_isq = global_inner_syncq;
 		sc->sc_osq = sc->sc_isq->sq_outer;
-	} else
-	    if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
+	} else if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq)
+		   && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
 		sc->sc_isq = sc->sc_osq;
 		sc->sc_osq = sc->sc_isq->sq_outer;
 	}
@@ -3923,9 +4155,13 @@ do_bufcall_synced(struct strevent *se)
 {
 	void streamscall (*func) (long);
 
-	read_lock(&event_hash_lock);
-	if (likely((func = se->x.b.func) != NULL)) {
+	se->se_task = current;
+	if (likely((func = xchg(&se->x.b.func, NULL)) != NULL)) {
 		queue_t *q;
+
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		struct module *kmod;
+#endif
 
 		if ((q = se->x.b.queue) != NULL) {
 			bool safe = test_bit(QSAFE_BIT, &q->q_flag);
@@ -3951,8 +4187,16 @@ do_bufcall_synced(struct strevent *se)
 			qput(&q);
 		} else
 			(*func) (se->x.b.arg);
-	}
-	read_unlock(&event_hash_lock);
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		if ((kmod = se->x.b.kmod) != NULL) {
+			module_put(kmod);
+			se->x.b.kmod = NULL;
+		}
+#endif
+		event_freeze(se);
+	} else
+		event_kill(se);
+	se->se_task = NULL;
 }
 
 /**
@@ -3983,9 +4227,13 @@ do_timeout_synced(struct strevent *se)
 {
 	void streamscall (*func) (caddr_t);
 
-	read_lock(&event_hash_lock);
-	if (likely((func = se->x.t.func) != NULL)) {
+	se->se_task = current;
+	if (likely((func = xchg(&se->x.t.func, NULL)) != NULL)) {
 		queue_t *q;
+
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		struct module *kmod;
+#endif
 
 		if ((q = se->x.t.queue) != NULL) {
 			int safe = (se->x.t.pl != 0 || test_bit(QSAFE_BIT, &q->q_flag));
@@ -4017,8 +4265,16 @@ do_timeout_synced(struct strevent *se)
 			if (unlikely(safe))
 				streams_local_restore(pl);
 		}
-	}
-	read_unlock(&event_hash_lock);
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		if ((kmod = se->x.t.kmod) != NULL) {
+			module_put(kmod);
+			se->x.t.kmod = NULL;
+		}
+#endif
+		event_freeze(se);
+	} else
+		event_kill(se);
+	se->se_task = NULL;
 }
 
 /**
@@ -4145,6 +4401,9 @@ do_weldq_synced(struct strevent *se)
 		if (likely((func = se->x.w.func) != NULL)) {
 			queue_t *q;
 
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+			struct module *kmod;
+#endif
 			if ((q = se->x.w.queue) != NULL) {
 				int safe = test_bit(QSAFE_BIT, &q->q_flag);
 				unsigned long pl = 0;
@@ -4167,7 +4426,14 @@ do_weldq_synced(struct strevent *se)
 				qput(&q);
 			} else
 				(*func) (se->x.w.arg);
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+			if ((kmod = se->x.w.kmod) != NULL) {
+				module_put(kmod);
+				se->x.w.kmod = NULL;
+			}
+#endif
 		}
+		event_kill(se);
 	}
 }
 
@@ -4261,7 +4527,6 @@ do_bufcall_event(struct strevent *se)
 	} else
 #endif
 		do_bufcall_synced(se);
-	event_free(se);
 }
 
 /*
@@ -4284,7 +4549,6 @@ do_timeout_event(struct strevent *se)
 	} else
 #endif
 		do_timeout_synced(se);
-	event_free(se);
 }
 
 /* 
@@ -4309,7 +4573,6 @@ do_weldq_event(struct strevent *se)
 	} else
 #endif
 		do_weldq_synced(se);
-	event_free(se);
 }
 
 /*
@@ -4334,7 +4597,6 @@ do_unweldq_event(struct strevent *se)
 	} else
 #endif
 		do_unweldq_synced(se);
-	event_free(se);
 }
 
 streams_noinline streams_fastcall void *
@@ -4500,7 +4762,7 @@ domfuncs(struct strthread *t)
 streams_noinline streams_fastcall __unlikely void
 timeouts(struct strthread *t)
 {
-	struct strevent *se, *se_next;
+	struct strevent *se, *se_link;
 	unsigned long flags;
 	int runs = 0;
 
@@ -4508,18 +4770,18 @@ timeouts(struct strthread *t)
 		prefetchw(t);
 		streams_spin_lock(&timeout_list_lock, flags);
 		clear_bit(strtimout, &t->flags);
-		se_next = XCHG(&t->strtimout_head, NULL);
+		se_link = XCHG(&t->strtimout_head, NULL);
 		t->strtimout_tail = &t->strtimout_head;
 		streams_spin_unlock(&timeout_list_lock, flags);
-		if (likely(se_next != NULL)) {
-			se = se_next;
+		if (likely(se_link != NULL)) {
+			se = se_link;
 			do {
-				se_next = se->se_next;
-				se->se_next = NULL;
+				se_link = se->se_link;
+				se->se_link = NULL;
 				/* this might further defer against a synchronization queue */
 				do_timeout_event(se);
-				prefetchw(se_next);
-			} while (unlikely((se = se_next) != NULL));
+				prefetchw(se_link);
+			} while (unlikely((se = se_link) != NULL));
 		}
 	} while (unlikely(test_bit(strtimout, &t->flags) != 0) && ++runs < 10);
 }
@@ -4621,7 +4883,7 @@ scanqueues(struct strthread *t)
 streams_noinline streams_fastcall __unlikely void
 doevents(struct strthread *t)
 {
-	struct strevent *se, *se_next;
+	struct strevent *se, *se_link;
 	unsigned long flags;
 	int runs = 0;
 
@@ -4629,16 +4891,16 @@ doevents(struct strthread *t)
 		prefetchw(t);
 		streams_local_save(flags);
 		clear_bit(strevents, &t->flags);
-		se_next = XCHG(&t->strevents_head, NULL);
+		se_link = XCHG(&t->strevents_head, NULL);
 		t->strevents_tail = &t->strevents_head;
 		streams_local_restore(flags);
-		if (likely(se_next != NULL)) {
-			se = se_next;
+		if (likely(se_link != NULL)) {
+			se = se_link;
 			do {
 				struct seinfo *s = (typeof(s)) se;
 
-				se_next = se->se_next;
-				se->se_next = NULL;
+				se_link = se->se_link;
+				se->se_link = NULL;
 
 				/* these might further defer against a synchronization queue */
 				switch (s->s_type) {
@@ -4664,7 +4926,7 @@ doevents(struct strthread *t)
 					event_free(se);
 					continue;
 				}
-			} while (unlikely((se = se_next) != NULL));
+			} while (unlikely((se = se_link) != NULL));
 		}
 	} while (unlikely(test_bit(strevents, &t->flags) != 0) && ++runs < 10);
 }
@@ -4703,7 +4965,7 @@ runsyncq(struct syncq *sq)
 
 	sq->sq_owner = current;
 	sq->sq_count = -1;
-	/* We are now in the barrier exclusive.  Just run them all exclusive.  Anything that wanted
+	/* We are now in the barrier exclusive.  Just run them all exclusive.  Anything that wanted 
 	   to enter the outer perimeter shared and the inner perimeter exclusive will run nicely
 	   with just the outer perimeter exclusive; this is because the outer perimeter is always
 	   more restrictive than the inner perimeter.  If there is only one perimeter, then it is
@@ -4749,22 +5011,22 @@ runsyncq(struct syncq *sq)
 			}
 		}
 		{
-			struct strevent *se, *se_next;
+			struct strevent *se, *se_link;
 
 			/* process stream events */
 			for (;;) {
-				se_next = XCHG(&sq->sq_ehead, NULL);
+				se_link = XCHG(&sq->sq_ehead, NULL);
 				sq->sq_etail = &sq->sq_ehead;
-				if (unlikely(se_next == NULL))
+				if (unlikely(se_link == NULL))
 					break;
-				se = se_next;
+				se = se_link;
 				do {
-					se_next = se->se_next;
-					se->se_next = NULL;
+					se_link = se->se_link;
+					se->se_link = NULL;
 					spin_unlock_irqrestore(&sq->sq_lock, flags);
 					sq_doevent_synced(se);
 					spin_lock_irqsave(&sq->sq_lock, flags);
-				} while (unlikely((se = se_next) != NULL));
+				} while (unlikely((se = se_link) != NULL));
 			}
 		}
 	} while (sq->sq_mhead || sq->sq_qhead || sq->sq_ehead);
@@ -4838,7 +5100,7 @@ backlog(struct strthread *t)
 streams_noinline streams_fastcall __unlikely void
 bufcalls(struct strthread *t)
 {
-	struct strevent *se, *se_next;
+	struct strevent *se, *se_link;
 	unsigned long flags;
 	int runs = 0;
 
@@ -4847,17 +5109,17 @@ bufcalls(struct strthread *t)
 		streams_local_save(flags);
 		clear_bit(strbcwait, &t->flags);
 		clear_bit(strbcflag, &t->flags);
-		se_next = XCHG(&t->strbcalls_head, NULL);
+		se_link = XCHG(&t->strbcalls_head, NULL);
 		t->strbcalls_tail = &t->strbcalls_head;
 		streams_local_restore(flags);
-		if (likely(se_next != NULL)) {
-			se = se_next;
+		if (likely(se_link != NULL)) {
+			se = se_link;
 			do {
-				se_next = se->se_next;
-				se->se_next = NULL;
+				se_link = se->se_link;
+				se->se_link = NULL;
 				/* this might further defer against a synchronization queue */
 				do_bufcall_event(se);
-			} while (unlikely((se = se_next) != NULL));
+			} while (unlikely((se = se_link) != NULL));
 		}
 	} while (unlikely(test_bit(strbcflag, &t->flags) != 0) && ++runs < 10);
 }
@@ -5365,6 +5627,54 @@ STATIC struct cacheinfo {
 /* Note: that we only have one cache for both MSGBLOCKs and MDBBLOCKs */
 
 /*
+ *  str_term_events:	- terminate events
+ *
+ *  Now, without SLAB_NOREAP, we need to clear out the event free list and event frozen list on
+ *  exit.
+ */
+STATIC __unlikely void
+str_term_events(void)
+{
+	struct strinfo *si = &Strinfo[DYN_STREVENT];
+	unsigned long flags;
+	struct strevent *se, *se_next;
+	int i, j, k;
+
+	streams_spin_lock(&event_hash_lock, flags);
+	for (se_next = XCHG(&event_free_list, NULL), i = 0; (se = se_next); ++i) {
+		se->se_link = NULL;
+		if ((*(se->se_prev) = (se_next = XCHG(&se->se_next, NULL))))
+			se_next->se_prev = se->se_prev;
+		se->se_prev = &se->se_next;
+		atomic_inc(&si->si_cnt);
+		event_free(se);
+	}
+	event_frozen_tail = &event_frozen_head;
+	for (se_next = XCHG(&event_frozen_head, NULL), j = 0; (se = se_next); ++j) {
+		se->se_link = NULL;
+		if ((*(se->se_prev) = (se_next = XCHG(&se->se_next, NULL))))
+			se_next->se_prev = se->se_prev;
+		se->se_prev = &se->se_next;
+		atomic_inc(&si->si_cnt);
+		event_free(se);
+	}
+	for (se_next = XCHG(&event_cancel_list, NULL), k = 0; (se = se_next); ++k) {
+		se->se_link = NULL;
+		if ((*(se->se_prev) = (se_next = XCHG(&se->se_next, NULL))))
+			se_next->se_prev = se->se_prev;
+		se->se_prev = &se->se_next;
+		event_free(se);
+	}
+	streams_spin_unlock(&event_hash_lock, flags);
+	if (i != 0)
+		__printd(("%s: events on the free list: %d\n", __FUNCTION__, i));
+	if (j != 0)
+		__printd(("%s: events on the frozen list: %d\n", __FUNCTION__, j));
+	if (k != 0)
+		__printd(("%s: events on the cancel list: %d\n", __FUNCTION__, k));
+}
+
+/*
  *  str_term_caches:	- terminate caches
  */
 STATIC __unlikely void
@@ -5449,6 +5759,7 @@ kstreamd(void *__bind_cpu)
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_should_stop) kthread_should_stop_funcp =
 	    (void *) HAVE_KTHREAD_SHOULD_STOP_ADDR;
+
 #define kthread_should_stop (*kthread_should_stop_funcp)
 #endif
 #endif
@@ -5615,6 +5926,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_create) kthread_create_funcp =
 	    (void *) HAVE_KTHREAD_CREATE_ADDR;
+
 #define kthread_create(w, x, y, z) (*kthread_create_funcp)(w, x, y, z)
 #endif
 #endif
@@ -5656,6 +5968,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 			static void (*__setscheduler) (struct task_struct * p, int policy,
 						       int prio) =
 			    (void *) HAVE___SETSCHEDULER_ADDR;
+
 			/* the lock happens to be first */
 			static spinlock_t *(*task_rq_lock) (struct task_struct * p,
 							    unsigned long *flags) =
@@ -5770,8 +6083,9 @@ kill_kstreamd(void)
 #define set_cpus_allowed(__p, __mask) (__p)->cpus_allowed = (__mask)
 #endif
 #if defined HAVE_DO_EXIT_ADDR
-STATIC asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
-    = (typeof(do_exit_)) HAVE_DO_EXIT_ADDR;
+STATIC asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET =
+    (typeof(do_exit_)) HAVE_DO_EXIT_ADDR;
+
 #undef do_exit
 #define do_exit do_exit_
 #endif
@@ -5942,6 +6256,7 @@ open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 {
 	static void (*func) (int, void (*)(struct softirq_action *), void *) =
 	    (typeof(func)) HAVE_OPEN_SOFTIRQ_ADDR;
+
 	return (*func) (nr, action, data);
 }
 #endif
@@ -6034,5 +6349,6 @@ strsched_exit(void)
 	sq_put(&global_inner_syncq);
 	sq_put(&global_outer_syncq);
 #endif
+	str_term_events();
 	str_term_caches();
 }

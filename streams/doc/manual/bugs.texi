@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.27 2008-12-16 08:34:19 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.28 2009-03-26 19:31:59 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,25 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-12-16 08:34:19 $ by $Author: brian $
+@c Last Modified $Date: 2009-03-26 19:31:59 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 027.  2009-03-26T07:56:40+0000
+
+Untimeout and unbufcall did not wait until the callback returned before returning when there was a
+collision between a cancellation of an event and the callback for the event.  Linux Fast-STREAMS now
+makes this assurance, provided that the cancellation is not being invoked from within the same
+thread as the callback (i.e. untimeout called from an ISR interrupting the callback, or, say, from
+the callback itself) in which case it returns immediately.
+
+Also, additional timer problems were encountered.  Cancelling timers from within an ISR did not have
+sufficient list protection (irq suppression) potentially resulting in list corruption or queue
+reference counting problem.
+
+@emph{*fixed*} in @command{streams-0.9.2.5}
+
 @item 026.  2008-12-16T08:17:47+0000
 
 Somewhere about Linux kernel @samp{2.6.17}, and during the openss7-0.9.2.D.rc2 master package
