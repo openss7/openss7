@@ -1,3 +1,13 @@
+2009-03-26  Brian Bidulock  <bidulock@openss7.org>
+
+	- better timer implementation and BUG #027
+	* doc/man/man9/untimeout.9.man
+	* doc/manual/bugs.texi
+	* doc/manual/news.texi
+	* include/sys/streams/strsubr.h
+	* src/kernel/strsched.c
+	* src/kernel/strutil.c
+
 2009-03-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/streams/strconf.h: put register_strdrv back the way it was before

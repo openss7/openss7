@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.90 2008-12-16 08:34:19 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.91 2009-03-26 19:31:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-12-16 08:34:19 $ by $Author: brian $
+ Last Modified $Date: 2009-03-26 19:31:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.91  2009-03-26 19:31:59  brian
+ - new timer implementation
+
  Revision 0.9.2.90  2008-12-16 08:34:19  brian
  - document and fix BUG #026
 
@@ -131,7 +134,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.90 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.91 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do not include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -190,12 +193,14 @@ struct strevent {
 		} e;			/* stream event */
 		struct {
 			queue_t *queue;
+			struct module *kmod;
 			void streamscall (*func) (long);
 			long arg;
 			size_t size;
 		} b;			/* bufcall event */
 		struct {
 			queue_t *queue;
+			struct module *kmod;
 			void streamscall (*func) (caddr_t);
 			caddr_t arg;
 			int pl;
@@ -204,14 +209,17 @@ struct strevent {
 		} t;			/* timeout event */
 		struct {
 			queue_t *queue;
+			struct module *kmod;
 			void streamscall (*func) (void *);
 			void *arg;
 			queue_t *q1, *q2, *q3, *q4;
 		} w;			/* weld request */
 	} x;
-	struct strevent *se_next;
-	struct strevent *se_prev;	/* actually hash list */
+	struct strevent *se_next;	/* hash, cancel, frozen or free list */
+	struct strevent **se_prev;	/* quick delete for hash, cancel, frozen or free list */
+	struct strevent *se_link;	/* scheduler lists only */
 	int se_id;			/* identifier for this event structure */
+	volatile struct task_struct *se_task;	/* task running callback */
 };
 
 #define se_procp    x.e.procp

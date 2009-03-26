@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100 fo+=tcqlorn
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.45 2008-11-04 09:07:27 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.46 2009-03-26 19:31:59 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-11-04 09:07:27 $ by $Author: brian $
+@c Last Modified $Date: 2009-03-26 19:31:59 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -92,7 +92,7 @@ This is the fourteenth (fifth full production) @cite{OpenSS7 Project} release of
 was no longer included as part of the @cite{OpenSS7 Master Package} since @file{openss7-0.9.2.D}.
 
 This is a stable, production grade release, and is part of the @cite{OpenSS7 Master Package}
-(@file{openss7-@value{VERSION_OPENSS&}}).  The release includes maintenance support for recent
+(@file{openss7-@value{VERSION_OPENSS7}}).  The release includes maintenance support for recent
 distributions, production kernels and tool chains.  This package is quite stable and has not had any
 significant changes for the last four (4) maintenance releases.
 
