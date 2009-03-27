@@ -1,3 +1,14 @@
+2009-03-27  Brian Bidulock  <bidulock@openss7.org>
+
+	- second run a new timer implementation and BUG #027
+	* doc/man/man9/bufcall.9.man: updated documentation
+	* doc/man/man9/timeout.9.man: updated documentation
+	* doc/man/man9/unbufcall.9.man: updated documentation
+	* doc/man/man9/untimeout.9.man: updated documentation
+	* include/sys/streams/stream.h: change toid_t and bcid_t from int to long
+	* include/sys/streams/strsubr.h: updates to strevent structure
+	* src/kernel/strsched.c: second new event implementation
+
 2009-03-26  Brian Bidulock  <bidulock@openss7.org>
 
 	- better timer implementation and BUG #027
