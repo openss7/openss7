@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.7 2008-04-28 16:47:07 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.8 2009-03-27 09:04:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:07 $ by $Author: brian $
+ Last Modified $Date: 2009-03-27 09:04:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.8  2009-03-27 09:04:29  brian
+ - second new timer (event) implementation
+
  Revision 0.9.2.7  2008-04-28 16:47:07  brian
  - updates for release
 
@@ -77,7 +80,7 @@
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifdef LIS
 #include <sys/LiS/stream.h>
@@ -98,13 +101,13 @@ union ioctypes {
 
 /* LIS forgets to typedef this */
 #ifndef bcid_t
-typedef int bcid_t;
+typedef long bcid_t;
 
 #define bcid_t bcid_t
 #endif
 /* LIS forgets to typedef this */
 #ifndef bufcall_id_t
-typedef int bufcall_id_t;
+typedef long bufcall_id_t;
 
 #define bufcall_id_t bufcall_id_t
 #endif

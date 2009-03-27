@@ -1,3 +1,7 @@
+2009-03-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/stream.h: change toid_t and bcid_t from int to long
+
 2008-12-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/qbufcall.9.man: update manual page

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.105 2008-09-10 03:49:43 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.106 2009-03-27 09:04:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:43 $ by $Author: brian $
+ Last Modified $Date: 2009-03-27 09:04:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.106  2009-03-27 09:04:30  brian
+ - second new timer (event) implementation
+
  Revision 0.9.2.105  2008-09-10 03:49:43  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -136,7 +139,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.105 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.106 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -1052,11 +1055,11 @@ struct wantio {
 #define fstream(__f) ((struct stdata *)((__f)->private_data))
 
 #undef bcid_t
-typedef int bcid_t;
+typedef long bcid_t;
 
 #define bcid_t bcid_t
 #undef bufcall_id_t
-typedef int bufcall_id_t;
+typedef long bufcall_id_t;
 
 #define bufcall_id_t bufcall_id_t
 
@@ -1501,11 +1504,11 @@ typedef void streamscall timo_fcn_t (caddr_t arg);
 
 #define timo_fcn_t timo_fcn_t
 #undef toid_t
-typedef int toid_t;			/* SVR4 */
+typedef long toid_t;			/* SVR4 */
 
 #define toid_t toid_t
 #undef timout_id_t
-typedef int timeout_id_t;		/* Solaris */
+typedef long timeout_id_t;		/* Solaris */
 
 #define timeout_id_t timeout_id_t
 

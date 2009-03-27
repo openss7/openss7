@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.91 2009-03-26 19:31:59 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.92 2009-03-27 09:04:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-26 19:31:59 $ by $Author: brian $
+ Last Modified $Date: 2009-03-27 09:04:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.92  2009-03-27 09:04:30  brian
+ - second new timer (event) implementation
+
  Revision 0.9.2.91  2009-03-26 19:31:59  brian
  - new timer implementation
 
@@ -134,7 +137,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.91 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.92 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do not include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -218,8 +221,9 @@ struct strevent {
 	struct strevent *se_next;	/* hash, cancel, frozen or free list */
 	struct strevent **se_prev;	/* quick delete for hash, cancel, frozen or free list */
 	struct strevent *se_link;	/* scheduler lists only */
-	int se_id;			/* identifier for this event structure */
-	volatile struct task_struct *se_task;	/* task running callback */
+	long se_id;			/* identifier for this event structure */
+	struct task_struct *se_task;	/* task running callback */
+	volatile int se_state;		/* state of the event */
 };
 
 #define se_procp    x.e.procp
@@ -229,6 +233,14 @@ struct strevent {
 #define se_func	    x.b.func
 #define se_arg	    x.b.arg
 #define se_size	    x.b.size
+
+#define SE_IDLE		0	/* event idle */
+#define SE_ARMED	1	/* event armed awaiting activation or cancellation */
+#define SE_TRIGGERED	2	/* event trigger awaiting processing or cancellation */
+#define SE_ACTIVE	3	/* event callback executing */
+#define SE_CANCELLED	4	/* event cancelled, awaiting processing */
+#define SE_HOLDING	5	/* event cancelling holding awaiting callback completion */
+#define SE_FROZEN	6	/* event frozen awaiting cancellation termination */
 
 #if defined CONFIG_STREAMS_SYNCQS
 /* synchronization queue structure */
