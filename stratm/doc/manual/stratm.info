@@ -8,7 +8,7 @@ END-INFO-DIR-ENTRY
 This file provides the Installation and Reference Manual for OpenSS7 STREAMS
 ATM.
 
-This is Edition 1.20081103, last updated 2009-01-16, of the `OpenSS7 STREAMS
+This is Edition 1.20081103, last updated 2009-03-25, of the `OpenSS7 STREAMS
 ATM Installation and Reference Manual', for Version 0.9.2 Release
 1.20081103.
 
@@ -32,7 +32,7 @@ another language, under the above conditions for modified versions.
 
 Indirect:
 stratm.info-1: 1227
-stratm.info-2: 273108
+stratm.info-2: 273106
 
 Tag Table:
 (Indirect)
@@ -159,93 +159,93 @@ Node: Downloading the Source RPM116956
 Node: Downloading the Debian DSC117660
 Node: Downloading the Tar Ball118385
 Node: Downloading from CVS120090
-Ref: Downloading from CVS-Footnote-1126460
-Ref: Downloading from CVS-Footnote-2126616
-Ref: Downloading from CVS-Footnote-3126735
-Node: Configuration127090
-Node: Configuring the Binary RPM127516
-Ref: Configuring the Binary RPM-Footnote-1130732
-Ref: Configuring the Binary RPM-Footnote-2130812
-Node: Configuring the Debian DEB130975
-Node: Configuring the Source RPM131341
-Ref: Configuring the Source RPM-Footnote-1139966
-Node: Configuring the Debian DSC140235
-Node: Configuring the Tar Ball140817
-Node: Configure Options141317
-Ref: Configure Options-Footnote-1160696
-Node: Environment Variables160989
-Node: Building169656
-Node: Building from the Source RPM169958
-Ref: Building from the Source RPM-Footnote-1171291
-Node: Building from the Debian DSC171371
-Ref: Building from the Debian DSC-Footnote-1172950
-Node: Building from the Tar Ball173030
-Ref: Building from the Tar Ball-Footnote-1174589
-Node: Installing174748
-Node: Installing the Binary RPM175038
-Node: Installing the Debian DEB176353
-Node: Installing the Tar Ball177034
-Node: Removing177789
-Node: Removing the Binary RPM178183
-Node: Removing the Debian DEB178631
-Node: Removing the Source RPM179113
-Node: Removing the Debian DSC179624
-Node: Removing the Tar Ball180251
-Node: Loading181068
-Ref: Loading-Footnote-1183614
-Node: Maintenance183694
-Node: Makefile Targets183834
-Node: User Targets184579
-Ref: User Targets-Footnote-1190248
-Ref: User Targets-Footnote-2190467
-Ref: User Targets-Footnote-3190667
-Node: Maintainer Targets190722
-Node: Clean Targets192312
-Ref: Clean Targets-Footnote-1195014
-Node: Manual Page Targets195168
-Node: Release Targets196377
-Node: Logging Targets198485
-Ref: Logging Targets-Footnote-1201559
-Node: Problem Report Targets201848
-Node: Release Archive Targets203457
-Node: RPM Build Targets205814
-Node: Debian Build Targets208853
-Node: Documentation Targets210850
-Node: Troubleshooting211538
-Node: Test Suites211829
-Node: Pre-installation Checks212089
-Ref: testsuite:ex0213454
-Ref: testsuite:ex1214328
-Ref: testsuite:ex2215165
-Ref: Pre-installation Checks-Footnote-1222313
-Node: Post-installation Checks222417
-Node: Running Test Suites223296
-Ref: testsuite:ex3224155
-Ref: testsuite:ex4225366
-Node: Problem Reports225731
-Node: Problem Report Guidelines226015
-Node: Generating Problem Reports228616
-Ref: autopr:ex0229948
-Ref: Generating Problem Reports-Footnote-1231155
-Node: Automatic Problem Reports231246
-Ref: autopr:ex1231979
-Node: Stand Alone Problem Reports233382
-Ref: autopr:ex2234058
-Node: Known Problems235496
-Node: Licenses236015
-Node: GNU Affero General Public License236343
-Node: GNU General Public License273108
-Node: GNU Lesser General Public License310488
-Node: GNU Free Documentation License319058
-Node: Indices344045
-Node: Concept Index344567
-Node: Type Index358890
-Node: Function Index359052
-Node: Variable Index359235
-Node: File Index362747
-Node: Option Index363331
-Node: Makefile Target Index368383
-Node: Author Index373103
-Node: Manual Page Index373355
+Ref: Downloading from CVS-Footnote-1126458
+Ref: Downloading from CVS-Footnote-2126614
+Ref: Downloading from CVS-Footnote-3126733
+Node: Configuration127088
+Node: Configuring the Binary RPM127514
+Ref: Configuring the Binary RPM-Footnote-1130730
+Ref: Configuring the Binary RPM-Footnote-2130810
+Node: Configuring the Debian DEB130973
+Node: Configuring the Source RPM131339
+Ref: Configuring the Source RPM-Footnote-1139964
+Node: Configuring the Debian DSC140233
+Node: Configuring the Tar Ball140815
+Node: Configure Options141315
+Ref: Configure Options-Footnote-1160694
+Node: Environment Variables160987
+Node: Building169654
+Node: Building from the Source RPM169956
+Ref: Building from the Source RPM-Footnote-1171289
+Node: Building from the Debian DSC171369
+Ref: Building from the Debian DSC-Footnote-1172948
+Node: Building from the Tar Ball173028
+Ref: Building from the Tar Ball-Footnote-1174587
+Node: Installing174746
+Node: Installing the Binary RPM175036
+Node: Installing the Debian DEB176351
+Node: Installing the Tar Ball177032
+Node: Removing177787
+Node: Removing the Binary RPM178181
+Node: Removing the Debian DEB178629
+Node: Removing the Source RPM179111
+Node: Removing the Debian DSC179622
+Node: Removing the Tar Ball180249
+Node: Loading181066
+Ref: Loading-Footnote-1183612
+Node: Maintenance183692
+Node: Makefile Targets183832
+Node: User Targets184577
+Ref: User Targets-Footnote-1190246
+Ref: User Targets-Footnote-2190465
+Ref: User Targets-Footnote-3190665
+Node: Maintainer Targets190720
+Node: Clean Targets192310
+Ref: Clean Targets-Footnote-1195012
+Node: Manual Page Targets195166
+Node: Release Targets196375
+Node: Logging Targets198483
+Ref: Logging Targets-Footnote-1201557
+Node: Problem Report Targets201846
+Node: Release Archive Targets203455
+Node: RPM Build Targets205812
+Node: Debian Build Targets208851
+Node: Documentation Targets210848
+Node: Troubleshooting211536
+Node: Test Suites211827
+Node: Pre-installation Checks212087
+Ref: testsuite:ex0213452
+Ref: testsuite:ex1214326
+Ref: testsuite:ex2215163
+Ref: Pre-installation Checks-Footnote-1222311
+Node: Post-installation Checks222415
+Node: Running Test Suites223294
+Ref: testsuite:ex3224153
+Ref: testsuite:ex4225364
+Node: Problem Reports225729
+Node: Problem Report Guidelines226013
+Node: Generating Problem Reports228614
+Ref: autopr:ex0229946
+Ref: Generating Problem Reports-Footnote-1231153
+Node: Automatic Problem Reports231244
+Ref: autopr:ex1231977
+Node: Stand Alone Problem Reports233380
+Ref: autopr:ex2234056
+Node: Known Problems235494
+Node: Licenses236013
+Node: GNU Affero General Public License236341
+Node: GNU General Public License273106
+Node: GNU Lesser General Public License310486
+Node: GNU Free Documentation License319056
+Node: Indices344043
+Node: Concept Index344565
+Node: Type Index358888
+Node: Function Index359050
+Node: Variable Index359233
+Node: File Index362745
+Node: Option Index363329
+Node: Makefile Target Index368381
+Node: Author Index373101
+Node: Manual Page Index373353
 
 End Tag Table
