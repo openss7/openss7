@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2009-04-01 17:00:08 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2009-04-01 21:15:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-04-01 17:00:08 $ by $Author: brian $
+ Last Modified $Date: 2009-04-01 21:15:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.59  2009-04-01 21:15:11  brian
+ - tweaks
+
  Revision 0.9.2.58  2009-04-01 17:00:08  brian
  - updates
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2009-04-01 17:00:08 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2009-04-01 21:15:11 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2009-04-01 17:00:08 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2009-04-01 21:15:11 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -135,7 +138,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2009-04-01 17:00:08 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2009-04-01 21:15:11 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -15176,7 +15179,7 @@ xp_e1_txrx_burst(struct cd *cd)
 	if ((lebno = (cd->lebno + 1) & (X400P_EBUFNO - 1)) != cd->uebno) {
 		register int slot;
 		register volatile uint32_t *xll;
-
+#if 0
 		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
 		   working in parallel. We only lead by one word to avoid a worse condition: cache
 		   ping-pong.  These prefetches are for read. */
@@ -15205,6 +15208,20 @@ xp_e1_txrx_burst(struct cd *cd)
 				}
 			}
 		}
+#else
+		register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
+		register const uint32_t *const wend = wbuf + 256;
+		register uint32_t *rbuf = cd->rbuf + (lebno << 8);
+
+		for (xll = cd->xll; wbuf < wend;) {
+			for (wbuf++, rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++, rbuf++) {
+				prefetch(wbuf + 1);
+				prefetchw(rbuf + 1);
+				*xll = *wbuf;
+				*rbuf = *xll;
+			}
+		}
+#endif
 		cd->lebno = lebno;
 		tasklet_hi_schedule(&cd->tasklet);
 	} else
@@ -15243,7 +15260,7 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		struct sp *sp;
 		int span;
 
-		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK | E1DIV);
+		cd->xlb[CTLREG] = (OUTBIT | INTACK | E1DIV);
 		xp_e1_txrx_burst(cd);
 		for (span = 0; span < X400_SPANS; span++) {
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -15544,7 +15561,7 @@ xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 		struct sp *sp;
 		int span;
 
-		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK | E1DIV);
+		cd->xlb[CTLREG] = (OUTBIT | INTACK | E1DIV);
 		xp_e1_txrx_burst(cd);
 		for (span = 0; span < X400_SPANS; span++) {
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -15659,7 +15676,7 @@ xp_t1_txrx_burst(struct cd *cd)
 	if ((lebno = (cd->lebno + 1) & (X400P_EBUFNO - 1)) != cd->uebno) {
 		register int slot;
 		register volatile uint32_t *xll;
-
+#if 0
 		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
 		   working in parallel. We only lead by two words to avoid a worse condition: cache 
 		   ping-pong.  These prefetches are for read. */
@@ -15692,6 +15709,22 @@ xp_t1_txrx_burst(struct cd *cd)
 				}
 			}
 		}
+#else
+		register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
+		register const uint32_t *const wend = wbuf + 256;
+		register uint32_t *rbuf = cd->rbuf + (lebno << 8);
+
+		for (xll = cd->xll; wbuf < wend;) {
+			for (wbuf++, rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++, rbuf++) {
+				if (slot & 0x3) {
+					prefetch(wbuf + 2);
+					prefetchw(rbuf + 2);
+					*xll = *wbuf;
+					*rbuf = *xll;
+				}
+			}
+		}
+#endif
 		cd->lebno = lebno;
 		tasklet_hi_schedule(&cd->tasklet);
 	} else
@@ -15730,7 +15763,7 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		struct sp *sp;
 		int span;
 
-		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK);
+		cd->xlb[CTLREG] = (OUTBIT | INTACK);
 		xp_t1_txrx_burst(cd);
 		for (span = 0; span < X400_SPANS; span++) {
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -15890,7 +15923,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		struct sp *sp;
 		int span;
 
-		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK);
+		cd->xlb[CTLREG] = (OUTBIT | INTACK);
 		xp_t1_txrx_burst(cd);
 		for (span = 0; span < X400_SPANS; span++) {
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -17807,6 +17840,11 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->xlb[0x3aa] = 0x80;	/* not LIRST */
 			break;
 		}
+		/* rewrite after LIRST */
+		cd->xlb[0x0b5] = 0x09;	/* master w/ 3 slaves, 8.192 MHz bus */
+		cd->xlb[0x1b5] = 0x08;	/* IBO slave */
+		cd->xlb[0x2b5] = 0x08;	/* IBO slave */
+		cd->xlb[0x3b5] = 0x08;	/* IBO slave */
 		break;
 	}
 	case V401PE:

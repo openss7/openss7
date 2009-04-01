@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2009-04-01 17:00:09 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2009-04-01 21:15:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-04-01 17:00:09 $ by $Author: brian $
+ Last Modified $Date: 2009-04-01 21:15:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.24  2009-04-01 21:15:12  brian
+ - tweaks
+
  Revision 0.9.2.23  2009-04-01 17:00:09  brian
  - updates
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2009-04-01 17:00:09 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2009-04-01 21:15:12 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2009-04-01 17:00:09 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2009-04-01 21:15:12 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   1
@@ -688,7 +691,7 @@ sl_config_t sl_default_e1_chan = {
 	.tb_abate_3 = 896 * 272,
 	.tb_onset_3 = 1024 * 272,
 	.tb_discd_3 = 1152 * 272,
-	.N1 = 127,
+	.N1 = 31,
 	.N2 = 8192,
 	.M = 5,
 };
@@ -715,7 +718,7 @@ sl_config_t sl_default_e1_span = {
 	.tb_abate_3 = 896 * 272,
 	.tb_onset_3 = 1024 * 272,
 	.tb_discd_3 = 1152 * 272,
-	.N1 = 127,
+	.N1 = 31,
 	.N2 = 8192,
 	.M = 5,
 };
@@ -742,7 +745,7 @@ sl_config_t sl_default_t1_chan = {
 	.tb_abate_3 = 896 * 272,
 	.tb_onset_3 = 1024 * 272,
 	.tb_discd_3 = 1152 * 272,
-	.N1 = 127,
+	.N1 = 31,
 	.N2 = 8192,
 	.M = 5,
 };
@@ -769,7 +772,7 @@ sl_config_t sl_default_t1_span = {
 	.tb_abate_3 = 896 * 272,
 	.tb_onset_3 = 1024 * 272,
 	.tb_discd_3 = 1152 * 272,
-	.N1 = 127,
+	.N1 = 31,
 	.N2 = 8192,
 	.M = 5,
 };
@@ -796,7 +799,7 @@ sl_config_t sl_default_j1_chan = {
 	.tb_abate_3 = 896 * 272,
 	.tb_onset_3 = 1024 * 272,
 	.tb_discd_3 = 1152 * 272,
-	.N1 = 127,
+	.N1 = 31,
 	.N2 = 8192,
 	.M = 5,
 };
@@ -823,7 +826,7 @@ sl_config_t sl_default_j1_span = {
 	.tb_abate_3 = 896 * 272,
 	.tb_onset_3 = 1024 * 272,
 	.tb_discd_3 = 1152 * 272,
-	.N1 = 127,
+	.N1 = 31,
 	.N2 = 8192,
 	.M = 5,
 };
@@ -850,7 +853,7 @@ sl_config_t sl_default_m2pa = {
 	.tb_abate_3 = 896 * 272,
 	.tb_onset_3 = 1024 * 272,
 	.tb_discd_3 = 1152 * 272,
-	.N1 = 127,
+	.N1 = 31,
 	.N2 = 8192,
 	.M = 5,
 };
@@ -22177,7 +22180,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.23 $ $Date: 2009-04-01 17:00:09 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.24 $ $Date: 2009-04-01 21:15:12 $");
 }
 
 void
