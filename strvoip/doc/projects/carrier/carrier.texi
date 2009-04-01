@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: carrier.texi,v 0.9.2.8 2008-09-20 11:04:40 brian Exp $
+% @(#) $Id: carrier.texi,v 0.9.2.9 2009-04-01 17:00:10 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-09-20 11:04:40 $ by $Author: brian $
+% Last Modified $Date: 2009-04-01 17:00:10 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: carrier.texi,v $
+% Revision 0.9.2.9  2009-04-01 17:00:10  brian
+% - updates
+%
 % Revision 0.9.2.8  2008-09-20 11:04:40  brian
 % - added package patchlevel
 %
@@ -377,6 +380,9 @@ Project} website for a current version.
 @smallexample
 @verbatim
 $Log: carrier.texi,v $
+Revision 0.9.2.9  2009-04-01 17:00:10  brian
+- updates
+
 Revision 0.9.2.8  2008-09-20 11:04:40  brian
 - added package patchlevel
 
@@ -2322,7 +2328,7 @@ The T400P and E400P cards are 4-span T1 or E1 cards manufactured by
 @uref{http://www.digium.com/, Digium}.
 @figref{24} shows a picture of a T400P card.
 
-@figure{v400p,24,T400P/E400P}
+@figuresized{v400p,24,T400P/E400P,5in}
 
 The T400P and E400P cards have the lowest level of signalling performance due to the lack of
 on-board HDLC functions.  Transfers to the host processor over the PCI bus use PCI I/O ports and
@@ -2406,7 +2412,7 @@ Digium}.
 These cards are a higher performance replacement for the T400P and E400P cards.
 @figref{25} shows a picture of a T405P card.
 
-@figure{t400p-ss7,25,TE405/410}
+@figuresized{t400p-ss7,25,TE405/410,5in}
 
 The TE405 and TE410 cards have a low level of signalling performance due to the lack of
 on-board HDLC functions.  However, transfers to the host process over the PCI bus use bus-mastering
@@ -2486,7 +2492,7 @@ The A101/102/104c cards are 1-, 2- and 4-span E1, T1 or J1 cards manufactured by
 @uref{http://www.sangoma.com/, Sangoma}.
 @figref{26} shows a picture of an A101c card.
 
-@figure{a101c,26,A101/102/104c}
+@figuresized{a101c,26,A101/102/104c,5in}
 
 The A10Xc cards have an increased level of signalling performance due to availability of on-board
 HDLC processing.  Transfers to the host are performed using bus-mastering PCI DMA burst transfers
@@ -2791,7 +2797,7 @@ The ACB56 cards are single V.35 56/64kbps synchronous cards manufactured by
 SeaLevel Systems and distributed by ICS.
 @figref{A-13} shows a picture of an ACB56 card.
 
-@figure{acb56,A-13,ACB56}
+@figuresized{acb56,A-13,ACB56,5in}
 
 @subsubheading Driver
 
@@ -2852,7 +2858,7 @@ integrated CSU/DSU, and other features absent from the ACB56 card.
 The PCA 200E card is a 155MHz ATM card manufactured by Marconi (formerly FORE).
 @figref{A-16} shows a picture of an PCA 200E card.
 
-@figure{pca200e,A-16,PCA 200E}
+@figuresized{pca200e,A-16,PCA 200E,5in}
 
 The PCA 200E cards have a good level of signalling performance because they have an on-board 25MHz
 i960 Intel RISC processor performing cell processing using buffer rings in the same manner as an
@@ -2901,7 +2907,7 @@ Following are the disadvantages of the PCA 200E cards:
 
 A BRI card.
 
-@figure{bri,A-17,BRI}
+@figuresized{bri,A-17,BRI,5in}
 
 @subsubheading Driver
 

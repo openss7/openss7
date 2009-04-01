@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:11:32 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2009-04-01 17:00:09 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:32 $ by $Author: brian $
+ Last Modified $Date: 2009-04-01 17:00:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.23  2009-04-01 17:00:09  brian
+ - updates
+
  Revision 0.9.2.22  2008-04-29 07:11:32  brian
  - updating headers for release
 
@@ -123,9 +126,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:11:32 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2009-04-01 17:00:09 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:11:32 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2009-04-01 17:00:09 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   1
@@ -207,7 +210,7 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9
  *  cable is built as follows:
  *
  *
- *                  JACK 1                      JACK 2
+ *                  JACK 1                      JACK 3
  *            _________________             __________________
  *           | | | | | | | | | |           | | | | | | | | | |
  *           | | | | | | | | | |           | | | | | | | | | |
@@ -237,7 +240,7 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9
  *
  *
  *  The above arrangement will allow the settings below where the PT is on
- *  span 0 (Jack 1) and the IUT is no span 1 (Jack 2).  Channel 19 is used
+ *  span 0 (Jack 1) and the IUT is on span 2 (Jack 3).  Channel 19 is used
  *  rather arbitrarily (its a big prime number).  This allows a single card to
  *  be used to test itself.
  */
@@ -247,7 +250,7 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9
 #define PTU_TEST_CHAN	19
 
 #define IUT_TEST_SLOT	0
-#define IUT_TEST_SPAN	1
+#define IUT_TEST_SPAN	2
 #define IUT_TEST_CHAN	19
 
 /*
@@ -402,6 +405,12 @@ static int test_resfd = -1;
 static void *QOS_buffer = NULL;
 static int QOS_length = 0;
 #else
+static unsigned short ptu_test_slot = PTU_TEST_SLOT;
+static unsigned short ptu_test_span = PTU_TEST_SPAN;
+static unsigned short ptu_test_chan = PTU_TEST_CHAN;
+static unsigned short iut_test_slot = IUT_TEST_SLOT;
+static unsigned short iut_test_span = IUT_TEST_SPAN;
+static unsigned short iut_test_chan = IUT_TEST_CHAN;
 static unsigned short addrs[3][1] = {
 	{(PTU_TEST_SLOT << 12) | (PTU_TEST_SPAN << 8) | (PTU_TEST_CHAN << 0)},
 	{(IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0)},
@@ -527,6 +536,8 @@ enum {
 	__TEST_DISABLE_REQ, __TEST_DISABLE_CON, __TEST_ERROR_IND, __TEST_SDL_OPTIONS,
 	__TEST_SDL_CONFIG, __TEST_SDT_OPTIONS, __TEST_SDT_CONFIG, __TEST_SL_OPTIONS,
 	__TEST_SL_CONFIG, __TEST_SDL_STATS, __TEST_SDT_STATS, __TEST_SL_STATS,
+	__TEST_SDL_GOPTIONS, __TEST_SDL_GCONFIG, __TEST_SDT_GOPTIONS, __TEST_SDT_GCONFIG,
+	__TEST_SL_GOPTIONS, __TEST_SL_GCONFIG,
 };
 
 /*
@@ -630,6 +641,479 @@ struct {
 },};
 #endif				/* TEST_M2PA */
 
+lmi_option_t lmi_default_e1_chan = {
+	.pvar = SS7_PVAR_ITUT_00,
+	.popt = 0,
+};
+lmi_option_t lmi_default_t1_chan = {
+	.pvar = SS7_PVAR_ANSI_00,
+	.popt = SS7_POPT_MPLEV,
+};
+lmi_option_t lmi_default_j1_chan = {
+	.pvar = SS7_PVAR_JTTC_94,
+	.popt = SS7_POPT_MPLEV,
+};
+lmi_option_t lmi_default_e1_span = {
+	.pvar = SS7_PVAR_ITUT_00,
+	.popt = SS7_POPT_HSL | SS7_POPT_XSN,
+};
+lmi_option_t lmi_default_t1_span = {
+	.pvar = SS7_PVAR_ANSI_00,
+	.popt = SS7_POPT_MPLEV | SS7_POPT_HSL | SS7_POPT_XSN,
+};
+lmi_option_t lmi_default_j1_span = {
+	.pvar = SS7_PVAR_JTTC_94,
+	.popt = SS7_POPT_MPLEV | SS7_POPT_HSL | SS7_POPT_XSN,
+};
+sl_config_t sl_default_e1_chan = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 127,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_e1_span = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 127,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_t1_chan = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 127,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_t1_span = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 127,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_j1_chan = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 127,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_j1_span = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 127,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_m2pa = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 127,
+	.N2 = 8192,
+	.M = 5,
+};
+sdt_config_t sdt_default_e1_span = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 793544,
+	.De = 11328,
+	.Ue = 198384,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_t1_span = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_j1_span = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_e1_chan = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 793544,
+	.De = 11328,
+	.Ue = 198384,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_t1_chan = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_j1_chan = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_m2pa = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdl_config_t sdl_default_e1_chan = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_DS0,
+	.ifrate = 64000,
+	.ifgtype = SDL_GTYPE_E1,
+	.ifgrate = 2048000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC5,
+	.ifclock = SDL_CLOCK_SLAVE,
+	.ifcoding = SDL_CODING_HDB3,
+	.ifframing = SDL_FRAMING_CCS,
+	.ifblksize = 8,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_120OHM_NM,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_t1_chan = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_DS0,
+	.ifrate = 64000,
+	.ifgtype = SDL_GTYPE_T1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 8,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_DSX_133FT,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_j1_chan = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_DS0A,
+	.ifrate = 64000,
+	.ifgtype = SDL_GTYPE_J1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6J,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 8,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_DSX_133FT,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_e1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_E1,
+	.ifrate = 2048000,
+	.ifgtype = SDL_GTYPE_E1,
+	.ifgrate = 2048000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC5,
+	.ifclock = SDL_CLOCK_SLAVE,
+	.ifcoding = SDL_CODING_HDB3,
+	.ifframing = SDL_FRAMING_CCS,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_120OHM_NM,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_t1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_T1,
+	.ifrate = 1544000,
+	.ifgtype = SDL_GTYPE_T1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_DSX_133FT,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_j1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_J1,
+	.ifrate = 1544000,
+	.ifgtype = SDL_GTYPE_J1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6J,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_DSX_133FT,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_m2pa = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_PACKET,
+	.ifrate = 10000000,
+	.ifgtype = SDL_GTYPE_SCTP,
+	.ifgrate = 10000000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_NONE,
+	.ifclock = SDL_CLOCK_NONE,
+	.ifcoding = SDL_CODING_NONE,
+	.ifframing = SDL_FRAMING_NONE,
+	.ifblksize = 0,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = 0,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+
 struct test_config {
 	lmi_option_t opt;
 	sdl_config_t sdl;
@@ -681,7 +1165,7 @@ struct test_config {
 		    .Ue = 144292000,	/* Ue - EIM error increment */
 		    .N = 16,	/* N */
 		    .m = 272,	/* m */
-		    .b = 64,	/* b */
+		    .b = 8,	/* b */
 		    .f = SDT_FLAGS_ONE,	/* f */
 	},			/* sdt */
 	{
@@ -2237,6 +2721,71 @@ print_ppa(int child, ppa_t * ppa)
 }
 #endif				/* TEST_X400 */
 void print_string_val(int child, const char *string, ulong val);
+void print_string(int child, const char *string);
+void
+print_lmi_options(int child, lmi_option_t *o)
+{
+	switch (o->pvar) {
+	case SS7_PVAR_ITUT_88:
+		print_string(child, "SS7_PVAR_ITUT_88");
+		break;
+	case SS7_PVAR_ITUT_93:
+		print_string(child, "SS7_PVAR_ITUT_93");
+		break;
+	case SS7_PVAR_ITUT_96:
+		print_string(child, "SS7_PVAR_ITUT_96");
+		break;
+	case SS7_PVAR_ITUT_00:
+		print_string(child, "SS7_PVAR_ITUT_00");
+		break;
+	case SS7_PVAR_ETSI_88:
+		print_string(child, "SS7_PVAR_ETSI_88");
+		break;
+	case SS7_PVAR_ETSI_93:
+		print_string(child, "SS7_PVAR_ETSI_93");
+		break;
+	case SS7_PVAR_ETSI_96:
+		print_string(child, "SS7_PVAR_ETSI_96");
+		break;
+	case SS7_PVAR_ETSI_00:
+		print_string(child, "SS7_PVAR_ETSI_00");
+		break;
+	case SS7_PVAR_ANSI_92:
+		print_string(child, "SS7_PVAR_ANSI_92");
+		break;
+	case SS7_PVAR_ANSI_96:
+		print_string(child, "SS7_PVAR_ANSI_96");
+		break;
+	case SS7_PVAR_ANSI_00:
+		print_string(child, "SS7_PVAR_ANSI_00");
+		break;
+	case SS7_PVAR_JTTC_94:
+		print_string(child, "SS7_PVAR_JTTC_94");
+		break;
+	case SS7_PVAR_CHIN_00:
+		print_string(child, "SS7_PVAR_CHIN_00");
+		break;
+	case SS7_PVAR_SING | SS7_PVAR_88:
+		print_string(child, "SS7_PVAR_SING_88");
+		break;
+	case SS7_PVAR_SPAN | SS7_PVAR_88:
+		print_string(child, "SS7_PVAR_SPAN_88");
+		break;
+	default:
+		print_string(child, "SS7_PVAR_UNKNOWN");
+		break;
+	}
+	if (o->popt & SS7_POPT_MPLEV)
+		print_string(child, "SS7_POPT_MPLEV");
+	if (o->popt & SS7_POPT_PCR)
+		print_string(child, "SS7_POPT_PCR");
+	if (o->popt & SS7_POPT_HSL)
+		print_string(child, "SS7_POPT_HSL");
+	if (o->popt & SS7_POPT_XSN)
+		print_string(child, "SS7_POPT_XSN");
+	if (o->popt & SS7_POPT_NOPR)
+		print_string(child, "SS7_POPT_NOPR");
+}
 void
 print_sdl_stats(int child, sdl_stats_t * s)
 {
@@ -2258,6 +2807,372 @@ print_sdl_stats(int child, sdl_stats_t * s)
 		print_string_val(child, "lead_dcd_lost", s->lead_dcd_lost);
 	if (s->carrier_lost)
 		print_string_val(child, "carrier_lost", s->carrier_lost);
+}
+void
+print_sdl_config(int child, sdl_config_t * c)
+{
+	if (c->ifflags & SDL_IF_UP)
+		print_string(child, "SDL_IF_UP");
+	if (c->ifflags & SDL_IF_RX_RUNNING)
+		print_string(child, "SDL_IF_RX_RUNNING");
+	if (c->ifflags & SDL_IF_TX_RUNNING)
+		print_string(child, "SDL_IF_TX_RUNNING");
+	switch (c->iftype) {
+	case SDL_TYPE_NONE:
+		print_string(child, "SDL_TYPE_NONE");
+		break;
+	case SDL_TYPE_V35:
+		print_string(child, "SDL_TYPE_V35");
+		break;
+	case SDL_TYPE_DS0:
+		print_string(child, "SDL_TYPE_DS0");
+		break;
+	case SDL_TYPE_DS0A:
+		print_string(child, "SDL_TYPE_DS0A");
+		break;
+	case SDL_TYPE_E1:
+		print_string(child, "SDL_TYPE_E1");
+		break;
+	case SDL_TYPE_T1:
+		print_string(child, "SDL_TYPE_T1");
+		break;
+	case SDL_TYPE_J1:
+		print_string(child, "SDL_TYPE_J1");
+		break;
+	case SDL_TYPE_ATM:
+		print_string(child, "SDL_TYPE_ATM");
+		break;
+	case SDL_TYPE_PACKET:
+		print_string(child, "SDL_TYPE_PACKET");
+		break;
+	default:
+		print_string(child, "SDL_TYPE_UNKNOWN");
+		break;
+	}
+	print_string_val(child, "ifrate", c->ifrate);
+	switch (c->ifgtype) {
+	case SDL_GTYPE_NONE:
+		print_string(child, "SDL_GTYPE_NONE");
+		break;
+	case SDL_GTYPE_T1:
+		print_string(child, "SDL_GTYPE_T1");
+		break;
+	case SDL_GTYPE_E1:
+		print_string(child, "SDL_GTYPE_E1");
+		break;
+	case SDL_GTYPE_J1:
+		print_string(child, "SDL_GTYPE_J1");
+		break;
+	case SDL_GTYPE_ATM:
+		print_string(child, "SDL_GTYPE_ATM");
+		break;
+	case SDL_GTYPE_ETH:
+		print_string(child, "SDL_GTYPE_ETH");
+		break;
+	case SDL_GTYPE_IP:
+		print_string(child, "SDL_GTYPE_IP");
+		break;
+	case SDL_GTYPE_UDP:
+		print_string(child, "SDL_GTYPE_UDP");
+		break;
+	case SDL_GTYPE_TCP:
+		print_string(child, "SDL_GTYPE_TCP");
+		break;
+	case SDL_GTYPE_RTP:
+		print_string(child, "SDL_GTYPE_RTP");
+		break;
+	case SDL_GTYPE_SCTP:
+		print_string(child, "SDL_GTYPE_SCTP");
+		break;
+	case SDL_GTYPE_T2:
+		print_string(child, "SDL_GTYPE_T2");
+		break;
+	case SDL_GTYPE_E2:
+		print_string(child, "SDL_GTYPE_E2");
+		break;
+	case SDL_GTYPE_E3:
+		print_string(child, "SDL_GTYPE_E3");
+		break;
+	case SDL_GTYPE_T3:
+		print_string(child, "SDL_GTYPE_T3");
+		break;
+	case SDL_GTYPE_OC3:
+		print_string(child, "SDL_GTYPE_OC3");
+		break;
+	case SDL_GTYPE_OC12:
+		print_string(child, "SDL_GTYPE_OC12");
+		break;
+	case SDL_GTYPE_OC48:
+		print_string(child, "SDL_GTYPE_OC48");
+		break;
+	case SDL_GTYPE_OC192:
+		print_string(child, "SDL_GTYPE_OC192");
+		break;
+	default:
+		print_string(child, "SDL_GTYPE_UNKNOWN");
+		break;
+	}
+	print_string_val(child, "ifgrate", c->ifgrate);
+	switch (c->ifmode) {
+	case SDL_MODE_NONE:
+		print_string(child, "SDL_MODE_NONE");
+		break;
+	case SDL_MODE_DSU:
+		print_string(child, "SDL_MODE_DSU");
+		break;
+	case SDL_MODE_CSU:
+		print_string(child, "SDL_MODE_CSU");
+		break;
+	case SDL_MODE_DTE:
+		print_string(child, "SDL_MODE_DTE");
+		break;
+	case SDL_MODE_DCE:
+		print_string(child, "SDL_MODE_DCE");
+		break;
+	case SDL_MODE_CLIENT:
+		print_string(child, "SDL_MODE_CLIENT");
+		break;
+	case SDL_MODE_SERVER:
+		print_string(child, "SDL_MODE_SERVER");
+		break;
+	case SDL_MODE_PEER:
+		print_string(child, "SDL_MODE_PEER");
+		break;
+	case SDL_MODE_ECHO:
+		print_string(child, "SDL_MODE_ECHO");
+		break;
+	case SDL_MODE_REM_LB:
+		print_string(child, "SDL_MODE_REM_LB");
+		break;
+	case SDL_MODE_LOC_LB:
+		print_string(child, "SDL_MODE_LOC_LB");
+		break;
+	case SDL_MODE_LB_ECHO:
+		print_string(child, "SDL_MODE_LB_ECHO");
+		break;
+	case SDL_MODE_TEST:
+		print_string(child, "SDL_MODE_TEST");
+		break;
+	default:
+		print_string(child, "SDL_MODE_UNKNOWN");
+		break;
+	}
+	switch (c->ifgmode) {
+	case SDL_GMODE_NONE:
+		print_string(child, "SDL_GMODE_NONE");
+		break;
+	case SDL_GMODE_LOC_LB:
+		print_string(child, "SDL_GMODE_LOC_LB");
+		break;
+	case SDL_GMODE_REM_LB:
+		print_string(child, "SDL_GMODE_REM_LB");
+		break;
+	case SDL_GMODE_BOTH_LB:
+		print_string(child, "SDL_GMODE_BOTH_LB");
+		break;
+	default:
+		print_string(child, "SDL_GMODE_UNKNOWN");
+		break;
+	}
+	switch (c->ifgcrc) {
+	case SDL_GCRC_NONE:
+		print_string(child, "SDL_GCRC_NONE");
+		break;
+	case SDL_GCRC_CRC4:
+		print_string(child, "SDL_GCRC_CRC4");
+		break;
+	case SDL_GCRC_CRC5:
+		print_string(child, "SDL_GCRC_CRC5");
+		break;
+	case SDL_GCRC_CRC6:
+		print_string(child, "SDL_GCRC_CRC6");
+		break;
+	case SDL_GCRC_CRC6J:
+		print_string(child, "SDL_GCRC_CRC6J");
+		break;
+	default:
+		print_string(child, "SDL_GCRC_UNKNOWN");
+		break;
+	}
+	switch (c->ifclock) {
+	case SDL_CLOCK_NONE:
+		print_string(child, "SDL_CLOCK_NONE");
+		break;
+	case SDL_CLOCK_INT:
+		print_string(child, "SDL_CLOCK_INT");
+		break;
+	case SDL_CLOCK_EXT:
+		print_string(child, "SDL_CLOCK_EXT");
+		break;
+	case SDL_CLOCK_LOOP:
+		print_string(child, "SDL_CLOCK_LOOP");
+		break;
+	case SDL_CLOCK_MASTER:
+		print_string(child, "SDL_CLOCK_MASTER");
+		break;
+	case SDL_CLOCK_SLAVE:
+		print_string(child, "SDL_CLOCK_SLAVE");
+		break;
+	case SDL_CLOCK_DPLL:
+		print_string(child, "SDL_CLOCK_DPLL");
+		break;
+	case SDL_CLOCK_ABR:
+		print_string(child, "SDL_CLOCK_ABR");
+		break;
+	case SDL_CLOCK_SHAPER:
+		print_string(child, "SDL_CLOCK_SHAPER");
+		break;
+	case SDL_CLOCK_TICK:
+		print_string(child, "SDL_CLOCK_TICK");
+		break;
+	default:
+		print_string(child, "SDL_CLOCK_UNKNOWN");
+		break;
+	}
+	switch (c->ifcoding) {
+	case SDL_CODING_NONE:
+		print_string(child, "SDL_CODING_NONE");
+		break;
+	case SDL_CODING_NRZ:
+		print_string(child, "SDL_CODING_NRZ");
+		break;
+	case SDL_CODING_NRZI:
+		print_string(child, "SDL_CODING_NRZI");
+		break;
+	case SDL_CODING_AMI:
+		print_string(child, "SDL_CODING_AMI");
+		break;
+	case SDL_CODING_B6ZS:
+		print_string(child, "SDL_CODING_B6ZS");
+		break;
+	case SDL_CODING_B8ZS:
+		print_string(child, "SDL_CODING_B8ZS");
+		break;
+	case SDL_CODING_HDB3:
+		print_string(child, "SDL_CODING_HDB3");
+		break;
+	case SDL_CODING_AAL1:
+		print_string(child, "SDL_CODING_AAL1");
+		break;
+	case SDL_CODING_AAL2:
+		print_string(child, "SDL_CODING_AAL2");
+		break;
+	case SDL_CODING_AAL5:
+		print_string(child, "SDL_CODING_AAL5");
+		break;
+	default:
+		print_string(child, "SDL_CODING_UNKNOWN");
+		break;
+	}
+	switch (c->ifframing) {
+	case SDL_FRAMING_NONE:
+		print_string(child, "SDL_FRAMING_NONE");
+		break;
+	case SDL_FRAMING_CCS:
+		print_string(child, "SDL_FRAMING_CCS");
+		break;
+	case SDL_FRAMING_CAS:
+		print_string(child, "SDL_FRAMING_CAS");
+		break;
+	case SDL_FRAMING_SF:
+	// case SDL_FRAMING_D4:
+		print_string(child, "SDL_FRAMING_SF");
+		print_string(child, "SDL_FRAMING_D4");
+		break;
+	case SDL_FRAMING_ESF:
+		print_string(child, "SDL_FRAMING_ESF");
+		break;
+	default:
+		print_string(child, "SDL_FRAMING_UNKNOWN");
+		break;
+	}
+	print_string_val(child, "ifblksize", c->ifblksize);
+	if (c->ifleads & SDL_LEAD_DTR)
+		print_string(child, "SDL_LEAD_DTR");
+	if (c->ifleads & SDL_LEAD_RTS)
+		print_string(child, "SDL_LEAD_RTS");
+	if (c->ifleads & SDL_LEAD_DCD)
+		print_string(child, "SDL_LEAD_DCD");
+	if (c->ifleads & SDL_LEAD_CTS)
+		print_string(child, "SDL_LEAD_CTS");
+	if (c->ifleads & SDL_LEAD_DSR)
+		print_string(child, "SDL_LEAD_DSR");
+	print_string_val(child, "ifbpv", c->ifbpv);
+	if (c->ifalarms & SDL_ALARM_RED)
+		print_string(child, "SDL_ALARM_RED");
+	if (c->ifalarms & SDL_ALARM_BLU)
+		print_string(child, "SDL_ALARM_BLU");
+	if (c->ifalarms & SDL_ALARM_YEL)
+		print_string(child, "SDL_ALARM_YEL");
+	if (c->ifalarms & SDL_ALARM_REC)
+		print_string(child, "SDL_ALARM_REC");
+	switch (c->iftxlevel) {
+	case SDL_TXLEVEL_NONE:
+		print_string(child, "SDL_TXLEVEL_NONE");
+		break;
+	case SDL_TXLEVEL_DSX_133FT:
+		// case SDL_TXLEVEL_CSU_0DB:
+		// case SDL_TXLEVEL_75OHM_NM:
+		print_string(child, "SDL_TXLEVEL_DSX_133FT");
+		print_string(child, "SDL_TXLEVEL_CSU_0DB");
+		print_string(child, "SDL_TXLEVEL_75OHM_NM");
+		break;
+	case SDL_TXLEVEL_DSX_266FT:
+		// case SDL_TXLEVEL_120OHM_NM:
+		print_string(child, "SDL_TXLEVEL_DSX_266FT");
+		print_string(child, "SDL_TXLEVEL_120OHM_NM");
+		break;
+	case SDL_TXLEVEL_DSX_399FT:
+		// case SDL_TXLEVEL_75OHM_PR:
+		print_string(child, "SDL_TXLEVEL_DSX_399FT");
+		print_string(child, "SDL_TXLEVEL_75OHM_PR");
+		break;
+	case SDL_TXLEVEL_DSX_533FT:
+		// case SDL_TXLEVEL_120OHM_PR:
+		print_string(child, "SDL_TXLEVEL_DSX_533FT");
+		print_string(child, "SDL_TXLEVEL_120OHM_PR");
+		break;
+	case SDL_TXLEVEL_DSX_666FT:
+		// case SDL_TXLEVEL_75OHM_HRL:
+		print_string(child, "SDL_TXLEVEL_DSX_666FT");
+		print_string(child, "SDL_TXLEVEL_75OHM_HRL");
+		break;
+	case SDL_TXLEVEL_CSU_8DB:
+		// case SDL_TXLEVEL_120OHM_HRL:
+		print_string(child, "SDL_TXLEVEL_CSU_8DB");
+		print_string(child, "SDL_TXLEVEL_120OHM_HRL");
+		break;
+	case SDL_TXLEVEL_CSU_15DB:
+		print_string(child, "SDL_TXLEVEL_CSU_15DB");
+		break;
+	case SDL_TXLEVEL_CSU_23DB:
+		print_string(child, "SDL_TXLEVEL_CSU_23DB");
+		break;
+	case SDL_TXLEVEL_MON_0DB:
+		print_string(child, "SDL_TXLEVEL_MON_0DB");
+		break;
+	case SDL_TXLEVEL_MON_12DB:
+		print_string(child, "SDL_TXLEVEL_MOD_12DB");
+		break;
+	case SDL_TXLEVEL_MON_20DB:
+		// case SDL_TXLEVEL_MON_26DB:
+		// case SDL_TXLEVEL_MON_30DB:
+		print_string(child, "SDL_TXLEVEL_MON_20DB");
+		print_string(child, "SDL_TXLEVEL_MON_26DB");
+		print_string(child, "SDL_TXLEVEL_MON_30DB");
+		break;
+	case SDL_TXLEVEL_MON_32DB:
+		print_string(child, "SDL_TXLEVEL_MON_32DB");
+		break;
+	default:
+		print_string(child, "SDL_TXLEVEL_UNKNOWN");
+		break;
+	}
+	print_string_val(child, "ifsync", c->ifsync);
+	print_string_val(child, "ifsyncsrc[0]", c->ifsyncsrc[0]);
+	print_string_val(child, "ifsyncsrc[1]", c->ifsyncsrc[1]);
+	print_string_val(child, "ifsyncsrc[2]", c->ifsyncsrc[2]);
+	print_string_val(child, "ifsyncsrc[3]", c->ifsyncsrc[3]);
 }
 
 void
@@ -2317,6 +3232,39 @@ print_sdt_stats(int child, sdt_stats_t * s)
 		print_string_val(child, "carrier_lost", s->carrier_lost);
 }
 void
+print_sdt_config(int child, sdt_config_t * c)
+{
+	print_string_val(child, "t8", c->t8);
+	print_string_val(child, "Tin", c->Tin);
+	print_string_val(child, "Tie", c->Tie);
+	print_string_val(child, "T", c->T);
+	print_string_val(child, "D", c->D);
+	print_string_val(child, "Te", c->Te);
+	print_string_val(child, "De", c->De);
+	print_string_val(child, "Ue", c->Ue);
+	print_string_val(child, "N", c->N);
+	print_string_val(child, "m", c->m);
+	print_string_val(child, "b", c->b);
+	switch (c->f) {
+	case SDT_FLAGS_ONE:
+		print_string(child, "SDT_FLAGS_ONE");
+		break;
+	case SDT_FLAGS_SHARED:
+		print_string(child, "SDT_FLAGS_SHARED");
+		break;
+	case SDT_FLAGS_TWO:
+		print_string(child, "SDT_FLAGS_TWO");
+		break;
+	case SDT_FLAGS_THREE:
+		print_string(child, "SDT_FLAGS_THREE");
+		break;
+	default:
+		print_string_val(child, "f", c->f);
+		break;
+	}
+}
+
+void
 print_sl_stats(int child, sl_stats_t *s)
 {
 	if (s->sl_dur_in_service)
@@ -2363,6 +3311,35 @@ print_sl_stats(int child, sl_stats_t *s)
 		print_string_val(child, "sl_cong_discd_ind[2]", s->sl_cong_discd_ind[2]);
 	if (s->sl_cong_discd_ind[3])
 		print_string_val(child, "sl_cong_discd_ind[3]", s->sl_cong_discd_ind[3]);
+}
+void
+print_sl_config(int child, sl_config_t * c)
+{
+	print_string_val(child, "t1", c->t1);
+	print_string_val(child, "t2", c->t2);
+	print_string_val(child, "t2l", c->t2l);
+	print_string_val(child, "t2h", c->t2h);
+	print_string_val(child, "t3", c->t3);
+	print_string_val(child, "t4n", c->t4n);
+	print_string_val(child, "t4e", c->t4e);
+	print_string_val(child, "t5", c->t5);
+	print_string_val(child, "t6", c->t6);
+	print_string_val(child, "t7", c->t7);
+	print_string_val(child, "rb_abate", c->rb_abate);
+	print_string_val(child, "rb_accept", c->rb_accept);
+	print_string_val(child, "rb_discard", c->rb_discard);
+	print_string_val(child, "tb_abate_1", c->tb_abate_1);
+	print_string_val(child, "tb_onset_1", c->tb_onset_1);
+	print_string_val(child, "tb_discd_1", c->tb_discd_1);
+	print_string_val(child, "tb_abate_2", c->tb_abate_2);
+	print_string_val(child, "tb_onset_2", c->tb_onset_2);
+	print_string_val(child, "tb_discd_2", c->tb_discd_2);
+	print_string_val(child, "tb_abate_3", c->tb_abate_3);
+	print_string_val(child, "tb_onset_3", c->tb_onset_3);
+	print_string_val(child, "tb_discd_3", c->tb_discd_3);
+	print_string_val(child, "N1", c->N1);
+	print_string_val(child, "N2", c->N2);
+	print_string_val(child, "M", c->M);
 }
 
 #if TEST_M2PA
@@ -5435,6 +6412,66 @@ test_msleep(int child, unsigned long m)
 static int
 begin_tests(int index)
 {
+	switch (ss7_pvar) {
+	case SS7_PVAR_ITUT_88:
+	case SS7_PVAR_ITUT_93:
+	case SS7_PVAR_ITUT_96:
+	case SS7_PVAR_ITUT_00:
+	case SS7_PVAR_ETSI_88:
+	case SS7_PVAR_ETSI_93:
+	case SS7_PVAR_ETSI_96:
+	case SS7_PVAR_ETSI_00:
+	case SS7_PVAR_SING | SS7_PVAR_88:
+	case SS7_PVAR_SPAN | SS7_PVAR_88:
+	case SS7_PVAR_CHIN_00:
+	default:
+		if (iut_test_chan == 0) {
+			config->opt = lmi_default_e1_span;
+			config->sl = sl_default_e1_span;
+			config->sdt = sdt_default_e1_span;
+			config->sdl = sdl_default_e1_span;
+		} else {
+			config->opt = lmi_default_e1_chan;
+			config->sl = sl_default_e1_chan;
+			config->sdt = sdt_default_e1_chan;
+			config->sdl = sdl_default_e1_chan;
+		}
+		break;
+	case SS7_PVAR_ANSI_92:
+	case SS7_PVAR_ANSI_96:
+	case SS7_PVAR_ANSI_00:
+		if (iut_test_chan == 0) {
+			config->opt = lmi_default_t1_span;
+			config->sl = sl_default_t1_span;
+			config->sdt = sdt_default_t1_span;
+			config->sdl = sdl_default_t1_span;
+		} else {
+			config->opt = lmi_default_t1_chan;
+			config->sl = sl_default_t1_chan;
+			config->sdt = sdt_default_t1_chan;
+			config->sdl = sdl_default_t1_chan;
+		}
+		break;
+	case SS7_PVAR_JTTC_94:
+		if (iut_test_chan == 0) {
+			config->opt = lmi_default_j1_span;
+			config->sl = sl_default_j1_span;
+			config->sdt = sdt_default_j1_span;
+			config->sdl = sdl_default_j1_span;
+		} else {
+			config->opt = lmi_default_j1_chan;
+			config->sl = sl_default_j1_chan;
+			config->sdt = sdt_default_j1_chan;
+			config->sdl = sdl_default_j1_chan;
+		}
+		break;
+	}
+	config->opt.pvar = ss7_pvar;
+#if TEST_M2PA
+	config->sl = sl_default_m2pa;
+	config->sdt = sdt_default_m2pa;
+	config->sdl = sdl_default_m2pa;
+#endif				/* TEST_M2PA */
 	state = 0;
 	if (stream_start(0, index) != __RESULT_SUCCESS)
 		goto failure;
@@ -6578,6 +7615,28 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sdl_stats(child, &stats->sdl);
 		return (err);
+	case __TEST_SDL_GOPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, "!options sdl");
+		ic.ic_cmd = SDL_IOCGOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_lmi_options(child, &config->opt);
+		return (err);
+	case __TEST_SDL_GCONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, "!config sdl");
+		ic.ic_cmd = SDL_IOCGCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sdl);
+		ic.ic_dp = (char *) &config->sdl;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sdl_config(child, &config->sdl);
+		return (err);
 	case __TEST_SDT_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sdt");
@@ -6605,6 +7664,28 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sdt_stats(child, &stats->sdt);
 		return (err);
+	case __TEST_SDT_GOPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, "!options sdt");
+		ic.ic_cmd = SDT_IOCGOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_lmi_options(child, &config->opt);
+		return (err);
+	case __TEST_SDT_GCONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, "!config sdt");
+		ic.ic_cmd = SDT_IOCGCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sdt);
+		ic.ic_dp = (char *) &config->sdt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sdt_config(child, &config->sdt);
+		return (err);
 	case __TEST_SL_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sl");
@@ -6631,6 +7712,28 @@ do_signal(int child, int action)
 		if ((err = test_ioctl(child, I_STR, (intptr_t) &ic)))
 			if (show && verbose > 1)
 				print_sl_stats(child, &stats->sl);
+		return (err);
+	case __TEST_SL_GOPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, "!options sl");
+		ic.ic_cmd = SL_IOCGOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_lmi_options(child, &config->opt);
+		return (err);
+	case __TEST_SL_GCONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, "!config sl");
+		ic.ic_cmd = SL_IOCGCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sl);
+		ic.ic_dp = (char *) &config->sl;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sl_config(child, &config->sl);
 		return (err);
 
 	case __TEST_ATTACH_REQ:
@@ -8079,6 +9182,50 @@ preamble_config(int child)
 		if (do_signal(child, __TEST_SL_CONFIG))
 			goto failure;
 	}
+#if TEST_X400
+	if (child == CHILD_PTU) {
+		if (do_signal(child, __TEST_SDT_OPTIONS))
+			goto failure;
+		if (do_signal(child, __TEST_SDT_CONFIG))
+			goto failure;
+	}
+#endif
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+postamble_config(int child)
+{
+	int failed = 0;
+
+	if (child != CHILD_PTU) {
+		state++;
+		if (do_signal(child, __TEST_SL_GOPTIONS))
+			failed = failed ? : state;
+		state++;
+		if (do_signal(child, __TEST_SL_GCONFIG))
+			failed = failed ? : state;
+	}
+	state++;
+#if TEST_X400
+	if (do_signal(child, __TEST_SDT_GOPTIONS))
+		failed = failed ? : state;
+	state++;
+	if (do_signal(child, __TEST_SDT_GCONFIG))
+		failed = failed ? : state;
+	state++;
+	if (do_signal(child, __TEST_SDL_GOPTIONS))
+		failed = failed ? : state;
+	state++;
+	if (do_signal(child, __TEST_SDL_GCONFIG))
+		failed = failed ? : state;
+#endif				/* TEST_X400 */
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -8182,6 +9329,8 @@ postamble_disable(int child)
 {
 	int failed = 0;
 
+	if (postamble_config(child))
+		failed = failed ? : state;
 	state++;
 #if TEST_M2PA
 	if (child == CHILD_IUT)
@@ -21028,7 +22177,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.22 $ $Date: 2008-04-29 07:11:32 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.23 $ $Date: 2009-04-01 17:00:09 $");
 }
 
 void
@@ -21089,6 +22238,18 @@ Options:\n\
     -I, --server-host [HOSTNAME[,HOSTNAME]*]\n\
         server host names(s) or IP numbers\n\
         [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
+    -k, --iut-card CARD\n\
+        card to use (1..16) [default: 1]\n\
+    -K, --ptu-card CARD\n\
+        card to use (1..16) [default: 1]\n\
+    -p, --iut-span SPAN\n\
+        span to use (1..4) [default: 3]\n\
+    -P, --ptu-span SPAN\n\
+        span to use (1..4) [default: 1]\n\
+    -i, --iut-chan CHAN\n\
+        channel to use E1 (1..31) T1 (1..24) 0: entire span [default: 19]\n\
+    -I, --ptu-chan CHAN\n\
+        channel to use E1 (1..31) T1 (1..24) 0: entire span [default: 19]\n\
     -d, --device DEVICE\n\
         device name to open [default: %2$s].\n\
     -e, --exit\n\
@@ -21123,12 +22284,12 @@ Symbols:\n\
         SS7_PVAR_ITUT_96  SS7_PVAR_ETSI_96  SS7_PVAR_ANSI_96\n\
         SS7_PVAR_ITUT_00  SS7_PVAR_ETSI_00  SS7_PVAR_ANSI_00  SS7_PVAR_CHIN_00\n\
     [DRAFT]\n\
-	M2PA_VERSION_DRAFT3   M2PA_VERSION_DRAFT3_1\n\
-	M2PA_VERSION_DRAFT4   M2PA_VERSION_DRAFT4_1   M2PA_VERSION_DRAFT4_9\n\
-	M2PA_VERSION_DRAFT5   M2PA_VERSION_DRAFT5_1\n\
-	M2PA_VERSION_DRAFT6   M2PA_VERSION_DRAFT6_1   M2PA_VERSION_DRAFT6_9\n\
-	M2PA_VERSION_DRAFT7   M2PA_VERSION_DRAFT9     M2PA_VERSION_DRAFT10\n\
-	M2PA_VERSION_DRAFT11  M2PA_VERSION_RFC4165\n\
+        M2PA_VERSION_DRAFT3   M2PA_VERSION_DRAFT3_1\n\
+        M2PA_VERSION_DRAFT4   M2PA_VERSION_DRAFT4_1   M2PA_VERSION_DRAFT4_9\n\
+        M2PA_VERSION_DRAFT5   M2PA_VERSION_DRAFT5_1\n\
+        M2PA_VERSION_DRAFT6   M2PA_VERSION_DRAFT6_1   M2PA_VERSION_DRAFT6_9\n\
+        M2PA_VERSION_DRAFT7   M2PA_VERSION_DRAFT9     M2PA_VERSION_DRAFT10\n\
+        M2PA_VERSION_DRAFT11  M2PA_VERSION_RFC4165\n\
 \n\
 ", argv[0], devname, TEST_PORT_NUMBER);
 }
@@ -21142,6 +22303,7 @@ main(int argc, char *argv[])
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
+
 #if TEST_M2PA
 	char *hostc = "127.0.0.1,127.0.0.2,127.0.0.3";
 	char *hosts = "127.0.0.1,127.0.0.2,127.0.0.3";
@@ -21170,10 +22332,19 @@ main(int argc, char *argv[])
 			{"server",	no_argument,		NULL, 'S'},
 			{"again",	no_argument,		NULL, 'a'},
 			{"wait",	no_argument,		NULL, 'w'},
+#if TEST_X400
+			{"iut-card",	required_argument,	NULL, 'k'},
+			{"ptu-card",	required_argument,	NULL, 'K'},
+			{"iut-span",	required_argument,	NULL, 'p'},
+			{"ptu-span",	required_argument,	NULL, 'P'},
+			{"iut-chan",	required_argument,	NULL, 'i'},
+			{"ptu-chan",	required_argument,	NULL, 'I'},
+#elif TEST_M2PA
 			{"client-port",	required_argument,	NULL, 'p'},
 			{"server-port",	required_argument,	NULL, 'P'},
 			{"client-host",	required_argument,	NULL, 'i'},
 			{"server-host",	required_argument,	NULL, 'I'},
+#endif
 			{"repeat",	no_argument,		NULL, 'r'},
 			{"repeat-fail",	no_argument,		NULL, 'R'},
 			{"device",	required_argument,	NULL, 'd'},
@@ -21194,9 +22365,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "uD:cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "uD:cSawk:K:p:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "uD:cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "uD:cSawk:K:p:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -21328,7 +22499,59 @@ main(int argc, char *argv[])
 		case 'w':	/* --wait */
 			test_duration = INFINITE_WAIT;
 			break;
-#if TEST_M2PA
+#if TEST_X400
+		case 'k':	/* -k, --iut-card */
+			val = atoi(optarg);
+			if (val >= 1 && val <= 16) {
+				iut_test_slot = val - 1;
+				addrs[1][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				addrs[2][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'K':	/* -k, --ptu-card */
+			val = atoi(optarg);
+			if (val >= 1 && val <= 16) {
+				ptu_test_slot = val - 1;
+				addrs[0][0] = (((ptu_test_slot & 0x0f) << 12) | ((ptu_test_span & 0x0f) << 8) | ((ptu_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'p':	/* -p, --iut-span */
+			val = atoi(optarg);
+			if (val >= 1 && val <= 4) {
+				iut_test_span = val - 1;
+				addrs[1][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				addrs[2][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'P':	/* -P, --ptu-span */
+			val = atoi(optarg);
+			if (val >= 1 && val <= 4) {
+				ptu_test_span = val - 1;
+				addrs[0][0] = (((ptu_test_slot & 0x0f) << 12) | ((ptu_test_span & 0x0f) << 8) | ((ptu_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'i':	/* -i, --iut-chan */
+			val = atoi(optarg);
+			if (val >= 0 && val <= 31) {
+				iut_test_chan = val;
+				addrs[1][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				addrs[2][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'I':	/* -I, --ptu-chan */
+			val = atoi(optarg);
+			if (val >= 0 && val <= 31) {
+				ptu_test_chan = val;
+				addrs[0][0] = (((ptu_test_slot & 0x0f) << 12) | ((ptu_test_span & 0x0f) << 8) | ((ptu_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+#elif TEST_M2PA
 		case 'p':	/* --client-port */
 			client_port_specified = 1;
 			ports[3] = atoi(optarg);

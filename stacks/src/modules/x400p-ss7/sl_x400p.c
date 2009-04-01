@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.57 $) $Date: 2009-01-19 13:31:39 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2009-04-01 17:00:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-19 13:31:39 $ by $Author: brian $
+ Last Modified $Date: 2009-04-01 17:00:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.58  2009-04-01 17:00:08  brian
+ - updates
+
  Revision 0.9.2.57  2009-01-19 13:31:39  brian
  - updating standalone agents
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.57 $) $Date: 2009-01-19 13:31:39 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2009-04-01 17:00:08 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.57 $) $Date: 2009-01-19 13:31:39 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2009-04-01 17:00:08 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -132,7 +135,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.57 $) $Date: 2009-01-19 13:31:39 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2009-04-01 17:00:08 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -467,6 +470,7 @@ STATIC struct ss7_bufpool xp_bufpool = { 0, };
 #define SYNC2 2
 #define SYNC3 3
 #define SYNC4 4
+#define SYNCEXTERN 5
 
 #define LEDBLK 0
 #define LEDGRN 1
@@ -1850,7 +1854,7 @@ STATIC sdl_config_t sdl_default_e1_chan = {
 	.ifmode = SDL_MODE_PEER,
 	.ifgmode = SDL_GMODE_NONE,
 	.ifgcrc = SDL_GCRC_CRC5,
-	.ifclock = SDL_CLOCK_SLAVE,
+	.ifclock = SDL_CLOCK_LOOP,
 	.ifcoding = SDL_CODING_HDB3,
 	.ifframing = SDL_FRAMING_CCS,
 	.ifblksize = 8,
@@ -1965,7 +1969,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 	{
 		uint8_t ccr1 = 0, tcr1 = 0, tcr2 = 0, licr = 0, test3 = 0, ccr6 = 0, ccr2 = 0;
 
-		/* The 2.048 MHz clock attacced at the MCLK pin is internally multiplied by 16 via
+		/* The 2.048 MHz clock attached at the MCLK pin is internally multiplied by 16 via
 		   an internal PLL circuit to form a a 16-times oversampler, which is used to
 		   recover the clock and data.
 
@@ -1985,46 +1989,39 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		case SDL_CLOCK_LOOP:
 			/* Use the signal present at RCLK as the transmit clock.  The TCLK pin is
 			   ignored. */
-			ccr6 |= 0x40;	/* CRC6.6: 1 = Force transmitter to internally switch to
+			ccr6 |= 0x04;	/* CCR6.2: 1 = Force transmitter to internally switch to
 					   RCLK as source of transmit clock.  Signal at TCLK pin is 
 					   ignored. */
-			ccr2 |= 0x04;	/* CCR2.2: 1 = switch to RCLKO if TCLK stops */
+			ccr2 &= ~0x04;	/* CCR2.2: 0 = do not switch to RCLKO if TCLK stops */
 			break;
 		case SDL_CLOCK_INT:
 			/* The TCLK pin is always the source of the transmit clock. */
-			ccr6 &= ~0x40;	/* CRC6.6: 0 = source to transmit clock determined by
+			ccr6 &= ~0x04;	/* CCR6.2: 0 = source to transmit clock determined by
 					   CCR2.2 (LOTCMC). */
 			ccr2 &= ~0x04;	/* CCR2.2: 0 = do not switch to RCLKO if TCLK stops */
 			break;
 		case SDL_CLOCK_MASTER:
 			/* Use the scaled signal present at MBLK as the transmit clock.  The TCLK
 			   pin is ignored. */
-			ccr6 &= ~0x40;	/* CRC6.6: 0 = source to transmit clock determined by
+			ccr6 &= ~0x04;	/* CCR6.2: 0 = source to transmit clock determined by
 					   CCR2.2 (LOTCMC). */
 			ccr2 &= ~0x04;	/* CCR2.2: 0 = do not switch to RCLKO if TCLK stops */
 			break;
 		case SDL_CLOCK_EXT:
 			/* Use the scaled signal present at the TSYSCLK as the transmit clock.  The 
 			   TCLK pin is ignored. */
-			ccr6 &= ~0x40;	/* CRC6.6: 0 = source to transmit clock determined by
+			ccr6 &= ~0x04;	/* CCR6.2: 0 = source to transmit clock determined by
 					   CCR2.2 (LOTCMC). */
 			ccr2 &= ~0x04;	/* CCR2.2: 0 = do not switch to RCLKO if TCLK stops */
 			break;
 		case SDL_CLOCK_SLAVE:
 			/* Switch to the clock present at RCLK when the signal at the TCLK pin
 			   fails to transition after 1 channel time. */
-			ccr6 |= 0x40;	/* CRC6.6: 1 = Force transmitter to internally switch to
-					   RCLK as source of transmit clock.  Signal at TCLK pin is 
-					   ignored. */
+			ccr6 &= ~0x04;	/* CCR6.2: 0 = source to transmit clock determined by
+					   CCR2.2 (LOTCMC). */
 			ccr2 |= 0x04;	/* CCR2.2: 1 = switch to RCLKO if TCLK stops */
 			break;
 		}
-
-#if 1
-		/* for testing */
-		ccr6 &= ~0x40;	/* CRC6.6: 0 = source to transmit clock determined by CCR2.2 (LOTCMC). */
-		ccr2 |= 0x04;	/* CCR2.2: 1 = switch to RCLKO if TCLK stops */
-#endif
 
 		xlb[0x1a] = ccr2;	/* CCR2 */
 		/* CCR2.7: 0 = update error counters once a second */
@@ -2032,7 +2029,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		/* CCR2.5: 0 = automatic transmit AIS generation disabled */
 		/* CCR2.4: 0 = automatic transmit RAI generation disabled */
 		/* CCR2.3: 0 = RSER as received under all conditions */
-		/* CCR2.2: X = do not/do siwtch to RCLKO if TCLK stops */
+		/* CCR2.2: X = do not/do switch to RCLKO if TCLK stops */
 		/* CCR2.1: 0 = do not force a freeze event */
 		/* CCR2.0: 0 = no freezing of receive signalling data */
 
@@ -2041,32 +2038,44 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		/* CCR3.6: 0 = define operation of TCHBLK output pin */
 		/* CCR3.5: 0 = TIRs define in which channels to insert idle code */
 		/* CCR3.4: 0 = unassigned (elastic store reset DS2154) */
-		/* CCR3.3: 0 = do not reinsert signalling bits at RSER */
+		/* CCR3.3: 0 = do not reinsert signalling bits at RSER (LIRST on DS2153) */
 		/* CCR3.2: 0 = do not insert signalling from TSIG pin */
 		/* CCR3.1: 1 = TSYSCLK is 2.048/4.096/8.192 MHz */
 		/* CCR3.0: 0 = RCL declared upon 2058 consecutive zeros */
 
-		xlb[0xa8] = 0x00;	/* CCR4 */
-		/* CCR4.7: 0 = remote loopback disabled */
-		/* CCR4.6: 0 = local loopback disabled */
-		/* CCR4.5: 0 = transmit normal data */
-		/* CCR4.4: 0 = TCM bit 4 (unused) */
-		/* CCR4.3: 0 = TCM bit 3 (unused) */
-		/* CCR4.2: 0 = TCM bit 2 (unused) */
-		/* CCR4.1: 0 = TCM bit 1 (unused) */
-		/* CCR4.0: 0 = TCM bit 0 (unused) */
+		switch (cd->device) {
+		case 0:	/* no IDR means DS2153 */
+			/* No CCR4 or CCR5 on DS2153. */
+			break;
+		case XP_DEV_DS2154:
+		case XP_DEV_DS21354:
+		case XP_DEV_DS21554:
+			xlb[0xa8] = 0x00;	/* CCR4 */
+			/* CCR4.7: 0 = remote loopback disabled */
+			/* CCR4.6: 0 = local loopback disabled */
+			/* CCR4.5: 0 = transmit normal data */
+			/* CCR4.4: 0 = TCM bit 4 (unused) */
+			/* CCR4.3: 0 = TCM bit 3 (unused) */
+			/* CCR4.2: 0 = TCM bit 2 (unused) */
+			/* CCR4.1: 0 = TCM bit 1 (unused) */
+			/* CCR4.0: 0 = TCM bit 0 (unused) */
 
-		xlb[0xaa] = 0x00;	/* CCR5 */
-		/* CCR5.7: 0 = no immediate LIRST */
-		/* CCR5.6: 0 = no RES align (not assigned DS2154) */
-		/* CCR5.5: 0 = no TES align (not assigned DS2154) */
-		/* CCR5.4: 0 = RCM bit 4 (unused) */
-		/* CCR5.3: 0 = RCM bit 3 (unused) */
-		/* CCR5.2: 0 = RCM bit 2 (unused) */
-		/* CCR5.1: 0 = RCM bit 1 (unused) */
-		/* CCR5.0: 0 = RCM bit 0 (unused) */
+			xlb[0xaa] = 0x00;	/* CCR5 */
+			/* CCR5.7: 0 = no immediate LIRST */
+			/* CCR5.6: 0 = no RES align (not assigned DS2154) */
+			/* CCR5.5: 0 = no TES align (not assigned DS2154) */
+			/* CCR5.4: 0 = RCM bit 4 (unused) */
+			/* CCR5.3: 0 = RCM bit 3 (unused) */
+			/* CCR5.2: 0 = RCM bit 2 (unused) */
+			/* CCR5.1: 0 = RCM bit 1 (unused) */
+			/* CCR5.0: 0 = RCM bit 0 (unused) */
+			break;
+		}
 
 		switch (cd->device) {
+		case 0:	/* no IDR means DS2153 */
+			/* No CCR6 on DS2153. */
+			break;
 		case XP_DEV_DS2154:
 			/* Note: no CCR6 on DS2154. */
 			break;
@@ -2102,7 +2111,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		/* RCR2.3: 0 = RLCLK low during Sa4 bit */
 		/* RCR2.2: 1 = RSYSCLK is 2.048/4.096/8.192 MHz */
 		/* RCR2.1: 1 = elastic store (receive) enabled */
-		/* RCR2.2: 0 = unassigned */
+		/* RCR2.0: 0 = unassigned */
 
 		tcr1 = 0x09;
 		/* TCR1.7: 0 = bipolar data at TPOS0 and TNEG0 */
@@ -2217,13 +2226,14 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		if (sp->config.iftxlevel < 8) {
 			/* not monitoring mode */
 			test3 = 0x00;	/* TEST3: 0x00 = no Rx gain */
-			licr = 0x00;	/* 75 Ohm, Normal, transmitter on */
+			licr = 0x00;	/* 75 Ohm, Normal, -12dB Rx EGL, transmitter on */
 			licr |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
 		} else {
 			/* monitoring mode */
 			test3 = 0x00;	/* TEST3: 0x00 = no Rx gain */
-			licr = 0x01;	/* LICR.0: 1 = transmitter off */
-			licr |= 0x10;	/* LICR.4: 1 = -43dB Rx EGL */
+			// licr = 0x01; /* LICR.0: 1 = transmitter off */
+			// licr |= 0x10; /* LICR.4: 1 = -43dB Rx EGL */
+			licr = 0x21;	/* 120 Ohm, Normal, -12dB Rx EGL, transmitter off */
 			switch (sp->config.iftxlevel & 0x3) {
 			case 0:
 				break;
@@ -2284,7 +2294,6 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 			   recommend that ABCD signalling not be set to all zero because they wille 
 			   emulate a CAS multiframe alignment word. */
 			xlb[offset] = 0x55;
-
 		/* Note: If CCR3.6 == 1, then a zero in the TCBRs implies that signaling data is to 
 		   be sourced from TSER (or TSIG if CCR3.2 == 1), and a one implies that signaling
 		   data for that channel is to be sourced from the Transmit Signaling (TS)
@@ -2293,29 +2302,62 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		for (offset = 0x22; offset <= 0x25; offset++)	/* TCB1 thru TCB4 */
 			xlb[offset] = 0xff;
 
-		/* reset and realign elastic stores */
-		switch (cd->device) {
-		case XP_DEV_DS2154:
-			/* Note: no CCR6 on DS2154. */
-			xlb[0x1b] = 0x92;	/* CCR3: reset elastic stores */
-			xlb[0x1b] = 0x82;	/* CCR3 */
-			break;
-		case XP_DEV_DS21354:
-		case XP_DEV_DS21554:
-			xlb[0x1d] = ccr6 | 0x03;	/* CRC6: reset elastic stores */
-			xlb[0x1d] = ccr6;	/* CRC6 */
-			/* CCR6.7: 0 = TTIP and TRING normal */
-			/* CCR6.6: 0 = normal data */
-			/* CCR6.5: 0 = E1 signal */
-			/* CCR6.4: 0 = unassigned */
-			/* CCR6.3: 0 = unassigned */
-			/* CCR6.2: X = Tx clock determined by CRC2.2 (LOTCMC)/Tx clock is RCLK */
-			/* CCR6.1: X = no RES reset */
-			/* CCR6.0: X = no TES reset */
-			xlb[0xaa] = 0x60;	/* CCR5 realign elastic stores */
-			xlb[0xaa] = 0x00;	/* CCR5 */
-			break;
+#if 1
+		if (timeouts) {
+			unsigned long timeout;
+
+			/* line interface reset */
+			switch (cd->device) {
+			case 0:	/* No IDR on DS2153. */
+				/* DS2153 uses CCR3.3 for LIRST. */
+				xlb[0x1b] = 0x8a;	/* CCR3 line interface reset (LIRST) */
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				xlb[0xaa] = 0x80;	/* CCR5 line interface reset (LIRST) */
+				break;
+			}
+			timeout = jiffies + 100 * HZ / 1000;
+			while (jiffies < timeout) ;
+			switch (cd->device) {
+			case 0:	/* No IDR on DS2153. */
+				/* DS2153 uses CCR3.3 for LIRST. */
+				xlb[0x1b] = 0x82;	/* CCR3 */
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				xlb[0xaa] = 0x00;	/* CCR5 */
+				break;
+			}
+
+			/* reset and realign elastic stores */
+			switch (cd->device) {
+			case XP_DEV_DS2154:
+				/* Note: no CCR6 on DS2154. */
+				xlb[0x1b] = 0x92;	/* CCR3: reset elastic stores */
+				xlb[0x1b] = 0x82;	/* CCR3 */
+				break;
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				xlb[0x1d] = ccr6 | 0x03;	/* CRC6: reset elastic stores */
+				xlb[0x1d] = ccr6;	/* CRC6 */
+				/* CCR6.7: 0 = TTIP and TRING normal */
+				/* CCR6.6: 0 = normal data */
+				/* CCR6.5: 0 = E1 signal */
+				/* CCR6.4: 0 = unassigned */
+				/* CCR6.3: 0 = unassigned */
+				/* CCR6.2: X = Tx clock determined by CRC2.2 (LOTCMC)/Tx clock is
+				   RCLK */
+				/* CCR6.1: X = no RES reset */
+				/* CCR6.0: X = no TES reset */
+				xlb[0xaa] = 0x60;	/* CCR5 realign elastic stores */
+				xlb[0xaa] = 0x00;	/* CCR5 */
+				break;
+			}
 		}
+#endif
 		break;
 	}
 	case V401PE:
@@ -2496,16 +2538,6 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		xlb[0x09] = reg09;
 		xlb[0x7c] = reg7c;
 
-#if 0
-		if (timeouts) {
-			unsigned long timeout;
-
-			xlb[0x0a] = 0x80;	/* LIRST to reset line interface */
-			timeout = jiffies + 100 * HZ / 1000;
-			while (jiffies < timeout) ;
-		}
-#endif
-		xlb[0x0a] = 0x30;	/* LIRST bask to normal, Resetting elastic buffers */
 		{
 			int byte, c;
 			unsigned short mask = 0;
@@ -2523,6 +2555,33 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 					xlb[0x39 + byte] = mask;
 					mask = 0;
 				}
+			}
+		}
+
+		if (timeouts) {
+			unsigned long timeout;
+
+			/* line interface reset */
+			xlb[0x0a] = 0x80;
+			xlb[0x0a] = 0x00;
+
+			/* wait for 40 ms */
+			timeout = jiffies + 100 * HZ / 1000;
+			while (jiffies < timeout) ;
+
+			/* elastic store reset */
+			switch (cd->device) {
+			case XP_DEV_DS2152:
+				/* CCR3.6 is ESR */
+				xlb[0x30] = 0x40;	/* CCR3: ESR */
+				xlb[0x30] = 0x00;	/* CCR3 */
+				break;
+			case XP_DEV_DS21352:
+			case XP_DEV_DS21552:
+				/* CCR7.4 and CCR7.5 are TESR and RESR (resp) */
+				xlb[0x0a] = 0x30;	/* CCR7: TESR and RESR */
+				xlb[0x0a] = 0x00;	/* CCR7: */
+				break;
 			}
 		}
 		break;
@@ -2681,61 +2740,221 @@ xp_span_reconfig(struct cd *cd, int span)
 	case E400P:
 	case E400PSS7:
 	{
-		uint8_t ccr1 = 0, tcr1 = 0, licr = 0, test3 = 0;
+		uint8_t ccr1 = 0, tcr1 = 0, tcr2 = 0, licr = 0, test3 = 0, ccr6 = 0, ccr2 = 0;
+
+		switch (sp->config.ifclock) {
+		default:
+			sp->config.ifclock = SDL_CLOCK_LOOP;
+		case SDL_CLOCK_LOOP:
+			/* Use the signal present at RCLK as the transmit clock.  The TCLK pin is
+			   ignored. */
+			ccr6 |= 0x04;	/* CCR6.2: 1 = Force transmitter to internally switch to
+					   RCLK as source of transmit clock.  Signal at TCLK pin is 
+					   ignored. */
+			ccr2 &= ~0x04;	/* CCR2.2: 0 = do not switch to RCLKO if TCLK stops */
+			break;
+		case SDL_CLOCK_INT:
+			/* The TCLK pin is always the source of the transmit clock. */
+			ccr6 &= ~0x04;	/* CCR6.2: 0 = source to transmit clock determined by
+					   CCR2.2 (LOTCMC). */
+			ccr2 &= ~0x04;	/* CCR2.2: 0 = do not switch to RCLKO if TCLK stops */
+			break;
+		case SDL_CLOCK_MASTER:
+			/* Use the scaled signal present at MBLK as the transmit clock.  The TCLK
+			   pin is ignored. */
+			ccr6 &= ~0x04;	/* CCR6.2: 0 = source to transmit clock determined by
+					   CCR2.2 (LOTCMC). */
+			ccr2 &= ~0x04;	/* CCR2.2: 0 = do not switch to RCLKO if TCLK stops */
+			break;
+		case SDL_CLOCK_EXT:
+			/* Use the scaled signal present at the TSYSCLK as the transmit clock.  The 
+			   TCLK pin is ignored. */
+			ccr6 &= ~0x04;	/* CCR6.2: 0 = source to transmit clock determined by
+					   CCR2.2 (LOTCMC). */
+			ccr2 &= ~0x04;	/* CCR2.2: 0 = do not switch to RCLKO if TCLK stops */
+			break;
+		case SDL_CLOCK_SLAVE:
+			/* Switch to the clock present at RCLK when the signal at the TCLK pin
+			   fails to transition after 1 channel time. */
+			ccr6 &= ~0x04;	/* CCR6.2: 0 = source to transmit clock determined by
+					   CCR2.2 (LOTCMC). */
+			ccr2 |= 0x04;	/* CCR2.2: 1 = switch to RCLKO if TCLK stops */
+			break;
+		}
+
+		xlb[0x1a] = ccr2;	/* CCR2 */
+		/* CCR2.7: 0 = update error counters once a second */
+		/* CCR2.6: 0 = count BPVs */
+		/* CCR2.5: 0 = automatic transmit AIS generation disabled */
+		/* CCR2.4: 0 = automatic transmit RAI generation disabled */
+		/* CCR2.3: 0 = RSER as received under all conditions */
+		/* CCR2.2: X = do not/do switch to RCLKO if TCLK stops */
+		/* CCR2.1: 0 = do not force a freeze event */
+		/* CCR2.0: 0 = no freezing of receive signalling data */
+
+		switch (cd->device) {
+		case 0:	/* no IDR means DS2153 */
+			/* No CCR6 on DS2153. */
+			break;
+		case XP_DEV_DS2154:
+			/* Note: no CCR6 on DS2154. */
+			break;
+		case XP_DEV_DS21354:
+		case XP_DEV_DS21554:
+			xlb[0x1d] = ccr6;	/* CRC6 */
+			/* CCR6.7: 0 = TTIP and TRING normal */
+			/* CCR6.6: 0 = normal data */
+			/* CCR6.5: 0 = E1 signal */
+			/* CCR6.4: 0 = unassigned */
+			/* CCR6.3: 0 = unassigned */
+			/* CCR6.2: X = Tx clock determined by CRC2.2 (LOTCMC)/Tx clock is RCLK */
+			/* CCR6.1: 0 = no RES reset */
+			/* CCR6.0: 0 = no TES reset */
+			break;
+		}
 
 		switch (sp->config.ifframing) {
 		default:
 		case SDL_FRAMING_CCS:
-			ccr1 |= 0x08;
+			ccr1 |= 0x08;	/* CCR1.3: 1 = Rx CCS signaling mode */
+			tcr1 &= ~0x20;	/* TCR1.5: 0 = sample time slot 16 at TSER pin */
 			break;
 		case SDL_FRAMING_CAS:
-			tcr1 |= 0x20;
+			ccr1 &= ~0x08;	/* CCR1.3: 0 = Rx CAS signaling mode */
+			tcr1 |= 0x20;	/* TCR1.5: 1 = source time slot 16 from TS0 to TS15
+					   registers */
 			break;
 		}
 		switch (sp->config.ifcoding) {
 		default:
 		case SDL_CODING_HDB3:
-			ccr1 |= 0x44;
+			ccr1 |= 0x40;	/* CCR1.6: 1 = Tx HDB3 enabled */
+			ccr1 |= 0x04;	/* CCR1.2: 1 = Rx HDB3 enabled */
 			break;
 		case SDL_CODING_AMI:
-			ccr1 |= 0x00;
+			ccr1 &= ~0x40;	/* CCR1.6: 0 = Tx HDB3 disabled */
+			ccr1 &= ~0x04;	/* CCR1.2: 0 = Rx HDB3 disabled */
 			break;
 		}
 		switch (sp->config.ifgcrc) {
 		case SDL_GCRC_CRC4:
-			ccr1 |= 0x11;
+			ccr1 |= 0x10;	/* CRC1.4: 1 = Tx CRC4 enabled */
+			ccr1 |= 0x01;	/* CRC1.0: 1 = Rx CRC4 enalled */
+			tcr2 |= 0x02;	/* TCR2.1: 1 = E-bits automatically set */
+#if 0
+			if (sp->config.ifframing == SDL_FRAMING_CAS)
+				tcr1 |= 0x02;	/* TCR1.1: 1 = CAS and CRC4 multiframe mode */
+#endif
 			break;
 		default:
-			ccr1 |= 0x00;
+			ccr1 &= ~0x10;	/* CRC1.4: 0 = Tx CRC4 disabled */
+			ccr1 &= ~0x01;	/* CRC1.0: 0 = Rx CRC4 disabled */
 			break;
 		}
-		xlb[0x12] = tcr1;
-		xlb[0x14] = ccr1;
+
+		xlb[0x12] = tcr1;	/* TCR1 */
+		/* TCR1.7: 0 = bipolar data at TPOS0 and TNEG0 */
+		/* TCR1.6: 0 = FAS bits/Sa bits/RAI sources from TAF and TNAF registers */
+		/* TCR1.5: X = sample TS 16 at TSER pin/source TS 16 from TS0 to TS15 */
+		/* TCR1.4: 0 = transmit data normally */
+		/* TCR1.3: 1 = source Si bits from TAF and TNAF regsiters (TCR1.6 must be zero) */
+		/* TCR1.2: 0 = transmit data normally */
+		/* TCR1.1: X = frame mode/CAS and CRC4 multiframe mode */
+		/* TCR1.0: 1 = TSYNC is an output */
+
+		xlb[0x13] = tcr2;	/* TCR2 */
+		/* TCR2.7: 0 = do not source Sa8 bit from TLINK pin */
+		/* TCR2.6: 0 = do not source Sa7 bit from TLINK pin */
+		/* TCR2.5: 0 = do not source Sa6 bit from TLINK pin */
+		/* TCR2.4: 0 = do not source Sa5 bit from TLINK pin */
+		/* TCR2.3: 0 = do not source Sa4 bit from TLINK pin */
+		/* TCR2.2: 0 = TPOSO/TNEGO full clock period */
+		/* TCR2.1: X = E-bits not automatically/automatically set */
+		/* TCR2.0: 0 = RLOS/LOTC pin is RLOS */
+
+		xlb[0x14] = ccr1;	/* CCR1 */
+		/* CCR1.7: 0 = framer loopback disabled */
+		/* CCR1.6: X = Tx HDB3 disabled/enabled */
+		/* CCR1.5: 0 = Tx G.802 disabled */
+		/* CCR1.4: X = Tx CRC4 disabled */
+		/* CCR1.3: X = signalling mode CAS/CCS */
+		/* CCR1.2: X = Rx HDB3 disabled/enabled */
+		/* CCR1.1: 0 = Rx G.802 disabled */
+		/* CCR1.0: X = Rx CRC4 disabled */
+
+		licr = 0x00;
+		/* LICR.7-5: 0x0 = 75 Ohm w/o protection resistors */
+		/* LICR.4: 0 = -12dB Rx EGL */
+		/* LICR.3: 0 = JA on receive side */
+		/* LICR.2: 0 = JA buffer depth 128 bits */
+		/* LICR.1: 0 = JA enabled */
+		/* LICR.0: X = transmitters on/off */
+
+		test3 = 0x00;
+		/* TEST3: 0x00 = no Rx gain */
 
 		if (sp->config.iftxlevel < 8) {
 			/* not monitoring mode */
-			test3 = 0x00;	/* TEST3 no gain */
-			licr = 0x00;	/* 75 Ohm, Normal, transmitter on */
+			test3 = 0x00;	/* TEST3: 0x00 = no Rx gain */
+			licr = 0x00;	/* 75 Ohm, Normal, -12dB Rx EGL, transmitter on */
 			licr |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
 		} else {
 			/* monitoring mode */
-			test3 = 0x00;	/* TEST3 no gain */
-			licr = 0x01;	/* 75 Ohm norm, transmitter off */
+			test3 = 0x00;	/* TEST3: 0x00 = no Rx gain */
+			// licr = 0x01; /* LICR.0: 1 = transmitter off */
+			// licr |= 0x10; /* LICR.4: 1 = -43dB Rx EGL */
+			licr = 0x21;	/* 120 Ohm, Normal, -12dB Rx EGL, transmitter off */
 			switch (sp->config.iftxlevel & 0x3) {
 			case 0:
 				break;
 			case 1:
-				test3 |= 0x72;	/* TEST3 12dB gain */
+				test3 |= 0x72;	/* TEST3: 0x72 = 12dB Rx gain */
 				break;
 			case 2:
 			case 3:
-				test3 |= 0x70;	/* TEST3 30dB gain */
+				test3 |= 0x70;	/* TEST3: 0x70 = 30dB Rx gain */
 				break;
 			}
 		}
 
 		xlb[0xac] = test3;
+		/* TEST3: 0x00 = no Rx gain */
+		/* TEST3: 0x70 = 12dB Rx gain */
+		/* TEST3: 0x72 = 30dB Rx gain */
+
 		xlb[0x18] = licr;
+		/* LICR.7: X = LBO bit 2 */
+		/* LICR.6: X = LBO bit 1 */
+		/* LICR.5: X = LBO bit 0 */
+		/* LICR.4: X = -12dB/-43dB Rx EGL */
+		/* LICR.3: 0 = JA on receive side */
+		/* LICR.2: 0 = JA buffer depth 128 bits */
+		/* LICR.1: 0 = JA enabled */
+		/* LICR.0: X = transmitters on/off */
+
+		/* reset and realign elastic stores */
+		switch (cd->device) {
+		case XP_DEV_DS2154:
+			/* Note: no CCR6 on DS2154. */
+			xlb[0x1b] = 0x92;	/* CCR3: reset elastic stores */
+			xlb[0x1b] = 0x82;	/* CCR3 */
+			break;
+		case XP_DEV_DS21354:
+		case XP_DEV_DS21554:
+			xlb[0x1d] = ccr6 | 0x03;	/* CRC6: reset elastic stores */
+			xlb[0x1d] = ccr6;	/* CRC6 */
+			/* CCR6.7: 0 = TTIP and TRING normal */
+			/* CCR6.6: 0 = normal data */
+			/* CCR6.5: 0 = E1 signal */
+			/* CCR6.4: 0 = unassigned */
+			/* CCR6.3: 0 = unassigned */
+			/* CCR6.2: X = Tx clock determined by CRC2.2 (LOTCMC)/Tx clock is RCLK */
+			/* CCR6.1: X = no RES reset */
+			/* CCR6.0: X = no TES reset */
+			xlb[0xaa] = 0x60;	/* CCR5 realign elastic stores */
+			xlb[0xaa] = 0x00;	/* CCR5 */
+			break;
+		}
 		break;
 	}
 	case V401PE:
@@ -2908,7 +3127,7 @@ xp_span_reconfig(struct cd *cd, int span)
 		default:
 			sp->config.ifclock = SDL_CLOCK_LOOP;
 		case SDL_CLOCK_LOOP:
-			/* Use the signal present at RCLK as the transmit clokc. The TCLK pin is
+			/* Use the signal present at RCLK as the transmit clock. The TCLK pin is
 			   ignored. */
 			reg70 = 0x06;
 			break;
@@ -5364,17 +5583,15 @@ sl_check_congestion(struct xp *xp, queue_t *q)
 						      xp->sl.statem.disc_status);
 		else {
 			if (xp->sl.statem.cong_status > old_cong_status) {
-				if (xp->sl.notify.events & SL_EVT_CONGEST_ONSET_IND
-				    && !xp->sl.stats.sl_cong_onset_ind[xp->sl.statem.
-								       cong_status]++) {
+				if ((xp->sl.notify.events & SL_EVT_CONGEST_ONSET_IND)
+				    && !xp->sl.stats.sl_cong_onset_ind[xp->sl.statem.cong_status]++) {
 					sl_link_congested_ind(xp, q, xp->sl.statem.cong_status,
 							      xp->sl.statem.disc_status);
 					return;
 				}
 			} else {
-				if (xp->sl.notify.events & SL_EVT_CONGEST_DISCD_IND
-				    && !xp->sl.stats.sl_cong_discd_ind[xp->sl.statem.
-								       disc_status]++) {
+				if ((xp->sl.notify.events & SL_EVT_CONGEST_DISCD_IND)
+				    && !xp->sl.stats.sl_cong_discd_ind[xp->sl.statem.disc_status]++) {
 					sl_link_congested_ind(xp, q, xp->sl.statem.cong_status,
 							      xp->sl.statem.disc_status);
 					return;
@@ -6301,7 +6518,7 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 
 					if (rx->rbits != 16)
 						goto residue_error;
-					if ((~rx->bcc & 0xffff) != (rx->residue & 0xffff))
+					if (((~rx->bcc) & 0xffff) != (rx->residue & 0xffff))
 						goto crc_error;
 					if (rx->bytes < hlen)
 						goto frame_too_short;
@@ -11784,8 +12001,8 @@ mx_commit_config_card(mx_config_t * arg)
 							if ((xp = sp->slots[slot])) {
 								if ((chan_reconfig &
 								     (1 << (chan - 1)))
-								    && xp->sdl.config.
-								    ifflags & SDL_IF_UP) {
+								    && (xp->sdl.config.
+									ifflags & SDL_IF_UP)) {
 									/* xp_chan_reconfig(xp); */
 								}
 							}
@@ -11798,8 +12015,8 @@ mx_commit_config_card(mx_config_t * arg)
 							if ((xp = sp->slots[slot])) {
 								if ((chan_reconfig &
 								     (1 << (chan - 1)))
-								    && xp->sdl.config.
-								    ifflags & SDL_IF_UP) {
+								    && (xp->sdl.config.
+									ifflags & SDL_IF_UP)) {
 									/* xp_chan_reconfig(xp); */
 								}
 							}
@@ -13828,12 +14045,8 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 				break;
 			case SDL_CLOCK_INT:	/* */
 			case SDL_CLOCK_MASTER:	/* */
-				arg->ifclock = SDL_CLOCK_MASTER;
-				break;
 			case SDL_CLOCK_EXT:	/* */
 			case SDL_CLOCK_SLAVE:	/* */
-				arg->ifclock = SDL_CLOCK_SLAVE;
-				break;
 			case SDL_CLOCK_LOOP:	/* */
 				break;
 			default:
@@ -14052,7 +14265,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 				}
 			}
 		}
-		if (xp && chan_reconfig && xp->sdl.config.ifflags & SDL_IF_UP) {
+		if (xp && chan_reconfig && (xp->sdl.config.ifflags & SDL_IF_UP)) {
 			if (sp && cd) {
 				if (xp->chan) {
 					switch (cd->config.ifgtype) {
@@ -14112,7 +14325,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 				break;
 			}
 		}
-		if (cd && card_reconfig && cd->config.ifflags & SDL_IF_UP) {
+		if (cd && card_reconfig && (cd->config.ifflags & SDL_IF_UP)) {
 			cd->eval_syncsrc = 1;
 		}
 	}
@@ -14199,7 +14412,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 				arg->ifframing = sp->config.ifframing;
 				arg->ifalarms = sp->config.ifalarms;
 				arg->ifrxlevel = sp->config.ifrxlevel;
-				arg->iftxlevel = sp->config.iftxlevel;
+				arg->iftxlevel = sp->config.iftxlevel + 1;
 				if ((cd = sp->cd)) {
 					int src;
 
@@ -14894,7 +15107,7 @@ xp_overflow(struct cd *cd)
 		struct xp *xp;
 		struct sp *sp;
 
-		if ((sp = cd->spans[span]) && sp->config.ifflags & SDL_IF_UP) {
+		if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
 			switch (sp->config.iftype) {
 			case SDL_TYPE_DS0:
 			case SDL_TYPE_DS0A:
@@ -14969,9 +15182,9 @@ xp_e1_txrx_burst(struct cd *cd)
 		   ping-pong.  These prefetches are for read. */
 		{
 			register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
+			register const uint32_t *const wend = wbuf + 256;
 
-			for (xll = cd->xll, wbuf = cd->wbuf + (lebno << 8);
-			     wbuf < cd->wbuf + (lebno << 8) + 256;) {
+			for (xll = cd->xll; wbuf < wend;) {
 				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++) {
 					prefetch(wbuf + 1);
 					*xll = *wbuf;
@@ -14983,13 +15196,14 @@ xp_e1_txrx_burst(struct cd *cd)
 		   ping-pong.  These prefetches are for read. */
 		{
 			register uint32_t *rbuf = cd->rbuf + (lebno << 8);
+			register const uint32_t *const rend = rbuf + 256;
 
-			for (xll = cd->xll, rbuf = cd->rbuf + (lebno << 8);
-			     rbuf < cd->rbuf + (lebno << 8) + 256;)
+			for (xll = cd->xll; rbuf < rend;) {
 				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++) {
 					prefetchw(rbuf + 1);
 					*rbuf = *xll;
 				}
+			}
 		}
 		cd->lebno = lebno;
 		tasklet_hi_schedule(&cd->tasklet);
@@ -15039,6 +15253,29 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 					printd(("%s: alarm recovery complete\n", __FUNCTION__));
 					sp->config.ifalarms &= ~SDL_ALARM_REC;
 					xlb[0x21] = 0x5f;	/* turn off yellow (TNAF) */
+#if 0
+					{
+						int ccr;
+
+						switch (__builtin_expect(cd->device, XP_DEV_DS21354)) {
+						case XP_DEV_DS21354:
+						case XP_DEV_DS21554:
+							ccr = xlb[0x1d];
+							/* reset elastic store */
+							xlb[0x1d] = ccr & ~0x03;
+							xlb[0x1d] = ccr | 0x03;
+							xlb[0x1d] = ccr & ~0x03;
+							break;
+						case XP_DEV_DS2154:
+							ccr = xlb[0x1b];
+							/* reset elastic store */
+							xlb[0x1b] = ccr & ~0x10;
+							xlb[0x1b] = ccr | 0x10;
+							xlb[0x1b] = ccr & ~0x10;
+							break;
+						}
+					}
+#endif
 					cd->eval_syncsrc = 1;
 				}
 			}
@@ -15050,10 +15287,120 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			int status, alarms = 0, leds = 0, all_leds;
 			volatile uint8_t *xlb = &cd->xlb[span << 8];
 
+#if defined _DEBUG
+			/* write-read-write cycle */
+			xlb[0x08] = 0xff;
+			status = xlb[0x08];
+			status &= 0xff;
+			xlb[0x08] = status;
+
+			if (status) {
+				if (status & 0x80)
+					printd(("%s: %d: %d: TESF: Transmit-Side Elastic Store Full\n", __FUNCTION__, span, cd->frame));
+				if (status & 0x40)
+					printd(("%s: %d: %d: TESE: Transmit-Side Elastic Store Empty\n", __FUNCTION__, span, cd->frame));
+				if (status & 0x20)
+					printd(("%s: %d: %d: JALT: Jitter Attenuator Limit Trip\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x10)
+					printd(("%s: %d: %d: RESF: Receive-Side Elastic Store Full\n", __FUNCTION__, span, cd->frame));
+				if (status & 0x08)
+					printd(("%s: %d: %d: RESE: Receive-Side Elastic Store Empty\n", __FUNCTION__, span, cd->frame));
+				if (status & 0x04)
+					printd(("%s: %d: %d: CRCRC: CRC Resync Criteria Met\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x02)
+					printd(("%s: %d: %d: FASRC: FAS Resync Criteria Met\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x01)
+					printd(("%s: %d: %d: CASRC: CAS Resync Criteria Met\n",
+						__FUNCTION__, span, cd->frame));
+			}
+
+			xlb[0x1e] = 0x07;
+			status = xlb[0x1e];
+			status &= 0x07;
+			xlb[0x1e] = status;
+
+			if (status) {
+				if (status & 0x04)
+					printd(("%s: %d: %d: FASSA: FAS Sync Active\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x02)
+					printd(("%s: %d: %d: CASSA: CAS MF Sync Active\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x01)
+					printd(("%s: %d: %d: CRC4SA: CRC4 MF Sync Active\n",
+						__FUNCTION__, span, cd->frame));
+			}
+
+			xlb[0x07] = 0x05;
+			status = xlb[0x07];
+			status &= 0x05;
+			xlb[0x07] = status;
+
+			if (status) {
+				if (status & 0x80)
+					printd(("%s: %d: %d: RMF: Receive CAS Multiframe\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x40)
+					printd(("%s: %d: %d: RAF: Receive Align Frame\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x20)
+					printd(("%s: %d: %d: TMF: Transmit Multiframe\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x10)
+					printd(("%s: %d: %d: SEC: One Second Timer\n", __FUNCTION__,
+						span, cd->frame));
+				if (status & 0x08)
+					printd(("%s: %d: %d: TAF: Transmit Align Frame\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x04)
+					printd(("%s: %d: %d: LOTC: Lost of Transmit Clock\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x02)
+					printd(("%s: %d: %d: RCMF: Receive CRC4 Multiframe\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x01)
+					printd(("%s: %d: %d: TSLIP: Transmit Elastic Store Slip\n",
+						__FUNCTION__, span, cd->frame));
+			}
+
+			xlb[0x06] = 0x1f;
+			status = xlb[0x06];
+			status &= 0x1f;
+			xlb[0x06] = status;
+
+			if (status) {
+				if (status & 0x80)
+					printd(("%s: %d: %d: RSA1: Receive Signaling All Ones/Signaling Change\n", __FUNCTION__, span, cd->frame));
+				if (status & 0x40)
+					printd(("%s: %d: %d: RDMA: Receive Distant MF Alarm\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x20)
+					printd(("%s: %d: %d: RSA0: Receive Signaling All Zeros/Signaling Change\n", __FUNCTION__, span, cd->frame));
+				if (status & 0x10)
+					printd(("%s: %d: %d: RSLIP: Receive-Side Elastic Store Slip\n", __FUNCTION__, span, cd->frame));
+				if (status & 0x08)
+					printd(("%s: %d: %d: RUA1: Receive Unframed All Ones\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x04)
+					printd(("%s: %d: %d: RRA: Receive Remote Alarm\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x02)
+					printd(("%s: %d: %d: RCL: Receive Carrier Loss\n",
+						__FUNCTION__, span, cd->frame));
+				if (status & 0x01)
+					printd(("%s: %d: %d: RLOS: Receive Loss of Sync\n",
+						__FUNCTION__, span, cd->frame));
+			}
+#else				/* defined _DEBUG */
+
 			/* write-read-write cycle */
 			xlb[0x06] = 0x0f;
 			status = xlb[0x06];
 			xlb[0x06] = status & 0x0f;
+#endif				/* defined _DEBUG */
 
 			if (status & 0x09)	/* RUA1 or RLOS */
 				alarms |= SDL_ALARM_RED;
@@ -15084,7 +15431,7 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 				leds |= LEDGRN;
 			all_leds = cd->leds;
 			all_leds &= ~(LEDYEL << (span << 1));
-			all_leds |= leds << (span << 1);
+			all_leds |= (leds << (span << 1));
 			if (cd->leds != all_leds) {
 				cd->xlb[LEDREG] = all_leds;
 				cd->leds = all_leds;
@@ -15092,6 +15439,30 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		}
 		// if (!(cd->frame % 8000))
 		if (!(cd->frame & 0x1fff)) {	/* 1.024 seconds */
+#if 0
+			printd(("%s: second tick frame is %d\n", __FUNCTION__, cd->frame));
+#ifdef _DEBUG
+			{
+				static char pbuf[256] = "\0";
+				char *p;
+				uint32_t *wp;
+				int i, j;
+
+				for (wp = cd->wbuf + (cd->lebno << 8), i = 0; i < 16; i++) {
+					for (j = 0, p = pbuf; j < 16; j++, p += 8, wp++) {
+						snprintf(p, 9, "%08x", *wp);
+					}
+					printd(("%s: wbuf data is %s\n", __FUNCTION__, pbuf));
+				}
+				for (wp = cd->rbuf + (cd->lebno << 8), i = 0; i < 16; i++) {
+					for (j = 0, p = pbuf; j < 16; j++, p += 8, wp++) {
+						snprintf(p, 9, "%08x", *wp);
+					}
+					printd(("%s: rbuf data is %s\n", __FUNCTION__, pbuf));
+				}
+			}
+#endif
+#endif
 			for (span = 0; span < X400_SPANS; span++)
 				if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
 					volatile uint8_t *xlb = &cd->xlb[span << 8];
@@ -15116,8 +15487,26 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 				}
 			}
 			if (cd->config.ifsync != syncsrc) {
-				cd->xlb[SYNREG] = syncsrc;
 				cd->config.ifsync = syncsrc;
+				cd->xlb[0x01a] = 0x00;
+				cd->xlb[0x11a] = 0x00;
+				cd->xlb[0x21a] = 0x00;
+				cd->xlb[0x31a] = 0x00;
+				if (syncsrc) {
+					/* The TCLK pin is always the source of transmit clock. */
+					cd->xlb[0x01d] = 0x00;
+					cd->xlb[0x11d] = 0x00;
+					cd->xlb[0x21d] = 0x00;
+					cd->xlb[0x31d] = 0x00;
+				} else {
+					/* Use the signal present at RCLK as the transmit clock.
+					   The TCLK pin is ignored. */
+					cd->xlb[0x01d] = 0x04;
+					cd->xlb[0x11d] = 0x04;
+					cd->xlb[0x21d] = 0x04;
+					cd->xlb[0x31d] = 0x04;
+				}
+				cd->xlb[SYNREG] = syncsrc;
 			}
 		}
 		cd->frame += 8;
@@ -15219,7 +15608,7 @@ xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				leds |= LEDGRN;
 			all_leds = cd->leds;
 			all_leds &= ~(LEDYEL << (span << 1));
-			all_leds |= leds << (span << 1);
+			all_leds |= (leds << (span << 1));
 			if (cd->leds != all_leds) {
 				cd->xlb[LEDREG] = all_leds;
 				cd->leds = all_leds;
@@ -15251,8 +15640,8 @@ xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				}
 			}
 			if (cd->config.ifsync != syncsrc) {
-				cd->xlb[SYNREG] = syncsrc;
 				cd->config.ifsync = syncsrc;
+				cd->xlb[SYNREG] = syncsrc;
 			}
 		}
 		cd->frame += 8;
@@ -15276,14 +15665,15 @@ xp_t1_txrx_burst(struct cd *cd)
 		   ping-pong.  These prefetches are for read. */
 		{
 			register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
+			register const uint32_t *const wend = wbuf + 256;
 
-			for (xll = cd->xll, wbuf = cd->wbuf + (lebno << 8);
-			     wbuf < cd->wbuf + (lebno << 8) + 256;) {
-				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++)
+			for (xll = cd->xll; wbuf < wend;) {
+				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++) {
 					if (slot & 0x3) {
 						prefetch(wbuf + 2);
 						*xll = *wbuf;
 					}
+				}
 			}
 		}
 		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
@@ -15291,14 +15681,16 @@ xp_t1_txrx_burst(struct cd *cd)
 		   ping-pong.  These prefetches are for read. */
 		{
 			register uint32_t *rbuf = cd->rbuf + (lebno << 8);
+			register const uint32_t *const rend = rbuf + 256;
 
-			for (xll = cd->xll, rbuf = cd->rbuf + (lebno << 8);
-			     rbuf < cd->rbuf + (lebno << 8) + 256;)
-				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++)
+			for (xll = cd->xll; rbuf < rend;) {
+				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++) {
 					if (slot & 0x3) {
 						prefetchw(rbuf + 2);
 						*rbuf = *xll;
 					}
+				}
+			}
 		}
 		cd->lebno = lebno;
 		tasklet_hi_schedule(&cd->tasklet);
@@ -15380,7 +15772,7 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 					int japan = (sp->config.ifgtype == SDL_GTYPE_J1);
 
 					xlb[0x1e] = japan ? 0x80 : 0x00;	/* no local loop */
-					xlb[0x40] = 0x40;	/* remote loop */
+					xlb[0x0a] = 0x40;	/* remote loop */
 					sp->config.ifgmode |= SDL_GMODE_REM_LB;
 				}
 			} else
@@ -15392,7 +15784,7 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 					int japan = (sp->config.ifgtype == SDL_GTYPE_J1);
 
 					xlb[0x1e] = japan ? 0x80 : 0x00;	/* no local loop */
-					xlb[0x40] = 0x00;	/* no remote loop */
+					xlb[0x0a] = 0x00;	/* no remote loop */
 					sp->config.ifgmode &= ~SDL_GMODE_REM_LB;
 				}
 			} else
@@ -15427,7 +15819,7 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 				leds |= LEDGRN;
 			all_leds = cd->leds;
 			all_leds &= ~(LEDYEL << (span << 1));
-			all_leds |= leds << (span << 1);
+			all_leds |= (leds << (span << 1));
 			if (cd->leds != all_leds) {
 				cd->xlb[LEDREG] = all_leds;
 				cd->leds = all_leds;
@@ -15459,8 +15851,8 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 				}
 			}
 			if (cd->config.ifsync != syncsrc) {
-				cd->xlb[SYNREG] = syncsrc;
 				cd->config.ifsync = syncsrc;
+				cd->xlb[SYNREG] = syncsrc;
 			}
 		}
 		cd->frame += 8;
@@ -15488,7 +15880,7 @@ STATIC __hot irqreturn_t
 #ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 xp_t401_interrupt(int irq, void *dev_id)
 #else
-xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
+xp_t401_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 #endif
 {
 	struct cd *cd = (struct cd *) dev_id;
@@ -15588,7 +15980,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				leds |= LEDGRN;
 			all_leds = cd->leds;
 			all_leds &= ~(LEDYEL << (span << 1));
-			all_leds |= leds << (span << 1);
+			all_leds |= (leds << (span << 1));
 			if (cd->leds != all_leds) {
 				cd->xlb[LEDREG] = all_leds;
 				cd->leds = all_leds;
@@ -15622,15 +16014,18 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 			if (cd->config.ifsync != syncsrc) {
 				cd->config.ifsync = syncsrc;
 				if (syncsrc) {
-					cd->xlb[(0 << 8) + 0x70] = 0x00;
-					cd->xlb[(1 << 8) + 0x70] = 0x00;
-					cd->xlb[(2 << 8) + 0x70] = 0x00;
-					cd->xlb[(3 << 8) + 0x70] = 0x00;
+					/* The TCLK pin is always the source of transmit clock. */
+					cd->xlb[0x070] = 0x00;
+					cd->xlb[0x170] = 0x00;
+					cd->xlb[0x270] = 0x00;
+					cd->xlb[0x370] = 0x00;
 				} else {
-					cd->xlb[(0 << 8) + 0x70] = 0x06;
-					cd->xlb[(1 << 8) + 0x70] = 0x06;
-					cd->xlb[(2 << 8) + 0x70] = 0x06;
-					cd->xlb[(3 << 8) + 0x70] = 0x06;
+					/* Use the signal present at RCLK as the transmit clock.
+					   The TCLK pin is ignored. */
+					cd->xlb[0x070] = 0x06;
+					cd->xlb[0x170] = 0x06;
+					cd->xlb[0x270] = 0x06;
+					cd->xlb[0x370] = 0x06;
 					syncsrc = SYNC1;
 				}
 				cd->xlb[SYNREG] = syncsrc;
@@ -16917,6 +17312,8 @@ xp_alloc_cd(void)
 		cd->prev = &x400p_cards;
 		cd->card = x400p_boards++;
 		x400p_cards = cd_get(cd);
+		bzero(wbuf, X400P_EBUFNO * 1024);
+		bzero(rbuf, X400P_EBUFNO * 1024);
 		cd->wbuf = wbuf;
 		cd->rbuf = rbuf;
 		tasklet_init(&cd->tasklet, NULL, 0);
@@ -17017,7 +17414,6 @@ xp_remove(struct pci_dev *dev)
 		cd->xlb[CTLREG] = 0;
 		cd->xlb[LEDREG] = 0;
 		cd->xlb[TSTREG] = 0;
-		cd->xlb[CTLREG1] = 0;
 	}
 	if (cd->irq) {
 		free_irq(cd->irq, cd);
@@ -17328,8 +17724,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[TSTREG] = 0;	/* do not drive TEST2 pin */
 		if (cd->devrev > 3) {
 			cd->xlb[CTLREG1] = 1;	/* non Rev. A mode */
+			cmn_err(CE_NOTE, "%s: setting non-Rev.A mode", DRV_NAME);
 		} else {
 			cd->xlb[CTLREG1] = 0;	/* Rev. A mode */
+			cmn_err(CE_NOTE, "%s: setting Rev.A mode", DRV_NAME);
 		}
 		/* setup E1 card defaults */
 		cd->config = sdl_default_e1_chan;
@@ -17339,27 +17737,76 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			for (offset = 0; offset < 192; offset++)
 				cd->xlb[(span << 8) + offset] = 0x00;
 		/* set up for interleaved serial bus operation, byte mode */
-		cd->xlb[(0 << 8) + 0xb5] = 0x09;	/* master w/ 3 slaves, 8.192 MHz bus */
-		cd->xlb[(1 << 8) + 0xb5] = 0x08;	/* IBO slave */
-		cd->xlb[(2 << 8) + 0xb5] = 0x08;	/* IBO slave */
-		cd->xlb[(3 << 8) + 0xb5] = 0x08;	/* IBO slave */
+		cd->xlb[0x0b5] = 0x09;	/* master w/ 3 slaves, 8.192 MHz bus */
+		cd->xlb[0x1b5] = 0x08;	/* IBO slave */
+		cd->xlb[0x2b5] = 0x08;	/* IBO slave */
+		cd->xlb[0x3b5] = 0x08;	/* IBO slave */
+#if 0
+		/* set LOTMC */
+		cd->xlb[0x01a] = 0x04;	/* CCR2: set LOTCMC */
+		cd->xlb[0x11a] = 0x04;	/* CCR2: set LOTCMC */
+		cd->xlb[0x21a] = 0x04;	/* CCR2: set LOTCMC */
+		cd->xlb[0x31a] = 0x04;	/* CCR2: set LOTCMC */
+		/* zero again */
+		for (span = 0; span < X400_SPANS; span++) {
+			for (offset = 0x00; offset < 0x09; offset++)
+				cd->xlb[(span << 8) + offset] = 0x00;
+			for (offset = 0x10; offset < 0x1a; offset++)
+				cd->xlb[(span << 8) + offset] = 0x00;
+			for (offset = 0x1b; offset < 192; offset++)
+				cd->xlb[(span << 8) + offset] = 0x00;
+		}
+		/* RCR1 */
+		cd->xlb[0x010] = 0x20;	/* RCR1: RSYNC input */
+		cd->xlb[0x110] = 0x20;	/* RCR1: RSYNC input */
+		cd->xlb[0x210] = 0x20;	/* RCR1: RSYNC input */
+		cd->xlb[0x310] = 0x20;	/* RCR1: RSYNC input */
+		/* RCR2 */
+		cd->xlb[0x011] = 0x06;	/* RCR2: RSYSCLK 2.048, RESE */
+		cd->xlb[0x111] = 0x06;	/* RCR2: RSYSCLK 2.048, RESE */
+		cd->xlb[0x211] = 0x06;	/* RCR2: RSYSCLK 2.048, RESE */
+		cd->xlb[0x311] = 0x06;	/* RCR2: RSYSCLK 2.048, RESE */
+		/* TCR1 */
+		cd->xlb[0x012] = 0x09;	/* TCR1: TSiS, TSYNC output */
+		cd->xlb[0x112] = 0x09;	/* TCR1: TSiS, TSYNC output */
+		cd->xlb[0x212] = 0x09;	/* TCR1: TSiS, TSYNC output */
+		cd->xlb[0x312] = 0x09;	/* TCR1: TSiS, TSYNC output */
+#endif
 		/* line interface reset */
-		cd->xlb[(0 << 8) + 0xaa] = 0x80;
-		printd(("%s: LIRST on span 0\n", DRV_NAME));
-		cd->xlb[(1 << 8) + 0xaa] = 0x80;
-		printd(("%s: LIRST on span 1\n", DRV_NAME));
-		cd->xlb[(2 << 8) + 0xaa] = 0x80;
-		printd(("%s: LIRST on span 2\n", DRV_NAME));
-		cd->xlb[(3 << 8) + 0xaa] = 0x80;
-		printd(("%s: LIRST on span 3\n", DRV_NAME));
+		switch (cd->device) {
+		case XP_DEV_DS2154:
+			cd->xlb[0x01b] = 0x8a;	/* LIRST */
+			cd->xlb[0x11b] = 0x8a;	/* LIRST */
+			cd->xlb[0x21b] = 0x8a;	/* LIRST */
+			cd->xlb[0x31b] = 0x8a;	/* LIRST */
+			break;
+		case XP_DEV_DS21354:
+		case XP_DEV_DS21554:
+			cd->xlb[0x0aa] = 0x80;	/* LIRST */
+			cd->xlb[0x1aa] = 0x80;	/* LIRST */
+			cd->xlb[0x2aa] = 0x80;	/* LIRST */
+			cd->xlb[0x3aa] = 0x80;	/* LIRST */
+			break;
+		}
 		/* wait for 40 ms */
 		timeout = jiffies + 100 * HZ / 1000;
 		while (jiffies < timeout) ;
-		/* reset LIRST bit */
-		cd->xlb[(0 << 8) + 0xaa] = 0x00;
-		cd->xlb[(1 << 8) + 0xaa] = 0x00;
-		cd->xlb[(2 << 8) + 0xaa] = 0x00;
-		cd->xlb[(3 << 8) + 0xaa] = 0x00;
+		/* release LIRST bit */
+		switch (cd->device) {
+		case XP_DEV_DS2154:
+			cd->xlb[0x01b] = 0x82;	/* not LIRST */
+			cd->xlb[0x11b] = 0x82;	/* not LIRST */
+			cd->xlb[0x21b] = 0x82;	/* not LIRST */
+			cd->xlb[0x31b] = 0x82;	/* not LIRST */
+			break;
+		case XP_DEV_DS21354:
+		case XP_DEV_DS21554:
+			cd->xlb[0x0aa] = 0x80;	/* not LIRST */
+			cd->xlb[0x1aa] = 0x80;	/* not LIRST */
+			cd->xlb[0x2aa] = 0x80;	/* not LIRST */
+			cd->xlb[0x3aa] = 0x80;	/* not LIRST */
+			break;
+		}
 		break;
 	}
 	case V401PE:
@@ -17368,32 +17815,28 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->config = sdl_default_e1_chan;
 		cd->isr = &xp_e401_interrupt;
 		/* place all framers in E1 mode */
-		cd->xlb[(0 << 8) + 0x00] = 0x02;
-		cd->xlb[(1 << 8) + 0x00] = 0x02;
-		cd->xlb[(2 << 8) + 0x00] = 0x02;
-		cd->xlb[(3 << 8) + 0x00] = 0x02;
+		cd->xlb[0x000] = 0x02;
+		cd->xlb[0x100] = 0x02;
+		cd->xlb[0x200] = 0x02;
+		cd->xlb[0x300] = 0x02;
 		/* set up for interleaved serial bus operation, byte mode */
-		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
-		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
-		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
-		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
-		/* link interface reset */
-		cd->xlb[(0 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
-		printd(("%s: LIRST on span 0\n", DRV_NAME));
-		cd->xlb[(1 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
-		printd(("%s: LIRST on span 1\n", DRV_NAME));
-		cd->xlb[(2 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
-		printd(("%s: LIRST on span 2\n", DRV_NAME));
-		cd->xlb[(3 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
-		printd(("%s: LIRST on span 3\n", DRV_NAME));
+		cd->xlb[0x0c5] = 0x28 + 0;
+		cd->xlb[0x1c5] = 0x28 + 1;
+		cd->xlb[0x2c5] = 0x28 + 2;
+		cd->xlb[0x3c5] = 0x28 + 3;
+		/* line interface reset */
+		cd->xlb[0x079] = 0xd8;	/* E1, normal, LIRST */
+		cd->xlb[0x179] = 0xd8;	/* E1, normal, LIRST */
+		cd->xlb[0x279] = 0xd8;	/* E1, normal, LIRST */
+		cd->xlb[0x379] = 0xd8;	/* E1, normal, LIRST */
 		/* wait for 40 ms */
 		timeout = jiffies + 100 * HZ / 1000;
 		while (jiffies < timeout) ;
 		/* release LIRST bit */
-		cd->xlb[(0 << 8) + 0x79] = 0x98;	/* E1, normal */
-		cd->xlb[(1 << 8) + 0x79] = 0x98;	/* E1, normal */
-		cd->xlb[(2 << 8) + 0x79] = 0x98;	/* E1, normal */
-		cd->xlb[(3 << 8) + 0x79] = 0x98;	/* E1, normal */
+		cd->xlb[0x079] = 0x98;	/* E1, normal */
+		cd->xlb[0x179] = 0x98;	/* E1, normal */
+		cd->xlb[0x279] = 0x98;	/* E1, normal */
+		cd->xlb[0x379] = 0x98;	/* E1, normal */
 		break;
 	}
 	case V400PT:
@@ -17405,8 +17848,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[TSTREG] = 0;	/* do not drive TEST2 pin */
 		if (cd->devrev > 3) {
 			cd->xlb[CTLREG1] = 1;	/* non Rev. A mode */
+			cmn_err(CE_NOTE, "%s: setting non-Rev.A mode", DRV_NAME);
 		} else {
 			cd->xlb[CTLREG1] = 0;	/* Rev. A mode */
+			cmn_err(CE_NOTE, "%s: setting Rev.A mode", DRV_NAME);
 		}
 #if 0
 		if (!japan) {
@@ -17428,27 +17873,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			for (offset = 0; offset < 160; offset++)
 				cd->xlb[(span << 8) + offset] = 0x00;
 		/* set up for interleaved serial bus operation, byte mode */
-		cd->xlb[(0 << 8) + 0x94] = 0x09;
-		cd->xlb[(1 << 8) + 0x94] = 0x08;
-		cd->xlb[(2 << 8) + 0x94] = 0x08;
-		cd->xlb[(3 << 8) + 0x94] = 0x08;
-		/* line interface reset */
-		cd->xlb[(0 << 8) + 0x0a] = 0x80;
-		printd(("%s: LIRST on span 0\n", DRV_NAME));
-		cd->xlb[(1 << 8) + 0x0a] = 0x80;
-		printd(("%s: LIRST on span 1\n", DRV_NAME));
-		cd->xlb[(2 << 8) + 0x0a] = 0x80;
-		printd(("%s: LIRST on span 2\n", DRV_NAME));
-		cd->xlb[(3 << 8) + 0x0a] = 0x80;
-		printd(("%s: LIRST on span 3\n", DRV_NAME));
-		/* reset LIRST bit */
-		cd->xlb[(0 << 8) + 0x0a] = 0x00;
-		cd->xlb[(1 << 8) + 0x0a] = 0x00;
-		cd->xlb[(2 << 8) + 0x0a] = 0x00;
-		cd->xlb[(3 << 8) + 0x0a] = 0x00;
-		/* wait for 40 ms */
-		timeout = jiffies + 100 * HZ / 1000;
-		while (jiffies < timeout) ;
+		cd->xlb[0x094] = 0x09;
+		cd->xlb[0x194] = 0x08;
+		cd->xlb[0x294] = 0x08;
+		cd->xlb[0x394] = 0x08;
 		break;
 	}
 	case V401PT:
@@ -17471,32 +17899,28 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 #endif
 		cd->xlb[SYNREG] = SYNC1;	/* default span1 */
 		/* place all framers in T1 mode */
-		cd->xlb[(0 << 8) + 0x00] = 0x00;
-		cd->xlb[(1 << 8) + 0x00] = 0x00;
-		cd->xlb[(2 << 8) + 0x00] = 0x00;
-		cd->xlb[(3 << 8) + 0x00] = 0x00;
+		cd->xlb[0x000] = 0x00;
+		cd->xlb[0x100] = 0x00;
+		cd->xlb[0x200] = 0x00;
+		cd->xlb[0x300] = 0x00;
 		/* set up for interleaved serial bus operation, byte mode */
-		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
-		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
-		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
-		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
-		/* link interface reset */
-		cd->xlb[(0 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
-		printd(("%s: LIRST on span 0\n", DRV_NAME));
-		cd->xlb[(1 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
-		printd(("%s: LIRST on span 1\n", DRV_NAME));
-		cd->xlb[(2 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
-		printd(("%s: LIRST on span 2\n", DRV_NAME));
-		cd->xlb[(3 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
-		printd(("%s: LIRST on span 3\n", DRV_NAME));
+		cd->xlb[0x0c5] = 0x28 + 0;
+		cd->xlb[0x1c5] = 0x28 + 1;
+		cd->xlb[0x2c5] = 0x28 + 2;
+		cd->xlb[0x3c5] = 0x28 + 3;
+		/* line interface reset */
+		cd->xlb[0x079] = 0x58;	/* T1, normal, LIRST */
+		cd->xlb[0x179] = 0x58;	/* T1, normal, LIRST */
+		cd->xlb[0x279] = 0x58;	/* T1, normal, LIRST */
+		cd->xlb[0x379] = 0x58;	/* T1, normal, LIRST */
 		/* wait for 40 ms */
 		timeout = jiffies + 100 * HZ / 1000;
 		while (jiffies < timeout) ;
 		/* release LIRST bit */
-		cd->xlb[(0 << 8) + 0x79] = 0x18;	/* T1, normal */
-		cd->xlb[(1 << 8) + 0x79] = 0x18;	/* T1, normal */
-		cd->xlb[(2 << 8) + 0x79] = 0x18;	/* T1, normal */
-		cd->xlb[(3 << 8) + 0x79] = 0x18;	/* T1, normal */
+		cd->xlb[0x079] = 0x18;	/* T1, normal */
+		cd->xlb[0x179] = 0x18;	/* T1, normal */
+		cd->xlb[0x279] = 0x18;	/* T1, normal */
+		cd->xlb[0x379] = 0x18;	/* T1, normal */
 		break;
 	}
 	default:
@@ -17518,13 +17942,19 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	switch (cd->config.ifgtype) {
 	case SDL_GTYPE_E1:
 		tasklet_init(&cd->tasklet, &xp_e1_card_tasklet, (unsigned long) cd);
+		printd(("%s: tasklet set to xp_e1_card_tasklet\n", __FUNCTION__));
 		break;
 	case SDL_GTYPE_T1:
 		tasklet_init(&cd->tasklet, &xp_t1_card_tasklet, (unsigned long) cd);
+		printd(("%s: tasklet set to xp_t1_card_tasklet\n", __FUNCTION__));
 		break;
 	case SDL_GTYPE_J1:
 		tasklet_init(&cd->tasklet, &xp_j1_card_tasklet, (unsigned long) cd);
+		printd(("%s: tasklet set to xp_j1_card_tasklet\n", __FUNCTION__));
 		break;
+	default:
+		swerr();
+		goto error_remove;
 	}
 	/* allocate span structures */
 	for (span = 0; span < X400_SPANS; span++)
