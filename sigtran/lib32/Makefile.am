@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 01:52:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-04-01 17:00:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 01:52:18 $ by $Author: brian $
+# Last Modified $Date: 2009-04-01 17:00:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -94,6 +94,15 @@ test_m2ua_as_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_m2ua_as_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_m2ua_as_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+pkglibexec32_PROGRAMS		+= test-m3ua-raw
+
+test_m3ua_raw_SOURCES		= $(top_srcdir)/src/test/test-m3ua-raw.c
+test_m3ua_raw_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+test_m3ua_raw_LDADD		= $(STREAMS_LDADD32)
+test_m3ua_raw_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
+test_m3ua_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_m3ua_raw_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
 ## RPM_BUILD_USER
 endif
 
@@ -108,6 +117,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2009-04-01 17:00:06  brian
+# - updates
+#
 # Revision 0.9.2.6  2008-04-29 01:52:18  brian
 # - updated headers for release
 #

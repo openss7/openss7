@@ -1,3 +1,8 @@
+2009-04-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/x400p-ss7/sl_x400p.c: driver updates
+	* src/test/x400p-ss7/test-x400p.c: test updates
+
 2009-03-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* stacks/src/include/xmap_ansi.h: added header file

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2009-02-18 20:18:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2009-04-01 17:00:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-02-18 20:18:41 $ by $Author: brian $
+# Last Modified $Date: 2009-04-01 17:00:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,11 +83,13 @@ EXTRA_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod \
 				  test-sigtran \
 				  test-m2pa \
-				  test-m2ua_as
+				  test-m2ua_as \
+				  test-m3ua-raw
 
 pkglibexec_PROGRAMS		= test-sigtran \
 				  test-m2pa \
-				  test-m2ua_as
+				  test-m2ua_as \
+				  test-m3ua-raw
 
 sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod \
 				  m2paconfig
@@ -135,6 +137,13 @@ test_m2ua_as_LDADD		= $(STREAMS_LDADD)
 test_m2ua_as_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_m2ua_as_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_m2ua_as_CFLAGS		= $(USER_CFLAGS)
+
+test_m3ua_raw_SOURCES		= src/test/test-m3ua-raw.c
+test_m3ua_raw_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+test_m3ua_raw_LDADD		= $(STREAMS_LDADD)
+test_m3ua_raw_LDFLAGS		= $(STREAMS_LDFLAGS)
+test_m3ua_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_m3ua_raw_CFLAGS		= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -509,6 +518,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.23  2009-04-01 17:00:06  brian
+# - updates
+#
 # Revision 0.9.2.22  2009-02-18 20:18:41  brian
 # - updated agents
 #
