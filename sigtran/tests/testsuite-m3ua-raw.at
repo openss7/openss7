@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: testsuite-m3ua-raw.at,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-04-01 16:59:50 $
+# @(#) $RCSfile: testsuite-m3ua-raw.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-04-04 05:05:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-04-01 16:59:50 $ by $Author: brian $
+# Last Modified $Date: 2009-04-04 05:05:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,168 +66,131 @@ AT_TESTED([test-m3ua-raw])
 AT_BANNER([M3UA-RAW tests])
 
 AT_SETUP([m3ua-raw test 0.1])
-AT_KEYWORDS([m3ua-raw Sanity])
+AT_KEYWORDS([m3ua-raw guard timer])
 AT_CHECK([test_m3ua_raw "0.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 1.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "1.1"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 0.2.1])
+AT_KEYWORDS([m3ua-raw preamble base])
+AT_CHECK([test_m3ua_raw "0.2.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 1.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "1.2"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 0.2.2])
+AT_KEYWORDS([m3ua-raw preamble info])
+AT_CHECK([test_m3ua_raw "0.2.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 1.3])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "1.3"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 0.2.3])
+AT_KEYWORDS([m3ua-raw preamble unbound])
+AT_CHECK([test_m3ua_raw "0.2.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 2.0])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "2.0"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 0.2.4])
+AT_KEYWORDS([m3ua-raw preamble options])
+AT_CHECK([test_m3ua_raw "0.2.4"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 2.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "2.1"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 0.2.5])
+AT_KEYWORDS([m3ua-raw preamble bind])
+AT_CHECK([test_m3ua_raw "0.2.5"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 2.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "2.2"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 1.1.1])
+AT_KEYWORDS([m3ua-raw preamble connect disconnect])
+AT_CHECK([test_m3ua_raw "1.1.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 2.3])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "2.3"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 1.1.2])
+AT_KEYWORDS([m3ua-raw preamble connect release])
+AT_CHECK([test_m3ua_raw "1.1.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 2.1.1])
+AT_KEYWORDS([m3ua-raw ASPUP Req])
+AT_CHECK([test_m3ua_raw "2.1.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 2.1.2])
+AT_KEYWORDS([m3ua-raw ASPUP Ack])
+AT_CHECK([test_m3ua_raw "2.1.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 2.2.1])
+AT_KEYWORDS([m3ua-raw ASPDN Req])
+AT_CHECK([test_m3ua_raw "2.2.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 2.2.2])
+AT_KEYWORDS([m3ua-raw ASPDN Ack])
+AT_CHECK([test_m3ua_raw "2.2.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 2.3.1])
+AT_KEYWORDS([m3ua-raw BEAT Req])
+AT_CHECK([test_m3ua_raw "2.3.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 2.3.2])
+AT_KEYWORDS([m3ua-raw BEAT Ack])
+AT_CHECK([test_m3ua_raw "2.3.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 2.3.3])
+AT_KEYWORDS([m3ua-raw BEAT])
+AT_CHECK([test_m3ua_raw "2.3.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 3.1.1])
+AT_KEYWORDS([m3ua-raw REG Req])
+AT_CHECK([test_m3ua_raw "3.1.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 3.1.2])
+AT_KEYWORDS([m3ua-raw REG Rsp])
+AT_CHECK([test_m3ua_raw "3.1.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 3.2.1])
+AT_KEYWORDS([m3ua-raw DEREG Req])
+AT_CHECK([test_m3ua_raw "3.2.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([m3ua-raw test 3.2.2])
+AT_KEYWORDS([m3ua-raw DEREG Rsp])
+AT_CHECK([test_m3ua_raw "3.2.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m3ua-raw test 4.1.1])
-AT_KEYWORDS([m3ua-raw])
+AT_KEYWORDS([m3ua-raw ASPAC Req])
 AT_CHECK([test_m3ua_raw "4.1.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m3ua-raw test 4.1.2])
-AT_KEYWORDS([m3ua-raw])
+AT_KEYWORDS([m3ua-raw ASPAC Ack])
 AT_CHECK([test_m3ua_raw "4.1.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 5.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "5.1"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 4.2.1])
+AT_KEYWORDS([m3ua-raw ASPIA Req])
+AT_CHECK([test_m3ua_raw "4.2.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 5.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "5.2"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 4.2.2])
+AT_KEYWORDS([m3ua-raw ASPIA Ack])
+AT_CHECK([test_m3ua_raw "4.2.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([m3ua-raw test 5.3])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "5.3"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 5.4])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "5.4"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 5.5.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "5.5.1"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 5.5.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "5.5.2"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 5.5.3])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "5.5.3"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 6.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "6.1"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 6.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "6.2"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 6.3])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "6.3"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 7.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "7.1"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 7.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "7.2"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 8.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "8.1"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 8.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "8.2"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 8.3])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "8.3"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 8.4])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "8.4"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 9.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "9.1"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 9.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "9.2"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 9.3])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "9.3"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 9.4])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "9.4"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 10.1])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "10.1"], [], [ignore], [], [], [])
-AT_CLEANUP
-
-AT_SETUP([m3ua-raw test 10.2])
-AT_KEYWORDS([m3ua-raw])
-AT_CHECK([test_m3ua_raw "10.2"], [], [ignore], [], [], [])
+AT_SETUP([m3ua-raw test 5.1.1])
+AT_KEYWORDS([m3ua-raw DAUD])
+AT_CHECK([test_m3ua_raw "5.1.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 # =============================================================================
 #
 # $Log: testsuite-m3ua-raw.at,v $
+# Revision 0.9.2.2  2009-04-04 05:05:24  brian
+# - last driver tweaks and M3UA test program
+#
 # Revision 0.9.2.1  2009-04-01 16:59:50  brian
 # - added raw testsuite
 #
