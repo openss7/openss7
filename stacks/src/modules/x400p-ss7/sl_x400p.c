@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2009-04-01 21:15:11 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-04-04 05:05:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-04-01 21:15:11 $ by $Author: brian $
+ Last Modified $Date: 2009-04-04 05:05:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.60  2009-04-04 05:05:25  brian
+ - last driver tweaks and M3UA test program
+
  Revision 0.9.2.59  2009-04-01 21:15:11  brian
  - tweaks
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2009-04-01 21:15:11 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-04-04 05:05:25 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2009-04-01 21:15:11 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-04-04 05:05:25 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -132,13 +135,12 @@ static char const ident[] =
 #include <sys/dsx_ioctl.h>
 
 #ifdef X400P_DOWNLOAD_FIRMWARE
-#include "v400pfw.h"
 #include "v401pfw.h"
 #endif
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2009-04-01 21:15:11 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-04-04 05:05:25 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -427,6 +429,7 @@ STATIC struct ss7_bufpool xp_bufpool = { 0, };
 /* SYNREG: 0x02 = sync source span 2 */
 /* SYNREG: 0x03 = sync source span 3 */
 /* SYNREG: 0x04 = sync source span 4 */
+/* SYNREG: 0x05 = sync to timing bus */
 
 #define CTLREG	0x401
 /* CTLREG.0: interrupt enable */
@@ -1857,7 +1860,7 @@ STATIC sdl_config_t sdl_default_e1_chan = {
 	.ifmode = SDL_MODE_PEER,
 	.ifgmode = SDL_GMODE_NONE,
 	.ifgcrc = SDL_GCRC_CRC5,
-	.ifclock = SDL_CLOCK_LOOP,
+	.ifclock = SDL_CLOCK_SLAVE,
 	.ifcoding = SDL_CODING_HDB3,
 	.ifframing = SDL_FRAMING_CCS,
 	.ifblksize = 8,
@@ -2044,7 +2047,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		/* CCR3.3: 0 = do not reinsert signalling bits at RSER (LIRST on DS2153) */
 		/* CCR3.2: 0 = do not insert signalling from TSIG pin */
 		/* CCR3.1: 1 = TSYSCLK is 2.048/4.096/8.192 MHz */
-		/* CCR3.0: 0 = RCL declared upon 2058 consecutive zeros */
+		/* CCR3.0: 0 = RCL declared upon 255 consecutive zeros */
 
 		switch (cd->device) {
 		case 0:	/* no IDR means DS2153 */
@@ -2096,8 +2099,8 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 			break;
 		}
 
-		xlb[0x10] = 0x20;	/* RCR1 */
-		/* RCR1.7: 0 = unused */
+		xlb[0x10] = 0xa0;	/* RCR1 */
+		/* RCR1.7: 1 = CAS/CRC4 multiframe */
 		/* RCR1.6: 0 = frame mode */
 		/* RCR1.5: 1 = RSYNC is an input */
 		/* RCR1.4: 0 = unassigned */
@@ -2321,8 +2324,8 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 				xlb[0xaa] = 0x80;	/* CCR5 line interface reset (LIRST) */
 				break;
 			}
-			timeout = jiffies + 100 * HZ / 1000;
-			while (jiffies < timeout) ;
+			timeout = (volatile unsigned long) jiffies + 100 * HZ / 1000;
+			while ((volatile unsigned long) jiffies < timeout) ;
 			switch (cd->device) {
 			case 0:	/* No IDR on DS2153. */
 				/* DS2153 uses CCR3.3 for LIRST. */
@@ -2569,8 +2572,8 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 			xlb[0x0a] = 0x00;
 
 			/* wait for 40 ms */
-			timeout = jiffies + 100 * HZ / 1000;
-			while (jiffies < timeout) ;
+			timeout = (volatile unsigned long) jiffies + 100 * HZ / 1000;
+			while ((volatile unsigned long) jiffies < timeout) ;
 
 			/* elastic store reset */
 			switch (cd->device) {
@@ -2671,8 +2674,8 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 			unsigned long timeout;
 
 			xlb[0x79] = 0x58;	/* JACLK on for T1 (and reset) */
-			timeout = jiffies + 100 * HZ / 1000;
-			while (jiffies < timeout) ;
+			timeout = (volatile unsigned long) jiffies + 100 * HZ / 1000;
+			while ((volatile unsigned long) jiffies < timeout) ;
 		}
 #endif
 		xlb[0x79] = 0x18;	/* JACLK on for T1 */
@@ -14817,11 +14820,16 @@ STATIC __hot void
 xp_e1_card_tasklet(unsigned long data)
 {
 	struct cd *cd = (struct cd *) data;
+	int uebno, reschedule = 0;
+	psw_t flags;
 
-	spin_lock(&cd->lock);
-	{
-		if (cd->uebno != cd->lebno) {
-			size_t boff = cd->uebno << 10;
+	spin_lock_irqsave(&cd->lock, flags);
+	if (likely((uebno = cd->uebno) != cd->lebno)) {
+		if ((cd->uebno = (uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
+			reschedule = 1;
+		spin_unlock_irqrestore(&cd->lock, flags);
+		{
+			size_t boff = uebno << 10;
 			uchar *wbeg = (uchar *) cd->wbuf + boff;
 			uchar *wend = wbeg + 1024;
 			uchar *rbeg = (uchar *) cd->rbuf + boff;
@@ -14842,11 +14850,11 @@ xp_e1_card_tasklet(unsigned long data)
 							       rend);
 				}
 			}
-			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
-				tasklet_hi_schedule(&cd->tasklet);
 		}
-	}
-	spin_unlock(&cd->lock);
+		if (reschedule)
+			tasklet_hi_schedule(&cd->tasklet);
+	} else
+		spin_unlock_irqrestore(&cd->lock, flags);
 }
 
 /*
@@ -14938,11 +14946,16 @@ STATIC __hot void
 xp_t1_card_tasklet(unsigned long data)
 {
 	struct cd *cd = (struct cd *) data;
+	int uebno, reschedule = 0;
+	psw_t flags;
 
-	spin_lock(&cd->lock);
-	{
-		if (cd->uebno != cd->lebno) {
-			size_t boff = cd->uebno << 10;
+	spin_lock_irqsave(&cd->lock, flags);
+	if ((uebno = cd->uebno) != cd->lebno) {
+		if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
+			reschedule = 1;
+		spin_unlock_irqrestore(&cd->lock, flags);
+		{
+			size_t boff = uebno << 10;
 			uchar *wbeg = (uchar *) cd->wbuf + boff;
 			uchar *wend = wbeg + 1024;
 			uchar *rbeg = (uchar *) cd->rbuf + boff;
@@ -14963,11 +14976,11 @@ xp_t1_card_tasklet(unsigned long data)
 							       rend);
 				}
 			}
-			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
-				tasklet_hi_schedule(&cd->tasklet);
 		}
-	}
-	spin_unlock(&cd->lock);
+		if (reschedule)
+			tasklet_hi_schedule(&cd->tasklet);
+	} else
+		spin_unlock_irqrestore(&cd->lock, flags);
 }
 
 /*
@@ -15060,11 +15073,16 @@ STATIC __hot void
 xp_j1_card_tasklet(unsigned long data)
 {
 	struct cd *cd = (struct cd *) data;
+	int uebno, reschedule = 0;
+	psw_t flags;
 
-	spin_lock(&cd->lock);
-	{
-		if (cd->uebno != cd->lebno) {
-			size_t boff = cd->uebno << 10;
+	spin_lock_irqsave(&cd->lock, flags);
+	if ((uebno = cd->uebno) != cd->lebno) {
+		if ((cd->uebno = (uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
+			reschedule = 1;
+		spin_unlock_irqrestore(&cd->lock, flags);
+		{
+			size_t boff = uebno << 10;
 			uchar *wbeg = (uchar *) cd->wbuf + boff;
 			uchar *wend = wbeg + 1024;
 			uchar *rbeg = (uchar *) cd->rbuf + boff;
@@ -15085,11 +15103,11 @@ xp_j1_card_tasklet(unsigned long data)
 							       rend);
 				}
 			}
-			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
-				tasklet_hi_schedule(&cd->tasklet);
 		}
-	}
-	spin_unlock(&cd->lock);
+		if (reschedule)
+			tasklet_hi_schedule(&cd->tasklet);
+	} else
+		spin_unlock_irqrestore(&cd->lock, flags);
 }
 
 /*
@@ -15160,9 +15178,9 @@ xp_overflow(struct cd *cd)
 			{
 				static unsigned long throttle = 0;
 
-				if (throttle + 10 <= jiffies)
+				if (throttle + 10 <= (volatile unsigned long) jiffies)
 					break;
-				throttle = jiffies;
+				throttle = (volatile unsigned long) jiffies;
 				swerr();
 				break;
 			}
@@ -15176,56 +15194,32 @@ xp_e1_txrx_burst(struct cd *cd)
 {
 	int lebno;
 
+	spin_lock(&cd->lock);
 	if ((lebno = (cd->lebno + 1) & (X400P_EBUFNO - 1)) != cd->uebno) {
-		register int slot;
-		register volatile uint32_t *xll;
-#if 0
-		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
-		   working in parallel. We only lead by one word to avoid a worse condition: cache
-		   ping-pong.  These prefetches are for read. */
+		cd->lebno = lebno;
+		spin_unlock(&cd->lock);
 		{
+			register int slot;
+			register volatile uint32_t *xll;
 			register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
 			register const uint32_t *const wend = wbuf + 256;
+			register uint32_t *rbuf = cd->rbuf + (lebno << 8);
 
 			for (xll = cd->xll; wbuf < wend;) {
-				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++) {
+				for (wbuf++, rbuf++, xll++, slot = 1; slot < 32;
+				     slot++, xll++, wbuf++, rbuf++) {
 					prefetch(wbuf + 1);
-					*xll = *wbuf;
-				}
-			}
-		}
-		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
-		   working in parallel. We only lead by one word to avoid a worse condition: cache
-		   ping-pong.  These prefetches are for read. */
-		{
-			register uint32_t *rbuf = cd->rbuf + (lebno << 8);
-			register const uint32_t *const rend = rbuf + 256;
-
-			for (xll = cd->xll; rbuf < rend;) {
-				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++) {
 					prefetchw(rbuf + 1);
+					*xll = *wbuf;
 					*rbuf = *xll;
 				}
 			}
 		}
-#else
-		register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
-		register const uint32_t *const wend = wbuf + 256;
-		register uint32_t *rbuf = cd->rbuf + (lebno << 8);
-
-		for (xll = cd->xll; wbuf < wend;) {
-			for (wbuf++, rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++, rbuf++) {
-				prefetch(wbuf + 1);
-				prefetchw(rbuf + 1);
-				*xll = *wbuf;
-				*rbuf = *xll;
-			}
-		}
-#endif
-		cd->lebno = lebno;
 		tasklet_hi_schedule(&cd->tasklet);
-	} else
+	} else {
+		spin_unlock(&cd->lock);
 		xp_overflow(cd);
+	}
 }
 
 /*
@@ -15260,7 +15254,7 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		struct sp *sp;
 		int span;
 
-		cd->xlb[CTLREG] = (OUTBIT | INTACK | E1DIV);
+		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK | E1DIV);
 		xp_e1_txrx_burst(cd);
 		for (span = 0; span < X400_SPANS; span++) {
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -15274,7 +15268,8 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 					{
 						int ccr;
 
-						switch (__builtin_expect(cd->device, XP_DEV_DS21354)) {
+						switch (__builtin_expect
+							(cd->device, XP_DEV_DS21354)) {
 						case XP_DEV_DS21354:
 						case XP_DEV_DS21554:
 							ccr = xlb[0x1d];
@@ -15310,113 +15305,117 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			status = xlb[0x08];
 			status &= 0xff;
 			xlb[0x08] = status;
+			status &= 0xff;
 
 			if (status) {
 				if (status & 0x80)
-					printd(("%s: %d: %d: TESF: Transmit-Side Elastic Store Full\n", __FUNCTION__, span, cd->frame));
+					__printd(("%s: %d: %d: TESF: Transmit-Side Elastic Store Full\n", __FUNCTION__, span, cd->frame));
 				if (status & 0x40)
-					printd(("%s: %d: %d: TESE: Transmit-Side Elastic Store Empty\n", __FUNCTION__, span, cd->frame));
+					__printd(("%s: %d: %d: TESE: Transmit-Side Elastic Store Empty\n", __FUNCTION__, span, cd->frame));
 				if (status & 0x20)
-					printd(("%s: %d: %d: JALT: Jitter Attenuator Limit Trip\n",
+					__printd(("%s: %d: %d: JALT: Jitter Attenuator Limit Trip\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x10)
-					printd(("%s: %d: %d: RESF: Receive-Side Elastic Store Full\n", __FUNCTION__, span, cd->frame));
+					__printd(("%s: %d: %d: RESF: Receive-Side Elastic Store Full\n", __FUNCTION__, span, cd->frame));
 				if (status & 0x08)
-					printd(("%s: %d: %d: RESE: Receive-Side Elastic Store Empty\n", __FUNCTION__, span, cd->frame));
+					__printd(("%s: %d: %d: RESE: Receive-Side Elastic Store Empty\n", __FUNCTION__, span, cd->frame));
 				if (status & 0x04)
-					printd(("%s: %d: %d: CRCRC: CRC Resync Criteria Met\n",
+					__printd(("%s: %d: %d: CRCRC: CRC Resync Criteria Met\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x02)
-					printd(("%s: %d: %d: FASRC: FAS Resync Criteria Met\n",
+					__printd(("%s: %d: %d: FASRC: FAS Resync Criteria Met\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x01)
-					printd(("%s: %d: %d: CASRC: CAS Resync Criteria Met\n",
+					__printd(("%s: %d: %d: CASRC: CAS Resync Criteria Met\n",
 						__FUNCTION__, span, cd->frame));
 			}
 
-			xlb[0x1e] = 0x07;
+			xlb[0x1e] = 0xff;
 			status = xlb[0x1e];
-			status &= 0x07;
+			status &= 0xff;
 			xlb[0x1e] = status;
+			status &= 0x07;
 
 			if (status) {
 				if (status & 0x04)
-					printd(("%s: %d: %d: FASSA: FAS Sync Active\n",
+					__printd(("%s: %d: %d: FASSA: FAS Sync Active\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x02)
-					printd(("%s: %d: %d: CASSA: CAS MF Sync Active\n",
+					__printd(("%s: %d: %d: CASSA: CAS MF Sync Active\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x01)
-					printd(("%s: %d: %d: CRC4SA: CRC4 MF Sync Active\n",
+					__printd(("%s: %d: %d: CRC4SA: CRC4 MF Sync Active\n",
 						__FUNCTION__, span, cd->frame));
 			}
 
-			xlb[0x07] = 0x05;
+			xlb[0x07] = 0xff;
 			status = xlb[0x07];
-			status &= 0x05;
+			status &= 0xff;
 			xlb[0x07] = status;
+			status &= 0x05;
 
 			if (status) {
 				if (status & 0x80)
-					printd(("%s: %d: %d: RMF: Receive CAS Multiframe\n",
+					__printd(("%s: %d: %d: RMF: Receive CAS Multiframe\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x40)
-					printd(("%s: %d: %d: RAF: Receive Align Frame\n",
+					__printd(("%s: %d: %d: RAF: Receive Align Frame\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x20)
-					printd(("%s: %d: %d: TMF: Transmit Multiframe\n",
+					__printd(("%s: %d: %d: TMF: Transmit Multiframe\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x10)
-					printd(("%s: %d: %d: SEC: One Second Timer\n", __FUNCTION__,
+					__printd(("%s: %d: %d: SEC: One Second Timer\n", __FUNCTION__,
 						span, cd->frame));
 				if (status & 0x08)
-					printd(("%s: %d: %d: TAF: Transmit Align Frame\n",
+					__printd(("%s: %d: %d: TAF: Transmit Align Frame\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x04)
-					printd(("%s: %d: %d: LOTC: Lost of Transmit Clock\n",
+					__printd(("%s: %d: %d: LOTC: Lost of Transmit Clock\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x02)
-					printd(("%s: %d: %d: RCMF: Receive CRC4 Multiframe\n",
+					__printd(("%s: %d: %d: RCMF: Receive CRC4 Multiframe\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x01)
-					printd(("%s: %d: %d: TSLIP: Transmit Elastic Store Slip\n",
+					__printd(("%s: %d: %d: TSLIP: Transmit Elastic Store Slip\n",
 						__FUNCTION__, span, cd->frame));
 			}
 
-			xlb[0x06] = 0x1f;
+			xlb[0x06] = 0xff;
 			status = xlb[0x06];
-			status &= 0x1f;
+			status &= 0xff;
 			xlb[0x06] = status;
+			status &= 0x1f;
 
 			if (status) {
 				if (status & 0x80)
-					printd(("%s: %d: %d: RSA1: Receive Signaling All Ones/Signaling Change\n", __FUNCTION__, span, cd->frame));
+					__printd(("%s: %d: %d: RSA1: Receive Signaling All Ones/Signaling Change\n", __FUNCTION__, span, cd->frame));
 				if (status & 0x40)
-					printd(("%s: %d: %d: RDMA: Receive Distant MF Alarm\n",
+					__printd(("%s: %d: %d: RDMA: Receive Distant MF Alarm\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x20)
-					printd(("%s: %d: %d: RSA0: Receive Signaling All Zeros/Signaling Change\n", __FUNCTION__, span, cd->frame));
+					__printd(("%s: %d: %d: RSA0: Receive Signaling All Zeros/Signaling Change\n", __FUNCTION__, span, cd->frame));
 				if (status & 0x10)
-					printd(("%s: %d: %d: RSLIP: Receive-Side Elastic Store Slip\n", __FUNCTION__, span, cd->frame));
+					__printd(("%s: %d: %d: RSLIP: Receive-Side Elastic Store Slip\n", __FUNCTION__, span, cd->frame));
 				if (status & 0x08)
-					printd(("%s: %d: %d: RUA1: Receive Unframed All Ones\n",
+					__printd(("%s: %d: %d: RUA1: Receive Unframed All Ones\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x04)
-					printd(("%s: %d: %d: RRA: Receive Remote Alarm\n",
+					_printd(("%s: %d: %d: RRA: Receive Remote Alarm\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x02)
-					printd(("%s: %d: %d: RCL: Receive Carrier Loss\n",
+					__printd(("%s: %d: %d: RCL: Receive Carrier Loss\n",
 						__FUNCTION__, span, cd->frame));
 				if (status & 0x01)
-					printd(("%s: %d: %d: RLOS: Receive Loss of Sync\n",
+					__printd(("%s: %d: %d: RLOS: Receive Loss of Sync\n",
 						__FUNCTION__, span, cd->frame));
 			}
 #else				/* defined _DEBUG */
 
 			/* write-read-write cycle */
-			xlb[0x06] = 0x0f;
+			xlb[0x06] = 0xff;
 			status = xlb[0x06];
-			xlb[0x06] = status & 0x0f;
+			xlb[0x06] = status & 0xff;
 #endif				/* defined _DEBUG */
 
 			if (status & 0x09)	/* RUA1 or RLOS */
@@ -15505,6 +15504,7 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			}
 			if (cd->config.ifsync != syncsrc) {
 				cd->config.ifsync = syncsrc;
+#if 0
 				cd->xlb[0x01a] = 0x00;
 				cd->xlb[0x11a] = 0x00;
 				cd->xlb[0x21a] = 0x00;
@@ -15523,6 +15523,7 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 					cd->xlb[0x21d] = 0x04;
 					cd->xlb[0x31d] = 0x04;
 				}
+#endif
 				cd->xlb[SYNREG] = syncsrc;
 			}
 		}
@@ -15561,7 +15562,7 @@ xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 		struct sp *sp;
 		int span;
 
-		cd->xlb[CTLREG] = (OUTBIT | INTACK | E1DIV);
+		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK | E1DIV);
 		xp_e1_txrx_burst(cd);
 		for (span = 0; span < X400_SPANS; span++) {
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -15673,62 +15674,34 @@ xp_t1_txrx_burst(struct cd *cd)
 {
 	int lebno;
 
+	spin_lock(&cd->lock);
 	if ((lebno = (cd->lebno + 1) & (X400P_EBUFNO - 1)) != cd->uebno) {
-		register int slot;
-		register volatile uint32_t *xll;
-#if 0
-		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
-		   working in parallel. We only lead by two words to avoid a worse condition: cache 
-		   ping-pong.  These prefetches are for read. */
+		cd->lebno = lebno;
+		spin_unlock(&cd->lock);
 		{
+			register int slot;
+			register volatile uint32_t *xll;
 			register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
 			register const uint32_t *const wend = wbuf + 256;
+			register uint32_t *rbuf = cd->rbuf + (lebno << 8);
 
 			for (xll = cd->xll; wbuf < wend;) {
-				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++) {
+				for (wbuf++, rbuf++, xll++, slot = 1; slot < 32;
+				     slot++, xll++, wbuf++, rbuf++) {
 					if (slot & 0x3) {
 						prefetch(wbuf + 2);
-						*xll = *wbuf;
-					}
-				}
-			}
-		}
-		/* PCI reads and writes are soooo slooowww that we want to get the prefetch engine
-		   working in parallel. We only lead by two words to avoid a worse condition: cache 
-		   ping-pong.  These prefetches are for read. */
-		{
-			register uint32_t *rbuf = cd->rbuf + (lebno << 8);
-			register const uint32_t *const rend = rbuf + 256;
-
-			for (xll = cd->xll; rbuf < rend;) {
-				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++) {
-					if (slot & 0x3) {
 						prefetchw(rbuf + 2);
+						*xll = *wbuf;
 						*rbuf = *xll;
 					}
 				}
 			}
 		}
-#else
-		register const uint32_t *wbuf = cd->wbuf + (lebno << 8);
-		register const uint32_t *const wend = wbuf + 256;
-		register uint32_t *rbuf = cd->rbuf + (lebno << 8);
-
-		for (xll = cd->xll; wbuf < wend;) {
-			for (wbuf++, rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++, rbuf++) {
-				if (slot & 0x3) {
-					prefetch(wbuf + 2);
-					prefetchw(rbuf + 2);
-					*xll = *wbuf;
-					*rbuf = *xll;
-				}
-			}
-		}
-#endif
-		cd->lebno = lebno;
 		tasklet_hi_schedule(&cd->tasklet);
-	} else
+	} else {
+		spin_unlock(&cd->lock);
 		xp_overflow(cd);
+	}
 }
 
 /*
@@ -15763,7 +15736,7 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		struct sp *sp;
 		int span;
 
-		cd->xlb[CTLREG] = (OUTBIT | INTACK);
+		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK);
 		xp_t1_txrx_burst(cd);
 		for (span = 0; span < X400_SPANS; span++) {
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -15913,7 +15886,7 @@ STATIC __hot irqreturn_t
 #ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 xp_t401_interrupt(int irq, void *dev_id)
 #else
-xp_t401_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 #endif
 {
 	struct cd *cd = (struct cd *) dev_id;
@@ -15923,7 +15896,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		struct sp *sp;
 		int span;
 
-		cd->xlb[CTLREG] = (OUTBIT | INTACK);
+		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK);
 		xp_t1_txrx_burst(cd);
 		for (span = 0; span < X400_SPANS; span++) {
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -17447,6 +17420,7 @@ xp_remove(struct pci_dev *dev)
 		cd->xlb[CTLREG] = 0;
 		cd->xlb[LEDREG] = 0;
 		cd->xlb[TSTREG] = 0;
+		cd->xlb[TSTREG] = 0;
 	}
 	if (cd->irq) {
 		free_irq(cd->irq, cd);
@@ -17494,21 +17468,8 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 	volatile unsigned long *data;
 	unsigned long timeout;
 
-	switch (board) {
-	case V400P:
-	case X400P:
-	case X400PSS7:
-		f = (unsigned char *) v400pfw;
-		flen = sizeof(v400pfw);
-		break;
-	case V401PT:
-	case V401PE:
-		f = (unsigned char *) v401pfw;
-		flen = sizeof(v401pfw);
-		break;
-	default:
-		return (-EIO);
-	};
+	f = (unsigned char *) v401pfw;
+	flen = sizeof(v401pfw);
 
 	data = (volatile unsigned long *) &cd->plx[GPIOC];
 	*data |= GPIO_WRITE;
@@ -17532,12 +17493,12 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 		return (-EIO);
 	}
 	printd(("%s: Xilinx Firmware Load: Loaded %d bytes\n", DRV_NAME, byte));
-	timeout = jiffies + 20 * HZ / 1000;
-	while (jiffies < timeout) ;
+	timeout = (volatile unsigned long) jiffies + 20 * HZ / 1000;
+	while ((volatile unsigned long) jiffies < timeout) ;
 	*data |= GPIO_WRITE;
 	printd(("%s: Xilinx Firmware Load: Done\n", DRV_NAME));
-	timeout = jiffies + 20 * HZ / 1000;
-	while (jiffies < timeout) ;
+	timeout = (volatile unsigned long) jiffies + 20 * HZ / 1000;
+	while ((volatile unsigned long) jiffies < timeout) ;
 	if (!(*data & GPIO_INIT)) {
 		cmn_err(CE_WARN, "%s: ERROR: Xilinx Firmware Load: Failed", DRV_NAME);
 		return (-EIO);
@@ -17659,6 +17620,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->xlb[SYNREG] = 0;	/* default autosync */
 	cd->xlb[CTLREG] = 0;	/* interrupts disabled */
 	cd->xlb[LEDREG] = 0;	/* turn off leds */
+	cd->xlb[TSTREG] = 0;	/* do not drive TEST2 pin */
+	cd->xlb[CTLREG1] = 1;	/* non Rev. A mode */
 
 	/* Note: only check the device id of the first framer of 4. */
 
@@ -17767,7 +17730,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->isr = &xp_e400_interrupt;
 		/* zero all span registers */
 		for (span = 0; span < X400_SPANS; span++)
-			for (offset = 0; offset < 192; offset++)
+			for (offset = 0; offset < 256; offset++)
 				cd->xlb[(span << 8) + offset] = 0x00;
 		/* set up for interleaved serial bus operation, byte mode */
 		cd->xlb[0x0b5] = 0x09;	/* master w/ 3 slaves, 8.192 MHz bus */
@@ -17786,7 +17749,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 				cd->xlb[(span << 8) + offset] = 0x00;
 			for (offset = 0x10; offset < 0x1a; offset++)
 				cd->xlb[(span << 8) + offset] = 0x00;
-			for (offset = 0x1b; offset < 192; offset++)
+			for (offset = 0x1b; offset < 0x50; offset++)
 				cd->xlb[(span << 8) + offset] = 0x00;
 		}
 		/* RCR1 */
@@ -17822,8 +17785,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			break;
 		}
 		/* wait for 40 ms */
-		timeout = jiffies + 100 * HZ / 1000;
-		while (jiffies < timeout) ;
+		timeout = (volatile unsigned long) jiffies + 100 * HZ / 1000;
+		while ((volatile unsigned long) jiffies < timeout) ;
 		/* release LIRST bit */
 		switch (cd->device) {
 		case XP_DEV_DS2154:
@@ -17845,10 +17808,49 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[0x1b5] = 0x08;	/* IBO slave */
 		cd->xlb[0x2b5] = 0x08;	/* IBO slave */
 		cd->xlb[0x3b5] = 0x08;	/* IBO slave */
+#if 0
+		/* set LOTMC */
+		cd->xlb[0x01a] = 0x04;	/* CCR2: set LOTCMC */
+		cd->xlb[0x11a] = 0x04;	/* CCR2: set LOTCMC */
+		cd->xlb[0x21a] = 0x04;	/* CCR2: set LOTCMC */
+		cd->xlb[0x31a] = 0x04;	/* CCR2: set LOTCMC */
+		/* zero again */
+		for (span = 0; span < X400_SPANS; span++) {
+			for (offset = 0x00; offset < 0x09; offset++)
+				cd->xlb[(span << 8) + offset] = 0x00;
+			for (offset = 0x10; offset < 0x1a; offset++)
+				cd->xlb[(span << 8) + offset] = 0x00;
+			for (offset = 0x1b; offset < 0x50; offset++)
+				cd->xlb[(span << 8) + offset] = 0x00;
+		}
+		/* RCR1 */
+		cd->xlb[0x010] = 0x20;	/* RCR1: RSYNC input */
+		cd->xlb[0x110] = 0x20;	/* RCR1: RSYNC input */
+		cd->xlb[0x210] = 0x20;	/* RCR1: RSYNC input */
+		cd->xlb[0x310] = 0x20;	/* RCR1: RSYNC input */
+		/* RCR2 */
+		cd->xlb[0x011] = 0x06;	/* RCR2: RSYSCLK 2.048, RESE */
+		cd->xlb[0x111] = 0x06;	/* RCR2: RSYSCLK 2.048, RESE */
+		cd->xlb[0x211] = 0x06;	/* RCR2: RSYSCLK 2.048, RESE */
+		cd->xlb[0x311] = 0x06;	/* RCR2: RSYSCLK 2.048, RESE */
+		/* TCR1 */
+		cd->xlb[0x012] = 0x09;	/* TCR1: TSiS, TSYNC output */
+		cd->xlb[0x112] = 0x09;	/* TCR1: TSiS, TSYNC output */
+		cd->xlb[0x212] = 0x09;	/* TCR1: TSiS, TSYNC output */
+		cd->xlb[0x312] = 0x09;	/* TCR1: TSiS, TSYNC output */
+#endif
 		break;
 	}
 	case V401PE:
 	{
+		cd->xlb[TSTREG] = 0;	/* do not drive TEST2 pin */
+		if (cd->devrev > 3) {
+			cd->xlb[CTLREG1] = 1;	/* non Rev. A mode */
+			cmn_err(CE_NOTE, "%s: setting non-Rev.A mode", DRV_NAME);
+		} else {
+			cd->xlb[CTLREG1] = 0;	/* Rev. A mode */
+			cmn_err(CE_NOTE, "%s: setting Rev.A mode", DRV_NAME);
+		}
 		/* setup E1 card defaults */
 		cd->config = sdl_default_e1_chan;
 		cd->isr = &xp_e401_interrupt;
@@ -17868,8 +17870,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[0x279] = 0xd8;	/* E1, normal, LIRST */
 		cd->xlb[0x379] = 0xd8;	/* E1, normal, LIRST */
 		/* wait for 40 ms */
-		timeout = jiffies + 100 * HZ / 1000;
-		while (jiffies < timeout) ;
+		timeout = (volatile unsigned long) jiffies + 100 * HZ / 1000;
+		while ((volatile unsigned long) jiffies < timeout) ;
 		/* release LIRST bit */
 		cd->xlb[0x079] = 0x98;	/* E1, normal */
 		cd->xlb[0x179] = 0x98;	/* E1, normal */
@@ -17919,6 +17921,14 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 	case V401PT:
 	{
+		cd->xlb[TSTREG] = 0;	/* do not drive TEST2 pin */
+		if (cd->devrev > 3) {
+			cd->xlb[CTLREG1] = 1;	/* non Rev. A mode */
+			cmn_err(CE_NOTE, "%s: setting non-Rev.A mode", DRV_NAME);
+		} else {
+			cd->xlb[CTLREG1] = 0;	/* Rev. A mode */
+			cmn_err(CE_NOTE, "%s: setting Rev.A mode", DRV_NAME);
+		}
 #if 0
 		if (!japan) {
 			/* setup T1 card defaults */
@@ -17952,8 +17962,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[0x279] = 0x58;	/* T1, normal, LIRST */
 		cd->xlb[0x379] = 0x58;	/* T1, normal, LIRST */
 		/* wait for 40 ms */
-		timeout = jiffies + 100 * HZ / 1000;
-		while (jiffies < timeout) ;
+		timeout = (volatile unsigned long) jiffies + 100 * HZ / 1000;
+		while ((volatile unsigned long) jiffies < timeout) ;
 		/* release LIRST bit */
 		cd->xlb[0x079] = 0x18;	/* T1, normal */
 		cd->xlb[0x179] = 0x18;	/* T1, normal */
