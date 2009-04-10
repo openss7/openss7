@@ -5,6 +5,7 @@
 %
 % =========================================================================
 %
+% Copyright (C) 2008-2009  Monavacon Limited <www.monavacon.com>
 % Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -84,6 +85,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
@@ -130,6 +132,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
+Copyright @copyright{} 2008-2009  Monavacon Limited <@uref{http://www.monavacon.com/}> @*
 Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
@@ -205,13 +208,17 @@ release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the @value{PACKAGE_
 * Copying::
 * Glossary::
 * Index::
+@end menu
 
+@ignore
  --- The Detailed Node Listing ---
 
 Acknowledgements
 
 * Sponsors::			Sponsors
 * Contributors::		Contributors
+* Supporters::			Supporters
+* Agencies::			Agencies
 
 Preface
 
@@ -231,7 +238,7 @@ Copying
 * GNU Lesser General Public License::	LGPL
 * GNU Free Documentation License::	FDL
 
-@end menu
+@end ignore
 
 @c Indices
 @c 
@@ -248,7 +255,18 @@ Copying
 @unnumbered Acknowledgements
 @cindex credits
 
+@menu
+* Sponsors::			Sponsors
+* Contributors::		Contributors
+* Supporters::			Supporters
+* Agencies::			Agencies
+* Authors::			Authors
+* Maintainer::			Maintainer
+@end menu
+
+@raisesections
 @include texi/funding.texi
+@lowersections
 
 @unnumberedsec Authors
 
@@ -492,7 +510,7 @@ the FAR (or any successor regulations).
 @node What is STREAMS?
 @section What is STREAMS?
 
-@dfn{STREAMS} is a facility first presented in a paper by Dennis M. Ritchie in
+@dfn{STREAMS} refers to a facility first presented in a paper by Dennis M. Ritchie in
 1984,@footnote{@cite{A Stream Input-Output System, AT&T Bell Laboratories Technical Journal 63, No.
 8 Part 2 (October, 1984), pp.  1897-1910.}} originally implemented on 4.1BSD and later part of
 @cite{Bell Laboratories Eighth Edition UNIX}, incorporated into
@@ -509,10 +527,10 @@ pipes (FIFOs), interprocess communication and networking.  Since its release in 
 Release 4}, @dfn{STREAMS} has been implemented across a wide range of @cite{UNIX}, @cite{UNIX}-like,
 and @cite{UNIX}-based systems, making its implementation and use an @i{ipso facto} standard.
 
-@dfn{STREAMS} is a facility that allows for a reconfigurable full duplex communications path,
+@dfn{STREAMS} refers to a facility that allows for a reconfigurable full duplex communications path,
 @dfn{Stream}, between a user process and a driver in the kernel.  Kernel protocol modules can be
 pushed onto and popped from the @dfn{Stream} between the user process and driver.  The @dfn{Stream}
-can be reconfigured in this way by a user process.  The user process, neighbouring protocol modules
+can be reconfigured in this way by a user process.  The user process, neighboring protocol modules
 and the driver communicate with each other using a message passing scheme closely related to
 @dfn{MOM (Message Oriented Middleware)}.  This permits a loose coupling between protocol modules,
 drivers and user processes, allowing a third-party and loadable kernel module approach to be taken
@@ -612,7 +630,7 @@ and match protocol layers.  @dfn{STREAMS} has an innate ability to provide suppo
 configuration of protocol layers.
 
 Also, telecommunications platforms must work with media streams as well as signalling streams.
-Because of its terminal subsystem background, @dfn{STREAMS} is far more suitable when applied to
+Because of its terminal subsystem background, @dfn{STREAMS} are far more suitable when applied to
 media streams that consist of steady flows of fixed size (small) message blocks.  Other mechanisms
 within the @b{Linux} kernel are either  unsuitable to such an approach (e.g, @samp{skbuff}s) or 
 too application specific (e.g, @dfn{ALS}).
@@ -754,23 +772,33 @@ as streams, the question is somewhat academic.  They certainly have much lower b
 or messages.@footnote{@cite{UNIX Papers, for UNIX Developers and Power Users, (Waite, 1987) pp. 358-359}}
 @end quotation
 
-With @dfn{@value{PACKAGE_TITLE}} it will be very possible to compare the performance of @dfn{STREAMS}
-in comparison to @dfn{Sockets}.  It will also be possible to compare the performance of traditional
-@b{Linux} pipes and FIFOs with @dfn{STREAMS}-based pipes and FIFOs.@footnote{In fact, such a
-performance comparison has been performed using @cite{@value{PACKAGE_TITLE}}.  On the test system, a
-@dfn{STREAMS}-based pipe delivered 80% of the write/read throughput performance experienced by
-@b{Linux} native pipes.}
+With @dfn{@value{PACKAGE_TITLE}} it has been possible to compare the performance of @dfn{STREAMS} in
+comparison to @dfn{Sockets}.  Such a performance comparison has been performed using
+@cite{@value{PACKAGE_TITLE}}.  On tested systems, a @dfn{STREAMS}-based UDP implementation delivers
+40-60% more write/read throughput than the @b{Linux} native sockets implementation.@footnote{See
+@url{http://www.openss7.org/strinet_perf.html, @cite{STREAMS vs. Sockets Performance Comparison for
+UDP}}.}  On tested systems, a @dfn{STREAMS}-based TCP and SCTP implementation delivers 200-300% more
+write/read throughput than the @b{Linux} native sockets implementation.@footnote{See
+@url{http://www.openss7.org/strsctp_perf.html, @cite{STREAMS vs. Sockets Performance Comparison for
+SCTP}}, which also includes TCP using XTIoS.}
+
+It has also be possible to compare the performance of traditional @b{Linux} pipes and FIFOs with
+@dfn{STREAMS}-based pipes and FIFOs.  Such a performance comparison has been performed using
+@cite{@value{PACKAGE_TITLE}}.  On tested systems, a @dfn{STREAMS}-based pipe delivered 300-600% of
+the write/read throughput performance experienced by @b{Linux} native pipes.@footnote{See
+@url{http://www.openss7.org/streams_perf.html, @cite{STREAMS-based vs. Legacy Pipe Performance
+Comparison}}.}
 
 @node STREAMS Benefits
 @subsection STREAMS Benefits
 @cindex benefits, STREAMS
 @cindex STREAMS, benefits
 
-@dfn{STREAMS} provides a flexible, portable, and reusable set of tools for development of @b{Linux}
-system communication services.  @dfn{STREAMS} allows an easy creation of modules that offer standard
-data communications services and the ability to manipulate those modules on a @dfn{Stream}.  From
-user level, modules can be dynamically selected and interconnected; kernel programming, assembly,
-and link editing are not required to create the interconnection.
+@dfn{STREAMS} provides a high-performance, flexible, portable, and reusable set of tools for
+development of @b{Linux} system communication services.  @dfn{STREAMS} allows an easy creation of
+modules that offer standard data communications services and the ability to manipulate those modules
+on a @dfn{Stream}.  From user level, modules can be dynamically selected and interconnected; kernel
+programming, assembly, and link editing are not required to create the interconnection.
 
 @dfn{STREAMS} also greatly simplifies the user interface for languages that have complex input and
 output requirements.
@@ -779,17 +807,17 @@ output requirements.
 @cindex Standardized Service Interfaces
 
 @dfn{STREAMS} simplifies the creation of modules that present a service interface to any
-neighbouring application program, module, or device driver.  A service interface is defined at the
-boundary between two neighbours.  In @dfn{STREAMS}, a @i{service interface} is a set of messages and
+neighboring application program, module, or device driver.  A service interface is defined at the
+boundary between two neighbors.  In @dfn{STREAMS}, a @i{service interface} is a set of messages and
 the rules that allow passage of these messages across the boundary.  A module that implements a
-service interface will receive a message from a neighbour and respond with an appropriate action
+service interface will receive a message from a neighbor and respond with an appropriate action
 (for example, send back a request to retransmit) based on the specific message received and the
 preceding sequence of messages.
 
 In general, any two modules can be connected anywhere in a @dfn{Stream}.  However, rational sequences are
 generally constructed by connecting modules with compatible protocol service interfaces.  For
 example, a module that implements an @dfn{SS7 MTP2 Signalling Link} protocol layer, as shown in
-@figref{13}, presents a protocol service interface at its input and output sides.  In this case,
+@figref{203}, presents a protocol service interface at its input and output sides.  In this case,
 other modules should only be connected to the input and output side if they have the compatible
 @dfn{SS7 Signalling Link} service interface.
 
@@ -932,7 +960,7 @@ Several oddities appear because time spent in server routines cannot be assigned
 user or process.  It is impossible, for example, for devices to support privileged @command{ioctl}
 calls, because the device has no idea who generated the message.  Accounting and scheduling becomes
 less accurate; a short census of several systems showed that between 4 and 8 per cent of non-idle
-CPU time was being spent in server routines.  Finally, the anonimity for server processing most
+CPU time was being spent in server routines.  Finally, the anonymity for server processing most
 certainly makes it more difficult to measure the performance of the new I/O system.
 @end quotation
 
@@ -980,7 +1008,11 @@ This was, of course, solved, even in @cite{UNIX System V Release 3.0} with the
 and
 @streamio{I_PUNLINK}
 @dfn{STREAMS} @command{ioctl} commands and the concept of a multiplexing pseudo-device driver.
-This fixed limitation you will see mentioned below.
+This fixed limitation you will see mentioned below.@footnote{It is interesting to note that Sun
+Microsystems claims that it was necessary to move all of the multiplexing down to the bottom end
+driver to gain efficiencies in the Solaris and OpenSolaris TCP/IP stack.  The move was deemed
+necessary to avoid lock contention between processors in upper layer modules.  The seems to go back
+to Ritchie's original concept that multiplexing be done only by the bottom-end driver.}
 
 The following excerpt shows how @cite{BSD}'ers like to misinterpret the situation:
 
@@ -1025,11 +1057,13 @@ The realities of @dfn{STREAMS} are as follows:
 
 @itemize
 
-@item @dfn{STREAMS} is implemented on every major ``Big Iron'' @cite{UNIX}.
+@item @dfn{STREAMS} are high performance.
+
+@item @dfn{STREAMS} are implemented on every major ``Big Iron'' @cite{UNIX}.
 
 Even Sun Microsystems chose to abandon @dfn{BSD Sockets} as an internal kernel networking implementation
 and moved to the @cite{UNIX System V Release 4} @dfn{STREAMS} subsystem instead.@footnote{BSD'er
-will tell you that Sun Microsystems just made a bad decision.} @dfn{STREAMS} is implemented (to list
+will tell you that Sun Microsystems just made a bad decision.} @dfn{STREAMS} are implemented (to list
 a few) in 
 @cite{AIX 5L Version 5.1 PSE},
 @cindex AIX
@@ -1046,13 +1080,15 @@ a few) in
 @cindex SunOS
 @cite{Super-UX},
 @cindex Super-UX
-@cite{UXP/V}
+@cite{UXP/V},
 @cindex UXP/V
-and
-@cite{MacOS OT}.
+@cite{MacOS OT}
 @cindex MacOS
+and
+@cite{Windows NT}
+@cindex Windows NT
 
-@item @dfn{STREAMS} is implemented on many Real-Time Operating Systems (RTOS) based on @cite{UNIX}.
+@item @dfn{STREAMS} are implemented on many Real-Time Operating Systems (RTOS) based on @cite{UNIX}.
 
 Examples include @cite{WindRiver}, @cite{PSOS}, @cite{VxWorks}, etc.
 
@@ -1132,7 +1168,8 @@ assertions approaches in its implementation avoiding these difficulties.
 @cite{LiS} and not derived from @cite{LiS}.  @cite{LiS} is a collection of software available under
 various licenses with little or no commercial licensing alternatives available.
 @cite{@value{PACKAGE_TITLE}} is released in entirety under the @dfn{AGPL}, but the implementation can
-be commercially licensed from @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+be commercially licensed from @uref{http://www.openss7.com/,OpenSS7 Corporation} and can be
+supported into application verticals by @uref{http://www.monavacon.com/,Monavacon Limited}.
 
 @item Scalable
 
@@ -1173,7 +1210,7 @@ including check scripts and installation conformance and verification test suite
 
 Well, @b{Linux} is the only @cite{SVR 4}
 @cindex SVR 4
-based system that does not provide @dfn{STREAMS}, although @dfn{STREAMS} is an essential part of
+based system that does not provide @dfn{STREAMS}, although @dfn{STREAMS} are an essential part of
 @cite{SVR 4}.
 @cindex SVR 4
 Without @dfn{STREAMS}, @b{Linux} is just another @cite{BSD},

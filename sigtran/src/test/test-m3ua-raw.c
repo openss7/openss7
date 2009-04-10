@@ -535,13 +535,13 @@ struct m3ua {
 	struct ua_parm dereg_status;
 } m3ua = {
 	.rc = { { NULL }, 0, 22222 },
-	.tmode = { { NULL }, sizeof(uint32_t), UA_TMODE_LOADSHARE },
-	.aspid = { { NULL }, sizeof(uint32_t), 1 },
+	// .tmode = { { NULL }, sizeof(uint32_t), UA_TMODE_LOADSHARE },
+	// .aspid = { { NULL }, sizeof(uint32_t), 1 },
 	.ntwk_app = { { NULL }, sizeof(uint32_t), 8 },
 	.loc_key_id = { { NULL }, sizeof(uint32_t), 10099 },
-	.dpc = { { NULL }, sizeof(uint32_t), 2240 },
-	.si = { { NULL }, sizeof(uint32_t), (3 << 24) },
-	// .opc = { { NULL }, sizeof(uint32_t), 3026 },
+	.dpc = { { NULL }, sizeof(uint32_t), 3026 },
+	// .si = { { NULL }, sizeof(uint32_t), (3 << 24) },
+	// .opc = { { NULL }, sizeof(uint32_t), 2240 },
 };
 
 /*
@@ -8762,7 +8762,7 @@ test_5_1_1_iut(int child)
 	if (do_signal(child, __TEST_DAUD_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	for (;;) {
-		if (expect(child, NORMAL_WAIT, __EVENT_TIMEOUT) != __RESULT_SUCCESS) {
+		if (expect(child, LONGEST_WAIT, __EVENT_TIMEOUT) != __RESULT_SUCCESS) {
 			switch (last_event) {
 			case __TEST_SCON_MSG:
 			case __TEST_DAVA_MSG:

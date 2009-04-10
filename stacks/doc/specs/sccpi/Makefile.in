@@ -149,42 +149,24 @@ EXTRA_PROGRAMS =
 @DEVELOPMENT_TRUE@@MAINTAINER_MODE_TRUE@@PKG_BUILD_INDEP_TRUE@am__append_15 = info pdf html txt # ps sgml
 subdir = doc/specs/sccpi
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/codeset.m4 \
-	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/glibc2.m4 \
-	$(top_srcdir)/m4/glibc21.m4 $(top_srcdir)/m4/iconv.m4 \
-	$(top_srcdir)/m4/intdiv0.m4 $(top_srcdir)/m4/intl.m4 \
-	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/intmax.m4 \
-	$(top_srcdir)/m4/inttypes-pri.m4 \
-	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/lcmessage.m4 \
-	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
-	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/lock.m4 $(top_srcdir)/m4/longlong.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/printf-posix.m4 $(top_srcdir)/m4/progtest.m4 \
-	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/stdint_h.m4 \
-	$(top_srcdir)/m4/uintmax_t.m4 $(top_srcdir)/m4/ulonglong.m4 \
-	$(top_srcdir)/m4/visibility.m4 $(top_srcdir)/m4/wchar_t.m4 \
-	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xsize.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/m4/openss7.m4 \
-	$(top_srcdir)/m4/dist.m4 $(top_srcdir)/m4/pr.m4 \
-	$(top_srcdir)/m4/init.m4 $(top_srcdir)/m4/kernel.m4 \
-	$(top_srcdir)/m4/devfs.m4 $(top_srcdir)/m4/genksyms.m4 \
-	$(top_srcdir)/m4/man.m4 $(top_srcdir)/m4/public.m4 \
-	$(top_srcdir)/m4/rpm.m4 $(top_srcdir)/m4/deb.m4 \
-	$(top_srcdir)/m4/libraries.m4 $(top_srcdir)/m4/autotest.m4 \
-	$(top_srcdir)/m4/strconf.m4 $(top_srcdir)/m4/streams.m4 \
-	$(top_srcdir)/m4/strcomp.m4 $(top_srcdir)/m4/xopen.m4 \
-	$(top_srcdir)/m4/xns.m4 $(top_srcdir)/m4/xti.m4 \
-	$(top_srcdir)/m4/nsl.m4 $(top_srcdir)/m4/sock.m4 \
-	$(top_srcdir)/m4/inet.m4 $(top_srcdir)/m4/sctp.m4 \
-	$(top_srcdir)/m4/chan.m4 $(top_srcdir)/m4/x25.m4 \
-	$(top_srcdir)/m4/iso.m4 $(top_srcdir)/m4/isdn.m4 \
-	$(top_srcdir)/m4/atm.m4 $(top_srcdir)/m4/doxy.m4 \
-	$(top_srcdir)/m4/lib32.m4 $(top_srcdir)/m4/perl.m4 \
-	$(top_srcdir)/m4/snmp.m4 $(top_srcdir)/m4/agent.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/m4/openss7.m4 $(top_srcdir)/m4/dist.m4 \
+	$(top_srcdir)/m4/pr.m4 $(top_srcdir)/m4/init.m4 \
+	$(top_srcdir)/m4/kernel.m4 $(top_srcdir)/m4/devfs.m4 \
+	$(top_srcdir)/m4/genksyms.m4 $(top_srcdir)/m4/man.m4 \
+	$(top_srcdir)/m4/public.m4 $(top_srcdir)/m4/rpm.m4 \
+	$(top_srcdir)/m4/deb.m4 $(top_srcdir)/m4/libraries.m4 \
+	$(top_srcdir)/m4/autotest.m4 $(top_srcdir)/m4/strconf.m4 \
+	$(top_srcdir)/m4/streams.m4 $(top_srcdir)/m4/strcomp.m4 \
+	$(top_srcdir)/m4/xopen.m4 $(top_srcdir)/m4/xns.m4 \
+	$(top_srcdir)/m4/xti.m4 $(top_srcdir)/m4/nsl.m4 \
+	$(top_srcdir)/m4/sock.m4 $(top_srcdir)/m4/inet.m4 \
+	$(top_srcdir)/m4/sctp.m4 $(top_srcdir)/m4/chan.m4 \
+	$(top_srcdir)/m4/x25.m4 $(top_srcdir)/m4/iso.m4 \
+	$(top_srcdir)/m4/isdn.m4 $(top_srcdir)/m4/atm.m4 \
+	$(top_srcdir)/m4/doxy.m4 $(top_srcdir)/m4/lib32.m4 \
+	$(top_srcdir)/m4/perl.m4 $(top_srcdir)/m4/snmp.m4 \
+	$(top_srcdir)/m4/agent.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/scripts/mkinstalldirs
