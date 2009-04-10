@@ -71,8 +71,10 @@ Enable @dfn{STREAMS} binary compatibility mode.
 When enabled, exported functions (and callouts) will never pass three arguments in registers on
 architectures supporting @code{regparm} (i.e. @var{__i386__}, @var{__x86_64__}, @var{__k8__})
 regardless of how the kernel was compiled.  Additional @cite{LiS} binary compatibility is also
-enabled (e.g. credentials).
+enabled (e.g. credentials).  However, when enabled, Linux Fast-STREAMS will fail conformance
+and validation testing (due to errors in @cite{LiS}).
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --disable-streams-irq
 @opindex streams-irq
@@ -91,24 +93,21 @@ Enable @dfn{STREAMS} statistics counting.
 When disabled, it is the module or driver's responsibility to increment @dfn{STREAMS} statistics
 upon entry to putp, srvp, qopen, qclose and qadmin procedures.  When enabled, @dfn{STREAMS} will
 perform statistics counting of entry to the putp, srvp, qopen, qclose and qadmin procedures whenever
-a module_stat structure is associated with the queue.  The @manref{scls(8)} utility can be used to
-display the statistics of any module or driver.  Enabling this feature has a slight negative impact
-on performance and is contrary to @cite{SVR 4.2} behaviour and is, therefore, disabled by default.
-This option defaults to @samp{disabled}.
+a @type{module_stat} structure is associated with the queue.  The @manref{scls(8)} utility can be
+used to display the statistics of any module or driver.  Enabling this feature has a slight negative
+impact on performance and is contrary to @cite{SVR 4.2} behaviour and was, therefore, originally
+disabled by default.  However, because few modules and drivers using this feature, it has been
+enabled by default on recent releases.
+This option defaults to @samp{enabled}.
+It is safe to disable this default; however, STREAMS drivers and modules in the OpenSS7 packages
+will not perform their own statistics counting.
 
 @item --enable-streams-syncqs
 @opindex streams-syncqs
 When enabled, MP synchronization queues are enabled for SMP kernels.
-This option defaults to @samp{disabled}.
-This option is not tested for early releases.
-
-@item --disable-streams-kthreads
-@opindex streams-kthreads
-When enabled, the @dfn{STREAMS} scheduler runs as a kernel thread.  When disabled, the @dfn{STREAMS} scheduler
-runs as a software interrupt (bottom half).
-Running the @dfn{STREAMS} scheduler at bottom half instead of a kernel thread breaks the @file{strinet}
-driver, which must be able to invoke kernel functions that might sleep (but don't).
 This option defaults to @samp{enabled}.
+It is safe to disable this option; however, all STREAMS drivers and module must be MP safe (marked
+with the D_MP flag) or they will not load.
 
 @item --disable-streams-utils
 @opindex streams-utils
@@ -125,6 +124,7 @@ When enabled, the @dfn{STREAMS}, the Stream head, and the clone driver are all c
 big compilation unit.  This allows the compiler greater opportunity to optimize.
 This option defaults to @samp{enabled}.
 Do not disable this option.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-module-sth
 @opindex module-sth
@@ -133,42 +133,49 @@ The default is to create the module as a separate loadable kernel module,
 unless option @samp{big-compile} is specified.
 This option defaults to @samp{disabled}.
 This option defaults to @samp{enabled} if @samp{big-compile} is enabled.
+This option has not been tested in some time: it is better to leave it at its default.
 
 @item --enable-module-bufmod
 @opindex module-bufmod
 Enable @file{bufmod} module linked into @file{streams} object.
 The default is to create the module as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-module-nullmod
 @opindex module-nullmod
 Enable @file{nullmod} module linked into @file{streams} object.
 The default is to create the module as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-module-pipemod
 @opindex module-pipemod
 Enable @file{pipemod} module linked into @file{streams} object.
 The default is to create the module as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-module-connld
 @opindex module-connld
 Enable @file{connld} module linked into @file{streams} object.
 The default is to create the module as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-module-sc
 @opindex module-sc
 Enable @file{sc} module linked into @file{streams} object.
 The default is to create the module as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-module-testmod
 @opindex module-testmod
 Enable @file{testmod} module linked into @file{streams} object.
 The default is to create the module as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-clone
 @opindex driver-clone
@@ -177,76 +184,104 @@ The default is to create the driver as a separate loadable kernel module,
 unless option @samp{big-compile} is specified.
 This option defaults to @samp{disabled}.
 This option defaults to @samp{enabled} if @samp{big-compile} is enabled.
+This option has not been tested in some time: it is better to leave it at its default.
 
 @item --enable-driver-echo
 @opindex driver-echo
 Enable @file{echo} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-fifo
 @opindex driver-fifo
 Enable @file{fifo} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-log
 @opindex driver-log
 Enable @file{log} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-loop
 @opindex driver-loop
 Enable @file{loop} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-nsdev
 @opindex driver-nsdev
 Enable @file{nsdev} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-mux
 @opindex driver-mux
 Enable @file{mux} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-nuls
 @opindex driver-nuls
 Enable @file{nuls} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-pipe
 @opindex driver-pipe
 Enable @file{pipe} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-sad
 @opindex driver-sad
 Enable @file{sad} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-sfx
 @opindex driver-sfx
 Enable @file{sfx} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-driver-spx
 @opindex driver-spx
 Enable @file{spx} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 This option defaults to @samp{disabled}.
+This option has not been tested in some time: it is better not to enable it.
 
 @item --enable-streams-fifos
 @opindex streams-fifos
 Enable override of system fifos with @dfn{STREAMS}-based fifos.
 This option defaults to @samp{disabled}.
 This option is not tested.  Do not enable this option yet.
+
+@item --with-streams-kthreads=[OPTION]
+@opindex streams-kthreads
+When enabled (@option{OPTION} is @samp{normal} or @samp{rt}), the @dfn{STREAMS} scheduler runs as
+a kernel thread.  When disabled (@option{OPTION} is @samp{no}), the @dfn{STREAMS} scheduler runs
+as a software interrupt (bottom half).  Running the @dfn{STREAMS} scheduler at bottom half instead
+of a kernel thread breaks the @file{strinet} and other drivers, that must be able to invoke kernel
+functions that might sleep (but don't).
+The option to set kernel threads to @samp{normal} or @samp{rt} priority was added during performance
+testing.  A priority of @samp{normal} (nice -19) was found to provide significant performance
+increase over @samp{rt} (real-time 99) due to significantly reduced context switching for a wide
+range of STREAMS drivers and modules.
+Therefore, this option defaults to @samp{normal}.
+This option has not been tested in some time: do not set it to @samp{no}, and leave it set a
+@samp{normal}.
+
 @end table

@@ -59,15 +59,15 @@
 
 The @cite{OpenSS7 @value{PACKAGE_TITLE}} package is a High-Performance @dfn{STREAMS} framework for
 @cite{Linux} that is compatible with @cite{SVR 4.2 MP} @dfn{STREAMS} and a host of other commercial
-@cite{UNIX@registeredsymbol{}} @dfn{STREAMS} implementations, with complete debugging and production release
-capabilities.  It is as a high-performance, production replacement for the buggy and now deprecated
-@cite{Linux STREAMS (LiS)}.
+@cite{UNIX@registeredsymbol{}} @dfn{STREAMS} implementations, with complete debugging and production
+release capabilities.  It is as a high-performance, production replacement for the buggy and now
+deprecated and unmaintained @cite{Linux STREAMS (LiS)}.
 
 The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
 drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
 development and execution of @dfn{STREAMS} modules and drivers under @cite{@value{PACKAGE_TITLE}}.
-It is completely documented with over four hundred (435) manual pages, and three (3) major print
-set manuals.
+It is completely documented with over four hundred (469) manual pages, three (3) major print
+set manuals and one (1) performance paper.
 
 The package configures, compiles, installs and builds @file{rpm}s or @file{deb}s for a wide range of
 Linux @manpage{rpm(1)}- or @manpage{dpkg(1)}-based distributions, and can be used on production
@@ -196,7 +196,7 @@ Provides only character-based node support.
 @end multitable
 @end ignore
 
-This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
-at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
-install for other architectures as well.
+This distribution is applicable to both 2.4 and 2.6 series @cite{Linux} kernels and has been
+validated on @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but it should
+build, install and validate for other @cite{Linux}-supported architectures as well.
 
