@@ -1,5 +1,5 @@
 OpenSS7 STREAMS Utilities -- read me first file.  2008-09-22
-$Id: README,v 0.9.2.19 2008-09-24 16:27:27 brian Exp $
+$Id: README,v 0.9.2.20 2009-04-19 00:28:35 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -296,8 +296,9 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+ Copyright (c) 2008-2009  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
 

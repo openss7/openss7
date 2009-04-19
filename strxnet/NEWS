@@ -1,14 +1,15 @@
-OpenSS7 XTI/TLI Networking -- history of user visible changes.  2008-10-31
-$Id: NEWS,v 0.9.2.80 2008-11-04 09:07:36 brian Exp $
+OpenSS7 XTI/TLI Networking -- history of user visible changes.  2009-04-04
+$Id: NEWS,v 0.9.2.81 2009-04-19 00:28:37 brian Exp $
+Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 XTI/TLI Networking package.
 
- Major changes for release strxnet-0.9.2.12
--------------------------------------------
+ Major changes for release strxnet-0.9.2.12.20090405
+----------------------------------------------------
 
 This is the thirteenth separate `OpenSS7 Project' release of the
 `OpenSS7 XTI/TLI Networking' package.  The package was originally
@@ -21,7 +22,7 @@ updated for OpenSS7 use, and other documentation for XTI components.
 The package is packaged as an OpenSS7-style `autoconf(1)' tarball.
 
 This release is a stable, production grade release and is part of the
-`OpenSS7 Master Package' (`openss7-0.9.2.G').
+`OpenSS7 Master Package' (`openss7-0.9.2.G.20090405').
 
 This release is primarily a maintenance release to support recent
 distributions and tool chains.
@@ -48,10 +49,12 @@ repository page (http://www.openss7.org/repos.html) for information
 concerning network installation and update sources.
 
 See ChangeLog
-(http://www.openss7.org/codefiles/strxnet-0.9.2.12/ChangeLog) and NEWS
-(http://www.openss7.org/codefiles/strxnet-0.9.2.12/NEWS) in the release
-for more information.  Also, see the `strxnet.pdf' manual in the
-release (also in html (http://www.openss7.org/strxnet_manual.html)).
+(http://www.openss7.org/codefiles/strxnet-0.9.2.12.20090405/ChangeLog)
+and NEWS
+(http://www.openss7.org/codefiles/strxnet-0.9.2.12.20090405/NEWS) in
+the release for more information.  Also, see the `strxnet.pdf' manual
+in the release (also in html
+(http://www.openss7.org/strxnet_manual.html)).
 
 For the news release, see `http://www.openss7.org/rel20081029_E.html'.
 
@@ -106,10 +109,12 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the strxnet package page (http://www.openss7.org/strxnet_pkg.html).
 
-See `http://www.openss7.org/codefiles/strxnet-0.9.2.12/ChangeLog' and
-`http://www.openss7.org/codefiles/strxnet-0.9.2.12/NEWS' in the release
-for more information.  Also, see the `strxnet.pdf' manual in the
-release (also in html `http://www.openss7.org/strxnet_manual.html').
+See
+`http://www.openss7.org/codefiles/strxnet-0.9.2.12.20090405/ChangeLog'
+and `http://www.openss7.org/codefiles/strxnet-0.9.2.12.20090405/NEWS'
+in the release for more information.  Also, see the `strxnet.pdf'
+manual in the release (also in html
+`http://www.openss7.org/strxnet_manual.html').
 
 For the news release, see `http://www.openss7.org/rel20081029_E.html'.
 
@@ -408,8 +413,9 @@ Initial autoconf/RPM packaging of the `strxnet' release.
 
 =========================================================================
 
+ Copyright (c) 2008-2009  Monavacon Limited  <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
 
