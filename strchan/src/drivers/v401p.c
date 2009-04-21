@@ -1,11 +1,12 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-11-26 13:13:54 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-04-21 07:48:36 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-26 13:13:54 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.18  2009-04-21 07:48:36  brian
+ - updates for release
+
  Revision 0.9.2.17  2008-11-26 13:13:54  brian
  - sync with working copy
 
@@ -65,10 +69,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-11-26 13:13:54 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-04-21 07:48:36 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-11-26 13:13:54 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-04-21 07:48:36 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -264,8 +268,8 @@ static char const ident[] =
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-11-26 13:13:54 $"
-#define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-04-21 07:48:36 $"
+#define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2009 Monavacon Limited.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_V400P_LICENSE	"GPL"
@@ -322,14 +326,40 @@ MODULE_ALIAS("/dev/v400p-mx");
 enum vp_board {
 	PLX9030 = 0,
 	PLXDEVBRD,
-	V400P,
-	V400PSS7,
-	T400P,
-	T400PSS7,
+	X400P,
 	E400P,
+	T400P,
+	X400PSS7,
 	E400PSS7,
-	V401PT,
+	T400PSS7,
+	V400P,
+	V400PE,
+	V400PT,
 	V401PE,
+	V401PT,
+};
+
+/* indexed by vp_board above */
+
+/* *INDENT-OFF* */
+STATIC struct {
+	char *name;
+	uint32_t hw_flags;
+	uint32_t idle_word;
+} vp_board_info[] __devinitdata = {
+	{ "PLX 9030",			0, 0x00000000 },
+	{ "PLX Development Board",	0, 0x00000000 },
+	{ "X400P",			1, 0xffffffff },
+	{ "E400P",			1, 0xffffffff },
+	{ "T400P",			1, 0xfefefefe },
+	{ "X400P-SS7",			1, 0xffffffff },
+	{ "E400P-SS7",			1, 0xffffffff },
+	{ "T400P-SS7",			1, 0xfefefefe },
+	{ "V400P",			1, 0xffffffff },
+	{ "V400PE",			1, 0xffffffff },
+	{ "V400PT",			1, 0xfefefefe },
+	{ "V401PE",			1, 0xffffffff },
+	{ "V401PT",			1, 0xfefefefe },
 };
 
 #define VPF_SUPPORTED	(1<<0)
@@ -337,64 +367,61 @@ enum vp_board {
 #define VP_DEV_IDMASK	0xf0
 #define VP_DEV_SHIFT	4
 #define VP_DEV_REVMASK	0x0f
-#define VP_DEV_DS2154	0x00
-#define VP_DEV_DS21354	0x01
-#define VP_DEV_DS21554	0x02
-#define VP_DEV_DS2152	0x08
-#define VP_DEV_DS21352	0x09
-#define VP_DEV_DS21552	0x0a
+#define VP_DEV_DS2152	0x00
+#define VP_DEV_DS21352	0x01
+#define VP_DEV_DS21552	0x02
+#define VP_DEV_DS2154	0x08
+#define VP_DEV_DS21354	0x09
+#define VP_DEV_DS21554	0x0a
 #define VP_DEV_DS2155	0x0b
-
-
-/* *INDENT-OFF* */
-STATIC struct {
-	char *name;
-	uint32_t hw_flags;
-} vp_board_info[] __devinitdata = {
-	{ "PLX 9030",			0 },
-	{ "PLX Development Board",	0 },
-	{ "V400P",			1 },
-	{ "V400P-SS7",			1 },
-	{ "T400P",			1 },
-	{ "T400P-SS7",			1 },
-	{ "E400P",			1 },
-	{ "E400P-SS7",			1 },
-	{ "V401PT",			1 },
-	{ "V401PE",			1 },
-};
+#define VP_DEV_DS2156	0x0c
 
 STATIC struct {
 	char *name;
 	uint32_t hw_flags;
 } vp_device_info[] __devinitdata = {
-	{ "DS2154 (E1)",	1 },
-	{ "DS21354 (E1)",	1 },
-	{ "DS21554 (E1)",	1 },
+	{ "DS2152 (T1)",	1 },
+	{ "DS21352 (T1)",	1 },
+	{ "DS21552 (T1)",	1 },
 	{ "Unknown ID 0011",	0 },
 	{ "Unknown ID 0100",	0 },
 	{ "Unknown ID 0101",	0 },
 	{ "Unknown ID 0110",	0 },
 	{ "Unknown ID 0111",	0 },
-	{ "DS2152 (T1)",	1 },
-	{ "DS21352 (T1)",	1 },
-	{ "DS21552 (T1)",	1 },
+	{ "DS2154 (E1)",	1 },
+	{ "DS21354 (E1)",	1 },
+	{ "DS21554 (E1)",	1 },
 	{ "DS2155 (E1/T1/J1)",	1 },
-	{ "Unknown ID 1100",	0 },
+	{ "DS2156 (E1/T1/J1)",	1 },
 	{ "Unknown ID 1101",	0 },
 	{ "Unknown ID 1110",	0 },
 	{ "Unknown ID 1111",	0 }
 };
-/* *INDENT-ON* */
 
-STATIC struct pci_device_id vp_pci_table[] __devinitdata = {
-	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, 0, 0, PLX9030},
-	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, 0, 0, PLXDEVBRD},
-	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, V400P},
-	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, 0, 0, V400PSS7},
-	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, V401PT},
-	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, V401PE},
+STATIC struct pci_device_id vp_pci_tbl[] __devinitdata = {
+	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLX9030},
+	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLXDEVBRD},
+	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400P},
+	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400PSS7},
+	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V400P},
+	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PT},
+	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
 	{0,}
 };
+/* *INDENT-ON* */
+
+#ifdef MODULE_DEVICE_TABLE
+MODULE_DEVICE_TABLE(pci, vp_pci_tbl);
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("pci:v000010B5d000009030sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000003001sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D00Dsv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000000557sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000004000sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D33Dsv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd*bc06sc80i*");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE_DEVICE_TABLE */
 
 /* Map from Tormenta channel to T1 time slot (less 1). */
 STATIC int vp_t1_slot_map[] = {
@@ -448,6 +475,16 @@ STATIC int vp_e1_chan_map[] = {
 #define VP_E1_TS_VALID_MASK	0x7fffffff	/* Mask of valid E1 time slots. */
 #define VP_T1_CHAN_VALID_MASK	0xeeeeeeee	/* Mask of valid T1 Tormenta channels. */
 #define VP_E1_CHAN_VALID_MASK	0xfffffffe	/* Mask of valid E1 Tormenta channels. */
+
+#ifdef __LITTLE_ENDIAN
+#define span_to_byte(__span) (3-(__span))
+#else
+#ifdef __BIG_ENDIAN
+#define span_to_byte(__span) (__span)
+#else
+#error "Must know the endianess of processor\n"
+#endif
+#endif
 
 /*
  *  Private structures.
@@ -607,7 +644,7 @@ struct vp {
 	spinlock_t lock;
 	uint flags;
 	struct tasklet_struct tasklet;
-	volatile uint32_t *buf;		/* Buffer containing sinlge RX/TX block. */
+	volatile uint32_t *buf;		/* Buffer containing single RX/TX block. */
 	ulong xll_region;
 	ulong xll_length;
 	volatile uint32_t *xll;
@@ -687,7 +724,7 @@ mx_init_priv(queue_t *q, major_t major, minor_t minor)
 
 	mx->c.next = NULL;
 	mx->c.prev = &mx->c.next;
-	x->c.vp = NULL;
+	mx->c.vp = NULL;
 
 	mx->x.next = NULL;
 	mx->x.prev = &mx->x.next;
@@ -873,12 +910,12 @@ mx_enable(struct mx *mx)
 	mx_set_state(mx, MXS_ENABLED);
 }
 
-STATIC noinline __unlikely int vp_cross_connect(uint32_t addr1, uint32_t addr2, uint32_t chans);
+noinline __unlikely int vp_cross_connect(uint32_t addr1, uint32_t addr2, uint32_t chans);
 
 /**
  * mx_connect: connect an MX stream
  * @mx: MX private structure
- * @flags: connect flags
+ * @cflags: connect flags
  * @slot: slot in multiplex
  *
  * Note that while an MX Stream is enabled for a card, none of the channels that are associated with
@@ -912,9 +949,10 @@ STATIC noinline __unlikely int vp_cross_connect(uint32_t addr1, uint32_t addr2, 
  * cross-connect MX Stream list so that it can properly recalculate cross-connect channel maps.
  */
 STATIC __unlikely void
-mx_connect(struct mx *mx, mx_ulong flags, mx_ulong flags, mx_ulong slot)
+mx_connect(struct mx *mx, mx_ulong cflags, mx_ulong slot)
 {
 	uint32_t slot = mx->addr[1];
+	unsigned long flags;
 
 	/* save and report the new address */
 	mx->addr[1] = slot;
@@ -950,7 +988,6 @@ mx_connect(struct mx *mx, mx_ulong flags, mx_ulong flags, mx_ulong slot)
 		spin_unlock_irqrestore(&vp->lock, flags);
 	} else {
 		struct vp *vp = &vp_cards[((slot >> 16) & 0xff)];
-		unsigned long flags;
 
 		/* digital cross-connect */
 
@@ -963,7 +1000,7 @@ mx_connect(struct mx *mx, mx_ulong flags, mx_ulong flags, mx_ulong slot)
 			vp->mx.xconnect = mx;
 			mx->x.vp = vp;
 		}
-		spin_lock_irqrestore(&vp->lock, flags);
+		spin_unlock_irqrestore(&vp->lock, flags);
 
 		/* Complete the digital cross-connect and connect channel maps by OR'ing the MX
 		   Streams maps into the VP cards' maps.  Complete the digital cross-connect
@@ -1008,7 +1045,7 @@ mx_disconnect(struct mx *mx, bool force)
 		   remaining connected cards. */
 		spin_lock_irqsave(&vp->lock, flags);
 		{
-			/* Remove from connected list.  Data will not be trasnferred from the point
+			/* Remove from connected list.  Data will not be transferred from the point
 			   that we took the spin lock. */
 			if ((*mx->c.prev = mx->c.next))
 				mx->c.next->c.prev = mx->c.prev;
@@ -1030,7 +1067,7 @@ mx_disconnect(struct mx *mx, bool force)
 	} else {
 		/* digital cross-connect */
 		/* Remove cross connect from the attached and target VP cards' xconnect tables. */
-		/* Recalculate both the attached and xconnected VP card's xconnect maps by OR'in
+		/* Recalculate both the attached and xconnected VP card's xconnect maps by OR'ing
 		   the xconnect maps of the remaining cross-connected cards. */
 		vp_cross_disconnect(mx->addr[0], mx->addr[1], mx->channels);
 
@@ -1053,7 +1090,7 @@ mx_disconnect(struct mx *mx, bool force)
 	/* This is problematic.  There is a period of time between when the MX Stream moves to the
 	   disconnected state and the MX_DISCONNECT_CON or MX_DISCONNECT_IND is delivered.  In this 
 	   time, some a fair amount of data could be delivered.  It is wise to flush both the read
-	   and the write side of the Stream before delivering eith the MX_DISCONNECT_CON or
+	   and the write side of the Stream before delivering either the MX_DISCONNECT_CON or
 	   MX_DISCONNECT_IND.  That is the caller's responsibility. */
 	mx_set_state(mx, MXS_ENABLED);
 
@@ -1109,7 +1146,7 @@ mx_detach(struct mx *mx, bool force)
  *  E1/T1/J1, as determined by the CH_ATTACH_REQ primitive, statistically multiplexed into a single
  *  Nx56kbps or Nx64kbps byte-stream.  A CH stream is considered slipage sensitive and delay
  *  insensitive.  CH streams are used for data channels (such as SS7 links or perhaps Frame Relay
- *  links).  CH streams should span multiple spans unless the spans are synchonization locked
+ *  links).  CH streams should not span multiple spans unless the spans are synchonization locked
  *  together (TXCLK comes from the same source for all spans at both ends of the span).  In fact it
  *  is questionable whether this can work at all between cards, so it should be restricted to the
  *  same card.  Data on CH Streams is transferred as a contiguous sequential stream of demultiplexed
@@ -1148,7 +1185,7 @@ ch_info_ack(struct ch *ch, queue_t *q, mblk_t *msg)
 	struct CH_info_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p) + alen + plen, BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + alen + plen, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		*p = ch->info;
@@ -1180,7 +1217,7 @@ ch_optmgmt_ack(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, size_t ol
 	struct CH_optmgmt_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p) + olen, BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + olen, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_OPTMGMT_ACK;
@@ -1212,7 +1249,7 @@ ch_ok_ack(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong prim, ch_ulong state)
 	struct CH_ok_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_OK_ACK;
@@ -1242,7 +1279,7 @@ ch_error_ack(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong prim, ch_ulong typ
 	struct CH_error_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_ERROR_ACK;
@@ -1273,7 +1310,7 @@ ch_attach_ack(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong ppa)
 	struct CH_ok_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_OK_ACK;
@@ -1302,8 +1339,8 @@ ch_enable_ack_con(struct ch *ch, queue_t *q, mblk_t *msg)
 	struct CH_ok_ack *p2;
 	mblk_t *mp, *mp2;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
-		if ((mp2 = ch_allocb(q, sizeof(*p2), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp2 = mi_allocb(q, sizeof(*p2), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->ch_primitive = CH_ENABLE_CON;
@@ -1344,8 +1381,8 @@ ch_connect_ack_con(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, ch_ul
 	struct CH_ok_ack *p2;
 	mblk_t *mp, *mp2;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
-		if ((mp2 = ch_allocb(q, sizeof(*p2), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp2 = mi_allocb(q, sizeof(*p2), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->ch_primitive = CH_CONNECT_CON;
@@ -1386,7 +1423,7 @@ ch_data_ind(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong slot)
 	struct CH_data_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_DATA_IND;
@@ -1417,7 +1454,7 @@ ch_disconnect_ind(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, ch_ulo
 	struct CH_disconnect_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_DISCONNECT_IND;
@@ -1448,8 +1485,8 @@ ch_disconnect_ack_con(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, ch
 	struct CH_ok_ack *p2;
 	mblk_t *mp, *mp2;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
-		if ((mp2 = ch_allocb(q, sizeof(*p2), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp2 = mi_allocb(q, sizeof(*p2), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->ch_primitive = CH_DISCONNECT_CON;
@@ -1489,7 +1526,7 @@ ch_disable_ind(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong cause)
 	struct CH_disable_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_DISABLE_IND;
@@ -1517,8 +1554,8 @@ ch_disable_ack_con(struct ch *ch, queue_t *q, mblk_t *msg)
 	struct CH_ok_ack *p2;
 	mblk_t *mp, *mp2;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
-		if ((mp2 = ch_allocb(q, sizeof(*p2), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp2 = mi_allocb(q, sizeof(*p2), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->ch_primitive = CH_DISABLE_CON;
@@ -1556,7 +1593,7 @@ ch_detach_ack(struct ch *ch, queue_t *q, mblk_t *msg)
 	struct CH_ok_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_OK_ACK;
@@ -1587,7 +1624,7 @@ ch_event_ind(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong event, ch_ulong sl
 	struct CH_event_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ch_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->ch_primitive = CH_EVENT_IND;
@@ -1623,7 +1660,7 @@ mx_info_ack(struct mx *mx, queue_t *q, mblk_t *msg)
 	struct MX_info_ack *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p) + alen + plen, BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + alen + plen, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		*p = mx->info;
@@ -1655,7 +1692,7 @@ mx_optmgmt_ack(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong flags, size_t ol
 	struct MX_optmgmt_ack *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p) + olen, BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + olen, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_OPTMGMT_ACK;
@@ -1687,7 +1724,7 @@ mx_ok_ack(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong prim, mx_ulong state)
 	struct MX_ok_ack *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_OK_ACK;
@@ -1717,7 +1754,7 @@ mx_error_ack(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong prim, mx_ulong typ
 	struct MX_error_ack *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_ERROR_ACK;
@@ -1748,7 +1785,7 @@ mx_attach_ack(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong ppa)
 	struct MX_ok_ack *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_OK_ACK;
@@ -1777,8 +1814,8 @@ mx_enable_ack_con(struct mx *mx, queue_t *q, mblk_t *msg)
 	struct MX_ok_ack *p2;
 	mblk_t *mp, *mp2;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
-		if ((mp2 = mx_allocb(q, sizeof(*p2), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp2 = mi_allocb(q, sizeof(*p2), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->mx_primitive = MX_ENABLE_CON;
@@ -1819,8 +1856,8 @@ mx_connect_ack_con(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong flags, mx_ul
 	struct MX_ok_ack *p2;
 	mblk_t *mp, *mp2;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
-		if ((mp2 = mx_allocb(q, sizeof(*p2), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp2 = mi_allocb(q, sizeof(*p2), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->mx_primitive = MX_CONNECT_CON;
@@ -1861,7 +1898,7 @@ mx_data_ind(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong slot)
 	struct MX_data_ind *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_DATA_IND;
@@ -1892,7 +1929,7 @@ mx_disconnect_ind(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong flags, mx_ulo
 	struct MX_disconnect_ind *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_DISCONNECT_IND;
@@ -1923,8 +1960,8 @@ mx_disconnect_ack_con(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong flags, mx
 	struct MX_ok_ack *p2;
 	mblk_t *mp, *mp2;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
-		if ((mp2 = mx_allocb(q, sizeof(*p2), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp2 = mi_allocb(q, sizeof(*p2), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->mx_primitive = MX_DISCONNECT_CON;
@@ -1964,7 +2001,7 @@ mx_disable_ind(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong cause)
 	struct MX_disable_ind *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_DISABLE_IND;
@@ -1992,8 +2029,8 @@ mx_disable_ack_con(struct mx *mx, queue_t *q, mblk_t *msg)
 	struct MX_ok_ack *p2;
 	mblk_t *mp, *mp2;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
-		if ((mp2 = mx_allocb(q, sizeof(*p2), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp2 = mi_allocb(q, sizeof(*p2), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->mx_primitive = MX_DISABLE_CON;
@@ -2031,7 +2068,7 @@ mx_detach_ack(struct mx *mx, queue_t *q, mblk_t *msg)
 	struct MX_ok_ack *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_OK_ACK;
@@ -2062,7 +2099,7 @@ mx_event_ind(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong event, mx_ulong sl
 	struct MX_event_ind *p;
 	mblk_t *mp;
 
-	if ((mp = mx_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mx_primitive = MX_EVENT_IND;
@@ -2083,15 +2120,15 @@ mx_event_ind(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong event, mx_ulong sl
  * @span: span number to configure
  * @timeouts: whether busy looping is permissable
  *
- * NOTE: we should actually do a schedule_timeout instead of a busy loop to get the 100ms delay that
- * are necessary.  What we are really looking for is usleep() from SVR4.  For now we busy loop but
- * it MUST CHANGE.  Once spans are configured at start-up with this longer configuration process,
- * all but a few registers do not need to change.
+ * NOTE: we should actually do a schedule_timeout instead of a busy loop to get the 100ms delay
+ * that are necessary.  What we are really looking for is usleep() from SVR4.  For now we busy
+ * loop but it MUST CHANGE.  Once spans are configured at start-up with this longer
+ * configuration process, all but a few registers do not need to change.
  *
- * A couple notes.  It migth be an idea to leave transmitters powered off or transmit all ones to
- * blue alarm the other end.  When the span is reconfigured, we can power transmitters or resume
- * normal framing operation.  During the first configuration, it might be an idea to set up the
- * DS2155 idle registers and per-channel idle registers.
+ * A couple notes.  It might be an idea to leave transmitters powered off or transmit all ones
+ * to blue alarm the other end.  When the span is reconfigured, we can power transmitters or
+ * resume normal framing operation.  During the first configuration, it might be an idea to set
+ * up the DS2155 idle registers and per-channel idle registers.
  */
 STATIC noinline __unlikely int
 vp_span_config(struct vp *vp, int span, bool timeouts)
@@ -2106,7 +2143,7 @@ vp_span_config(struct vp *vp, int span, bool timeouts)
 	case E400P:
 	case E400PSS7:
 	{
-		uint8_t reg14 = 0, reg12 = 0, reg18 = 0, regac = 0;
+		uint8_t ccr1 = 0, tcr1 = 0, tcr2 = 0, licr = 0, test3 = 0, ccr6 = 0, ccr2 = 0;
 
 		xlb[0x1a] = 0x04;	/* CCR2: set LOTCMC */
 
@@ -2116,79 +2153,192 @@ vp_span_config(struct vp *vp, int span, bool timeouts)
 			if (offset != 0x1a)
 				xlb[offset] = 0x00;
 
-		xlb[0x10] = 0x20;	/* RCR1: Rsync as input */
-		xlb[0x11] = 0x06;	/* RCR2: Sysclk = 2.048 Mhz */
+		xlb[0x10] = 0x20;	/* RCR1 */
+		/* RCR1.7: 0 = CAS/CRC4 multiframe */
+		/* RCR1.6: 0 = frame mode */
+		/* RCR1.5: 1 = RSYNC is an input */
+		/* RCR1.4: 0 = unassigned */
+		/* RCR1.3: 0 = unassigned */
+		/* RCR1.2: 0 = resync if FAS received in error 3 consecutive times */
+		/* RCR1.1: 0 = auto resync enabled */
+		/* RCR1.0: 0 = no immediate resync */
 
-		reg12 = 0x09;	/* TCR1: TSiS mode */
+		xlb[0x11] = 0x06;	/* RCR2 */
+		/* RCR2.7: 0 = RLCLK low during Sa8 bit */
+		/* RCR2.6: 0 = RLCLK low during Sa7 bit */
+		/* RCR2.5: 0 = RLCLK low during Sa6 bit */
+		/* RCR2.4: 0 = RLCLK low during Sa5 bit */
+		/* RCR2.3: 0 = RLCLK low during Sa4 bit */
+		/* RCR2.2: 1 = RSYSCLK is 2.048/4.096/8.192 MHz */
+		/* RCR2.1: 1 = elastic store (receive) enabled */
+		/* RCR2.0: 0 = unassigned */
+
+		tcr1 = 0x09;
+		/* TCR1.7: 0 = bipolar data at TPOS0 and TNEG0 */
+		/* TCR1.6: 0 = FAS bits/Sa bits/RAI sources from TAF and TNAF registers */
+		/* TCR1.5: 0 = sample time slot 16 at TSER pin */
+		/* TCR1.4: 0 = transmit data normally */
+		/* TCR1.3: 1 = source Si bits from TAF and TNAF regsiters (TCR1.6 must be zero) */
+		/* TCR1.2: 0 = transmit data normally */
+		/* TCR1.1: 0 = frame mode */
+		/* TCR1.0: 1 = TSYNC is an output */
+
 		switch (sp->config.ifframing) {
 		default:
 			sp->config.ifframing = SDL_FRAMING_CCS;
 		case SDL_FRAMING_CCS:
-			reg14 |= 0x08;
+			ccr1 |= 0x08;	/* CCR1.3: 1 = Rx CCS signaling mode */
+			tcr1 &= ~0x20;	/* TCR1.5: 0 = sample time slot 16 at TSER pin */
 			break;
 		case SDL_FRAMING_CAS:
-			reg12 |= 0x20;
+			ccr1 &= ~0x08;	/* CCR1.3: 0 = Rx CAS signaling mode */
+			tcr1 |= 0x20;	/* TCR1.5: 1 = source time slot 16 from TS0 to TS15
+					   registers */
 			break;
 		}
 		switch (sp->config.ifcoding) {
 		default:
 			sp->config.ifcoding = SDL_CODING_HDB3;
 		case SDL_CODING_HDB3:
-			reg14 |= 0x44;
+			ccr1 |= 0x40;	/* CCR1.6: 1 = Tx HDB3 enabled */
+			ccr1 |= 0x04;	/* CCR1.2: 1 = Rx HDB3 enabled */
 			break;
 		case SDL_CODING_AMI:
-			reg14 |= 0x00;
+			ccr1 &= ~0x40;	/* CCR1.6: 0 = Tx HDB3 disabled */
+			ccr1 &= ~0x04;	/* CCR1.2: 0 = Rx HDB3 disabled */
 			break;
 		}
 		switch (sp->config.ifgcrc) {
 		default:
 			sp->config.ifgcrc = SDL_GCRC_CRC5;
 		case SDL_GCRC_CRC5:
-			reg14 |= 0x00;
+			ccr1 &= ~0x10;	/* CRC1.4: 0 = Tx CRC4 disabled */
+			ccr1 &= ~0x01;	/* CRC1.0: 0 = Rx CRC4 disabled */
 			break;
 		case SDL_GCRC_CRC4:
-			reg14 |= 0x11;
+			ccr1 |= 0x10;	/* CRC1.4: 1 = Tx CRC4 enabled */
+			ccr1 |= 0x01;	/* CRC1.0: 1 = Rx CRC4 enalled */
+#if 0
+			tcr2 |= 0x02;	/* TCR2.1: 1 = E-bits automatically set */
+			if (sp->config.ifframing == SDL_FRAMING_CAS)
+				tcr1 |= 0x02;	/* TCR1.1: 1 = CAS and CRC4 multiframe mode */
+#endif
 			break;
 		}
-		xlb[0x12] = reg12;
-		xlb[0x14] = reg14;
+
+		xlb[0x12] = tcr1;	/* TCR1 */
+		/* TCR1.7: 0 = bipolar data at TPOS0 and TNEG0 */
+		/* TCR1.6: 0 = FAS bits/Sa bits/RAI sources from TAF and TNAF registers */
+		/* TCR1.5: X = sample TS 16 at TSER pin/source TS 16 from TS0 to TS15 */
+		/* TCR1.4: 0 = transmit data normally */
+		/* TCR1.3: 1 = source Si bits from TAF and TNAF regsiters (TCR1.6 must be zero) */
+		/* TCR1.2: 0 = transmit data normally */
+		/* TCR1.1: X = frame mode/CAS and CRC4 multiframe mode */
+		/* TCR1.0: 1 = TSYNC is an output */
+
+
+		xlb[0x14] = ccr1;	/* CCR1 */
+		/* CCR1.7: 0 = framer loopback disabled */
+		/* CCR1.6: X = Tx HDB3 disabled/enabled */
+		/* CCR1.5: 0 = Tx G.802 disabled */
+		/* CCR1.4: X = Tx CRC4 disabled */
+		/* CCR1.3: X = signalling mode CAS/CCS */
+		/* CCR1.2: X = Rx HDB3 disabled/enabled */
+		/* CCR1.1: 0 = Rx G.802 disabled */
+		/* CCR1.0: X = Rx CRC4 disabled */
+
+		licr = 0x00;
+		/* LICR.7-5: 0x0 = 75 Ohm w/o protection resistors */
+		/* LICR.4: 0 = -12dB Rx EGL */
+		/* LICR.3: 0 = JA on receive side */
+		/* LICR.2: 0 = JA buffer depth 128 bits */
+		/* LICR.1: 0 = JA enabled */
+		/* LICR.0: X = transmitters on/off */
+
+		test3 = 0x00;
+		/* TEST3: 0x00 = no Rx gain */
 
 		if (sp->config.iftxlevel < 8) {
 			/* not monitoring mode */
-			regac = 0x00;	/* TEST3 no gain */
-			reg18 = 0x00;	/* 75 Ohm, Normal, transmitter on */
-			reg18 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+			test3 = 0x00;	/* TEST3 no gain */
+			licr = 0x00;	/* 75 Ohm, Normal, transmitter on */
+			licr |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
 		} else {
 			/* monitoring mode */
-			regac = 0x00;	/* TEST3 no gain */
-			reg18 = 0x01;	/* 75 Ohm norm, transmitter off */
+			test3 = 0x00;	/* TEST3: 0x00 = no Rx gain */
+			// licr = 0x01; /* LICR.0: 1 = transmitter off */
+			// licr |= 0x10; /* LICR.4: 1 = -43dB Rx EGL */
+			licr = 0x01;	/* 75 Ohm norm, transmitter off */
 			switch (sp->config.iftxlevel & 0x3) {
 			case 0:
 				break;
 			case 1:
-				regac |= 0x72;	/* TEST3 12dB gain */
+				test3 |= 0x72;	/* TEST3: 0x72 = 12dB Rx gain */
 				break;
 			case 2:
 			case 3:
-				regac |= 0x70;	/* TEST3 30dB gain */
+				test3 |= 0x70;	/* TEST3: 0x70 = 30dB Rx gain */
 				break;
 			}
 		}
-		// reg18 |= 0x01; /* disable transmitter */
 
-		xlb[0xac] = regac;
-		xlb[0x18] = reg18;
+		xlb[0xac] = test3;
+		/* TEST3: 0x00 = no Rx gain */
+		/* TEST3: 0x70 = 12dB Rx gain */
+		/* TEST3: 0x72 = 30dB Rx gain */
+
+		xlb[0x18] = licr;
+		/* LICR.7: X = LBO bit 2 */
+		/* LICR.6: X = LBO bit 1 */
+		/* LICR.5: X = LBO bit 0 */
+		/* LICR.4: X = -12dB/-43dB Rx EGL */
+		/* LICR.3: 0 = JA on receive side */
+		/* LICR.2: 0 = JA buffer depth 128 bits */
+		/* LICR.1: 0 = JA enabled */
+		/* LICR.0: X = transmitters on/off */
 
 		xlb[0x1b] = 0x8a;	/* CRC3: LIRST & TSCLKM */
+
+		/* Note: The TAF register must be programmed with the 7-bit FAS word (0x1b).  The
+		   DS21354/DS21554 do not automatically set these bits. */
 		xlb[0x20] = 0x1b;	/* TAFR */
+		/* TAF.7: 0 = Si bit */
+		/* TAF.6: 0 = frame alignment signal bit */
+		/* TAF.5: 0 = frame alignment signal bit */
+		/* TAF.4: 1 = frame alignment signal bit */
+		/* TAF.3: 1 = frame alignment signal bit */
+		/* TAF.2: 0 = frame alignment signal bit */
+		/* TAF.1: 1 = frame alignment signal bit */
+		/* TAF.0: 1 = frame alignment signal bit */
+
+		/* Note: bit 6 of the TNAF register must be programmed to one.  The DS21354/DS21554 
+		   does not automaticallly set this bit. */
 		xlb[0x21] = 0x5f;	/* TNAFR */
-		xlb[0x40] = 0x0b;	/* TSR1 */
+		/* TNAF.7 0 = Si bit */
+		/* TNAF.6 1 = FNA signal bit */
+		/* TNAF.5 0 = remote alarm */
+		/* TNAF.4 1 = additional bit 4 */
+		/* TNAF.3 1 = additional bit 5 */
+		/* TNAF.2 1 = additional bit 6 */
+		/* TNAF.1 1 = additional bit 7 */
+		/* TNAF.0 1 = additional bit 8 */
+
+		/* set up transmit signalling */
+		xlb[0x40] = 0x0b;	/* TS1: no alarm, spare bits one */
 
 		if (timeouts) {
-			/* wierd thing to do */
 			for (offset = 0x41; offset <= 0x4f; offset++)
+				/* TS2 thru TS16 */
+				/* Set b and d bits transmit signalling each channel. (ITU-T specification
+				   recommend that ABCD signalling not be set to all zero because they wille 
+				   emulate a CAS multiframe alignment word. */
 				xlb[offset] = 0x55;
-			for (offset = 0x22; offset <= 0x25; offset++)
+			/* Note: If CCR3.6 == 1, then a zero in the TCBRs implies that signaling data is to 
+			   be sourced from TSER (or TSIG if CCR3.2 == 1), and a one implies that signaling
+			   data for that channel is to be sourced from the Transmit Signaling (TS)
+			   registers.  In this mode, the voice-channel number scheme (CH1 to CH30) is used. 
+			 */
+			for (offset = 0x22; offset <= 0x25; offset++)	/* TCB1 thru TCB4 */
 				xlb[offset] = 0xff;
 			timeout = jiffies + 100 * HZ / 1000;
 			while (jiffies < timeout) ;
@@ -4344,7 +4494,7 @@ vp_rxtx_burst(struct vp *vp)
 		register int frame, slot;
 		register uint32_t x, amask, dmask;
 
-		dmask = (vp->channels == 24) ? VP_TI_CHAN_VALID_MASK : VP_E1_CHAN_VALID_MASK;
+		dmask = (vp->channels == 24) ? VP_T1_CHAN_VALID_MASK : VP_E1_CHAN_VALID_MASK;
 		xmask = vp->xmask >> 1;
 
 		/* Perform a receive cycle.  For the receive cycle, the elastic buffer number is
@@ -6396,8 +6546,8 @@ vp_resume(struct pci_dev *pdev)
 STATIC struct pci_driver vp_driver = {
 	.name = DRV_NAME,
 	.probe = vp_probe,
-	.remove = vp_remove,
-	.id_table = &vp_pci_table,
+	.remove = __devexit_p(vp_remove),
+	.id_table = &vp_pci_tbl,
 #ifdef CONFIG_PM
 	.suspend = vp_suspend,
 	.resume = vp_resume,

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2009-04-01 21:15:12 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2009-04-21 07:48:34 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-04-01 21:15:12 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.25  2009-04-21 07:48:34  brian
+ - updates for release
+
  Revision 0.9.2.24  2009-04-01 21:15:12  brian
  - tweaks
 
@@ -129,9 +132,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2009-04-01 21:15:12 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2009-04-21 07:48:34 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2009-04-01 21:15:12 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2009-04-21 07:48:34 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   1
@@ -253,7 +256,7 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9
 #define PTU_TEST_CHAN	19
 
 #define IUT_TEST_SLOT	0
-#define IUT_TEST_SPAN	2
+#define IUT_TEST_SPAN	1
 #define IUT_TEST_CHAN	19
 
 /*
@@ -22180,7 +22183,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.24 $ $Date: 2009-04-01 21:15:12 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.25 $ $Date: 2009-04-21 07:48:34 $");
 }
 
 void

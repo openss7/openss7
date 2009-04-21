@@ -1,11 +1,12 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-30 18:31:48 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2009-04-21 07:48:41 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:31:48 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strace.c,v $
+ Revision 0.9.2.22  2009-04-21 07:48:41  brian
+ - updates for release
+
  Revision 0.9.2.21  2008-10-30 18:31:48  brian
  - rationalized drivers, modules and test programs
 
@@ -73,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-30 18:31:48 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2009-04-21 07:48:41 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-30 18:31:48 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2009-04-21 07:48:41 $";
 
 /*
  *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.
@@ -639,11 +643,7 @@ int
 strace_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
 {
 	char sbuf[LOGMSGSZ << 2];
-	char fchar[] = "          ";
-	char *fstr = fchar, *tp;
 	struct log_ctl lc;
-	time_t ltime;
-	char timebuf[26];
 	int len;
 
 	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < sizeof(lc)) {
@@ -655,6 +655,11 @@ strace_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
 	snprintf_text(sbuf, sizeof(sbuf), (char *) data->buf, data->len);
 	len = fprintf(file, "%d", lc.seq_no);
 	if (len != -1) {
+		char fchar[] = "          ";
+		char *fstr = fchar, *tp;
+		time_t ltime = lc.ltime;
+		char timebuf[26];
+
 		ctime_r(&ltime, timebuf);
 		for (tp = timebuf;; tp++) {
 			if (*tp == '\n') {
@@ -694,7 +699,9 @@ version(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 1997-2001  Brian Bidulock.       All Rights Reserved.\n\
 Distributed under AGPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -774,7 +781,8 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -1108,7 +1116,7 @@ strlog_open(int argc, char *argv[], struct trace_ids *tids, size_t count)
 		for (dev = logdevices; (*dev); dev++) {
 			if (debug)
 				fprintf(stderr, "%s: trying device %s\n", argv[0], (*dev));
-			if ((strlog_fd = open((*dev), O_RDWR)) == 0)
+			if ((strlog_fd = open((*dev), O_RDWR)) != -1)
 				break;
 		}
 		if ((*dev) == NULL) {

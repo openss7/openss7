@@ -1,12 +1,13 @@
-% -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
+% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: porting.texi,v 0.9.2.27 2008-11-26 12:01:40 brian Exp $
+% @(#) $Id: porting.texi,v 0.9.2.28 2009-04-21 07:48:39 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
-% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -17,7 +18,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-11-26 12:01:40 $ by $Author: brian $
+% Last Modified $Date: 2009-04-21 07:48:39 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -84,8 +85,9 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
 
@@ -130,8 +132,9 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
+Copyright @copyright{} 2008-2009  Monavacon Limited <@uref{http://www.monavacon.com/}> @*
 Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
-Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+Copyright @copyright{} 1997-2001  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
 @noindent

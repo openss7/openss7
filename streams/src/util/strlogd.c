@@ -1,26 +1,28 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-10-30 18:31:37 $
+ @(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-04-21 07:48:40 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:31:37 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlogd.c,v $
+ Revision 0.9.2.4  2009-04-21 07:48:40  brian
+ - updates for release
+
  Revision 0.9.2.3  2008-10-30 18:31:37  brian
  - rationalized drivers, modules and test programs
 
@@ -70,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-10-30 18:31:37 $"
+#ident "@(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-04-21 07:48:40 $"
 
-static char const ident[] = "$RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-10-30 18:31:37 $";
+static char const ident[] = "$RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-04-21 07:48:40 $";
 
 /*
  *  SVR 4.2 Daemon: strlogd - (Daemon) Receives console log messages from the
@@ -598,7 +603,9 @@ version(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 1997-2001  Brian Bidulock.       All Rights Reserved.\n\
 Distributed under GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -670,8 +677,9 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\

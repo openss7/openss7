@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-04-04 05:05:25 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2009-04-21 07:48:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-04-04 05:05:25 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.61  2009-04-21 07:48:34  brian
+ - updates for release
+
  Revision 0.9.2.60  2009-04-04 05:05:25  brian
  - last driver tweaks and M3UA test program
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-04-04 05:05:25 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2009-04-21 07:48:34 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-04-04 05:05:25 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2009-04-21 07:48:34 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -140,7 +143,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2009-04-04 05:05:25 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2009-04-21 07:48:34 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -490,31 +493,6 @@ STATIC struct ss7_bufpool xp_bufpool = { 0, };
 
 #define X400P_SDL_ALARM_SETTLE_TIME	    5000	/* allow alarms to settle for 5 seconds */
 
-/*
- *  Mapping of channels 0-23 for T1, 1-31 for E1 into PCM highway timeslots.
- */
-STATIC int xp_t1_chan_map[] = {
-	1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15,
-	17, 18, 19, 21, 22, 23, 25, 26, 27, 29, 30, 31
-};
-STATIC int xp_e1_chan_map[] = {
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
-};
-
-#define X400P_T1_CHAN_DESCRIPTOR 0xEEEEEEEE
-#define X400P_E1_CHAN_DESCRIPTOR 0xFFFFFFFE
-
-#ifdef __LITTLE_ENDIAN
-#define span_to_byte(__span) (3-(__span))
-#else
-#ifdef __BIG_ENDIAN
-#define span_to_byte(__span) (__span)
-#else
-#error "Must know the endianess of processor\n"
-#endif
-#endif
-
 enum xp_board {
 	PLX9030 = 0,
 	PLXDEVBRD,
@@ -536,8 +514,8 @@ enum xp_board {
 /* *INDENT-OFF* */
 static struct {
 	char *name;
-	u32 hw_flags;
-	u32 idle_word;
+	uint32_t hw_flags;
+	uint32_t idle_word;
 } xp_board_info[] __devinitdata = {
 	{ "PLX 9030",			0, 0x00000000 },
 	{ "PLX Development Board",	0, 0x00000000 },
@@ -554,7 +532,7 @@ static struct {
 	{ "V401PT",			1, 0xfefefefe },
 };
 
-#define XPF_SUPPORTED	0x01
+#define XPF_SUPPORTED	(1<<0)
 
 #define XP_DEV_IDMASK	0xf0
 #define XP_DEV_SHIFT	4
@@ -615,27 +593,44 @@ MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd*bc06sc80i*");
 #endif				/* MODULE_ALIAS */
 #endif				/* MODULE_DEVICE_TABLE */
 
-STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
-STATIC void __devexit xp_remove(struct pci_dev *);
-
-#ifdef CONFIG_PM
-#ifndef HAVE_KTYPE_PM_MESSAGE_T
-typedef u32 pm_message_t;
-#endif
-STATIC int xp_suspend(struct pci_dev *pdev, pm_message_t state);
-STATIC int xp_resume(struct pci_dev *pdev);
-#endif
-
-STATIC struct pci_driver xp_driver = {
-      name:DRV_NAME,
-      probe:xp_probe,
-      remove:__devexit_p(xp_remove),
-      id_table:xp_pci_tbl,
-#ifdef CONFIG_PM
-      suspend:xp_suspend,
-      resume:xp_resume,
-#endif
+/* Map from T1 time slot (less 1) to Tormenta channel. */
+STATIC int xp_t1_chan_map[] = {
+	1, 2, 3,
+	5, 6, 7,
+	9, 10, 11,
+	13, 14, 15,
+	17, 18, 19,
+	21, 22, 23,
+	25, 26, 27,
+	29, 30, 31
 };
+
+/* Map from E1 time slot (less 1) to Tormenta channel. */
+STATIC int xp_e1_chan_map[] = {
+	1, 2, 3, 4,
+	5, 6, 7, 8,
+	9, 10, 11, 12,
+	13, 14, 15, 16,
+	17, 18, 19, 20,
+	21, 22, 23, 24,
+	25, 26, 27, 28,
+	29, 30, 31
+};
+
+#define XP_T1_TS_VALID_MASK	0x00ffffff	/* Mask of valid T1 time slots. */
+#define XP_E1_TS_VALID_MASK	0x7fffffff	/* Mask of valid E1 time slots. */
+#define XP_T1_CHAN_VALID_MASK	0xeeeeeeee	/* Mask of valid T1 Tormenta channels. */
+#define XP_E1_CHAN_VALID_MASK	0xfffffffe	/* Mask of valid E1 Tormenta channels. */
+
+#ifdef __LITTLE_ENDIAN
+#define span_to_byte(__span) (3-(__span))
+#else
+#ifdef __BIG_ENDIAN
+#define span_to_byte(__span) (__span)
+#else
+#error "Must know the endianess of processor\n"
+#endif
+#endif
 
 STATIC int x400p_boards = 0;
 STATIC struct cd *x400p_cards;
@@ -2099,8 +2094,8 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 			break;
 		}
 
-		xlb[0x10] = 0xa0;	/* RCR1 */
-		/* RCR1.7: 1 = CAS/CRC4 multiframe */
+		xlb[0x10] = 0x20;	/* RCR1 */
+		/* RCR1.7: 0 = CAS/CRC4 multiframe */
 		/* RCR1.6: 0 = frame mode */
 		/* RCR1.5: 1 = RSYNC is an input */
 		/* RCR1.4: 0 = unassigned */
@@ -2129,28 +2124,9 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		/* TCR1.1: 0 = frame mode */
 		/* TCR1.0: 1 = TSYNC is an output */
 
-		tcr2 = 0x00;
-		/* TCR2.7: 0 = do not source Sa8 bit from TLINK pin */
-		/* TCR2.6: 0 = do not source Sa7 bit from TLINK pin */
-		/* TCR2.5: 0 = do not source Sa6 bit from TLINK pin */
-		/* TCR2.4: 0 = do not source Sa5 bit from TLINK pin */
-		/* TCR2.3: 0 = do not source Sa4 bit from TLINK pin */
-		/* TCR2.2: 0 = TPOSO/TNEGO full clock period */
-		/* TCR2.1: 0 = E-bits not automatically set */
-		/* TCR2.0: 0 = RLOS/LOTC pin is RLOS */
-
-		ccr1 = 0x00;
-		/* CCR1.7: 0 = framer loopback disabled */
-		/* CCR1.6: 0 = Tx HDB3 disabled */
-		/* CCR1.5: 0 = Tx G.802 disabled */
-		/* CCR1.4: 0 = Tx CRC4 disabled */
-		/* CCR1.3: 0 = CAS signalling mode */
-		/* CCR1.2: 0 = Rx HDB3 disabled */
-		/* CCR1.1: 0 = Rx G.802 disabled */
-		/* CCR1.0: 0 = Rx CRC4 disabled */
-
 		switch (sp->config.ifframing) {
 		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
 		case SDL_FRAMING_CCS:
 			ccr1 |= 0x08;	/* CCR1.3: 1 = Rx CCS signaling mode */
 			tcr1 &= ~0x20;	/* TCR1.5: 0 = sample time slot 16 at TSER pin */
@@ -2163,6 +2139,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		}
 		switch (sp->config.ifcoding) {
 		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
 		case SDL_CODING_HDB3:
 			ccr1 |= 0x40;	/* CCR1.6: 1 = Tx HDB3 enabled */
 			ccr1 |= 0x04;	/* CCR1.2: 1 = Rx HDB3 enabled */
@@ -2173,6 +2150,12 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 			break;
 		}
 		switch (sp->config.ifgcrc) {
+		default:
+			sp->config.ifgcrc = SDL_GCRC_CRC5;
+		case SDL_GCRC_CRC5:
+			ccr1 &= ~0x10;	/* CRC1.4: 0 = Tx CRC4 disabled */
+			ccr1 &= ~0x01;	/* CRC1.0: 0 = Rx CRC4 disabled */
+			break;
 		case SDL_GCRC_CRC4:
 			ccr1 |= 0x10;	/* CRC1.4: 1 = Tx CRC4 enabled */
 			ccr1 |= 0x01;	/* CRC1.0: 1 = Rx CRC4 enalled */
@@ -2181,10 +2164,6 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 			if (sp->config.ifframing == SDL_FRAMING_CAS)
 				tcr1 |= 0x02;	/* TCR1.1: 1 = CAS and CRC4 multiframe mode */
 #endif
-			break;
-		default:
-			ccr1 &= ~0x10;	/* CRC1.4: 0 = Tx CRC4 disabled */
-			ccr1 &= ~0x01;	/* CRC1.0: 0 = Rx CRC4 disabled */
 			break;
 		}
 
@@ -8374,7 +8353,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		{
 			printd(("%s: performing enable on E1 span %d\n", DRV_NAME, sp->span));
 			spin_lock_irqsave(&cd->lock, flags);
-			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
+			cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
 			cd->eval_syncsrc = 1;
 			cd->xlb[CTLREG] = (E1DIV);
@@ -17468,6 +17447,27 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 	volatile unsigned long *data;
 	unsigned long timeout;
 
+#if 0
+	/* prints out PLX registers for debugging */
+	{
+		char buf[64] = { 0, };
+		volatile unsigned char *c;
+		int i, offs = 0;
+
+		for (c = (volatile unsigned char *)cd->plx, i = 0; i < cd->plx_length; i++, c++) {
+			if (i && !(i & 0x0f)) {
+				__printd(("%s\n", buf));
+				buf[0] = '\0';
+				offs = 0;
+			}
+			offs += snprintf(buf + offs, sizeof(buf)-offs, "%02x ", *c);
+		}
+		if (offs) {
+			__printd(("%s\n", buf));
+		}
+	}
+#endif
+
 	f = (unsigned char *) v401pfw;
 	flen = sizeof(v401pfw);
 
@@ -17617,11 +17617,11 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 
 	/* all boards have these registers regardless of framer */
 
-	cd->xlb[SYNREG] = 0;	/* default autosync */
+	cd->xlb[SYNREG] = SYNCSELF;	/* default autosync */
 	cd->xlb[CTLREG] = 0;	/* interrupts disabled */
 	cd->xlb[LEDREG] = 0;	/* turn off leds */
 	cd->xlb[TSTREG] = 0;	/* do not drive TEST2 pin */
-	cd->xlb[CTLREG1] = 1;	/* non Rev. A mode */
+	cd->xlb[CTLREG1] = 0;	/* Rev. A mode */
 
 	/* Note: only check the device id of the first framer of 4. */
 
@@ -17718,13 +17718,17 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		int span, offset;
 
 		cd->xlb[TSTREG] = 0;	/* do not drive TEST2 pin */
+#if 0
 		if (cd->devrev > 3) {
 			cd->xlb[CTLREG1] = 1;	/* non Rev. A mode */
 			cmn_err(CE_NOTE, "%s: setting non-Rev.A mode", DRV_NAME);
 		} else {
+#endif
 			cd->xlb[CTLREG1] = 0;	/* Rev. A mode */
 			cmn_err(CE_NOTE, "%s: setting Rev.A mode", DRV_NAME);
+#if 0
 		}
+#endif
 		/* setup E1 card defaults */
 		cd->config = sdl_default_e1_chan;
 		cd->isr = &xp_e400_interrupt;
@@ -18022,6 +18026,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 }
 
 #ifdef CONFIG_PM
+#ifndef HAVE_KTYPE_PM_MESSAGE_T
+typedef u32 pm_message_t;
+#endif
+
 /*
  *  X400P-SS7 Suspend
  *  -----------------------------------
@@ -18043,7 +18051,18 @@ xp_resume(struct pci_dev *pdev)
 	fixme(("Write a resume routine.\n"));
 	return 0;
 }
-#endif
+#endif				/* CONFIG_PM */
+
+STATIC struct pci_driver xp_driver = {
+	.name = DRV_NAME,
+	.probe = xp_probe,
+	.remove = __devexit_p(xp_remove),
+	.id_table = xp_pci_tbl,
+#ifdef CONFIG_PM
+	.suspend = xp_suspend,
+	.resume = xp_resume,
+#endif				/* CONFIG_PM */
+};
 
 /* 
  *  X400P-SS7 PCI Init
