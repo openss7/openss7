@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-04-04 05:05:24 $
+ @(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2009-04-21 07:48:32 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-04-04 05:05:24 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m3ua-raw.c,v $
+ Revision 0.9.2.5  2009-04-21 07:48:32  brian
+ - updates for release
+
  Revision 0.9.2.4  2009-04-04 05:05:24  brian
  - last driver tweaks and M3UA test program
 
@@ -79,9 +82,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-04-04 05:05:24 $"
+#ident "@(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2009-04-21 07:48:32 $"
 
-static char const ident[] = "$RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2009-04-04 05:05:24 $";
+static char const ident[] = "$RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2009-04-21 07:48:32 $";
 
 /*
  *  This file is for testing raw M3UA in conjunction with the sctp_t driver.  It provides test cases

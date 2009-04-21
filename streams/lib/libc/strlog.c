@@ -1,11 +1,12 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 12:54:03 $
+ @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-04-21 07:48:40 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:03 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.c,v $
+ Revision 0.9.2.7  2009-04-21 07:48:40  brian
+ - updates for release
+
  Revision 0.9.2.6  2008-04-28 12:54:03  brian
  - update file headers for release
 
@@ -62,10 +66,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 12:54:03 $"
+#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-04-21 07:48:40 $"
 
 static char const ident[] =
-    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 12:54:03 $";
+    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-04-21 07:48:40 $";
 
 #define rpl_realloc realloc /* hah! */
 
@@ -1041,11 +1045,7 @@ int
 __streams_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
 {
 	char sbuf[LOGMSGSZ << 2];
-	char fchar[] = "          ";
-	char *fstr = fchar, *tp;
 	struct log_ctl lc;
-	time_t ltime;
-	char timebuf[26];
 	int len;
 
 	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < sizeof(lc)) {
@@ -1057,6 +1057,11 @@ __streams_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
 	snprintf_text(sbuf, sizeof(sbuf), (char *) data->buf, data->len);
 	len = fprintf(file, "%d", lc.seq_no);
 	if (len != -1) {
+		char fchar[] = "          ";
+		char *fstr = fchar, *tp;
+		time_t ltime = lc.ltime;
+		char timebuf[26];
+
 		ctime_r(&ltime, timebuf);
 		for (tp = timebuf;; tp++) {
 			if (*tp == '\n') {

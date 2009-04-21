@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2009-01-19 10:39:41 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2009-04-21 07:48:40 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-01-19 10:39:41 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strerr.c,v $
+ Revision 0.9.2.30  2009-04-21 07:48:40  brian
+ - updates for release
+
  Revision 0.9.2.29  2009-01-19 10:39:41  brian
  - added new standalone agent
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2009-01-19 10:39:41 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2009-04-21 07:48:40 $"
 
-static char const ident[] = "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2009-01-19 10:39:41 $";
+static char const ident[] = "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2009-04-21 07:48:40 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -635,11 +638,7 @@ int
 strace_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 {
 	char sbuf[LOGMSGSZ << 2];
-	char fchar[] = "          ";
-	char *fstr = fchar, *tp;
 	struct log_ctl lc;
-	time_t ltime;
-	char timebuf[26];
 	int len;
 
 	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < sizeof(lc)) {
@@ -651,6 +650,11 @@ strace_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 	snprintf_text(sbuf, sizeof(sbuf), (char *) data->buf, data->len);
 	len = fprintf(file, "%d", lc.seq_no);
 	if (len != -1) {
+		char fchar[] = "          ";
+		char *fstr = fchar, *tp;
+		time_t ltime = lc.ltime;
+		char timebuf[26];
+
 		ctime_r(&ltime, timebuf);
 		for (tp = timebuf;; tp++) {
 			if (*tp == '\n') {
@@ -690,7 +694,9 @@ version(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved.\n\
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 1997-2001  Brian Bidulock.       All Rights Reserved.\n\
 Distributed under AGPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -762,8 +768,8 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com>\n\
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\

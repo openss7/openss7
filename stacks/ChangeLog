@@ -1,3 +1,9 @@
+2009-04-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/mx/mx_mux.c
+	* src/modules/x400p-ss7/sl_x400p.c
+	* src/test/x400p-ss7/test-x400p.c
+
 2009-04-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/x400p-ss7/sl_x400p.c: last driver tweaks.

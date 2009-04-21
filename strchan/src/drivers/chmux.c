@@ -1,11 +1,12 @@
 /*****************************************************************************
 
- @(#) $RCSfile: chmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:55 $
+ @(#) $RCSfile: chmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-04-21 07:48:36 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-11-26 13:13:55 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chmux.c,v $
+ Revision 0.9.2.2  2009-04-21 07:48:36  brian
+ - updates for release
+
  Revision 0.9.2.1  2008-11-26 13:13:55  brian
  - sync with working copy
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: chmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:55 $"
+#ident "@(#) $RCSfile: chmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-04-21 07:48:36 $"
 
-static char const ident[] = "$RCSfile: chmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:55 $";
+static char const ident[] = "$RCSfile: chmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-04-21 07:48:36 $";
 
 /*
  * This is a CH multiplexing driver.  Its purpose is to allow a single device,
@@ -88,11 +92,11 @@ static char const ident[] = "$RCSfile: chmux.c,v $ $Name: OpenSS7-0_9_2 $($Revis
  *
  * Lower CH Streams are always treated as Style 1 Streams.  If the lower Stream is
  * in fact a Style 2 CH Stream, it must be attached to a PPA before it is linked
- * beneath the multiplexing driver.  CLone upper CH Streams are always treated as
+ * beneath the multiplexing driver.  Clone upper CH Streams are always treated as
  * Style 2 Streams.  PPA addressing for the upper CH streams is performed using a
  * globally assigned PPA or CLEI that is assigned to a lower Stream at the time
  * that it is linked beneath the multiplexing driver.  Upper CH streams can be
- * attached to a PPA in on of two fashions: as a normal CH Stream, or as a monitor
+ * attached to a PPA in one of two fashions: as a normal CH Stream, or as a monitor
  * Stream.  When attached as a monitor Stream, data that is passed in either
  * direction is copied to the monitor Stream.  This allows monitoring taps for
  * maintenance or for wiretap applications.
@@ -118,9 +122,9 @@ static char const ident[] = "$RCSfile: chmux.c,v $ $Name: OpenSS7-0_9_2 $($Revis
 #include <ss7/chi_ioctl.h>
 
 #define CH_MUX_DESCRIP		"CH MULTIPLEX (CH-MUX) STREAMS MULTIPLEXING DRIVER"
-#define CH_MUX_REVISION		"OpenSS7 $RCSfile: chmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:55 $"
-#define CH_MUX_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define CH_MUX_DEVICE		"Part of the OpenSS7 STack for Linux Fast-STREAMS."
+#define CH_MUX_REVISION		"OpenSS7 $RCSfile: chmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-04-21 07:48:36 $"
+#define CH_MUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define CH_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CH_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CH_MUX_LICENSE		"GPL"
 #define CH_MUX_BANNER		CH_MUX_DESCRIP		"\n" \

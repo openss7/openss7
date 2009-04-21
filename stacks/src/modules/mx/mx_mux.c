@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:13 $
+ @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2009-04-21 07:48:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:13 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_mux.c,v $
+ Revision 0.9.2.10  2009-04-21 07:48:33  brian
+ - updates for release
+
  Revision 0.9.2.9  2008-09-22 20:31:13  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:13 $"
+#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2009-04-21 07:48:33 $"
 
 static char const ident[] =
-    "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:13 $";
+    "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2009-04-21 07:48:33 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -71,7 +74,10 @@ static char const ident[] =
  *  view of the device driver.  It is then possible to open a single MX upper stream on this
  *  multiplexer and link it, for example, under the MG multiplexer.
  *
- *
+ *  This multiplexing driver also permits channel mapping and multiplexing in that a CH stream may
+ *  also be opened on the upper multiplex and mapped to a number of statistically multiplexed
+ *  channels in any number of MX streams.  Note that this driver accesses only channelized
+ *  interfaces.
  */
 #include <sys/os7/compat.h>
 
@@ -81,7 +87,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:13 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2009-04-21 07:48:33 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

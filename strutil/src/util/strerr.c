@@ -1,17 +1,18 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-10-30 18:31:48 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2009-04-21 07:48:41 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU Affero General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:31:48 $ by $Author: brian $
+ Last Modified $Date: 2009-04-21 07:48:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strerr.c,v $
+ Revision 0.9.2.26  2009-04-21 07:48:41  brian
+ - updates for release
+
  Revision 0.9.2.25  2008-10-30 18:31:48  brian
  - rationalized drivers, modules and test programs
 
@@ -70,10 +74,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-10-30 18:31:48 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2009-04-21 07:48:41 $"
 
-static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-10-30 18:31:48 $";
+static char const ident[] = "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2009-04-21 07:48:41 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -376,8 +379,7 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 		if (*fmt == '.') {
 			++fmt;
 			if (isdigit(*fmt))
-				for (decimal = 0; isdigit(*fmt);
-				     decimal *= 10, decimal += (*fmt - '0')) ;
+				for (decimal = 0; isdigit(*fmt); decimal *= 10, decimal += (*fmt - '0')) ;
 			else if (*fmt == '*') {
 				if (args + PROMOTE_SIZEOF(int) <= aend) {
 					decimal = PROMOTE_ARGVAL(int, args);
@@ -620,14 +622,10 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 }
 
 int
-strace_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
+strace_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 {
 	char sbuf[LOGMSGSZ << 2];
-	char fchar[] = "          ";
-	char *fstr = fchar, *tp;
 	struct log_ctl lc;
-	time_t ltime;
-	char timebuf[26];
 	int len;
 
 	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < sizeof(lc)) {
@@ -639,6 +637,11 @@ strace_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
 	snprintf_text(sbuf, sizeof(sbuf), (char *) data->buf, data->len);
 	len = fprintf(file, "%d", lc.seq_no);
 	if (len != -1) {
+		char fchar[] = "          ";
+		char *fstr = fchar, *tp;
+		time_t ltime = lc.ltime;
+		char timebuf[26];
+
 		ctime_r(&ltime, timebuf);
 		for (tp = timebuf;; tp++) {
 			if (*tp == '\n') {
@@ -678,7 +681,9 @@ version(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 1997-2001  Brian Bidulock.       All Rights Reserved.\n\
 Distributed under AGPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -750,7 +755,8 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -990,21 +996,16 @@ strlog_enter(int argc, char *argv[])
 
 				/* initialize default filename */
 				if (pidfile[0] == '\0')
-					snprintf(pidfile, sizeof(pidfile), "/var/run/%s.pid",
-						 program);
+					snprintf(pidfile, sizeof(pidfile), "/var/run/%s.pid", program);
 				if (output > 1)
-					syslog(MY_FACILITY(LOG_NOTICE),
-					       "%s: Writing daemon pid to file %s", program,
-					       pidfile);
+					syslog(MY_FACILITY(LOG_NOTICE), "%s: Writing daemon pid to file %s", program, pidfile);
 				if ((pidf = fopen(pidfile, "w+"))) {
 					fprintf(pidf, "%d", (int) pid);
 					fflush(pidf);
 					fclose(pidf);
 				} else {
 					syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
-					syslog(MY_FACILITY(LOG_ERR),
-					       "%s: Could not write pid to file %s", program,
-					       pidfile);
+					syslog(MY_FACILITY(LOG_ERR), "%s: Could not write pid to file %s", program, pidfile);
 					strlog_exit(2);
 				}
 			}
@@ -1032,18 +1033,15 @@ strlog_enter(int argc, char *argv[])
 		localtime_r(&curtime, &tm);
 		/* initialize default filename */
 		if (outfile[0] == '\0')
-			snprintf(outpath, sizeof(outpath), "%s/%s.%02d-%02d", outpdir, basname,
-				 tm.tm_mon, tm.tm_mday);
+			snprintf(outpath, sizeof(outpath), "%s/%s.%02d-%02d", outpdir, basname, tm.tm_mon, tm.tm_mday);
 		else
 			snprintf(outpath, sizeof(outpath), "%s/%s", outpdir, outfile);
 		if (output > 1)
-			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stdout to file %s",
-			       program, outpath);
+			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stdout to file %s", program, outpath);
 		fflush(stdout);
 		if (freopen(outpath, "a", stdout) == NULL) {
 			syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
-			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stdout to %s", program,
-			       outpath);
+			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stdout to %s", program, outpath);
 			strlog_exit(2);
 		}
 	}
@@ -1054,13 +1052,11 @@ strlog_enter(int argc, char *argv[])
 		else
 			snprintf(errpath, sizeof(errpath), "%s/%s", outpdir, errfile);
 		if (output > 1)
-			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stderr to file %s",
-			       program, errpath);
+			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stderr to file %s", program, errpath);
 		fflush(stderr);
 		if (freopen(errpath, "a", stderr) == NULL) {
 			syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
-			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stderr to %s", program,
-			       errpath);
+			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stderr to %s", program, errpath);
 			strlog_exit(2);
 		}
 	}
@@ -1152,8 +1148,7 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options,
-				     &option_index);
+		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?");
 #endif				/* defined _GNU_SOURCE */
@@ -1333,14 +1328,12 @@ main(int argc, char *argv[])
 				lc = (struct log_ctl *) cbuf;
 				if (ctl.len < sizeof(*lc)) {
 					if (output > 2)
-						fprintf(stderr, "ctl.len = %d, skipping\n",
-							ctl.len);
+						fprintf(stderr, "ctl.len = %d, skipping\n", ctl.len);
 					continue;
 				}
 				if (dat.len <= 0) {
 					if (output > 2)
-						fprintf(stderr, "dat.len = %d, skipping\n",
-							dat.len);
+						fprintf(stderr, "dat.len = %d, skipping\n", dat.len);
 					continue;
 				}
 				if (!nomead || outfile[0] == '\0') {

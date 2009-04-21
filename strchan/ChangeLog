@@ -1,3 +1,9 @@
+2009-04-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/chmux.c
+	* src/drivers/v401p.c
+	* src/drivers/x400p.c
+
 2009-03-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/mxi_ioctl2.h: corections

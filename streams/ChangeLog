@@ -1,3 +1,28 @@
+2009-04-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/SPG.texi
+	* doc/manual/SPG2.texi
+	* doc/manual/STREAMS.texi
+	* doc/manual/STREAMS_FAQ.texi
+	* doc/manual/bugs.texi
+	* doc/manual/configure.texi
+	* doc/manual/descrip.texi
+	* doc/manual/drivers.texi
+	* doc/manual/install.texi
+	* doc/manual/modules.texi
+	* doc/manual/news.texi
+	* doc/manual/porting.texi
+	* doc/manual/prerequisites.texi
+	* doc/manual/releases.texi
+	* doc/manual/rpm.texi
+	* doc/manual/todo.texi
+	* doc/manual/tree.texi
+	* doc/manual/utilities.texi
+	* lib/libc/strlog.c
+	* src/util/strace.c
+	* src/util/strerr.c
+	* src/util/strlogd.c
+
 2009-03-27  Brian Bidulock  <bidulock@openss7.org>
 
 	- second run a new timer implementation and BUG #027
