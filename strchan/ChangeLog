@@ -1,3 +1,23 @@
+2009-04-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: added whitepaper
+	* doc/Makefile.am: added whitepaper
+	* doc/papers/Makefile.am: added whitepaper
+	* doc/papers/org.css: added whitepaper
+	* doc/papers/voipt.bib: added whitepaper
+	* doc/papers/voipt.tex: added whitepaper
+	* doc/papers/voipt_fig01.fig: added whitepaper
+	* doc/papers/voipt_fig02.fig: added whitepaper
+	* doc/papers/voipt_fig03.fig: added whitepaper
+	* doc/papers/voipt_fig04.fig: added whitepaper
+	* doc/papers/voipt_fig05.fig: added whitepaper
+	* doc/papers/voipt_fig06.fig: added whitepaper
+	* doc/papers/voipt_fig07.fig: added whitepaper
+	* doc/papers/voipt_fig08.fig: added whitepaper
+
+	* src/drivers/v401p.c: driver updates
+	* src/drivers/x400p.c: driver updates
+
 2009-04-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/chmux.c
