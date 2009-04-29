@@ -1,12 +1,13 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.26 2008-12-06 12:58:13 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.27 2009-04-29 18:05:10 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
-% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -54,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-12-06 12:58:13 $ by $Author: brian $
+% Last Modified $Date: 2009-04-29 18:05:10 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,8 +83,9 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
 
@@ -128,7 +130,8 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2008-2009  Monavacon Limited <@uref{http://www.monavacon.com/}> @*
+Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -406,6 +409,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 @verbatim
 $Log: openss7.texi,v $
+Revision 0.9.2.27  2009-04-29 18:05:10  brian
+- updated documentation for release
+
 Revision 0.9.2.26  2008-12-06 12:58:13  brian
 - updates for stratm package
 
@@ -516,21 +522,23 @@ VERSION}.
 @cindex manual disclaimer
 
 @noindent
-@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
-implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
-that the contents of the manual are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
-no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
-consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
-in an action of contract, negligence or other tortious action, arising out of or in connection with
-any use of this manual or the performance or implementation of the contents thereof.
+@cite{Monavacon Limited} and @cite{OpenSS7 Corporation} disclaim all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{Monavacon Limited} or @cite{OpenSS7
+Corporation} be liable for any direct, indirect, special or consequential damages or any damages
+whatsoever resulting from loss of use, data or profits, whether in an action of contract, negligence
+or other tortious action, arising out of or in connection with any use of this manual or the
+performance or implementation of the contents thereof.
 
 @noindent
-@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
-reason, including but not limited to, conformity with standards promulgated by various agencies,
-utilization of advances in the state of the technical arts, or the reflection of changes in the
-design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
-Corporation} is under no obligation to provide any feature listed herein.
+@cite{Monavacon Limited} and @cite{OpenSS7 Corporation} reserve the right to revise this software
+and documentation for any reason, including but not limited to, conformity with standards
+promulgated by various agencies, utilization of advances in the state of the technical arts, or the
+reflection of changes in the design of any techniques, or procedures embodied, described, or
+referred to herein.  @cite{Monavacon Limited} and @cite{OpenSS7 Corporation} are under no obligation
+to provide any feature listed herein.
 
 @unnumberedsubsec U.S. Government Restricted Rights
 
@@ -551,9 +559,10 @@ the FAR (or any successor regulations).
 @unnumberedsec Acknowledgements
 @cindex credits
 
-The @cite{OpenSS7 @value{PACKAGE_TITLE}} project was funded in part by:
+@url{http://www.openss7.org/,, The OpenSS7 Project} was funded in part by:
 
 @multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.monavacon.com/, Monavacon Limited}
 @item @tab @bullet{} @uref{http://www.openss7.com/, OpenSS7 Corporation}
 @end multitable
 
@@ -722,18 +731,18 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Background
 @cindex background
 
-@uref{http://www.openss7.org/, The OpenSS7 Project} was started in 1996 an made it Web debut in
+@uref{http://www.openss7.org/, The OpenSS7 Project} was started in 1996 and made its Web debut in
 2000.  The initial objectives of the OpenSS7 Project were to provide an SS7 stack implementation for
 Linux.  Initial work on development of the SS7 stack attempted to integrate the SS7 protocol
 elements into Linux's BSD-like Sockets based networking system.  Early on this approach became
-problematic.  Although the true BSD sockets networking system is somewhat ameniable to a wider range
+problematic.  Although the true BSD sockets networking system is somewhat amenable to a wider range
 of protocols that just the TCP/IP protocol suite, as evidenced by the early adoption of OSI
 protocols into BSD 4.3 , the incarnation of the system present in Linux deviates largely from the
 BSD module in that there is no clean separation between the socket layer and the protocol layer, and
-that the protocol layer cannot actually be stacked in the same fashion as is possible in BSD.  Thes
-and other difficulties led the project, in 2001, to persue the STREAMS approach to networking.
+that the protocol layer cannot actually be stacked in the same fashion as is possible in BSD.  These
+and other difficulties led the project, in 2001, to pursue the STREAMS approach to networking.
 
-At the time (in 2000), there was an implemetnation for STREAMS for Linux, called Linux STREAMS, or
+At the time (in 2000), there was an implementation for STREAMS for Linux, called Linux STREAMS, or
 @cite{LiS} for short.  The OpenSS7 Project worked extensively with enhancing the @cite{LiS} package
 for use with SS7 and SIGTRAN protocols.  The versions of @cite{LiS} that were available for the
 Linux 2.2 series kernels available at the time were quite stable.@footnote{Linux 2.2 series kernels
@@ -741,7 +750,7 @@ did @emph{not} support symmetrical multi-processing (SMP) making it similar to S
 versions of @cite{LiS} that were available for the Linux 2.4 series kernels attempted to support SMP
 using the same SVR 4.0-like STREAMS model.  These versions of @cite{LiS} were incredibly difficult
 to stabilize on Linux 2.4 series kernels.  Much of the problems with @cite{LiS} appeared to be
-related to a poor coding style, and the attempt to maintain portablity to systems other than Linux,
+related to a poor coding style, and the attempt to maintain portability to systems other than Linux,
 (even though it appears that ports were not even popular).
 
 Therefore, in 2003, the OpenSS7 Project decided to replace @cite{LiS} with a completely new
@@ -1172,7 +1181,7 @@ particular, the standard header files (@file{sys/tihdr.h} and @file{sys/tiuser.h
 of the original @cite{LiS} releases from @uref{http://www.gcom.com/, GCOM} release of @cite{LiS}
 contained errors.
 
-This package provides the X/Open Transport Inteface/Transport Layer Interface (XTI/TLI) library
+This package provides the X/Open Transport Interface/Transport Layer Interface (XTI/TLI) library
 described in the X/Open Networking Services (XNS) 5.2 specification available from the
 @uref{http://www.opengroup.org/, OpenGroup}.  This library and cooperating @dfn{STREAMS} modules
 (@file{streams-timod}) provide XTI/TLI library functionality to any driver providing the Transport
@@ -1432,7 +1441,7 @@ networks.
 
 The components in this subpackage are the
 ATM
-components that were originalling part of the @command{strss7} package.@footnote{The @command{strss7}
+components that were orignally part of the @command{strss7} package.@footnote{The @command{strss7}
 package was getting much too large and was split into @command{strchan}, @command{striso},
 @command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
 
@@ -3205,7 +3214,7 @@ packages for use by developers and administrators.
 @chapter Conformance
 @cindex conformance
 
-Each add-on package to the @value{PACKAGE_TITLE} has its own set of conformances to @emph{ipso
+Each add-on package to the @value{PACKAGE_TITLE} has its own set of conformance to @emph{ipso
 facto} or @emph{standards} specifications.  In general, however, most of the add-on packages can
 only to either @emph{ipso facto} nor @emph{standards} specifications when used with @cite{Linux
 Fast-STREAMS}.
