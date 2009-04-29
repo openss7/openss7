@@ -2,11 +2,12 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: npi.texi,v 0.9.2.22 2008-11-26 12:01:52 brian Exp $
+% @(#) $Id: npi.texi,v 0.9.2.24 2009-04-29 18:05:46 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 %
 % All Rights Reserved.
 %
@@ -54,11 +55,11 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-11-26 12:01:52 $ by $Author: brian $
+% Last Modified $Date: 2009-04-29 18:05:46 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c %**start of header
 @setfilename npi.info
 @include texi/args.texi
@@ -86,8 +87,9 @@ published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 This specification was originally published by UNIX International OSI Work Group
 in Revision: 2.0.0 (1992/08/17).
 
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1992       UNIX International, Inc.
 
 All Rights Reserved.
@@ -140,6 +142,20 @@ under the above conditions for modified versions.
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2001-2008  OpenSS7 Corporation
+@subtitle Copyright @copyright{} 1992 UNIX International, Inc.
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7. It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+network interface to these components as well as providing a basis for network control for other
+network protocols.
+@end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
@@ -232,12 +248,13 @@ Fax: (65) 776-0421
 @end ignore
 
 @noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1992       UNIX International, Inc. @*
 
 @noindent
-All Rights Reserved. @*
+All Rights Reserved.
 
 @noindent
 Permission is granted to make and distribute verbatim copies of this manual provided the copyright
@@ -264,7 +281,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS DOCUMENTATION.}
 @noindent
 This document is based on the UNIX System Laboratories Network Provider Interface (NPI)
 specification which was used with permission by the UNIX International OSI Work Group (UI OSIWG).
-Participation inthe UI OSIWG is open to UNIX International members and other interested parties.
+Participation in the UI OSIWG is open to UNIX International members and other interested parties.
 For further information contact UNIX International at the addresses above.
 
 @noindent
@@ -276,8 +293,8 @@ available from UNIX System Laboratories or UNIX International members.
 @subsubheading Trademarks:
 
 @noindent
-UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in the United
-States and other countries.
+UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in
+the United States and other countries.
 X/Open(TM) is a trademark of the X/Open Company Ltd. in the UK and other
 countries.
 OpenSS7(TM) is a trademark of OpenSS7 Corporation in the United States and other
@@ -297,6 +314,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 All Rights Reserved.
@@ -304,6 +322,9 @@ All Rights Reserved.
 @noindent
 Unauthorized distribution or duplication is prohibited.
 
+@sp 1
+
+@ignore
 @noindent
 This software and related documentation is protected by copyright and distributed under licenses
 restricting its use, copying, distribution and decompilation.  No part of this software or related
@@ -316,12 +337,45 @@ this information and keep it confidential, and will not disclose the information
 document without the written permission of its owner.
 
 @noindent
-@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+Monavacon Limited and OpenSS7 Corporation reserve the right to revise this software and
 documentation for any reason, including but not limited to, conformity with standards promulgated by
 various agencies, utilization of advances in the state of the technical arts, or the reflection of
 changes in the design of any techniques, or procedures embodied, described, or referred to herein.
-@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
-listed herein.
+Monavacon Limited and OpenSS7 Corporation are under no obligation to provide any feature listed
+herein.
+@end ignore
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of Monavacon Limited and OpenSS7
+Corporation not be used in advertising or publicity pertaining to distribution of this documentation
+or its contents without specific, written prior permission.  Monavacon Limited and OpenSS7
+Corporation make no representation about the suitability of this documentation for any purpose.  It
+is provided ``as is'' without express or implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{Monavacon Limited and OpenSS7 Corporation disclaim all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the document are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall Monavacon Limited or OpenSS7 Corporation be liable
+for any direct, indirect, special or consequential damages or any damages whatsoever resulting from
+loss of use, data or profits, whether in an action of contract, negligence or other tortious action,
+arising out of or in connection with any use of this document or the performance or implementation
+of the contents thereof.}
+
+@sp 1
+
+@noindent
+Monavacon Limited and OpenSS7 Corporation reserve the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+Monavacon Limited and OpenSS7 Corporation is under no obligation to provide any feature listed
+herein.
 
 @vskip 0pt
 @end titlepage

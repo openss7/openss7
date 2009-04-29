@@ -1,12 +1,13 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.31 2008-11-26 12:01:24 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.32 2009-04-29 18:05:09 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
-% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -54,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-11-26 12:01:24 $ by $Author: brian $
+% Last Modified $Date: 2009-04-29 18:05:09 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,8 +83,9 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
 
@@ -128,6 +130,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
+Copyright @copyright{} 2008-2009  Monavacon Limited <@uref{http://www.monavacon.com/}> @*
 Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
@@ -397,13 +400,16 @@ updates.  To ensure that you are working with a current version, contact the
 Project} website for a current version.
 
 A current version of this manual is normally distributed with the @cite{@value{PACKAGE_TITLE}}
-package.
+package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
 
 @unnumberedsubsec Version Control
 
 @smallexample
 @verbatim
 $Log: LiS.texi,v $
+Revision 1.1.6.32  2009-04-29 18:05:09  brian
+- updated documentation for release
+
 Revision 1.1.6.31  2008-11-26 12:01:24  brian
 - updated to FDL 1.3
 
@@ -578,21 +584,23 @@ VERSION}.
 @cindex manual disclaimer
 
 @noindent
-@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
-implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
-that the contents of the manual are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
-no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
-consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
-in an action of contract, negligence or other tortious action, arising out of or in connection with
-any use of this manual or the performance or implementation of the contents thereof.
+@cite{Monavacon Limited} and @cite{OpenSS7 Corporation} disclaim all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{Monavacon Limited} or @cite{OpenSS7
+Corporation} be liable for any direct, indirect, special or consequential damages or any damages
+whatsoever resulting from loss of use, data or profits, whether in an action of contract, negligence
+or other tortious action, arising out of or in connection with any use of this manual or the
+performance or implementation of the contents thereof.
 
 @noindent
-@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
-reason, including but not limited to, conformity with standards promulgated by various agencies,
-utilization of advances in the state of the technical arts, or the reflection of changes in the
-design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
-Corporation} is under no obligation to provide any feature listed herein.
+@cite{Monavacon Limited} and @cite{OpenSS7 Corporation} reserve the right to revise this software
+and documentation for any reason, including but not limited to, conformity with standards
+promulgated by various agencies, utilization of advances in the state of the technical arts, or the
+reflection of changes in the design of any techniques, or procedures embodied, described, or
+referred to herein.  @cite{Monavacon Limited} and @cite{OpenSS7 Corporation} are under no obligation
+to provide any feature listed herein.
 
 @unnumberedsubsec U.S. Government Restricted Rights
 
@@ -626,6 +634,7 @@ Funding for completion of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package was
 provided in part by:
 
 @multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.monavacon.com/, Monavacon Limited}
 @item @tab @bullet{} @uref{http://www.openss7.org/,, OpenSS7 Corporation}
 @end multitable
 

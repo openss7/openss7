@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.47 2009-04-21 07:48:38 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.48 2009-04-29 18:05:32 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-04-21 07:48:38 $ by $Author: brian $
+% Last Modified $Date: 2009-04-29 18:05:32 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -417,13 +417,16 @@ updates.  To ensure that you are working with a current version, contact the
 Project} website for a current version.
 
 A current version of this manual is normally distributed with the @cite{@value{PACKAGE_TITLE}}
-package.
+package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
 
 @unnumberedsubsec Version Control
 
 @smallexample
 @verbatim
 $Log: STREAMS.texi,v $
+Revision 0.9.2.48  2009-04-29 18:05:32  brian
+- updated documentation for release
+
 Revision 0.9.2.47  2009-04-21 07:48:38  brian
 - updates for release
 
@@ -578,21 +581,23 @@ VERSION}.
 @cindex manual disclaimer
 
 @noindent
-@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
-implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
-that the contents of the manual are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
-no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
-consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
-in an action of contract, negligence or other tortious action, arising out of or in connection with
-any use of this manual or the performance or implementation of the contents thereof.
+@cite{Monavacon Limited} and @cite{OpenSS7 Corporation} disclaim all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{Monavacon Limited} or @cite{OpenSS7
+Corporation} be liable for any direct, indirect, special or consequential damages or any damages
+whatsoever resulting from loss of use, data or profits, whether in an action of contract, negligence
+or other tortious action, arising out of or in connection with any use of this manual or the
+performance or implementation of the contents thereof.
 
 @noindent
-@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
-reason, including but not limited to, conformity with standards promulgated by various agencies,
-utilization of advances in the state of the technical arts, or the reflection of changes in the
-design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
-Corporation} is under no obligation to provide any feature listed herein.
+@cite{Monavacon Limited} and @cite{OpenSS7 Corporation} reserve the right to revise this software
+and documentation for any reason, including but not limited to, conformity with standards
+promulgated by various agencies, utilization of advances in the state of the technical arts, or the
+reflection of changes in the design of any techniques, or procedures embodied, described, or
+referred to herein.  @cite{Monavacon Limited} and @cite{OpenSS7 Corporation} are under no obligation
+to provide any feature listed herein.
 
 @unnumberedsubsec U.S. Government Restricted Rights
 
@@ -612,6 +617,16 @@ the FAR (or any successor regulations).
 @node Acknowledgements
 @unnumberedsec Acknowledgements
 @cindex credits
+
+@url{http://www.openss7.org/,, The OpenSS7 Project} was funded in part by:
+
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.monavacon.com/, Monavacon Limited}
+@item @tab @bullet{} @uref{http://www.openss7.com/, OpenSS7 Corporation}
+@end multitable
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/,, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
 
 @include texi/funding.texi
 

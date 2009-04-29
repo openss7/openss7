@@ -1,12 +1,13 @@
 % -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi.texi,v 0.9.2.24 2008-09-20 11:04:45 brian Exp $
+% @(#) $Id: tpi.texi,v 0.9.2.26 2009-04-29 18:05:44 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 %
 % All Rights Reserved.
 %
@@ -54,11 +55,11 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-09-20 11:04:45 $ by $Author: brian $
+% Last Modified $Date: 2009-04-29 18:05:44 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c %**start of header
 @setfilename tpi.info
 @include texi/args.texi
@@ -86,39 +87,36 @@ published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 This specification was originally published by UNIX International OSI Special
 Interest Group in Revision: 1.5 (1992/12/10).
 
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1992       UNIX International, Inc.
 
 All Rights Reserved.
 
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission is granted to make and distribute verbatim copies of this manual provided the copyright
+notice and this permission notice are preserved on all copies.
 
 @ignore
-Permission is granted to process this file through Tex and print the results,
-provided the printed document carries copying permission notice identical to
-this one except for the removal of this paragraph (this paragraph not being
-relevant to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-Permission to use, copy, modify, and distribute this documentation for any
-purpose and without fee is hereby granted, provided that the above copyright
-notice appears in all copies and that both that copyright notice and this
-permission notice appear in supporting documentation, and that the name UNIX
-International not be used in advertising or publicity pertaining to distribution
-of the software without specific, written prior permission. UNIX International
-makes no representations about the suitability of this documentation for any
-purpose. It is provided ``as is'' without express or implied warranty.
+Permission to use, copy, modify, and distribute this documentation for any purpose and without fee
+is hereby granted, provided that the above copyright notice appears in all copies and that both that
+copyright notice and this permission notice appear in supporting documentation, and that the name
+UNIX International not be used in advertising or publicity pertaining to distribution of the
+software without specific, written prior permission. UNIX International makes no representations
+about the suitability of this documentation for any purpose. It is provided ``as is'' without
+express or implied warranty.
 
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided the entire resulting derived
-work is distributed under the terms of a permission notice identical to this
-one.
+Permission is granted to copy and distribute modified versions of this manual under the conditions
+for verbatim copying, provided the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
 
-Permission is granted to copy and distribute translations of this manual into
-another language, under the above conditions for modified versions.
+Permission is granted to copy and distribute translations of this manual into another language,
+under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
@@ -139,12 +137,27 @@ another language, under the above conditions for modified versions.
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2001-2008  OpenSS7 Corporation
+@subtitle Copyright @copyright{} 1992 UNIX International, Inc.
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7. It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+transport interface to these components as well as providing a basis for transport control for other
+transport protocols.
+@end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
+
 @subsubheading Published by:
 
 @center UNIX International
@@ -230,58 +243,53 @@ Fax: (65) 776-0421
 @end ignore
 
 @noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1992       UNIX International, Inc. @*
 
 @noindent
-All Rights Reserved. @*
+All Rights Reserved.
 
 @noindent
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission is granted to make and distribute verbatim copies of this manual provided the copyright
+notice and this permission notice are preserved on all copies.
 
 @noindent
-Permission to use, copy, modify, and distribute this documentation for any
-purpose and without fee is hereby granted, provided that the above copyright
-notice appears in all copies and that both that copyright notice and this
-permission notice appear in supporting documentation, and that the name UNIX
-International not be used in advertising or publicity pertaining to distribution
-of the software without specific, written prior permission. UNIX International
-makes no representations about the suitability of this documentation for any
-purpose. It is provided ``as is'' without express or implied warranty.
+Permission to use, copy, modify, and distribute this documentation for any purpose and without fee
+is hereby granted, provided that the above copyright notice appears in all copies and that both that
+copyright notice and this permission notice appear in supporting documentation, and that the name
+UNIX International not be used in advertising or publicity pertaining to distribution of the
+software without specific, written prior permission. UNIX International makes no representations
+about the suitability of this documentation for any purpose. It is provided ``as is'' without
+express or implied warranty.
 
 @noindent
-@b{UNIX INTERNATIONAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-DOCUMENTATION, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS,
-IN NO EVENT SHALL UNIX INTERNATIONAL BE LIABLE FOR ANY SPECIAL, INDIRECT OR
-CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA
-OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
-ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
-DOCUMENTATION.}
+@b{UNIX INTERNATIONAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION, INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL UNIX INTERNATIONAL BE LIABLE
+FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS DOCUMENTATION.}
 
 @subsubheading Notice:
 
 @noindent
-This document is based on the UNIX System Laboratories Transport Provider
-Interface (TPI) specification which was used with permission by the UNIX
-International OSI Special Interest Group (UI OSISIG).  Participation in the UI
-OSISIG is open to UNIX International members and other interested parties.
-For further information contact UNIX International at the addresses above.
+This document is based on the UNIX System Laboratories Transport Provider Interface (TPI)
+specification which was used with permission by the UNIX International OSI Special Interest Group
+(UI OSISIG).  Participation in the UI OSISIG is open to UNIX International members and other
+interested parties.  For further information contact UNIX International at the addresses above.
 
 @noindent
-UNIX International is making this documentation available as a reference point
-for the industry. While UNIX International believes that these interfaces are
-well defined in this release of the document, minor changes may be made prior to
-products conforming to the interfaces being made available from UNIX System
-Laboratories or UNIX International members.
+UNIX International is making this documentation available as a reference point for the industry.
+While UNIX International believes that these interfaces are well defined in this release of the
+document, minor changes may be made prior to products conforming to the interfaces being made
+available from UNIX System Laboratories or UNIX International members.
 
 @subsubheading Trademarks:
 
 @noindent
-UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in the United
-States and other countries.
+UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in
+the United States and other countries.
 X/Open(TM) is a trademark of the X/Open Company Ltd. in the UK and other
 countries.
 OpenSS7(TM) is a trademark of OpenSS7 Corporation in the United States and other
@@ -301,6 +309,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 All Rights Reserved.
@@ -308,27 +317,60 @@ All Rights Reserved.
 @noindent
 Unauthorized distribution or duplication is prohibited.
 
+@sp 1
+
+@ignore
 @noindent
-This software and related documentation is protected by copyright and
-distributed under licenses restricting its use, copying, distribution and
-de-compilation.  No part of this software or related documentation may be
-reproduced in any form by any means without the prior written authorization of
+This software and related documentation is protected by copyright and distributed under licenses
+restricting its use, copying, distribution and decompilation.  No part of this software or related
+documentation may be reproduced in any form by any means without the prior written authorization of
 the copyright holder, and licensors, if any.
 
 @noindent
-The recipient of this document, by its retention and use, warrants that the
-recipient will protect this information and keep it confidential, and will not
-disclose the information contained in this document without the written
-permission of its owner.
+The recipient of this document, by its retention and use, warrants that the recipient will protect
+this information and keep it confidential, and will not disclose the information contained in this
+document without the written permission of its owner.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} reserves the right to revise
-this software and documentation for any reason, including but not limited to,
-conformity with standards promulgated by various agencies, utilization of
-advances in the state of the technical arts, or the reflection of changes in the
-design of any techniques, or procedures embodied, described, or referred to
-herein.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no
-obligation to provide any feature listed herein.
+Monavacon Limited and OpenSS7 Corporation reserve the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+Monavacon Limited and OpenSS7 Corporation are under no obligation to provide any feature listed
+herein.
+@end ignore
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of Monavacon Limited and OpenSS7
+Corporation not be used in advertising or publicity pertaining to distribution of this documentation
+or its contents without specific, written prior permission.  Monavacon Limited and OpenSS7
+Corporation make no representation about the suitability of this documentation for any purpose.  It
+is provided ``as is'' without express or implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{Monavacon Limited and OpenSS7 Corporation disclaim all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the document are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall Monavacon Limited or OpenSS7 Corporation be liable
+for any direct, indirect, special or consequential damages or any damages whatsoever resulting from
+loss of use, data or profits, whether in an action of contract, negligence or other tortious action,
+arising out of or in connection with any use of this document or the performance or implementation
+of the contents thereof.}
+
+@sp 1
+
+@noindent
+Monavacon Limited and OpenSS7 Corporation reserve the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+Monavacon Limited and OpenSS7 Corporation is under no obligation to provide any feature listed
+herein.
 
 @vskip 0pt
 @end titlepage
@@ -355,6 +397,8 @@ obligation to provide any feature listed herein.
 @defcodeindex ct
 @c Define an index of manual pages.
 @defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
 
 @c frags out automake
 @c @ifnottex
@@ -367,6 +411,7 @@ obligation to provide any feature listed herein.
 @syncodeindex tp cp
 @syncodeindex vr cp
 @syncodeindex ct cp
+@syncodeindex mo cp
 @c @end ifnottex
 
 @include texi/macros.texi
@@ -374,28 +419,32 @@ obligation to provide any feature listed herein.
 
 @iftex
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}@prindex \name\
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}@pvindex \name\
 @end macro
 
-@macro perr {name}
-@code{\name\}@peindex \name\
+@macro perr{name}
+@code{[\name\]}@peindex \name\
 @end macro
 
-@macro psta {name}
+@macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
-@macro parm {name}
-@code{\name\}@vrindex \name\
+@macro parm{name}
+@var{\name\}@vrindex \name\
 @end macro
 
-@macro pioc {name}
+@macro pioc{name}
 @code{\name\}@ctindex \name\
+@end macro
+
+@macro mobj{name}
+@code{\name\}@moindex \name\
 @end macro
 
 @end iftex
@@ -413,7 +462,7 @@ obligation to provide any feature listed herein.
 @end macro
 
 @macro perr{name}
-@code{\name\}
+@code{[\name\]}
 @end macro
 
 @macro psta{name}
@@ -421,10 +470,14 @@ obligation to provide any feature listed herein.
 @end macro
 
 @macro parm{name}
-@code{\name\}
+@var{\name\}
 @end macro
 
 @macro pioc{name}
+@code{\name\}
+@end macro
+
+@macro mobj{name}
 @code{\name\}
 @end macro
 
@@ -2400,8 +2453,8 @@ stream read queue.} write and read queues.
 @ifnotplaintext
 @c skip indexes for plain text (regex search works better)
 @c @iftex
-@c @node Index
-@c @unnumbered Index
+@c @node Indices
+@c @unnumbered Indices
 @c @end iftex
 
 @c @ifnottex
@@ -2462,6 +2515,11 @@ stream read queue.} write and read queues.
 @c @node Input-Output Control Index
 @c @section Input-Output Control Index
 @c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
 @c 
 @c @page
 @c @node Manual Page Index
