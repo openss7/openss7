@@ -82,7 +82,7 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 
 /* DEFINES */
-#define GPIO_ID         0       /* Generic Port Driver ID */
+#define GPIO_ID         302       /* Generic Port Driver ID */
 #define DR_MINOR        255     /* Driver Minor device number */
 #define LO_WATER        1         	/* Packet Size Minimum */
 #define HI_WATER        64 * 1024	/* Packet Size Maximum */ 

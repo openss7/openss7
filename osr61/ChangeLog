@@ -1,3 +1,9 @@
+2009-04-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: bug fixes
+	* src/drivers/gpio/source/gpiodrv.c: bug fixes
+	* src/drivers/sctmr/source/scttimer.c: bug fixes
+
 2009-03-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/mercd/source/msdrcv.c: fixes
