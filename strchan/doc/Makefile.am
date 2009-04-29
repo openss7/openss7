@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-02 06:51:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2009-04-29 11:35:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-02 06:51:28 $ by $Author: brian $
+# Last Modified $Date: 2009-04-29 11:35:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,7 +54,7 @@ include ../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = . man manual specs projects
+SUBDIRS = . man manual papers specs projects
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
@@ -72,6 +72,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2009-04-29 11:35:42  brian
+# - added whitepaper, driver updates
+#
 # Revision 0.9.2.5  2008-12-02 06:51:28  brian
 # - document CHI
 #

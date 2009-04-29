@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-04-21 07:48:36 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-04-29 11:35:42 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-04-21 07:48:36 $ by $Author: brian $
+ Last Modified $Date: 2009-04-29 11:35:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.19  2009-04-29 11:35:42  brian
+ - added whitepaper, driver updates
+
  Revision 0.9.2.18  2009-04-21 07:48:36  brian
  - updates for release
 
@@ -69,10 +72,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-04-21 07:48:36 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-04-29 11:35:42 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-04-21 07:48:36 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-04-29 11:35:42 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -85,11 +88,11 @@ static char const ident[] =
  *
  *  Because the service order of cards is independent, there is one MX channel per card consisting
  *  of 8 samples of 128 time slots or 1024 bytes per 1ms interrupt.  Also, elastic buffering is
- *  performed on a card by card basis.  Each kernel memory page consists of 4096 bytes or 4
- *  interrupt frames and represents 4ms per card.  Elastic buffering to 32ms to accomodate a 10ms
- *  tick clock is provided.  The elastic buffer consists of 8 pages per card.  In an attempt to keep
- *  signalling an voice path latency to a minimum, each interrupt time frame is delivered to the MX
- *  channel.
+ *  performed on a card by card basis and independently in the receive and transmit directions.
+ *  Each kernel memory page consists of 4096 bytes or 4 interrupt frames and represents 4ms per
+ *  card.  Elastic buffering to 32ms to accomodate a 10ms tick clock is provided.  The elastic
+ *  buffer consists of 8 pages per card.  In an attempt to keep signalling and voice path latency to
+ *  a minimum, each interrupt time frame is delivered to the MX channel.
  *
  *  The previous X400P driver used to spawn a tasklet to process receive blocks and generate
  *  transmit blocks.  Tasklets run at bottom half and are run immediately upon return from the
@@ -268,7 +271,7 @@ static char const ident[] =
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2009-04-21 07:48:36 $"
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-04-29 11:35:42 $"
 #define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2009 Monavacon Limited.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2218,8 +2221,8 @@ vp_span_config(struct vp *vp, int span, bool timeouts)
 		case SDL_GCRC_CRC4:
 			ccr1 |= 0x10;	/* CRC1.4: 1 = Tx CRC4 enabled */
 			ccr1 |= 0x01;	/* CRC1.0: 1 = Rx CRC4 enalled */
-#if 0
 			tcr2 |= 0x02;	/* TCR2.1: 1 = E-bits automatically set */
+#if 0
 			if (sp->config.ifframing == SDL_FRAMING_CAS)
 				tcr1 |= 0x02;	/* TCR1.1: 1 = CAS and CRC4 multiframe mode */
 #endif
@@ -2236,6 +2239,15 @@ vp_span_config(struct vp *vp, int span, bool timeouts)
 		/* TCR1.1: X = frame mode/CAS and CRC4 multiframe mode */
 		/* TCR1.0: 1 = TSYNC is an output */
 
+		xlb[0x13] = tcr2;	/* TCR2 */
+		/* TCR2.7: 0 = do not source Sa8 bit from TLINK pin */
+		/* TCR2.6: 0 = do not source Sa7 bit from TLINK pin */
+		/* TCR2.5: 0 = do not source Sa6 bit from TLINK pin */
+		/* TCR2.4: 0 = do not source Sa5 bit from TLINK pin */
+		/* TCR2.3: 0 = do not source Sa4 bit from TLINK pin */
+		/* TCR2.2: 0 = TPOSO/TNEGO full clock period */
+		/* TCR2.1: X = E-bits not automatically/automatically set */
+		/* TCR2.0: 0 = RLOS/LOTC pin is RLOS */
 
 		xlb[0x14] = ccr1;	/* CCR1 */
 		/* CCR1.7: 0 = framer loopback disabled */
@@ -2297,8 +2309,6 @@ vp_span_config(struct vp *vp, int span, bool timeouts)
 		/* LICR.1: 0 = JA enabled */
 		/* LICR.0: X = transmitters on/off */
 
-		xlb[0x1b] = 0x8a;	/* CRC3: LIRST & TSCLKM */
-
 		/* Note: The TAF register must be programmed with the 7-bit FAS word (0x1b).  The
 		   DS21354/DS21554 do not automatically set these bits. */
 		xlb[0x20] = 0x1b;	/* TAFR */
@@ -2326,26 +2336,75 @@ vp_span_config(struct vp *vp, int span, bool timeouts)
 		/* set up transmit signalling */
 		xlb[0x40] = 0x0b;	/* TS1: no alarm, spare bits one */
 
+		for (offset = 0x41; offset <= 0x4f; offset++)
+			/* TS2 thru TS16 */
+			/* Set b and d bits transmit signalling each channel. (ITU-T specification
+			   recommend that ABCD signalling not be set to all zero because they wille 
+			   emulate a CAS multiframe alignment word. */
+			xlb[offset] = 0x55;
+		/* Note: If CCR3.6 == 1, then a zero in the TCBRs implies that signaling data is to 
+		   be sourced from TSER (or TSIG if CCR3.2 == 1), and a one implies that signaling
+		   data for that channel is to be sourced from the Transmit Signaling (TS)
+		   registers.  In this mode, the voice-channel number scheme (CH1 to CH30) is used. 
+		 */
+		for (offset = 0x22; offset <= 0x25; offset++)	/* TCB1 thru TCB4 */
+			xlb[offset] = 0xff;
+
+#if 1
 		if (timeouts) {
-			for (offset = 0x41; offset <= 0x4f; offset++)
-				/* TS2 thru TS16 */
-				/* Set b and d bits transmit signalling each channel. (ITU-T specification
-				   recommend that ABCD signalling not be set to all zero because they wille 
-				   emulate a CAS multiframe alignment word. */
-				xlb[offset] = 0x55;
-			/* Note: If CCR3.6 == 1, then a zero in the TCBRs implies that signaling data is to 
-			   be sourced from TSER (or TSIG if CCR3.2 == 1), and a one implies that signaling
-			   data for that channel is to be sourced from the Transmit Signaling (TS)
-			   registers.  In this mode, the voice-channel number scheme (CH1 to CH30) is used. 
-			 */
-			for (offset = 0x22; offset <= 0x25; offset++)	/* TCB1 thru TCB4 */
-				xlb[offset] = 0xff;
-			timeout = jiffies + 100 * HZ / 1000;
-			while (jiffies < timeout) ;
+			unsigned long timeout;
+
+			/* line interface reset */
+			switch (cd->device) {
+			case 0:	/* No IDR on DS2153. */
+				/* DS2153 uses CCR3.3 for LIRST. */
+				xlb[0x1b] = 0x8a;	/* CCR3 line interface reset (LIRST) */
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				xlb[0xaa] = 0x80;	/* CCR5 line interface reset (LIRST) */
+				break;
+			}
+			timeout = (volatile unsigned long) jiffies + 100 * HZ / 1000;
+			while ((volatile unsigned long) jiffies < timeout) ;
+			switch (cd->device) {
+			case 0:	/* No IDR on DS2153. */
+				/* DS2153 uses CCR3.3 for LIRST. */
+				xlb[0x1b] = 0x82;	/* CCR3 */
+				break;
+			case XP_DEV_DS2154:
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				xlb[0xaa] = 0x00;	/* CCR5 */
+				break;
 		}
 
-		xlb[0x1b] = 0x9a;	/* CRC3: set ESR as well */
-		xlb[0x1b] = 0x82;	/* CRC3: TSCLKM only */
+			/* reset and realign elastic stores */
+			switch (cd->device) {
+			case XP_DEV_DS2154:
+				/* Note: no CCR6 on DS2154. */
+				xlb[0x1b] = 0x92;	/* CCR3: reset elastic stores */
+				xlb[0x1b] = 0x82;	/* CCR3 */
+				break;
+			case XP_DEV_DS21354:
+			case XP_DEV_DS21554:
+				xlb[0x1d] = ccr6 | 0x03;	/* CRC6: reset elastic stores */
+				xlb[0x1d] = ccr6;	/* CRC6 */
+				/* CCR6.7: 0 = TTIP and TRING normal */
+				/* CCR6.6: 0 = normal data */
+				/* CCR6.5: 0 = E1 signal */
+				/* CCR6.4: 0 = unassigned */
+				/* CCR6.3: 0 = unassigned */
+				/* CCR6.2: X = Tx clock determined by CRC2.2 (LOTCMC)/Tx clock is
+				   RCLK */
+				/* CCR6.1: X = no RES reset */
+				/* CCR6.0: X = no TES reset */
+				xlb[0xaa] = 0x60;	/* CCR5 realign elastic stores */
+				xlb[0xaa] = 0x00;	/* CCR5 */
+				break;
+			}
+		}
 		break;
 	}
 	case V401PE:

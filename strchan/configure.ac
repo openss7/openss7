@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-12-02 08:24:42 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2009-04-29 11:35:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-02 08:24:42 $ by $Author: brian $
+# Last Modified $Date: 2009-04-29 11:35:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([strchan],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.18 $) $Date: 2008-12-02 08:24:42 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.19 $) $Date: 2009-04-29 11:35:41 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -189,6 +189,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 doc/manual/texi/args.texi
+		 doc/papers/Makefile
 		 doc/specs/Makefile
 		 doc/specs/chi/Makefile
 		 doc/specs/mxi/Makefile
@@ -204,6 +205,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.19  2009-04-29 11:35:41  brian
+# - added whitepaper, driver updates
+#
 # Revision 0.9.2.18  2008-12-02 08:24:42  brian
 # - document MXI
 #
