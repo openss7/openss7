@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.4 2007/07/22 01:09:45 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.5 2009-04-29 12:22:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,31 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/07/22 01:09:45 $ by $Author: brian $
+@c Last Modified $Date: 2009-04-29 12:22:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 003.  2009-04-29T12:14:54+0000
+
+Alterations in the registration function corrected in streams-0.9.2.5 cause the failure loading the
+gpio driver module.  GPIO_ID redefined from zero to 302 to correct this problem until release of
+registration function changes.
+This bug existed in the original Intel/Dialogic code.
+Thanks to D. Milanovic for reporting this problem.
+
+@emph{*fixed*} in @command{osr61-0.9.4}.
+
+The sctmr driver module was failing to load because it dependend on GPLv2 symbols from other modules
+but did not declare a license of GPLv2.  Added missing MODULE_AUTHOR, MODULE_DESCRIPTION,
+MODULE_LICENSE, MODULE_ALIAS and MODULE_VERSION macros for this driver.
+This bug existed in the original Intel/Dialogic code.
+Thanks to D. Milanovic for reporting this problem.
+
+@item 002.  2009-04-29T12:14:54+0000
+
+@emph{*fixed*} in @command{osr61-0.9.4}.
+
 @item 001.  2007-07-21T17:15:02-0600
 
 It was discovered that recent kernel on RHAS4 are defining irq_handler_t but

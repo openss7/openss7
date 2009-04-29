@@ -53,6 +53,21 @@
 #include "timerlibmod.h"
 #include "drvdebug.h"
 
+MODULE_AUTHOR("Intel");
+MODULE_DESCRIPTION("Dialogic Timer Module");
+MODULE_LICENSE("GPL v2");
+#ifdef LFS
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("sctmr");
+MODULE_ALIAS("streams-sctmr");
+MODULE_ALIAS("streams-sctmrDriver");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
+#endif
+
 /* FOR DEBUG PURPOSES ONLY */
 int	time_resolution = 1;
 
