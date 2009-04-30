@@ -2,12 +2,13 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi.texi,v 0.9.2.25 2009-04-29 18:05:22 brian Exp $
+% @(#) $Id: tpi.texi,v 0.9.2.28 2009-04-30 06:07:40 brian Exp $
 %
 % =========================================================================
 %
 % Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -18,7 +19,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -55,7 +56,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-04-29 18:05:22 $ by $Author: brian $
+% Last Modified $Date: 2009-04-30 06:07:40 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -123,6 +124,11 @@ under the above conditions for modified versions.
 @set MANUAL_TITLE Transport Provider Interface
 @set MANUAL_TYPE Specification
 
+@set PART Transport
+@set LONG Transport Layer
+@set SHORT TP
+@set INTERFACE TPI
+
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
@@ -148,8 +154,8 @@ under the above conditions for modified versions.
 This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
 the @value{MANUAL_TITLE} for OpenSS7. It contains recommendations on software architecture as well
 as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
-transport interface to these components as well as providing a basis for transport control for other
-transport protocols.
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -369,7 +375,7 @@ Monavacon Limited and OpenSS7 Corporation reserve the right to revise this softw
 documentation for any reason, including but not limited to, conformity with standards promulgated by
 various agencies, utilization of advances in the state of the technical arts, or the reflection of
 changes in the design of any techniques, or procedures embodied, described, or referred to herein.
-Monavacon Limited and OpenSS7 Corporation is under no obligation to provide any feature listed
+Monavacon Limited and OpenSS7 Corporation are under no obligation to provide any feature listed
 herein.
 
 @vskip 0pt
@@ -2474,6 +2480,7 @@ stream read queue.} write and read queues.
 @c * Primitive Values Index::
 @c * Primitive Error Values Index::
 @c * Input-Output Control Index::
+@c * MIB Object Index::
 @c * Manual Page Index::
 @c @end menu
 @c 

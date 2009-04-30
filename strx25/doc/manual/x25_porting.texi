@@ -1,11 +1,14 @@
 % -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: x25_porting.texi,v 0.9.2.4 2008-11-26 12:01:49 brian Exp $
+% @(#) $Id: x25_porting.texi,v 0.9.2.5 2009-04-30 06:07:43 brian Exp $
 %
 % =========================================================================
 %
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -53,31 +56,18 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-11-26 12:01:49 $ by $Author: brian $
+% Last Modified $Date: 2009-04-30 06:07:43 $ by $Author: brian $
 %
 % =========================================================================
-%
-% $Log: x25_porting.texi,v $
-% Revision 0.9.2.4  2008-11-26 12:01:49  brian
-% - updated to FDL 1.3
-%
-% Revision 0.9.2.3  2008-09-20 11:04:41  brian
-% - added package patchlevel
-%
-% Revision 0.9.2.2  2008-08-03 06:03:41  brian
-% - protected agains texinfo commands in log entries
-%
-% Revision 0.9.2.1  2008-06-13 06:43:55  brian
-% - added files
-%
-% =========================================================================
-
-\input texinfo
+\input texinfo @c -*- texinfo -*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c %**start of header
 @setfilename x25_porting.info
 @include texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE X.25 Porting Guide
 @settitle @value{MANUAL_TITLE}
+@c %**end of header
 
 @dircategory STREAMS
 @direntry
@@ -92,42 +82,40 @@
 @ifinfo
 This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
 
-This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
-the @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
-@value{PACKAGE_VERSION} Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
+
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
 
 All Rights Reserved.
 
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission is granted to make and distribute verbatim copies of this manual provided the copyright
+notice and this permission notice are preserved on all copies.
 
 @ignore
-Permission is granted to process this file through Tex and print the results,
-provided the printed manual carries copying permission notice identical to this
-one except for the removal of this paragraph (this paragraph not being relevant
-to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+manual carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided the entire resulting derived
-work is distributed under the terms of a permission notice identical to this
-one.
+Permission is granted to copy and distribute modified versions of this manual under the conditions
+for verbatim copying, provided the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
 
-Permission is granted to copy and distribute translations of this manual into
-another language, under the above conditions for modified versions.
+Permission is granted to copy and distribute translations of this manual into another language,
+	   under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE X.25 Porting Guide
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -135,15 +123,20 @@ another language, under the above conditions for modified versions.
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
-@subtitle Package @value{PACKAGE}-@value{VERSION}
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2001-2008  OpenSS7 Corporation
+@subtitle All Rights Reserved.
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
-Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 All Rights Reserved. @*
 
 @noindent
@@ -160,137 +153,115 @@ Project} and was funded in part by @uref{http://www.openss7.com/, OpenSS7
 Corporation}.
 
 @noindent
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission is granted to make and distribute verbatim copies of this manual provided the copyright
+notice and this permission notice are preserved on all copies.
 
 @noindent
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided that the entire resulting
-derived work is distributed under the terms of a permission notice identical to
-this one.
+Permission is granted to copy and distribute modified versions of this manual under the conditions
+for verbatim copying, provided that the entire resulting derived work is distributed under the terms
+of a permission notice identical to this one.
 
 @noindent
-Permission is granted to copy and distribute translations of this manual into
-another language, under the same conditions as for modified versions.
+Permission is granted to copy and distribute translations of this manual into another language,
+under the same conditions as for modified versions.
 
 @vskip 0pt
 @end titlepage
 @page
 
-@c Define an index of authors.
-@c @defindex au
-
-@c Define an index of makefile targets
-@c @defcodeindex mk
-
-@c Define an index of configure output variables.
-@c @defcodeindex ov
-
-@c Define an index of configure variables.
-@c @defcodeindex cv
-
-@c Define an index of options.
-@c @defcodeindex op
-
-@c Define an index of targets.
-@c @defcodeindex tr
-
-@c Define an index of commands.
-@c @defcodeindex cm
-
-@c Put the macros and variables into their own index.
-@c @syncodeindex fn cp
-@c @syncodeindex ov vr
-@c @syncodeindex cv vr
-@c @syncodeindex fn vr
-
-@c Put everything else into one index (arbitrarily chosen to be the concept index).
-@c @syncodeindex op cp
-@c @syncodeindex tr cp
-@c @syncodeindex cm cp
-
-@c An index of manual pages
-@defcodeindex mp
-
-@c Define an index of primitives.
+@c Define an index of primitives
 @defcodeindex pr
-@c Define an index of primitive values.
+@c Define an index of primitive values
 @defcodeindex pv
-@c Define an index of protocol states.
-@defcodeindex st
-@c Define an index of protocol errors.
+@c Define an index of primitive error values
 @defcodeindex pe
-@c Define an index of input-output controls.
-@defcodeindex ci
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
 
-@synindex tp cp
-@synindex fn cp
-@syncodeindex vr cp
-@synindex pg cp
-
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
-@syncodeindex st cp
 @syncodeindex pe cp
-@syncodeindex ci cp
-
-@synindex mp cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
 
 @iftex
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}@prindex \name\
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}@pvindex \name\
 @end macro
 
-@macro perr {name}
-@code{\name\}@peindex \name\
+@macro perr{name}
+@code{[\name\]}@peindex \name\
 @end macro
 
-@macro psta {name}
+@macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
-@macro parm {name}
-@code{\name\}@vrindex \name\
+@macro parm{name}
+@var{\name\}@vrindex \name\
 @end macro
 
-@macro dlioc {name}
-@code{\name\}@ciindex \name\
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@macro mobj{name}
+@code{\name\}@moindex \name\
 @end macro
 
 @end iftex
 
 @ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}
 @end macro
 
-@macro perr {name}
+@macro perr{name}
+@code{[\name\]}
+@end macro
+
+@macro psta{name}
 @code{\name\}
 @end macro
 
-@macro psta {name}
+@macro parm{name}
+@var{\name\}
+@end macro
+
+@macro pioc{name}
 @code{\name\}
 @end macro
 
-@macro parm {name}
-@code{\name\}
-@end macro
-
-@macro dlioc {name}
+@macro mobj{name}
 @code{\name\}
 @end macro
 
@@ -434,6 +405,9 @@ A current version of this manual is normally distributed with the
 @smallexample
 @verbatim
 $Log: x25_porting.texi,v $
+Revision 0.9.2.5  2009-04-30 06:07:43  brian
+- more documentation updates for release
+
 Revision 0.9.2.4  2008-11-26 12:01:49  brian
 - updated to FDL 1.3
 
@@ -1265,35 +1239,35 @@ developed by Spider Systems, Ltd., and is widely available on many platforms.
 @cite{IRIX} documents the following input-output controls:
 
 @itemize
-@item @dlioc{N_getnliversion} -- gets the NLI interface version.
+@item @pioc{N_getnliversion} -- gets the NLI interface version.
 @end itemize
 
 @itemize
-@item @dlioc{N_snident} --
-@item @dlioc{N_snmode} --
-@item @dlioc{N_snconfig} --
-@item @dlioc{N_snread} --
-@item @dlioc{N_getstats} --
-@item @dlioc{N_zerostats} --
-@item @dlioc{N_putpvcmap} --
-@item @dlioc{N_getpvcmap} --
-@item @dlioc{N_getVCstatus} --
-@item @dlioc{N_getnliversion} --
-@item @dlioc{N_traceon} --
-@item @dlioc{N_traceoff} --
-@item @dlioc{N_nuimsg} --
-@item @dlioc{N_nuiput} --
-@item @dlioc{N_nuidel} --
-@item @dlioc{N_nuiget} --
-@item @dlioc{N_nuimget} --
-@item @dlioc{N_nuireset} --
-@item @dlioc{N_zeroVCstats} --
-@item @dlioc{N_putx32map} --
-@item @dlioc{N_getx32map} --
-@item @dlioc{N_getSNIDstats} --
-@item @dlioc{N_zeroSNIDstats} --
-@item @dlioc{N_setQOSDATPRI} --
-@item @dlioc{N_resetQOSDATPRI} --
+@item @pioc{N_snident} --
+@item @pioc{N_snmode} --
+@item @pioc{N_snconfig} --
+@item @pioc{N_snread} --
+@item @pioc{N_getstats} --
+@item @pioc{N_zerostats} --
+@item @pioc{N_putpvcmap} --
+@item @pioc{N_getpvcmap} --
+@item @pioc{N_getVCstatus} --
+@item @pioc{N_getnliversion} --
+@item @pioc{N_traceon} --
+@item @pioc{N_traceoff} --
+@item @pioc{N_nuimsg} --
+@item @pioc{N_nuiput} --
+@item @pioc{N_nuidel} --
+@item @pioc{N_nuiget} --
+@item @pioc{N_nuimget} --
+@item @pioc{N_nuireset} --
+@item @pioc{N_zeroVCstats} --
+@item @pioc{N_putx32map} --
+@item @pioc{N_getx32map} --
+@item @pioc{N_getSNIDstats} --
+@item @pioc{N_zeroSNIDstats} --
+@item @pioc{N_setQOSDATPRI} --
+@item @pioc{N_resetQOSDATPRI} --
 @end itemize
 
 @node IRIX NLI Drivers and Modules
@@ -2121,17 +2095,87 @@ The @file{libsx25.a} library provides some potentially useful functions.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
+
+@c @ifnottex
+@c @c concatenate indices for html and info
 @node Index
 @unnumbered Index
-@cindex index
 @printindex cp
+@c @end ifnottex
 
-@c ----------------------------------------------------------------------------
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * MIB Object Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents
 @page
 @contents
 @bye
-
-@c ============================================================================

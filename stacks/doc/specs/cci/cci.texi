@@ -2,12 +2,13 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: cci.texi,v 0.9.2.16 2009-04-29 18:05:15 brian Exp $
+% @(#) $Id: cci.texi,v 0.9.2.17 2009-04-30 06:07:33 brian Exp $
 %
 % =========================================================================
 %
 % Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -55,7 +56,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-04-29 18:05:15 $ by $Author: brian $
+% Last Modified $Date: 2009-04-30 06:07:33 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -88,7 +89,7 @@ published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
 Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
 
 All Rights Reserved.
@@ -128,6 +129,11 @@ herein.
 @include texi/args.texi
 @set MANUAL_TITLE Call Control Interface (CCI)
 @set MANUAL_TYPE Specification
+
+@set PART Call Control
+@set LONG Call Control
+@set SHORT CC
+@set INTERFACE CCI
 
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
@@ -429,7 +435,7 @@ herein.
 @end macro
 
 @macro perr{name}
-@var{[\name\]}@peindex \name\
+@code{[\name\]}@peindex \name\
 @end macro
 
 @macro psta{name}
@@ -463,7 +469,7 @@ herein.
 @end macro
 
 @macro perr{name}
-@var{[\name\]}
+@code{[\name\]}
 @end macro
 
 @macro psta{name}
@@ -590,13 +596,13 @@ It is the intent of this document that it act as the primary source of informati
 @section Audience
 
 The audience for this document is software developers, maintainers and users and integrators of the
-@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 and ISDN
-stack.
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 and ISDN stack.
 
 @section Disclaimer
 
 Although the author has attempted to ensure that the information in this document is complete and
-correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+correct, neither the Author, Monavacon Limited nor OpenSS7 Corporation will take any responsibility
+in it.
 
 @section Revision History
 
@@ -604,12 +610,20 @@ Take care that you are working with a current version of this documentation: you
 notified of updates.  To ensure that you are working with a current version, check the
 @uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
 
+A current version of this specification is normall distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @file{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/repos/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
 Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document
 is an @strong{UNCONTROLLED VERSION}.
+
+@subsection Version Control
 
 @smallexample
 @verbatim
 $Log: cci.texi,v $
+Revision 0.9.2.17  2009-04-30 06:07:33  brian
+- more documentation updates for release
+
 Revision 0.9.2.16  2009-04-29 18:05:15  brian
 - updated documentation for release
 

@@ -1,11 +1,14 @@
 % -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: dlpi_porting.texi,v 0.9.2.4 2008-11-26 12:01:52 brian Exp $
+% @(#) $Id: dlpi_porting.texi,v 0.9.2.5 2009-04-30 06:07:46 brian Exp $
 %
 % =========================================================================
 %
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -53,31 +56,18 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-11-26 12:01:52 $ by $Author: brian $
+% Last Modified $Date: 2009-04-30 06:07:46 $ by $Author: brian $
 %
 % =========================================================================
-%
-% $Log: dlpi_porting.texi,v $
-% Revision 0.9.2.4  2008-11-26 12:01:52  brian
-% - updated to FDL 1.3
-%
-% Revision 0.9.2.3  2008-09-20 11:04:43  brian
-% - added package patchlevel
-%
-% Revision 0.9.2.2  2008-08-03 06:03:41  brian
-% - protected agains texinfo commands in log entries
-%
-% Revision 0.9.2.1  2008-06-18 16:43:15  brian
-% - added new files for NLI and DLPI
-%
-% =========================================================================
-
-\input texinfo
+\input texinfo @c -*- texinfo -*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c %**start of header
 @setfilename dlpi_porting.info
 @include texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE DLPI Porting Guide
 @settitle @value{MANUAL_TITLE}
+@c %**end of header
 
 @dircategory STREAMS
 @direntry
@@ -92,42 +82,40 @@
 @ifinfo
 This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
 
-This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
-the @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
-@value{PACKAGE_VERSION} Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
+
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
 
 All Rights Reserved.
 
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission is granted to make and distribute verbatim copies of this manual provided the copyright
+notice and this permission notice are preserved on all copies.
 
 @ignore
-Permission is granted to process this file through Tex and print the results,
-provided the printed manual carries copying permission notice identical to this
-one except for the removal of this paragraph (this paragraph not being relevant
-to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+manual carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided the entire resulting derived
-work is distributed under the terms of a permission notice identical to this
-one.
+Permission is granted to copy and distribute modified versions of this manual under the conditions
+for verbatim copying, provided the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
 
-Permission is granted to copy and distribute translations of this manual into
-another language, under the above conditions for modified versions.
+Permission is granted to copy and distribute translations of this manual into another language,
+   under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE DLPI Porting Guide
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -135,15 +123,20 @@ another language, under the above conditions for modified versions.
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
-@subtitle Package @value{PACKAGE}-@value{VERSION}
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2001-2008  OpenSS7 Corporation
+@subtitle All Rights Reserved.
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
-Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 All Rights Reserved. @*
 
 @noindent
@@ -160,137 +153,115 @@ Project} and was funded in part by @uref{http://www.openss7.com/, OpenSS7
 Corporation}.
 
 @noindent
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission is granted to make and distribute verbatim copies of this manual provided the copyright
+notice and this permission notice are preserved on all copies.
 
 @noindent
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided that the entire resulting
-derived work is distributed under the terms of a permission notice identical to
-this one.
+Permission is granted to copy and distribute modified versions of this manual under the conditions
+for verbatim copying, provided that the entire resulting derived work is distributed under the terms
+of a permission notice identical to this one.
 
 @noindent
-Permission is granted to copy and distribute translations of this manual into
-another language, under the same conditions as for modified versions.
+Permission is granted to copy and distribute translations of this manual into another language,
+	   under the same conditions as for modified versions.
 
 @vskip 0pt
 @end titlepage
 @page
 
-@c Define an index of authors.
-@c @defindex au
-
-@c Define an index of makefile targets
-@c @defcodeindex mk
-
-@c Define an index of configure output variables.
-@c @defcodeindex ov
-
-@c Define an index of configure variables.
-@c @defcodeindex cv
-
-@c Define an index of options.
-@c @defcodeindex op
-
-@c Define an index of targets.
-@c @defcodeindex tr
-
-@c Define an index of commands.
-@c @defcodeindex cm
-
-@c Put the macros and variables into their own index.
-@c @syncodeindex fn cp
-@c @syncodeindex ov vr
-@c @syncodeindex cv vr
-@c @syncodeindex fn vr
-
-@c Put everything else into one index (arbitrarily chosen to be the concept index).
-@c @syncodeindex op cp
-@c @syncodeindex tr cp
-@c @syncodeindex cm cp
-
-@c An index of manual pages
-@defcodeindex mp
-
-@c Define an index of primitives.
+@c Define an index of primitives
 @defcodeindex pr
-@c Define an index of primitive values.
+@c Define an index of primitive values
 @defcodeindex pv
-@c Define an index of protocol states.
-@defcodeindex st
-@c Define an index of protocol errors.
+@c Define an index of primitive error values
 @defcodeindex pe
-@c Define an index of DLPI input-output controls.
-@defcodeindex ci
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
 
-@synindex tp cp
-@synindex fn cp
-@syncodeindex vr cp
-@synindex pg cp
-
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
-@syncodeindex st cp
 @syncodeindex pe cp
-@syncodeindex ci cp
-
-@synindex mp cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
 
 @iftex
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}@prindex \name\
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}@pvindex \name\
 @end macro
 
-@macro perr {name}
-@code{\name\}@peindex \name\
+@macro perr{name}
+@code{[\name\]}@peindex \name\
 @end macro
 
-@macro psta {name}
+@macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
-@macro parm {name}
-@code{\name\}@vrindex \name\
+@macro parm{name}
+@var{\name\}@vrindex \name\
 @end macro
 
-@macro dlioc {name}
-@code{\name\}@ciindex \name\
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@macro mobj{name}
+@code{\name\}@moindex \name\
 @end macro
 
 @end iftex
 
 @ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}
 @end macro
 
-@macro perr {name}
+@macro perr{name}
+@code{[\name\]}
+@end macro
+
+@macro psta{name}
 @code{\name\}
 @end macro
 
-@macro psta {name}
+@macro parm{name}
+@var{\name\}
+@end macro
+
+@macro pioc{name}
 @code{\name\}
 @end macro
 
-@macro parm {name}
-@code{\name\}
-@end macro
-
-@macro dlioc {name}
+@macro mobj{name}
 @code{\name\}
 @end macro
 
@@ -325,7 +296,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Porting from UnixWare::
 * Developing on OpenSS7::
 * Licenses::
-* Indices::
+* Index::
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -442,6 +413,9 @@ A current version of this manual is normally distributed with the
 @smallexample
 @verbatim
 $Log: dlpi_porting.texi,v $
+Revision 0.9.2.5  2009-04-30 06:07:46  brian
+- more documentation updates for release
+
 Revision 0.9.2.4  2008-11-26 12:01:52  brian
 - updated to FDL 1.3
 
@@ -1051,8 +1025,8 @@ modes at all.
 @cite{@value{PACKAGE_TITLE}} supports promiscuous mode using the standard DLPI
 @prim{DL_PROMISCON_REQ} and @prim{DL_PROMISCOFF_REQ} primitives, but also
 supports binding to the @pval{PROMISCUOUS_SAP}, activation of promicuous
-modes using input-output controls: primarily @dlioc{DLIOCSPROMISC},
-@dlioc{DLIOCGPROMISC}, and activation of multicast addresses using
+modes using input-output controls: primarily @pioc{DLIOCSPROMISC},
+@pioc{DLIOCGPROMISC}, and activation of multicast addresses using
 implementation specific extensions used to enable all multicast addresses.
 
 @subsubsection Raw Mode
@@ -1251,7 +1225,7 @@ applications.
 
 The closest set of input-output controls that are common across a number of
 implementations are those provided originally by @cite{SVR4.2}.  This set is the
-@dlioc{DLIOC} set of input-output controls.  This set of input-output controls,
+@pioc{DLIOC} set of input-output controls.  This set of input-output controls,
 or subsets of this set, appear to be supported by @cite{IRIX}, @cite{PowerMAX},
 @cite{SVR4.2}, @cite{UnixWare 1} and @cite{2}, but appear to have been dropped
 by @cite{UnixWare 7}.
@@ -1876,7 +1850,7 @@ DL_PROMISCON_REQ}).
 @cindex AIX raw mode
 
 @cite{AIX} supports a @dfn{raw mode}.  Setting a DLPI Stream to raw mode
-consists of using the @dlioc{DL_PKT_FORMAT} input-output control to set the
+consists of using the @pioc{DL_PKT_FORMAT} input-output control to set the
 packet format for the Stream to @pval{NS_INCLUDE_MAC}.  When set to @dfn{raw
 mode}, the MAC and LLC link-layer headers are both placed in the data portion of
 the message.
@@ -1897,7 +1871,7 @@ link-layer header for the final message, and the attached @msg{M_DATA} message
 block must contain the link-layer header including the MAC addresses.
 
 @cite{@value{PACKAGE_TITLE}} provides full source-level compatibility with this
-mode by providing a source-compatible @dlioc{DL_PKG_FORMAT} input-output
+mode by providing a source-compatible @pioc{DL_PKG_FORMAT} input-output
 control that accepts the @pval{NS_INCLDUE_MAC} format.  When the raw format is
 set using this input-output control, an @cite{AIX} compataible raw mode is
 applied to the Stream.
@@ -1908,7 +1882,7 @@ applied to the Stream.
 @cindex AIX llc2 mode
 
 @cite{AIX} supports an @dfn{LLC2 mode}.  Setting a DLPI Stream to LLC2 mode
-consists of using the @dlioc{DL_PKG_FORMAT} input-output control to set the
+consists of using the @pioc{DL_PKG_FORMAT} input-output control to set the
 packet format for the Stream to @pval{NS_INCLUDE_LLC}.  When set to @dfn{LLC2
 mode}, the LLC link-layer headers are placed in the data portion of the message.
 Only the MAC addresses are removed or inserted when messages are received or
@@ -1927,7 +1901,7 @@ portion of the @prim{DL_UNITDATA_REQ} primitive contain only the MAC address and
 do not contain the DSAP, SSAP or SNAP portion.
 
 @cite{@value{PACKAGE_TITLE}} provides full source-lvel compatibility with this
-mode by providing a source-compatible @dlioc{DL_PKG_FORMAT} input-outpu control
+mode by providing a source-compatible @pioc{DL_PKG_FORMAT} input-outpu control
 that accepts the @pval{NS_INCLUDE_LLC} format.  When the LLC format is set using
 this input-output control, an @cite{AIX} compatible LLC2 mode is applied to the
 Stream.
@@ -2232,13 +2206,13 @@ Implementation-specific input-output controls provided by @cite{AIX} are as
 follows:
 
 @multitable @columnfractions 0.35 0.65
-@item @dlioc{DL_PKT_FORMAT} -- @tab set the packet format.
-@item @dlioc{DL_INPUT_RESOLVE} -- @tab register input address resolution callback.
-@item @dlioc{DL_OUTPUT_RESOLVE} -- @tab register output address resolution callback.
-@item @dlioc{DL_ROUTE} -- @tab disable, query or assign a source route.
-@item @dlioc{DL_TUNE_LLC} -- @tab query or alter tunable LLC parameters.
-@item @dlioc{DL_ZERO_STATS} -- @tab reset local or global statistics.
-@item @dlioc{DL_SET_REMADDR} -- @tab set remote address for XID/TEST.
+@item @pioc{DL_PKT_FORMAT} -- @tab set the packet format.
+@item @pioc{DL_INPUT_RESOLVE} -- @tab register input address resolution callback.
+@item @pioc{DL_OUTPUT_RESOLVE} -- @tab register output address resolution callback.
+@item @pioc{DL_ROUTE} -- @tab disable, query or assign a source route.
+@item @pioc{DL_TUNE_LLC} -- @tab query or alter tunable LLC parameters.
+@item @pioc{DL_ZERO_STATS} -- @tab reset local or global statistics.
+@item @pioc{DL_SET_REMADDR} -- @tab set remote address for XID/TEST.
 @end multitable
 
 Note that @cite{@value{PACKAGE_TITLE}} documents these input-output controls in
@@ -3138,18 +3112,18 @@ The following primitives are not supported by @cite{IRIX}:
 @item @prim{DL_PROMISCON_REQ}
 
 Not supported by @cite{IRIX}, although I trust that it will respsond to the
-@dlioc{DLIOCSPROMISC} input-output control, regardless of it not being
+@pioc{DLIOCSPROMISC} input-output control, regardless of it not being
 documented.
 @item @prim{DL_PROMISCOFF_REQ}
 
 Not supported by @cite{IRIX}, although I trust that it will respsond to the
-@dlioc{DLIOCSPROMISC} input-output control, regardless of it not being
+@pioc{DLIOCSPROMISC} input-output control, regardless of it not being
 documented.
 @item @prim{DL_GET_STATISTICS_REQ},
 @prim{DL_GET_STATISTICS_ACK}
 
 Not supported by @cite{IRIX}, although I trust that it will respsond to the
-@dlioc{DLIOCGMIB} input-output control, regardless of it not being
+@pioc{DLIOCGMIB} input-output control, regardless of it not being
 documented.
 @end itemize
 
@@ -3398,7 +3372,7 @@ A PPA is identified by a unique PPA identifier.
 @cite{OSF} only supports the Style 2 provider because it is more suitable for
 supporting large numbers of PPAs.
 
-To establish a list of available PPAs, @cite{OSF} provides the @dlioc{ND_GET}
+To establish a list of available PPAs, @cite{OSF} provides the @pioc{ND_GET}
 input-output control.  This input-output control is a general purpose
 @ioctlref{I_STR} input-output control that takes a buffer containing a
 identifier string (in this case ``dl_ifnames'') and returns a output string in
@@ -3409,7 +3383,7 @@ sscc0 (PPA 1) ln0 (PPA 2) dsy9 (PPA 3) dsy1 \
 (PPA 4) sl0 (PPA 5) sl1 (PPA 6) lo0
 @end smallexample
 
-The @dlioc{ND_GET} input-output control is defined as:
+The @pioc{ND_GET} input-output control is defined as:
 
 @smallexample
 #define ND_GET (('N' << 8) + 0)
@@ -3703,7 +3677,7 @@ station.
 See @manref{dlpi_ioctl(4)} for more detail.
 
 @itemize
-@item @dlioc{ND_GET} -- Used to obtain the string representation of any number
+@item @pioc{ND_GET} -- Used to obtain the string representation of any number
 of kernel identifiers.  In this case, ``dl_ifnames'' is used to identify the
 available PPAs on the system.
 @end itemize
@@ -3764,7 +3738,7 @@ OpenSS7 X.25 porting guide for more information.
 One simplification provided by the @cite{@value{PACKAGE_TITLE}} implementation
 is that the PPA associated with a given network interface is the same as the
 IETF Interface MIB @var{ifIndex} associated with that interface.  It is not
-necessary to use the @dlioc{ND_GET} in the fashion of @cite{OSF} to collect
+necessary to use the @pioc{ND_GET} in the fashion of @cite{OSF} to collect
 information about the mapping of interface names to interface indices.  Either
 the SNMP functions can be used, or the input-output controls documented in
 @manref{netdevice(7)} can be used.
@@ -3854,7 +3828,7 @@ the usual manner.
 support LLC Type 2 operation.  However, it does not appear to have an @cite{LLC2
 Mode} necessary for use by LLC2 DLS users.  This might just be a documentation
 oversight.  @cite{@value{PACKAGE_TITLE}} provides the normal SVR 4.2
-@dlioc{DLIOCLLC2MODE} input-output control for setting the @dfn{LLC2 Mode}.
+@pioc{DLIOCLLC2MODE} input-output control for setting the @dfn{LLC2 Mode}.
 
 @subsubsection PowerMAX LLC Type 3 Operation
 @cindex llc3 operation
@@ -3876,9 +3850,9 @@ LLC Type 3 operation.
 @cite{PowerMAX} provides the symbol @constant{PROMISCUOUS_SAP} that once bound
 to acts as though @prim{DL_PROMISCON_REQ} was successful at the
 @pval{DL_PROMISC_SAP} level.  The input-output contol command,
-@dlioc{DLIOCSPROMISC} can be used to set the Stream as promiscuous at the
+@pioc{DLIOCSPROMISC} can be used to set the Stream as promiscuous at the
 @pval{DL_PROMISC_PHYS} level.  The input-output control command,
-@dlioc{DLIOCADDMULTI} can be used to set the Stream as promiscuous at the
+@pioc{DLIOCADDMULTI} can be used to set the Stream as promiscuous at the
 @pval{DL_PROMISC_MULTI} level, but it needs to be executed once for each known
 multicast or group address.
 
@@ -3888,7 +3862,7 @@ multicast or group address.
 @cindex PowerMAX raw mode
 
 @cite{PowerMAX} does not appear to have an @dfn{Raw Mode}.  That is, it does
-not document the availablity of the @dlioc{DLIOCRAWMODE} input-output control
+not document the availablity of the @pioc{DLIOCRAWMODE} input-output control
 command used by SVR4.2 to toggle the @dfn{Raw Mode}.  This might just be a
 documentation oversight, in which case, @cite{@value{PACKAGE_TITLE}} provides
 one anyway.
@@ -3905,7 +3879,7 @@ the data payload.  Otherwise, LLC data would normally be sent by a
 
 @cite{PowerMAX} does not directly support LLC Type 2 operation.  Nevertheless,
 it does not appear to have an @dfn{LLC2 Mode}.  That is, it does not document
-the availability of the @dlioc{DLIOCLLC2MODE} input-output control command.
+the availability of the @pioc{DLIOCLLC2MODE} input-output control command.
 
 @subsubsection PowerMAX CSMA/CD Mode
 @anchor{PowerMAX CSMA/CD Mode}
@@ -3914,7 +3888,7 @@ the availability of the @dlioc{DLIOCLLC2MODE} input-output control command.
 @cindex PowerMAX csma/cd mode
 
 @cite{PowerMAX} documents that the @dfn{CSMA/CD Mode} can be toggled using the
-usual SVR 4.2 @dlioc{DLIOCCSMACDMODE} input-output control.
+usual SVR 4.2 @pioc{DLIOCCSMACDMODE} input-output control.
 
 @subsubsection PowerMAX Fast Path
 
@@ -3966,12 +3940,12 @@ Needed only for Style 2 and @cite{PowerMAX} is only Style 1 drivers.
 @prim{DL_DISABMULTI_REQ}
 
 Some of the functionality of these primitives can be achieved with the
-@dlioc{DLIOCADDMULTI} and @dlioc{DLIOCDELMULTI} input-output controls.
+@pioc{DLIOCADDMULTI} and @pioc{DLIOCDELMULTI} input-output controls.
 @item @prim{DL_PROMISCON_REQ},
 @prim{DL_PROMISCOFF_REQ}
 
 Some of the functionality of this primitive can be acheived with the
-@dlioc{DLIOCSPROMISC} and @dlioc{DLIOCGPROMISC} input-output controls.
+@pioc{DLIOCSPROMISC} and @pioc{DLIOCGPROMISC} input-output controls.
 @item @prim{DL_XID_REQ},
 @prim{DL_XID_IND},
 @prim{DL_XID_RES},
@@ -3991,16 +3965,16 @@ is not supported.
 @prim{DL_PHYS_ADDR_ACK}
 
 Some of the functionality of this primitive can be acheived with the
-@dlioc{DLIOCGENADDR} input-output control.
+@pioc{DLIOCGENADDR} input-output control.
 @item @prim{DL_SET_PHYS_ADDR_REQ}
 
 Some of the functionality of this primitive can be acheived with the
-@dlioc{DLIOCSENADDR} input-output control.
+@pioc{DLIOCSENADDR} input-output control.
 @item @prim{DL_GET_STATISTICS_REQ},
 @prim{DL_GET_STATISTICS_ACK}
 
 Some of the functionality of this primitive can be acheived with the
-@dlioc{DLIOCGMIB} and @dlioc{DLIOCSMIB} input-output controls.
+@pioc{DLIOCGMIB} and @pioc{DLIOCSMIB} input-output controls.
 @end itemize
 
 The following connectionless mode primitives are not supported by
@@ -4067,24 +4041,24 @@ a LAN station.
 controls as follows:
 
 @multitable @columnfractions 0.35 0.65
-@item @dlioc{DLIOCSMIB} -- @tab Set MIB.
-@item @dlioc{DLIOCGMIB} -- @tab Get MIB.
-@item @dlioc{DLIOCSENADDR} -- @tab Set Ethernet address.
-@item @dlioc{DLIOCGENADDR} -- @tab Get Ethernet address.
-@item @dlioc{DLIOCSLPCFLG} -- @tab Set local packet copy flag.
-@item @dlioc{DLIOCGLPCFLG} -- @tab Get local packet copy flag.
-@item @dlioc{DLIOCSPROMISC} -- @tab Toggle promiscuous state.
-@item @dlioc{DLIOCGPROMISC} -- @tab Get promiscuous state.
-@item @dlioc{DLIOCADDMULTI} -- @tab Add multicast address.
-@item @dlioc{DLIOCDELMULTI} -- @tab Delete multicast address.
-@item @dlioc{DLIOCGETMULTI} -- @tab Get multicast address list.
-@item @dlioc{DLIOCDISABLE} -- @tab Disable controller.
-@item @dlioc{DLIOCENABLE} -- @tab Enable controller.
-@item @dlioc{DLIOCRESET} -- @tab Reset controller.
-@item @dlioc{DLIOCCSMACDMODE} -- @tab Toggle CSMA-CD mode.
+@item @pioc{DLIOCSMIB} -- @tab Set MIB.
+@item @pioc{DLIOCGMIB} -- @tab Get MIB.
+@item @pioc{DLIOCSENADDR} -- @tab Set Ethernet address.
+@item @pioc{DLIOCGENADDR} -- @tab Get Ethernet address.
+@item @pioc{DLIOCSLPCFLG} -- @tab Set local packet copy flag.
+@item @pioc{DLIOCGLPCFLG} -- @tab Get local packet copy flag.
+@item @pioc{DLIOCSPROMISC} -- @tab Toggle promiscuous state.
+@item @pioc{DLIOCGPROMISC} -- @tab Get promiscuous state.
+@item @pioc{DLIOCADDMULTI} -- @tab Add multicast address.
+@item @pioc{DLIOCDELMULTI} -- @tab Delete multicast address.
+@item @pioc{DLIOCGETMULTI} -- @tab Get multicast address list.
+@item @pioc{DLIOCDISABLE} -- @tab Disable controller.
+@item @pioc{DLIOCENABLE} -- @tab Enable controller.
+@item @pioc{DLIOCRESET} -- @tab Reset controller.
+@item @pioc{DLIOCCSMACDMODE} -- @tab Toggle CSMA-CD mode.
 @end multitable
 
-Strangely enough, the @dlioc{DLIOCLLC2MODE} and @dlioc{DLIOCRAWMODE}
+Strangely enough, the @pioc{DLIOCLLC2MODE} and @pioc{DLIOCRAWMODE}
 input-output controls are not documented.
 
 See @manref{dlpi_ioctl(4)} for more detail.
@@ -4638,8 +4612,8 @@ architectures, where multiple opens were enabled:
 STREAMS input-output controls can then be sent:
 
 @itemize
-@item @dlioc{DLIOCGPROMISC} -- Determine state of promiscuous mode (on/off).
-@item @dlioc{DLIOCSPROMISC} -- Toggle state of promiscuous mode (on/off).@footnote{@url{http://ou800doc.caldera.com/en/HDK_concepts/ddT_promiscuous.html}}
+@item @pioc{DLIOCGPROMISC} -- Determine state of promiscuous mode (on/off).
+@item @pioc{DLIOCSPROMISC} -- Toggle state of promiscuous mode (on/off).@footnote{@url{http://ou800doc.caldera.com/en/HDK_concepts/ddT_promiscuous.html}}
 @end itemize
 
 @subsubsection SVR4.2 Raw Mode
@@ -4680,45 +4654,45 @@ the data payload.  Otherwise, LLC data would normally be sent by a
 @cindex SVR4.2 input-output controls
 
 @table @asis
-@item @dlioc{DLIOCSMIB} -- Get MIB statistics (DL_mib_t).
-@item @dlioc{DLIOCGMIB} -- Get MIB statistics (DL_mib_t).
-@item @dlioc{DLIOCSENADDR} -- Set physical (MAC) address.
-@item @dlioc{DLIOCGENADDR} -- Return Ethernet (MAC) address.
-@item @dlioc{DLIOCSLPCFLG} -- Set local copy packet flag (send local packets on wire).
-@item @dlioc{DLIOCGLPCFLG} -- Get local copy packet flag (send local packets on wire).
-@item @dlioc{DLIOCSPROMISC} -- Set promiscuous mode flag.
-@item @dlioc{DLIOCGPROMISC} -- Get promiscuous mode flag.
+@item @pioc{DLIOCSMIB} -- Get MIB statistics (DL_mib_t).
+@item @pioc{DLIOCGMIB} -- Get MIB statistics (DL_mib_t).
+@item @pioc{DLIOCSENADDR} -- Set physical (MAC) address.
+@item @pioc{DLIOCGENADDR} -- Return Ethernet (MAC) address.
+@item @pioc{DLIOCSLPCFLG} -- Set local copy packet flag (send local packets on wire).
+@item @pioc{DLIOCGLPCFLG} -- Get local copy packet flag (send local packets on wire).
+@item @pioc{DLIOCSPROMISC} -- Set promiscuous mode flag.
+@item @pioc{DLIOCGPROMISC} -- Get promiscuous mode flag.
 
 The @prim{DL_PROMISCON_REQ} primitive is defined for DLPI 2.0.0 (UnixWare 7 and
 SCO OpenServer Release 5) and the DLPI 1.x equivalent is the
-@dlioc{DLIOCSPROMISC} input-output control.  Note, however, that these
+@pioc{DLIOCSPROMISC} input-output control.  Note, however, that these
 primitives are NAK'ed by the DLPI module because promiscuous mode is not
 implemented through DLPI (On UnixWare 7).  The only way to implement promiscuous
 mode for UnixWare 7 and SCO OpenServer Release 5 is with MDI.
 
-@item @dlioc{DLIOCADDMULTI} -- Add multicast address.
-@item @dlioc{DLIOCDELMULTI} -- Delete multicast address.
-@item @dlioc{DLIOCGETMULTI} -- Return list of multicast addresses.
-@item @dlioc{DLIOCDISABLE} -- Disable controller -- nearest equivalent is @prim{DL_UNBIND_REQ}.
-@item @dlioc{DLIOCENABLE} -- Enable controller -- nearest equivalent is @prim{DL_BIND_REQ}.
-@item @dlioc{DLIOCRESET} -- Reset controller -- nearest equivalent is to close and open the driver.
-@item @dlioc{DLIOCCSMACDMODE} -- Switch SAP type to RAW.
-@item @dlioc{DLIOCRAWMODE} -- Toggle RAW mode (Token-Ring adapters).
-@item @dlioc{DLIOCLLC2MODE} -- Toggle LLC2 mode (Token-Ring adapters).
+@item @pioc{DLIOCADDMULTI} -- Add multicast address.
+@item @pioc{DLIOCDELMULTI} -- Delete multicast address.
+@item @pioc{DLIOCGETMULTI} -- Return list of multicast addresses.
+@item @pioc{DLIOCDISABLE} -- Disable controller -- nearest equivalent is @prim{DL_UNBIND_REQ}.
+@item @pioc{DLIOCENABLE} -- Enable controller -- nearest equivalent is @prim{DL_BIND_REQ}.
+@item @pioc{DLIOCRESET} -- Reset controller -- nearest equivalent is to close and open the driver.
+@item @pioc{DLIOCCSMACDMODE} -- Switch SAP type to RAW.
+@item @pioc{DLIOCRAWMODE} -- Toggle RAW mode (Token-Ring adapters).
+@item @pioc{DLIOCLLC2MODE} -- Toggle LLC2 mode (Token-Ring adapters).
 
 @c
 @c Note that Solaris identifies these as DLPI_1 input-output controls.  Now
 @c that's going back.
 @c
-@c @item @dlioc{DLGADDR} -- Return Ethernet (MAC) address.
-@c @item @dlioc{DLGBROAD} -- Get broadcast address.
-@c @item @dlioc{DLSLLC2} -- Toggle LLC2 mode (Token-Ring adapters).
-@c @item @dlioc{DLSRAW} -- Toggle RAW mode (Token-Ring adapters).
+@c @item @pioc{DLGADDR} -- Return Ethernet (MAC) address.
+@c @item @pioc{DLGBROAD} -- Get broadcast address.
+@c @item @pioc{DLSLLC2} -- Toggle LLC2 mode (Token-Ring adapters).
+@c @item @pioc{DLSRAW} -- Toggle RAW mode (Token-Ring adapters).
 
-@c @item @dlioc{MACIOC_GETADDR} -- Return Ethernet (MAC) address.
+@c @item @pioc{MACIOC_GETADDR} -- Return Ethernet (MAC) address.
 
-@c @item @dlioc{SIOCGIFDEBUG} -- Get debug level.
-@c @item @dlioc{SIOCGIFFLAGS} -- Socket I/O control to get interface flags (acknowledged and ignored).
+@c @item @pioc{SIOCGIFDEBUG} -- Get debug level.
+@c @item @pioc{SIOCGIFFLAGS} -- Socket I/O control to get interface flags (acknowledged and ignored).
 @end table
 
 See @manref{dlpi_ioctl(4)} for more detail.
@@ -4849,7 +4823,7 @@ other tools rely upon promiscuous mode.
 The UnixWare 7 and SCO OpenServer MDI specification provides optional support
 for promiscuous mode; it is no required.  To implement promiscuous mode in an
 MDI driver, you must code a `switch' statement to process the MDI
-@dlioc{MACIOC_PROMISC} input-output control.  For UnixWare 7 MDI drivers, the
+@pioc{MACIOC_PROMISC} input-output control.  For UnixWare 7 MDI drivers, the
 @command{bcfg(4dsp)} file includes the mandatory @constant{PROMISCUOUS}
 parameter that must be set to `true' if the driver supports promiscuous mode, or
 `false' if it does not.
@@ -4868,12 +4842,12 @@ is called, the drivers should fail subsequent calls to @manpage{open(2s)}.
 must disable promiscious mode when the MDI device is closed.
 @item M_IOCTL(D7str)
 
-includes a `switch' statement to process the @dlioc{MACIOC_PROMISC} input-output
+includes a `switch' statement to process the @pioc{MACIOC_PROMISC} input-output
 control.
 
 The @prim{DL_PROMISCON_REQ} primitive is defined for DLPI 2.0.0 (UnixWare 7 and
 SCO OpenServer Release 5) and the DLPI 1.x equivalent is the
-@dlioc{DLIOCSPROMISC} input-output control  Note, however, that these primitives
+@pioc{DLIOCSPROMISC} input-output control  Note, however, that these primitives
 are NAK'ed by the DLPI module because promiscuous mode is not implemented
 through DLPI.  The only way to implement promiscuous mode for UnixWare 7 and
 SCO OpenServer Release 5 is with MDI.
@@ -4884,14 +4858,14 @@ To access a MDI device in promiscuous mode:
 @enumerate
 @item Open the @file{/dev/mdi} device.
 @item Send a @prim{MAC_BIND_REQ} primitive to the device with the @manref{putmsg(2s)} or @manref{putpmsg(2s)} system call.
-@item Send a @dlioc{MACIOC_PROMISC} input-output control to enable promiscous mode.
+@item Send a @pioc{MACIOC_PROMISC} input-output control to enable promiscous mode.
 @item Read all frames with @manref{getmsg(2s)} or @manref{getpmsg(2s)} until ``done''.
 @item Close the file descriptor for the @file{/dev/mdi} device.
 @end enumerate
 
 Promiscuous mode must be disabled when MDI drivers are opened (they are usually
 opened eby the @dfn{DLPI} module), and the @dfn{DLPI} module will not pass the
-@dlioc{MACIOC_PROMISC} input-output control to the driver, because the
+@pioc{MACIOC_PROMISC} input-output control to the driver, because the
 underlying @prim{DL_PROMISCON_REQ} primitive is NAK'ed on @file{/dev/netX}
 devices.  Because MDI drivers support only one open per device, it is not
 possible to open the network adapter for both a protocol stack and a network
@@ -4906,7 +4880,7 @@ started.
 @cindex UnixWare raw mode
 
 @cite{UnixWare} does not document an @dfn{Raw mode} feature, regardless of it
-being supported on older versions using the @dlioc{DLIOCRAWMODE} input-output
+being supported on older versions using the @pioc{DLIOCRAWMODE} input-output
 control.
 
 @subsubsection UnixWare LLC2 Mode
@@ -4915,7 +4889,7 @@ control.
 @cindex UnixWare llc2 mode
 
 @cite{UnixWare} does not document an @dfn{LLC2 mode} feature, regardless of it
-being supported on older versions using the @dlioc{DLIOCLLC2MODE} input-output
+being supported on older versions using the @pioc{DLIOCLLC2MODE} input-output
 control.
 
 @subsubsection UnixWare CSMA/CD Mode
@@ -4925,7 +4899,7 @@ control.
 @cindex UnixWare csma/cd mode
 
 @cite{UnixWare} does not document a @dfn{CSMA/CD mode} feature, regardless of it
-being supported on older versions using the @dlioc{DLIOCCSMACDMODE} input-output
+being supported on older versions using the @pioc{DLIOCCSMACDMODE} input-output
 control.
 
 @subsubsection UnixWare Fast Path
@@ -4998,12 +4972,12 @@ These two primitives are not necessary as @cite{UnixWare} only provides a Style
 @prim{DL_PROMISCOFF_REQ}
 
 These to primitives are not supported directly and will result in an error of
-@perr{DL_NOTSUPPORTED}.  The input-output control @dlioc{DLIOCSPROMISC} is also
-not supported.  Also, the DLPI driver will not pass a @dlioc{MACIOC_PROMISC} to
+@perr{DL_NOTSUPPORTED}.  The input-output control @pioc{DLIOCSPROMISC} is also
+not supported.  Also, the DLPI driver will not pass a @pioc{MACIOC_PROMISC} to
 the MDI level.  It is necessary, according to @cite{UnixWare} documentation that
 if promiscuous mode is required at the physical level, @pval{DL_PROMISC_PHYS},
 that a privielged user must open an otherwise unused MDI device Stream and use
-the @dlioc{MACIOC_PROMISC} input-output control on it directly.
+the @pioc{MACIOC_PROMISC} input-output control on it directly.
 
 @end itemize
 
@@ -5151,32 +5125,32 @@ Providers.
 
 @ignore
 @multitable @columnfractions 0.35 0.65
-@item @dlioc{DLIOCSMIB} -- @tab Set MIB statistics (DL_mib_t).
-@item @dlioc{DLIOCGMIB} -- @tab Get MIB statistics (DL_mib_t).
-@item @dlioc{DLIOCSENADDR} -- @tab Set physical (MAC) address.
-@item @dlioc{DLIOCGENADDR} -- @tab Return Ethernet (MAC) address.
-@item @dlioc{DLIOCSLPCFLG} -- @tab Set local copy packet flag (send local packets on wire).
-@item @dlioc{DLIOCGLPCFLG} -- @tab Get local copy packet flag (send local packets on wire).
-@item @dlioc{DLIOCSPROMISC} -- @tab Set promiscuous mode flag.
-@item @dlioc{DLIOCGPROMISC} -- @tab Get promiscuous mode flag.
-@item @dlioc{DLIOCADDMULTI} -- @tab Add multicast address.
-@item @dlioc{DLIOCDELMULTI} -- @tab Delete multicast address.
-@item @dlioc{DLIOCGETMULTI} -- @tab Return list of multicast addresses.
-@item @dlioc{DLIOCDISABLE} -- @tab Disable controller -- nearest equivalent is @prim{DL_UNBIND_REQ}.
-@item @dlioc{DLIOCENABLE} -- @tab Enable controller -- nearest equivalent is @prim{DL_BIND_REQ}.
-@item @dlioc{DLIOCRESET} -- @tab Reset controller -- nearest equivalent is to close and open the driver.
-@item @dlioc{DLIOCCSMACDMODE} -- @tab Switch SAP type to RAW.
-@item @dlioc{DLIOCLLC2MODE} -- @tab Toggle LLC2 mode (Token-Ring adapters).
-@item @dlioc{DLIOCRAWMODE} -- @tab Toggle RAW mode (Token-Ring adapters).
+@item @pioc{DLIOCSMIB} -- @tab Set MIB statistics (DL_mib_t).
+@item @pioc{DLIOCGMIB} -- @tab Get MIB statistics (DL_mib_t).
+@item @pioc{DLIOCSENADDR} -- @tab Set physical (MAC) address.
+@item @pioc{DLIOCGENADDR} -- @tab Return Ethernet (MAC) address.
+@item @pioc{DLIOCSLPCFLG} -- @tab Set local copy packet flag (send local packets on wire).
+@item @pioc{DLIOCGLPCFLG} -- @tab Get local copy packet flag (send local packets on wire).
+@item @pioc{DLIOCSPROMISC} -- @tab Set promiscuous mode flag.
+@item @pioc{DLIOCGPROMISC} -- @tab Get promiscuous mode flag.
+@item @pioc{DLIOCADDMULTI} -- @tab Add multicast address.
+@item @pioc{DLIOCDELMULTI} -- @tab Delete multicast address.
+@item @pioc{DLIOCGETMULTI} -- @tab Return list of multicast addresses.
+@item @pioc{DLIOCDISABLE} -- @tab Disable controller -- nearest equivalent is @prim{DL_UNBIND_REQ}.
+@item @pioc{DLIOCENABLE} -- @tab Enable controller -- nearest equivalent is @prim{DL_BIND_REQ}.
+@item @pioc{DLIOCRESET} -- @tab Reset controller -- nearest equivalent is to close and open the driver.
+@item @pioc{DLIOCCSMACDMODE} -- @tab Switch SAP type to RAW.
+@item @pioc{DLIOCLLC2MODE} -- @tab Toggle LLC2 mode (Token-Ring adapters).
+@item @pioc{DLIOCRAWMODE} -- @tab Toggle RAW mode (Token-Ring adapters).
 
-@item @dlioc{DLGADDR} -- @tab Return Ethernet (MAC) address.
-@item @dlioc{DLGBROAD} -- @tab Get broadcast address.
-@item @dlioc{DLSLLC2} -- @tab Toggle LLC2 mode (Token-Ring adapters).
-@item @dlioc{DLSRAW} -- @tab Toggle RAW mode (Token-Ring adapters).
+@item @pioc{DLGADDR} -- @tab Return Ethernet (MAC) address.
+@item @pioc{DLGBROAD} -- @tab Get broadcast address.
+@item @pioc{DLSLLC2} -- @tab Toggle LLC2 mode (Token-Ring adapters).
+@item @pioc{DLSRAW} -- @tab Toggle RAW mode (Token-Ring adapters).
 
-@item @dlioc{MACIOC_GETADDR} -- @tab Return Ethernet (MAC) address.
-@item @dlioc{SIOCGIFDEBUG} -- @tab Get debug level.
-@item @dlioc{SIOCGIFFLAGS} -- @tab Socket I/O control to get interface flags (acknowledged and ignored).
+@item @pioc{MACIOC_GETADDR} -- @tab Return Ethernet (MAC) address.
+@item @pioc{SIOCGIFDEBUG} -- @tab Get debug level.
+@item @pioc{SIOCGIFFLAGS} -- @tab Socket I/O control to get interface flags (acknowledged and ignored).
 @end multitable
 @end ignore
 
@@ -5184,30 +5158,30 @@ The DLPI driver intercepts and response to the following MACIOC input-output
 contorl commands:
 
 @multitable @columnfractions 0.35 0.65
-@item @dlioc{MACIOC_CLRMCA} -- @tab
-@item @dlioc{MACIOC_DIAG} -- @tab
-@item @dlioc{MACIOC_GETADDR} -- @tab @i{Return MAC address.}
-@item @dlioc{MACIOC_GETIFSTAT} -- @tab
-@item @dlioc{MACIOC_GETRADDR} -- @tab @i{Return factory MAC address.}
-@item @dlioc{MACIOC_GETSTAT} -- @tab @i{Return statistics.}
-@item @dlioc{MACIOC_LOCALSTAT} -- @tab
-@item @dlioc{MACIOC_PROMISC} -- @tab @i{Enable promiscuous mode.}
-@item @dlioc{MACIOC_SETADDR} -- @tab @i{Set MAC address.}
-@item @dlioc{MACIOC_UNITSEL} -- @tab
+@item @pioc{MACIOC_CLRMCA} -- @tab
+@item @pioc{MACIOC_DIAG} -- @tab
+@item @pioc{MACIOC_GETADDR} -- @tab @i{Return MAC address.}
+@item @pioc{MACIOC_GETIFSTAT} -- @tab
+@item @pioc{MACIOC_GETRADDR} -- @tab @i{Return factory MAC address.}
+@item @pioc{MACIOC_GETSTAT} -- @tab @i{Return statistics.}
+@item @pioc{MACIOC_LOCALSTAT} -- @tab
+@item @pioc{MACIOC_PROMISC} -- @tab @i{Enable promiscuous mode.}
+@item @pioc{MACIOC_SETADDR} -- @tab @i{Set MAC address.}
+@item @pioc{MACIOC_UNITSEL} -- @tab
 @end multitable
 
 The DLPI driver passes all other MACIOC input-output control commands to the MDI
 driver beneath it.  Other MACIOC input-output control commands are as follows:
 
 @multitable @columnfractions 0.35 0.65
-@item @dlioc{MACIOC_CLRSTAT} -- @tab @i{Clear statistics structure.}
-@item @dlioc{MACIOC_DELALLMCA} -- @tab @i{Stop receiving multicast frames.}
-@item @dlioc{MACIOC_DELMCA} -- @tab @i{Stop receiving MAC frames.}
-@item @dlioc{MACIOC_GETMCA} -- @tab @i{Return active multicast addresses.}
-@item @dlioc{MACIOC_GETMCSIZ} -- @tab @i{Return multicast address table size.}
-@item @dlioc{MACIOC_SETALLMCA} -- @tab @i{Deliver mulicast frames.}
-@item @dlioc{MACIOC_SETMCA} -- @tab @i{Receive MAC frames.}
-@item @dlioc{MACIOC_SETSTAT} -- @tab @i{Modify MIB attributes.}
+@item @pioc{MACIOC_CLRSTAT} -- @tab @i{Clear statistics structure.}
+@item @pioc{MACIOC_DELALLMCA} -- @tab @i{Stop receiving multicast frames.}
+@item @pioc{MACIOC_DELMCA} -- @tab @i{Stop receiving MAC frames.}
+@item @pioc{MACIOC_GETMCA} -- @tab @i{Return active multicast addresses.}
+@item @pioc{MACIOC_GETMCSIZ} -- @tab @i{Return multicast address table size.}
+@item @pioc{MACIOC_SETALLMCA} -- @tab @i{Deliver mulicast frames.}
+@item @pioc{MACIOC_SETMCA} -- @tab @i{Receive MAC frames.}
+@item @pioc{MACIOC_SETSTAT} -- @tab @i{Modify MIB attributes.}
 @end multitable
 
 See @manref{dlpi_ioctl(4)} for more detail.
@@ -5398,69 +5372,43 @@ See @manref{dlpi_ioctl(4)} for more detail.
 @page
 @include texi/fdl13.texi
 
-@c ----------------------------------------------------------------------------
-@c ----------------------------------------------------------------------------
 
-@node Indices
-@unnumbered Indices
-@cindex indices
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
 
-@c ----------------------------------------------------------------------------
-
-@menu
-* Index::			Index of Concepts
-@c * Type Index::		Index of Data Types
-@c * Function Index::		Index of Functions and Macros
-@c * Variable Index::		Index of Variables and Constants
-@c * File Index::		Index of Files and Programs
-@c * Primitive Index::		Index of Primitives
-@c * Primitive Value Index::	Index of Primitive Values
-@c * Protocol State Index::	Index of Protocol States
-@c * Protocol Error Index::	Index of Protocol Errors
-@c * Input-Output Control Index:: Index of Input-Output Controls
-@c * Manual Page Index::		Index of Manual Pages Referenced
-@end menu
-
-@c ----------------------------------------------------------------------------
-
+@c @ifnottex
+@c @c concatenate indices for html and info
 @node Index
-@unnumberedsec Index
+@unnumbered Index
 @printindex cp
+@c @end ifnottex
 
-@c @page
-@c @node Type Index
-@c @unnumberedsec Index of Data Types
-@c @printindex tp
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * MIB Object Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
 @c 
 @c @page
-@c @node Function Index
-@c @unnumberedsec Index of Functions and Macros
-@c @printindex fn
-@c 
-@c @page
-@c @node Variable Index
-@c @unnumberedsec Index of Variables and Constants
-@c @printindex vr
-@c 
-@c @page
-@c @node File Index
-@c @unnumberedsec Index of Files and Programs
-@c @printindex pg
-@c 
-@c @c @page
-@c @c @node Option Index
-@c @c @unnumberedsec Index of Configuration Options
-@c @c @printindex op
-@c 
-@c @c @page
-@c @c @node Makefile Target Index
-@c @c @unnumberedsec Index of Makefile Targets
-@c @c @printindex mk
-@c 
-@c @c @page
-@c @c @node Author Index
-@c @c @unnumberedsec Index of Authors
-@c @c @printindex au
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
 @c 
 @c @page
 @c @node Primitive Index
@@ -5468,36 +5416,44 @@ See @manref{dlpi_ioctl(4)} for more detail.
 @c @printindex pr
 @c 
 @c @page
-@c @node Primitive Value Index
-@c @section Primitive Value Index 
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
 @c @printindex pv
 @c 
 @c @page
-@c @node Protocol State Index
-@c @section Protocol State Index 
-@c @printindex st
-@c 
-@c @page
-@c @node Protocol Error Index
-@c @section Protocol Error Index
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
 @c @printindex pe
 @c 
 @c @page
 @c @node Input-Output Control Index
 @c @section Input-Output Control Index
-@c @printindex ci
+@c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
 @c 
 @c @page
 @c @node Manual Page Index
-@c @unnumberedsec Index of Manual Pages Referenced
+@c @section Manual Page Index
 @c @printindex mp
-
-@c ----------------------------------------------------------------------------
+@c @end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents
 @page
 @contents
 @bye
-
-@c ============================================================================
