@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: rtp.4.man,v 0.9.2.3 2008-04-29 02:07:51 brian Exp $
+.\" @(#) $Id: rtp.4.man,v 0.9.2.4 2009-05-01 08:50:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 02:07:51 $ by $Author: brian $
+.\" Last Modified $Date: 2009-05-01 08:50:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: rtp.4.man,v $
+.\" Revision 0.9.2.4  2009-05-01 08:50:17  brian
+.\" - pass check target for release
+.\"
 .\" Revision 0.9.2.3  2008-04-29 02:07:51  brian
 .\" - updated headers for release
 .\"
@@ -102,6 +105,9 @@ sort-adjacent-labels
 .SH DESCRIPTION
 .B RTP
 is an implementation of the Real-Time Transport Protocol defined in RFC 1889.
+.[
+rfc1889
+.]
 .B RTP
 provides the encapsulation and control of media in
 .BR udp (4)

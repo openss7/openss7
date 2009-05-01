@@ -1,3 +1,9 @@
+2009-05-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strvoip.refs: pass check target for release
+	* doc/man/man4/iax.4.man: pass check target for release
+	* doc/man/man4/rtp.4.man: pass check target for release
+
 2009-04-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/carrier/carrier.texi: sized figures
