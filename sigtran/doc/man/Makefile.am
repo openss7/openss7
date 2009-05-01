@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2009-05-01 08:48:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 01:52:14 $ by $Author: brian $
+# Last Modified $Date: 2009-05-01 08:48:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,6 +121,7 @@ MANS_UNUSED = \
 	man8/sigtran.8 \
 	man8/sua.8 \
 	man8/test-m3ua_as.8 \
+	man8/test-m3ua-raw.8 \
 	man8/tua.8 \
 	man8/uaconfd.8
 
@@ -247,6 +248,7 @@ dist_noinst_MANS = \
 	man8/test-m2pa.8.man \
 	man8/test-m2ua_as.8.man \
 	man8/test-m3ua_as.8.man \
+	man8/test-m3ua-raw.8.man \
 	man8/test-sigtran.8.man \
 	man8/tua.8.man \
 	man8/uaconfd.8.man
@@ -259,6 +261,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.10  2009-05-01 08:48:26  brian
+# - pass check target for release
+#
 # Revision 0.9.2.9  2008-04-29 01:52:14  brian
 # - updated headers for release
 #
