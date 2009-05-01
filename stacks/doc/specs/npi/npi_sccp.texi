@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: npi_sccp.texi,v 0.9.2.4 2009-05-01 04:50:31 brian Exp $
+% @(#) $Id: npi_sccp.texi,v 0.9.2.5 2009-05-01 04:50:54 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-05-01 04:50:31 $ by $Author: brian $
+% Last Modified $Date: 2009-05-01 04:50:54 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -392,19 +392,15 @@ sections, no front-cover texts and no back-cover texts.
 
 @section Abstract
 
-This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
-the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
-as platform and system applicability of the @value{MANUAL_TITLE}.
+This document is a Corrigendum for SCCP Conformance to the Transport Provider Interface containing
+technical details concerning the implementation of the Signalling Connection Control Part (SCCP)
+using the Network Provider Interface (NPI).  It contains recommendations on software architecture as
+well as platform and system applicability of NPI-SCCP.
 
 @noindent
 This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
 (@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
 components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
-
-This document is a Corrigendum for SCCP Conformance to the Transport Provider Interface containing
-technical details concerning the implementation of the Signalling Connection Control Part (SCCP)
-using the Network Provider Interface (NPI).  It contains recommendations on software architecture as
-well as platform and system applicability of NPI-SCCP.
 
 @subsection Purpose
 @cpindex STREAMS
@@ -452,7 +448,7 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: npi_sccp.texi,v $
-Revision 0.9.2.4  2009-05-01 04:50:31  brian
+Revision 0.9.2.5  2009-05-01 04:50:54  brian
 - update documentation for release
 
 Revision 0.9.2.3  2009-04-30 06:07:48  brian
@@ -1159,6 +1155,7 @@ An identifier of a particular physical medium over which communication transpire
 
 @node Licenses
 @unnumbered Licenses
+@cindex licenses
 
 All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
 The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
