@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi_tcap.texi,v 0.9.2.25 2009-05-01 04:50:34 brian Exp $
+% @(#) $Id: tpi_tcap.texi,v 0.9.2.27 2009-05-01 04:50:55 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-05-01 04:50:34 $ by $Author: brian $
+% Last Modified $Date: 2009-05-01 04:50:55 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -348,7 +348,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 
 @ifnottex
 @node Top
-@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@top Transport Provider Interface---Corrigendum for @value{SHORT} Conformance
 @unnumbered About This Manual
 This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
 @cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
@@ -411,9 +411,10 @@ sections, no front-cover texts and no back-cover texts.
 
 @section Abstract
 
-This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
-the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
-as platform and system applicability of the @value{MANUAL_TITLE}.
+This document is a Corrigendum for @value{SHORT} Conformance to the Transport Provider Interface
+containing technical details concerning the implementation of the @value{LONG} (@value{SHORT}) using
+the X/Open Transport Provider Interface (TPI).  It contains recommendations on software architecture
+as well as platform and system applicability of @value{INTERFACE}.
 
 @noindent
 This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
@@ -423,11 +424,11 @@ components as well as providing a basis for @value{PART} control for other @valu
 @subsection Purpose
 @cpindex STREAMS
 
-The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
-This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
-by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
-of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
-that are made available in the software package.
+The purpose of this document is to provide technical documentation of the @value{SHORT} Transport
+Provider Interface (@value{INTERFACE}).  This document is intended to be included with the OpenSS7
+@cite{STREAMS} software package released by @cite{OpenSS7 Corporation}.  It is intended to assist
+software developers, maintainers and users of the @value{INTERFACE} with understanding the software
+architecture and technical interfaces that are made available in the software package.
 
 @subsection Intent
 
@@ -466,7 +467,7 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: tpi_tcap.texi,v $
-Revision 0.9.2.25  2009-05-01 04:50:34  brian
+Revision 0.9.2.27  2009-05-01 04:50:55  brian
 - update documentation for release
 
 Revision 0.9.2.24  2009-04-30 06:07:48  brian
@@ -1568,6 +1569,7 @@ An identifier of a particular physical medium over which communication transpire
 
 @node Licenses
 @unnumbered Licenses
+@cindex licenses
 
 All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
 The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no

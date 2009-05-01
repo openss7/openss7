@@ -13,240 +13,265 @@ This is Edition 1.20090405, last updated 2009-04-04, of the `OpenSS7 STREAMS
 ATM Installation and Reference Manual', for Version 0.9.2 Release
 1.20090405.
 
+Copyright (C) 2008-2009  Monavacon Limited (http://www.monavacon.com/)
 Copyright (C) 2001-2008  OpenSS7 Corporation (http://www.openss7.com/)
-Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-
+Copyright (C) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 All Rights Reserved.
 
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission is granted to copy, distribute and/or modify this document under the
+terms of the GNU Free Documentation License, Version 1.3 or any later version
+published by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts, and no Back-Cover Texts.  A copy of the license is included
+in the section entitled *note GNU Free Documentation License::.
 
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided the entire resulting
-derived work is distributed under the terms of a permission notice identical to
-this one.
+Permission to use, copy and distribute this documentation without modification,
+for any purpose and without fee or royalty is hereby granted, provided that
+both the above copyright notice and this permission notice appears in all
+copies and that the name of `OpenSS7 Corporation' not be used in advertising or
+publicity pertaining to distribution of this documentation or its contents
+without specific, written prior permission.  `OpenSS7 Corporation' makes no
+representation about the suitability of this documentation for any purpose.  It
+is provided "as is" without express or implied warranty.
 
-Permission is granted to copy and distribute translations of this manual into
-another language, under the above conditions for modified versions.
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION
+INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE DOCUMENT ARE
+SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT
+INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL
+OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE
+PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 
 
 Indirect:
-stratm.info-1: 1227
-stratm.info-2: 272061
+stratm.info-1: 2483
+stratm.info-2: 285192
 
 Tag Table:
 (Indirect)
-Node: Top1227
-Node: Preface4788
-Node: Notice5267
-Ref: Notice-Footnote-15858
-Node: Abstract5903
-Node: Revisions7932
-Ref: Revisions-Footnote-18896
-Node: Disclaimer8967
-Node: Acknowledgements11298
-Node: Sponsors11693
-Node: Contributors12424
-Node: Authors12910
-Node: Maintainer13242
-Node: Web Resources13648
-Node: Quick Start Guide19497
-Ref: Quick Start Guide-Footnote-132581
-Ref: Quick Start Guide-Footnote-232645
-Ref: Quick Start Guide-Footnote-332860
-Ref: Quick Start Guide-Footnote-432956
-Ref: Quick Start Guide-Footnote-533055
-Node: Introduction33202
-Node: Overview33569
-Ref: Overview-Footnote-134062
-Node: Organization34107
-Node: Conventions34695
-Node: Objective34894
-Node: Reference35007
-Node: Files35363
-Ref: Files-Footnote-141551
-Ref: Files-Footnote-241660
-Ref: Files-Footnote-341769
-Ref: Files-Footnote-441827
-Ref: Files-Footnote-541922
-Node: Drivers42039
-Node: Modules42318
-Node: Libraries43308
-Node: Utilities43597
-Node: Development46076
-Node: Development Header Files::46641
-Node: Static and Shared Libraries48450
-Ref: Static and Shared Libraries-Footnote-149255
-Node: Kernel Module Development49343
-Ref: Kernel Module Development-Footnote-150765
-Node: Manual Pages50881
-Node: Conformance51583
-Node: NPI Interface Conformance52329
-Node: TPI Interface Conformance53007
-Node: XTI Interface Conformance53722
-Node: IETF Conformance54508
-Node: Releases54649
-Ref: Releases-Footnote-155746
-Ref: Releases-Footnote-255821
-Ref: Releases-Footnote-355896
-Node: Prerequisites55971
-Ref: Prerequisites-Footnote-158535
-Ref: Prerequisites-Footnote-258599
-Ref: Prerequisites-Footnote-358814
-Ref: Prerequisites-Footnote-458910
-Node: Compatibility59009
-Node: GNU/Linux Distributions59487
-Ref: GNU/Linux Distributions-Footnote-162019
-Node: Linux Kernel62195
-Ref: Linux Kernel-Footnote-164400
-Node: Linux Architectures64594
-Node: Linux STREAMS65347
-Ref: Linux STREAMS-Footnote-166026
-Node: Linux Fast-STREAMS66101
-Node: Release Notes66526
-Node: Release stratm-stratm-0.9.2.1.2009040566861
-Node: Release stratm-0.9.2.170284
-Node: Maturity71653
-Node: Pre-Alpha Releases72275
-Node: Alpha Releases72869
-Node: Beta Releases73644
-Node: Gamma Releases74535
-Node: Production Releases75454
-Node: Unstable Releases76344
-Node: Bugs77293
-Node: Defect Notices77563
-Ref: Defect Notices-Footnote-178688
-Node: Known Defects78806
-Node: Historical Defects79199
-Node: Schedule79815
-Node: History82818
-Node: Installation83032
-Node: Repositories83491
-Node: Repositories for YUM85388
-Node: Repositories for APT89098
-Node: Downloading89279
-Node: Downloading with YUM91151
-Node: Downloading with APT95746
-Node: Downloading the Binary RPM96036
-Ref: Downloading the Binary RPM-Footnote-1104201
-Ref: Downloading the Binary RPM-Footnote-2104636
-Ref: Downloading the Binary RPM-Footnote-3104785
-Ref: Downloading the Binary RPM-Footnote-4104914
-Ref: Downloading the Binary RPM-Footnote-5105210
-Ref: Downloading the Binary RPM-Footnote-6105379
-Ref: Downloading the Binary RPM-Footnote-7105635
-Ref: Downloading the Binary RPM-Footnote-8105704
-Ref: Downloading the Binary RPM-Footnote-9105773
-Ref: Downloading the Binary RPM-Footnote-10105842
-Ref: Downloading the Binary RPM-Footnote-11105980
-Ref: Downloading the Binary RPM-Footnote-12106050
-Ref: Downloading the Binary RPM-Footnote-13106192
-Node: Downloading the Debian DEB106262
-Ref: Downloading the Debian DEB-Footnote-1114310
-Ref: Downloading the Debian DEB-Footnote-2114507
-Ref: Downloading the Debian DEB-Footnote-3114656
-Ref: Downloading the Debian DEB-Footnote-4114785
-Ref: Downloading the Debian DEB-Footnote-5115081
-Ref: Downloading the Debian DEB-Footnote-6115250
-Ref: Downloading the Debian DEB-Footnote-7115506
-Ref: Downloading the Debian DEB-Footnote-8115575
-Ref: Downloading the Debian DEB-Footnote-9115644
-Ref: Downloading the Debian DEB-Footnote-10115713
-Ref: Downloading the Debian DEB-Footnote-11115851
-Ref: Downloading the Debian DEB-Footnote-12115921
-Ref: Downloading the Debian DEB-Footnote-13116063
-Node: Downloading the Source RPM116133
-Node: Downloading the Debian DSC116837
-Node: Downloading the Tar Ball117562
-Node: Downloading from CVS119267
-Ref: Downloading from CVS-Footnote-1125635
-Ref: Downloading from CVS-Footnote-2125791
-Ref: Downloading from CVS-Footnote-3125910
-Node: Configuration126265
-Node: Configuring the Binary RPM126691
-Ref: Configuring the Binary RPM-Footnote-1129829
-Ref: Configuring the Binary RPM-Footnote-2129898
-Node: Configuring the Debian DEB130051
-Node: Configuring the Source RPM130417
-Ref: Configuring the Source RPM-Footnote-1139042
-Node: Configuring the Debian DSC139311
-Node: Configuring the Tar Ball139893
-Node: Configure Options140393
-Ref: Configure Options-Footnote-1159772
-Node: Environment Variables160065
-Node: Building168732
-Node: Building from the Source RPM169034
-Ref: Building from the Source RPM-Footnote-1170345
-Node: Building from the Debian DSC170414
-Ref: Building from the Debian DSC-Footnote-1171971
-Node: Building from the Tar Ball172040
-Ref: Building from the Tar Ball-Footnote-1173599
-Node: Installing173758
-Node: Installing the Binary RPM174048
-Node: Installing the Debian DEB175361
-Node: Installing the Tar Ball176042
-Node: Removing176797
-Node: Removing the Binary RPM177191
-Node: Removing the Debian DEB177639
-Node: Removing the Source RPM178121
-Node: Removing the Debian DSC178632
-Node: Removing the Tar Ball179259
-Node: Loading180076
-Ref: Loading-Footnote-1182578
-Node: Maintenance182647
-Node: Makefile Targets182787
-Node: User Targets183532
-Ref: User Targets-Footnote-1189201
-Ref: User Targets-Footnote-2189420
-Ref: User Targets-Footnote-3189620
-Node: Maintainer Targets189675
-Node: Clean Targets191265
-Ref: Clean Targets-Footnote-1193967
-Node: Manual Page Targets194121
-Node: Release Targets195330
-Node: Logging Targets197438
-Ref: Logging Targets-Footnote-1200512
-Node: Problem Report Targets200801
-Node: Release Archive Targets202410
-Node: RPM Build Targets204767
-Node: Debian Build Targets207806
-Node: Documentation Targets209803
-Node: Troubleshooting210491
-Node: Test Suites210782
-Node: Pre-installation Checks211042
-Ref: testsuite:ex0212407
-Ref: testsuite:ex1213281
-Ref: testsuite:ex2214118
-Ref: Pre-installation Checks-Footnote-1221266
-Node: Post-installation Checks221370
-Node: Running Test Suites222249
-Ref: testsuite:ex3223108
-Ref: testsuite:ex4224319
-Node: Problem Reports224684
-Node: Problem Report Guidelines224968
-Node: Generating Problem Reports227569
-Ref: autopr:ex0228901
-Ref: Generating Problem Reports-Footnote-1230108
-Node: Automatic Problem Reports230199
-Ref: autopr:ex1230932
-Node: Stand Alone Problem Reports232335
-Ref: autopr:ex2233011
-Node: Known Problems234449
-Node: Licenses234968
-Node: GNU Affero General Public License235296
-Node: GNU General Public License272061
-Node: GNU Lesser General Public License309441
-Node: GNU Free Documentation License318011
-Node: Indices342998
-Node: Concept Index343520
-Node: Type Index357787
-Node: Function Index357949
-Node: Variable Index358132
-Node: File Index361644
-Node: Option Index362228
-Node: Makefile Target Index367280
-Node: Author Index372000
-Node: Manual Page Index372252
+Node: Top2483
+Node: Preface6044
+Node: Notice6511
+Ref: Notice-Footnote-17148
+Node: Abstract7193
+Node: Revision History8983
+Ref: Revision History-Footnote-110956
+Node: Disclaimer11033
+Node: Acknowledgements12920
+Node: Sponsors13584
+Node: Contributors14602
+Node: Supporters15435
+Node: Telecommunications15812
+Node: Aerospace and Military20004
+Ref: Aerospace and Military-Footnote-121139
+Ref: Aerospace and Military-Footnote-221240
+Ref: Aerospace and Military-Footnote-321288
+Node: Financial21362
+Node: Education22760
+Ref: Education-Footnote-123311
+Ref: Education-Footnote-223366
+Node: Agencies23424
+Node: Authors24764
+Node: Maintainer25096
+Node: Web Resources25502
+Node: Quick Start Guide31351
+Ref: Quick Start Guide-Footnote-145456
+Ref: Quick Start Guide-Footnote-245520
+Ref: Quick Start Guide-Footnote-345735
+Ref: Quick Start Guide-Footnote-445831
+Ref: Quick Start Guide-Footnote-545930
+Node: Introduction46077
+Node: Overview46444
+Ref: Overview-Footnote-146937
+Node: Organization46982
+Node: Conventions47570
+Node: Objective47769
+Node: Reference47882
+Node: Files48238
+Ref: Files-Footnote-154426
+Ref: Files-Footnote-254535
+Ref: Files-Footnote-354644
+Ref: Files-Footnote-454702
+Ref: Files-Footnote-554797
+Node: Drivers54914
+Node: Modules55193
+Node: Libraries56183
+Node: Utilities56472
+Node: Development58960
+Node: Development Header Files::59525
+Node: Static and Shared Libraries61334
+Ref: Static and Shared Libraries-Footnote-162139
+Node: Kernel Module Development62236
+Ref: Kernel Module Development-Footnote-163658
+Node: Manual Pages63774
+Node: Conformance64476
+Node: NPI Interface Conformance65222
+Node: TPI Interface Conformance65900
+Node: XTI Interface Conformance66615
+Node: IETF Conformance67401
+Node: Releases67542
+Ref: Releases-Footnote-168639
+Ref: Releases-Footnote-268714
+Ref: Releases-Footnote-368789
+Node: Prerequisites68864
+Ref: Prerequisites-Footnote-171612
+Ref: Prerequisites-Footnote-271676
+Ref: Prerequisites-Footnote-371891
+Ref: Prerequisites-Footnote-471987
+Node: Compatibility72086
+Node: GNU/Linux Distributions72564
+Ref: GNU/Linux Distributions-Footnote-175096
+Node: Linux Kernel75272
+Ref: Linux Kernel-Footnote-177477
+Node: Linux Architectures77671
+Node: Linux STREAMS78424
+Ref: Linux STREAMS-Footnote-179112
+Node: Linux Fast-STREAMS79187
+Node: Release Notes79621
+Node: Release stratm-stratm-0.9.2.1.2009040579956
+Node: Release stratm-0.9.2.183388
+Node: Maturity84757
+Node: Pre-Alpha Releases85379
+Node: Alpha Releases85973
+Node: Beta Releases86748
+Node: Gamma Releases87639
+Node: Production Releases88558
+Node: Unstable Releases89448
+Node: Bugs90397
+Node: Defect Notices90667
+Ref: Defect Notices-Footnote-191792
+Node: Known Defects91910
+Node: Historical Defects92303
+Node: Schedule92919
+Node: History95922
+Node: Installation96136
+Node: Repositories96595
+Node: Repositories for YUM98501
+Node: Repositories for APT102211
+Node: Downloading102392
+Node: Downloading with YUM104273
+Node: Downloading with APT108868
+Node: Downloading the Binary RPM109158
+Ref: Downloading the Binary RPM-Footnote-1117323
+Ref: Downloading the Binary RPM-Footnote-2117758
+Ref: Downloading the Binary RPM-Footnote-3117907
+Ref: Downloading the Binary RPM-Footnote-4118036
+Ref: Downloading the Binary RPM-Footnote-5118332
+Ref: Downloading the Binary RPM-Footnote-6118501
+Ref: Downloading the Binary RPM-Footnote-7118757
+Ref: Downloading the Binary RPM-Footnote-8118826
+Ref: Downloading the Binary RPM-Footnote-9118895
+Ref: Downloading the Binary RPM-Footnote-10118964
+Ref: Downloading the Binary RPM-Footnote-11119102
+Ref: Downloading the Binary RPM-Footnote-12119172
+Ref: Downloading the Binary RPM-Footnote-13119314
+Node: Downloading the Debian DEB119384
+Ref: Downloading the Debian DEB-Footnote-1127432
+Ref: Downloading the Debian DEB-Footnote-2127629
+Ref: Downloading the Debian DEB-Footnote-3127778
+Ref: Downloading the Debian DEB-Footnote-4127907
+Ref: Downloading the Debian DEB-Footnote-5128203
+Ref: Downloading the Debian DEB-Footnote-6128372
+Ref: Downloading the Debian DEB-Footnote-7128628
+Ref: Downloading the Debian DEB-Footnote-8128697
+Ref: Downloading the Debian DEB-Footnote-9128766
+Ref: Downloading the Debian DEB-Footnote-10128835
+Ref: Downloading the Debian DEB-Footnote-11128973
+Ref: Downloading the Debian DEB-Footnote-12129043
+Ref: Downloading the Debian DEB-Footnote-13129185
+Node: Downloading the Source RPM129255
+Node: Downloading the Debian DSC129959
+Node: Downloading the Tar Ball130684
+Node: Downloading from CVS132389
+Ref: Downloading from CVS-Footnote-1138757
+Ref: Downloading from CVS-Footnote-2138913
+Ref: Downloading from CVS-Footnote-3139032
+Node: Configuration139387
+Node: Configuring the Binary RPM139813
+Ref: Configuring the Binary RPM-Footnote-1142951
+Ref: Configuring the Binary RPM-Footnote-2143020
+Node: Configuring the Debian DEB143173
+Node: Configuring the Source RPM143539
+Ref: Configuring the Source RPM-Footnote-1152164
+Node: Configuring the Debian DSC152433
+Node: Configuring the Tar Ball153015
+Node: Configure Options153515
+Ref: Configure Options-Footnote-1172903
+Node: Environment Variables173196
+Node: Building181863
+Node: Building from the Source RPM182165
+Ref: Building from the Source RPM-Footnote-1183476
+Node: Building from the Debian DSC183545
+Ref: Building from the Debian DSC-Footnote-1185102
+Node: Building from the Tar Ball185171
+Ref: Building from the Tar Ball-Footnote-1186730
+Node: Installing186889
+Node: Installing the Binary RPM187179
+Node: Installing the Debian DEB188492
+Node: Installing the Tar Ball189173
+Node: Removing189928
+Node: Removing the Binary RPM190322
+Node: Removing the Debian DEB190770
+Node: Removing the Source RPM191252
+Node: Removing the Debian DSC191763
+Node: Removing the Tar Ball192390
+Node: Loading193207
+Ref: Loading-Footnote-1195709
+Node: Maintenance195778
+Node: Makefile Targets195918
+Node: User Targets196663
+Ref: User Targets-Footnote-1202332
+Ref: User Targets-Footnote-2202551
+Ref: User Targets-Footnote-3202751
+Node: Maintainer Targets202806
+Node: Clean Targets204396
+Ref: Clean Targets-Footnote-1207098
+Node: Manual Page Targets207252
+Node: Release Targets208461
+Node: Logging Targets210569
+Ref: Logging Targets-Footnote-1213643
+Node: Problem Report Targets213932
+Node: Release Archive Targets215541
+Node: RPM Build Targets217898
+Node: Debian Build Targets220937
+Node: Documentation Targets222934
+Node: Troubleshooting223622
+Node: Test Suites223913
+Node: Pre-installation Checks224173
+Ref: testsuite:ex0225538
+Ref: testsuite:ex1226412
+Ref: testsuite:ex2227249
+Ref: Pre-installation Checks-Footnote-1234397
+Node: Post-installation Checks234501
+Node: Running Test Suites235380
+Ref: testsuite:ex3236239
+Ref: testsuite:ex4237450
+Node: Problem Reports237815
+Node: Problem Report Guidelines238099
+Node: Generating Problem Reports240700
+Ref: autopr:ex0242032
+Ref: Generating Problem Reports-Footnote-1243239
+Node: Automatic Problem Reports243330
+Ref: autopr:ex1244063
+Node: Stand Alone Problem Reports245466
+Ref: autopr:ex2246142
+Node: Known Problems247580
+Node: Licenses248099
+Node: GNU Affero General Public License248427
+Node: GNU General Public License285192
+Node: GNU Lesser General Public License322572
+Node: GNU Free Documentation License331142
+Node: Indices356129
+Node: Concept Index356651
+Node: Type Index371080
+Node: Function Index371242
+Node: Variable Index371425
+Node: File Index374937
+Node: Option Index375521
+Node: Makefile Target Index380573
+Node: Author Index385293
+Node: Manual Page Index385545
 
 End Tag Table
