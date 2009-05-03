@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: draft-bidulock-tsvwg-xos-00.me,v 0.9.2.3 2008-07-01 12:31:04 brian Exp $
+.\" @(#) $Id: draft-bidulock-tsvwg-xos-00.me,v 0.9.2.4 2009-05-03 10:54:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,11 +52,14 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 12:31:04 $ by $Author: brian $
+.\" Last Modified $Date: 2009-05-03 10:54:39 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: draft-bidulock-tsvwg-xos-00.me,v $
+.\" Revision 0.9.2.4  2009-05-03 10:54:39  brian
+.\" - documentation updates
+.\"
 .\" Revision 0.9.2.3  2008-07-01 12:31:04  brian
 .\" - updated man pages, drafts, specs, header files
 .\"
@@ -68,9 +71,9 @@
 .\"
 .\" =========================================================================
 .ds version Version\ 0.0
-.ds year 2008
-.ds date June\ 18,\ 2008
-.ds expiry December\ 2008
+.ds year 2009
+.ds date May\ 1,\ 2009
+.ds expiry November\ 2009
 .nr levels 0
 .so ../draft4.me
 .bp
@@ -570,9 +573,9 @@ for more information on port number.
 .pp
 The SCTP association \fB\)MUST\fP be created before the virtual circuit can be
 established.  The SCTP association \fB\)MAY\fP be maintained after the last
-virtual circuit associated with the SCTP association has been cleared or make
-be released in accordance with X.25 and ISO 8208 data link procedures.  Note
-that the SCTP association corresponds to the LAPB
+virtual circuit associated with the SCTP association has been cleared or \fB\)MAY\fP be released in
+accordance with X.25 and ISO 8208 data link procedures.  Note that the SCTP association corresponds
+to the LAPB
 .[
 iso 3309
 .]
@@ -605,12 +608,12 @@ multiple quasi-independent streams of sequenced data records and can negotiate
 the number of outbound streams (between 1 and 65536) during association
 establishment.  In general, streams in SCTP are used to establish an ordered
 relationship between packets (all packets transmitted on the same stream with
-sequenced delivery will be delivered in order), an the stream id is not
-intended to be used to identifying virtual circuits of any kind.  For example,
-there is no requirement on SCTP peers to negotiation the same number of
-inbound streams as the number of outbound streams; and, there is no
-requirement to deliver the stream id as part of the information associated
-with received data.
+sequenced delivery will be delivered in order), and the stream identifier is
+not intended to be used to identifying virtual circuits of any kind.  For
+example, there is no requirement on SCTP peers to negotiation the same number
+of inbound streams as the number of outbound streams; and, there is no
+requirement to deliver the stream identifier as part of the information
+associated with received data.
 .pp
 Therefore, the mapping between LCI and SCTP stream number is not an identity
 relationship (for all but LCI zero (0)).  Once a virtual circuit is assigned
@@ -1712,6 +1715,9 @@ finalized for publication as an RFC.
 .nf
 \fC\s-3
 $Log: draft-bidulock-tsvwg-xos-00.me,v $
+Revision 0.9.2.4  2009-05-03 10:54:39  brian
+- documentation updates
+
 Revision 0.9.2.3  2008-07-01 12:31:04  brian
 - updated man pages, drafts, specs, header files
 

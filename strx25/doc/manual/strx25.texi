@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: strx25.texi,v 0.9.2.7 2009-05-01 04:50:49 brian Exp $
+% @(#) $Id: strx25.texi,v 0.9.2.8 2009-05-03 10:54:45 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-05-01 04:50:49 $ by $Author: brian $
+% Last Modified $Date: 2009-05-03 10:54:45 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -341,6 +341,7 @@ Development
 * Static and Shared Libraries::	Libraries in the package
 * Kernel Module Development::	Kernel development with the package
 * Manual Pages::		Manual Pages in the package
+* Programming Manuals::         Programming Manuals in the package
 
 Conformance
 
@@ -498,6 +499,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: strx25.texi,v $
+Revision 0.9.2.8  2009-05-03 10:54:45  brian
+- documentation updates
+
 Revision 0.9.2.7  2009-05-01 04:50:49  brian
 - update documentation for release
 
@@ -738,6 +742,70 @@ This manual uses @cite{texinfo} typographic conventions.
 @chapter Objective
 @cindex objective
 
+@menu
+* Benefits::
+@end menu
+
+The @value{PACKAGE_TITLE} package is intended to provide compatibility with
+@cite{UNIX System V Release 4} networking components based on the Wide Area
+Network Interface (WAN), Link Layer Interface (LLI) and Network Layer Interface
+(NLI) in a single add-on package to @cite{Linux Fast-STREAMS}.  One purpose in
+achieving compatability is the porting of legacy applications from @cite{UNIX}
+to @cite{Linux} using the capabilities of @cite{STREAMS} and @cite{Linux
+Fast-STREAMS}.
+
+Another objective of providing these interfaces for Streams for @cite{Linux
+Fast-STREAMS} was to permit @manref{x25-plp(4)} Streams to be opened, linked
+under multiplexing drivers, and to have @cite{STREAMS} modules pushed over
+them.  The purpose was to provide access to the X.25 protocol suite to
+@cite{STREAMS} modules and drivers written for other packages under the
+@url{http://www.openss7.org/,OpenSS7 Project}, as well as to provide ISO
+capabilities for the @file{striso-@value{VERSION_STRISO}} package.
+
+The initial approach to implementing X.25 and Frame Relay drivers was to
+provide an in-kernel @cite{STREAMS} over socket approach.  Under this approach,
+the @cite{STREAMS} @manref{x25-plp(4)} driver converts between NLI primitives
+received from the Stream head and in-kernel calls to an internally opened
+socket of the appropriate type.  While this provided an adequate mechanism for
+providing Internet Protocol @cite{STREAMS} presenting the appropriate service
+interface, it is rather inefficient.
+
+The second approach that is available in this release is a complete
+@cite{STREAMS} implementation of the @manref{x25-plp(4)} and @manref{lapb(4)}
+drivers.  The ability to link these Streams underneath multiplexing drivers or
+pushed beneath modules for protocols such as @manref{cons(4)} is very
+beneficial.
+
+The result is stable, production grade, 64-bit clean TPI implementations of
+X.25 protocols for @cite{Linux Fast-STREAMS} that can be used by other
+@cite{STREAMS} modules and drivers.
+
+@node Benefits
+@section Benefits
+
+There are a number of benefits of the @cite{STREAMS} approach to X.25 for
+@cite{Linux}:
+
+@enumerate
+@item
+The X.25 (Packet Layer Protocol) PLP layer can be generalized.  This layer can
+be used over TCP to form the XOT protocol, and over SCTP to form the XOS
+protocol.
+@item
+Historical @cite{UNIX} applications written for branded @cite{UNIX} such as
+@cite{AIX}, @cite{HP-UX}, @cite{IRIX} and @cite{Solaris}, or for embedded
+systems such as @cite{PT}, @cite{Radisys} or @cite{SBE} can be ported to
+@cite{Linux} without modification.
+@item
+The International Organization for Standardization (ISO), IEEE and Open Group
+(POSIX) application programming interfaces may be used, such as XX25,
+increasing application portability.
+@item
+OSI CONS and CLNS modules can be used over the X.25 PLP driver to provide OSI
+CONS and CLNS services for X.25 and ISO 8208 OSI application such as Military,
+Aviation (CNS/ATM) and Financial applications.
+@end enumerate
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -923,10 +991,11 @@ programs and kernel space @dfn{STREAMS} modules and drivers based on the package
 follow describe these development facilities.
 
 @menu
-* Development Header Files::
-* Static and Shared Libraries::
-* Kernel Module Development::
-* Manual Pages::
+* Development Header Files::	Header Files in the package
+* Static and Shared Libraries::	Libraries in the package
+* Kernel Module Development::	Kernel development with the package
+* Manual Pages::		Manual Pages in the package
+* Programming Manuals::         Programming Manuals in the package
 @end menu
 
 @node Development Header Files::
@@ -947,9 +1016,107 @@ files from all add-on packages are required, the order of these directives would
 Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
 package in the directory @file{/usr/include/@value{PACKAGE}}:
 
-@table @file
+@table @header
+@item npi_x25.h
+NPI interface service primitive definitions for X.25.
+@item sx25.h
+NLI interface message primitive definitions.
+@item xnetdb.h
+X.25 networking database definitions.
+@item xti_xx25.h
+XTI interface service primitive definitions for X.25.
+@end table
 
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}/sys}:
 
+@table @header
+@item sys/npi_x25.h
+NPI interface service primitive definitions for X.25.
+@item sys/xti_xx25.h
+XTI interface service primitive definitions for X.25.
+@end table
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}/netx25}:
+
+@table @header
+@item netx25/ll_control.h
+LLI interface input-output control definitions.
+@item netx25/nli.h
+NLI interface message primitive definitions.
+@item netx25/x25_control.h
+X.25 PLP interface input-output control definitions.
+@item netx25/x25_proto.h
+X.25 PLP interface message primitive definitions.
+@item netx25/xnetdb.h
+X.25 networking database definitions.
+@end table
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}/snet}:
+
+@table @header
+@item snet/dl_control.h
+DLPI interface input-output control definitions.
+@item snet/dl_proto.h
+DLPI interface message primitive definitions.
+@item snet/ixe_control.h
+IP over X.25 Encapsulation (IXE) interface input-output control definitions.
+@item snet/ixe_proto.h
+IP over X.25 Encapsulation (IXE) interface message primitive definitions.
+@item snet/ll_control.h
+LLI interface input-output control definitions.
+@item snet/ll_proto.h
+LLI interface message primitive definitions.
+@item snet/mlp_control.h
+X.25 MLP interface input-output control definitions.
+@item snet/mlp_proto.h
+X.25 MLP interface message primitive definitions.
+@item snet/wan_control.h
+WAN interface input-output control definitions.
+@item snet/wan_proto.h
+WAN interface message primitive definitions.
+@item snet/x25_control.h
+X.25 PLP interface input-output control definitions.
+@item snet/x25_proto.h
+X.25 PLP interface message primitive definitions.
+@item snet/x32_control.h
+X.32 PAD interface input-output control definitions.
+@item snet/xxx_control.h
+@end table
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}/sys/snet}:
+
+@table @header
+@item sys/snet/dl_control.h
+DLPI interface input-output control definitions.
+@item sys/snet/dl_proto.h
+DLPI interface message primitive definitions.
+@item sys/snet/ixe_control.h
+IP over X.25 Encapsulation (IXE) interface input-output control definitions.
+@item sys/snet/ixe_proto.h
+IP over X.25 Encapsulation (IXE) interface message primitive definitions.
+@item sys/snet/ll_control.h
+LLI interface input-output control definitions.
+@item sys/snet/ll_proto.h
+LLI interface message primitive definitions.
+@item sys/snet/mlp_control.h
+X.25 MLP interface input-output control definitions.
+@item sys/snet/mlp_proto.h
+X.25 MLP interface message primitive definitions.
+@item sys/snet/wan_control.h
+WAN interface input-output control definitions.
+@item sys/snet/wan_proto.h
+WAN interface message primitive definitions.
+@item sys/snet/x25_control.h
+X.25 PLP interface input-output control definitions.
+@item sys/snet/x25_proto.h
+X.25 PLP interface message primitive definitions.
+@item sys/snet/x32_control.h
+X.32 PAD interface input-output control definitions.
+@item sys/snet/xxx_control.h
 @end table
 
 @subsection User Space Programs
@@ -970,6 +1137,7 @@ Aside from including this header files, the general procedures for compiling @df
 and drivers also apply to @dfn{STREAMS} modules and drivers written to the Transport Provider
 Interface.
 
+@page
 @node Static and Shared Libraries
 @section Libraries
 
@@ -998,6 +1166,7 @@ Link to the @file{/usr/lib/libxnet.a} static library.
 
 @end table
 
+@page
 @node Kernel Module Development
 @section Kernel Modules
 
@@ -1027,6 +1196,7 @@ output of @samp{uname -r}.}
 
 @end itemize
 
+@page
 @node Manual Pages
 @section Manual Pages
 
@@ -1040,15 +1210,272 @@ The following manual pages are installed in Section 3 of the manual (in the subd
 @file{/usr/share/man/man3}):
 
 @table @manref
-
-
+@item endpadent(3)
+@item endxhostent(3)
+@item equalx25(3)
+@item getnettype(3)
+@item getpadbyaddr(3)
+@item getpadent(3)
+@item getxhostbyaddr(3)
+@item getxhostbyname(3)
+@item getxhostent(3)
+@item libsx25(3)
+@item libx25(3)
+@item linkidtox25(3)
+@item padtos(3)
+@item setpadent(3)
+@item setxhostent(3)
+@item snidtox25(3)
+@item stox25(3)
+@item SX25(3)
+@item sx25(3)
+@item x25diags(3)
+@item x25_find_link_parameters(3)
+@item x25_read_config_parameters(3)
+@item x25_read_config_parameters_file(3)
+@item x25_save_link_parameters(3)
+@item x25_set_parse_error_function(3)
+@item x25tolinkid(3)
+@item x25tos(3)
+@item x25tosnid(3)
+@item x25_write_config_parameters(3)
+@item x25_write_config_parameters_file(3)
+@item xti_x25(3)
+@item XX25(3)
 @end table
+
+The following manual pages are installed in Section 4 of the manual (in the subdirectory
+@file{/usr/share/man/man4}):
+
+@table @manref
+@item cd-llc(4)
+@item cdpmod(4)
+@item cons(4)
+@item dlaix(4)
+@item dl-llc(4)
+@item hdlc(4)
+@item ifr(4)
+@item ipx25(4)
+@item ixe(4)
+@item lapb(4)
+@item llc2(4)
+@item lli(4)
+@item mfe(4)
+@item mlp(4)
+@item nli3(4)
+@item npi(4)
+@item plp(4)
+@item s_cdi(4)
+@item s_cons(4)
+@item s_dlpi(4)
+@item s_lli(4)
+@item s_nli3(4)
+@item s_npi(4)
+@item s_wan(4)
+@item s_xx25(4)
+@item wan(4)
+@item X25(4)
+@item x25_lapb(4)
+@item x25-lapb(4)
+@item x25_llc2(4)
+@item x25-llc2(4)
+@item x25-llc(4)
+@item x25_plp(4)
+@item x25-plp(4)
+@item xos(4)
+@item xot(4)
+@item xx25(4)
+@end table
+
+The following manual pages are installed in Section 5 of the manual (in the subdirectory
+@file{/usr/share/man/man5}):
+
+@table @manref
+@item extraformat(5)
+@item ifrdlciconf(5)
+@item ifrtemplate(5)
+@item lapbtemplate(5)
+@item llc2template(5)
+@item lsapformat(5)
+@item mfeprotoconf(5)
+@item mfetemplate(5)
+@item padent(5)
+@item qosformat(5)
+@item strx25(5)
+@item wanmapconf(5)
+@item wantemplate(5)
+@item x25conf(5)
+@item x25_primitives(5)
+@item x25template(5)
+@item xaddrf(5)
+@item xhostent(5)
+@end table
+
+The following manual pages are installed in Section 7 of the manual (in the subdirectory
+@file{/usr/share/man/man7}):
+
+@table @manref
+@item dlpi_lapb(7)
+@item dlpi_llc2(7)
+@item dlpi_x25(7)
+@item N_Abort(7)
+@item N_CC(7)
+@item N_CI(7)
+@item N_DAck(7)
+@item N_Data(7)
+@item N_DC(7)
+@item N_DI(7)
+@item N_EAck(7)
+@item N_EData(7)
+@item N_getlinkstats(7)
+@item N_getoneVCstats(7)
+@item N_getpvcmap(7)
+@item N_getstats(7)
+@item N_getVCstats(7)
+@item N_getVCstatus(7)
+@item NLI(7)
+@item nli(7)
+@item N_linkconfig(7)
+@item N_linkent(7)
+@item N_linkmode(7)
+@item N_linkread(7)
+@item N_nuidel(7)
+@item N_nuiget(7)
+@item N_nuimget(7)
+@item N_nuiput(7)
+@item N_nuireset(7)
+@item npi_x25(7)
+@item N_putpvcmap(7)
+@item N_PVC_ATTACH(7)
+@item N_PVC_DETACH(7)
+@item N_RC(7)
+@item N_RI(7)
+@item N_traceoff(7)
+@item N_traceon(7)
+@item N_X25_ADD_ROUTE(7)
+@item N_X25_FLUSH_ROUTE(7)
+@item N_X25_GET_NEXT_ROUTE(7)
+@item N_X25_GET_ROUTE(7)
+@item N_X25_RM_ROUTE(7)
+@item N_Xcanlis(7)
+@item N_Xelisten(7)
+@item N_Xlisten(7)
+@item N_zerostats(7)
+@item WAN(7)
+@item wan(7)
+@end table
+
+The following manual pages are installed in Section 8 of the manual (in the subdirectory
+@file{/usr/share/man/man8}):
+
+@table @manref
+@item ifrdlci(8)
+@item ifrstat(8)
+@item ifrtune(8)
+@item ixemap(8)
+@item ixetune(8)
+@item linkadd(8)
+@item linkdel(8)
+@item linklist(8)
+@item linkreset(8)
+@item linkstart(8)
+@item linkstate(8)
+@item linkstop(8)
+@item lltune(8)
+@item mfeproto(8)
+@item mfevc(8)
+@item mlptune(8)
+@item nuimap(8)
+@item pvcmap(8)
+@item strx25_mknod(8)
+@item vcstat(8)
+@item wanmap(8)
+@item wantune(8)
+@item x25diags(8)
+@item x25file(8)
+@item x25info(8)
+@item x25netd(8)
+@item x25route(8)
+@item x25stat(8)
+@item x25trace(8)
+@item x25tune(8)
+@item x32map(8)
+@end table
+
 
 To assist in the development of user programs and @cite{STREAMS} driver or modules using the
 @cite{@value{PACKAGE_TITLE}} protocol module, the following header files are provided:
 
 @table @header
 
+
+@end table
+
+@page
+@node Programming Manuals
+@section Programming Manuals
+
+A number of programming manuals and interface specifications are included in
+this and related sub-packages of the @cite{OpenSS7 Master Package} release.
+
+The manuals included in this sub-package are listed here:
+
+@table @cite
+
+@item Network Layer Interface (NLI) Specification
+
+This service primitive interface specification specifies a @cite{STREAMS}
+message and input-output control interface to drivers and modules implementing
+the X.25 and Frame Relay protocols.  This interface was originally specified by
+Spider Systems Limited (now part of a division of Emerson Power) and was
+documented with @cite{AIX}, @cite{HP-XU}, @cite{IRIX}, @cite{Solaris} and
+others.  These documents are available over the web from their various sources.
+
+This document specifies the @url{http://www.openss7.org/,OpenSS7 Project}'s
+view of the Version 3 @acronym{NLI} interface designed to be as compatible with all major
+implementations as possible.  (Note that the @acronym{NLI} is rather different
+from the standard @acronym{NPI} interface.)
+
+The latest copy is normally available on line in
+@uref{http://www.openss7.org/specs/nli.pdf,PDF format} or in simple
+@uref{http://www.openss7.org/specs/nli.html,HTML format}.
+
+@item Link Layer Interface (LLI) Specification
+
+This service primitive interface specification specifies a @cite{STREAMS} message
+and input-output control interface to drivers and modules implementing the X.25
+and Frame Relay protocols.  This interface was originally specified by Spider
+Systems, Ltd. and was documented with @cite{AIX}, @cite{HP-XU}, @cite{IRIX},
+@cite{Solaris} and others.  These documents are available over the web from
+their various sources.
+
+This document specifies the @url{http://www.openss7.org/,OpenSS7 Project}'s
+view of the @acronym{NLI} interface designed to be as compatible with all major
+implementations as possible.  (Note that the @acronym{LLI} is rather similar
+with regard to the message passing interface with the standard @acronym{DLPI};
+however, the input-output control interface is quite different.)
+
+The latest copy is normally available on line in
+@uref{http://www.openss7.org/specs/lli.pdf,PDF format} or in simple
+@uref{http://www.openss7.org/specs/lli.html,HTML format}.
+
+@item Wide Area Network Interface (WAN) Specification
+
+This service primitive interface specification specifies a @cite{STREAMS}
+message and input-output control interface to drivers and modules implementing
+the X.25 and Frame Relay protocols.  This interface was originally specified by
+Spider Systems, Ltd. and was documented with @cite{AIX}, @cite{HP-UX},
+@cite{IRIX} and @cite{Solaris} and others.  These documents are available over
+the web from their various sources.
+
+This document specifies the @url{http://www.openss7.org/,OpenSS7 Project}'s
+view of the @acronym{WAN} interface designed to be as compatible with all major
+implementations as possible.  (Note that the @acronym{WAN} is rather different
+from the more usual @acronym{CDI} interface.)
+
+The latest copy is normally available on line in
+@uref{http://www.openss7.org/specs/wan.pdf,PDF format} or in simple
+@uref{http://www.openss7.org/specs/wan.html,HTML format}.
 
 @end table
 
@@ -1066,46 +1493,133 @@ perform regression, target architecture validation and trouble shooting, (@pxref
 @pxrefman{Test Suites}).
 
 @menu
+* WAN Interface Conformance::	    Conformance to the WAN.
+* CDI Interface Conformance::	    Conformance to the CDI.
+* LLI Interface Conformance::	    Conformance to the LLI.
+* DLPI Interface Conformance::	    Conformance to the DLPI.
+* NLI Interface Conformance::	    Conformance to the NLI.
 * NPI Interface Conformance::	    Conformance to the NPI.
 * TPI Interface Conformance::	    Conformance to the TPI.
 * XTI Interface Conformance::	    Conformance to the XTI.
+* XX25 Interface Conformance::	    Conformance to the XX25.
 * IETF Conformance::		    Conformance to IETF
 @end menu
+
+@node WAN Interface Conformance
+@section WAN Interface Conformance
+@cindex WAN interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers and modules conform to the
+@cite{Wide Area Network} interface as released by various
+sources.@footnote{Such as the @cite{AIXLink/X.25}, @cite{HP-UX}, @cite{IRIX},
+@cite{Solaris}, @cite{PT}, @cite{Radisys} and @cite{SBE} documentation.}
+An @url{http://www.openss7.org/,OpenSS7 Project} document specifying the
+protocol is available as part of the @samp{strx25} package available on line in
+@uref{http://www.openss7.org/specs/wan.pdf, PDF format}, or also in simple
+@uref{http://www.openss7.org/specs/wan.html, HTML format}.
+
+@node CDI Interface Conformance
+@section CDI Interface Conformance
+@cindex CDI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Communications
+Device Interface (CDI) Revision 1.0.0} as release by @cite{NCR Compten}.  A
+copy of the original document is unavailable.  An
+@uref{http://www.openss7.org/OpenSS7 Project} document specifying the protocol
+is available as part of the @samp{strxns} package available on line in
+@uref{http://www.openss7.org/specs/cdi.pdf, PDF format}, or also in simple
+@uref{http://www.openss7.org/specs/cdi.html, HTML format}.
+
+@node LLI Interface Conformance
+@section LLI Interface Conformance
+@cindex LLI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers and modules conform to the
+@cite{Link Layer Interface} as released by various
+sources.@footnote{Such as the @cite{AIXLink/X.25}, @cite{HP-UX}, @cite{IRIX},
+@cite{Solaris}, @cite{PT}, @cite{Radisys} and @cite{SBE} documentation.}
+An @url{http://www.openss7.org/,OpenSS7 Project} document specifying the
+protocol is available as part of the @samp{strx25} package available on line in
+@uref{http://www.openss7.org/specs/lli.pdf, PDF format}, or also in simple
+@uref{http://www.openss7.org/specs/lli.html, HTML format}.
+
+@node DLPI Interface Conformance
+@section DLPI Interface Conformance
+@cindex DLPI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Data Link
+Provider Interface (DLPI) Revision 2.0.0} as released by @cite{UNIX
+International}.  A copy of the original document is available from
+@uref{http://www.openss7.org/docs/dlpi.pdf, The OpenSS7 Project Website}.  A
+reprint of the document specifying this version of the protocol is available as
+part of the @samp{strxns} package available on line in
+@uref{http://www.openss7.org/specs/dlpi.pdf, PDF format}, or also in simple
+@uref{http://www.openss7.org/specs/dlpi.html, HTML format}.
+
+@node NLI Interface Conformance
+@section NLI Interface Conformance
+@cindex NLI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers and modules conform to the
+@cite{Network Layer Interface Revision 3} as released by various
+sources.@footnote{Such as the @cite{AIXLink/X.25}, @cite{HP-UX}, @cite{IRIX},
+@cite{Solaris}, @cite{PT}, @cite{Radisys} and @cite{SBE} documentation.}
+An @url{http://www.openss7.org/,OpenSS7 Project} document specifying this
+version of the protocol is available as part of the @samp{strx25} package
+available on line in @uref{http://www.openss7.org/specs/nli.pdf, PDF format},
+or also in simple @uref{http://www.openss7.org/specs/nli.html, HTML format}.
 
 @node NPI Interface Conformance
 @section NPI Interface Conformance
 @cindex NPI interface conformance
 
-The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Network Provider Interface (NPI)
-Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
-available from @uref{http://www.openss7.org/docs/npi.pdf, The OpenSS7 Project Website}.
-A reprint of the document specifying this version of the protocol is available as part of the
-@samp{strxns} package available on line in @uref{http://www.openss7.org/specs/npi.pdf, PDF format},
-or also in simple @uref{http://www.openss7.org/specs/npi.html, HTML format}.
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Network Provider
+Interface (NPI) Revision 2.0.0} as released by @cite{UNIX International}.  A
+copy of the original document is available from
+@uref{http://www.openss7.org/docs/npi.pdf, The OpenSS7 Project Website}.  A
+reprint of the document specifying this version of the protocol is available as
+part of the @samp{strxns} package available on line in
+@uref{http://www.openss7.org/specs/npi.pdf, PDF format}, or also in simple
+@uref{http://www.openss7.org/specs/npi.html, HTML format}.
 
 @node TPI Interface Conformance
 @section TPI Interface Conformance
 @cindex TPI interface conformance
 
-The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Transport Provider Interface (TPI)
-Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
-available from @uref{http://www.openss7.org/docs/tpi.pdf, The OpenSS7 Project Website}.
-A reprint of the document specifying this version of the protocol is available as part of the
-@samp{strxnet} package available on line in @uref{http://www.openss7.org/specs/tpi.pdf, PDF format},
-or also in simple @uref{http://www.openss7.org/specs/tpi.html, HTML format}.
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Transport
+Provider Interface (TPI) Revision 2.0.0} as released by @cite{UNIX
+International}.  A copy of the original document is available from
+@uref{http://www.openss7.org/docs/tpi.pdf, The OpenSS7 Project Website}.  A
+reprint of the document specifying this version of the protocol is available as
+part of the @samp{strxnet} package available on line in
+@uref{http://www.openss7.org/specs/tpi.pdf, PDF format}, or also in simple
+@uref{http://www.openss7.org/specs/tpi.html, HTML format}.
 
 @node XTI Interface Conformance
 @section XTI Interface Conformance
 @cindex XTI interface conformance
 
-The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{X/Open Transport Interface/Transport
-Layer Interface (XTI/TLI) X/Open Networking Services (XNS) Revision 5.2} as released by @cite{The
-OpenGroup}.  A copy of the original document is available from @uref{http://www.opengroup.org/, The
-OpenGroup website}.
-Reprints of the document are not available from The OpenSS7 Project website due to copyright
-restrictions.  Similar information is available in the manual pages that accompany the
-@samp{strxnet} package.  These can be viewed on line starting at
-@uref{http://www.openss7.org/man2html?3+xti, XTI/TLI manpage}.
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{X/Open Transport
+Interface/Transport Layer Interface (XTI/TLI) X/Open Networking Services (XNS)
+Revision 5.2} as released by @cite{The OpenGroup}.  A copy of the original
+document is available from @uref{http://www.opengroup.org/, The OpenGroup
+website}.  Reprints of the document are not available from The OpenSS7 Project
+website due to copyright restrictions.  Similar information is available in the
+manual pages that accompany the @samp{strxnet} package.  These can be viewed on
+line starting at @uref{http://www.openss7.org/man2html?3+xti, XTI/TLI manpage}.
+
+@node XX25 Interface Conformance
+@section XX25 Interface Conformance
+@cindex XX25 interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers and modules conform to the
+@cite{X.25 Programming Interface using XTI (XX25)} as released by @cite{The
+OpenGroup}.  A copy of the original document is available from
+@uref{http://www.opengroup.org/, The OpenGroup website}.  Reprints of the
+document are not available from The OpenSS7 Project website due to copyright
+restrictions.  Similar information is available in the manual pages that
+accompany the @samp{strx25} package.  These can be viewed on line starting at
+@uref{http://www.openss7.org/man2html?3+xx25, XX25 manpage}.
 
 @node IETF Conformance
 @section IETF Conformance
